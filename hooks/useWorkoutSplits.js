@@ -1,39 +1,36 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from "react";
 import {
   fetchWorkoutSplitsByWorkoutId,
   addWorkoutSplit,
   updateWorkoutSplit,
   deleteWorkoutSplit,
-} from '../services/WorkoutSplitsService'; // ייבוא של הפונקציות
+} from "../services/WorkoutSplitsService";
 
 const useWorkoutSplits = (workoutId) => {
   const [workoutSplits, setWorkoutSplits] = useState([]);
   const [error, setError] = useState(null);
-  const [loading, setLoading] = useState(true); // מצב לבדוק אם הנתונים נטענים
+  const [loading, setLoading] = useState(true);
 
-  // פונקציה לשליפת workout splits לפי workout ID
   const fetchSplits = async (workoutId) => {
-    setLoading(true); // מתחילים לטעון
+    setLoading(true);
     try {
-        if (workoutId) { // ודא שה-workoutId קיים
-            const splits = await fetchWorkoutSplitsByWorkoutId(workoutId);
-            setWorkoutSplits(splits);
-        } else {
-            
-        }
+      if (workoutId) {
+        const splits = await fetchWorkoutSplitsByWorkoutId(workoutId);
+        setWorkoutSplits(splits);
+      } else {
+      }
     } catch (error) {
-        console.error("Error fetching splits:", error); // לוג שגיאות
-        setError(error.message);
+      console.error("Error fetching splits:", error);
+      setError(error.message);
     } finally {
-        setLoading(false); // מסיימים את הטעינה
+      setLoading(false);
     }
-};
+  };
 
   useEffect(() => {
     fetchSplits();
-  }, [workoutId]); // תלות ב-workoutId
+  }, [workoutId]);
 
-  // הוספת workout split
   const createWorkoutSplit = async (name, createdAt) => {
     setLoading(true);
     try {
@@ -46,7 +43,6 @@ const useWorkoutSplits = (workoutId) => {
     }
   };
 
-  // עדכון workout split
   const modifyWorkoutSplit = async (id, name, createdAt) => {
     setLoading(true);
     try {
@@ -61,7 +57,6 @@ const useWorkoutSplits = (workoutId) => {
     }
   };
 
-  // מחיקת workout split
   const removeWorkoutSplit = async (id) => {
     setLoading(true);
     try {
@@ -78,7 +73,7 @@ const useWorkoutSplits = (workoutId) => {
     workoutSplits,
     error,
     loading,
-    fetchSplits, // ייצוא הפונקציה
+    fetchSplits,
     createWorkoutSplit,
     modifyWorkoutSplit,
     removeWorkoutSplit,

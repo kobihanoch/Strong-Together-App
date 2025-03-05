@@ -24,12 +24,15 @@ const { width, height } = Dimensions.get("window");
 const Home = ({ navigation }) => {
   const { user, logout } = useAuth();
   const [username, setUsername] = useState(null);
+  const [userId, setUserId] = useState(null);
 
   const {
     trackingData: exerciseTrackingData,
+    mostFrequentSplit,
     loading,
     error,
-  } = useExerciseTracking(user?.id);
+  } = useExerciseTracking(userId ?? null);
+
   const uniqueDates = new Set();
 
   exerciseTrackingData.forEach((item) => {
@@ -43,6 +46,7 @@ const Home = ({ navigation }) => {
   useEffect(() => {
     if (user) {
       setUsername(user.username);
+      setUserId(user.id);
     }
   }, [user]);
 
@@ -74,105 +78,141 @@ const Home = ({ navigation }) => {
       </View>
 
       <View style={styles.midContainer}>
-        <View
-          style={{ flex: 0.6, justifyContent: "center", alignItems: "center" }}
-        >
+        <View style={{ flex: 2 }}>
           <View style={styles.workoutsContainer}>
             <Text
               style={{
                 fontFamily: "PoppinsRegular",
-                color: "#8ca7d1",
-                fontSize: RFValue(12),
-                opacity: 0.5,
+                color: "#7d9bbd",
+                fontSize: RFValue(13),
               }}
             >
-              Workouts made
+              Your workout count is
             </Text>
+            <View
+              style={{
+                borderRadius: width * 0.8,
+                borderColor: "#FACC15",
+                borderWidth: 3,
+                borderStyle: "solid",
+                height: height * 0.05,
+                width: height * 0.05,
+                justifyContent: "center",
+                alignItems: "center",
+                shadowColor: "#FACC15",
+                shadowOffset: { width: 0, height: 2 },
+                shadowOpacity: 0.8,
+                shadowRadius: 4,
+                elevation: 4,
+              }}
+            >
+              <Text
+                style={{
+                  fontFamily: "PoppinsBold",
+                  color: "#FACC15",
+                  fontSize: RFValue(18),
+                  alignSelf: "center",
+                }}
+              >
+                {totalWorkoutsNumber}
+              </Text>
+            </View>
+          </View>
+        </View>
+        <View
+          style={{
+            flex: 3,
+            display: "flex",
+            flexDirection: "row",
+            gap: width * 0.02,
+            width: "90%",
+          }}
+        >
+          <View
+            style={{
+              flex: 5,
+              width: "100%",
+              backgroundColor: "#0d2540",
+              borderRadius: height * 0.02,
+              flexDirection: "column",
+              justifyContent: "center",
+              shadowColor: "#000",
+              shadowOffset: { width: 0, height: 2 },
+              shadowOpacity: 0.1,
+              shadowRadius: 8,
+              elevation: 4,
+              gap: height * 0.02,
+            }}
+          >
             <Text
               style={{
                 fontFamily: "PoppinsBold",
-                color: "#FACC15",
-                fontSize: RFValue(20),
-                alignSelf: "center",
-                textShadowColor: "#FACC15",
-                textShadowOffset: { width: 0, height: 0 },
-                textShadowRadius: 5,
+                color: "white",
+                marginHorizontal: width * 0.05,
+                fontSize: RFValue(32),
               }}
             >
-              {totalWorkoutsNumber}
+              {mostFrequentSplit}
             </Text>
             <Text
               style={{
-                fontFamily: "PoppinsRegular",
-                color: "#8ca7d1",
-                fontSize: RFValue(12),
-                alignSelf: "center",
+                fontFamily: "PoppinsLight",
+                color: "#7d9bbd",
+                opacity: 0.9,
+                marginHorizontal: width * 0.05,
               }}
             >
-              Keep it up !
+              Most common workout
+            </Text>
+          </View>
+          <View
+            style={{
+              flex: 5,
+              backgroundColor: "#0d2540",
+              borderRadius: height * 0.02,
+              flexDirection: "column",
+              justifyContent: "space-between",
+              shadowColor: "#000",
+              shadowOffset: { width: 0, height: 2 },
+              shadowOpacity: 0.1,
+              shadowRadius: 8,
+              elevation: 4,
+            }}
+          >
+            <Text
+              style={{
+                fontFamily: "PoppinsBold",
+                color: "white",
+                padding: height * 0.02,
+              }}
+            >
+              Schedule workout
             </Text>
           </View>
         </View>
-
-        <View
-          style={{
-            flex: 0.4,
-            backgroundColor: "transparent",
-            justifyContent: "center",
-            alignItems: "center",
-          }}
-        >
-          <Text>asd</Text>
-        </View>
-      </View>
-
-      <View style={styles.bottomContainer}>
-        <View
-          style={{
-            flex: 0.3,
-            justifyContent: "center",
-            alignItems: "center",
-            width: "80%",
-          }}
-        >
-          <GoToButton>
-            <Text
-              style={{
-                fontFamily: "PoppinsRegular",
-                fontSize: RFValue(14),
-                color: "black",
-              }}
-            >
-              Button 1
-            </Text>
-          </GoToButton>
+        <View style={{ flex: 3, flexDirection: "row" }}>
+          <View
+            style={{
+              width: "90%",
+              display: "flex",
+              backgroundColor: "#0d2540",
+              borderRadius: height * 0.02,
+              shadowColor: "#000",
+              shadowOffset: { width: 0, height: 2 },
+              shadowOpacity: 0.1,
+              shadowRadius: 8,
+              elevation: 4,
+            }}
+          >
+            <Text>View</Text>
+          </View>
         </View>
         <View
           style={{
-            flex: 0.3,
+            flex: 2,
             justifyContent: "center",
             alignItems: "center",
-            width: "80%",
-          }}
-        >
-          <GoToButton>
-            <Text
-              style={{
-                fontFamily: "PoppinsRegular",
-                fontSize: RFValue(14),
-                color: "black",
-              }}
-            >
-              Create/Change workout
-            </Text>
-          </GoToButton>
-        </View>
-        <View
-          style={{
-            flex: 0.3,
-            justifyContent: "center",
-            alignItems: "center",
-            width: "80%",
+            width: "90%",
           }}
         >
           <GoToButton onPress={handleLogout}>
@@ -188,6 +228,8 @@ const Home = ({ navigation }) => {
           </GoToButton>
         </View>
       </View>
+
+      <View style={styles.bottomContainer}></View>
     </View>
   );
 };
@@ -209,24 +251,25 @@ const styles = StyleSheet.create({
   },
 
   midContainer: {
-    flex: 0.4,
-    flexDirection: "row",
-    justifyContent: "space-around",
+    flex: 1,
+    flexDirection: "column",
+    justifyContent: "flex-start",
     alignItems: "center",
+    gap: height * 0.005,
   },
   workoutsContainer: {
-    backgroundColor: "#00142a",
-    height: "80%",
+    backgroundColor: "#0d2540",
+    height: "100%",
     width: "90%",
-    flexDirection: "column",
+    flexDirection: "row",
+    alignItems: "center",
     justifyContent: "space-between",
-    borderRadius: height * 0.04,
-    paddingHorizontal: width * 0.05,
-    paddingVertical: height * 0.03,
+    borderRadius: height * 0.02,
+    paddingHorizontal: width * 0.08,
   },
 
   bottomContainer: {
-    flex: 0.42,
+    flex: 0,
     flexDirection: "column",
     justifyContent: "space-around",
     alignItems: "center",
