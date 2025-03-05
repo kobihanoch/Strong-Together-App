@@ -22,7 +22,6 @@ import GoToButton from "../components/HomeComponents/GoToButton";
 const { width, height } = Dimensions.get("window");
 
 const Home = ({ navigation }) => {
-  const temp = 0;
   const { user, logout } = useAuth();
   const [username, setUsername] = useState(null);
 
