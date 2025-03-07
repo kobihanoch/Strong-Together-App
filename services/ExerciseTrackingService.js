@@ -55,25 +55,27 @@ export const getMostFrequentSplitNameByUserId = async (userId) => {
 
     const frequencyMap = {};
 
-    data.forEach(({ workoutsplit_id, splitname, workoutdate }) => {
+    data.forEach(({ workoutsplit_id, splitname }) => {
       if (!frequencyMap[workoutsplit_id]) {
         frequencyMap[workoutsplit_id] = { count: 0, splitname };
       }
       frequencyMap[workoutsplit_id].count += 1;
     });
 
-    let mostFrequentSplitName = null;
+    let mostFrequentSplit = { workoutsplit_id: null, splitname: null };
     let maxCount = 0;
 
-    Object.values(frequencyMap).forEach(({ count, splitname }) => {
-      if (count > maxCount) {
-        maxCount = count;
-        mostFrequentSplitName = splitname;
+    Object.entries(frequencyMap).forEach(
+      ([workoutsplit_id, { count, splitname }]) => {
+        if (count > maxCount) {
+          maxCount = count;
+          mostFrequentSplit = { workoutsplit_id, splitname };
+        }
       }
-    });
+    );
 
-    //console.log("Most frequent split for user:", mostFrequentSplitName);
-    return mostFrequentSplitName;
+    // console.log("Most frequent split for user:", mostFrequentSplit);
+    return mostFrequentSplit;
   } catch (error) {
     console.error("Error fetching most frequent split name:", error.message);
     throw error;

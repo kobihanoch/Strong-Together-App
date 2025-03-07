@@ -4,6 +4,7 @@ import {
   addWorkoutSplit,
   updateWorkoutSplit,
   deleteWorkoutSplit,
+  fetchWorkoutSplitById,
 } from "../services/WorkoutSplitsService";
 
 const useWorkoutSplits = (workoutId) => {
@@ -17,7 +18,6 @@ const useWorkoutSplits = (workoutId) => {
       if (workoutId) {
         const splits = await fetchWorkoutSplitsByWorkoutId(workoutId);
         setWorkoutSplits(splits);
-      } else {
       }
     } catch (error) {
       console.error("Error fetching splits:", error);
@@ -27,8 +27,22 @@ const useWorkoutSplits = (workoutId) => {
     }
   };
 
+  // Get workout split by workout split id
+  const fetchWorkoutSplit = async (id) => {
+    setLoading(true);
+    try {
+      const split = await fetchWorkoutSplitById(id);
+      return split;
+    } catch (error) {
+      console.error("Error fetching workout split:", error);
+      setError(error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    fetchSplits();
+    fetchSplits(workoutId);
   }, [workoutId]);
 
   const createWorkoutSplit = async (name, createdAt) => {
@@ -74,6 +88,7 @@ const useWorkoutSplits = (workoutId) => {
     error,
     loading,
     fetchSplits,
+    fetchWorkoutSplit,
     createWorkoutSplit,
     modifyWorkoutSplit,
     removeWorkoutSplit,

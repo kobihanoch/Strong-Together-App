@@ -8,16 +8,19 @@ import {
   Image,
 } from "react-native";
 import Layout from "../components/Layout";
-import { useAuth } from "../context/AuthContext"; // גישה לקונטקסט
+import useWorkoutSplits from "../hooks/useWorkoutSplits";
+import { useAuth } from "../context/AuthContext";
 import TopComponent from "../components/TopComponent";
 import React, { useState, useEffect } from "react";
-import supabase from "../src/supabaseClient"; // מניח שיש לך קליינט של Supabase מוגדר
+import supabase from "../src/supabaseClient";
 import Icon from "react-native-vector-icons/FontAwesome";
+import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 import { LinearGradient } from "expo-linear-gradient";
 import { RFValue } from "react-native-responsive-fontsize";
 import Theme1 from "../components/Theme1";
 import useExerciseTracking from "../hooks/useExerciseTracking";
 import GoToButton from "../components/HomeComponents/GoToButton";
+import MostCommonWorkoutSummaryCard from "../components/HomeComponents/MostCommonWorkoutSummaryCard";
 
 const { width, height } = Dimensions.get("window");
 
@@ -25,10 +28,15 @@ const Home = ({ navigation }) => {
   const { user, logout } = useAuth();
   const [username, setUsername] = useState(null);
   const [userId, setUserId] = useState(null);
+  const [
+    mostFrequentWorkoutSplitMuscleGroup,
+    setMostFrequentWorkoutSplitMuscleGroup,
+  ] = useState(null);
+
+  const { fetchWorkoutSplit } = useWorkoutSplits();
 
   const {
     trackingData: exerciseTrackingData,
-    mostFrequentSplit,
     loading,
     error,
   } = useExerciseTracking(userId ?? null);
@@ -58,14 +66,6 @@ const Home = ({ navigation }) => {
     );
   }
 
-  const handleLogout = () => {
-    logout();
-    navigation.reset({
-      index: 0,
-      routes: [{ name: "AuthStack", params: { screen: "Intro" } }],
-    });
-  };
-
   return (
     <View style={{ flex: 1, paddingVertical: height * 0.02 }}>
       {/* Header */}
@@ -89,23 +89,7 @@ const Home = ({ navigation }) => {
             >
               Your workout count is
             </Text>
-            <View
-              style={{
-                borderRadius: width * 0.8,
-                borderColor: "#FACC15",
-                borderWidth: 3,
-                borderStyle: "solid",
-                height: height * 0.05,
-                width: height * 0.05,
-                justifyContent: "center",
-                alignItems: "center",
-                shadowColor: "#FACC15",
-                shadowOffset: { width: 0, height: 2 },
-                shadowOpacity: 0.8,
-                shadowRadius: 4,
-                elevation: 4,
-              }}
-            >
+            <View style={{}}>
               <Text
                 style={{
                   fontFamily: "PoppinsBold",
@@ -121,53 +105,21 @@ const Home = ({ navigation }) => {
         </View>
         <View
           style={{
-            flex: 3,
+            flex: 3.5,
             display: "flex",
             flexDirection: "row",
             gap: width * 0.02,
             width: "90%",
           }}
         >
+          <MostCommonWorkoutSummaryCard
+            userId={userId}
+            height={height}
+            width={width}
+          />
           <View
             style={{
-              flex: 5,
-              width: "100%",
-              backgroundColor: "#0d2540",
-              borderRadius: height * 0.02,
-              flexDirection: "column",
-              justifyContent: "center",
-              shadowColor: "#000",
-              shadowOffset: { width: 0, height: 2 },
-              shadowOpacity: 0.1,
-              shadowRadius: 8,
-              elevation: 4,
-              gap: height * 0.02,
-            }}
-          >
-            <Text
-              style={{
-                fontFamily: "PoppinsBold",
-                color: "white",
-                marginHorizontal: width * 0.05,
-                fontSize: RFValue(32),
-              }}
-            >
-              {mostFrequentSplit}
-            </Text>
-            <Text
-              style={{
-                fontFamily: "PoppinsLight",
-                color: "#7d9bbd",
-                opacity: 0.9,
-                marginHorizontal: width * 0.05,
-              }}
-            >
-              Most common workout
-            </Text>
-          </View>
-          <View
-            style={{
-              flex: 5,
+              flex: 4,
               backgroundColor: "#0d2540",
               borderRadius: height * 0.02,
               flexDirection: "column",
@@ -190,7 +142,7 @@ const Home = ({ navigation }) => {
             </Text>
           </View>
         </View>
-        <View style={{ flex: 3, flexDirection: "row" }}>
+        <View style={{ flex: 4.5, flexDirection: "row" }}>
           <View
             style={{
               width: "90%",
@@ -207,29 +159,7 @@ const Home = ({ navigation }) => {
             <Text>View</Text>
           </View>
         </View>
-        <View
-          style={{
-            flex: 2,
-            justifyContent: "center",
-            alignItems: "center",
-            width: "90%",
-          }}
-        >
-          <GoToButton onPress={handleLogout}>
-            <Text
-              style={{
-                fontFamily: "PoppinsBold",
-                fontSize: RFValue(14),
-                color: "red",
-              }}
-            >
-              Log Out
-            </Text>
-          </GoToButton>
-        </View>
       </View>
-
-      <View style={styles.bottomContainer}></View>
     </View>
   );
 };
@@ -255,7 +185,7 @@ const styles = StyleSheet.create({
     flexDirection: "column",
     justifyContent: "flex-start",
     alignItems: "center",
-    gap: height * 0.005,
+    gap: height * 0.01,
   },
   workoutsContainer: {
     backgroundColor: "#0d2540",
