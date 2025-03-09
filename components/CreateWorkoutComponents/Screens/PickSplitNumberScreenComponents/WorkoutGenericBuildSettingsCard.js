@@ -17,8 +17,12 @@ import { LinearGradient } from "expo-linear-gradient";
 
 const { width, height } = Dimensions.get("window");
 
-function WorkoutGenericBuildSettingsCard() {
+function WorkoutGenericBuildSettingsCard({ setSplitsNumber }) {
   const [splits, setSplits] = useState(1);
+  const updateSplits = (newSplits) => {
+    setSplits(newSplits);
+    setSplitsNumber(newSplits);
+  };
 
   return (
     <LinearGradient
@@ -41,7 +45,7 @@ function WorkoutGenericBuildSettingsCard() {
         <Text
           style={{
             fontFamily: "PoppinsRegular",
-            fontSize: RFValue(18),
+            fontSize: RFValue(15),
             color: "#0d2540",
             textAlign: "center",
           }}
@@ -58,7 +62,7 @@ function WorkoutGenericBuildSettingsCard() {
           gap: width * 0.08,
         }}
       >
-        <TouchableOpacity onPress={() => setSplits(Math.max(1, splits - 1))}>
+        <TouchableOpacity onPress={() => updateSplits(Math.max(1, splits - 1))}>
           <FontAwesome5
             name="minus"
             size={RFValue(35)}
@@ -75,7 +79,7 @@ function WorkoutGenericBuildSettingsCard() {
         >
           {splits}
         </Text>
-        <TouchableOpacity onPress={() => setSplits(Math.min(6, splits + 1))}>
+        <TouchableOpacity onPress={() => updateSplits(Math.min(6, splits + 1))}>
           <FontAwesome5
             name="plus"
             size={RFValue(35)}
