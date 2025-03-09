@@ -49,7 +49,7 @@ const MostCommonWorkoutSummaryCard = ({
       style={{
         flex: 6,
         width: "100%",
-        backgroundColor: "#0d2540",
+        backgroundColor: "rgb(46, 84, 255)",
         borderRadius: height * 0.02,
         flexDirection: "column",
         justifyContent: "center",
@@ -58,7 +58,7 @@ const MostCommonWorkoutSummaryCard = ({
         shadowOpacity: 0.1,
         shadowRadius: 8,
         elevation: 4,
-        gap: height * 0.02,
+        gap: height * 0.0,
       }}
     >
       <View
@@ -67,21 +67,24 @@ const MostCommonWorkoutSummaryCard = ({
           flexDirection: "row",
           justifyContent: "space-between",
           marginHorizontal: width * 0.05,
+          alignItems: "center",
         }}
       >
         <Text
           style={{
             fontFamily: "PoppinsBold",
             color: "white",
-            fontSize: RFValue(32),
+            fontSize: RFValue(12),
+            width: "70%",
           }}
         >
-          {mostFreqWorkoutSplitName}
+          Most common workout
         </Text>
 
         <TouchableOpacity
           style={{
-            width: "35%",
+            width: "30%",
+            height: "70%",
             justifyContent: "center",
             alignItems: "center",
             borderRadius: height * 0.02,
@@ -89,12 +92,13 @@ const MostCommonWorkoutSummaryCard = ({
           }}
         >
           <LinearGradient
-            colors={["#2196F3", "rgb(11, 129, 255)"]}
+            colors={["rgb(15, 131, 255)", "rgb(101, 155, 255)"]}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
             style={{
               flex: 1,
               width: "100%",
+              height: "100%",
               justifyContent: "center",
               alignItems: "center",
               borderRadius: height * 0.02,
@@ -103,6 +107,7 @@ const MostCommonWorkoutSummaryCard = ({
             <View
               style={{
                 display: "flex",
+                height: "100%",
                 flexDirection: "column",
                 justifyContent: "center",
                 alignItems: "center",
@@ -127,24 +132,24 @@ const MostCommonWorkoutSummaryCard = ({
       <Text
         style={{
           fontFamily: "PoppinsBold",
-          color: "#7d9bbd",
-          opacity: 0.9,
-          fontSize: RFValue(10),
+          color: "#0d2540",
+          opacity: 1,
+          fontSize: RFValue(35),
           marginHorizontal: width * 0.05,
         }}
       >
-        {mostFrequentWorkoutSplitMuscleGroup}
+        {mostFreqWorkoutSplitName}
       </Text>
 
       <Text
         style={{
-          fontFamily: "PoppinsLight",
-          color: "#b4c6db",
+          fontFamily: "PoppinsBold",
+          color: "#0d2540",
           opacity: 0.9,
           marginHorizontal: width * 0.05,
         }}
       >
-        Most common workout
+        {mostFrequentWorkoutSplitMuscleGroup}
       </Text>
     </View>
   );

@@ -78,12 +78,15 @@ const Home = ({ navigation }) => {
               backgroundColor: "#0d2540",
               borderRadius: height * 0.02,
               flexDirection: "column",
-              justifyContent: "space-between",
+              justifyContent: "flex-start",
+              alignItems: "center",
               shadowColor: "#000",
               shadowOffset: { width: 0, height: 2 },
               shadowOpacity: 0.1,
               shadowRadius: 8,
               elevation: 4,
+              gap: height * 0.02,
+              paddingTop: height * 0.01,
             }}
           >
             <Text
@@ -94,12 +97,37 @@ const Home = ({ navigation }) => {
               }}
             >
               Create workout
+            </Text>
+            <View
+              style={{
+                width: "100%",
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
               <TouchableOpacity
                 onPress={() => navigation.navigate("CreateWorkout")}
               >
-                <Text style={{ fontSize: RFValue(50) }}>+++</Text>
+                <LinearGradient
+                  colors={["#2196F3", "rgb(11, 129, 255)"]}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 1 }}
+                  style={{
+                    justifyContent: "center",
+                    alignItems: "center",
+                    borderRadius: height * 0.08,
+                    height: height * 0.08,
+                    width: width * 0.2,
+                  }}
+                >
+                  <FontAwesome5
+                    name="plus"
+                    color="white"
+                    size={RFValue(15)}
+                  ></FontAwesome5>
+                </LinearGradient>
               </TouchableOpacity>
-            </Text>
+            </View>
           </View>
         </View>
         <View style={{ flex: 4.5, flexDirection: "row" }}>

@@ -26,11 +26,11 @@ function WorkoutCountCard({ userId, height, width }) {
       <Text
         style={{
           fontFamily: "PoppinsRegular",
-          color: "#7d9bbd",
+          color: "white",
           fontSize: RFValue(13),
         }}
       >
-        Your workout count is
+        Workout count
       </Text>
       <View style={{}}>
         <Text
