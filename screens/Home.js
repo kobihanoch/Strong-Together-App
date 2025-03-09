@@ -17,10 +17,8 @@ import Icon from "react-native-vector-icons/FontAwesome";
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 import { LinearGradient } from "expo-linear-gradient";
 import { RFValue } from "react-native-responsive-fontsize";
-import Theme1 from "../components/Theme1";
-import useExerciseTracking from "../hooks/useExerciseTracking";
-import GoToButton from "../components/HomeComponents/GoToButton";
 import MostCommonWorkoutSummaryCard from "../components/HomeComponents/MostCommonWorkoutSummaryCard";
+import WorkoutCountCard from "../components/HomeComponents/WorkoutCountCard";
 
 const { width, height } = Dimensions.get("window");
 
@@ -28,27 +26,6 @@ const Home = ({ navigation }) => {
   const { user, logout } = useAuth();
   const [username, setUsername] = useState(null);
   const [userId, setUserId] = useState(null);
-  const [
-    mostFrequentWorkoutSplitMuscleGroup,
-    setMostFrequentWorkoutSplitMuscleGroup,
-  ] = useState(null);
-
-  const { fetchWorkoutSplit } = useWorkoutSplits();
-
-  const {
-    trackingData: exerciseTrackingData,
-    loading,
-    error,
-  } = useExerciseTracking(userId ?? null);
-
-  const uniqueDates = new Set();
-
-  exerciseTrackingData.forEach((item) => {
-    const date = new Date(item.workoutdate).toDateString();
-    uniqueDates.add(date);
-  });
-
-  const totalWorkoutsNumber = uniqueDates.size;
 
   // Set username after user is laoded
   useEffect(() => {
@@ -79,29 +56,7 @@ const Home = ({ navigation }) => {
 
       <View style={styles.midContainer}>
         <View style={{ flex: 2 }}>
-          <View style={styles.workoutsContainer}>
-            <Text
-              style={{
-                fontFamily: "PoppinsRegular",
-                color: "#7d9bbd",
-                fontSize: RFValue(13),
-              }}
-            >
-              Your workout count is
-            </Text>
-            <View style={{}}>
-              <Text
-                style={{
-                  fontFamily: "PoppinsBold",
-                  color: "#FACC15",
-                  fontSize: RFValue(18),
-                  alignSelf: "center",
-                }}
-              >
-                {totalWorkoutsNumber}
-              </Text>
-            </View>
-          </View>
+          <WorkoutCountCard userId={userId} height={height} width={width} />
         </View>
         <View
           style={{
@@ -138,7 +93,12 @@ const Home = ({ navigation }) => {
                 padding: height * 0.02,
               }}
             >
-              Schedule workout
+              Create workout
+              <TouchableOpacity
+                onPress={() => navigation.navigate("CreateWorkout")}
+              >
+                <Text style={{ fontSize: RFValue(50) }}>+++</Text>
+              </TouchableOpacity>
             </Text>
           </View>
         </View>
@@ -186,16 +146,6 @@ const styles = StyleSheet.create({
     justifyContent: "flex-start",
     alignItems: "center",
     gap: height * 0.01,
-  },
-  workoutsContainer: {
-    backgroundColor: "#0d2540",
-    height: "100%",
-    width: "90%",
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    borderRadius: height * 0.02,
-    paddingHorizontal: width * 0.08,
   },
 
   bottomContainer: {

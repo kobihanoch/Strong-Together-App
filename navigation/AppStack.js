@@ -1,10 +1,11 @@
-import React from 'react';
-import { createStackNavigator } from '@react-navigation/stack';
-import Home from '../screens/Home';
-import Settings from '../screens/Settings';
-import MyWorkoutPlan from '../screens/MyWorkoutPlan';
-import StartWorkout from '../screens/StartWorkout';
-import PostWorkoutSummary from '../screens/PostWorkoutSummary';
+import React from "react";
+import { createStackNavigator } from "@react-navigation/stack";
+import Home from "../screens/Home";
+import Settings from "../screens/Settings";
+import MyWorkoutPlan from "../screens/MyWorkoutPlan";
+import StartWorkout from "../screens/StartWorkout";
+import PostWorkoutSummary from "../screens/PostWorkoutSummary";
+import CreateWorkout from "../screens/CreateWorkout";
 
 const Stack = createStackNavigator();
 
@@ -14,7 +15,7 @@ const AppStack = () => {
       screenOptions={{
         headerShown: false,
         gestureEnabled: false,
-        cardStyle: { backgroundColor: 'white', flex: 0.88}, // רקע שקוף לכל המסכים
+        cardStyle: { backgroundColor: "white", flex: 0.88 },
       }}
     >
       <Stack.Screen name="Home" component={Home} />
@@ -22,6 +23,7 @@ const AppStack = () => {
       <Stack.Screen name="MyWorkoutPlan" component={MyWorkoutPlan} />
       <Stack.Screen name="StartWorkout" component={StartWorkout} />
       <Stack.Screen name="PostWorkoutSummary" component={PostWorkoutSummary} />
+      <Stack.Screen name="CreateWorkout" component={CreateWorkout} />
     </Stack.Navigator>
   );
 };

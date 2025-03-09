@@ -14,10 +14,12 @@ const useWorkoutSplits = (workoutId) => {
 
   const fetchSplits = async (workoutId) => {
     setLoading(true);
+    console.log("Fetching splits for workoutId:", workoutId);
     try {
       if (workoutId) {
         const splits = await fetchWorkoutSplitsByWorkoutId(workoutId);
         setWorkoutSplits(splits);
+        console.log("Fetched data:", splits);
       }
     } catch (error) {
       console.error("Error fetching splits:", error);
