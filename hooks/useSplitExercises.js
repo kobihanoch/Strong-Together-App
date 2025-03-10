@@ -1,6 +1,6 @@
 import { useState } from "react";
 import {
-  addExerciseToSplit,
+  addExerciseToSplit, // פונקציה חדשה להוספת תרגיל בודד
   getExercisesBySplitId,
   getExercisesByWorkoutId,
   addExercisesToSplit,
@@ -42,25 +42,24 @@ const useSplitExercises = (workoutId) => {
   const addExercisesToWorkoutSplit = async (splitId, exercises) => {
     try {
       setLoading(true);
-
-      if (!Array.isArray(exercises)) {
-        return;
-      }
-
-      if (!exercises[Symbol.iterator]) {
-        throw new Error("Exercises array is not iterable.");
-      }
-
-      if (exercises.length === 0) {
-        return;
-      }
-
-      const fixedExercises = exercises.map((ex) => ({ ...ex }));
-      const newExercises = await addExercisesToSplit(splitId, fixedExercises);
-
+      const newExercises = await addExercisesToSplit(splitId, exercises);
       setSplitExercises((prevExercises) => [...prevExercises, ...newExercises]);
-
       return newExercises;
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const addExerciseToWorkoutSplit = async (splitId, exerciseId) => {
+    try {
+      setLoading(true);
+      const newExercise = await addExerciseToSplit(splitId, exerciseId);
+      if (newExercise) {
+        setSplitExercises((prevExercises) => [...prevExercises, newExercise]);
+      }
+      return newExercise;
     } catch (err) {
       setError(err.message);
     } finally {
@@ -76,6 +75,7 @@ const useSplitExercises = (workoutId) => {
     fetchExercisesBySplitId,
     addExercisesToWorkoutSplit,
     fetchAllExercises,
+    addExerciseToWorkoutSplit,
   };
 };
 

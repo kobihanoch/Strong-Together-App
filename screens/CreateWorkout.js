@@ -26,20 +26,7 @@ function CreateWorkout({ navigation }) {
     }
   }, [step]);
 
-  useEffect(() => {
-    console.log(
-      "🧐 Watching selectedExercisesBySplit (before crash):",
-      selectedExercisesBySplit
-    );
-    Object.keys(selectedExercisesBySplit).forEach((key) => {
-      if (!Array.isArray(selectedExercisesBySplit[key])) {
-        console.error(
-          `🚨 ERROR: expected an array for key ${key}, but got:`,
-          selectedExercisesBySplit[key]
-        );
-      }
-    });
-  }, [selectedExercisesBySplit]);
+  console.log("!!!!!!!!!!!!!!!!!!!!!!!!!!", selectedExercisesBySplit);
 
   return (
     <LinearGradient

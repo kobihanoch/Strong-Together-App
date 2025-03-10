@@ -68,3 +68,35 @@ export const addExercisesToSplit = async (splitId, exercises) => {
     throw err;
   }
 };
+
+// Add a single exercise to a workout split
+export const addExerciseToSplit = async ({
+  workoutsplit_id,
+  exercise_id,
+  created_at,
+}) => {
+  try {
+    if (!workoutsplit_id || !exercise_id) {
+      console.error("❌ ERROR: Missing required fields:", {
+        workoutsplit_id,
+        exercise_id,
+      });
+      return;
+    }
+
+    const { data, error } = await supabase
+      .from("exercisetoworkoutsplit")
+      .insert([{ workoutsplit_id, exercise_id, created_at }])
+      .select("*");
+
+    if (error) throw error;
+    console.log(
+      `✅ Successfully added exercise ${exercise_id} to split ${workoutsplit_id}:`,
+      data
+    );
+    return data;
+  } catch (err) {
+    console.error("❌ Error adding exercise to workout split:", err.message);
+    throw err;
+  }
+};

@@ -20,8 +20,90 @@ function ModifySplitNamesScreen({
 }) {
   const { addNewWorkout } = useWorkouts(userId);
   const { createWorkoutSplit } = useWorkoutSplits();
-  const { addExercisesToWorkoutSplit } = useSplitExercises();
+  const { addExerciseToWorkoutSplit } = useSplitExercises();
   const [saving, setSaving] = useState(false);
+
+  const saveWorkoutPlan = async () => {
+    if (!userId) {
+      console.error("❌ ERROR: User ID is missing!");
+      return;
+    }
+
+    try {
+      console.log("🟢 Starting workout creation...");
+      setSaving(true);
+
+      // 1️⃣ יצירת אימון חדש
+      const workoutData = await addNewWorkout(
+        userId,
+        "My New Workout",
+        Object.keys(selectedExercisesBySplit).length
+      );
+
+      if (!workoutData?.id) {
+        throw new Error("❌ Failed to create workout. No ID returned.");
+      }
+
+      console.log("✅ Workout created with ID:", workoutData.id);
+      const workoutId = workoutData.id;
+
+      // 2️⃣ יצירת פיצולי אימון ושמירתם במפה
+      const createdSplits = {};
+
+      for (const splitName of Object.keys(selectedExercisesBySplit)) {
+        console.log(`📌 Creating split for: ${splitName}`);
+
+        const splitData = await createWorkoutSplit(workoutId, splitName);
+        if (!splitData?.id) {
+          throw new Error(`❌ Workout split creation failed for ${splitName}`);
+        }
+
+        console.log(`✅ Created split: ${splitName} (ID: ${splitData.id})`);
+        createdSplits[splitName] = splitData.id;
+      }
+
+      console.log("🔄 Finished saving splits, now handling exercises...");
+
+      // 3️⃣ הכנסת כל תרגיל בנפרד לכל פיצול
+      for (const [splitName, exercises] of Object.entries(
+        selectedExercisesBySplit
+      )) {
+        const splitId = createdSplits[splitName];
+        if (!splitId) {
+          console.warn(
+            `⚠️ No split ID found for ${splitName}, skipping exercises.`
+          );
+          continue;
+        }
+
+        console.log(
+          `🔍 Adding ${exercises.length} exercises to split ${splitName} (ID: ${splitId})`
+        );
+
+        for (const exercise of exercises) {
+          const exerciseData = {
+            workoutsplit_id: splitId,
+            exercise_id: exercise.id,
+            created_at: new Date().toISOString(),
+          };
+
+          console.log(`📝 Adding exercise:`, exerciseData);
+
+          await addExerciseToWorkoutSplit(exerciseData);
+        }
+
+        console.log(`✅ Successfully added all exercises to split ${splitId}`);
+      }
+
+      console.log("🏁 Workout plan saved successfully!");
+    } catch (error) {
+      console.error("❌ Error saving workout plan:", error);
+      Alert.alert("Error", error.message);
+    } finally {
+      setSaving(false);
+      console.log("🔄 Finished saving, updating state.");
+    }
+  };
 
   return (
     <View
@@ -115,8 +197,8 @@ function ModifySplitNamesScreen({
           <GradientedGoToButton
             gradientColors={["rgb(0, 148, 12)", "rgb(0, 98, 8)"]}
             borderRadius={height * 0.1}
-            /*onPress={saveWorkoutPlan}*/
-            /*disabled={saving}*/
+            onPress={saveWorkoutPlan}
+            disabled={saving}
           >
             <View
               style={{
