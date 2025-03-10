@@ -18,6 +18,9 @@ import GradientedGoToButton from "../components/GradientedGoToButton";
 import { LinearGradient } from "expo-linear-gradient";
 import PickSplitNumberScreen from "../components/CreateWorkoutComponents/Screens/PickSplitNumberScreen";
 import ModifySplitNamesScreen from "../components/CreateWorkoutComponents/Screens/ModifySplitNamesScreen";
+import AddExercisesScreen from "../components/CreateWorkoutComponents/Screens/AddExercisesScreen";
+import useExercises from "../hooks/useExercises";
+
 const { width, height } = Dimensions.get("window");
 
 function CreateWorkout({ navigation }) {
@@ -25,7 +28,9 @@ function CreateWorkout({ navigation }) {
   const [username, setUsername] = useState(null);
   const [userId, setUserId] = useState(null);
   const [splitsNumber, setSplitsNumber] = useState(1);
+  const { exercises, error } = useExercises();
   const [step, setStep] = useState(1);
+  const [editWorkoutSplitName, setEditWorkoutSplitName] = useState("A");
 
   // Set username after user is laoded
   useEffect(() => {
@@ -52,7 +57,18 @@ function CreateWorkout({ navigation }) {
         />
       )}
       {step === 2 && (
-        <ModifySplitNamesScreen setStep={setStep} splitsNumber={splitsNumber} />
+        <ModifySplitNamesScreen
+          setStep={setStep}
+          splitsNumber={splitsNumber}
+          setEditWorkoutSplitName={setEditWorkoutSplitName}
+        />
+      )}
+      {step === 3 && (
+        <AddExercisesScreen
+          setStep={setStep}
+          workoutSplitName={editWorkoutSplitName}
+          exercises={exercises}
+        />
       )}
     </LinearGradient>
   );

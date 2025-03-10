@@ -13,7 +13,11 @@ import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 
 const { width, height } = Dimensions.get("window");
 
-function ModifySplitNamesCard({ splitsNumber }) {
+function ModifySplitNamesCard({
+  splitsNumber,
+  setEditWorkoutSplitName,
+  setStep,
+}) {
   const [splitNames, setSplitNames] = useState(
     Array.from({ length: splitsNumber }, (_, i) => String.fromCharCode(65 + i)) // 65 = 'A', 66 = 'B' וכו'
   );
@@ -102,6 +106,10 @@ function ModifySplitNamesCard({ splitsNumber }) {
                 justifyContent: "center",
                 alignItems: "center",
                 gap: height * 0.01,
+              }}
+              onPress={() => {
+                setEditWorkoutSplitName(item);
+                setStep(3);
               }}
             >
               <View>

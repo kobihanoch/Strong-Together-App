@@ -4,10 +4,15 @@ import ModifySplitNamesCard from "./ModifySplitNamesScreenComponents/ModifySplit
 import { RFValue } from "react-native-responsive-fontsize";
 import GradientedGoToButton from "../../GradientedGoToButton";
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
+import useExercises from "../../../hooks/useExercises";
 
 const { width, height } = Dimensions.get("window");
 
-function ModifySplitNamesScreen({ setStep, splitsNumber }) {
+function ModifySplitNamesScreen({
+  setStep,
+  splitsNumber,
+  setEditWorkoutSplitName,
+}) {
   return (
     <View
       style={{
@@ -45,14 +50,58 @@ function ModifySplitNamesScreen({ setStep, splitsNumber }) {
         </Text>
       </View>
       <View style={{ flex: 7 }}>
-        <ModifySplitNamesCard splitsNumber={splitsNumber} />
+        <ModifySplitNamesCard
+          splitsNumber={splitsNumber}
+          setEditWorkoutSplitName={setEditWorkoutSplitName}
+          setStep={setStep}
+        />
       </View>
-      <View style={{ flex: 1.5, alignItems: "center" }}>
-        <View style={{ width: "50%" }}>
+      <View
+        style={{
+          flex: 1.5,
+          alignItems: "center",
+          flexDirection: "row",
+          gap: width * 0.04,
+          justifyContent: "center",
+        }}
+      >
+        <View style={{ width: "30%" }}>
           <GradientedGoToButton
             gradientColors={["#FF9500", "#FF6B00"]}
             borderRadius={height * 0.1}
-            onPress={() => setStep(2)}
+            onPress={() => setStep(1)}
+          >
+            <View
+              style={{
+                flexDirection: "row",
+                justifyContent: "space-between",
+                gap: width * 0.04,
+                alignItems: "center",
+                opacity: 1,
+              }}
+            >
+              <FontAwesome5
+                name="arrow-left"
+                color="white"
+                size={RFValue(17)}
+              />
+              <Text
+                style={{
+                  fontFamily: "PoppinsBold",
+                  color: "white",
+                  fontSize: RFValue(15),
+                }}
+              >
+                Back
+              </Text>
+            </View>
+          </GradientedGoToButton>
+        </View>
+        <View style={{ width: "30%" }}>
+          <GradientedGoToButton
+            gradientColors={["#FF9500", "#FF6B00"]}
+            borderRadius={height * 0.1}
+            onPress={() => setStep(3)}
           >
             <View
               style={{
@@ -70,7 +119,7 @@ function ModifySplitNamesScreen({ setStep, splitsNumber }) {
                   fontSize: RFValue(15),
                 }}
               >
-                Next step
+                Next
               </Text>
               <FontAwesome5
                 name="arrow-right"

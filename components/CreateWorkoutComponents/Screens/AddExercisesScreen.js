@@ -1,11 +1,13 @@
 import React from "react";
 import { View, Text, Dimensions } from "react-native";
-import ModifySplitNamesCard from "./ModifySplitNamesScreenComponents/ModifySplitNamesCard";
 import { RFValue } from "react-native-responsive-fontsize";
-import GradientedGoToButton from "../../GradientedGoToButton";
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
+import ChooseExercisesCard from "../AddExercisesScreenComponents/ChooseExercisesCard";
+import GradientedGoToButton from "../../GradientedGoToButton";
 
-function AddExercisesScreen({ workoutSplitName }) {
+const { width, height } = Dimensions.get("window");
+
+function AddExercisesScreen({ setStep, workoutSplitName, exercises }) {
   return (
     <View
       style={{
@@ -29,7 +31,7 @@ function AddExercisesScreen({ workoutSplitName }) {
             color: "white",
           }}
         >
-          Manage your workout plan
+          Pick your exercises
         </Text>
         <Text
           style={{
@@ -39,16 +41,27 @@ function AddExercisesScreen({ workoutSplitName }) {
             color: "white",
           }}
         >
-          Add exercises to create the best plan out there!
+          Split {workoutSplitName}
         </Text>
       </View>
       <View style={{ flex: 7 }}>
-        <ModifySplitNamesCard splitsNumber={splitsNumber} />
+        <ChooseExercisesCard
+          workoutSplitName={workoutSplitName}
+          exercises={exercises}
+        />
       </View>
-      <View style={{ flex: 1.5, alignItems: "center" }}>
-        <View style={{ width: "50%" }}>
+      <View
+        style={{
+          flex: 1.5,
+          alignItems: "center",
+          flexDirection: "row",
+          gap: width * 0.04,
+          justifyContent: "center",
+        }}
+      >
+        <View style={{ width: "60%" }}>
           <GradientedGoToButton
-            gradientColors={["#FF9500", "#FF6B00"]}
+            gradientColors={["rgb(0, 123, 47)", "rgb(0, 141, 40)"]}
             borderRadius={height * 0.1}
             onPress={() => setStep(2)}
           >
@@ -68,13 +81,9 @@ function AddExercisesScreen({ workoutSplitName }) {
                   fontSize: RFValue(15),
                 }}
               >
-                Next step
+                Save split {workoutSplitName}
               </Text>
-              <FontAwesome5
-                name="arrow-right"
-                color="white"
-                size={RFValue(17)}
-              />
+              <FontAwesome5 name="check" color="white" size={RFValue(17)} />
             </View>
           </GradientedGoToButton>
         </View>

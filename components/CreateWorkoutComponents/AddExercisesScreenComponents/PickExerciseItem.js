@@ -3,13 +3,13 @@ import { View, Text, StyleSheet, Dimensions, Image } from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";
 import { LinearGradient } from "expo-linear-gradient";
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
-import images from "../../components/images";
+import images from "../../images";
 
 const { width, height } = Dimensions.get("window");
 
-const ExerciseItem = ({ exercise }) => {
-  const mainMuscle = exercise.exercises.targetmuscle;
-  const specificMuscle = exercise.exercises.specifictargetmuscle;
+const PickExerciseItem = ({ exercise }) => {
+  const mainMuscle = exercise.targetmuscle;
+  const specificMuscle = exercise.specifictargetmuscle;
 
   const imagePath = images[mainMuscle]?.[specificMuscle];
 
@@ -58,7 +58,7 @@ const ExerciseItem = ({ exercise }) => {
                 color: "black",
               }}
             >
-              {exercise.exercise}
+              {exercise.name}
             </Text>
             <Text
               style={{
@@ -67,8 +67,7 @@ const ExerciseItem = ({ exercise }) => {
                 color: "#919191",
               }}
             >
-              {exercise.exercises.targetmuscle},{" "}
-              {exercise.exercises.specifictargetmuscle}
+              {exercise.targetmuscle}, {exercise.specifictargetmuscle}
             </Text>
 
             <Text
@@ -80,21 +79,7 @@ const ExerciseItem = ({ exercise }) => {
                 marginTop: height * 0.01,
               }}
             >
-              Reps per set
-            </Text>
-            <Text
-              style={{
-                fontFamily: "PoppinsBold",
-                fontSize: RFValue(12),
-                color: "black",
-                opacity: 0.7,
-              }}
-            >
-              {Array.isArray(exercise.sets)
-                ? exercise.sets.join(" / ")
-                : exercise.sets
-                ? exercise.sets.split(",").join(" ")
-                : "N/A"}
+              None
             </Text>
           </View>
           <View style={{ margin: width * 0.04 }}>
@@ -114,7 +99,7 @@ const ExerciseItem = ({ exercise }) => {
 const styles = StyleSheet.create({
   exerciseContainer: {
     backgroundColor: "#fafafa",
-    width: "90%",
+    width: "100%",
     alignSelf: "center",
     height: height * 0.14,
     flex: 1,
@@ -123,4 +108,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ExerciseItem;
+export default PickExerciseItem;
