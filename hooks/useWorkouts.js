@@ -1,35 +1,63 @@
-import { useState, useEffect } from 'react';
-import { fetchWorkoutsByUserId, addWorkout, deleteWorkout, updateWorkout } from '../services/WorkoutService';
+import { useState, useEffect } from "react";
+import {
+  fetchWorkoutsByUserId,
+  addWorkout,
+  deleteWorkout,
+  updateWorkout,
+} from "../services/WorkoutService";
 
 export const useWorkouts = (userId) => {
-    const [workouts, setWorkouts] = useState([]);
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState(null);
+  const [workouts, setWorkouts] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
-    const getWorkoutByUserId = async () => {
-        if (!userId) return; // בדיקה אם userId קיים
-        setLoading(true);
-        setError(null);
-        try {
-            const data = await fetchWorkoutsByUserId(userId);
-            setWorkouts(data);
-        } catch (err) {
-            setError(err);
-        } finally {
-            setLoading(false);
-        }
-    };
+  // Fetch all workouts for a user
+  const getWorkoutByUserId = async () => {
+    if (!userId) return;
+    setLoading(true);
+    setError(null);
+    try {
+      const data = await fetchWorkoutsByUserId(userId);
+      setWorkouts(data);
+    } catch (err) {
+      setError(err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    useEffect(() => {
-        if (userId) {
-            getWorkoutByUserId(); // קריאה לשליפת האימונים כאשר userId משתנה
-        }
-    }, [userId]);
+  useEffect(() => {
+    if (userId) {
+      getWorkoutByUserId();
+    }
+  }, [userId]);
 
-    // החזרת האימון הראשון אם קיים, או null אם אין אימונים
-    const workout = workouts.length > 0 ? workouts[0] : null;
+  // Add a new workout plan
+  const addNewWorkout = async (userId, name, splitsNumber) => {
+    if (!userId) return;
+    setLoading(true);
+    setError(null);
+    try {
+      const newWorkout = await addWorkout(userId, name, splitsNumber);
+      setWorkouts((prev) => [...prev, newWorkout]); // Update state with the new workout
+      return newWorkout;
+    } catch (err) {
+      setError(err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    return { workout, loading, error, getWorkoutByUserId };
+  const workout = workouts.length > 0 ? workouts[0] : null;
+
+  return {
+    workout,
+    workouts,
+    loading,
+    error,
+    getWorkoutByUserId,
+    addNewWorkout,
+  };
 };
 
 export default useWorkouts;

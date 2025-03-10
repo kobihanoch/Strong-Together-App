@@ -26,10 +26,21 @@ export const fetchWorkoutSplitsByUserId = async (userId) => {
 export const addWorkoutSplit = async (workoutId, name, createdAt) => {
   const { data, error } = await supabase
     .from("workoutsplits")
-    .insert([{ workout_id: workoutId, name, created_at: createdAt }]);
+    .insert([{ workout_id: workoutId, name: name, created_at: createdAt }])
+    .select("*");
 
-  if (error) throw error;
-  return data;
+  if (error) {
+    console.error("Error inserting workout split:", error.message);
+    throw error;
+  }
+
+  if (!data || data.length === 0) {
+    console.error("Error: Workout split not returned from Supabase.");
+    throw new Error("Workout split creation failed. No data returned.");
+  }
+
+  console.log("Workout split created successfully:", data[0]);
+  return data[0]; // מחזיר את ה-Split שנוצר עם ה-ID שלו
 };
 
 // Update an existing workout split by ID (without muscle_group)

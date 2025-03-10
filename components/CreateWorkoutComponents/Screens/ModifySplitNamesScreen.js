@@ -1,18 +1,28 @@
-// ModifySplitNamesScreen.js - Displays split names and their selected exercise counts
-import React from "react";
-import { View, Text, Dimensions } from "react-native";
+import React, { useState, useRef, useEffect } from "react";
+import { View, Text, Dimensions, Alert } from "react-native";
 import ModifySplitNamesCard from "../ModifySplitNamesScreenComponents/ModifySplitNamesCard";
 import { RFValue } from "react-native-responsive-fontsize";
 import GradientedGoToButton from "../../GradientedGoToButton";
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
+import useWorkoutSplits from "../../../hooks/useWorkoutSplits";
+import useSplitExercises from "../../../hooks/useSplitExercises";
+import useWorkouts from "../../../hooks/useWorkouts";
 
 const { width, height } = Dimensions.get("window");
 
 function ModifySplitNamesScreen({
+  navigation,
   setStep,
   splitsNumber,
   setEditWorkoutSplitName,
+  selectedExercisesBySplit = {},
+  userId,
 }) {
+  const { addNewWorkout } = useWorkouts(userId);
+  const { createWorkoutSplit } = useWorkoutSplits();
+  const { addExercisesToWorkoutSplit } = useSplitExercises();
+  const [saving, setSaving] = useState(false);
+
   return (
     <View
       style={{
@@ -49,13 +59,16 @@ function ModifySplitNamesScreen({
           Add exercises to create the best plan out there!
         </Text>
       </View>
+
       <View style={{ flex: 7 }}>
         <ModifySplitNamesCard
           splitsNumber={splitsNumber}
           setEditWorkoutSplitName={setEditWorkoutSplitName}
           setStep={setStep}
+          selectedExercisesBySplit={selectedExercisesBySplit}
         />
       </View>
+
       <View
         style={{
           flex: 1.5,
@@ -97,11 +110,13 @@ function ModifySplitNamesScreen({
             </View>
           </GradientedGoToButton>
         </View>
+
         <View style={{ width: "30%" }}>
           <GradientedGoToButton
-            gradientColors={["#FF9500", "#FF6B00"]}
+            gradientColors={["rgb(0, 148, 12)", "rgb(0, 98, 8)"]}
             borderRadius={height * 0.1}
-            onPress={() => setStep(3)}
+            /*onPress={saveWorkoutPlan}*/
+            /*disabled={saving}*/
           >
             <View
               style={{
@@ -119,13 +134,9 @@ function ModifySplitNamesScreen({
                   fontSize: RFValue(15),
                 }}
               >
-                Next
+                {saving ? "Saving..." : "Save"}
               </Text>
-              <FontAwesome5
-                name="arrow-right"
-                color="white"
-                size={RFValue(17)}
-              />
+              <FontAwesome5 name="check" color="white" size={RFValue(17)} />
             </View>
           </GradientedGoToButton>
         </View>

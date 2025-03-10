@@ -12,7 +12,7 @@ const ExerciseList = ({ exercises, onSelectExercise, selectedExercises }) => {
         renderItem={({ item }) => (
           <PickExerciseItem
             onSelectExercise={onSelectExercise}
-            isSelected={selectedExercises.some((ex) => ex.id === item.id)}
+            isSelected={selectedExercises.some((ex) => ex.name === item.name)}
             exercise={item}
           />
         )}

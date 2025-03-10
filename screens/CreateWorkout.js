@@ -12,19 +12,34 @@ const { width, height } = Dimensions.get("window");
 
 function CreateWorkout({ navigation }) {
   const { user } = useAuth();
-  const [username, setUsername] = useState(null);
-  const [userId, setUserId] = useState(null);
   const [splitsNumber, setSplitsNumber] = useState(1);
-  const { exercises, error } = useExercises(); // Fetching all exercises
+  const { exercises } = useExercises();
   const [step, setStep] = useState(1);
-  const [editWorkoutSplitName, setEditWorkoutSplitName] = useState("A"); // Going to step 3 to know which split is editing
+  const [editWorkoutSplitName, setEditWorkoutSplitName] = useState("A");
+  const [selectedExercisesBySplit, setSelectedExercisesBySplit] = useState({});
 
   useEffect(() => {
-    if (user) {
-      setUsername(user.username);
-      setUserId(user.id);
+    if (step === 1) {
+      setSelectedExercisesBySplit((prev) =>
+        prev && Object.keys(prev).length > 0 ? prev : {}
+      );
     }
-  }, [user]);
+  }, [step]);
+
+  useEffect(() => {
+    console.log(
+      "🧐 Watching selectedExercisesBySplit (before crash):",
+      selectedExercisesBySplit
+    );
+    Object.keys(selectedExercisesBySplit).forEach((key) => {
+      if (!Array.isArray(selectedExercisesBySplit[key])) {
+        console.error(
+          `🚨 ERROR: expected an array for key ${key}, but got:`,
+          selectedExercisesBySplit[key]
+        );
+      }
+    });
+  }, [selectedExercisesBySplit]);
 
   return (
     <LinearGradient
@@ -44,6 +59,8 @@ function CreateWorkout({ navigation }) {
           setStep={setStep}
           splitsNumber={splitsNumber}
           setEditWorkoutSplitName={setEditWorkoutSplitName}
+          selectedExercisesBySplit={selectedExercisesBySplit}
+          userId={user.id}
         />
       )}
       {step === 3 && (
@@ -51,6 +68,8 @@ function CreateWorkout({ navigation }) {
           setStep={setStep}
           workoutSplitName={editWorkoutSplitName}
           exercises={exercises}
+          selectedExercisesBySplit={selectedExercisesBySplit}
+          setSelectedExercisesBySplit={setSelectedExercisesBySplit}
         />
       )}
     </LinearGradient>

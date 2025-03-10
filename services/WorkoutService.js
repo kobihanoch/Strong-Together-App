@@ -1,38 +1,48 @@
-import supabase from '../src/supabaseClient';
+import supabase from "../src/supabaseClient";
 
-
+// Fetch workouts by user ID
 export const fetchWorkoutsByUserId = async (userId) => {
-    const { data, error } = await supabase
-        .from('workoutplans')
-        .select('*')
-        .eq('user_id', userId);
+  const { data, error } = await supabase
+    .from("workoutplans")
+    .select("*")
+    .eq("user_id", userId);
 
-    if (error) throw error;
-    return data;
+  if (error) throw error;
+  return data;
 };
 
+// Add a new workout plan
+export const addWorkout = async (userId, name, splitsNumber) => {
+  if (!userId) {
+    console.error("Error: userId is missing.");
+    throw new Error("User ID is required.");
+  }
 
-export const addWorkout = async ({ user_id, trainer_id, name, numberofsplits, level }) => {
-    try {
-        const { data, error } = await supabase
-            .from('workoutplans')
-            .insert([{
-                user_id,
-                trainer_id,
-                name,
-                numberofsplits,
-                created_at: new Date().toISOString(),
-                is_deleted: false, 
-                level
-            }]);
+  console.log("Adding workout for user:", userId);
 
-        if (error) {
-            throw error;
-        }
+  const { data, error } = await supabase
+    .from("workoutplans")
+    .insert([
+      {
+        user_id: userId,
+        trainer_id: userId,
+        name: name || "My Custom Workout",
+        numberofsplits: splitsNumber,
+        created_at: new Date().toISOString(),
+      },
+    ])
+    .select("*");
 
-        return data;
-    } catch (error) {
-        console.error("Error adding new workout:", error);
-        return null;
-    }
+  if (error) {
+    console.error("Error inserting workout:", error.message);
+    throw error;
+  }
+
+  if (!data || data.length === 0) {
+    console.error("Error: No data returned after inserting workout.");
+    throw new Error("Workout creation failed.");
+  }
+
+  console.log("Workout created successfully:", data[0]);
+  return data[0];
 };

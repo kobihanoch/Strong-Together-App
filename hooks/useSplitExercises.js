@@ -3,11 +3,12 @@ import {
   addExerciseToSplit,
   getExercisesBySplitId,
   getExercisesByWorkoutId,
+  addExercisesToSplit,
 } from "../services/SplitExerciseService";
 
 const useSplitExercises = (workoutId) => {
   const [splitExercises, setSplitExercises] = useState([]);
-  const [allExercises, setAllExercises] = useState([]); // הוספת מצב לכל התרגילים
+  const [allExercises, setAllExercises] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
@@ -37,17 +38,29 @@ const useSplitExercises = (workoutId) => {
     }
   };
 
-  // Add new exercise to a specific split
-  const addExercise = async (splitId, exerciseId) => {
+  // Add multiple exercises to a specific split
+  const addExercisesToWorkoutSplit = async (splitId, exercises) => {
     try {
       setLoading(true);
-      const newExerciseData = {
-        workoutsplit_id: splitId,
-        exercise_id: exerciseId,
-        created_at: new Date().toISOString(),
-      };
-      const newExercise = await addExerciseToSplit(newExerciseData);
-      setSplitExercises((prevExercises) => [...prevExercises, newExercise[0]]);
+
+      if (!Array.isArray(exercises)) {
+        return;
+      }
+
+      if (!exercises[Symbol.iterator]) {
+        throw new Error("Exercises array is not iterable.");
+      }
+
+      if (exercises.length === 0) {
+        return;
+      }
+
+      const fixedExercises = exercises.map((ex) => ({ ...ex }));
+      const newExercises = await addExercisesToSplit(splitId, fixedExercises);
+
+      setSplitExercises((prevExercises) => [...prevExercises, ...newExercises]);
+
+      return newExercises;
     } catch (err) {
       setError(err.message);
     } finally {
@@ -57,11 +70,11 @@ const useSplitExercises = (workoutId) => {
 
   return {
     splitExercises,
-    allExercises, // החזרת allExercises
+    allExercises,
     loading,
     error,
     fetchExercisesBySplitId,
-    addExercise,
+    addExercisesToWorkoutSplit,
     fetchAllExercises,
   };
 };

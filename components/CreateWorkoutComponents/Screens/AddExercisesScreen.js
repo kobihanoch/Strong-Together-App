@@ -8,20 +8,29 @@ import { useState } from "react";
 
 const { width, height } = Dimensions.get("window");
 
-function AddExercisesScreen({ setStep, workoutSplitName, exercises }) {
+function AddExercisesScreen({
+  setStep,
+  workoutSplitName,
+  exercises,
+  setSelectedExercisesBySplit,
+  selectedExercisesBySplit,
+}) {
+  const initialSelectedExercises =
+    selectedExercisesBySplit[workoutSplitName] || [];
+
+  const handleSaveExercises = (splitName, selectedExercises) => {
+    setSelectedExercisesBySplit((prev) => ({
+      ...prev,
+      [splitName]: Array.isArray(selectedExercises) ? selectedExercises : [],
+    }));
+    setStep(2);
+  };
+
   return (
-    <View
-      style={{
-        flexDirection: "column",
-        flex: 1,
-        paddingHorizontal: width * 0.05,
-      }}
-    >
+    <View style={{ flex: 1, paddingHorizontal: width * 0.05 }}>
       <View
         style={{
           flex: 1.5,
-          flexDirection: "column",
-          gap: height * 0.01,
           justifyContent: "center",
         }}
       >
@@ -45,49 +54,14 @@ function AddExercisesScreen({ setStep, workoutSplitName, exercises }) {
           Split {workoutSplitName}
         </Text>
       </View>
-      <View style={{ flex: 7 }}>
+
+      <View style={{ flex: 9, marginBottom: height * 0.04 }}>
         <ChooseExercisesCard
           workoutSplitName={workoutSplitName}
           exercises={exercises}
+          initialSelectedExercises={initialSelectedExercises}
+          onSave={handleSaveExercises}
         />
-      </View>
-      <View
-        style={{
-          flex: 1.5,
-          alignItems: "center",
-          flexDirection: "row",
-          gap: width * 0.04,
-          justifyContent: "center",
-        }}
-      >
-        <View style={{ width: "60%" }}>
-          <GradientedGoToButton
-            gradientColors={["rgb(0, 123, 47)", "rgb(0, 141, 40)"]}
-            borderRadius={height * 0.1}
-            onPress={() => setStep(2)}
-          >
-            <View
-              style={{
-                flexDirection: "row",
-                justifyContent: "space-between",
-                gap: width * 0.04,
-                alignItems: "center",
-                opacity: 1,
-              }}
-            >
-              <Text
-                style={{
-                  fontFamily: "PoppinsBold",
-                  color: "white",
-                  fontSize: RFValue(15),
-                }}
-              >
-                Save split {workoutSplitName}
-              </Text>
-              <FontAwesome5 name="check" color="white" size={RFValue(17)} />
-            </View>
-          </GradientedGoToButton>
-        </View>
       </View>
     </View>
   );

@@ -12,6 +12,7 @@ const useWorkoutSplits = (workoutId) => {
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  // Fetch all splits for a given workout ID
   const fetchSplits = async (workoutId) => {
     setLoading(true);
     console.log("Fetching splits for workoutId:", workoutId);
@@ -29,7 +30,7 @@ const useWorkoutSplits = (workoutId) => {
     }
   };
 
-  // Get workout split by workout split id
+  // Fetch a specific workout split by its ID
   const fetchWorkoutSplit = async (id) => {
     setLoading(true);
     try {
@@ -47,18 +48,23 @@ const useWorkoutSplits = (workoutId) => {
     fetchSplits(workoutId);
   }, [workoutId]);
 
-  const createWorkoutSplit = async (name, createdAt) => {
+  // Add a new workout split
+  const createWorkoutSplit = async (workoutId, name) => {
     setLoading(true);
     try {
+      const createdAt = new Date().toISOString();
       const newSplit = await addWorkoutSplit(workoutId, name, createdAt);
-      setWorkoutSplits((prev) => [...prev, newSplit]);
+      setWorkoutSplits((prev) => [...prev, ...newSplit]); // Updating state with the new split
+      return newSplit;
     } catch (error) {
+      console.error("Error adding workout split:", error);
       setError(error.message);
     } finally {
       setLoading(false);
     }
   };
 
+  // Update an existing workout split
   const modifyWorkoutSplit = async (id, name, createdAt) => {
     setLoading(true);
     try {
@@ -73,6 +79,7 @@ const useWorkoutSplits = (workoutId) => {
     }
   };
 
+  // Remove a workout split
   const removeWorkoutSplit = async (id) => {
     setLoading(true);
     try {
