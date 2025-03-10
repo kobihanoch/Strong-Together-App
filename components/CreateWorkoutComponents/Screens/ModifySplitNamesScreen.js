@@ -23,6 +23,19 @@ function ModifySplitNamesScreen({
   const { addExerciseToWorkoutSplit } = useSplitExercises();
   const [saving, setSaving] = useState(false);
 
+  const [isSaveDisabled, setIsSaveDisabled] = useState(true);
+
+  useEffect(() => {
+    const hasEmptySplit = Object.values(selectedExercisesBySplit).some(
+      (exercises) => !exercises || exercises.length === 0
+    );
+
+    console.log("🧐 Selected Exercises By Split:", selectedExercisesBySplit);
+    console.log("🚨 isSaveDisabled:", hasEmptySplit);
+
+    setIsSaveDisabled(hasEmptySplit);
+  }, [selectedExercisesBySplit]);
+
   const saveWorkoutPlan = async () => {
     if (!userId) {
       console.error("❌ ERROR: User ID is missing!");
@@ -198,7 +211,7 @@ function ModifySplitNamesScreen({
             gradientColors={["rgb(0, 148, 12)", "rgb(0, 98, 8)"]}
             borderRadius={height * 0.1}
             onPress={saveWorkoutPlan}
-            disabled={saving}
+            disabled={saving || isSaveDisabled}
           >
             <View
               style={{

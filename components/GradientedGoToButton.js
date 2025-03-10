@@ -8,9 +8,14 @@ const GradientedGoToButton = ({
   onPress,
   title,
   children,
+  disabled = false,
 }) => {
   return (
-    <TouchableOpacity onPress={onPress} style={styles.buttonContainer}>
+    <TouchableOpacity
+      onPress={disabled ? null : onPress}
+      style={[styles.buttonContainer, { opacity: disabled ? 0.5 : 1 }]}
+      pointerEvents={disabled ? "none" : "auto"}
+    >
       <LinearGradient
         colors={gradientColors}
         style={[styles.gradientButton, { borderRadius }]}

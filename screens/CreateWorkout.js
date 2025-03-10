@@ -16,17 +16,29 @@ function CreateWorkout({ navigation }) {
   const { exercises } = useExercises();
   const [step, setStep] = useState(1);
   const [editWorkoutSplitName, setEditWorkoutSplitName] = useState("A");
-  const [selectedExercisesBySplit, setSelectedExercisesBySplit] = useState({});
+  const initializeSplits = (splitsNumber) => {
+    if (!splitsNumber || splitsNumber <= 0) return {}; // אם אין פיצולים, מחזירים אובייקט ריק
+
+    return Array.from({ length: splitsNumber }, (_, i) =>
+      String.fromCharCode(65 + i)
+    ) // ["A", "B", "C"...]
+      .reduce((acc, split) => {
+        acc[split] = [];
+        return acc;
+      }, {});
+  };
+
+  const [selectedExercisesBySplit, setSelectedExercisesBySplit] = useState(
+    selectedExercisesBySplit && Object.keys(selectedExercisesBySplit).length > 0
+      ? selectedExercisesBySplit
+      : initializeSplits(splitsNumber)
+  );
 
   useEffect(() => {
-    if (step === 1) {
-      setSelectedExercisesBySplit((prev) =>
-        prev && Object.keys(prev).length > 0 ? prev : {}
-      );
-    }
-  }, [step]);
+    setSelectedExercisesBySplit(initializeSplits(splitsNumber));
+  }, [splitsNumber]); // יתעדכן מחדש בכל שינוי של מספר הפיצולים
 
-  console.log("!!!!!!!!!!!!!!!!!!!!!!!!!!", selectedExercisesBySplit);
+  console.log("All exercises selected: ", selectedExercisesBySplit);
 
   return (
     <LinearGradient
