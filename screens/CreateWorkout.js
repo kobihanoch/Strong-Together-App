@@ -11,7 +11,7 @@ import {
   Image,
   TextInput,
 } from "react-native";
-import WorkoutGenericBuildSettingsCard from "../components/CreateWorkoutComponents/Screens/PickSplitNumberScreenComponents/WorkoutGenericBuildSettingsCard";
+import WorkoutGenericBuildSettingsCard from "../components/CreateWorkoutComponents/PickSplitNumberScreenComponents/WorkoutGenericBuildSettingsCard";
 import { RFValue } from "react-native-responsive-fontsize";
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 import GradientedGoToButton from "../components/GradientedGoToButton";

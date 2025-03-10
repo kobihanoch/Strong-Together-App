@@ -1,6 +1,6 @@
 import React from "react";
 import { View, Text, Dimensions } from "react-native";
-import WorkoutGenericBuildSettingsCard from "./PickSplitNumberScreenComponents/WorkoutGenericBuildSettingsCard";
+import WorkoutGenericBuildSettingsCard from "../PickSplitNumberScreenComponents/WorkoutGenericBuildSettingsCard";
 import { RFValue } from "react-native-responsive-fontsize";
 import GradientedGoToButton from "../../GradientedGoToButton";
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
