@@ -1,10 +1,10 @@
+// ModifySplitNamesScreen.js - Displays split names and their selected exercise counts
 import React from "react";
 import { View, Text, Dimensions } from "react-native";
-import ModifySplitNamesCard from "./ModifySplitNamesScreenComponents/ModifySplitNamesCard";
+import ModifySplitNamesCard from "../ModifySplitNamesScreenComponents/ModifySplitNamesCard";
 import { RFValue } from "react-native-responsive-fontsize";
 import GradientedGoToButton from "../../GradientedGoToButton";
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
-import useExercises from "../../../hooks/useExercises";
 
 const { width, height } = Dimensions.get("window");
 

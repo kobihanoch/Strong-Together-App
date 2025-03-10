@@ -7,9 +7,26 @@ import ExerciseList from "./ExerciseList";
 
 const { width, height } = Dimensions.get("window");
 
-function ChooseExercisesCard({ workoutSplitName, exercises }) {
+function ChooseExercisesCard({
+  workoutSplitName,
+  exercises,
+  onSelectionChange = () => {},
+}) {
   const [groupedExercises, setGroupedExercises] = useState({});
   const [selectedMuscleGroup, setSelectedMuscleGroup] = useState(null);
+  const [selectedExercises, setSelectedExercises] = useState([]);
+
+  const toggleExerciseSelection = (exercise) => {
+    setSelectedExercises((prevSelected) => {
+      const updatedSelection = prevSelected.some((ex) => ex.id === exercise.id)
+        ? prevSelected.filter((ex) => ex.id !== exercise.id)
+        : [...prevSelected, exercise];
+
+      onSelectionChange(updatedSelection.length);
+      console.log(updatedSelection);
+      return updatedSelection;
+    });
+  };
 
   // Group exercises by muscle group
   useEffect(() => {
@@ -60,7 +77,11 @@ function ChooseExercisesCard({ workoutSplitName, exercises }) {
       </View>
 
       {/* List of grouped exercises*/}
-      <ExerciseList exercises={groupedExercises[selectedMuscleGroup] || []} />
+      <ExerciseList
+        exercises={groupedExercises[selectedMuscleGroup] || []}
+        onSelectExercise={toggleExerciseSelection}
+        selectedExercises={selectedExercises}
+      />
     </LinearGradient>
   );
 }

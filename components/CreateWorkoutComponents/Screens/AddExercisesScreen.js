@@ -4,6 +4,7 @@ import { RFValue } from "react-native-responsive-fontsize";
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 import ChooseExercisesCard from "../AddExercisesScreenComponents/ChooseExercisesCard";
 import GradientedGoToButton from "../../GradientedGoToButton";
+import { useState } from "react";
 
 const { width, height } = Dimensions.get("window");
 

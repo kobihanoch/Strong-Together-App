@@ -1,8 +1,8 @@
+// ModifySplitNamesCard.js - Displays split names and their selected exercise counts
 import React, { useState } from "react";
 import {
   View,
   Text,
-  TextInput,
   FlatList,
   Dimensions,
   TouchableOpacity,
@@ -19,14 +19,8 @@ function ModifySplitNamesCard({
   setStep,
 }) {
   const [splitNames, setSplitNames] = useState(
-    Array.from({ length: splitsNumber }, (_, i) => String.fromCharCode(65 + i)) // 65 = 'A', 66 = 'B' וכו'
+    Array.from({ length: splitsNumber }, (_, i) => String.fromCharCode(65 + i))
   );
-
-  const updateSplitName = (index, newName) => {
-    const updatedNames = [...splitNames];
-    updatedNames[index] = newName;
-    setSplitNames(updatedNames);
-  };
 
   return (
     <LinearGradient
@@ -95,7 +89,7 @@ function ModifySplitNamesCard({
                     fontSize: RFValue(10),
                   }}
                 >
-                  0 Exercises
+                  No exercises
                 </Text>
               </View>
             </View>
@@ -117,7 +111,7 @@ function ModifySplitNamesCard({
                   name="plus-circle"
                   size={RFValue(15)}
                   color={"white"}
-                ></FontAwesome5>
+                />
               </View>
               <Text
                 style={{
