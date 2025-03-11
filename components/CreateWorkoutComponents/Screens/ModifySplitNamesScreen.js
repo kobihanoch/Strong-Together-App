@@ -15,8 +15,9 @@ function ModifySplitNamesScreen({
   setStep,
   splitsNumber,
   setEditWorkoutSplitName,
-  selectedExercisesBySplit = {},
+  selectedExercisesBySplit,
   userId,
+  setSelectedExercisesBySplit,
 }) {
   const { addNewWorkout } = useWorkouts(userId);
   const { createWorkoutSplit } = useWorkoutSplits();
@@ -36,6 +37,7 @@ function ModifySplitNamesScreen({
     setIsSaveDisabled(hasEmptySplit);
   }, [selectedExercisesBySplit]);
 
+  // Save workout
   const saveWorkoutPlan = async () => {
     if (!userId) {
       console.error("❌ ERROR: User ID is missing!");
@@ -43,10 +45,10 @@ function ModifySplitNamesScreen({
     }
 
     try {
-      console.log("🟢 Starting workout creation...");
+      console.log("🟢 Initiating workout creation...");
       setSaving(true);
 
-      // 1️⃣ יצירת אימון חדש
+      // Create a new workout
       const workoutData = await addNewWorkout(
         userId,
         "My New Workout",
@@ -57,64 +59,43 @@ function ModifySplitNamesScreen({
         throw new Error("❌ Failed to create workout. No ID returned.");
       }
 
-      console.log("✅ Workout created with ID:", workoutData.id);
       const workoutId = workoutData.id;
 
-      // 2️⃣ יצירת פיצולי אימון ושמירתם במפה
+      // Create workout splits and store their IDs
       const createdSplits = {};
 
       for (const splitName of Object.keys(selectedExercisesBySplit)) {
-        console.log(`📌 Creating split for: ${splitName}`);
-
         const splitData = await createWorkoutSplit(workoutId, splitName);
-        if (!splitData?.id) {
+        if (!splitData[0]?.id) {
           throw new Error(`❌ Workout split creation failed for ${splitName}`);
         }
 
-        console.log(`✅ Created split: ${splitName} (ID: ${splitData.id})`);
-        createdSplits[splitName] = splitData.id;
+        createdSplits[splitName] = splitData[0].id;
       }
 
-      console.log("🔄 Finished saving splits, now handling exercises...");
-
-      // 3️⃣ הכנסת כל תרגיל בנפרד לכל פיצול
+      // 3Assign exercises to each workout split
       for (const [splitName, exercises] of Object.entries(
         selectedExercisesBySplit
       )) {
         const splitId = createdSplits[splitName];
-        if (!splitId) {
-          console.warn(
-            `⚠️ No split ID found for ${splitName}, skipping exercises.`
-          );
-          continue;
-        }
-
-        console.log(
-          `🔍 Adding ${exercises.length} exercises to split ${splitName} (ID: ${splitId})`
-        );
+        if (!splitId) continue;
 
         for (const exercise of exercises) {
-          const exerciseData = {
-            workoutsplit_id: splitId,
-            exercise_id: exercise.id,
-            created_at: new Date().toISOString(),
-          };
-
-          console.log(`📝 Adding exercise:`, exerciseData);
-
-          await addExerciseToWorkoutSplit(exerciseData);
+          await addExerciseToWorkoutSplit(splitId, exercise.id);
         }
-
-        console.log(`✅ Successfully added all exercises to split ${splitId}`);
       }
 
-      console.log("🏁 Workout plan saved successfully!");
+      console.log("🏁 Workout plan successfully saved.");
+
+      // Navigate to the Home screen after successful save
+      Alert.alert("Success", "Workout has been saved successfully!", [
+        { text: "OK", onPress: () => navigation.navigate("MyWorkoutPlan") },
+      ]);
     } catch (error) {
       console.error("❌ Error saving workout plan:", error);
       Alert.alert("Error", error.message);
     } finally {
       setSaving(false);
-      console.log("🔄 Finished saving, updating state.");
     }
   };
 

@@ -36,9 +36,14 @@ function CreateWorkout({ navigation }) {
 
   useEffect(() => {
     setSelectedExercisesBySplit(initializeSplits(splitsNumber));
-  }, [splitsNumber]); // יתעדכן מחדש בכל שינוי של מספר הפיצולים
+  }, [splitsNumber]);
 
   console.log("All exercises selected: ", selectedExercisesBySplit);
+
+  useEffect(() => {
+    console.log("🔄 splitsNumber changed:", splitsNumber);
+    setSelectedExercisesBySplit(initializeSplits(splitsNumber));
+  }, [splitsNumber]);
 
   return (
     <LinearGradient
@@ -59,6 +64,8 @@ function CreateWorkout({ navigation }) {
           splitsNumber={splitsNumber}
           setEditWorkoutSplitName={setEditWorkoutSplitName}
           selectedExercisesBySplit={selectedExercisesBySplit}
+          navigation={navigation}
+          setSelectedExercisesBySplit={setSelectedExercisesBySplit}
           userId={user.id}
         />
       )}

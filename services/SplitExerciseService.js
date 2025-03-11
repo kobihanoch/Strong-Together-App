@@ -70,11 +70,13 @@ export const addExercisesToSplit = async (splitId, exercises) => {
 };
 
 // Add a single exercise to a workout split
-export const addExerciseToSplit = async ({
-  workoutsplit_id,
-  exercise_id,
-  created_at,
-}) => {
+export const addExerciseToSplit = async (workoutsplit_id, exercise_id) => {
+  console.log(
+    "Service splitId ",
+    workoutsplit_id,
+    " Service exxerciID ",
+    exercise_id
+  );
   try {
     if (!workoutsplit_id || !exercise_id) {
       console.error("❌ ERROR: Missing required fields:", {
@@ -84,10 +86,12 @@ export const addExerciseToSplit = async ({
       return;
     }
 
+    const created_at = new Date().toISOString();
+
     const { data, error } = await supabase
       .from("exercisetoworkoutsplit")
       .insert([{ workoutsplit_id, exercise_id, created_at }])
-      .select("*");
+      .select("id");
 
     if (error) throw error;
     console.log(

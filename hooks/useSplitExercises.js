@@ -55,6 +55,7 @@ const useSplitExercises = (workoutId) => {
   const addExerciseToWorkoutSplit = async (splitId, exerciseId) => {
     try {
       setLoading(true);
+      console.log("Hook splitId ", splitId, " Hook exxerciID ", exerciseId);
       const newExercise = await addExerciseToSplit(splitId, exerciseId);
       if (newExercise) {
         setSplitExercises((prevExercises) => [...prevExercises, newExercise]);

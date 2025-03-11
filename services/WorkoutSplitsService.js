@@ -27,7 +27,7 @@ export const addWorkoutSplit = async (workoutId, name, createdAt) => {
   const { data, error } = await supabase
     .from("workoutsplits")
     .insert([{ workout_id: workoutId, name: name, created_at: createdAt }])
-    .select("*");
+    .select("id, created_at, name, workout_id");
 
   if (error) {
     console.error("Error inserting workout split:", error.message);
@@ -38,9 +38,7 @@ export const addWorkoutSplit = async (workoutId, name, createdAt) => {
     console.error("Error: Workout split not returned from Supabase.");
     throw new Error("Workout split creation failed. No data returned.");
   }
-
-  console.log("Workout split created successfully:", data[0]);
-  return data[0]; // מחזיר את ה-Split שנוצר עם ה-ID שלו
+  return data;
 };
 
 // Update an existing workout split by ID (without muscle_group)
