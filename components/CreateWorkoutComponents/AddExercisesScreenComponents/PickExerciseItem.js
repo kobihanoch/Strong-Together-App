@@ -1,11 +1,12 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
+  TouchableOpacity,
+  TextInput,
   StyleSheet,
   Dimensions,
   Image,
-  TouchableOpacity,
 } from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";
 import { LinearGradient } from "expo-linear-gradient";
@@ -19,16 +20,58 @@ const PickExerciseItem = ({ exercise, onSelectExercise, isSelected }) => {
   const specificMuscle = exercise.specifictargetmuscle;
   const imagePath = images[mainMuscle]?.[specificMuscle];
 
+  const getInitialSets = (exerciseSets) => {
+    if (
+      !exerciseSets ||
+      !Array.isArray(exerciseSets) ||
+      exerciseSets.length === 0
+    ) {
+      return ["10", "10", "10"];
+    }
+    return exerciseSets.map((set) =>
+      isNaN(set) || set === "" ? "10" : set.toString()
+    );
+  };
+
+  const [sets, setSets] = useState(getInitialSets(exercise.sets));
+  const [isEditing, setIsEditing] = useState(false);
+
+  useEffect(() => {
+    if (
+      exercise.sets &&
+      JSON.stringify(exercise.sets) !== JSON.stringify(sets)
+    ) {
+      setSets(getInitialSets(exercise.sets));
+    }
+  }, [exercise.sets]);
+
+  const handleSetChange = (index, value) => {
+    setSets((prevSets) => {
+      const newSets = [...prevSets];
+      newSets[index] = value;
+      return newSets;
+    });
+  };
+
+  const handleSaveSets = () => {
+    const sanitizedSets = sets.map((set) => (set.trim() === "" ? "10" : set));
+    setSets(sanitizedSets);
+    onSelectExercise({ ...exercise, sets: sanitizedSets });
+    setIsEditing(false);
+  };
+
   return (
     <TouchableOpacity
-      onPress={() => onSelectExercise(exercise)}
+      onPress={() => onSelectExercise({ ...exercise, sets })}
       style={[
         styles.exerciseContainer,
         isSelected && { borderColor: "#0d2540", borderWidth: 2 },
       ]}
+      activeOpacity={0.8}
     >
       <View style={{ flex: 1, flexDirection: "row" }}>
-        <View style={{ flex: 0.4, justifyContent: "center" }}>
+        {/* תמונת תרגיל */}
+        <View style={{ flex: 0.35, justifyContent: "center" }}>
           <LinearGradient
             colors={["#00142a", "#0d2540"]}
             style={styles.imageContainer}
@@ -37,23 +80,51 @@ const PickExerciseItem = ({ exercise, onSelectExercise, isSelected }) => {
           </LinearGradient>
         </View>
 
+        {/* מידע תרגיל */}
         <View style={styles.exerciseInfoContainer}>
-          <View style={{ alignSelf: "center" }}>
-            <Text style={styles.exerciseName}>{exercise.name}</Text>
-            <Text style={styles.muscleText}>
-              {exercise.targetmuscle}, {exercise.specifictargetmuscle}
-            </Text>
-            <Text style={styles.placeholderText}>None</Text>
-          </View>
+          <Text style={styles.exerciseName}>{exercise.name}</Text>
+          <Text style={styles.muscleText}>
+            {exercise.targetmuscle}, {exercise.specifictargetmuscle}
+          </Text>
+
+          {/* מצב עריכה - שורת קלט מסודרת */}
+          {isEditing ? (
+            <View style={styles.editingContainer}>
+              <View style={styles.inputsRow}>
+                {sets.map((set, index) => (
+                  <TextInput
+                    key={index}
+                    style={styles.editingInput}
+                    keyboardType="numeric"
+                    value={set}
+                    onChangeText={(value) => handleSetChange(index, value)}
+                    maxLength={2}
+                  />
+                ))}
+                <TouchableOpacity
+                  style={styles.saveButton}
+                  onPress={handleSaveSets}
+                >
+                  <FontAwesome5 name="check" style={styles.saveButtonText} />
+                </TouchableOpacity>
+              </View>
+            </View>
+          ) : (
+            <TouchableOpacity
+              style={styles.setsContainer}
+              onPress={() => setIsEditing(true)}
+            >
+              {sets.map((set, index) => (
+                <View key={index} style={styles.setBubble}>
+                  <Text style={styles.setText}>{set}</Text>
+                </View>
+              ))}
+            </TouchableOpacity>
+          )}
         </View>
 
-        <View
-          style={{
-            flex: 0.1,
-            margin: width * 0.04,
-            alignItems: "center",
-          }}
-        >
+        {/* אייקון בחירה */}
+        <View style={styles.iconContainer}>
           <FontAwesome5
             name={isSelected ? "check-circle" : "info-circle"}
             size={18}
@@ -70,12 +141,13 @@ const styles = StyleSheet.create({
     backgroundColor: "#fafafa",
     width: "100%",
     alignSelf: "center",
-    height: height * 0.14,
+    height: height * 0.16,
     flex: 1,
     borderRadius: width * 0.03,
     marginVertical: height * 0.005,
     borderColor: "transparent",
     borderWidth: 2,
+    padding: width * 0.02,
   },
   imageContainer: {
     flex: 1,
@@ -93,10 +165,10 @@ const styles = StyleSheet.create({
     opacity: 0.8,
   },
   exerciseInfoContainer: {
-    flex: 0.5,
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginLeft: width * 0.05,
+    flex: 0.55,
+    justifyContent: "center",
+    gap: height * 0.01,
+    paddingLeft: width * 0.02,
   },
   exerciseName: {
     fontFamily: "PoppinsBold",
@@ -109,11 +181,60 @@ const styles = StyleSheet.create({
     fontSize: RFValue(12),
     color: "#919191",
   },
-  placeholderText: {
-    fontFamily: "PoppinsRegular",
+  setsContainer: {
+    flexDirection: "row",
+    justifyContent: "flex-start",
+    marginTop: 5,
+  },
+  setBubble: {
+    backgroundColor: "#0d2540",
+    paddingVertical: 5,
+    paddingHorizontal: 10,
+    borderRadius: 10,
+    marginRight: 5,
+  },
+  setText: {
+    color: "white",
     fontSize: RFValue(12),
-    color: "black",
-    opacity: 0.7,
+    fontFamily: "PoppinsBold",
+  },
+  editingContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "flex-start",
+    marginTop: 5,
+  },
+  inputsRow: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  editingInput: {
+    width: 40,
+    height: 30,
+    borderWidth: 2,
+    borderColor: "#0d2540",
+    borderRadius: 10,
+    textAlign: "center",
+    fontSize: RFValue(14),
+    backgroundColor: "#fff",
+    marginRight: 5,
+  },
+  saveButton: {
+    backgroundColor: "#0d2540",
+    paddingHorizontal: 12,
+    paddingVertical: 5,
+    borderRadius: 10,
+  },
+  saveButtonText: {
+    color: "white",
+    fontSize: RFValue(14),
+    fontFamily: "PoppinsBold",
+  },
+  iconContainer: {
+    flex: 0.1,
+    marginRight: width * 0.04,
+    flexDirection: "row",
+    justifyContent: "flex-end",
     marginTop: height * 0.01,
   },
 });

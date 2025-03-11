@@ -32,29 +32,18 @@ function ChooseExercisesCard({
     setSelectedMuscleGroup(Object.keys(grouped)[0]);
   }, [exercises]);
 
-  useEffect(() => {
-    console.log("🔄 selectedExercises updated:", selectedExercises);
-
-    if (selectedExercises.length === 0) {
-      console.warn("⚠️ WARNING: selectedExercises is EMPTY after update!");
-    }
-
-    const isValid =
-      Array.isArray(selectedExercises) &&
-      selectedExercises.every((ex) => typeof ex === "object" && ex !== null);
-    if (!isValid) {
-      console.error(
-        "❌ ERROR: selectedExercises contains invalid data!",
-        selectedExercises
-      );
-    }
-  }, [selectedExercises]);
-
   const toggleExerciseSelection = (exercise) => {
     setSelectedExercises((prevSelected) => {
-      return prevSelected.some((ex) => ex.name === exercise.name)
-        ? prevSelected.filter((ex) => ex.name !== exercise.name)
-        : [...prevSelected, exercise];
+      const existingExercise = prevSelected.find((ex) => ex.id === exercise.id);
+
+      if (existingExercise) {
+        return prevSelected.filter((ex) => ex.id !== exercise.id);
+      }
+
+      return [
+        ...prevSelected,
+        { ...exercise, sets: exercise.sets || ["10", "10", "10"] },
+      ];
     });
   };
 

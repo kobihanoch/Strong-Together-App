@@ -70,7 +70,11 @@ export const addExercisesToSplit = async (splitId, exercises) => {
 };
 
 // Add a single exercise to a workout split
-export const addExerciseToSplit = async (workoutsplit_id, exercise_id) => {
+export const addExerciseToSplit = async (
+  workoutsplit_id,
+  exercise_id,
+  sets
+) => {
   console.log(
     "Service splitId ",
     workoutsplit_id,
@@ -90,7 +94,7 @@ export const addExerciseToSplit = async (workoutsplit_id, exercise_id) => {
 
     const { data, error } = await supabase
       .from("exercisetoworkoutsplit")
-      .insert([{ workoutsplit_id, exercise_id, created_at }])
+      .insert([{ workoutsplit_id, exercise_id, created_at, sets }])
       .select("id");
 
     if (error) throw error;

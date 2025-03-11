@@ -73,7 +73,7 @@ function ModifySplitNamesScreen({
         createdSplits[splitName] = splitData[0].id;
       }
 
-      // 3Assign exercises to each workout split
+      // Assign exercises to each workout split with their corresponding sets
       for (const [splitName, exercises] of Object.entries(
         selectedExercisesBySplit
       )) {
@@ -81,7 +81,11 @@ function ModifySplitNamesScreen({
         if (!splitId) continue;
 
         for (const exercise of exercises) {
-          await addExerciseToWorkoutSplit(splitId, exercise.id);
+          await addExerciseToWorkoutSplit(
+            splitId,
+            exercise.id,
+            exercise.sets || ["10", "10", "10"]
+          );
         }
       }
 

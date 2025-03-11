@@ -11,9 +11,11 @@ const ExerciseList = ({ exercises, onSelectExercise, selectedExercises }) => {
         showsVerticalScrollIndicator={false}
         renderItem={({ item }) => (
           <PickExerciseItem
-            onSelectExercise={onSelectExercise}
-            isSelected={selectedExercises.some((ex) => ex.name === item.name)}
             exercise={item}
+            onSelectExercise={(updatedExercise) =>
+              onSelectExercise(updatedExercise)
+            }
+            isSelected={selectedExercises.some((ex) => ex.id === item.id)}
           />
         )}
       />

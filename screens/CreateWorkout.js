@@ -38,7 +38,10 @@ function CreateWorkout({ navigation }) {
     setSelectedExercisesBySplit(initializeSplits(splitsNumber));
   }, [splitsNumber]);
 
-  console.log("All exercises selected: ", selectedExercisesBySplit);
+  console.log(
+    "All exercises selected: ",
+    JSON.stringify(selectedExercisesBySplit, null, 2)
+  );
 
   useEffect(() => {
     console.log("🔄 splitsNumber changed:", splitsNumber);
