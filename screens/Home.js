@@ -19,6 +19,8 @@ import { LinearGradient } from "expo-linear-gradient";
 import { RFValue } from "react-native-responsive-fontsize";
 import MostCommonWorkoutSummaryCard from "../components/HomeComponents/MostCommonWorkoutSummaryCard";
 import WorkoutCountCard from "../components/HomeComponents/WorkoutCountCard";
+import { useUserWorkout } from "../hooks/useUserWorkout";
+import LoadingPage from "../components/LoadingPage";
 
 const { width, height } = Dimensions.get("window");
 
@@ -26,6 +28,8 @@ const Home = ({ navigation }) => {
   const { user, logout } = useAuth();
   const [username, setUsername] = useState(null);
   const [userId, setUserId] = useState(null);
+  const { userWorkout, loading, error } = useUserWorkout(user?.id);
+  const [hasAssignedWorkout, setHasAssignedWorkout] = useState(false);
 
   // Set username after user is laoded
   useEffect(() => {
@@ -35,6 +39,15 @@ const Home = ({ navigation }) => {
     }
   }, [user]);
 
+  // Set user's assigned workout state after user is loaded
+  useEffect(() => {
+    if (userWorkout && userWorkout.length > 0) {
+      setHasAssignedWorkout(true);
+    } else {
+      setHasAssignedWorkout(false);
+    }
+  }, [userWorkout]);
+
   if (!user || !user.username) {
     return (
       <View style={styles.errorContainer}>
@@ -43,7 +56,9 @@ const Home = ({ navigation }) => {
     );
   }
 
-  return (
+  return loading ? (
+    <LoadingPage message="Loading user data..." />
+  ) : (
     <View style={{ flex: 1, paddingVertical: height * 0.02 }}>
       {/* Header */}
       <View style={styles.headerContainer}>
@@ -72,6 +87,7 @@ const Home = ({ navigation }) => {
             height={height}
             width={width}
           />
+
           <View
             style={{
               flex: 4,
@@ -89,45 +105,91 @@ const Home = ({ navigation }) => {
               paddingTop: height * 0.01,
             }}
           >
-            <Text
-              style={{
-                fontFamily: "PoppinsBold",
-                color: "white",
-                padding: height * 0.02,
-              }}
-            >
-              Create workout
-            </Text>
-            <View
-              style={{
-                width: "100%",
-                justifyContent: "center",
-                alignItems: "center",
-              }}
-            >
-              <TouchableOpacity
-                onPress={() => navigation.navigate("CreateWorkout")}
-              >
-                <LinearGradient
-                  colors={["#2196F3", "rgb(11, 129, 255)"]}
-                  start={{ x: 0, y: 0 }}
-                  end={{ x: 1, y: 1 }}
+            {hasAssignedWorkout ? (
+              <>
+                <Text
                   style={{
-                    justifyContent: "center",
-                    alignItems: "center",
-                    borderRadius: height * 0.08,
-                    height: height * 0.08,
-                    width: width * 0.2,
+                    fontFamily: "PoppinsBold",
+                    color: "white",
+                    padding: height * 0.02,
                   }}
                 >
-                  <FontAwesome5
-                    name="plus"
-                    color="white"
-                    size={RFValue(15)}
-                  ></FontAwesome5>
-                </LinearGradient>
-              </TouchableOpacity>
-            </View>
+                  Edit workout
+                </Text>
+                <View
+                  style={{
+                    width: "100%",
+                    justifyContent: "center",
+                    alignItems: "center",
+                  }}
+                >
+                  <TouchableOpacity
+                    onPress={() => navigation.navigate("CreateWorkout")}
+                  >
+                    <LinearGradient
+                      colors={["#2196F3", "rgb(17, 87, 162)"]}
+                      start={{ x: 0, y: 0 }}
+                      end={{ x: 1, y: 1 }}
+                      style={{
+                        justifyContent: "center",
+                        alignItems: "center",
+                        borderRadius: height * 0.08,
+                        height: height * 0.08,
+                        width: width * 0.2,
+                      }}
+                    >
+                      <FontAwesome5
+                        name="edit"
+                        color="white"
+                        size={RFValue(15)}
+                      ></FontAwesome5>
+                    </LinearGradient>
+                  </TouchableOpacity>
+                </View>
+              </>
+            ) : (
+              <>
+                <Text
+                  style={{
+                    fontFamily: "PoppinsBold",
+                    color: "white",
+                    padding: height * 0.02,
+                  }}
+                >
+                  Create workout
+                </Text>
+                <View
+                  style={{
+                    width: "100%",
+                    justifyContent: "center",
+                    alignItems: "center",
+                  }}
+                >
+                  <TouchableOpacity
+                    onPress={() => navigation.navigate("CreateWorkout")}
+                  >
+                    <LinearGradient
+                      colors={["#2196F3", "rgb(11, 129, 255)"]}
+                      start={{ x: 0, y: 0 }}
+                      end={{ x: 1, y: 1 }}
+                      style={{
+                        justifyContent: "center",
+                        alignItems: "center",
+                        borderRadius: height * 0.08,
+                        height: height * 0.08,
+                        width: width * 0.2,
+                      }}
+                    >
+                      <FontAwesome5
+                        name="plus"
+                        color="white"
+                        size={RFValue(15)}
+                      ></FontAwesome5>
+                    </LinearGradient>
+                  </TouchableOpacity>
+                </View>
+              </>
+            )}
           </View>
         </View>
         <View style={{ flex: 4.5, flexDirection: "row" }}>
