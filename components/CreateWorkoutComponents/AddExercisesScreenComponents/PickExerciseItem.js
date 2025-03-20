@@ -70,7 +70,6 @@ const PickExerciseItem = ({ exercise, onSelectExercise, isSelected }) => {
       activeOpacity={0.8}
     >
       <View style={{ flex: 1, flexDirection: "row" }}>
-        {/* תמונת תרגיל */}
         <View style={{ flex: 0.35, justifyContent: "center" }}>
           <LinearGradient
             colors={["#00142a", "#0d2540"]}
@@ -80,14 +79,12 @@ const PickExerciseItem = ({ exercise, onSelectExercise, isSelected }) => {
           </LinearGradient>
         </View>
 
-        {/* מידע תרגיל */}
         <View style={styles.exerciseInfoContainer}>
           <Text style={styles.exerciseName}>{exercise.name}</Text>
           <Text style={styles.muscleText}>
             {exercise.targetmuscle}, {exercise.specifictargetmuscle}
           </Text>
 
-          {/* מצב עריכה - שורת קלט מסודרת */}
           {isEditing ? (
             <View style={styles.editingContainer}>
               <View style={styles.inputsRow}>
@@ -123,7 +120,6 @@ const PickExerciseItem = ({ exercise, onSelectExercise, isSelected }) => {
           )}
         </View>
 
-        {/* אייקון בחירה */}
         <View style={styles.iconContainer}>
           <FontAwesome5
             name={isSelected ? "check-circle" : "info-circle"}

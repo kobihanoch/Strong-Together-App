@@ -11,6 +11,20 @@ export const fetchWorkoutsByUserId = async (userId) => {
   return data;
 };
 
+// A function for learning
+export const getUserWorkout = async (userId) => {
+  const { data, error } = await supabase
+    .from("users")
+    .select(
+      "*, workoutplans!workoutplans_user_id_fkey(*, workoutsplits(*, exercisetoworkoutsplit(*)))"
+    )
+    .eq("id", userId);
+  console.log(
+    "WorkoutService: User + Workout + Splits + Exercises were fetched successfully!"
+  );
+  return data[0].workoutplans;
+};
+
 // Add a new workout plan
 export const addWorkout = async (userId, name, splitsNumber) => {
   if (!userId) {
