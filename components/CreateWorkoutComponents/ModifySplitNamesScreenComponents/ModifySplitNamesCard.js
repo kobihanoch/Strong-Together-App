@@ -19,8 +19,8 @@ function ModifySplitNamesCard({
   setStep,
   selectedExercisesBySplit,
 }) {
-  const [splitNames, setSplitNames] = useState(
-    Array.from({ length: splitsNumber }, (_, i) => String.fromCharCode(65 + i))
+  const splitNames = Array.from({ length: splitsNumber }, (_, i) =>
+    String.fromCharCode(65 + i)
   );
 
   return (

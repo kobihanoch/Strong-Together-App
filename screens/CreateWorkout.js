@@ -7,25 +7,34 @@ import PickSplitNumberScreen from "../components/CreateWorkoutComponents/Screens
 import ModifySplitNamesScreen from "../components/CreateWorkoutComponents/Screens/ModifySplitNamesScreen";
 import AddExercisesScreen from "../components/CreateWorkoutComponents/Screens/AddExercisesScreen";
 import useExercises from "../hooks/useExercises";
+// TOMORROW: ADD A HOOK TO FETCH CURRRENT WORKOUT - IF EXISTS LOAD IT HERE
+import { useUserWorkout } from "../hooks/useUserWorkout";
 
 const { width, height } = Dimensions.get("window");
 
 function CreateWorkout({ navigation }) {
   const { user } = useAuth();
+  const { userWorkout, loading, error } = useUserWorkout(user?.id);
+
   const [splitsNumber, setSplitsNumber] = useState(1);
-  const { exercises } = useExercises();
+  const { exercises, setExercises } = useExercises();
   const [step, setStep] = useState(1);
   const [editWorkoutSplitName, setEditWorkoutSplitName] = useState("A");
-  const initializeSplits = (splitsNumber) => {
-    if (!splitsNumber || splitsNumber <= 0) return {}; // אם אין פיצולים, מחזירים אובייקט ריק
 
-    return Array.from({ length: splitsNumber }, (_, i) =>
-      String.fromCharCode(65 + i)
-    ) // ["A", "B", "C"...]
-      .reduce((acc, split) => {
-        acc[split] = [];
-        return acc;
-      }, {});
+  const initializeSplits = (splitsNumber) => {
+    if (
+      !selectedExercisesBySplit ||
+      Object.keys(selectedExercisesBySplit).length === 0
+    ) {
+      if (!splitsNumber || splitsNumber <= 0) return {};
+      return Array.from({ length: splitsNumber }, (_, i) =>
+        String.fromCharCode(65 + i)
+      ) // ["A", "B", "C"...]
+        .reduce((acc, split) => {
+          acc[split] = [];
+          return acc;
+        }, {});
+    }
   };
 
   const [selectedExercisesBySplit, setSelectedExercisesBySplit] = useState(
@@ -34,18 +43,58 @@ function CreateWorkout({ navigation }) {
       : initializeSplits(splitsNumber)
   );
 
+  // Handling assigned workout if exists
   useEffect(() => {
-    setSelectedExercisesBySplit(initializeSplits(splitsNumber));
+    (async () => {
+      if (userWorkout && userWorkout.length > 0) {
+        setSplitsNumber(userWorkout[0].numberofsplits);
+
+        // Creates a dictionary with assigned workout to pass as an argument
+        const excDict = {};
+
+        userWorkout[0].workoutsplits.forEach((split) => {
+          excDict[split.name] = [...split.exercisetoworkoutsplit];
+        });
+
+        // Sorting the dictionary
+        const sortedExcDict = Object.keys(excDict)
+          .sort()
+          .reduce((acc, key) => {
+            acc[key] = excDict[key];
+            return acc;
+          }, {});
+
+        // Make this dict. main
+        setSelectedExercisesBySplit(sortedExcDict);
+      }
+    })();
+  }, [userWorkout]);
+
+  // Going towards step 2 if already has a workout
+  useEffect(() => {
+    if (userWorkout && userWorkout.length > 0) {
+      setStep(2);
+    }
+  }, [selectedExercisesBySplit]);
+
+  useEffect(() => {
+    if (
+      !selectedExercisesBySplit ||
+      Object.keys(selectedExercisesBySplit).length === 0
+    ) {
+      console.log("🔄 Initializing splits after splitsNumber update...");
+      setSelectedExercisesBySplit(initializeSplits(splitsNumber));
+    }
   }, [splitsNumber]);
 
-  console.log(
-    "All exercises selected: ",
-    JSON.stringify(selectedExercisesBySplit, null, 2)
-  );
-
   useEffect(() => {
-    console.log("🔄 splitsNumber changed:", splitsNumber);
-    setSelectedExercisesBySplit(initializeSplits(splitsNumber));
+    if (
+      !selectedExercisesBySplit ||
+      Object.keys(selectedExercisesBySplit).length === 0
+    ) {
+      console.log("🔄 splitsNumber changed:", splitsNumber);
+      setSelectedExercisesBySplit(initializeSplits(splitsNumber));
+    }
   }, [splitsNumber]);
 
   return (

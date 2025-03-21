@@ -16,9 +16,11 @@ function ChooseExercisesCard({
 }) {
   const [groupedExercises, setGroupedExercises] = useState({});
   const [selectedMuscleGroup, setSelectedMuscleGroup] = useState(null);
-  const [selectedExercises, setSelectedExercises] = useState(
-    initialSelectedExercises
-  );
+  const [selectedExercises, setSelectedExercises] = useState();
+
+  useEffect(() => {
+    setSelectedExercises(initialSelectedExercises || []);
+  }, [initialSelectedExercises, workoutSplitName]);
 
   useEffect(() => {
     const grouped = exercises.reduce((acc, exercise) => {
