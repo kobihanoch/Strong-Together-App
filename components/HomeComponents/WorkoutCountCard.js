@@ -4,20 +4,18 @@ import useExerciseTracking from "../../hooks/useExerciseTracking";
 import { RFValue } from "react-native-responsive-fontsize";
 
 function WorkoutCountCard({ userId, height, width }) {
-  const {
-    trackingData: exerciseTrackingData,
-    loading,
-    error,
-  } = useExerciseTracking(userId ?? null);
+  const { trackingData, loading, error } = useExerciseTracking(userId);
 
-  const uniqueDates = new Set();
+  const [totalWorkoutsNumber, setTotalWorkoutNumber] = useState(0);
 
-  exerciseTrackingData.forEach((item) => {
-    const date = new Date(item.workoutdate).toDateString();
-    uniqueDates.add(date);
-  });
-
-  const totalWorkoutsNumber = uniqueDates.size;
+  // Updating workout counter
+  useEffect(() => {
+    const uniWorkouts = new Set();
+    trackingData.forEach((exerciseInTrackingData) => {
+      uniWorkouts.add(exerciseInTrackingData.workoutdate);
+    });
+    setTotalWorkoutNumber(uniWorkouts.size);
+  }, [trackingData]);
 
   const styles = createStyles(height, width);
 

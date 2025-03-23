@@ -24,7 +24,7 @@ const MostCommonWorkoutSummaryCard = ({
     mostFrequentSplit,
     loading,
     error,
-  } = useExerciseTracking(userId ?? null);
+  } = useExerciseTracking(userId);
 
   // Extract workout split ID and name from mostFrequentSplit
   const {

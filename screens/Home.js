@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   Image,
 } from "react-native";
+import { useFocusEffect } from "@react-navigation/native";
 import Layout from "../components/Layout";
 import useWorkoutSplits from "../hooks/useWorkoutSplits";
 import { useAuth } from "../context/AuthContext";
@@ -28,7 +29,7 @@ const Home = ({ navigation }) => {
   const { user, logout } = useAuth();
   const [username, setUsername] = useState(null);
   const [userId, setUserId] = useState(null);
-  const { userWorkout, loading, error } = useUserWorkout(user?.id);
+  const { refetch, userWorkout, loading, error } = useUserWorkout(user?.id);
   const [hasAssignedWorkout, setHasAssignedWorkout] = useState(false);
 
   // Set username after user is laoded
@@ -38,6 +39,14 @@ const Home = ({ navigation }) => {
       setUserId(user.id);
     }
   }, [user]);
+
+  useFocusEffect(
+    React.useCallback(() => {
+      if (user?.id) {
+        refetch();
+      }
+    }, [user?.id])
+  );
 
   // Set user's assigned workout state after user is loaded
   useEffect(() => {

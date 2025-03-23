@@ -100,7 +100,7 @@ function ModifySplitNamesScreen({
         for (const exercise of exercises) {
           await addExerciseToWorkoutSplit(
             splitId,
-            exercise.id,
+            exercise.exercise_id || exercise.id,
             exercise.sets || ["10", "10", "10"]
           );
         }

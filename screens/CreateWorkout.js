@@ -75,26 +75,21 @@ function CreateWorkout({ navigation }) {
     if (userWorkout && userWorkout.length > 0) {
       setStep(2);
     }
-  }, [selectedExercisesBySplit]);
+  }, [userWorkout]);
 
   useEffect(() => {
-    if (
-      !selectedExercisesBySplit ||
-      Object.keys(selectedExercisesBySplit).length === 0
-    ) {
-      console.log("🔄 Initializing splits after splitsNumber update...");
-      setSelectedExercisesBySplit(initializeSplits(splitsNumber));
-    }
-  }, [splitsNumber]);
+    if (!selectedExercisesBySplit) return;
 
-  useEffect(() => {
-    if (
-      !selectedExercisesBySplit ||
-      Object.keys(selectedExercisesBySplit).length === 0
-    ) {
-      console.log("🔄 splitsNumber changed:", splitsNumber);
-      setSelectedExercisesBySplit(initializeSplits(splitsNumber));
-    }
+    const allowedSplits = Array.from({ length: splitsNumber }, (_, i) =>
+      String.fromCharCode(65 + i)
+    ); // ['A', 'B', 'C', ...]
+
+    const updated = {};
+    allowedSplits.forEach((split) => {
+      updated[split] = selectedExercisesBySplit[split] || [];
+    });
+
+    setSelectedExercisesBySplit(updated);
   }, [splitsNumber]);
 
   return (
