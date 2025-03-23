@@ -13,6 +13,7 @@ import BottomTabBar from "../components/BottomTabBar";
 import Theme1 from "../components/Theme1";
 import GoToButton from "../components/HomeComponents/GoToButton";
 import { useAuth } from "../context/AuthContext";
+import { CommonActions } from "@react-navigation/native";
 
 const { width, height } = Dimensions.get("window");
 
@@ -20,10 +21,12 @@ const Settings = ({ navigation }) => {
   const { user, logout } = useAuth();
   const handleLogout = () => {
     logout();
-    navigation.reset({
-      index: 0,
-      routes: [{ name: "AuthStack", params: { screen: "Intro" } }],
-    });
+    navigation.dispatch(
+      CommonActions.reset({
+        index: 0,
+        routes: [{ name: "Intro" }],
+      })
+    );
   };
 
   return (

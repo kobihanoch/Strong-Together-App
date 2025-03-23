@@ -1,22 +1,26 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View, ActivityIndicator } from 'react-native';
-import React, { useState, useEffect } from 'react';
-import { NavigationContainer } from '@react-navigation/native';
-import AuthStack from './navigation/AuthStack'; 
-import AppStack from './navigation/AppStack';    
-import * as Font from 'expo-font';
-import BottomTabBar from './components/BottomTabBar'; 
-import { AuthProvider, useAuth } from './context/AuthContext'; 
-import Theme1 from './components/Theme1';
+import {
+  NavigationContainer,
+  useNavigationContainerRef,
+  CommonActions,
+} from "@react-navigation/native";
+import React, { useState, useEffect, useRef } from "react";
+import { View, Text, ActivityIndicator, StyleSheet } from "react-native";
+import AuthStack from "./navigation/AuthStack";
+import AppStack from "./navigation/AppStack";
+import BottomTabBar from "./components/BottomTabBar";
+import Theme1 from "./components/Theme1";
+import * as Font from "expo-font";
+import { AuthProvider, useAuth } from "./context/AuthContext";
 
 export default function App() {
   const [fontsLoaded, setFontsLoaded] = useState(false);
+  const navigationRef = useNavigationContainerRef();
 
   const loadFonts = async () => {
     await Font.loadAsync({
-      'PoppinsLight': require('./assets/fonts/Poppins-Light.ttf'),
-      'PoppinsRegular': require('./assets/fonts/Poppins-Regular.ttf'),
-      'PoppinsBold': require('./assets/fonts/Poppins-Bold.ttf'),
+      PoppinsLight: require("./assets/fonts/Poppins-Light.ttf"),
+      PoppinsRegular: require("./assets/fonts/Poppins-Regular.ttf"),
+      PoppinsBold: require("./assets/fonts/Poppins-Bold.ttf"),
     });
     setFontsLoaded(true);
   };
@@ -24,6 +28,17 @@ export default function App() {
   useEffect(() => {
     loadFonts();
   }, []);
+
+  const handleLogoutReset = () => {
+    if (navigationRef.isReady()) {
+      navigationRef.dispatch(
+        CommonActions.reset({
+          index: 0,
+          routes: [{ name: "AuthStack" }],
+        })
+      );
+    }
+  };
 
   if (!fontsLoaded) {
     return (
@@ -35,18 +50,17 @@ export default function App() {
   }
 
   return (
-    <AuthProvider>
-      <NavigationContainer>
+    <AuthProvider onLogout={handleLogoutReset}>
+      <NavigationContainer ref={navigationRef}>
         <AuthWrapper />
       </NavigationContainer>
     </AuthProvider>
   );
 }
 
-
 function AuthWrapper() {
-  const { isLoggedIn } = useAuth();  
-  const [selectedTab, setSelectedTab] = useState('Home');
+  const { isLoggedIn } = useAuth();
+  const [selectedTab, setSelectedTab] = useState("Home");
 
   const handleTabPress = (tabName) => {
     setSelectedTab(tabName);
@@ -56,7 +70,9 @@ function AuthWrapper() {
     <View style={{ flex: 1 }}>
       {isLoggedIn ? (
         <>
-          <Theme1><AppStack /></Theme1>
+          <Theme1>
+            <AppStack />
+          </Theme1>
           <BottomTabBar selectedTab={selectedTab} onTabPress={handleTabPress} />
         </>
       ) : (
@@ -69,7 +85,7 @@ function AuthWrapper() {
 const styles = StyleSheet.create({
   loadingContainer: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
 });
