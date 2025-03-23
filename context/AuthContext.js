@@ -23,10 +23,12 @@ export const AuthProvider = ({ children, onLogout }) => {
     checkLoginStatus();
   }, []);
 
-  const [profilePicTrigger, setProfilePicTrigger] = useState(0);
-
-  const updateProfilePic = () => {
-    //setProfilePicTrigger((prev) => prev + 1);
+  const updateProfilePic = (picUrl) => {
+    setUser((prevUser) => {
+      const updatedUser = { ...prevUser, profile_image_url: picUrl };
+      AsyncStorage.setItem("user", JSON.stringify(updatedUser));
+      return updatedUser;
+    });
   };
 
   const login = (userData) => {
@@ -46,14 +48,7 @@ export const AuthProvider = ({ children, onLogout }) => {
 
   return (
     <AuthContext.Provider
-      value={{
-        isLoggedIn,
-        user,
-        login,
-        logout,
-        updateProfilePic,
-        profilePicTrigger,
-      }}
+      value={{ isLoggedIn, user, login, logout, updateProfilePic }}
     >
       {children}
     </AuthContext.Provider>

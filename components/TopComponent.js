@@ -16,43 +16,13 @@ import supabase from "../src/supabaseClient";
 const { width, height } = Dimensions.get("window");
 
 const TopComponent = () => {
-  const { user, logout, profilePicTrigger } = useAuth();
-  const [username, setUsername] = useState(null);
-  const [fullName, setFullname] = useState(null);
-  const [profileImageUrl, setProfileImageUrl] = useState("");
-  const [isModalVisible, setIsModalVisible] = useState(false); // מצב עבור הפעלת ה-Modal
+  const { user } = useAuth();
 
-  useEffect(() => {
-    const fetchUserData = async () => {
-      if (user) {
-        try {
-          const { data, error } = await supabase
-            .from("users")
-            .select("profile_image_url")
-            .eq("id", user.id)
-            .single();
+  const profileImageUrl = user?.profile_image_url;
+  const username = user?.username;
+  const fullName = user?.name;
 
-          if (error) {
-            console.error("Error fetching user data:", error);
-            return;
-          }
-
-          console.log("Profile pic:", data.profile_image_url);
-          setUsername(user.username);
-          setFullname(user.name);
-          setProfileImageUrl(data.profile_image_url || "");
-        } catch (err) {
-          console.error("Error:", err);
-        }
-      } else {
-        setUsername(null);
-        setFullname(null);
-        setProfileImageUrl("");
-      }
-    };
-
-    fetchUserData();
-  }, [user]);
+  const [isModalVisible, setIsModalVisible] = useState(false);
 
   const handleImagePress = () => {
     setIsModalVisible(true);

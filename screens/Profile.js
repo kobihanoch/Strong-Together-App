@@ -17,7 +17,7 @@ import useUserData from "../hooks/useUserData";
 const { width, height } = Dimensions.get("window");
 
 function Profile({ navigation }) {
-  const { user, updateProfilePic, profilePicTrigger } = useAuth();
+  const { user, updateProfilePic } = useAuth();
   const {
     uploadToStorage,
     fetchPublicUrl,
@@ -63,10 +63,11 @@ function Profile({ navigation }) {
 
         const publicUrl = await fetchPublicUrl(file.name);
 
-        setProfileImageUrl(publicUrl);
+        setProfileImageUrl(`${publicUrl}?t=${Date.now()}`);
 
         await updateProfilePictureURLForUser(user.id, publicUrl);
-        updateProfilePic;
+
+        updateProfilePic(`${publicUrl}?t=${Date.now()}`);
       }
     } catch (err) {
       console.log("Error handling profile image upload:", err);
