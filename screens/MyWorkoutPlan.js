@@ -115,113 +115,141 @@ const MyWorkoutPlan = () => {
 
   return (
     <View style={{ flex: 1, paddingVertical: height * 0.02 }}>
-      <View
-        style={{
-          flex: 0.15,
-          flexDirection: "row",
-          justifyContent: "space-between",
-          alignItems: "center",
-          paddingHorizontal: width * 0.06,
-        }}
-      >
-        <View>
-          <Text
+      {workout ? (
+        <>
+          <View
             style={{
-              fontFamily: "PoppinsBold",
-              fontSize: RFValue(16),
-              color: "black",
-            }}
-          >
-            Your workouts
-          </Text>
-          <Text
-            style={{
-              fontFamily: "PoppinsRegular",
-              fontSize: RFValue(13),
-              color: "#999999",
-            }}
-          >
-            Select a workout to start
-          </Text>
-        </View>
-        <View style={{ justifyContent: "center", alignItems: "center" }}>
-          <TouchableOpacity
-            style={{
-              height: height * 0.07,
-              width: height * 0.13,
-              backgroundColor: "#0d2540",
-              justifyContent: "center",
+              flex: 0.15,
+              flexDirection: "row",
+              justifyContent: "space-between",
               alignItems: "center",
-              borderRadius: width * 0.5,
-              opacity: buttonOpacity,
-              shadowColor: "#00142a",
-              shadowOffset: { width: 0, height: 0 },
-              shadowOpacity: 0.5,
-              shadowRadius: 5,
-              elevation: 5,
+              paddingHorizontal: width * 0.06,
             }}
-            onPress={() =>
-              navigation.navigate("StartWorkout", {
-                workoutSplit: selectedSplit,
-              })
-            }
           >
-            <View
-              style={{
-                flexDirection: "row",
-                justifyContent: "center",
-                alignItems: "center",
-              }}
-            >
-              <FontAwesome5 name="bolt" size={15} color="#FACC15" />
+            <View>
+              <Text
+                style={{
+                  fontFamily: "PoppinsBold",
+                  fontSize: RFValue(16),
+                  color: "black",
+                }}
+              >
+                Your workouts
+              </Text>
               <Text
                 style={{
                   fontFamily: "PoppinsRegular",
-                  fontSize: RFValue(12),
-                  color: "white",
-                  marginLeft: 10,
+                  fontSize: RFValue(13),
+                  color: "#999999",
                 }}
               >
-                Start
+                Select a workout to start
               </Text>
             </View>
-          </TouchableOpacity>
-        </View>
-      </View>
+            <View style={{ justifyContent: "center", alignItems: "center" }}>
+              <TouchableOpacity
+                style={{
+                  height: height * 0.07,
+                  width: height * 0.13,
+                  backgroundColor: "#0d2540",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  borderRadius: width * 0.5,
+                  opacity: buttonOpacity,
+                  shadowColor: "#00142a",
+                  shadowOffset: { width: 0, height: 0 },
+                  shadowOpacity: 0.5,
+                  shadowRadius: 5,
+                  elevation: 5,
+                }}
+                onPress={() =>
+                  navigation.navigate("StartWorkout", {
+                    workoutSplit: selectedSplit,
+                  })
+                }
+              >
+                <View
+                  style={{
+                    flexDirection: "row",
+                    justifyContent: "center",
+                    alignItems: "center",
+                  }}
+                >
+                  <FontAwesome5 name="bolt" size={15} color="#FACC15" />
+                  <Text
+                    style={{
+                      fontFamily: "PoppinsRegular",
+                      fontSize: RFValue(12),
+                      color: "white",
+                      marginLeft: 10,
+                    }}
+                  >
+                    Start
+                  </Text>
+                </View>
+              </TouchableOpacity>
+            </View>
+          </View>
 
-      <View
-        style={{
-          flex: 0.3,
-          justifyContent: "center",
-          alignItems: "flex-start",
-        }}
-      >
-        <FlatList
-          data={sortedWorkoutSplits}
-          keyExtractor={(item) => item.id.toString()}
-          showsHorizontalScrollIndicator={false}
-          pagingEnabled
-          horizontal={true}
-          renderItem={({ item }) => (
-            <WorkoutSplitItem
-              item={item}
-              exercise_count={countExercisesForSplit(item.id)}
-              isSelected={item.id === selectedSplit?.id}
-              onPress={() => handleWorkoutSplitPress(item)}
+          <View
+            style={{
+              flex: 0.3,
+              justifyContent: "center",
+              alignItems: "flex-start",
+            }}
+          >
+            <FlatList
+              data={sortedWorkoutSplits}
+              keyExtractor={(item) => item.id.toString()}
+              showsHorizontalScrollIndicator={false}
+              pagingEnabled
+              horizontal={true}
+              renderItem={({ item }) => (
+                <WorkoutSplitItem
+                  item={item}
+                  exercise_count={countExercisesForSplit(item.id)}
+                  isSelected={item.id === selectedSplit?.id}
+                  onPress={() => handleWorkoutSplitPress(item)}
+                />
+              )}
             />
-          )}
-        />
-      </View>
+          </View>
 
-      <View style={{ flex: 0.55 }}>
-        <FlatList
-          data={filteredExercises}
-          showsVerticalScroll
-          showsVerticalScrollIndicator={false}
-          keyExtractor={(item, index) => index.toString()}
-          renderItem={({ item }) => <ExerciseItem exercise={item} />}
-        />
-      </View>
+          <View style={{ flex: 0.55 }}>
+            <FlatList
+              data={filteredExercises}
+              showsVerticalScroll
+              showsVerticalScrollIndicator={false}
+              keyExtractor={(item, index) => index.toString()}
+              renderItem={({ item }) => <ExerciseItem exercise={item} />}
+            />
+          </View>
+        </>
+      ) : (
+        <>
+          <View
+            style={{
+              flex: 1,
+              justifyContent: "center",
+              alignItems: "center",
+              flexDirection: "column",
+            }}
+          >
+            <Text style={{ fontSize: RFValue(23), fontFamily: "PoppinsBold" }}>
+              No workout available
+            </Text>
+            <Text
+              style={{
+                fontSize: RFValue(18),
+                fontFamily: "PoppinsRegular",
+                color: "gray",
+              }}
+            >
+              Create one to start your journy
+            </Text>
+          </View>
+        </>
+      )}
     </View>
   );
 };
