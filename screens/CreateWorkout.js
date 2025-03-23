@@ -119,6 +119,7 @@ function CreateWorkout({ navigation }) {
           navigation={navigation}
           setSelectedExercisesBySplit={setSelectedExercisesBySplit}
           userId={user.id}
+          userWorkout={userWorkout}
         />
       )}
       {step === 3 && (

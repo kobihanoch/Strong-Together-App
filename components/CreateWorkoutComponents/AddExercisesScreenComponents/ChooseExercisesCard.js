@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { TouchableOpacity } from "react-native";
-import { View, Text, Dimensions } from "react-native";
+import { TouchableOpacity, View, Text, Dimensions } from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";
 import { LinearGradient } from "expo-linear-gradient";
 import MuscleTabs from "./MuscleTabs";
@@ -16,10 +15,21 @@ function ChooseExercisesCard({
 }) {
   const [groupedExercises, setGroupedExercises] = useState({});
   const [selectedMuscleGroup, setSelectedMuscleGroup] = useState(null);
-  const [selectedExercises, setSelectedExercises] = useState();
+  const [selectedExercises, setSelectedExercises] = useState([]);
+
+  const normalizeExercise = (exercise) => ({
+    id: exercise.exercise_id || exercise.id,
+    name: exercise.name || exercise.exercise || "Unnamed Exercise",
+    sets: Array.isArray(exercise.sets)
+      ? exercise.sets.map((s) => s.toString())
+      : ["10", "10", "10"],
+    targetmuscle: exercise.targetmuscle || null,
+    specifictargetmuscle: exercise.specifictargetmuscle || null,
+  });
 
   useEffect(() => {
-    setSelectedExercises(initialSelectedExercises || []);
+    const normalized = initialSelectedExercises.map(normalizeExercise);
+    setSelectedExercises(normalized);
   }, [initialSelectedExercises, workoutSplitName]);
 
   useEffect(() => {
@@ -29,31 +39,24 @@ function ChooseExercisesCard({
       acc[muscleGroup].push(exercise);
       return acc;
     }, {});
-
     setGroupedExercises(grouped);
     setSelectedMuscleGroup(Object.keys(grouped)[0]);
   }, [exercises]);
 
   const toggleExerciseSelection = (exercise) => {
+    const normalized = normalizeExercise(exercise);
     setSelectedExercises((prevSelected) => {
-      const existingExercise = prevSelected.find((ex) => ex.id === exercise.id);
-
-      if (existingExercise) {
-        return prevSelected.filter((ex) => ex.id !== exercise.id);
+      const exists = prevSelected.some((ex) => ex.id === normalized.id);
+      if (exists) {
+        return prevSelected.filter((ex) => ex.id !== normalized.id);
       }
-
-      return [
-        ...prevSelected,
-        { ...exercise, sets: exercise.sets || ["10", "10", "10"] },
-      ];
+      return [...prevSelected, normalized];
     });
   };
 
   return (
     <LinearGradient
-      colors={["rgb(255, 255, 255)", "rgb(255, 255, 255)"]}
-      start={{ x: 0, y: 0 }}
-      end={{ x: 1, y: 1 }}
+      colors={["#ffffff", "#ffffff"]}
       style={{
         flex: 1,
         flexDirection: "column",
@@ -62,7 +65,6 @@ function ChooseExercisesCard({
         paddingVertical: height * 0.02,
       }}
     >
-      {/* Header and tabs */}
       <View style={{ flexDirection: "column", flex: 3 }}>
         <Text
           style={{
@@ -76,7 +78,6 @@ function ChooseExercisesCard({
           {workoutSplitName} Exercises
         </Text>
 
-        {/* Tabs */}
         <MuscleTabs
           muscleGroups={Object.keys(groupedExercises)}
           selectedMuscleGroup={selectedMuscleGroup}
@@ -84,7 +85,6 @@ function ChooseExercisesCard({
         />
       </View>
 
-      {/* List of grouped exercises*/}
       <ExerciseList
         exercises={groupedExercises[selectedMuscleGroup] || []}
         onSelectExercise={toggleExerciseSelection}

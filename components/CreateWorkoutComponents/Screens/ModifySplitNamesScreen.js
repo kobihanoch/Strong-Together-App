@@ -7,6 +7,8 @@ import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 import useWorkoutSplits from "../../../hooks/useWorkoutSplits";
 import useSplitExercises from "../../../hooks/useSplitExercises";
 import useWorkouts from "../../../hooks/useWorkouts";
+import { deleteWorkout } from "../../../services/WorkoutService";
+import { useDeleteWorkout } from "../../../hooks/useDeleteWorkout";
 
 const { width, height } = Dimensions.get("window");
 
@@ -18,11 +20,13 @@ function ModifySplitNamesScreen({
   selectedExercisesBySplit,
   userId,
   setSelectedExercisesBySplit,
+  userWorkout,
 }) {
   const { addNewWorkout } = useWorkouts(userId);
   const { createWorkoutSplit } = useWorkoutSplits();
   const { addExerciseToWorkoutSplit } = useSplitExercises();
   const [saving, setSaving] = useState(false);
+  const { deleteUserWorkout, error, loading } = useDeleteWorkout();
 
   const [isSaveDisabled, setIsSaveDisabled] = useState(true);
 
@@ -31,8 +35,8 @@ function ModifySplitNamesScreen({
       (exercises) => !exercises || exercises.length === 0
     );
 
-    console.log("🧐 Selected Exercises By Split:", selectedExercisesBySplit);
-    console.log("🚨 isSaveDisabled:", hasEmptySplit);
+    console.log("Selected Exercises By Split:", selectedExercisesBySplit);
+    console.log("isSaveDisabled:", hasEmptySplit);
 
     setIsSaveDisabled(hasEmptySplit);
   }, [selectedExercisesBySplit]);
@@ -40,14 +44,27 @@ function ModifySplitNamesScreen({
   // Save workout
   const saveWorkoutPlan = async () => {
     if (!userId) {
-      console.error("❌ ERROR: User ID is missing!");
+      console.error("ERROR: User ID is missing!");
       return;
     }
 
     try {
-      console.log("🟢 Initiating workout creation...");
+      console.log("Initiating workout creation...");
       setSaving(true);
 
+      // Check if user already has a workout
+      if (userWorkout && userWorkout.length > 0) {
+        // Update
+        console.log("Deleting workout");
+        try {
+          await deleteUserWorkout(userId);
+          console.log("Workout successfully deleted.");
+        } catch (err) {
+          Alert.alert("Error", err.message || "Something went wrong");
+        }
+      }
+
+      console.log("Creating workout");
       // Create a new workout
       const workoutData = await addNewWorkout(
         userId,
@@ -56,7 +73,7 @@ function ModifySplitNamesScreen({
       );
 
       if (!workoutData?.id) {
-        throw new Error("❌ Failed to create workout. No ID returned.");
+        throw new Error("Failed to create workout. No ID returned.");
       }
 
       const workoutId = workoutData.id;
@@ -67,7 +84,7 @@ function ModifySplitNamesScreen({
       for (const splitName of Object.keys(selectedExercisesBySplit)) {
         const splitData = await createWorkoutSplit(workoutId, splitName);
         if (!splitData[0]?.id) {
-          throw new Error(`❌ Workout split creation failed for ${splitName}`);
+          throw new Error(`Workout split creation failed for ${splitName}`);
         }
 
         createdSplits[splitName] = splitData[0].id;
@@ -96,7 +113,7 @@ function ModifySplitNamesScreen({
         { text: "OK", onPress: () => navigation.navigate("MyWorkoutPlan") },
       ]);
     } catch (error) {
-      console.error("❌ Error saving workout plan:", error);
+      console.error("Error saving workout plan:", error);
       Alert.alert("Error", error.message);
     } finally {
       setSaving(false);

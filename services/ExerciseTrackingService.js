@@ -3,9 +3,11 @@ import supabase from "../src/supabaseClient";
 export const getExercisesTrackingByUserId = async (userId) => {
   try {
     const { data, error } = await supabase
-      .from("exercisetracking")
-      .select("*")
-      .eq("user_id", userId);
+      .from("users")
+      .select(
+        "workoutplans!workoutplans_user_id_fkey(workoutsplits(exercisetoworkoutsplit(*)))"
+      )
+      .eq("id", userId);
 
     if (error) throw error;
 

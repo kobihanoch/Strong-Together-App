@@ -26,6 +26,11 @@ function AddExercisesScreen({
     setStep(2);
   };
 
+  console.log(
+    "Selected exercise by split: " +
+      JSON.stringify(selectedExercisesBySplit, null, 2)
+  );
+
   return (
     <View style={{ flex: 1, paddingHorizontal: width * 0.05 }}>
       <View
@@ -57,6 +62,7 @@ function AddExercisesScreen({
 
       <View style={{ flex: 9, marginBottom: height * 0.04 }}>
         <ChooseExercisesCard
+          key={workoutSplitName}
           workoutSplitName={workoutSplitName}
           exercises={exercises}
           initialSelectedExercises={initialSelectedExercises}

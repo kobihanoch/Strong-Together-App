@@ -25,6 +25,23 @@ export const getUserWorkout = async (userId) => {
   return data[0].workoutplans;
 };
 
+// Removes a workout plan
+export const deleteWorkout = async (userId) => {
+  if (!userId) {
+    console.log("Error: user not found.");
+    return;
+  }
+  const { data, error } = await supabase
+    .from("workoutplans")
+    .delete()
+    .eq("user_id", userId);
+  if (error) {
+    console.log("Error occured deleting a workout: " + error);
+    throw error;
+  }
+  return data;
+};
+
 // Add a new workout plan
 export const addWorkout = async (userId, name, splitsNumber) => {
   if (!userId) {
