@@ -63,7 +63,9 @@ function CreateOrEditWorkoutCard({ hasAssignedWorkout, navigation }) {
                 style={{
                   fontFamily: "PoppinsRegular",
                   color: "white",
+                  textAlign: "center",
                   fontSize: RFValue(10),
+                  marginTop: height * 0.01,
                   opacity: 0.5,
                 }}
               >

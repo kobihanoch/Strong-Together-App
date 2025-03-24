@@ -33,6 +33,7 @@ const Home = ({ navigation }) => {
   const [userId, setUserId] = useState(null);
   const { refetch, userWorkout, loading, error } = useUserWorkout(user?.id);
   const [hasAssignedWorkout, setHasAssignedWorkout] = useState(false);
+  const profileImageUrl = user?.profile_image_url;
 
   // Set username after user is laoded
   useEffect(() => {
@@ -73,10 +74,42 @@ const Home = ({ navigation }) => {
     <View style={{ flex: 1, paddingVertical: height * 0.02 }}>
       {/* Header */}
       <View style={styles.headerContainer}>
-        <Text style={styles.headerText}>
-          Welcome,{" "}
-          <Text style={{ fontFamily: "PoppinsBold" }}>{username} </Text>!
-        </Text>
+        <View
+          style={{
+            justifyContent: "center",
+            alignItems: "center",
+            flex: 1.5,
+          }}
+        >
+          <Image
+            source={
+              profileImageUrl
+                ? { uri: profileImageUrl }
+                : require("../assets/profile.png")
+            }
+            style={{
+              height: height * 0.06,
+              width: height * 0.06,
+              resizeMode: "stretch",
+              borderRadius: height * 0.05,
+            }}
+          ></Image>
+        </View>
+        <View style={{ justifyContent: "center", flex: 8.5 }}>
+          <Text style={styles.headerText}>
+            Welcome,{" "}
+            <Text style={{ fontFamily: "PoppinsBold" }}>{username} </Text>!
+          </Text>
+          <Text
+            style={{
+              fontSize: RFValue(13),
+              color: "black",
+              fontFamily: "PoppinsRegular",
+            }}
+          >
+            Check out your dashboard
+          </Text>
+        </View>
       </View>
 
       <View style={styles.midContainer}>
@@ -123,12 +156,15 @@ const Home = ({ navigation }) => {
 
 const styles = StyleSheet.create({
   headerContainer: {
-    flex: 1.5,
     paddingHorizontal: width * 0.06,
-    justifyContent: "center",
+    flex: 1.5,
+    flexDirection: "row",
+    gap: width * 0.05,
+    alignItems: "center",
   },
   headerText: {
     fontFamily: "PoppinsRegular",
+    color: "black",
     fontSize: RFValue(18),
   },
   semiHeaderText: {
