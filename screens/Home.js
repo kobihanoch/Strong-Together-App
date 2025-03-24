@@ -22,6 +22,8 @@ import MostCommonWorkoutSummaryCard from "../components/HomeComponents/MostCommo
 import WorkoutCountCard from "../components/HomeComponents/WorkoutCountCard";
 import { useUserWorkout } from "../hooks/useUserWorkout";
 import LoadingPage from "../components/LoadingPage";
+import CreateOrEditWorkoutCard from "../components/HomeComponents/CreateOrEditWorkoutCard";
+import NewAchivementCard from "../components/HomeComponents/NewAchivementCard";
 
 const { width, height } = Dimensions.get("window");
 
@@ -114,97 +116,18 @@ const Home = ({ navigation }) => {
               paddingTop: height * 0.01,
             }}
           >
-            {hasAssignedWorkout ? (
-              <>
-                <Text
-                  style={{
-                    fontFamily: "PoppinsBold",
-                    color: "white",
-                    padding: height * 0.02,
-                  }}
-                >
-                  Edit workout
-                </Text>
-                <View
-                  style={{
-                    width: "100%",
-                    justifyContent: "center",
-                    alignItems: "center",
-                  }}
-                >
-                  <TouchableOpacity
-                    onPress={() => navigation.navigate("CreateWorkout")}
-                  >
-                    <LinearGradient
-                      colors={["#2196F3", "rgb(17, 87, 162)"]}
-                      start={{ x: 0, y: 0 }}
-                      end={{ x: 1, y: 1 }}
-                      style={{
-                        justifyContent: "center",
-                        alignItems: "center",
-                        borderRadius: height * 0.08,
-                        height: height * 0.08,
-                        width: width * 0.2,
-                      }}
-                    >
-                      <FontAwesome5
-                        name="edit"
-                        color="white"
-                        size={RFValue(15)}
-                      ></FontAwesome5>
-                    </LinearGradient>
-                  </TouchableOpacity>
-                </View>
-              </>
-            ) : (
-              <>
-                <Text
-                  style={{
-                    fontFamily: "PoppinsBold",
-                    color: "white",
-                    padding: height * 0.02,
-                  }}
-                >
-                  Create workout
-                </Text>
-                <View
-                  style={{
-                    width: "100%",
-                    justifyContent: "center",
-                    alignItems: "center",
-                  }}
-                >
-                  <TouchableOpacity
-                    onPress={() => navigation.navigate("CreateWorkout")}
-                  >
-                    <LinearGradient
-                      colors={["#2196F3", "rgb(11, 129, 255)"]}
-                      start={{ x: 0, y: 0 }}
-                      end={{ x: 1, y: 1 }}
-                      style={{
-                        justifyContent: "center",
-                        alignItems: "center",
-                        borderRadius: height * 0.08,
-                        height: height * 0.08,
-                        width: width * 0.2,
-                      }}
-                    >
-                      <FontAwesome5
-                        name="plus"
-                        color="white"
-                        size={RFValue(15)}
-                      ></FontAwesome5>
-                    </LinearGradient>
-                  </TouchableOpacity>
-                </View>
-              </>
-            )}
+            <CreateOrEditWorkoutCard
+              hasAssignedWorkout={hasAssignedWorkout}
+              navigation={navigation}
+            ></CreateOrEditWorkoutCard>
           </View>
         </View>
-        <View style={{ flex: 4.5, flexDirection: "row" }}>
+        <View style={{ flex: 4.5, flexDirection: "row", gap: width * 0.02 }}>
+          <NewAchivementCard user={user}></NewAchivementCard>
+          {/*Another component here*/}
           <View
             style={{
-              width: "90%",
+              width: "50%",
               display: "flex",
               backgroundColor: "#0d2540",
               borderRadius: height * 0.02,

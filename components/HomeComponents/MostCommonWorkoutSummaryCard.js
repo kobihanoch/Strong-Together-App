@@ -156,6 +156,7 @@ const MostCommonWorkoutSummaryCard = ({
             flexDirection: "row",
             justifyContent: "center",
             alignItems: "center",
+            opacity: 0.6,
           }}
         >
           <Text
