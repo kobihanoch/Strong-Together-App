@@ -80,12 +80,12 @@ const Home = ({ navigation }) => {
       </View>
 
       <View style={styles.midContainer}>
-        <View style={{ flex: 2 }}>
+        <View style={{ flex: 1.5 }}>
           <WorkoutCountCard userId={userId} height={height} width={width} />
         </View>
         <View
           style={{
-            flex: 3.5,
+            flex: 4,
             display: "flex",
             flexDirection: "row",
             gap: width * 0.02,
@@ -97,51 +97,24 @@ const Home = ({ navigation }) => {
             height={height}
             width={width}
           />
-
-          <View
-            style={{
-              flex: 4,
-              backgroundColor: "#0d2540",
-              borderRadius: height * 0.02,
-              flexDirection: "column",
-              justifyContent: "flex-start",
-              alignItems: "center",
-              shadowColor: "#000",
-              shadowOffset: { width: 0, height: 2 },
-              shadowOpacity: 0.1,
-              shadowRadius: 8,
-              elevation: 4,
-              gap: height * 0.02,
-              paddingTop: height * 0.01,
-            }}
-          >
-            <CreateOrEditWorkoutCard
-              hasAssignedWorkout={hasAssignedWorkout}
-              navigation={navigation}
-            ></CreateOrEditWorkoutCard>
-          </View>
         </View>
-        <View style={{ flex: 4.5, flexDirection: "row", gap: width * 0.02 }}>
+        <View
+          style={{
+            flex: 4.5,
+            width: "88%",
+            flexDirection: "row",
+            gap: width * 0.02,
+            justifyContent: "center",
+          }}
+        >
           <NewAchivementCard
             user={user}
             hasAssignedWorkout={hasAssignedWorkout}
           ></NewAchivementCard>
-          {/*Another component here*/}
-          <View
-            style={{
-              width: "48%",
-              display: "flex",
-              backgroundColor: "#0d2540",
-              borderRadius: height * 0.02,
-              shadowColor: "#000",
-              shadowOffset: { width: 0, height: 2 },
-              shadowOpacity: 0.1,
-              shadowRadius: 8,
-              elevation: 4,
-            }}
-          >
-            <Text>View</Text>
-          </View>
+          <CreateOrEditWorkoutCard
+            hasAssignedWorkout={hasAssignedWorkout}
+            navigation={navigation}
+          ></CreateOrEditWorkoutCard>
         </View>
       </View>
     </View>
@@ -150,7 +123,7 @@ const Home = ({ navigation }) => {
 
 const styles = StyleSheet.create({
   headerContainer: {
-    flex: 0.15,
+    flex: 1.5,
     paddingHorizontal: width * 0.06,
     justifyContent: "center",
   },
@@ -165,7 +138,7 @@ const styles = StyleSheet.create({
   },
 
   midContainer: {
-    flex: 1,
+    flex: 8.5,
     flexDirection: "column",
     justifyContent: "flex-start",
     alignItems: "center",

@@ -40,20 +40,21 @@ const MostCommonWorkoutSummaryCard = ({
   }, [mostFreqWorkoutsplit_id]);
 
   return (
-    <View
+    <LinearGradient
+      colors={["rgb(92, 201, 134)", "rgb(0, 125, 100)"]}
       style={{
         flex: 6,
         width: "100%",
-        backgroundColor: "#0d2540",
         borderRadius: height * 0.02,
         flexDirection: "column",
-        justifyContent: "center",
+        justifyContent: "space-around",
         shadowColor: "#000",
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.1,
         shadowRadius: 8,
         elevation: 4,
-        gap: height * 0.0,
+        paddingVertical: height * 0.02,
+        paddingHorizontal: width * 0.08,
       }}
     >
       {mostFrequentSplit ? (
@@ -63,91 +64,69 @@ const MostCommonWorkoutSummaryCard = ({
               display: "flex",
               flexDirection: "row",
               justifyContent: "space-between",
-              marginHorizontal: width * 0.05,
               alignItems: "center",
+              flex: 4,
             }}
+          >
+            <View style={{ flexDirection: "column" }}>
+              <Text
+                style={{
+                  fontFamily: "PoppinsBold",
+                  color: "white",
+                  fontSize: RFValue(13),
+                }}
+              >
+                Most Common Workout
+              </Text>
+              <Text
+                style={{
+                  fontFamily: "PoppinsRegular",
+                  color: "white",
+                  fontSize: RFValue(10),
+                  opacity: 0.5,
+                }}
+              >
+                Your most favourite workout
+              </Text>
+            </View>
+            <View
+              style={{
+                backgroundColor: "white",
+                opacity: 0.4,
+                height: height * 0.04,
+                width: height * 0.04,
+                justifyContent: "center",
+                alignItems: "center",
+                borderRadius: height * 0.01,
+              }}
+            >
+              <FontAwesome5 name="dumbbell"></FontAwesome5>
+            </View>
+          </View>
+
+          <View
+            style={{ justifyContent: "center", alignItems: "center", flex: 6 }}
           >
             <Text
               style={{
                 fontFamily: "PoppinsBold",
-                color: "white",
-                fontSize: RFValue(12),
-                width: "70%",
+                color: "rgb(4, 67, 53)",
+                fontSize: RFValue(45),
               }}
             >
-              Most common workout
+              {mostFreqWorkoutSplitName}
             </Text>
 
-            <TouchableOpacity
+            <Text
               style={{
-                width: "30%",
-                height: "70%",
-                justifyContent: "center",
-                alignItems: "center",
-                borderRadius: height * 0.02,
-                overflow: "hidden",
+                fontFamily: "PoppinsBold",
+                color: "rgb(4, 67, 53)",
+                marginTop: width * 0.02,
               }}
             >
-              <LinearGradient
-                colors={["rgb(15, 131, 255)", "rgb(101, 155, 255)"]}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 1 }}
-                style={{
-                  flex: 1,
-                  width: "100%",
-                  height: "100%",
-                  justifyContent: "center",
-                  alignItems: "center",
-                  borderRadius: height * 0.02,
-                }}
-              >
-                <View
-                  style={{
-                    display: "flex",
-                    height: "100%",
-                    flexDirection: "column",
-                    justifyContent: "center",
-                    alignItems: "center",
-                    gap: height * 0.006,
-                  }}
-                >
-                  <FontAwesome5 name="dumbbell" color="white" opacity="0.8" />
-                  <Text
-                    style={{
-                      fontSize: RFValue(8),
-                      color: "white",
-                      opacity: 0.8,
-                    }}
-                  >
-                    Start
-                  </Text>
-                </View>
-              </LinearGradient>
-            </TouchableOpacity>
+              {mostFrequentWorkoutSplitMuscleGroup}
+            </Text>
           </View>
-
-          <Text
-            style={{
-              fontFamily: "PoppinsBold",
-              color: "white",
-              opacity: 0.6,
-              fontSize: RFValue(35),
-              marginHorizontal: width * 0.05,
-            }}
-          >
-            {mostFreqWorkoutSplitName}
-          </Text>
-
-          <Text
-            style={{
-              fontFamily: "PoppinsBold",
-              color: "white",
-              opacity: 0.4,
-              marginHorizontal: width * 0.05,
-            }}
-          >
-            {mostFrequentWorkoutSplitMuscleGroup}
-          </Text>
         </>
       ) : (
         <View
@@ -170,7 +149,7 @@ const MostCommonWorkoutSummaryCard = ({
           </Text>
         </View>
       )}
-    </View>
+    </LinearGradient>
   );
 };
 

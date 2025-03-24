@@ -39,7 +39,7 @@ function NewAchivementCard({ user, hasAssignedWorkout }) {
       colors={["rgb(89, 67, 135)", "rgb(51, 16, 125)"]}
       style={{
         display: "flex",
-        width: "40%",
+        width: "60%",
         justifyContent: "center",
         alignItems: "center",
         borderRadius: height * 0.02,
@@ -71,10 +71,24 @@ function NewAchivementCard({ user, hasAssignedWorkout }) {
             >
               Personal Record
             </Text>
-            <Image
-              source={require("../../assets/gold-medal.png")}
-              style={{ height: "50%", width: "50%" }}
-            ></Image>
+            <View
+              style={{
+                shadowColor: "#FFD700",
+                shadowOffset: { width: 0, height: 0 },
+                shadowOpacity: 0.7,
+                shadowRadius: 20,
+                elevation: 20,
+                alignItems: "center",
+                justifyContent: "center",
+                height: "50%",
+                width: "50%",
+              }}
+            >
+              <Image
+                source={require("../../assets/gold-medal.png")}
+                style={{ height: "100%", width: "100%" }}
+              ></Image>
+            </View>
           </View>
           <View
             style={{
@@ -125,6 +139,8 @@ function NewAchivementCard({ user, hasAssignedWorkout }) {
             flexDirection: "column",
             gap: height * 0.02,
             opacity: 0.6,
+            justifyContent: "center",
+            alignItems: "center",
           }}
         >
           <Image
@@ -135,7 +151,7 @@ function NewAchivementCard({ user, hasAssignedWorkout }) {
             style={{
               fontFamily: "PoppinsBold",
               color: "white",
-              fontSize: RFValue(8),
+              fontSize: RFValue(11),
               textAlign: "center",
             }}
           >
