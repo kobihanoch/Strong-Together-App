@@ -65,7 +65,7 @@ const MostCommonWorkoutSummaryCard = ({
               flexDirection: "row",
               justifyContent: "space-between",
               alignItems: "center",
-              flex: 4,
+              flex: 3,
             }}
           >
             <View style={{ flexDirection: "column" }}>
@@ -105,7 +105,7 @@ const MostCommonWorkoutSummaryCard = ({
           </View>
 
           <View
-            style={{ justifyContent: "center", alignItems: "center", flex: 6 }}
+            style={{ justifyContent: "center", alignItems: "center", flex: 7 }}
           >
             <Text
               style={{
