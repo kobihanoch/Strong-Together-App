@@ -74,10 +74,9 @@ const Home = ({ navigation }) => {
       {/* Header */}
       <View style={styles.headerContainer}>
         <Text style={styles.headerText}>
-          Welcome back,{" "}
+          Welcome,{" "}
           <Text style={{ fontFamily: "PoppinsBold" }}>{username} </Text>!
         </Text>
-        <Text style={styles.semiHeaderText}>Check out your dashboard</Text>
       </View>
 
       <View style={styles.midContainer}>
@@ -123,11 +122,14 @@ const Home = ({ navigation }) => {
           </View>
         </View>
         <View style={{ flex: 4.5, flexDirection: "row", gap: width * 0.02 }}>
-          <NewAchivementCard user={user}></NewAchivementCard>
+          <NewAchivementCard
+            user={user}
+            hasAssignedWorkout={hasAssignedWorkout}
+          ></NewAchivementCard>
           {/*Another component here*/}
           <View
             style={{
-              width: "50%",
+              width: "48%",
               display: "flex",
               backgroundColor: "#0d2540",
               borderRadius: height * 0.02,
@@ -154,7 +156,7 @@ const styles = StyleSheet.create({
   },
   headerText: {
     fontFamily: "PoppinsRegular",
-    fontSize: RFValue(16),
+    fontSize: RFValue(18),
   },
   semiHeaderText: {
     fontFamily: "PoppinsRegular",

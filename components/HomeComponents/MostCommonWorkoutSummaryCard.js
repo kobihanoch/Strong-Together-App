@@ -44,7 +44,7 @@ const MostCommonWorkoutSummaryCard = ({
       style={{
         flex: 6,
         width: "100%",
-        backgroundColor: "rgb(46, 84, 255)",
+        backgroundColor: "#0d2540",
         borderRadius: height * 0.02,
         flexDirection: "column",
         justifyContent: "center",
@@ -129,8 +129,8 @@ const MostCommonWorkoutSummaryCard = ({
           <Text
             style={{
               fontFamily: "PoppinsBold",
-              color: "#0d2540",
-              opacity: 1,
+              color: "white",
+              opacity: 0.6,
               fontSize: RFValue(35),
               marginHorizontal: width * 0.05,
             }}
@@ -141,8 +141,8 @@ const MostCommonWorkoutSummaryCard = ({
           <Text
             style={{
               fontFamily: "PoppinsBold",
-              color: "#0d2540",
-              opacity: 0.9,
+              color: "white",
+              opacity: 0.4,
               marginHorizontal: width * 0.05,
             }}
           >

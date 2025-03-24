@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { View, Text, Image, Dimensions } from "react-native";
 import useExerciseTracking from "../../hooks/useExerciseTracking";
 import { RFValue } from "react-native-responsive-fontsize";
+import { LinearGradient } from "expo-linear-gradient";
 
 const { width, height } = Dimensions.get("window");
 
@@ -34,11 +35,11 @@ function NewAchivementCard({ user, hasAssignedWorkout }) {
   }, [trackingData]);
 
   return (
-    <View
+    <LinearGradient
+      colors={["rgb(89, 67, 135)", "rgb(51, 16, 125)"]}
       style={{
         display: "flex",
         width: "40%",
-        backgroundColor: "#0d2540",
         justifyContent: "center",
         alignItems: "center",
         borderRadius: height * 0.02,
@@ -86,9 +87,10 @@ function NewAchivementCard({ user, hasAssignedWorkout }) {
             <Text
               style={{
                 color: "white",
-                fontSize: RFValue(16),
+                fontSize: RFValue(12),
                 marginTop: height * 0.0,
                 fontFamily: "PoppinsBold",
+                opacity: 0.8,
               }}
             >
               {prExcersice}
@@ -98,6 +100,8 @@ function NewAchivementCard({ user, hasAssignedWorkout }) {
                 color: "white",
                 fontFamily: "PoppinsRegular",
                 fontSize: RFValue(13),
+                marginTop: height * 0.01,
+                opacity: 0.8,
               }}
             >
               {prWeight} kg
@@ -107,6 +111,7 @@ function NewAchivementCard({ user, hasAssignedWorkout }) {
                 color: "white",
                 fontFamily: "PoppinsRegular",
                 fontSize: RFValue(13),
+                opacity: 0.8,
               }}
             >
               {" "}
@@ -138,7 +143,7 @@ function NewAchivementCard({ user, hasAssignedWorkout }) {
           </Text>
         </View>
       )}
-    </View>
+    </LinearGradient>
   );
 }
 
