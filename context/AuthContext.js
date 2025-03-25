@@ -133,6 +133,7 @@ export const AuthProvider = ({ children, onLogout }) => {
 
   const logout = async () => {
     await supabase.auth.signOut();
+    await supabase.auth.clearSession();
     await supabase.auth.setAuth(null);
     setIsLoggedIn(false);
     setUser(null);
