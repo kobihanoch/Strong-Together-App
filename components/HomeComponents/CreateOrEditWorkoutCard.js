@@ -63,7 +63,9 @@ function CreateOrEditWorkoutCard({ hasAssignedWorkout, navigation }) {
                 style={{
                   fontFamily: "PoppinsRegular",
                   color: "white",
+                  textAlign: "center",
                   fontSize: RFValue(10),
+                  marginTop: height * 0.01,
                   opacity: 0.5,
                 }}
               >
@@ -105,21 +107,42 @@ function CreateOrEditWorkoutCard({ hasAssignedWorkout, navigation }) {
           </>
         ) : (
           <>
-            <Text
+            <View
               style={{
-                fontFamily: "PoppinsBold",
-                color: "white",
-                padding: height * 0.02,
+                flex: 3,
+                alignItems: "center",
+                justifyContent: "flex-start",
+                marginTop: height * 0.02,
               }}
             >
-              Create workout
-            </Text>
+              <Text
+                style={{
+                  fontFamily: "PoppinsBold",
+                  color: "white",
+                  fontSize: RFValue(13),
+                }}
+              >
+                Create workout
+              </Text>
+              <Text
+                style={{
+                  fontFamily: "PoppinsRegular",
+                  color: "white",
+                  textAlign: "center",
+                  fontSize: RFValue(10),
+                  marginTop: height * 0.01,
+                  opacity: 0.5,
+                }}
+              >
+                Start proccess
+              </Text>
+            </View>
             <View
               style={{
                 width: "100%",
+                flex: 7,
                 justifyContent: "center",
                 alignItems: "center",
-                marginTop: height * 0.05,
               }}
             >
               <TouchableOpacity
