@@ -37,10 +37,11 @@ const Home = ({ navigation }) => {
 
   // Set username after user is laoded
   useEffect(() => {
-    if (user) {
-      setUsername(user.username);
-      setUserId(user.id);
-    }
+    console.log("User is:  " + JSON.stringify(user))
+    if (user && user.username && user.id) {
+    setUsername(user.username);
+    setUserId(user.id);
+  }
   }, [user]);
 
   useFocusEffect(
@@ -59,14 +60,6 @@ const Home = ({ navigation }) => {
       setHasAssignedWorkout(false);
     }
   }, [userWorkout]);
-
-  if (!user || !user.username) {
-    return (
-      <View style={styles.errorContainer}>
-        <Text style={styles.errorText}>Error: No user data available.</Text>
-      </View>
-    );
-  }
 
   return loading ? (
     <LoadingPage message="Loading user data..." />
