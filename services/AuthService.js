@@ -17,7 +17,7 @@ export const registerUser = async (
       .maybeSingle();
 
     if (checkUserError) {
-      throw checkUserError;
+      console.log(checkUserError);
     }
 
     if (existingUser) {
@@ -31,7 +31,7 @@ export const registerUser = async (
     });
 
     if (signUpError) {
-      throw signUpError;
+      console.log(signUpError);
     }
 
     const userId = authData.user.id;
@@ -49,12 +49,12 @@ export const registerUser = async (
     ]);
 
     if (insertError) {
-      throw insertError;
+      console.log(insertError);
     }
 
     return { success: true, email, username, password };
   } catch (error) {
-    console.error("Error during registration:", error.message);
+    console.log("Error during registration:", error.message);
     return { success: false, reason: "REGISTRATION_FAILED", error };
   }
 };
@@ -68,6 +68,7 @@ export const loginUser = async (username, password) => {
       .single();
 
     if (fetchEmailError || !userRow) {
+      Alert.alert("Username or password are incorrect");
       return { success: false, reason: "USERNAME_NOT_FOUND" };
     }
 
