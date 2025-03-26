@@ -26,34 +26,12 @@ const Login = ({ navigation }) => {
   const { login } = useAuth();
 
   const handleLogin = async () => {
-    const errorMessages = validateInputs();
-
-    if (errorMessages.length === 0) {
-      const { data, error } = await supabase
-        .from("users")
-        .select("*")
-        .eq("username", username);
-
-      if (error) {
-        console.error("Supabase error:", error);
-        Alert.alert(
-          "Login Failed",
-          "An error occurred while fetching user data."
-        );
-        return;
-      }
-
-      if (!data || data.length === 0) {
-        Alert.alert("Login Failed", "Username or password are incorrect.");
-        return;
-      }
-
-      try {
-        await login(username, password);
-        navigation.navigate("Home");
-      } catch (error) {
-        console.error("Login failed:", error.message);
-      }
+    try {
+      console.log("Calling login from useAuth");
+      await login(username, password);
+      navigation.navigate("Home");
+    } catch (error) {
+      console.log("Login failed:", error.message);
     }
   };
 

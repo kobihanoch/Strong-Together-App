@@ -36,7 +36,7 @@ const Register = ({ navigation }) => {
       try {
         await register(email, password, username, fullName, gender);
       } catch (error) {
-        console.error("Registration failed:", error.message);
+        console.log("Registration failed:", error.message);
       }
     } else {
       Alert.alert("Registration Failed", errorMessages.join("\n"));
