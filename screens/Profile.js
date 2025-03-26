@@ -17,6 +17,16 @@ const { width, height } = Dimensions.get("window");
 function Profile({ navigation }) {
   const { user, updateProfilePic } = useAuth();
   const [mediaLoading, setMediaLoading] = useState(false);
+  const [username, setUsername] = useState(null);
+  const [email, setEmail] = useState(null);
+  const [fullname, setFullname] = useState(null);
+
+
+  useEffect (() => {
+    setUsername(user.username);
+    setEmail(user.email);
+    setFullname(user.name);
+  }, [user])
 
   return mediaLoading ? (
     <LoadingPage message="Loading user data..." />
@@ -43,11 +53,19 @@ function Profile({ navigation }) {
           updateProfilePic={updateProfilePic}
           setMediaLoading={setMediaLoading}
         ></ImagePickerComponent>
+        
+      </View>
+      <View style={{ flex: 7, width: "90%" }}>
         <Text style={{ fontFamily: "PoppinsBold", fontSize: RFValue(17) }}>
-          {user?.username}
+          {username}
+        </Text>
+        <Text style={{ fontFamily: "PoppinsBold", fontSize: RFValue(17) }}>
+          {fullname}
+        </Text>
+        <Text style={{ fontFamily: "PoppinsBold", fontSize: RFValue(17) }}>
+          {email}
         </Text>
       </View>
-      <View style={{ flex: 7 }}></View>
     </View>
   );
 }
