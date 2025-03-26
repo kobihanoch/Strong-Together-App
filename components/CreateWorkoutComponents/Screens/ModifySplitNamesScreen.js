@@ -72,6 +72,7 @@ function ModifySplitNamesScreen({
         Object.keys(selectedExercisesBySplit).length
       );
 
+      console.log("WOrkout id: " + workoutData.id);
       if (!workoutData?.id) {
         throw new Error("Failed to create workout. No ID returned.");
       }
