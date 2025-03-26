@@ -16,6 +16,10 @@ function CreateWorkout({ navigation }) {
   const { user } = useAuth();
   const { userWorkout, loading, error } = useUserWorkout(user?.id);
 
+  useEffect(() => {
+    console.log("User ID is: " + user.id);
+  }, [user]);
+
   const [splitsNumber, setSplitsNumber] = useState(1);
   const { exercises, setExercises } = useExercises();
   const [step, setStep] = useState(1);

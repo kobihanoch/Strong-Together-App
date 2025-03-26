@@ -29,60 +29,31 @@ const Login = ({ navigation }) => {
     const errorMessages = validateInputs();
 
     if (errorMessages.length === 0) {
-      const hashedPassword = CryptoJS.SHA256(password).toString(); // Hashing
+      const { data, error } = await supabase
+        .from("users")
+        .select("*")
+        .eq("username", username);
+
+      if (error) {
+        console.error("Supabase error:", error);
+        Alert.alert(
+          "Login Failed",
+          "An error occurred while fetching user data."
+        );
+        return;
+      }
+
+      if (!data || data.length === 0) {
+        Alert.alert("Login Failed", "Username or password are incorrect.");
+        return;
+      }
 
       try {
-        const { data, error } = await supabase
-          .from("users")
-          .select("*")
-          .eq("username", username);
-
-        if (error) {
-          console.error("Supabase error:", error);
-          Alert.alert(
-            "Login Failed",
-            "An error occurred while fetching user data."
-          );
-          return;
-        }
-
-        if (!data || data.length === 0) {
-          Alert.alert("Login Failed", "User not found.");
-          return;
-        }
-
-        const userData = data[0];
-
-        if (!userData || !userData.username || !userData.passwordhash) {
-          console.error("Invalid user data:", userData);
-          Alert.alert("Login Failed", "Invalid user data received.");
-          return;
-        }
-
-        if (userData.passwordhash === hashedPassword) {
-          const userContextData = {
-            username: userData.username,
-            name: userData.name,
-            email: userData.email,
-            id: userData.id,
-            profile_image_url: userData.profile_image_url,
-            // Need to add more user properties (Like profile pic, etc..)
-          };
-          await AsyncStorage.setItem("isLoggedIn", "true");
-          await AsyncStorage.setItem("user", JSON.stringify(userData));
-          console.log("Login successful. User data:", userContextData);
-          login(userContextData);
-          navigation.navigate("Home");
-        } else {
-          console.log("Incorrect password for user:", username);
-          Alert.alert("Login Failed", "Incorrect password.");
-        }
+        await login(username, password);
+        navigation.navigate("Home");
       } catch (error) {
-        console.error("Error logging in:", error.message);
-        Alert.alert("Login Failed", "An error occurred while logging in.");
+        console.error("Login failed:", error.message);
       }
-    } else {
-      Alert.alert("Login Failed", errorMessages.join("\n"));
     }
   };
 

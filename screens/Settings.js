@@ -21,12 +21,6 @@ const Settings = ({ navigation }) => {
   const { user, logout } = useAuth();
   const handleLogout = () => {
     logout();
-    navigation.dispatch(
-      CommonActions.reset({
-        index: 0,
-        routes: [{ name: "Intro" }],
-      })
-    );
   };
 
   return (
