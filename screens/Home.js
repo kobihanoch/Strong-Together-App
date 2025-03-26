@@ -33,7 +33,7 @@ const Home = ({ navigation }) => {
   const [userId, setUserId] = useState(null);
   const { refetch, userWorkout, loading, error } = useUserWorkout(user?.id);
   const [hasAssignedWorkout, setHasAssignedWorkout] = useState(false);
-  const profileImageUrl = user?.profile_image_url;
+  const [profileImageUrl, setProfileImageUrl] = useState(null);
 
   // Set username after user is laoded
   useEffect(() => {
@@ -41,6 +41,7 @@ const Home = ({ navigation }) => {
     if (user && user.username && user.id) {
     setUsername(user.username);
     setUserId(user.id);
+    setProfileImageUrl(user.profile_image_url);
   }
   }, [user]);
 

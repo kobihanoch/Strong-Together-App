@@ -17,10 +17,17 @@ const { width, height } = Dimensions.get("window");
 
 const TopComponent = () => {
   const { user } = useAuth();
+  const [username, setUsername] = useState(null);
+  const [fullname, setFullname] = useState(null);
+  const [profileImageUrl, SetProfileImageUrl] = useState(null);
 
-  const profileImageUrl = user?.profile_image_url;
-  const username = user?.username;
-  const fullName = user?.name;
+  useEffect(() => {
+    if (user) {
+      setUsername(user.username);
+      setFullname(user.name);
+      SetProfileImageUrl(user.profile_image_url);
+    }
+  });
 
   const [isModalVisible, setIsModalVisible] = useState(false);
 
@@ -69,7 +76,7 @@ const TopComponent = () => {
               opacity: 0.7,
             }}
           >
-            {fullName}
+            {fullname}
           </Text>
         </View>
       </View>

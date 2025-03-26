@@ -11,11 +11,10 @@ import BottomTabBar from "./components/BottomTabBar";
 import Theme1 from "./components/Theme1";
 import * as Font from "expo-font";
 import { AuthProvider, useAuth } from "./context/AuthContext";
-import { useNavigation } from "@react-navigation/native";
 
 export default function App() {
   const [fontsLoaded, setFontsLoaded] = useState(false);
-  const navigationRef = useRef();
+  const navigationRef = useNavigationContainerRef();
 
   const loadFonts = async () => {
     await Font.loadAsync({
@@ -31,12 +30,14 @@ export default function App() {
   }, []);
 
   const handleLogoutReset = () => {
-    navigation.dispatch(
-      CommonActions.reset({
-        index: 0,
-        routes: [{ name: "Intro" }],
-      })
-    );
+    if (navigationRef.isReady()) {
+      navigationRef.dispatch(
+        CommonActions.reset({
+          index: 0,
+          routes: [{ name: "AuthStack" }],
+        })
+      );
+    }
   };
 
   if (!fontsLoaded) {

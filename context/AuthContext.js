@@ -11,22 +11,39 @@ export const AuthProvider = ({ children, onLogout }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [user, setUser] = useState(null);
 
+  // Need to check - should workout because now we load the session status from supabase and not from ASYNC storage, which we dont support anymore
   useEffect(() => {
-    const checkLoginStatus = async () => {
-      const loggedInStatus = await AsyncStorage.getItem("isLoggedIn");
-      const savedUser = await AsyncStorage.getItem("user");
+    const { data: listener } = supabase.auth.onAuthStateChange(
+      async (event, session) => {
+        console.log("Auth event:", event);
 
-      if (loggedInStatus === "true" && savedUser) {
-        const userData = JSON.parse(savedUser);
-        setIsLoggedIn(true);
-        setUser(userData);
-      } else {
-        setIsLoggedIn(false);
-        setUser(null);
+        if (session) {
+          setIsLoggedIn(true);
+
+          const { data: fullUser, error } = await supabase
+            .from("users")
+            .select("*")
+            .eq("id", session.user.id)
+            .single();
+
+          if (fullUser) {
+            setUser(fullUser);
+            console.log("Full user loaded:", fullUser);
+          } else {
+            setUser(null);
+            console.log("Failed to load full user:", error);
+          }
+        } else {
+          setIsLoggedIn(false);
+          setUser(null);
+          console.log("No session found");
+        }
       }
-    };
+    );
 
-    checkLoginStatus();
+    return () => {
+      listener.subscription.unsubscribe();
+    };
   }, []);
 
   const updateProfilePic = (picUrl) => {
@@ -43,9 +60,9 @@ export const AuthProvider = ({ children, onLogout }) => {
         .from("users")
         .select("*")
         .eq("username", username)
-        .single();
+        .maybeSingle();
 
-      if (checkUserError && checkUserError.message !== "No rows found") {
+      if (checkUserError) {
         throw checkUserError;
       }
 
@@ -84,14 +101,6 @@ export const AuthProvider = ({ children, onLogout }) => {
         throw insertError;
       }
 
-      const { data: fullUser, error: fetchError } = await supabase
-        .from("users")
-        .select("id, *")
-        .eq("username", username);
-
-      if (!fullUser) {
-        return;
-      }
       login(username, password);
     } catch (error) {
       console.error("Error during registration:", error.message);
@@ -121,7 +130,9 @@ export const AuthProvider = ({ children, onLogout }) => {
       const { data: fullUser, error: fetchError } = await supabase
         .from("users")
         .select("id, *")
-        .eq("username", username);
+        .eq("username", username)
+        .single();
+
       if (!fullUser) {
         return;
       } else {
@@ -132,11 +143,19 @@ export const AuthProvider = ({ children, onLogout }) => {
   };
 
   const logout = async () => {
+    console.log("HI");
+    const { data, error } = await supabase.auth.getSession();
+    console.log(
+      "AuthContext auth session before logout: " + JSON.stringify(data)
+    );
     await supabase.auth.signOut();
-    await supabase.auth.clearSession();
-    await supabase.auth.setAuth(null);
+    const { data: data2, error: error2 } = await supabase.auth.getSession();
+    console.log(
+      "AuthContext auth session after logout: " + JSON.stringify(data2)
+    );
     setIsLoggedIn(false);
     setUser(null);
+
     if (onLogout) onLogout();
   };
 
