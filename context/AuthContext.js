@@ -2,6 +2,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import React, { createContext, useContext, useState, useEffect } from "react";
 import supabase from "../src/supabaseClient";
 import { Alert } from "react-native";
+import { useAuthActions } from "../hooks/useAuthActions";
 
 const AuthContext = createContext();
 
@@ -109,36 +110,14 @@ export const AuthProvider = ({ children, onLogout }) => {
   };
 
   const login = async (username, password) => {
-    const { data: userRow, error } = await supabase
-      .from("users")
-      .select("email")
-      .eq("username", username)
-      .single();
+    const { success, login, error, loading, fullUser } = useAuthActions();
+    login(username, password);
 
-    if (error || !userRow) {
-      throw new Error("Username not found");
-    }
-
-    const { data, error: loginError } = await supabase.auth.signInWithPassword({
-      email: userRow.email,
-      password,
-    });
-
-    if (loginError) {
-      throw loginError;
+    if (!success) {
+      throw error;
     } else {
-      const { data: fullUser, error: fetchError } = await supabase
-        .from("users")
-        .select("id, *")
-        .eq("username", username)
-        .single();
-
-      if (!fullUser) {
-        return;
-      } else {
-        setIsLoggedIn(true);
-        setUser(fullUser);
-      }
+      setIsLoggedIn(true);
+      setUser(fullUser);
     }
   };
 
