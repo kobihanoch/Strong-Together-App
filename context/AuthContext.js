@@ -137,7 +137,7 @@ export const AuthProvider = ({ children, onLogout }) => {
         return;
       } else {
         setIsLoggedIn(true);
-        setUser(fullUser[0]);
+        setUser(fullUser);
       }
     }
   };
