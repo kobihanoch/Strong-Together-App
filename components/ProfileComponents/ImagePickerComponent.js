@@ -90,7 +90,21 @@ function ImagePickerComponent({ user, updateProfilePic, setMediaLoading }) {
   };
 
   return (
-    <View style={{ alignItems: "center" }}>
+    <View
+      style={{
+        alignItems: "center",
+        flexDirection: "column",
+        gap: height * 0.02,
+      }}
+    >
+      {profileImageUrl ? (
+        <TouchableOpacity
+          onPress={deleteProfilePicture}
+          style={styles.deleteButton}
+        >
+          <Text style={styles.deleteButtonText}>Remove Picture</Text>
+        </TouchableOpacity>
+      ) : null}
       <TouchableOpacity onPress={pickAndUploadImage}>
         {mediaLoading ? (
           <ActivityIndicator size="large" />
@@ -105,15 +119,6 @@ function ImagePickerComponent({ user, updateProfilePic, setMediaLoading }) {
           />
         )}
       </TouchableOpacity>
-
-      {profileImageUrl ? (
-        <TouchableOpacity
-          onPress={deleteProfilePicture}
-          style={styles.deleteButton}
-        >
-          <Text style={styles.deleteButtonText}>Remove Picture</Text>
-        </TouchableOpacity>
-      ) : null}
     </View>
   );
 }
