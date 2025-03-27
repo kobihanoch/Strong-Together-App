@@ -55,17 +55,18 @@ function Profile({ navigation }) {
         ></ImagePickerComponent>
         
       </View>
-      <View style={{ flex: 7, width: "90%" }}>
+      <View style={{ flex: 2, width: "90%", justifyContent: "flex-start", alignItems: "center" }}>
         <Text style={{ fontFamily: "PoppinsBold", fontSize: RFValue(17) }}>
           {username}
         </Text>
-        <Text style={{ fontFamily: "PoppinsBold", fontSize: RFValue(17) }}>
+        <Text style={{ fontFamily: "PoppinsRegular", fontSize: RFValue(15), opacity: 0.3 }}>
           {fullname}
         </Text>
         <Text style={{ fontFamily: "PoppinsBold", fontSize: RFValue(17) }}>
           {email}
         </Text>
       </View>
+      <View style={{flex: 5}}><Text>View</Text></View>
     </View>
   );
 }
