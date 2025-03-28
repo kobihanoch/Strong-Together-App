@@ -19,6 +19,7 @@ import { useNavigation } from "@react-navigation/native";
 import WorkoutSplitItem from "../components/MyWorkoutPlanComponents/WorkoutSplitItem";
 import ExerciseItem from "../components/MyWorkoutPlanComponents/ExerciseItem";
 import LoadingPage from "../components/LoadingPage";
+import { useUserWorkout } from "../hooks/useUserWorkout";
 
 const { width, height } = Dimensions.get("window");
 
@@ -26,6 +27,33 @@ const MyWorkoutPlan = () => {
   const navigation = useNavigation();
   const { user } = useAuth();
   const userId = user?.id;
+  const { userWorkout, loading, error } = useUserWorkout(userId);
+
+  /*const [workout, setWorkout] = useState(null);
+  const [workoutSplits, setWorkoutSplits] = useState(null);
+  const [allExercises, setAllExercises] = useState(null);*/
+
+  // Sets workout only from userWorkout
+  useEffect(() => {
+    if (userWorkout) {
+      const dictWorkout = Object.fromEntries(
+        Object.entries(userWorkout[0]).slice(0, 7)
+      );
+    }
+  }, [userWorkout]);
+
+  // Sets workout splits only from userWorkout
+  useEffect(() => {
+    if (userWorkout) {
+      const fullWorkoutSplits = userWorkout[0].workoutsplits;
+      console.log("Array is: " + fullWorkoutSplits);
+      const splits = [];
+      fullWorkoutSplits.forEach((split) => {
+        splits.push(Object.fromEntries(Object.entries(split).slice(0, 5)));
+      });
+      console.log("AFTER PUSH: " + JSON.stringify(splits, null, 2));
+    }
+  }, [userWorkout]);
 
   const {
     workout,
