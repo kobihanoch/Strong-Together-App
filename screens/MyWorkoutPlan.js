@@ -27,49 +27,32 @@ const MyWorkoutPlan = () => {
   const navigation = useNavigation();
   const { user } = useAuth();
   const userId = user?.id;
-  const { userWorkout, loading, error } = useUserWorkout(userId);
+
+  const {
+    workout,
+    workoutSplits,
+    exercises: allExercises,
+    loading,
+    error,
+  } = useUserWorkout(userId);
 
   /*const [workout, setWorkout] = useState(null);
   const [workoutSplits, setWorkoutSplits] = useState(null);
   const [allExercises, setAllExercises] = useState(null);*/
 
-  // Sets workout only from userWorkout
-  useEffect(() => {
-    if (userWorkout) {
-      const dictWorkout = Object.fromEntries(
-        Object.entries(userWorkout[0]).slice(0, 7)
-      );
-    }
-  }, [userWorkout]);
+  /*useEffect(() => {
+    console.log(
+      "Workout from hook: " + JSON.stringify(workout, null, 2)
+    );
+    console.log(
+      "Workout Splits from hook: " +
+        JSON.stringify(workoutSplits, null, 2)
+    );
+    console.log(
+      "Exercsies from hook: " + JSON.stringify(allExercises, null, 2)
+    );
+  }, [workout, workoutSplits, allExercises]);*/
 
-  // Sets workout splits only from userWorkout
-  useEffect(() => {
-    if (userWorkout) {
-      const fullWorkoutSplits = userWorkout[0].workoutsplits;
-      console.log("Array is: " + fullWorkoutSplits);
-      const splits = [];
-      fullWorkoutSplits.forEach((split) => {
-        splits.push(Object.fromEntries(Object.entries(split).slice(0, 5)));
-      });
-      console.log("AFTER PUSH: " + JSON.stringify(splits, null, 2));
-    }
-  }, [userWorkout]);
-
-  const {
-    workout,
-    loading: loading1,
-    getWorkoutByUserId,
-  } = useWorkouts(userId);
-  const {
-    workoutSplits,
-    loading: loading2,
-    fetchSplits,
-  } = useWorkoutSplits(workout?.id);
-  const {
-    allExercises,
-    loading: loading3,
-    fetchAllExercises,
-  } = useSplitExercises();
   const [delayFinishedLoading, setDelayFinishedLoading] = useState(false);
 
   const [selectedSplit, setSelectedSplit] = useState(null);
@@ -78,20 +61,7 @@ const MyWorkoutPlan = () => {
   // FETCHING DATA -----------------------------------------------
 
   useEffect(() => {
-    if (userId) {
-      getWorkoutByUserId();
-    }
-  }, [userId]);
-
-  useEffect(() => {
-    if (workout?.id) {
-      fetchSplits(workout.id);
-      fetchAllExercises(workout.id);
-    }
-  }, [workout?.id]);
-
-  useEffect(() => {
-    if (workoutSplits.length > 0) {
+    if (workoutSplits && workoutSplits.length > 0) {
       setSelectedSplit(workoutSplits[0]);
     }
   }, [workoutSplits]);
@@ -114,7 +84,11 @@ const MyWorkoutPlan = () => {
     ).length;
   };
 
-  const sortedWorkoutSplits = workoutSplits.sort((a, b) => a.id - b.id);
+  /*useEffect (() => {
+    const sortedWorkoutSplits = workoutSplits.sort((a, b) =>
+      a.name.localeCompare(b.name)
+    );
+  })*/
 
   // ANIMATIONS ------------------------------------------------------------------------
 
@@ -127,17 +101,7 @@ const MyWorkoutPlan = () => {
 
   // LOADING ------------------------------------------------------------
 
-  useEffect(() => {
-    if (!loading1) {
-      const delayTimeout = setTimeout(() => {
-        setDelayFinishedLoading(true);
-      }, 1000);
-
-      return () => clearTimeout(delayTimeout);
-    }
-  }, [loading1]);
-
-  if (loading1 || loading2 || loading3 || !delayFinishedLoading) {
+  if (loading) {
     return <LoadingPage message="Getting your workout..." />;
   }
 
@@ -227,7 +191,7 @@ const MyWorkoutPlan = () => {
             }}
           >
             <FlatList
-              data={sortedWorkoutSplits}
+              data={workoutSplits}
               keyExtractor={(item) => item.id.toString()}
               showsHorizontalScrollIndicator={false}
               pagingEnabled
