@@ -20,86 +20,25 @@ import WorkoutSplitItem from "../components/MyWorkoutPlanComponents/WorkoutSplit
 import ExerciseItem from "../components/MyWorkoutPlanComponents/ExerciseItem";
 import LoadingPage from "../components/LoadingPage";
 import { useUserWorkout } from "../hooks/useUserWorkout";
+import { useMyWorkoutPlanPageLogic } from "../hooks/logic/useMyWorkoutPlanPageLogic.js";
 
 const { width, height } = Dimensions.get("window");
 
 const MyWorkoutPlan = () => {
   const navigation = useNavigation();
   const { user } = useAuth();
-  const userId = user?.id;
-
   const {
     workout,
     workoutSplits,
-    exercises: allExercises,
+    allExercises,
     loading,
     error,
-  } = useUserWorkout(userId);
-
-  /*const [workout, setWorkout] = useState(null);
-  const [workoutSplits, setWorkoutSplits] = useState(null);
-  const [allExercises, setAllExercises] = useState(null);*/
-
-  /*useEffect(() => {
-    console.log(
-      "Workout from hook: " + JSON.stringify(workout, null, 2)
-    );
-    console.log(
-      "Workout Splits from hook: " +
-        JSON.stringify(workoutSplits, null, 2)
-    );
-    console.log(
-      "Exercsies from hook: " + JSON.stringify(allExercises, null, 2)
-    );
-  }, [workout, workoutSplits, allExercises]);*/
-
-  const [delayFinishedLoading, setDelayFinishedLoading] = useState(false);
-
-  const [selectedSplit, setSelectedSplit] = useState(null);
-  const [buttonOpacity, setButtonOpacity] = useState(1);
-
-  // FETCHING DATA -----------------------------------------------
-
-  useEffect(() => {
-    if (workoutSplits && workoutSplits.length > 0) {
-      setSelectedSplit(workoutSplits[0]);
-    }
-  }, [workoutSplits]);
-
-  // PREVIEW DATA BY FILTERS ---------------------------------------------------------------
-
-  const filteredExercises = selectedSplit
-    ? allExercises.filter(
-        (exercise) => exercise.workoutsplit_id === selectedSplit.id
-      )
-    : [];
-
-  const handleWorkoutSplitPress = (split) => {
-    setSelectedSplit(split);
-  };
-
-  const countExercisesForSplit = (splitId) => {
-    return allExercises.filter(
-      (exercise) => exercise.workoutsplit_id === splitId
-    ).length;
-  };
-
-  /*useEffect (() => {
-    const sortedWorkoutSplits = workoutSplits.sort((a, b) =>
-      a.name.localeCompare(b.name)
-    );
-  })*/
-
-  // ANIMATIONS ------------------------------------------------------------------------
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setButtonOpacity((prev) => (prev === 1 ? 0.8 : 1));
-    }, 750);
-    return () => clearInterval(interval);
-  }, []);
-
-  // LOADING ------------------------------------------------------------
+    selectedSplit,
+    handleWorkoutSplitPress,
+    filteredExercises,
+    countExercisesForSplit,
+    buttonOpacity,
+  } = useMyWorkoutPlanPageLogic(user);
 
   if (loading) {
     return <LoadingPage message="Getting your workout..." />;
