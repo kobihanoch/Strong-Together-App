@@ -24,43 +24,19 @@ import { useUserWorkout } from "../hooks/useUserWorkout";
 import LoadingPage from "../components/LoadingPage";
 import CreateOrEditWorkoutCard from "../components/HomeComponents/CreateOrEditWorkoutCard";
 import NewAchivementCard from "../components/HomeComponents/NewAchivementCard";
+import useHomePageLogic from "../hooks/logic/useHomePageLogic";
 
 const { width, height } = Dimensions.get("window");
 
 const Home = ({ navigation }) => {
   const { user, logout } = useAuth();
-  const [username, setUsername] = useState(null);
-  const [userId, setUserId] = useState(null);
-  const { refetch, userWorkout, loading, error } = useUserWorkout(user?.id);
-  const [hasAssignedWorkout, setHasAssignedWorkout] = useState(false);
-  const [profileImageUrl, setProfileImageUrl] = useState(null);
-
-  // Set username after user is laoded
-  useEffect(() => {
-    console.log("User is:  " + JSON.stringify(user))
-    if (user && user.username && user.id) {
-    setUsername(user.username);
-    setUserId(user.id);
-    setProfileImageUrl(user.profile_image_url);
-  }
-  }, [user]);
-
-  useFocusEffect(
-    React.useCallback(() => {
-      if (user?.id) {
-        refetch();
-      }
-    }, [user?.id])
-  );
-
-  // Set user's assigned workout state after user is loaded
-  useEffect(() => {
-    if (userWorkout && userWorkout.length > 0) {
-      setHasAssignedWorkout(true);
-    } else {
-      setHasAssignedWorkout(false);
-    }
-  }, [userWorkout]);
+  // Hook handling
+  const { username,
+    userId,
+    hasAssignedWorkout,
+    profileImageUrl,
+    loading,
+    error} = useHomePageLogic(user);
 
   return loading ? (
     <LoadingPage message="Loading user data..." />
