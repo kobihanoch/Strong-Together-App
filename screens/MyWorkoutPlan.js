@@ -138,7 +138,7 @@ const MyWorkoutPlan = () => {
               renderItem={({ item }) => (
                 <WorkoutSplitItem
                   item={item}
-                  exercise_count={countExercisesForSplit(item.id)}
+                  exercise_count={countExercisesForSplit(allExercises, item.id)}
                   isSelected={item.id === selectedSplit?.id}
                   onPress={() => handleWorkoutSplitPress(item)}
                 />
