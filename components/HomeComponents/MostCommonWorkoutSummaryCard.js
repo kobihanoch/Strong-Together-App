@@ -41,7 +41,7 @@ const MostCommonWorkoutSummaryCard = ({
 
   return (
     <LinearGradient
-      colors={["rgb(147, 115, 220)", "rgb(92, 99, 234)"]}
+      colors={["#1e3c72", "#2a5298"]}
       style={{
         flex: 6,
         width: "100%",
@@ -110,7 +110,7 @@ const MostCommonWorkoutSummaryCard = ({
             <Text
               style={{
                 fontFamily: "PoppinsBold",
-                color: "rgb(30, 33, 93)",
+                color: "rgb(196, 199, 223)",
                 fontSize: RFValue(45),
               }}
             >
@@ -120,7 +120,7 @@ const MostCommonWorkoutSummaryCard = ({
             <Text
               style={{
                 fontFamily: "PoppinsBold",
-                color: "rgb(30, 33, 93)",
+                color: "rgb(196, 199, 223)",
                 marginTop: width * 0.02,
               }}
             >
