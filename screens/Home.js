@@ -1,35 +1,24 @@
+import React from "react";
 import {
-  View,
-  Text,
-  StyleSheet,
   Dimensions,
-  ScrollView,
-  TouchableOpacity,
   Image,
+  StyleSheet,
+  Text,
+  View
 } from "react-native";
-import { useFocusEffect } from "@react-navigation/native";
-import Layout from "../components/Layout";
-import useWorkoutSplits from "../hooks/useWorkoutSplits";
-import { useAuth } from "../context/AuthContext";
-import TopComponent from "../components/TopComponent";
-import React, { useState, useEffect } from "react";
-import supabase from "../src/supabaseClient";
-import Icon from "react-native-vector-icons/FontAwesome";
-import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
-import { LinearGradient } from "expo-linear-gradient";
 import { RFValue } from "react-native-responsive-fontsize";
-import MostCommonWorkoutSummaryCard from "../components/HomeComponents/MostCommonWorkoutSummaryCard";
-import WorkoutCountCard from "../components/HomeComponents/WorkoutCountCard";
-import { useUserWorkout } from "../hooks/useUserWorkout";
-import LoadingPage from "../components/LoadingPage";
 import CreateOrEditWorkoutCard from "../components/HomeComponents/CreateOrEditWorkoutCard";
+import MostCommonWorkoutSummaryCard from "../components/HomeComponents/MostCommonWorkoutSummaryCard";
 import NewAchivementCard from "../components/HomeComponents/NewAchivementCard";
+import WorkoutCountCard from "../components/HomeComponents/WorkoutCountCard";
+import LoadingPage from "../components/LoadingPage";
+import { useAuth } from "../context/AuthContext";
 import useHomePageLogic from "../hooks/logic/useHomePageLogic";
 
 const { width, height } = Dimensions.get("window");
 
 const Home = ({ navigation }) => {
-  const { user, logout } = useAuth();
+  const { user } = useAuth();
   // Hook handling
   const { username,
     userId,
@@ -106,7 +95,7 @@ const Home = ({ navigation }) => {
             flex: 4.5,
             width: "88%",
             flexDirection: "row",
-            gap: width * 0.02,
+            gap: width * 0.01,
             justifyContent: "center",
           }}
         >
@@ -148,7 +137,7 @@ const styles = StyleSheet.create({
     flexDirection: "column",
     justifyContent: "flex-start",
     alignItems: "center",
-    gap: height * 0.01,
+    gap: height * 0.005,
   },
 
   bottomContainer: {
