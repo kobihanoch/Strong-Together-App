@@ -1,8 +1,8 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useUserWorkout } from "../useUserWorkout";
 
 const useStatisticsPageLogic = (user) => {
-  const { workoutSplits } = useUserWorkout(user?.id);
+  const { workoutSplits, loading } = useUserWorkout(user?.id);
   const [splitsCount, setSplitsCount] = useState(null);
 
   useEffect(() => {
@@ -10,7 +10,7 @@ const useStatisticsPageLogic = (user) => {
       setSplitsCount(workoutSplits.length);
     }
   }, [workoutSplits]);
-  return { splitsCount };
+  return { splitsCount, loading };
 };
 
 export default useStatisticsPageLogic;
