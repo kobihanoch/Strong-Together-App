@@ -16,7 +16,7 @@ export const getUserWorkout = async (userId) => {
   const { data, error } = await supabase
     .from("users")
     .select(
-      "*, workoutplans!workoutplans_user_id_fkey(*, workoutsplits(*, exercisetoworkoutsplit(*)))"
+      "*, workoutplans!workoutplans_user_id_fkey(*, workoutsplits(*, exercisetoworkoutsplit(*, exercises (description, targetmuscle, specifictargetmuscle))))"
     )
     .eq("id", userId);
   console.log(
