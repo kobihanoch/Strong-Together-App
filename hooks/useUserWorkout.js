@@ -5,6 +5,9 @@ export const useUserWorkout = (userId) => {
   const [userWorkout, setUserWorkout] = useState(null);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [workout, setWorkout] = useState(null);
+  const [workoutSplits, setWorkoutSplits] = useState(null);
+  const [exercises, setExercises] = useState(null);
 
   const fetchUserWorkout = async () => {
     if (!userId) return;
@@ -26,8 +29,46 @@ export const useUserWorkout = (userId) => {
   };
 
   useEffect(() => {
+    if (userWorkout) {
+      // Sets workout only from userWorkout
+      const workoutObj = Object.fromEntries(
+        Object.entries(userWorkout[0]).slice(0, 7)
+      );
+      setWorkout(workoutObj);
+
+      // Sets workout splits only from userWorkout
+      const fullWorkoutSplits = userWorkout[0].workoutsplits;
+      const splits = [];
+      fullWorkoutSplits.forEach((split) => {
+        splits.push(Object.fromEntries(Object.entries(split).slice(0, 5)));
+      });
+      setWorkoutSplits(splits);
+
+      // Sets exercises only from userWorkout
+      const allExercises = fullWorkoutSplits.flatMap((split) =>
+        (split.exercisetoworkoutsplit ?? []).map((item) => {
+          const { exercises, ...itemWithoutExercises } = item;
+          return {
+            ...itemWithoutExercises,
+            ...exercises,
+          };
+        })
+      );
+      setExercises(allExercises);
+    }
+  }, [userWorkout]);
+
+  useEffect(() => {
     fetchUserWorkout();
   }, [userId]);
 
-  return { userWorkout, loading, error, refetch: fetchUserWorkout };
+  return {
+    userWorkout,
+    loading,
+    error,
+    refetch: fetchUserWorkout,
+    workout,
+    workoutSplits,
+    exercises,
+  };
 };

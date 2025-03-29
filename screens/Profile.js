@@ -21,7 +21,6 @@ function Profile({ navigation }) {
   const [email, setEmail] = useState(null);
   const [fullname, setFullname] = useState(null);
 
-
   useEffect (() => {
     setUsername(user.username);
     setEmail(user.email);

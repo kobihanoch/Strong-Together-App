@@ -8,8 +8,8 @@ import images from "../../components/images";
 const { width, height } = Dimensions.get("window");
 
 const ExerciseItem = ({ exercise }) => {
-  const mainMuscle = exercise.exercises.targetmuscle;
-  const specificMuscle = exercise.exercises.specifictargetmuscle;
+  const mainMuscle = exercise.targetmuscle;
+  const specificMuscle = exercise.specifictargetmuscle;
 
   const imagePath = images[mainMuscle]?.[specificMuscle];
 
@@ -67,8 +67,7 @@ const ExerciseItem = ({ exercise }) => {
                 color: "#919191",
               }}
             >
-              {exercise.exercises.targetmuscle},{" "}
-              {exercise.exercises.specifictargetmuscle}
+              {exercise.targetmuscle}, {exercise.specifictargetmuscle}
             </Text>
 
             <Text
