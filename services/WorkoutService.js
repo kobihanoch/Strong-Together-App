@@ -11,7 +11,7 @@ export const fetchWorkoutsByUserId = async (userId) => {
   return data;
 };
 
-// A function for learning
+// Gets user workout learning
 export const getUserWorkout = async (userId) => {
   const { data, error } = await supabase
     .from("users")
@@ -23,6 +23,16 @@ export const getUserWorkout = async (userId) => {
     "WorkoutService: User + Workout + Splits + Exercises were fetched successfully!"
   );
   return data[0].workoutplans;
+};
+
+// Gets user workout learning
+export const getUserExerciseTracking = async (userId) => {
+  const { data, error } = await supabase
+    .from("exercisetracking")
+    .select("*")
+    .eq("user_id", userId);
+  console.log("WorkoutService: exercisetracking were fetched successfully!");
+  return data;
 };
 
 // Removes a workout plan
