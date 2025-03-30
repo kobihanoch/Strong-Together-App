@@ -11,59 +11,61 @@ const { width, height } = Dimensions.get("window");
 
 const StatisticsPage = () => {
   const { user } = useAuth();
-  const { splitsCount, loading } = useStatisticsPageLogic(user);
+  const { selectedDate, setSelectedDate, loading } =
+    useStatisticsPageLogic(user);
 
   return loading ? (
     <LoadingPage message="Analyzing" />
   ) : (
-    <View style={styles.pageContainer}>
-      <View
-        style={[styles.contentContainer, { flex: 1, alignItems: "flex-start" }]}
-      >
-        <Text style={{ fontFamily: "PoppinsBold", fontSize: RFValue(18) }}>
+    <LinearGradient
+      colors={["#00142a", "#0d2540"]}
+      style={[
+        styles.pageContainer,
+        {
+          flex: 6,
+          backgroundColor: "rgb(69, 0, 148)",
+          borderRadius: height * 0.0,
+          flexDirection: "column",
+          paddingHorizontal: width * 0.05,
+        },
+      ]}
+    >
+      <View style={{ flex: 1, justifyContent: "flex-start" }}>
+        <Text
+          style={{
+            fontFamily: "PoppinsBold",
+            fontSize: RFValue(18),
+            color: "white",
+          }}
+        >
           Your progreesion
         </Text>
       </View>
-      <LinearGradient
-        colors={["#00142a", "#0d2540"]}
-        style={[
-          styles.contentContainer,
-          {
-            flex: 2.5,
-            backgroundColor: "rgb(69, 0, 148)",
-            borderRadius: height * 0.02,
-          },
-        ]}
-      >
-        <CalendarCard />
-      </LinearGradient>
       <View
-        style={[
-          styles.contentContainer,
-          { flex: 3.5, backgroundColor: "blue" },
-        ]}
+        style={{
+          flex: 3,
+          width: "100%",
+          justifyContent: "center",
+          alignItems: "center",
+        }}
       >
-        <Text>PRS of workout</Text>
+        <CalendarCard
+          selectedDate={selectedDate}
+          setSelectedDate={setSelectedDate}
+        />
       </View>
-      <View
-        style={[
-          styles.contentContainer,
-          { flex: 3, backgroundColor: "orange" },
-        ]}
-      >
-        <Text>Lessons learned for next workout</Text>
+      <View style={{ flex: 7 }}>
+        <Text>asdas</Text>
       </View>
-    </View>
+    </LinearGradient>
   );
 };
 
 const styles = StyleSheet.create({
   pageContainer: {
     flex: 1,
-    paddingVertical: height * 0.02,
+    paddingVertical: height * 0.03,
     flexDirection: "column",
-    justifyContent: "center",
-    alignItems: "center",
   },
   contentContainer: {
     width: "90%",
