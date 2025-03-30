@@ -1,7 +1,6 @@
 import { LinearGradient } from "expo-linear-gradient";
 import React from "react";
-import { Dimensions, StyleSheet, Text, View } from "react-native";
-import { RFValue } from "react-native-responsive-fontsize";
+import { Dimensions, StyleSheet, View } from "react-native";
 import LoadingPage from "../components/LoadingPage";
 import CalendarCard from "../components/StatisticsComponents/CalendarCard";
 import ExercisesFlatList from "../components/StatisticsComponents/ExercisesFlatList";
@@ -18,6 +17,7 @@ const StatisticsPage = () => {
     loading,
     exerciseTracking,
     exerciseTrackingByDate,
+    exerciseTrackingByDatePrev,
   } = useStatisticsPageLogic(user);
 
   return loading ? (
@@ -36,23 +36,9 @@ const StatisticsPage = () => {
         },
       ]}
     >
-      <View style={{ flex: 1, justifyContent: "flex-start" }}>
-        <Text
-          style={{
-            fontFamily: "PoppinsBold",
-            fontSize: RFValue(18),
-            color: "white",
-          }}
-        >
-          Your progreesion
-        </Text>
-      </View>
-      <View style={{ flex: 6 }}>
-        <ExercisesFlatList data={exerciseTrackingByDate}></ExercisesFlatList>
-      </View>
       <View
         style={{
-          flex: 3,
+          flex: 2,
           width: "100%",
           justifyContent: "center",
           alignItems: "center",
@@ -62,6 +48,12 @@ const StatisticsPage = () => {
           selectedDate={selectedDate}
           setSelectedDate={setSelectedDate}
         />
+      </View>
+      <View style={{ flex: 8 }}>
+        <ExercisesFlatList
+          data={exerciseTrackingByDate}
+          dataToCompare={exerciseTrackingByDatePrev || []}
+        ></ExercisesFlatList>
       </View>
     </LinearGradient>
   );

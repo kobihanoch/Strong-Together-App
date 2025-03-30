@@ -16,7 +16,7 @@
     "@supabase/storage-js": "^2.7.1",
     "@supabase/supabase-js": "^2.47.2",
     "crypto-js": "^4.2.0",
-    "expo": "~52.0.38",
+    "expo": "~52.0.41",
     "expo-app-loading": "^2.1.1",
     "expo-font": "~13.0.4",
     "expo-image-picker": "~16.0.6",
@@ -40,7 +40,6 @@
     "react-native-svg": "15.8.0",
     "react-native-url-polyfill": "^2.0.0",
     "react-native-vector-icons": "^10.2.0",
-    "react-native-week-view": "^0.30.0",
     "use-latest-callback": "^0.2.1"
   },
   "devDependencies": {
