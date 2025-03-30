@@ -3,16 +3,16 @@ import { useEffect, useState } from "react";
 import { useUserWorkout } from "../useUserWorkout";
 
 const useStatisticsPageLogic = (user) => {
-  const { workoutSplits, loading } = useUserWorkout(user?.id);
-  const [splitsCount, setSplitsCount] = useState(null);
+  const { loading, fetchUserExerciseTracking, exerciseTracking } =
+    useUserWorkout(user?.id);
   const [selectedDate, setSelectedDate] = useState(moment());
 
+  // Gets all exercise tracking of user
   useEffect(() => {
-    if (workoutSplits && workoutSplits.length > 0) {
-      setSplitsCount(workoutSplits.length);
-    }
-  }, [workoutSplits]);
-  return { splitsCount, loading, selectedDate, setSelectedDate };
+    fetchUserExerciseTracking();
+  }, []);
+
+  return { loading, selectedDate, setSelectedDate, exerciseTracking };
 };
 
 export default useStatisticsPageLogic;

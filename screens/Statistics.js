@@ -11,7 +11,7 @@ const { width, height } = Dimensions.get("window");
 
 const StatisticsPage = () => {
   const { user } = useAuth();
-  const { selectedDate, setSelectedDate, loading } =
+  const { selectedDate, setSelectedDate, loading, exerciseTracking } =
     useStatisticsPageLogic(user);
 
   return loading ? (
