@@ -4,6 +4,7 @@ import { Dimensions, StyleSheet, Text, View } from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";
 import LoadingPage from "../components/LoadingPage";
 import CalendarCard from "../components/StatisticsComponents/CalendarCard";
+import ExercisesFlatList from "../components/StatisticsComponents/ExercisesFlatList";
 import { useAuth } from "../context/AuthContext";
 import useStatisticsPageLogic from "../hooks/logic/useStatisticsPageLogic";
 
@@ -11,8 +12,13 @@ const { width, height } = Dimensions.get("window");
 
 const StatisticsPage = () => {
   const { user } = useAuth();
-  const { selectedDate, setSelectedDate, loading, exerciseTracking } =
-    useStatisticsPageLogic(user);
+  const {
+    selectedDate,
+    setSelectedDate,
+    loading,
+    exerciseTracking,
+    exerciseTrackingByDate,
+  } = useStatisticsPageLogic(user);
 
   return loading ? (
     <LoadingPage message="Analyzing" />
@@ -41,6 +47,9 @@ const StatisticsPage = () => {
           Your progreesion
         </Text>
       </View>
+      <View style={{ flex: 6 }}>
+        <ExercisesFlatList data={exerciseTrackingByDate}></ExercisesFlatList>
+      </View>
       <View
         style={{
           flex: 3,
@@ -53,9 +62,6 @@ const StatisticsPage = () => {
           selectedDate={selectedDate}
           setSelectedDate={setSelectedDate}
         />
-      </View>
-      <View style={{ flex: 7 }}>
-        <Text>asdas</Text>
       </View>
     </LinearGradient>
   );
