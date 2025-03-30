@@ -1,6 +1,9 @@
 import moment from "moment";
 import { useEffect, useState } from "react";
-import { filterExercisesByDate } from "../../utils/statisticsUtils";
+import {
+  filterExercisesByDate,
+  getLastWorkoutWithSameType,
+} from "../../utils/statisticsUtils";
 import { useUserWorkout } from "../useUserWorkout";
 
 const useStatisticsPageLogic = (user) => {
@@ -17,35 +20,9 @@ const useStatisticsPageLogic = (user) => {
   }, []);
 
   useEffect(() => {
-    if (exerciseTracking?.length > 0 && exerciseTrackingByDate?.length > 0) {
-      const sortedEtArr = [...exerciseTracking].sort(
-        (a, b) => new Date(a.workoutdate) - new Date(b.workoutdate)
-      );
-
-      let previousWorkout = [];
-      const currentSplit = exerciseTrackingByDate[0].splitname;
-      const currentDate = exerciseTrackingByDate[0].workoutdate;
-
-      while (sortedEtArr.length > 0) {
-        const last = sortedEtArr.pop();
-
-        if (
-          last.splitname === currentSplit &&
-          last.workoutdate !== currentDate
-        ) {
-          previousWorkout.push(last);
-          break;
-        }
-      }
-
-      if (previousWorkout) {
-        console.log(
-          "Found previous workout:",
-          JSON.stringify(previousWorkout, null, 2)
-        );
-        setExerciseTrackingByDatePrev(previousWorkout);
-      }
-    }
+    setExerciseTrackingByDatePrev(
+      getLastWorkoutWithSameType(exerciseTracking, exerciseTrackingByDate)
+    );
   }, [exerciseTracking, exerciseTrackingByDate]);
 
   useEffect(() => {
