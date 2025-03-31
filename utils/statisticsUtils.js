@@ -10,6 +10,30 @@ export const filterExercisesByDate = (exerciseTracking, selectedDate) => {
   }
 };
 
+export const formatDate = (dateToFormat) => {
+  const monthNames = [
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
+    "May",
+    "Jun",
+    "Jul",
+    "Aug",
+    "Sep",
+    "Oct",
+    "Nov",
+    "Dec",
+  ];
+
+  const dateObj = new Date(dateToFormat);
+  const monthName = monthNames[dateObj.getMonth()];
+  const day = dateObj.getDate();
+  const year = dateObj.getFullYear();
+
+  return `${monthName} ${day}, ${year}`;
+};
+
 const isExerciseInLastWorkoutWithSameType = (exerciseId, lastWorkout) => {
   return lastWorkout.some((ex) => ex.exercise_id === exerciseId);
 };
