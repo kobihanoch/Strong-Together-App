@@ -29,7 +29,9 @@ export const getUserWorkout = async (userId) => {
 export const getUserExerciseTracking = async (userId) => {
   const { data, error } = await supabase
     .from("exercisetracking")
-    .select("*")
+    .select(
+      "*, exercisetoworkoutsplit(exercises(targetmuscle, specifictargetmuscle))"
+    )
     .eq("user_id", userId);
   console.log("WorkoutService: exercisetracking were fetched successfully!");
   return data;
