@@ -18,7 +18,7 @@ import useHomePageLogic from "../hooks/logic/useHomePageLogic";
 const { width, height } = Dimensions.get("window");
 
 const Home = ({ navigation }) => {
-  const { user, logout } = useAuth();
+  const { user } = useAuth();
   // Hook handling
   const { username,
     userId,
@@ -95,7 +95,7 @@ const Home = ({ navigation }) => {
             flex: 4.5,
             width: "88%",
             flexDirection: "row",
-            gap: width * 0.02,
+            gap: width * 0.01,
             justifyContent: "center",
           }}
         >
@@ -137,7 +137,7 @@ const styles = StyleSheet.create({
     flexDirection: "column",
     justifyContent: "flex-start",
     alignItems: "center",
-    gap: height * 0.01,
+    gap: height * 0.005,
   },
 
   bottomContainer: {

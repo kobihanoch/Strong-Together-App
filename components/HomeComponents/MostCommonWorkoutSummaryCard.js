@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from "react";
-import { View, Text, TouchableOpacity } from "react-native";
-import { LinearGradient } from "expo-linear-gradient";
 import { FontAwesome5 } from "@expo/vector-icons";
+import { LinearGradient } from "expo-linear-gradient";
+import React, { useEffect, useState } from "react";
+import { Text, View } from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";
-import useWorkoutSplits from "../../hooks/useWorkoutSplits";
 import useExerciseTracking from "../../hooks/useExerciseTracking";
+import useWorkoutSplits from "../../hooks/useWorkoutSplits";
 
 const MostCommonWorkoutSummaryCard = ({
   userId,
@@ -41,7 +41,7 @@ const MostCommonWorkoutSummaryCard = ({
 
   return (
     <LinearGradient
-      colors={["rgb(92, 201, 134)", "rgb(0, 125, 100)"]}
+      colors={["#1e3c72", "#2a5298"]}
       style={{
         flex: 6,
         width: "100%",
@@ -110,7 +110,7 @@ const MostCommonWorkoutSummaryCard = ({
             <Text
               style={{
                 fontFamily: "PoppinsBold",
-                color: "rgb(4, 67, 53)",
+                color: "rgb(196, 199, 223)",
                 fontSize: RFValue(45),
               }}
             >
@@ -120,7 +120,7 @@ const MostCommonWorkoutSummaryCard = ({
             <Text
               style={{
                 fontFamily: "PoppinsBold",
-                color: "rgb(4, 67, 53)",
+                color: "rgb(196, 199, 223)",
                 marginTop: width * 0.02,
               }}
             >
