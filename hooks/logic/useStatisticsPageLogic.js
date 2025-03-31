@@ -2,7 +2,7 @@ import moment from "moment";
 import { useEffect, useState } from "react";
 import {
   filterExercisesByDate,
-  getLastWorkoutWithSameType,
+  getLastWorkoutForEachExercise,
 } from "../../utils/statisticsUtils";
 import { useUserWorkout } from "../useUserWorkout";
 
@@ -21,7 +21,7 @@ const useStatisticsPageLogic = (user) => {
 
   useEffect(() => {
     setExerciseTrackingByDatePrev(
-      getLastWorkoutWithSameType(exerciseTracking, exerciseTrackingByDate)
+      getLastWorkoutForEachExercise(exerciseTracking, exerciseTrackingByDate)
     );
   }, [exerciseTracking, exerciseTrackingByDate]);
 

@@ -18,9 +18,22 @@ const ExercisesFlatList = ({ data, dataToCompare }) => {
         style={styles.item}
       >
         <Text
-          style={{ fontFamily: "PoppinsBold", fontSize: RFValue(15), flex: 1 }}
+          style={{
+            fontFamily: "PoppinsBold",
+            fontSize: RFValue(15),
+            flex: 0.5,
+          }}
         >
           {item.exercise}
+        </Text>
+        <Text
+          style={{
+            fontFamily: "PoppinsBold",
+            fontSize: RFValue(10),
+            flex: 0.5,
+          }}
+        >
+          {item.workoutdate}
         </Text>
 
         <View style={{ flexDirection: "column", flex: 9 }}>
@@ -34,23 +47,23 @@ const ExercisesFlatList = ({ data, dataToCompare }) => {
             <View
               style={{
                 flexDirection: "row",
-                gap: width * 0.05,
+                gap: width * 0.02,
+                justifyContent: "center",
+                alignItems: "center",
                 alignSelf: "center",
-                backgroundColor: "rgba(157, 157, 157, 0.17)",
+                backgroundColor: "rgba(157, 157, 157, 0)",
                 borderRadius: height * 0.02,
               }}
             >
               {item.weight.map((w, index) => {
                 const prevWeight = previousExercise?.weight?.[index];
                 const isImproved = prevWeight !== undefined && w > prevWeight;
-                let color,
-                  borderColor = "";
-                if (prevWeight) {
-                  color = isImproved ? "green" : "red";
-                } else {
-                  color = "black";
-                }
-                borderColor = color;
+                const color =
+                  prevWeight === undefined
+                    ? "black"
+                    : isImproved
+                    ? "green"
+                    : "red";
 
                 return (
                   <View
@@ -60,8 +73,9 @@ const ExercisesFlatList = ({ data, dataToCompare }) => {
                       justifyContent: "center",
                       alignItems: "center",
                       padding: height * 0.01,
-                      borderRadius: height * 0.01,
                       width: width * 0.2,
+                      borderRightWidth: index < item.weight.length - 1 ? 1 : 0,
+                      borderColor: "rgba(116, 116, 116, 0.31)",
                     }}
                   >
                     <Text
@@ -114,7 +128,7 @@ const ExercisesFlatList = ({ data, dataToCompare }) => {
               gap: height * 0.02,
             }}
           >
-            <Text>Previuos workout</Text>
+            <Text>In compare to</Text>
             {/* Prev Workout */}
             {previousExercise ? (
               <View
@@ -132,23 +146,16 @@ const ExercisesFlatList = ({ data, dataToCompare }) => {
                       justifyContent: "center",
                       alignItems: "center",
                       padding: height * 0.01,
-                      borderRadius: height * 0.01,
                       width: width * 0.2,
+                      borderRightWidth:
+                        index < previousExercise.weight.length - 1 ? 1 : 0,
+                      borderColor: "rgba(116, 116, 116, 0.31)",
                     }}
                   >
                     <Text
                       style={{
-                        fontFamily: "PoppinsBold",
-                        fontSize: RFValue(15),
-                        color: "black",
-                      }}
-                    >
-                      Set {index + 1}
-                    </Text>
-                    <Text
-                      style={{
                         fontFamily: "PoppinsRegular",
-                        fontSize: RFValue(13),
+                        fontSize: RFValue(15),
                         color: "black",
                       }}
                     >
@@ -157,11 +164,20 @@ const ExercisesFlatList = ({ data, dataToCompare }) => {
                     <Text
                       style={{
                         fontFamily: "PoppinsRegular",
-                        fontSize: RFValue(13),
+                        fontSize: RFValue(15),
                         color: "black",
                       }}
                     >
                       {previousExercise.reps[index]} reps
+                    </Text>
+                    <Text
+                      style={{
+                        fontFamily: "PoppinsBold",
+                        fontSize: RFValue(15),
+                        color: "black",
+                      }}
+                    >
+                      Set {index + 1}
                     </Text>
                   </View>
                 ))}
