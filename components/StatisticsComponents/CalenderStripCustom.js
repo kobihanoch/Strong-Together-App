@@ -12,7 +12,11 @@ import { RFValue } from "react-native-responsive-fontsize";
 
 const { width, height } = Dimensions.get("window");
 
-const CalendarStripCustom = ({ onDateSelect, selectedDate }) => {
+const CalendarStripCustom = ({
+  onDateSelect,
+  selectedDate,
+  userExerciseLogs,
+}) => {
   const [datesList, setDatesList] = useState([]);
   const [currentMonth, setCurrentMonth] = useState(
     moment().format("MMMM YYYY")
@@ -48,7 +52,7 @@ const CalendarStripCustom = ({ onDateSelect, selectedDate }) => {
   const scrollToSelectedDate = () => {
     const index = datesList.findIndex((d) => d.isSame(selectedDate, "day"));
 
-    const itemWidth = width * 0.14 + width * 0.02;
+    const itemWidth = width * 0.18 + width * 0.02;
     const offset = index * itemWidth - width / 2 + itemWidth / 2;
 
     if (index !== -1 && flatListRef.current) {
@@ -79,6 +83,17 @@ const CalendarStripCustom = ({ onDateSelect, selectedDate }) => {
     const isSelected = item.isSame(selectedDate, "day");
     const isToday = item.isSame(moment(), "day");
 
+    const dateKey = item.format("YYYY-MM-DD");
+
+    let workoutLogForDate = null;
+    if (Array.isArray(userExerciseLogs)) {
+      workoutLogForDate = userExerciseLogs.find(
+        (log) => log.workoutdate === dateKey
+      );
+    }
+
+    const splitName = workoutLogForDate?.splitname;
+
     return (
       <TouchableOpacity
         style={[styles.dateItem, isSelected && styles.selectedItem]}
@@ -108,6 +123,33 @@ const CalendarStripCustom = ({ onDateSelect, selectedDate }) => {
         >
           {item.format("D")}
         </Text>
+
+        {splitName ? (
+          <Text
+            style={{
+              fontSize: RFValue(13),
+              color: isSelected ? "black" : "rgb(148, 149, 177)",
+              fontFamily: "PoppinsBold",
+              textAlign: "center",
+            }}
+            numberOfLines={1}
+          >
+            {splitName}
+          </Text>
+        ) : (
+          <Text
+            style={{
+              fontSize: RFValue(13),
+              color: isSelected ? "black" : "white",
+              fontFamily: "PoppinsRegular",
+              textAlign: "center",
+              opacity: 0.2,
+            }}
+            numberOfLines={1}
+          >
+            Rest
+          </Text>
+        )}
       </TouchableOpacity>
     );
   };
@@ -116,7 +158,7 @@ const CalendarStripCustom = ({ onDateSelect, selectedDate }) => {
     <View style={styles.container}>
       <Text style={styles.monthHeader}>{currentMonth}</Text>
 
-      <View style={{ width: "100%", alignItems: "center" }}>
+      <View style={{ width: "100%", alignItems: "center", height: "90%" }}>
         <FlatList
           ref={flatListRef}
           data={datesList}
@@ -132,8 +174,8 @@ const CalendarStripCustom = ({ onDateSelect, selectedDate }) => {
           initialNumToRender={10}
           maxToRenderPerBatch={20}
           getItemLayout={(data, index) => ({
-            length: width * 0.14 + width * 0.02,
-            offset: (width * 0.14 + width * 0.02) * index,
+            length: width * 0.18 + width * 0.02,
+            offset: (width * 0.18 + width * 0.02) * index,
             index,
           })}
           onViewableItemsChanged={onViewRef.current}
@@ -150,7 +192,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     flexDirection: "column",
-    gap: height * 0.02,
   },
   monthHeader: {
     textAlign: "center",
@@ -159,19 +200,21 @@ const styles = StyleSheet.create({
     fontSize: RFValue(14),
   },
   dateItem: {
-    width: width * 0.14,
-    aspectRatio: 1,
+    width: width * 0.18,
+    flexDirection: "column",
+    gap: height * 0.005,
     borderRadius: width * 0.07,
     marginHorizontal: width * 0.01,
     alignItems: "center",
     justifyContent: "center",
+    paddingVertical: height * 0.01,
     backgroundColor: "transparent",
   },
   selectedItem: {
     backgroundColor: "white",
   },
   dayName: {
-    fontSize: RFValue(10),
+    fontSize: RFValue(12),
     color: "white",
     fontFamily: "PoppinsRegular",
   },

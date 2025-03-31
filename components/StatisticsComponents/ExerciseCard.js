@@ -1,13 +1,14 @@
+import { FontAwesome5 } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import React from "react";
 import { Dimensions, Image, StyleSheet, Text, View } from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";
 import images from "../../components/images";
-import { formatDate } from "../../utils/statisticsUtils";
+import { formatDate, isSetPR } from "../../utils/statisticsUtils";
 
 const { width, height } = Dimensions.get("window");
 
-const ExerciseCard = ({ item, dataToCompare }) => {
+const ExerciseCard = ({ item, dataToCompare, exerciseTracking }) => {
   const previousExercise = Array.isArray(dataToCompare)
     ? dataToCompare.find((prev) => prev.exercise_id == item.exercise_id)
     : null;
@@ -20,7 +21,7 @@ const ExerciseCard = ({ item, dataToCompare }) => {
 
   return (
     <LinearGradient
-      colors={["rgb(255, 255, 255)", "rgb(216, 234, 255)"]}
+      colors={["rgb(238, 245, 255)", "rgb(231, 233, 236)"]}
       style={styles.item}
     >
       <View
@@ -81,7 +82,7 @@ const ExerciseCard = ({ item, dataToCompare }) => {
       </View>
 
       <View style={{ flexDirection: "column", flex: 8, gap: height * 0.03 }}>
-        <View style={{ flex: 5, flexDirection: "column", gap: height * 0.02 }}>
+        <View style={{ flex: 5, flexDirection: "column", gap: height * 0.01 }}>
           <View>
             <Text style={{ fontFamily: "PoppinsBold", fontSize: RFValue(12) }}>
               Current workout
@@ -102,62 +103,92 @@ const ExerciseCard = ({ item, dataToCompare }) => {
             {item.weight.map((w, index) => {
               const prevWeight = previousExercise?.weight?.[index];
               const isImproved = prevWeight !== undefined && w > prevWeight;
-              const color =
-                prevWeight === undefined
-                  ? "black"
-                  : isImproved
-                  ? "rgb(13, 177, 54)"
-                  : "rgb(177, 13, 13)";
-              const backgroundColor =
-                prevWeight === undefined
-                  ? "rgba(219, 219, 219, 0.1)"
-                  : isImproved
-                  ? "rgba(13, 177, 54, 0.07)"
-                  : "rgba(177, 13, 13, 0.07)";
+              const isPr = isSetPR(exerciseTracking, w);
+              const color = isPr
+                ? "rgb(170, 122, 2)"
+                : prevWeight === undefined
+                ? "black"
+                : isImproved
+                ? "rgb(13, 177, 54)"
+                : "rgb(177, 13, 13)";
+              const backgroundColor = isPr
+                ? "rgba(255, 183, 0, 0.07)"
+                : prevWeight === undefined
+                ? "rgba(219, 219, 219, 0.1)"
+                : isImproved
+                ? "rgba(13, 177, 54, 0.07)"
+                : "rgba(177, 13, 13, 0.07)";
 
               return (
                 <View
                   key={index}
                   style={{
-                    flexDirection: "column",
+                    flexDirection: "row",
                     justifyContent: "center",
                     alignItems: "center",
+                    gap: width * 0.02,
+                    height: "100%",
                     paddingVertical: height * 0.02,
                     paddingHorizontal: height * 0.01,
-                    width: width * 0.2,
+                    width: width * 0.22,
                     backgroundColor,
                     borderRadius: height * 0.02,
                     //borderRightWidth: index < item.weight.length - 1 ? 1 : 0,
                     //borderColor: "rgba(116, 116, 116, 0.31)",
                   }}
                 >
-                  <Text
-                    style={{
-                      fontFamily: "PoppinsRegular",
-                      fontSize: RFValue(12),
-                      color,
-                    }}
+                  <View style={{ flexDirection: "column" }}>
+                    <Text
+                      style={{
+                        fontFamily: "PoppinsRegular",
+                        fontSize: RFValue(12),
+                        color,
+                      }}
+                    >
+                      {w} kg
+                    </Text>
+                    <Text
+                      style={{
+                        fontFamily: "PoppinsRegular",
+                        fontSize: RFValue(12),
+                        color,
+                      }}
+                    >
+                      {item.reps[index]} reps
+                    </Text>
+                    <Text
+                      style={{
+                        fontFamily: "PoppinsBold",
+                        fontSize: RFValue(13),
+                        color,
+                      }}
+                    >
+                      Set {index + 1}
+                    </Text>
+                  </View>
+                  <View
+                    style={{ justifyContent: "center", alignItems: "center" }}
                   >
-                    {w} kg
-                  </Text>
-                  <Text
-                    style={{
-                      fontFamily: "PoppinsRegular",
-                      fontSize: RFValue(12),
-                      color,
-                    }}
-                  >
-                    {item.reps[index]} reps
-                  </Text>
-                  <Text
-                    style={{
-                      fontFamily: "PoppinsBold",
-                      fontSize: RFValue(13),
-                      color,
-                    }}
-                  >
-                    Set {index + 1}
-                  </Text>
+                    {isPr ? (
+                      <Text style={{ fontFamily: "PoppinsBold", color }}>
+                        PR
+                      </Text>
+                    ) : prevWeight ? (
+                      isImproved ? (
+                        <FontAwesome5
+                          name="arrow-up"
+                          color={color}
+                        ></FontAwesome5>
+                      ) : (
+                        <FontAwesome5
+                          name="arrow-down"
+                          color={color}
+                        ></FontAwesome5>
+                      )
+                    ) : (
+                      <Text></Text>
+                    )}
+                  </View>
                 </View>
               );
             })}
@@ -278,8 +309,7 @@ const ExerciseCard = ({ item, dataToCompare }) => {
 const styles = StyleSheet.create({
   item: {
     marginRight: width * 0.05,
-    backgroundColor: "#f5f5f5",
-    width: width * 0.75,
+    width: width * 0.8,
     flexDirection: "column",
     justifyContent: "flex-start",
     paddingHorizontal: width * 0.05,

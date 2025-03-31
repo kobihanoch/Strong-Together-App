@@ -5,7 +5,7 @@ import ExerciseCard from "./ExerciseCard";
 
 const { width, height } = Dimensions.get("window");
 
-const ExercisesFlatList = ({ data, dataToCompare }) => {
+const ExercisesFlatList = ({ data, dataToCompare, exerciseTracking }) => {
   return (
     <View style={{ flex: 7, justifyContent: "center", alignItems: "center" }}>
       {data && data.length > 0 ? (
@@ -17,6 +17,7 @@ const ExercisesFlatList = ({ data, dataToCompare }) => {
             <ExerciseCard
               item={item}
               dataToCompare={dataToCompare}
+              exerciseTracking={exerciseTracking}
             ></ExerciseCard>
           )}
           contentContainerStyle={{ padding: 10 }}

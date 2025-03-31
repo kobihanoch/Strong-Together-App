@@ -38,7 +38,7 @@ const StatisticsPage = () => {
     >
       <View
         style={{
-          flex: 2,
+          flex: 2.5,
           width: "100%",
           justifyContent: "center",
           alignItems: "center",
@@ -47,12 +47,14 @@ const StatisticsPage = () => {
         <CalendarCard
           selectedDate={selectedDate}
           setSelectedDate={setSelectedDate}
+          userExerciseLogs={exerciseTracking || []}
         />
       </View>
-      <View style={{ flex: 8 }}>
+      <View style={{ flex: 7.5 }}>
         <ExercisesFlatList
           data={exerciseTrackingByDate}
           dataToCompare={exerciseTrackingByDatePrev || []}
+          exerciseTracking={exerciseTracking}
         ></ExercisesFlatList>
       </View>
     </LinearGradient>

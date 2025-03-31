@@ -71,10 +71,10 @@ export const getLastWorkoutForEachExercise = (
       }
     });
 
-    console.log(
-      "Found previous workout:",
-      JSON.stringify(previousWorkout, null, 2)
-    );
+    //console.log(
+    // "Found previous workout:",
+    // JSON.stringify(previousWorkout, null, 2)
+    // );
 
     return previousWorkout;
   }
@@ -112,9 +112,14 @@ export const getLastWorkoutWithSameType = (
       }
     }
 
-    console.log("PREVIOUS WORKOUT FULL:", JSON.stringify(lastWorkout, null, 2));
+    //console.log("PREVIOUS WORKOUT FULL:", JSON.stringify(lastWorkout, null, 2));
     return lastWorkout;
   }
 
   return [];
+};
+
+export const isSetPR = (exerciseTracking, weight) => {
+  let allWeightArr = exerciseTracking.flatMap((et) => et.weight);
+  return weight == Math.max(...allWeightArr);
 };
