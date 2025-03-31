@@ -2,6 +2,28 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.6.0](https://github.com/kobihanoch/Strong-Together-App/compare/v1.5.0...v1.6.0) (2025-03-31)
+
+
+### Features
+
+* **home:** change home UI colors ([238fa21](https://github.com/kobihanoch/Strong-Together-App/commit/238fa21175dc260d45a69f1f8d20a9a6afbaa80e))
+* **home:** changed home UI colors ([8e94907](https://github.com/kobihanoch/Strong-Together-App/commit/8e949077c40cb20067db8c328abdd0e96ec8c98f))
+* **statistics:** added comparing to last workout ([e0d7502](https://github.com/kobihanoch/Strong-Together-App/commit/e0d7502e039f192d8567583ec1529548b3f4b57d))
+* **statistics:** added picture of muscle for UI ([da4935b](https://github.com/kobihanoch/Strong-Together-App/commit/da4935b77d8c733469e9374a88c82538c57f8003))
+* **statistics:** added UI feature for PR set ([a7a65d3](https://github.com/kobihanoch/Strong-Together-App/commit/a7a65d3f37eede110368181f8feabbe7bc75f740))
+* **statistics:** create Statistics screen (initial layout)" ([1bc6028](https://github.com/kobihanoch/Strong-Together-App/commit/1bc6028e0e6e3a6b90f1d0eba94e159f887b168e))
+* **statistics:** created basic exercise flatlist UI by dates of workout ([99f57ad](https://github.com/kobihanoch/Strong-Together-App/commit/99f57ad0bbd3234b1eb64146d81b27816b7bd4bc))
+* **statistics:** created screen statistics with calendar card ([fdd58eb](https://github.com/kobihanoch/Strong-Together-App/commit/fdd58ebb4890e3e74e61b536917b57c52bbe028a))
+* **statistics:** fixed comparing to last workout assigned per exercise ([dbf0899](https://github.com/kobihanoch/Strong-Together-App/commit/dbf08998e2c3b0801a128d23bcb3d96479049d6f))
+* **statistics:** page logic handles user's exercise tracking data ([b24a95e](https://github.com/kobihanoch/Strong-Together-App/commit/b24a95e303c2b0565f65625d07a4016cc976a6dd))
+* **statistics:** smart comparing, updated comapring defines if last record is from last workout ([60cb616](https://github.com/kobihanoch/Strong-Together-App/commit/60cb616047801450811ea6857b2144b51d6f52f4))
+* **statistics:** UI changed ([d410d86](https://github.com/kobihanoch/Strong-Together-App/commit/d410d863fb6a74f8867f7186d799c66f086abb6e))
+* **statistics:** week calendar is fully functional ([a2f2cde](https://github.com/kobihanoch/Strong-Together-App/commit/a2f2cde33fdeda1fd9be7a496d3a3eac1ae5791e))
+* **userworkout:** hook and service handles fetch of user exercise tracking data ([be71d71](https://github.com/kobihanoch/Strong-Together-App/commit/be71d714d74d18562cd5aeff3e3f441bc5dbb8b3))
+* **utils:** created format date function for statistics ([772de87](https://github.com/kobihanoch/Strong-Together-App/commit/772de878da6dc1448263ad3a5a9b99bf85eb15c2))
+* **workoutService:** fetch target muscle and specific target muscle in exercise tracking ([27d154a](https://github.com/kobihanoch/Strong-Together-App/commit/27d154a530e45ca7a3d2ba13c30a40624f67b881))
+
 ## [1.5.0](https://github.com/kobihanoch/Strong-Together-App/compare/v1.4.1...v1.5.0) (2025-03-29)
 
 
