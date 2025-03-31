@@ -7,6 +7,7 @@ import StartWorkout from "../screens/StartWorkout";
 import PostWorkoutSummary from "../screens/PostWorkoutSummary";
 import CreateWorkout from "../screens/CreateWorkout";
 import Profile from "../screens/Profile";
+import Statistics from "../screens/Statistics";
 
 const Stack = createStackNavigator();
 
@@ -26,6 +27,7 @@ const AppStack = () => {
       <Stack.Screen name="StartWorkout" component={StartWorkout} />
       <Stack.Screen name="PostWorkoutSummary" component={PostWorkoutSummary} />
       <Stack.Screen name="CreateWorkout" component={CreateWorkout} />
+      <Stack.Screen name="Statistics" component={Statistics} />
     </Stack.Navigator>
   );
 };
