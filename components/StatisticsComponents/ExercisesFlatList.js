@@ -1,7 +1,15 @@
 import { LinearGradient } from "expo-linear-gradient";
 import React from "react";
-import { Dimensions, FlatList, StyleSheet, Text, View } from "react-native";
+import {
+  Dimensions,
+  FlatList,
+  Image,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";
+import images from "../../components/images";
 
 const { width, height } = Dimensions.get("window");
 
@@ -10,38 +18,77 @@ const ExercisesFlatList = ({ data, dataToCompare }) => {
     const previousExercise = Array.isArray(dataToCompare)
       ? dataToCompare.find((prev) => prev.exercise_id == item.exercise_id)
       : null;
-    console.log(JSON.stringify(previousExercise));
+    //console.log(JSON.stringify(previousExercise));
+    const mainMuscle = item.exercisetoworkoutsplit.exercises.targetmuscle;
+    const specificMuscle =
+      item.exercisetoworkoutsplit.exercises.specifictargetmuscle;
+
+    const imagePath = images[mainMuscle]?.[specificMuscle];
 
     return (
       <LinearGradient
         colors={["rgb(255, 255, 255)", "rgb(216, 234, 255)"]}
         style={styles.item}
       >
-        <Text
-          style={{
-            fontFamily: "PoppinsBold",
-            fontSize: RFValue(15),
-            flex: 0.5,
-          }}
-        >
-          {item.exercise}
-        </Text>
-        <Text
-          style={{
-            fontFamily: "PoppinsBold",
-            fontSize: RFValue(10),
-            flex: 0.5,
-          }}
-        >
-          {item.workoutdate}
-        </Text>
+        <View style={{ flex: 2, flexDirection: "row", alignItems: "center" }}>
+          <View style={{ flex: 7 }}>
+            <Text
+              style={{
+                fontFamily: "PoppinsBold",
+                fontSize: RFValue(17),
+              }}
+            >
+              {item.exercise}
+            </Text>
 
-        <View style={{ flexDirection: "column", flex: 9 }}>
+            <Text
+              style={{
+                fontFamily: "PoppinsRegular",
+                fontSize: RFValue(10),
+                opacity: 0.4,
+              }}
+            >
+              {item.workoutdate.split("-").reverse().join(".")}
+            </Text>
+          </View>
+          <LinearGradient
+            colors={["#00142a", "#0d2540"]}
+            style={{
+              flex: 3,
+              borderRadius: 10,
+              alignItems: "center",
+              justifyContent: "center",
+              margin: width * 0.02,
+              borderWidth: 2,
+              borderColor: "#666d75",
+              height: "80%",
+              opacity: 0.9,
+            }}
+          >
+            <View>
+              <Image
+                source={imagePath}
+                style={{
+                  height: 50,
+                  width: 50,
+                  resizeMode: "contain",
+                  opacity: 0.8,
+                }}
+              />
+            </View>
+          </LinearGradient>
+        </View>
+
+        <View style={{ flexDirection: "column", flex: 8 }}>
           <View
             style={{ flex: 4.5, flexDirection: "column", gap: height * 0.02 }}
           >
             <View>
-              <Text>Current workout</Text>
+              <Text
+                style={{ fontFamily: "PoppinsBold", fontSize: RFValue(12) }}
+              >
+                Current workout
+              </Text>
             </View>
             {/* Current Workout */}
             <View
@@ -128,14 +175,42 @@ const ExercisesFlatList = ({ data, dataToCompare }) => {
               gap: height * 0.02,
             }}
           >
-            <Text>In compare to</Text>
+            <View
+              style={{ flexDirection: "row", justifyContent: "space-between" }}
+            >
+              <Text
+                style={{ fontFamily: "PoppinsBold", fontSize: RFValue(12) }}
+              >
+                In compare to
+              </Text>
+              <Text
+                style={{
+                  fontFamily: "PoppinsRegular",
+                  fontSize: RFValue(10),
+                }}
+              >
+                {previousExercise
+                  ? previousExercise.isLastWorkout
+                    ? "Last workout"
+                    : previousExercise.workoutdate
+                        .split("-")
+                        .reverse()
+                        .join(".")
+                  : ""}
+              </Text>
+            </View>
             {/* Prev Workout */}
             {previousExercise ? (
               <View
                 style={{
                   flexDirection: "row",
-                  gap: width * 0.05,
+                  gap: width * 0.02,
+                  justifyContent: "center",
+                  alignItems: "center",
                   alignSelf: "center",
+                  backgroundColor: "rgba(157, 157, 157, 0)",
+                  borderRadius: height * 0.02,
+                  opacity: 0.3,
                 }}
               >
                 {previousExercise.weight.map((w, index) => (
@@ -178,18 +253,6 @@ const ExercisesFlatList = ({ data, dataToCompare }) => {
                       }}
                     >
                       Set {index + 1}
-                    </Text>
-                    <Text
-                      style={{
-                        fontFamily: "PoppinsReguar",
-                        fontSize: RFValue(7),
-                        color: "black",
-                        textAlign: "center",
-                      }}
-                    >
-                      {previousExercise.isLastWorkout
-                        ? "Last workout"
-                        : previousExercise.workoutdate}
                     </Text>
                   </View>
                 ))}
