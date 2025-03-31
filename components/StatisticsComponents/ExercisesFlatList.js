@@ -1,5 +1,5 @@
 import React from "react";
-import { Dimensions, FlatList, StyleSheet, Text, View } from "react-native";
+import { Dimensions, FlatList, Text, View } from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";
 import ExerciseCard from "./ExerciseCard";
 
@@ -35,19 +35,5 @@ const ExercisesFlatList = ({ data, dataToCompare }) => {
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  item: {
-    marginRight: width * 0.05,
-    backgroundColor: "#f5f5f5",
-    width: width * 0.75,
-    flexDirection: "column",
-    justifyContent: "flex-start",
-    paddingHorizontal: width * 0.05,
-    paddingVertical: height * 0.03,
-    gap: height * 0.02,
-    borderRadius: height * 0.02,
-  },
-});
 
 export default ExercisesFlatList;
