@@ -1,40 +1,77 @@
-import {
-  View,
-  Text,
-  StyleSheet,
-  Dimensions,
-  ScrollView,
-  TouchableOpacity,
-  Image,
-} from "react-native";
-import { useFocusEffect } from "@react-navigation/native";
-import { useAuth } from "../context/AuthContext";
-import React, { useState, useEffect } from "react";
-import supabase from "../src/supabaseClient";
-import Icon from "react-native-vector-icons/FontAwesome";
-import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 import { LinearGradient } from "expo-linear-gradient";
-import { RFValue } from "react-native-responsive-fontsize";
-import MostCommonWorkoutSummaryCard from "../components/HomeComponents/MostCommonWorkoutSummaryCard";
-import WorkoutCountCard from "../components/HomeComponents/WorkoutCountCard";
-import { useUserWorkout } from "../hooks/useUserWorkout";
+import React from "react";
+import { Dimensions, StyleSheet, View } from "react-native";
 import LoadingPage from "../components/LoadingPage";
-import CreateOrEditWorkoutCard from "../components/HomeComponents/CreateOrEditWorkoutCard";
-import NewAchivementCard from "../components/HomeComponents/NewAchivementCard";
-import useHomePageLogic from "../hooks/logic/useHomePageLogic";
+import CalendarCard from "../components/StatisticsComponents/CalendarCard";
+import ExercisesFlatList from "../components/StatisticsComponents/ExercisesFlatList";
+import { useAuth } from "../context/AuthContext";
 import useStatisticsPageLogic from "../hooks/logic/useStatisticsPageLogic";
 
 const { width, height } = Dimensions.get("window");
 
 const StatisticsPage = () => {
   const { user } = useAuth();
-  const { splitsCount } = useStatisticsPageLogic(user);
+  const {
+    selectedDate,
+    setSelectedDate,
+    loading,
+    exerciseTracking,
+    exerciseTrackingByDate,
+    exerciseTrackingByDatePrev,
+  } = useStatisticsPageLogic(user);
 
-  return (
-    <View>
-      <Text>Splits count: {splitsCount}</Text>
-    </View>
+  return loading ? (
+    <LoadingPage message="Analyzing" />
+  ) : (
+    <LinearGradient
+      colors={["#00142a", "#0d2540"]}
+      style={[
+        styles.pageContainer,
+        {
+          flex: 6,
+          backgroundColor: "rgb(69, 0, 148)",
+          borderRadius: height * 0.0,
+          flexDirection: "column",
+          paddingHorizontal: width * 0.05,
+        },
+      ]}
+    >
+      <View
+        style={{
+          flex: 2.5,
+          width: "100%",
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
+        <CalendarCard
+          selectedDate={selectedDate}
+          setSelectedDate={setSelectedDate}
+          userExerciseLogs={exerciseTracking || []}
+        />
+      </View>
+      <View style={{ flex: 7.5 }}>
+        <ExercisesFlatList
+          data={exerciseTrackingByDate}
+          dataToCompare={exerciseTrackingByDatePrev || []}
+          exerciseTracking={exerciseTracking}
+        ></ExercisesFlatList>
+      </View>
+    </LinearGradient>
   );
 };
+
+const styles = StyleSheet.create({
+  pageContainer: {
+    flex: 1,
+    paddingVertical: height * 0.03,
+    flexDirection: "column",
+  },
+  contentContainer: {
+    width: "90%",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+});
 
 export default StatisticsPage;

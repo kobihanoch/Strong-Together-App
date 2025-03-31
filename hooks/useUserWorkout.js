@@ -1,5 +1,8 @@
-import React, { useEffect, useState, useCallback } from "react";
-import { getUserWorkout } from "../services/WorkoutService";
+import { useEffect, useState } from "react";
+import {
+  getUserExerciseTracking,
+  getUserWorkout,
+} from "../services/WorkoutService";
 
 export const useUserWorkout = (userId) => {
   const [userWorkout, setUserWorkout] = useState(null);
@@ -8,6 +11,7 @@ export const useUserWorkout = (userId) => {
   const [workout, setWorkout] = useState(null);
   const [workoutSplits, setWorkoutSplits] = useState(null);
   const [exercises, setExercises] = useState(null);
+  const [exerciseTracking, setExerciseTracking] = useState(null);
 
   const fetchUserWorkout = async () => {
     if (!userId) return;
@@ -16,6 +20,26 @@ export const useUserWorkout = (userId) => {
       console.log("Trying to fetch data from hook...");
       const data = await getUserWorkout(userId);
       setUserWorkout(data);
+    } catch (err) {
+      setError(err);
+      console.log("Failed. Error: " + err);
+    } finally {
+      //await new Promise((resolve) => setTimeout(resolve, 2000));
+      setLoading(false);
+      console.log(
+        "useUserWorkout: Data fetched from hook succesfully! State was updated."
+      );
+    }
+  };
+
+  const fetchUserExerciseTracking = async () => {
+    if (!userId) return;
+    setLoading(true);
+    try {
+      console.log("Trying to fetch data from hook...");
+      const data = await getUserExerciseTracking(userId);
+      console.log(JSON.stringify(data));
+      setExerciseTracking(data);
     } catch (err) {
       setError(err);
       console.log("Failed. Error: " + err);
@@ -67,6 +91,8 @@ export const useUserWorkout = (userId) => {
     loading,
     error,
     refetch: fetchUserWorkout,
+    fetchUserExerciseTracking,
+    exerciseTracking,
     workout,
     workoutSplits,
     exercises,
