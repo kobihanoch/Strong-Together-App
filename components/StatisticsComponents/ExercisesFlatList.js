@@ -179,6 +179,18 @@ const ExercisesFlatList = ({ data, dataToCompare }) => {
                     >
                       Set {index + 1}
                     </Text>
+                    <Text
+                      style={{
+                        fontFamily: "PoppinsReguar",
+                        fontSize: RFValue(7),
+                        color: "black",
+                        textAlign: "center",
+                      }}
+                    >
+                      {previousExercise.isLastWorkout
+                        ? "Last workout"
+                        : previousExercise.workoutdate}
+                    </Text>
                   </View>
                 ))}
               </View>

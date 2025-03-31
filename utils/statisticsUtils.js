@@ -10,6 +10,10 @@ export const filterExercisesByDate = (exerciseTracking, selectedDate) => {
   }
 };
 
+const isExerciseInLastWorkoutWithSameType = (exerciseId, lastWorkout) => {
+  return lastWorkout.some((ex) => ex.exercise_id === exerciseId);
+};
+
 export const getLastWorkoutForEachExercise = (
   exerciseTracking,
   exerciseTrackingByDate
@@ -20,38 +24,26 @@ export const getLastWorkoutForEachExercise = (
     );
 
     const currentDate = exerciseTrackingByDate[0].workoutdate;
-    const lastWorkoutDates = {}; // { exercise_id: lastWorkoutDate }
+    const lastWorkoutWithSameType = getLastWorkoutWithSameType(
+      exerciseTracking,
+      exerciseTrackingByDate
+    );
+
     const previousWorkout = [];
 
-    for (const ex of sortedEtArr) {
-      if (
-        !lastWorkoutDates[ex.exercise_id] &&
-        new Date(ex.workoutdate) < new Date(currentDate)
-      ) {
-        lastWorkoutDates[ex.exercise_id] = ex.workoutdate;
-      }
-    }
-
     exerciseTrackingByDate.forEach((exercise) => {
-      const lastDate = lastWorkoutDates[exercise.exercise_id];
-      if (lastDate) {
-        const prev = sortedEtArr.find(
-          (et) =>
-            et.exercise_id === exercise.exercise_id &&
-            et.workoutdate === lastDate
-        );
+      const lastLog = sortedEtArr.find(
+        (log) =>
+          log.exercise_id === exercise.exercise_id &&
+          new Date(log.workoutdate) < new Date(currentDate)
+      );
 
-        if (prev) {
-          previousWorkout.push({
-            ...prev,
-            isLastWorkout: !sortedEtArr.some(
-              (et) =>
-                et.exercise_id === exercise.exercise_id &&
-                new Date(et.workoutdate) > new Date(prev.workoutdate) &&
-                new Date(et.workoutdate) < new Date(currentDate)
-            ),
-          });
-        }
+      if (lastLog) {
+        const isLastWorkout = isExerciseInLastWorkoutWithSameType(
+          exercise.exercise_id,
+          lastWorkoutWithSameType
+        );
+        previousWorkout.push({ ...lastLog, isLastWorkout });
       }
     });
 
@@ -75,28 +67,30 @@ export const getLastWorkoutWithSameType = (
       (a, b) => new Date(a.workoutdate) - new Date(b.workoutdate)
     );
 
-    let previousWorkout = [];
-    const currentSplit = exerciseTrackingByDate[0].splitname;
     const currentDate = exerciseTrackingByDate[0].workoutdate;
-    console.log("Current split: " + JSON.stringify(currentSplit));
+    const splitName = exerciseTrackingByDate[0].splitname;
 
-    while (sortedEtArr.length > 0) {
-      const last = sortedEtArr.pop();
+    let lastWorkout = [];
+    let prevDate = "";
 
-      if (last.splitname === currentSplit && last.workoutdate !== currentDate) {
-        previousWorkout.push(last);
-        break;
+    for (let j = sortedEtArr.length - 1; j >= 0; j--) {
+      const entry = sortedEtArr[j];
+      if (entry.splitname === splitName && entry.workoutdate < currentDate) {
+        if (!prevDate) {
+          prevDate = entry.workoutdate;
+        }
+
+        if (entry.workoutdate !== prevDate) {
+          break;
+        }
+
+        lastWorkout.push(entry);
       }
     }
 
-    if (previousWorkout) {
-      console.log(
-        "Found previous workout:",
-        JSON.stringify(previousWorkout, null, 2)
-      );
-
-      return previousWorkout;
-    }
-    return [];
+    console.log("PREVIOUS WORKOUT FULL:", JSON.stringify(lastWorkout, null, 2));
+    return lastWorkout;
   }
+
+  return [];
 };
