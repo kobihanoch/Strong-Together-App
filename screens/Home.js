@@ -1,5 +1,12 @@
 import React from "react";
-import { Dimensions, Image, StyleSheet, Text, View } from "react-native";
+import {
+  Dimensions,
+  Image,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";
 import CreateOrEditWorkoutCard from "../components/HomeComponents/CreateOrEditWorkoutCard";
 import MostCommonWorkoutSummaryCard from "../components/HomeComponents/MostCommonWorkoutSummaryCard";
@@ -8,6 +15,13 @@ import WorkoutCountCard from "../components/HomeComponents/WorkoutCountCard";
 import LoadingPage from "../components/LoadingPage";
 import { useAuth } from "../context/AuthContext";
 import useHomePageLogic from "../hooks/logic/useHomePageLogic";
+import Icon from "react-native-vector-icons/Feather";
+import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
+import { FontAwesome5 } from "@expo/vector-icons";
+import StartWorkoutButton from "../components/HomeComponents/StartWorkoutButton";
+import { formatDate } from "../utils/statisticsUtils";
+import LastWorkoutSection from "../components/HomeComponents/LastWorkoutSection";
+import QuickLookSection from "../components/HomeComponents/QuickLookSection";
 
 const { width, height } = Dimensions.get("window");
 
@@ -20,6 +34,8 @@ const Home = ({ navigation }) => {
     hasAssignedWorkout,
     profileImageUrl,
     loading,
+    firstName,
+    lastWorkoutDate,
     error,
   } = useHomePageLogic(user);
 
@@ -29,49 +45,26 @@ const Home = ({ navigation }) => {
     <View style={{ flex: 1, paddingVertical: height * 0.02 }}>
       {/* Header */}
       <View style={styles.headerContainer}>
-        <View
-          style={{
-            justifyContent: "center",
-            alignItems: "center",
-            flex: 1.5,
-          }}
-        >
-          <Image
-            source={
-              profileImageUrl
-                ? { uri: profileImageUrl }
-                : require("../assets/profile.png")
-            }
-            style={{
-              height: height * 0.06,
-              width: height * 0.06,
-              resizeMode: "stretch",
-              borderRadius: height * 0.05,
-            }}
-          ></Image>
-        </View>
         <View style={{ justifyContent: "center", flex: 8.5 }}>
-          <Text style={styles.headerText}>
-            Welcome,{" "}
-            <Text style={{ fontFamily: "Inter_700Bold" }}>{username} </Text>!
-          </Text>
-          <Text
-            style={{
-              fontSize: RFValue(13),
-              color: "black",
-              fontFamily: "Inter_400Regular",
-            }}
-          >
-            Check out your dashboard
-          </Text>
+          <Text style={styles.headerText}>Hello, {firstName}!</Text>
         </View>
       </View>
 
       <View style={styles.midContainer}>
-        <View style={{ flex: 1.5 }}>
-          <WorkoutCountCard userId={userId} height={height} width={width} />
-        </View>
-        <View
+        {/*flex 1.3*/}
+        <StartWorkoutButton></StartWorkoutButton>
+
+        {/*flex 1*/}
+        <LastWorkoutSection
+          lastWorkoutDate={lastWorkoutDate}
+        ></LastWorkoutSection>
+
+        {/*flex 2.7*/}
+        <QuickLookSection
+          user={user}
+          hasAssignedWorkout={hasAssignedWorkout}
+        ></QuickLookSection>
+        {/*<View
           style={{
             flex: 4,
             display: "flex",
@@ -103,7 +96,7 @@ const Home = ({ navigation }) => {
             hasAssignedWorkout={hasAssignedWorkout}
             navigation={navigation}
           ></CreateOrEditWorkoutCard>
-        </View>
+        </View>*/}
       </View>
     </View>
   );
@@ -118,9 +111,9 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   headerText: {
-    fontFamily: "Inter_400Regular",
+    fontFamily: "Inter_600SemiBold",
     color: "black",
-    fontSize: RFValue(18),
+    fontSize: RFValue(40),
   },
   semiHeaderText: {
     fontFamily: "Inter_400Regular",

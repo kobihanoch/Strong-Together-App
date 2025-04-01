@@ -21,10 +21,7 @@ function WorkoutCountCard({ userId, height, width }) {
   const styles = createStyles(height, width);
 
   return (
-    <LinearGradient
-      style={styles.workoutsContainer}
-      colors={["#1e3c72", "#2a5298"]}
-    >
+    <View style={{ flex: 3, height: "100%" }}>
       <View style={styles.workoutsContainer}>
         <View style={{ flexDirection: "column" }}>
           <Text
@@ -60,7 +57,7 @@ function WorkoutCountCard({ userId, height, width }) {
           </Text>
         </View>
       </View>
-    </LinearGradient>
+    </View>
   );
 }
 

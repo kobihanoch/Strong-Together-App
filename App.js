@@ -1,4 +1,9 @@
-import { Inter_400Regular, Inter_700Bold } from "@expo-google-fonts/inter";
+import {
+  Inter_400Regular,
+  Inter_700Bold,
+  Inter_500Medium,
+  Inter_600SemiBold,
+} from "@expo-google-fonts/inter";
 import {
   CommonActions,
   NavigationContainer,
@@ -23,6 +28,8 @@ export default function App() {
       PoppinsLight: require("./assets/fonts/Poppins-Light.ttf"),
       Inter_400Regular,
       Inter_700Bold,
+      Inter_500Medium,
+      Inter_600SemiBold,
     });
     setFontsLoaded(true);
   };

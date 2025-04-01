@@ -1,4 +1,4 @@
-import { FontAwesome5 } from "@expo/vector-icons";
+import { FontAwesome5, MaterialCommunityIcons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import React, { useEffect, useState } from "react";
 import { Text, View } from "react-native";
@@ -40,116 +40,72 @@ const MostCommonWorkoutSummaryCard = ({
   }, [mostFreqWorkoutsplit_id]);
 
   return (
-    <LinearGradient
-      colors={["#1e3c72", "#2a5298"]}
+    <View
       style={{
-        flex: 6,
-        width: "100%",
+        flex: 3,
+        height: "100%",
         borderRadius: height * 0.02,
-        flexDirection: "column",
-        justifyContent: "space-around",
+        backgroundColor: "white",
         shadowColor: "#000",
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 8,
-        elevation: 4,
-        paddingVertical: height * 0.02,
-        paddingHorizontal: width * 0.08,
+        shadowOffset: { width: 0, height: 0 },
+        shadowOpacity: 0.05,
+        shadowRadius: 5,
+        elevation: 1,
       }}
     >
       {mostFrequentSplit ? (
         <>
           <View
             style={{
-              display: "flex",
-              flexDirection: "row",
-              justifyContent: "space-between",
-              alignItems: "center",
-              flex: 3,
+              flex: 1,
+              flexDirection: "column",
+              justifyContent: "center",
+              gap: height * 0.03,
             }}
           >
-            <View style={{ flexDirection: "column" }}>
-              <Text
-                style={{
-                  fontFamily: "Inter_700Bold",
-                  color: "white",
-                  fontSize: RFValue(13),
-                }}
-              >
-                Most Common Workout
-              </Text>
-              <Text
-                style={{
-                  fontFamily: "Inter_400Regular",
-                  color: "white",
-                  fontSize: RFValue(10),
-                  opacity: 0.5,
-                }}
-              >
-                Your most favourite workout
-              </Text>
-            </View>
             <View
               style={{
-                backgroundColor: "white",
-                opacity: 0.4,
-                height: height * 0.04,
-                width: height * 0.04,
-                justifyContent: "center",
-                alignItems: "center",
-                borderRadius: height * 0.01,
+                flexDirection: "row",
+                justifyContent: "space-between",
+                paddingHorizontal: width * 0.02,
               }}
             >
-              <FontAwesome5 name="dumbbell"></FontAwesome5>
-            </View>
-          </View>
+              <Text
+                style={{
+                  fontFamily: "Inter_600SemiBold",
+                  fontSize: RFValue(12),
 
-          <View
-            style={{ justifyContent: "center", alignItems: "center", flex: 7 }}
-          >
+                  color: "black",
+                }}
+              >
+                Common
+              </Text>
+              <MaterialCommunityIcons
+                name={"star"}
+                color="#2979FF"
+                backgroundColor="rgba(41, 121, 255, 0.2)"
+                borderRadius={height * 0.005}
+                padding={height * 0.002}
+                size={RFValue(12)}
+              ></MaterialCommunityIcons>
+            </View>
+
             <Text
               style={{
-                fontFamily: "Inter_700Bold",
-                color: "rgb(196, 199, 223)",
-                fontSize: RFValue(45),
+                fontFamily: "Inter_600SemiBold",
+                fontSize: RFValue(25),
+                color: "black",
+                alignSelf: "center",
               }}
             >
               {mostFreqWorkoutSplitName}
             </Text>
-
-            <Text
-              style={{
-                fontFamily: "Inter_700Bold",
-                color: "rgb(196, 199, 223)",
-                marginTop: width * 0.02,
-              }}
-            >
-              {mostFrequentWorkoutSplitMuscleGroup}
-            </Text>
           </View>
         </>
       ) : (
-        <View
-          style={{
-            display: "flex",
-            flexDirection: "row",
-            justifyContent: "center",
-            alignItems: "center",
-            opacity: 0.6,
-          }}
-        >
-          <Text
-            style={{
-              fontFamily: "Inter_700Bold",
-              color: "white",
-              fontSize: RFValue(12),
-            }}
-          >
-            No workouts yet
-          </Text>
-        </View>
+        <Text>asdad</Text>
       )}
-    </LinearGradient>
+    </View>
   );
 };
 

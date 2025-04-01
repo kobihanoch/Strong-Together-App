@@ -66,7 +66,7 @@ const TopComponent = () => {
         <View style={{ marginLeft: width * 0.04 }}>
           <Text
             style={{
-              fontFamily: "Inter_700Bold",
+              fontFamily: "Inter_600SemiBold",
               fontSize: RFValue(18),
               color: "black",
             }}
@@ -90,6 +90,7 @@ const TopComponent = () => {
           name={"bell"}
           size={RFValue(18)}
           color={"#1A1A1A"}
+          opacity={0.8}
         ></MaterialCommunityIcons>
       </TouchableOpacity>
 
@@ -131,7 +132,7 @@ const styles = StyleSheet.create({
     borderBottomColor: "rgba(219, 219, 219, 0.8)",
   },
   profileImage: {
-    height: height * 0.07,
+    height: height * 0.06,
     aspectRatio: 1,
     resizeMode: "stretch",
     borderWidth: 0.5,

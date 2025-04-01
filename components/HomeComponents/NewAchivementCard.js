@@ -35,21 +35,7 @@ function NewAchivementCard({ user, hasAssignedWorkout }) {
   }, [trackingData]);
 
   return (
-    <LinearGradient
-      colors={["rgb(89, 67, 135)", "rgb(51, 16, 125)"]}
-      style={{
-        display: "flex",
-        width: "60%",
-        justifyContent: "center",
-        alignItems: "center",
-        borderRadius: height * 0.02,
-        shadowColor: "#000",
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 8,
-        elevation: 4,
-      }}
-    >
+    <View style={{ flex: 3, height: "100%" }}>
       {hasAssignedWorkout ? (
         <View style={{ flexDirection: "column" }}>
           <View
@@ -159,7 +145,7 @@ function NewAchivementCard({ user, hasAssignedWorkout }) {
           </Text>
         </View>
       )}
-    </LinearGradient>
+    </View>
   );
 }
 
