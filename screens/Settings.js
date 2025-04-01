@@ -1,31 +1,24 @@
-import React, { useRef, useEffect } from "react";
+import { useNavigation } from "@react-navigation/native";
+import React from "react";
 import {
-  View,
-  Text,
-  Button,
-  StyleSheet,
-  Animated,
   Dimensions,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";
-import { LinearGradient } from "expo-linear-gradient";
-import BottomTabBar from "../components/BottomTabBar";
-import Theme1 from "../components/Theme1";
-import GoToButton from "../components/HomeComponents/GoToButton";
 import { useAuth } from "../context/AuthContext";
-import { CommonActions } from "@react-navigation/native";
 
 const { width, height } = Dimensions.get("window");
 
-const Settings = ({ navigation }) => {
+const Settings = () => {
   const { user, logout } = useAuth();
-  const handleLogout = () => {
-    logout();
-  };
+  const navigation = useNavigation();
 
   return (
     <View style={{ flex: 1, paddingVertical: height * 0.02 }}>
-      <GoToButton onPress={handleLogout}>
+      <TouchableOpacity onPress={logout}>
         <Text
           style={{
             fontFamily: "PoppinsBold",
@@ -35,7 +28,7 @@ const Settings = ({ navigation }) => {
         >
           Log Out
         </Text>
-      </GoToButton>
+      </TouchableOpacity>
     </View>
   );
 };
