@@ -11,6 +11,8 @@ import {
 } from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";
 import { useAuth } from "../context/AuthContext";
+import Icon from "react-native-vector-icons/Feather";
+import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 
 const { width, height } = Dimensions.get("window");
 
@@ -39,11 +41,15 @@ const TopComponent = () => {
   };
 
   return (
-    <LinearGradient colors={["#00142a", "#0d2540"]} style={styles.topContainer}>
+    <LinearGradient
+      colors={["transparent", "transparent"]}
+      style={styles.topContainer}
+    >
       <View
         style={{
           flexDirection: "row",
           justifyContent: "flex-start",
+          alignItems: "center",
           flex: 0.5,
         }}
       >
@@ -57,34 +63,35 @@ const TopComponent = () => {
             style={styles.profileImage}
           />
         </TouchableOpacity>
-        <View style={{ marginLeft: width * 0.02 }}>
+        <View style={{ marginLeft: width * 0.04 }}>
           <Text
             style={{
               fontFamily: "Inter_700Bold",
-              fontSize: RFValue(12),
-              color: "white",
-            }}
-          >
-            {username}
-          </Text>
-          <Text
-            style={{
-              fontFamily: "Inter_400Regular",
-              fontSize: RFValue(10),
-              color: "white",
-              opacity: 0.7,
+              fontSize: RFValue(18),
+              color: "black",
             }}
           >
             {fullname}
           </Text>
+          <Text
+            style={{
+              fontFamily: "Inter_400Regular",
+              fontSize: RFValue(13),
+              color: "black",
+              opacity: 0.7,
+            }}
+          >
+            @{username}
+          </Text>
         </View>
       </View>
-      <View style={{ flex: 0.5, alignItems: "flex-end" }}>
-        <Image
-          source={require("../assets/minilogoNew.png")}
-          style={styles.logoImage}
-        />
-      </View>
+      <TouchableOpacity style={{ paddingBottom: height * 0.02 }}>
+        <MaterialCommunityIcons
+          name={"bell"}
+          size={RFValue(18)}
+          color={"#1A1A1A"}
+        ></MaterialCommunityIcons>
+      </TouchableOpacity>
 
       {/* Modal */}
       <Modal
@@ -112,16 +119,20 @@ const TopComponent = () => {
 
 const styles = StyleSheet.create({
   topContainer: {
-    flex: 0.2,
+    flex: 1,
     width: "100%",
     flexDirection: "row",
     justifyContent: "space-between",
-    alignItems: "center",
+    alignItems: "flex-end",
     paddingHorizontal: width * 0.06,
+    paddingVertical: height * 0.01,
+    backgroundColor: "#F9F9F9",
+    borderBottomWidth: 0.5,
+    borderBottomColor: "rgba(219, 219, 219, 0.8)",
   },
   profileImage: {
-    height: height * 0.04,
-    width: height * 0.04,
+    height: height * 0.07,
+    aspectRatio: 1,
     resizeMode: "stretch",
     borderWidth: 0.5,
     borderRadius: 40,

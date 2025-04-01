@@ -12,6 +12,7 @@ import Theme1 from "./components/Theme1";
 import { AuthProvider, useAuth } from "./context/AuthContext";
 import AppStack from "./navigation/AppStack";
 import AuthStack from "./navigation/AuthStack";
+import { StatusBar } from "react-native";
 
 export default function App() {
   const [fontsLoaded, setFontsLoaded] = useState(false);
@@ -71,6 +72,7 @@ function AuthWrapper() {
     <View style={{ flex: 1 }}>
       {isLoggedIn ? (
         <>
+          <StatusBar barStyle="dark-content" />
           <Theme1>
             <AppStack />
           </Theme1>
