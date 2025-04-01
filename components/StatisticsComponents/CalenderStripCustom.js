@@ -217,14 +217,17 @@ const styles = StyleSheet.create({
     fontSize: RFValue(12),
     color: "white",
     fontFamily: "PoppinsRegular",
+    opacity: 0.5,
   },
   dayNumber: {
     fontSize: RFValue(20),
     color: "white",
     fontFamily: "PoppinsBold",
+    opacity: 0.5,
   },
   selectedText: {
     color: "black",
+    opacity: 1,
   },
 });
 
