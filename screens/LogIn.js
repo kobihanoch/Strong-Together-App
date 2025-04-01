@@ -1,29 +1,26 @@
+import { LinearGradient } from "expo-linear-gradient";
 import React, { useState } from "react";
 import {
-  View,
-  Text,
-  Image,
-  TouchableOpacity,
-  StyleSheet,
-  Alert,
+  ActivityIndicator,
   Dimensions,
+  Image,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
-import { LinearGradient } from "expo-linear-gradient";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import Icon from "react-native-vector-icons/FontAwesome";
 import InputField from "../components/InputField";
-import CryptoJS from "crypto-js";
 import Validators from "../components/Validators";
-import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
-import supabase from "../src/supabaseClient";
 import { useAuth } from "../context/AuthContext";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const { width, height } = Dimensions.get("window");
 
 const Login = ({ navigation }) => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const { login } = useAuth();
+  const { login, loading } = useAuth();
 
   const handleLogin = async () => {
     try {
@@ -94,7 +91,11 @@ const Login = ({ navigation }) => {
                 onPress={handleLogin}
               >
                 <View style={styles.buttonContent}>
-                  <Text style={styles.buttonLoginText}>Log in</Text>
+                  {loading ? (
+                    <ActivityIndicator></ActivityIndicator>
+                  ) : (
+                    <Text style={styles.buttonLoginText}>Log in</Text>
+                  )}
                 </View>
               </TouchableOpacity>
             </View>
