@@ -1,3 +1,4 @@
+import { Inter_400Regular, Inter_700Bold } from "@expo-google-fonts/inter";
 import {
   CommonActions,
   NavigationContainer,
@@ -19,8 +20,8 @@ export default function App() {
   const loadFonts = async () => {
     await Font.loadAsync({
       PoppinsLight: require("./assets/fonts/Poppins-Light.ttf"),
-      Inter_400Regular: require("./assets/fonts/Poppins-Regular.ttf"),
-      Inter_700Bold: require("./assets/fonts/Poppins-Bold.ttf"),
+      Inter_400Regular,
+      Inter_700Bold,
     });
     setFontsLoaded(true);
   };
