@@ -7,7 +7,7 @@ const { width, height } = Dimensions.get("window");
 
 const StartWorkoutButton = () => {
   return (
-    <View style={{ flex: 1.3, width: "85%" }}>
+    <View style={{ flex: 1.1, width: "85%" }}>
       {/*<WorkoutCountCard userId={userId} height={height} width={width} />*/}
       <TouchableOpacity
         style={{

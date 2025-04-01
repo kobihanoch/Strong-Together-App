@@ -51,7 +51,7 @@ const Home = ({ navigation }) => {
       </View>
 
       <View style={styles.midContainer}>
-        {/*flex 1.3*/}
+        {/*flex 1.1*/}
         <StartWorkoutButton></StartWorkoutButton>
 
         {/*flex 1*/}
@@ -113,7 +113,7 @@ const styles = StyleSheet.create({
   headerText: {
     fontFamily: "Inter_600SemiBold",
     color: "black",
-    fontSize: RFValue(40),
+    fontSize: RFValue(35),
   },
   semiHeaderText: {
     fontFamily: "Inter_400Regular",

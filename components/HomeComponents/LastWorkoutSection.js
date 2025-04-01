@@ -2,15 +2,18 @@ import React from "react";
 import { Text, View } from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";
 import { formatDate } from "../../utils/statisticsUtils";
+import { getDaysSince } from "../../utils/homePageUtils";
+import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 
 const LastWorkoutSection = ({ lastWorkoutDate }) => {
-  console.log(lastWorkoutDate);
   return (
     <View
       style={{
         flex: 1,
         width: "80%",
-        justifyContent: "center",
+        alignItems: "center",
+        flexDirection: "row",
+        justifyContent: "space-between",
       }}
     >
       <Text
@@ -18,10 +21,27 @@ const LastWorkoutSection = ({ lastWorkoutDate }) => {
           fontFamily: "Inter_400Regular",
           color: "#1A1A1A",
           opacity: 0.7,
-          fontSize: RFValue(14),
+          fontSize: RFValue(12),
         }}
       >
-        Last workout at: {formatDate(lastWorkoutDate)}
+        <MaterialCommunityIcons
+          name="clock"
+          color="#1A1A1A"
+          opacity={0.7}
+        ></MaterialCommunityIcons>{" "}
+        Last workout at: {formatDate(lastWorkoutDate).split(",")[0]}
+        {"\n"}
+        {formatDate(lastWorkoutDate).split(",")[1].trim()}
+      </Text>
+      <Text
+        style={{
+          fontFamily: "Inter_400Regular",
+          color: "#1A1A1A",
+          opacity: 0.7,
+          fontSize: RFValue(12),
+        }}
+      >
+        {getDaysSince(lastWorkoutDate)}
       </Text>
     </View>
   );
