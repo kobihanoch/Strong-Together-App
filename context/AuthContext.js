@@ -1,8 +1,7 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import React, { createContext, useContext, useState, useEffect } from "react";
+import React, { createContext, useContext, useEffect, useState } from "react";
+import { loginUser, registerUser } from "../services/AuthService";
 import supabase from "../src/supabaseClient";
-import { Alert } from "react-native";
-import { registerUser, loginUser } from "../services/AuthService";
 
 const AuthContext = createContext();
 
@@ -11,6 +10,7 @@ export const useAuth = () => useContext(AuthContext);
 export const AuthProvider = ({ children, onLogout }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const { data: listener } = supabase.auth.onAuthStateChange(
@@ -100,13 +100,19 @@ export const AuthProvider = ({ children, onLogout }) => {
   };
 
   const login = async (username, password) => {
-    console.log("sdfdffsdfd");
-    const result = await loginUser(username, password);
-    if (!result.success) {
-      throw new Error(result.reason);
+    try {
+      setLoading(true);
+      const result = await loginUser(username, password);
+      if (!result.success) {
+        throw new Error(result.reason);
+      }
+      setIsLoggedIn(true);
+      setUser(result.user);
+    } catch (err) {
+      console.log("Error logging in: " + err);
+    } finally {
+      setLoading(false);
     }
-    setIsLoggedIn(true);
-    setUser(result.user);
   };
 
   const logout = async () => {
@@ -128,7 +134,15 @@ export const AuthProvider = ({ children, onLogout }) => {
 
   return (
     <AuthContext.Provider
-      value={{ isLoggedIn, user, register, login, logout, updateProfilePic }}
+      value={{
+        isLoggedIn,
+        user,
+        register,
+        login,
+        logout,
+        updateProfilePic,
+        loading,
+      }}
     >
       {children}
     </AuthContext.Provider>
