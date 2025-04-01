@@ -119,7 +119,7 @@ const styles = StyleSheet.create({
     fontSize: 17,
     marginLeft: 10,
     color: "white",
-    fontFamily: "PoppinsRegular",
+    fontFamily: "Inter_400Regular",
   },
   logoImage: {
     width: 30,
@@ -135,13 +135,13 @@ const styles = StyleSheet.create({
   welcomeText: {
     fontSize: 40,
     color: "white",
-    fontFamily: "PoppinsRegular",
+    fontFamily: "Inter_400Regular",
     textAlign: "center",
   },
   loginText: {
     fontSize: 20,
     color: "white",
-    fontFamily: "PoppinsRegular",
+    fontFamily: "Inter_400Regular",
   },
   divider: {
     height: 0.5,
@@ -177,6 +177,6 @@ const styles = StyleSheet.create({
     color: "#007bff",
     flex: 1,
     textAlign: "center",
-    fontFamily: "PoppinsRegular",
+    fontFamily: "Inter_400Regular",
   },
 });

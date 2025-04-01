@@ -1,11 +1,5 @@
 import React from "react";
-import {
-  Dimensions,
-  Image,
-  StyleSheet,
-  Text,
-  View
-} from "react-native";
+import { Dimensions, Image, StyleSheet, Text, View } from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";
 import CreateOrEditWorkoutCard from "../components/HomeComponents/CreateOrEditWorkoutCard";
 import MostCommonWorkoutSummaryCard from "../components/HomeComponents/MostCommonWorkoutSummaryCard";
@@ -20,12 +14,14 @@ const { width, height } = Dimensions.get("window");
 const Home = ({ navigation }) => {
   const { user } = useAuth();
   // Hook handling
-  const { username,
+  const {
+    username,
     userId,
     hasAssignedWorkout,
     profileImageUrl,
     loading,
-    error} = useHomePageLogic(user);
+    error,
+  } = useHomePageLogic(user);
 
   return loading ? (
     <LoadingPage message="Loading user data..." />
@@ -57,13 +53,13 @@ const Home = ({ navigation }) => {
         <View style={{ justifyContent: "center", flex: 8.5 }}>
           <Text style={styles.headerText}>
             Welcome,{" "}
-            <Text style={{ fontFamily: "PoppinsBold" }}>{username} </Text>!
+            <Text style={{ fontFamily: "Inter_700Bold" }}>{username} </Text>!
           </Text>
           <Text
             style={{
               fontSize: RFValue(13),
               color: "black",
-              fontFamily: "PoppinsRegular",
+              fontFamily: "Inter_400Regular",
             }}
           >
             Check out your dashboard
@@ -122,12 +118,12 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   headerText: {
-    fontFamily: "PoppinsRegular",
+    fontFamily: "Inter_400Regular",
     color: "black",
     fontSize: RFValue(18),
   },
   semiHeaderText: {
-    fontFamily: "PoppinsRegular",
+    fontFamily: "Inter_400Regular",
     fontSize: RFValue(13),
     marginTop: height * 0.01,
   },
@@ -157,7 +153,7 @@ const styles = StyleSheet.create({
   },
   logoutButtonText: {
     color: "white",
-    fontFamily: "PoppinsBold",
+    fontFamily: "Inter_700Bold",
     fontSize: width * 0.04,
     textAlign: "center",
   },

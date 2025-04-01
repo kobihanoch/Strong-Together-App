@@ -1,8 +1,8 @@
-import { View, Text, StyleSheet } from "react-native";
-import React, { useState, useEffect } from "react";
-import useExerciseTracking from "../../hooks/useExerciseTracking";
-import { RFValue } from "react-native-responsive-fontsize";
 import { LinearGradient } from "expo-linear-gradient";
+import React, { useEffect, useState } from "react";
+import { StyleSheet, Text, View } from "react-native";
+import { RFValue } from "react-native-responsive-fontsize";
+import useExerciseTracking from "../../hooks/useExerciseTracking";
 
 function WorkoutCountCard({ userId, height, width }) {
   const { trackingData, loading, error } = useExerciseTracking(userId);
@@ -29,7 +29,7 @@ function WorkoutCountCard({ userId, height, width }) {
         <View style={{ flexDirection: "column" }}>
           <Text
             style={{
-              fontFamily: "PoppinsBold",
+              fontFamily: "Inter_700Bold",
               color: "white",
               fontSize: RFValue(13),
             }}
@@ -38,7 +38,7 @@ function WorkoutCountCard({ userId, height, width }) {
           </Text>
           <Text
             style={{
-              fontFamily: "PoppinsRegular",
+              fontFamily: "Inter_400Regular",
               color: "white",
               fontSize: RFValue(10),
               opacity: 0.5,
@@ -50,7 +50,7 @@ function WorkoutCountCard({ userId, height, width }) {
         <View style={{}}>
           <Text
             style={{
-              fontFamily: "PoppinsBold",
+              fontFamily: "Inter_700Bold",
               color: "#FACC15",
               fontSize: RFValue(18),
               alignSelf: "center",

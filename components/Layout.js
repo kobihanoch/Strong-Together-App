@@ -1,10 +1,10 @@
-import { ScrollView, View, StyleSheet, Dimensions } from 'react-native';
+import { Dimensions, ScrollView, StyleSheet } from "react-native";
 
-const { width, height } = Dimensions.get('window');
+const { width, height } = Dimensions.get("window");
 
 const Layout = ({ children }) => {
   return (
-    <ScrollView 
+    <ScrollView
       contentContainerStyle={styles.container}
       keyboardShouldPersistTaps="handled"
       showsVerticalScrollIndicator={true} // מאפשר לראות את פס הגלילה
@@ -16,12 +16,12 @@ const Layout = ({ children }) => {
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#f2f5f7',
+    backgroundColor: "#f2f5f7",
     paddingHorizontal: width * 0.06,
     paddingTop: height * 0.08,
     paddingBottom: height * 1.2,
     height: height,
-    fontFamily: 'PoppinsRegular',
+    fontFamily: "Inter_400Regular",
   },
 });
 

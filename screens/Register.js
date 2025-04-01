@@ -1,20 +1,18 @@
-import React, { useState, useCallback } from "react";
+import { LinearGradient } from "expo-linear-gradient";
+import React, { useState } from "react";
 import {
-  View,
-  Text,
-  Image,
-  TouchableOpacity,
-  StyleSheet,
   Alert,
   Dimensions,
+  Image,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
-import { LinearGradient } from "expo-linear-gradient";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import Icon from "react-native-vector-icons/FontAwesome";
 import InputField from "../components/InputField";
-import CryptoJS from "crypto-js";
 import Validators from "../components/Validators";
-import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
-import supabase from "../src/supabaseClient";
 import { useAuth } from "../context/AuthContext";
 
 const { width, height } = Dimensions.get("window");
@@ -156,7 +154,7 @@ const styles = StyleSheet.create({
     fontSize: 17,
     marginLeft: 10,
     color: "white",
-    fontFamily: "PoppinsRegular",
+    fontFamily: "Inter_400Regular",
   },
   logoImage: {
     width: 30,
@@ -172,14 +170,14 @@ const styles = StyleSheet.create({
   welcomeText: {
     fontSize: 40,
     color: "white",
-    fontFamily: "PoppinsRegular",
+    fontFamily: "Inter_400Regular",
     width: width * 0.9,
     textAlign: "center",
   },
   subText: {
     fontSize: 20,
     color: "white",
-    fontFamily: "PoppinsRegular",
+    fontFamily: "Inter_400Regular",
   },
   divider: {
     height: 0.5,
@@ -215,7 +213,7 @@ const styles = StyleSheet.create({
     color: "#007bff",
     flex: 1,
     textAlign: "center",
-    fontFamily: "PoppinsRegular",
+    fontFamily: "Inter_400Regular",
   },
 });
 

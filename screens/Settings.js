@@ -1,19 +1,8 @@
-import React, { useRef, useEffect } from "react";
-import {
-  View,
-  Text,
-  Button,
-  StyleSheet,
-  Animated,
-  Dimensions,
-} from "react-native";
+import React from "react";
+import { Dimensions, StyleSheet, Text, View } from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";
-import { LinearGradient } from "expo-linear-gradient";
-import BottomTabBar from "../components/BottomTabBar";
-import Theme1 from "../components/Theme1";
 import GoToButton from "../components/HomeComponents/GoToButton";
 import { useAuth } from "../context/AuthContext";
-import { CommonActions } from "@react-navigation/native";
 
 const { width, height } = Dimensions.get("window");
 
@@ -28,7 +17,7 @@ const Settings = ({ navigation }) => {
       <GoToButton onPress={handleLogout}>
         <Text
           style={{
-            fontFamily: "PoppinsBold",
+            fontFamily: "Inter_700Bold",
             fontSize: RFValue(14),
             color: "red",
           }}

@@ -35,7 +35,7 @@ const ExerciseCard = ({ item, dataToCompare, exerciseTracking }) => {
         <View style={{ flex: 7 }}>
           <Text
             style={{
-              fontFamily: "PoppinsBold",
+              fontFamily: "Inter_700Bold",
               fontSize: RFValue(17),
             }}
           >
@@ -44,7 +44,7 @@ const ExerciseCard = ({ item, dataToCompare, exerciseTracking }) => {
 
           <Text
             style={{
-              fontFamily: "PoppinsRegular",
+              fontFamily: "Inter_400Regular",
               fontSize: RFValue(10),
               opacity: 0.4,
             }}
@@ -84,7 +84,9 @@ const ExerciseCard = ({ item, dataToCompare, exerciseTracking }) => {
       <View style={{ flexDirection: "column", flex: 8, gap: height * 0.03 }}>
         <View style={{ flex: 5, flexDirection: "column", gap: height * 0.01 }}>
           <View>
-            <Text style={{ fontFamily: "PoppinsBold", fontSize: RFValue(12) }}>
+            <Text
+              style={{ fontFamily: "Inter_700Bold", fontSize: RFValue(12) }}
+            >
               Current workout
             </Text>
           </View>
@@ -140,7 +142,7 @@ const ExerciseCard = ({ item, dataToCompare, exerciseTracking }) => {
                   <View style={{ flexDirection: "column" }}>
                     <Text
                       style={{
-                        fontFamily: "PoppinsRegular",
+                        fontFamily: "Inter_400Regular",
                         fontSize: RFValue(12),
                         color,
                       }}
@@ -149,7 +151,7 @@ const ExerciseCard = ({ item, dataToCompare, exerciseTracking }) => {
                     </Text>
                     <Text
                       style={{
-                        fontFamily: "PoppinsRegular",
+                        fontFamily: "Inter_400Regular",
                         fontSize: RFValue(12),
                         color,
                       }}
@@ -158,7 +160,7 @@ const ExerciseCard = ({ item, dataToCompare, exerciseTracking }) => {
                     </Text>
                     <Text
                       style={{
-                        fontFamily: "PoppinsBold",
+                        fontFamily: "Inter_700Bold",
                         fontSize: RFValue(13),
                         color,
                       }}
@@ -170,7 +172,7 @@ const ExerciseCard = ({ item, dataToCompare, exerciseTracking }) => {
                     style={{ justifyContent: "center", alignItems: "center" }}
                   >
                     {isPr ? (
-                      <Text style={{ fontFamily: "PoppinsBold", color }}>
+                      <Text style={{ fontFamily: "Inter_700Bold", color }}>
                         PR
                       </Text>
                     ) : prevWeight ? (
@@ -208,12 +210,14 @@ const ExerciseCard = ({ item, dataToCompare, exerciseTracking }) => {
           <View
             style={{ flexDirection: "row", justifyContent: "space-between" }}
           >
-            <Text style={{ fontFamily: "PoppinsBold", fontSize: RFValue(12) }}>
+            <Text
+              style={{ fontFamily: "Inter_700Bold", fontSize: RFValue(12) }}
+            >
               In compare to
             </Text>
             <Text
               style={{
-                fontFamily: "PoppinsRegular",
+                fontFamily: "Inter_400Regular",
                 fontSize: RFValue(10),
               }}
             >
@@ -252,7 +256,7 @@ const ExerciseCard = ({ item, dataToCompare, exerciseTracking }) => {
                 >
                   <Text
                     style={{
-                      fontFamily: "PoppinsRegular",
+                      fontFamily: "Inter_400Regular",
                       fontSize: RFValue(12),
                       color: "black",
                     }}
@@ -261,7 +265,7 @@ const ExerciseCard = ({ item, dataToCompare, exerciseTracking }) => {
                   </Text>
                   <Text
                     style={{
-                      fontFamily: "PoppinsRegular",
+                      fontFamily: "Inter_400Regular",
                       fontSize: RFValue(12),
                       color: "black",
                     }}
@@ -270,7 +274,7 @@ const ExerciseCard = ({ item, dataToCompare, exerciseTracking }) => {
                   </Text>
                   <Text
                     style={{
-                      fontFamily: "PoppinsBold",
+                      fontFamily: "Inter_700Bold",
                       fontSize: RFValue(13),
                       color: "black",
                     }}
@@ -290,7 +294,7 @@ const ExerciseCard = ({ item, dataToCompare, exerciseTracking }) => {
             >
               <Text
                 style={{
-                  fontFamily: "PoppinsRegular",
+                  fontFamily: "Inter_400Regular",
                   fontSize: RFValue(13),
                   color: "black",
                   opacity: 0.5,

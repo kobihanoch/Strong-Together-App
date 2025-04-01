@@ -1,5 +1,5 @@
 import React from "react";
-import { ScrollView, TouchableOpacity, Text, Dimensions } from "react-native";
+import { Dimensions, ScrollView, Text, TouchableOpacity } from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";
 
 const { width, height } = Dimensions.get("window");
@@ -33,7 +33,7 @@ const MuscleTabs = ({ muscleGroups, selectedMuscleGroup, onSelectMuscle }) => {
             style={{
               fontSize: RFValue(11),
               color: selectedMuscleGroup === muscle ? "white" : "black",
-              fontFamily: "PoppinsBold",
+              fontFamily: "Inter_700Bold",
             }}
           >
             {muscle}

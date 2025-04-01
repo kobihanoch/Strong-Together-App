@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from "react";
-import { TouchableOpacity, View, Text, Dimensions } from "react-native";
-import { RFValue } from "react-native-responsive-fontsize";
 import { LinearGradient } from "expo-linear-gradient";
-import MuscleTabs from "./MuscleTabs";
+import React, { useEffect, useState } from "react";
+import { Dimensions, Text, TouchableOpacity, View } from "react-native";
+import { RFValue } from "react-native-responsive-fontsize";
 import ExerciseList from "./ExerciseList";
+import MuscleTabs from "./MuscleTabs";
 
 const { width, height } = Dimensions.get("window");
 
@@ -68,7 +68,7 @@ function ChooseExercisesCard({
       <View style={{ flexDirection: "column", flex: 3 }}>
         <Text
           style={{
-            fontFamily: "PoppinsBold",
+            fontFamily: "Inter_700Bold",
             fontSize: RFValue(16),
             color: "#0d2540",
             textAlign: "center",

@@ -1,7 +1,7 @@
-import React from "react";
-import { View, Text, StyleSheet, Dimensions, Image } from "react-native";
-import { RFValue } from "react-native-responsive-fontsize";
 import { LinearGradient } from "expo-linear-gradient";
+import React from "react";
+import { Dimensions, Image, StyleSheet, Text, View } from "react-native";
+import { RFValue } from "react-native-responsive-fontsize";
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 import images from "../../components/images";
 
@@ -53,7 +53,7 @@ const ExerciseItem = ({ exercise }) => {
           <View style={{ alignSelf: "center" }}>
             <Text
               style={{
-                fontFamily: "PoppinsBold",
+                fontFamily: "Inter_700Bold",
                 fontSize: RFValue(13),
                 color: "black",
               }}
@@ -62,7 +62,7 @@ const ExerciseItem = ({ exercise }) => {
             </Text>
             <Text
               style={{
-                fontFamily: "PoppinsRegular",
+                fontFamily: "Inter_400Regular",
                 fontSize: RFValue(12),
                 color: "#919191",
               }}
@@ -72,7 +72,7 @@ const ExerciseItem = ({ exercise }) => {
 
             <Text
               style={{
-                fontFamily: "PoppinsRegular",
+                fontFamily: "Inter_400Regular",
                 fontSize: RFValue(12),
                 color: "black",
                 opacity: 0.7,
@@ -83,7 +83,7 @@ const ExerciseItem = ({ exercise }) => {
             </Text>
             <Text
               style={{
-                fontFamily: "PoppinsBold",
+                fontFamily: "Inter_700Bold",
                 fontSize: RFValue(12),
                 color: "black",
                 opacity: 0.7,

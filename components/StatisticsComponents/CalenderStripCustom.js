@@ -129,7 +129,7 @@ const CalendarStripCustom = ({
             style={{
               fontSize: RFValue(13),
               color: isSelected ? "black" : "rgb(148, 149, 177)",
-              fontFamily: "PoppinsBold",
+              fontFamily: "Inter_700Bold",
               textAlign: "center",
             }}
             numberOfLines={1}
@@ -141,7 +141,7 @@ const CalendarStripCustom = ({
             style={{
               fontSize: RFValue(13),
               color: isSelected ? "black" : "white",
-              fontFamily: "PoppinsRegular",
+              fontFamily: "Inter_400Regular",
               textAlign: "center",
               opacity: 0.2,
             }}
@@ -196,7 +196,7 @@ const styles = StyleSheet.create({
   monthHeader: {
     textAlign: "center",
     color: "white",
-    fontFamily: "PoppinsBold",
+    fontFamily: "Inter_700Bold",
     fontSize: RFValue(14),
   },
   dateItem: {
@@ -216,12 +216,12 @@ const styles = StyleSheet.create({
   dayName: {
     fontSize: RFValue(12),
     color: "white",
-    fontFamily: "PoppinsRegular",
+    fontFamily: "Inter_400Regular",
   },
   dayNumber: {
     fontSize: RFValue(20),
     color: "white",
-    fontFamily: "PoppinsBold",
+    fontFamily: "Inter_700Bold",
   },
   selectedText: {
     color: "black",

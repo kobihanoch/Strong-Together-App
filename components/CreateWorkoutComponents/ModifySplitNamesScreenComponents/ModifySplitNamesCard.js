@@ -1,14 +1,14 @@
 // ModifySplitNamesCard.js - Displays split names and their selected exercise counts
-import React, { useState } from "react";
+import { LinearGradient } from "expo-linear-gradient";
+import React from "react";
 import {
-  View,
-  Text,
-  FlatList,
   Dimensions,
+  FlatList,
+  Text,
   TouchableOpacity,
+  View,
 } from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";
-import { LinearGradient } from "expo-linear-gradient";
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 
 const { width, height } = Dimensions.get("window");
@@ -79,7 +79,7 @@ function ModifySplitNamesCard({
                 <View style={{ flexDirection: "column" }}>
                   <Text
                     style={{
-                      fontFamily: "PoppinsBold",
+                      fontFamily: "Inter_700Bold",
                       color: "black",
                       fontSize: RFValue(30),
                     }}
@@ -88,7 +88,7 @@ function ModifySplitNamesCard({
                   </Text>
                   <Text
                     style={{
-                      fontFamily: "PoppinsRegular",
+                      fontFamily: "Inter_400Regular",
                       color: "black",
                       fontSize: RFValue(10),
                     }}
@@ -121,7 +121,7 @@ function ModifySplitNamesCard({
                 </View>
                 <Text
                   style={{
-                    fontFamily: "PoppinsRegular",
+                    fontFamily: "Inter_400Regular",
                     fontSize: RFValue(10),
                     textAlign: "center",
                     color: "white",

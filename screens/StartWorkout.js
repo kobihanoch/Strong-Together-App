@@ -1,41 +1,42 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { View, Text, StyleSheet, Dimensions, FlatList, TextInput, Alert, TouchableOpacity, Animated } from 'react-native';
-import Theme1 from '../components/Theme1';
-import useExercises from '../hooks/useExercises';
-import { RFValue } from 'react-native-responsive-fontsize';
-import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
-import supabase from '../src/supabaseClient';
-import { LinearGradient } from 'expo-linear-gradient';
-import PageIndicator from '../components/PageIndicator';
-import ExerciseItem from '../components/StartWorkoutComponents/ExerciseItem';
-import { useAuth } from '../context/AuthContext'; 
-import GradientedGoToButton from '../components/GradientedGoToButton';
+import React, { useEffect, useRef, useState } from "react";
+import {
+  Alert,
+  Animated,
+  Dimensions,
+  FlatList,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
+import { RFValue } from "react-native-responsive-fontsize";
+import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
+import GradientedGoToButton from "../components/GradientedGoToButton";
+import PageIndicator from "../components/PageIndicator";
+import ExerciseItem from "../components/StartWorkoutComponents/ExerciseItem";
+import { useAuth } from "../context/AuthContext";
+import useExercises from "../hooks/useExercises";
+import supabase from "../src/supabaseClient";
 
-
-
-const { width, height } = Dimensions.get('window');
+const { width, height } = Dimensions.get("window");
 
 const StartWorkout = ({ navigation, route }) => {
-
-  const { user, logout } = useAuth(); 
-  const [userId, setUserId] = useState(null); 
+  const { user, logout } = useAuth();
+  const [userId, setUserId] = useState(null);
 
   const workoutTime = route.params?.workoutTime || 0;
 
-    useEffect(() => {
-        // Loading when user is updating
-        if (user && user.id) {
-            setUserId(user.id);
-            console.log("User ID:", user.id);
-        }
-    }, [user]); 
-
+  useEffect(() => {
+    // Loading when user is updating
+    if (user && user.id) {
+      setUserId(user.id);
+      console.log("User ID:", user.id);
+    }
+  }, [user]);
 
   const { workoutSplit } = route.params;
-  const [ workoutSplitID, setWorkoutSplitID ] = useState(0);
+  const [workoutSplitID, setWorkoutSplitID] = useState(0);
   const { exercises, error } = useExercises(workoutSplit.id);
 
-  
   const [workoutData, setWorkoutData] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [flatListHeight, setFlatListHeight] = useState(0);
@@ -47,7 +48,6 @@ const StartWorkout = ({ navigation, route }) => {
   const glowAnimation = useRef(new Animated.Value(1)).current;
   const countdownScale = useRef(new Animated.Value(1)).current;
 
-  
   useEffect(() => {
     if (workoutSplit && workoutSplit.id) {
       setWorkoutSplitID(workoutSplit.id);
@@ -57,7 +57,7 @@ const StartWorkout = ({ navigation, route }) => {
   useEffect(() => {
     if (showCountdown) {
       const interval = setInterval(() => {
-        setCountdownValue(prev => {
+        setCountdownValue((prev) => {
           if (prev === 1) {
             clearInterval(interval);
             setShowCountdown(false);
@@ -106,12 +106,14 @@ const StartWorkout = ({ navigation, route }) => {
       if (innerFlatListRef.current) {
         innerFlatListRef.current.scrollToIndex({ index: 0, animated: true });
       }
-    }, 100); 
+    }, 100);
   };
 
   const handleUpdateSet = (exercisetosplit_id, weight, reps, index) => {
-    setWorkoutData(prevData => {
-      const existingExercise = prevData.find(item => item.exercisetosplit_id === exercisetosplit_id);
+    setWorkoutData((prevData) => {
+      const existingExercise = prevData.find(
+        (item) => item.exercisetosplit_id === exercisetosplit_id
+      );
       if (existingExercise) {
         const updatedWeights = [...existingExercise.weights];
         const updatedReps = [...existingExercise.reps];
@@ -119,9 +121,13 @@ const StartWorkout = ({ navigation, route }) => {
         if (weight !== null) updatedWeights[index] = weight;
         if (reps !== null) updatedReps[index] = reps;
 
-        return prevData.map(item =>
+        return prevData.map((item) =>
           item.exercisetosplit_id === exercisetosplit_id
-            ? { ...item, weights: updatedWeights.filter(w => w !== null), reps: updatedReps.filter(r => r !== null) }
+            ? {
+                ...item,
+                weights: updatedWeights.filter((w) => w !== null),
+                reps: updatedReps.filter((r) => r !== null),
+              }
             : item
         );
       } else {
@@ -135,9 +141,9 @@ const StartWorkout = ({ navigation, route }) => {
           ...prevData,
           {
             exercisetosplit_id,
-            workoutdate: new Date().toISOString().split('T')[0],
-            weights: weights.filter(w => w !== null),
-            reps: reps.filter(r => r !== null),
+            workoutdate: new Date().toISOString().split("T")[0],
+            weights: weights.filter((w) => w !== null),
+            reps: reps.filter((r) => r !== null),
           },
         ];
       }
@@ -146,7 +152,7 @@ const StartWorkout = ({ navigation, route }) => {
 
   const saveWorkoutDataToDatabase = async () => {
     try {
-      const { error } = await supabase.from('exercisetracking').insert(
+      const { error } = await supabase.from("exercisetracking").insert(
         workoutData.map(({ weights, reps, ...rest }) => ({
           ...rest,
           weight: weights,
@@ -155,17 +161,16 @@ const StartWorkout = ({ navigation, route }) => {
       );
 
       if (error) throw error;
-      console.log('Data inserted successfully:', workoutData);
+      console.log("Data inserted successfully:", workoutData);
       Alert.alert("Success", "Workout saved successfully!");
 
-      navigation.navigate('PostWorkoutSummary', { 
-        workoutData: workoutData, 
-        workoutSplitID: workoutSplitID, 
-        userId: userId
+      navigation.navigate("PostWorkoutSummary", {
+        workoutData: workoutData,
+        workoutSplitID: workoutSplitID,
+        userId: userId,
       });
-
     } catch (error) {
-      console.error('Error inserting data:', error.message);
+      console.error("Error inserting data:", error.message);
     }
   };
 
@@ -179,39 +184,73 @@ const StartWorkout = ({ navigation, route }) => {
       handleUpdateSet={handleUpdateSet}
       innerFlatListRef={innerFlatListRef}
       setFlatListHeight={setFlatListHeight}
-      setCurrentSetIndex={setCurrentSetIndex} 
+      setCurrentSetIndex={setCurrentSetIndex}
       flatListRef={flatListRef}
     />
   );
 
   return (
-    <View style={{flex: 1, backgroundColor: '#0d2540'}}>
+    <View style={{ flex: 1, backgroundColor: "#0d2540" }}>
       <View style={styles.container}>
         {showCountdown ? (
           <View style={styles.countdownContainer}>
-            <Animated.Text style={[styles.countdownText, { transform: [{ scale: countdownScale }] }]}>
+            <Animated.Text
+              style={[
+                styles.countdownText,
+                { transform: [{ scale: countdownScale }] },
+              ]}
+            >
               {countdownValue > 0 ? countdownValue : "START!"}
             </Animated.Text>
           </View>
         ) : (
           <>
-            <View style={{ alignItems: 'center', justifyContent: 'center', paddingVertical: height * 0.02, backgroundColor: '#0d2540' }}>
-              
-              <View style={{height: height * 0.02, marginVertical: height * 0.02, width: width * 0.35,}}>
+            <View
+              style={{
+                alignItems: "center",
+                justifyContent: "center",
+                paddingVertical: height * 0.02,
+                backgroundColor: "#0d2540",
+              }}
+            >
+              <View
+                style={{
+                  height: height * 0.02,
+                  marginVertical: height * 0.02,
+                  width: width * 0.35,
+                }}
+              >
                 <GradientedGoToButton
-                    gradientColors={['#FF6347', '#FF4500']}
-
-                    borderRadius={height * 0.08}
-                    onPress={saveWorkoutDataToDatabase}
+                  gradientColors={["#FF6347", "#FF4500"]}
+                  borderRadius={height * 0.08}
+                  onPress={saveWorkoutDataToDatabase}
                 >
-                  <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', opacity: 0.8}}>
-                    <Text style={{ color: 'white', fontSize: RFValue(10), fontFamily: 'PoppinsBold' }}>Finish Workout</Text>
-                    <FontAwesome5 name={"stopwatch"} size={RFValue(13)} color={"white"} style={{marginLeft: width * 0.02,}}></FontAwesome5>
+                  <View
+                    style={{
+                      flexDirection: "row",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                      opacity: 0.8,
+                    }}
+                  >
+                    <Text
+                      style={{
+                        color: "white",
+                        fontSize: RFValue(10),
+                        fontFamily: "Inter_700Bold",
+                      }}
+                    >
+                      Finish Workout
+                    </Text>
+                    <FontAwesome5
+                      name={"stopwatch"}
+                      size={RFValue(13)}
+                      color={"white"}
+                      style={{ marginLeft: width * 0.02 }}
+                    ></FontAwesome5>
                   </View>
                 </GradientedGoToButton>
               </View>
-              
-
             </View>
             <PageIndicator
               totalPages={exercises.length}
@@ -237,7 +276,10 @@ const StartWorkout = ({ navigation, route }) => {
                   setCurrentSetIndex(1);
 
                   if (innerFlatListRef.current) {
-                    innerFlatListRef.current.scrollToIndex({ index: 0, animated: true });
+                    innerFlatListRef.current.scrollToIndex({
+                      index: 0,
+                      animated: true,
+                    });
                   }
                 }
               }}
@@ -250,62 +292,62 @@ const StartWorkout = ({ navigation, route }) => {
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, },
+  container: { flex: 1 },
   countdownContainer: {
-    position: 'absolute',
+    position: "absolute",
     top: 0,
     left: 0,
     right: 0,
     bottom: 0,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#00142a',
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#00142a",
     zIndex: 1,
   },
   countdownText: {
     fontSize: RFValue(80),
-    color: 'white',
-    fontFamily: 'PoppinsBold',
+    color: "white",
+    fontFamily: "Inter_700Bold",
   },
-  exerciseContainer: { width, flex: 1, backgroundColor: 'white' },
+  exerciseContainer: { width, flex: 1, backgroundColor: "white" },
   infoContainer: {
     flex: 0.4,
-    justifyContent: 'center',
-    alignItems: 'center',
-    flexDirection: 'row',
+    justifyContent: "center",
+    alignItems: "center",
+    flexDirection: "row",
   },
   exerciseName: {
-    fontFamily: 'PoppinsBold',
+    fontFamily: "Inter_700Bold",
     fontSize: RFValue(20),
-    color: 'white',
+    color: "white",
     marginTop: height * 0.03,
   },
   exerciseDescription: {
-    fontFamily: 'PoppinsRegular',
+    fontFamily: "Inter_400Regular",
     fontSize: RFValue(15),
-    color: '#8ca7d1',
+    color: "#8ca7d1",
     marginTop: height * 0.01,
   },
   setContainer: {
-    alignItems: 'center',
+    alignItems: "center",
     flex: 1,
-    backgroundColor: 'white',
-    justifyContent: 'center',
-    alignSelf: 'center',
+    backgroundColor: "white",
+    justifyContent: "center",
+    alignSelf: "center",
   },
   setLabel: {
     fontSize: RFValue(25),
-    color: '#00142a',
+    color: "#00142a",
   },
   input: {
-    backgroundColor: '#fafafa',
+    backgroundColor: "#fafafa",
     borderRadius: 5,
     paddingVertical: 10,
     paddingHorizontal: 20,
     marginBottom: 5,
     fontSize: RFValue(18),
-    justifyContent: 'center',
-    textAlign: 'center',
+    justifyContent: "center",
+    textAlign: "center",
   },
 });
 

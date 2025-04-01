@@ -1,9 +1,9 @@
 import React from "react";
-import { View, Text, Dimensions } from "react-native";
-import WorkoutGenericBuildSettingsCard from "../PickSplitNumberScreenComponents/WorkoutGenericBuildSettingsCard";
+import { Dimensions, Text, View } from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";
-import GradientedGoToButton from "../../GradientedGoToButton";
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
+import GradientedGoToButton from "../../GradientedGoToButton";
+import WorkoutGenericBuildSettingsCard from "../PickSplitNumberScreenComponents/WorkoutGenericBuildSettingsCard";
 
 const { width, height } = Dimensions.get("window");
 
@@ -26,7 +26,7 @@ function PickSplitNumberScreen({ setStep, setSplitsNumber }) {
       >
         <Text
           style={{
-            fontFamily: "PoppinsBold",
+            fontFamily: "Inter_700Bold",
             fontSize: RFValue(17),
             color: "white",
           }}
@@ -35,7 +35,7 @@ function PickSplitNumberScreen({ setStep, setSplitsNumber }) {
         </Text>
         <Text
           style={{
-            fontFamily: "PoppinsRegular",
+            fontFamily: "Inter_400Regular",
             fontSize: RFValue(12),
             opacity: 0.5,
             color: "white",
@@ -65,7 +65,7 @@ function PickSplitNumberScreen({ setStep, setSplitsNumber }) {
             >
               <Text
                 style={{
-                  fontFamily: "PoppinsBold",
+                  fontFamily: "Inter_700Bold",
                   color: "white",
                   fontSize: RFValue(15),
                 }}

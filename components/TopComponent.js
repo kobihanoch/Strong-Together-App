@@ -1,17 +1,16 @@
-import {
-  View,
-  Image,
-  StyleSheet,
-  Dimensions,
-  Text,
-  Modal,
-  TouchableOpacity,
-} from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
-import { useAuth } from "../context/AuthContext";
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
+import {
+  Dimensions,
+  Image,
+  Modal,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";
-import supabase from "../src/supabaseClient";
+import { useAuth } from "../context/AuthContext";
 
 const { width, height } = Dimensions.get("window");
 
@@ -61,7 +60,7 @@ const TopComponent = () => {
         <View style={{ marginLeft: width * 0.02 }}>
           <Text
             style={{
-              fontFamily: "PoppinsBold",
+              fontFamily: "Inter_700Bold",
               fontSize: RFValue(12),
               color: "white",
             }}
@@ -70,7 +69,7 @@ const TopComponent = () => {
           </Text>
           <Text
             style={{
-              fontFamily: "PoppinsRegular",
+              fontFamily: "Inter_400Regular",
               fontSize: RFValue(10),
               color: "white",
               opacity: 0.7,

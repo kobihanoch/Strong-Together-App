@@ -1,16 +1,16 @@
 import {
+  CommonActions,
   NavigationContainer,
   useNavigationContainerRef,
-  CommonActions,
 } from "@react-navigation/native";
-import React, { useState, useEffect, useRef } from "react";
-import { View, Text, ActivityIndicator, StyleSheet } from "react-native";
-import AuthStack from "./navigation/AuthStack";
-import AppStack from "./navigation/AppStack";
+import * as Font from "expo-font";
+import React, { useEffect, useState } from "react";
+import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
 import BottomTabBar from "./components/BottomTabBar";
 import Theme1 from "./components/Theme1";
-import * as Font from "expo-font";
 import { AuthProvider, useAuth } from "./context/AuthContext";
+import AppStack from "./navigation/AppStack";
+import AuthStack from "./navigation/AuthStack";
 
 export default function App() {
   const [fontsLoaded, setFontsLoaded] = useState(false);
@@ -19,8 +19,8 @@ export default function App() {
   const loadFonts = async () => {
     await Font.loadAsync({
       PoppinsLight: require("./assets/fonts/Poppins-Light.ttf"),
-      PoppinsRegular: require("./assets/fonts/Poppins-Regular.ttf"),
-      PoppinsBold: require("./assets/fonts/Poppins-Bold.ttf"),
+      Inter_400Regular: require("./assets/fonts/Poppins-Regular.ttf"),
+      Inter_700Bold: require("./assets/fonts/Poppins-Bold.ttf"),
     });
     setFontsLoaded(true);
   };

@@ -1,25 +1,19 @@
-import React, { useState, useEffect } from "react";
+import { useNavigation } from "@react-navigation/native";
+import React from "react";
 import {
-  View,
-  Text,
-  StyleSheet,
   Dimensions,
   FlatList,
+  StyleSheet,
+  Text,
   TouchableOpacity,
-  ActivityIndicator,
+  View,
 } from "react-native";
-import { useAuth } from "../context/AuthContext";
-import useWorkoutSplits from "../hooks/useWorkoutSplits";
-import useWorkouts from "../hooks/useWorkouts";
-import useSplitExercises from "../hooks/useSplitExercises";
 import { RFValue } from "react-native-responsive-fontsize";
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
-import Theme1 from "../components/Theme1";
-import { useNavigation } from "@react-navigation/native";
-import WorkoutSplitItem from "../components/MyWorkoutPlanComponents/WorkoutSplitItem";
-import ExerciseItem from "../components/MyWorkoutPlanComponents/ExerciseItem";
 import LoadingPage from "../components/LoadingPage";
-import { useUserWorkout } from "../hooks/useUserWorkout";
+import ExerciseItem from "../components/MyWorkoutPlanComponents/ExerciseItem";
+import WorkoutSplitItem from "../components/MyWorkoutPlanComponents/WorkoutSplitItem";
+import { useAuth } from "../context/AuthContext";
 import { useMyWorkoutPlanPageLogic } from "../hooks/logic/useMyWorkoutPlanPageLogic.js";
 
 const { width, height } = Dimensions.get("window");
@@ -60,7 +54,7 @@ const MyWorkoutPlan = () => {
             <View>
               <Text
                 style={{
-                  fontFamily: "PoppinsBold",
+                  fontFamily: "Inter_700Bold",
                   fontSize: RFValue(16),
                   color: "black",
                 }}
@@ -69,7 +63,7 @@ const MyWorkoutPlan = () => {
               </Text>
               <Text
                 style={{
-                  fontFamily: "PoppinsRegular",
+                  fontFamily: "Inter_400Regular",
                   fontSize: RFValue(13),
                   color: "#999999",
                 }}
@@ -109,7 +103,7 @@ const MyWorkoutPlan = () => {
                   <FontAwesome5 name="bolt" size={15} color="#FACC15" />
                   <Text
                     style={{
-                      fontFamily: "PoppinsRegular",
+                      fontFamily: "Inter_400Regular",
                       fontSize: RFValue(12),
                       color: "white",
                       marginLeft: 10,
@@ -166,13 +160,15 @@ const MyWorkoutPlan = () => {
               flexDirection: "column",
             }}
           >
-            <Text style={{ fontSize: RFValue(23), fontFamily: "PoppinsBold" }}>
+            <Text
+              style={{ fontSize: RFValue(23), fontFamily: "Inter_700Bold" }}
+            >
               No workout available
             </Text>
             <Text
               style={{
                 fontSize: RFValue(18),
-                fontFamily: "PoppinsRegular",
+                fontFamily: "Inter_400Regular",
                 color: "gray",
               }}
             >
@@ -207,11 +203,11 @@ const styles = StyleSheet.create({
     width: width * 0.7,
   },
   splitName: {
-    fontFamily: "PoppinsBold",
+    fontFamily: "Inter_700Bold",
     fontSize: RFValue(25),
   },
   splitExercises: {
-    fontFamily: "PoppinsRegular",
+    fontFamily: "Inter_400Regular",
     fontSize: RFValue(12),
     color: "#666",
   },
@@ -225,12 +221,12 @@ const styles = StyleSheet.create({
     marginVertical: height * 0.005,
   },
   exerciseName: {
-    fontFamily: "PoppinsBold",
+    fontFamily: "Inter_700Bold",
     fontSize: RFValue(16),
     color: "#007bff",
   },
   exerciseDetails: {
-    fontFamily: "PoppinsRegular",
+    fontFamily: "Inter_400Regular",
     fontSize: RFValue(12),
     color: "#555",
     marginTop: height * 0.005,

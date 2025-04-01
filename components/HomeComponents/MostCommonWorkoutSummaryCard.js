@@ -71,7 +71,7 @@ const MostCommonWorkoutSummaryCard = ({
             <View style={{ flexDirection: "column" }}>
               <Text
                 style={{
-                  fontFamily: "PoppinsBold",
+                  fontFamily: "Inter_700Bold",
                   color: "white",
                   fontSize: RFValue(13),
                 }}
@@ -80,7 +80,7 @@ const MostCommonWorkoutSummaryCard = ({
               </Text>
               <Text
                 style={{
-                  fontFamily: "PoppinsRegular",
+                  fontFamily: "Inter_400Regular",
                   color: "white",
                   fontSize: RFValue(10),
                   opacity: 0.5,
@@ -109,7 +109,7 @@ const MostCommonWorkoutSummaryCard = ({
           >
             <Text
               style={{
-                fontFamily: "PoppinsBold",
+                fontFamily: "Inter_700Bold",
                 color: "rgb(196, 199, 223)",
                 fontSize: RFValue(45),
               }}
@@ -119,7 +119,7 @@ const MostCommonWorkoutSummaryCard = ({
 
             <Text
               style={{
-                fontFamily: "PoppinsBold",
+                fontFamily: "Inter_700Bold",
                 color: "rgb(196, 199, 223)",
                 marginTop: width * 0.02,
               }}
@@ -140,7 +140,7 @@ const MostCommonWorkoutSummaryCard = ({
         >
           <Text
             style={{
-              fontFamily: "PoppinsBold",
+              fontFamily: "Inter_700Bold",
               color: "white",
               fontSize: RFValue(12),
             }}

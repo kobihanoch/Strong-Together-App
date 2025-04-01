@@ -1,16 +1,15 @@
+import { useNavigation, useNavigationState } from "@react-navigation/native";
+import { LinearGradient } from "expo-linear-gradient";
 import React, { useEffect, useState } from "react";
 import {
-  View,
-  TouchableOpacity,
-  StyleSheet,
-  Dimensions,
-  Text,
   Alert,
+  Dimensions,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
 } from "react-native";
-import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
-import { useNavigationState, useNavigation } from "@react-navigation/native";
-import { LinearGradient } from "expo-linear-gradient";
 import { RFValue } from "react-native-responsive-fontsize";
+import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 
 const { width, height } = Dimensions.get("window");
 
@@ -163,7 +162,7 @@ const styles = StyleSheet.create({
   timerText: {
     color: "white",
     fontSize: RFValue(12),
-    fontFamily: "PoppinsBold",
+    fontFamily: "Inter_700Bold",
   },
   exitButton: {
     justifyContent: "center",

@@ -1,15 +1,15 @@
-import React, { useState, useEffect } from "react";
+import { LinearGradient } from "expo-linear-gradient";
+import React, { useEffect, useState } from "react";
 import {
-  View,
-  Text,
-  TouchableOpacity,
-  TextInput,
-  StyleSheet,
   Dimensions,
   Image,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";
-import { LinearGradient } from "expo-linear-gradient";
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 import images from "../../images";
 
@@ -167,13 +167,13 @@ const styles = StyleSheet.create({
     paddingLeft: width * 0.02,
   },
   exerciseName: {
-    fontFamily: "PoppinsBold",
+    fontFamily: "Inter_700Bold",
     fontSize: RFValue(13),
     color: "black",
     width: "100%",
   },
   muscleText: {
-    fontFamily: "PoppinsRegular",
+    fontFamily: "Inter_400Regular",
     fontSize: RFValue(12),
     color: "#919191",
   },
@@ -192,7 +192,7 @@ const styles = StyleSheet.create({
   setText: {
     color: "white",
     fontSize: RFValue(12),
-    fontFamily: "PoppinsBold",
+    fontFamily: "Inter_700Bold",
   },
   editingContainer: {
     flexDirection: "row",
@@ -224,7 +224,7 @@ const styles = StyleSheet.create({
   saveButtonText: {
     color: "white",
     fontSize: RFValue(14),
-    fontFamily: "PoppinsBold",
+    fontFamily: "Inter_700Bold",
   },
   iconContainer: {
     flex: 0.1,

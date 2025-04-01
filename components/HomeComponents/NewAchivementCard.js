@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from "react";
-import { View, Text, Image, Dimensions } from "react-native";
-import useExerciseTracking from "../../hooks/useExerciseTracking";
-import { RFValue } from "react-native-responsive-fontsize";
 import { LinearGradient } from "expo-linear-gradient";
+import React, { useEffect, useState } from "react";
+import { Dimensions, Image, Text, View } from "react-native";
+import { RFValue } from "react-native-responsive-fontsize";
+import useExerciseTracking from "../../hooks/useExerciseTracking";
 
 const { width, height } = Dimensions.get("window");
 
@@ -65,7 +65,7 @@ function NewAchivementCard({ user, hasAssignedWorkout }) {
               style={{
                 color: "white",
                 textAlign: "center",
-                fontFamily: "PoppinsBold",
+                fontFamily: "Inter_700Bold",
                 fontSize: RFValue(13),
               }}
             >
@@ -103,7 +103,7 @@ function NewAchivementCard({ user, hasAssignedWorkout }) {
                 color: "white",
                 fontSize: RFValue(12),
                 marginTop: height * 0.0,
-                fontFamily: "PoppinsBold",
+                fontFamily: "Inter_700Bold",
                 opacity: 0.8,
               }}
             >
@@ -112,7 +112,7 @@ function NewAchivementCard({ user, hasAssignedWorkout }) {
             <Text
               style={{
                 color: "white",
-                fontFamily: "PoppinsRegular",
+                fontFamily: "Inter_400Regular",
                 fontSize: RFValue(13),
                 marginTop: height * 0.01,
                 opacity: 0.8,
@@ -123,7 +123,7 @@ function NewAchivementCard({ user, hasAssignedWorkout }) {
             <Text
               style={{
                 color: "white",
-                fontFamily: "PoppinsRegular",
+                fontFamily: "Inter_400Regular",
                 fontSize: RFValue(13),
                 opacity: 0.8,
               }}
@@ -149,7 +149,7 @@ function NewAchivementCard({ user, hasAssignedWorkout }) {
           ></Image>
           <Text
             style={{
-              fontFamily: "PoppinsBold",
+              fontFamily: "Inter_700Bold",
               color: "white",
               fontSize: RFValue(11),
               textAlign: "center",

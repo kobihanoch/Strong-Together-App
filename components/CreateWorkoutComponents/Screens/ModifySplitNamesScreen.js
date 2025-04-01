@@ -1,14 +1,13 @@
-import React, { useState, useRef, useEffect } from "react";
-import { View, Text, Dimensions, Alert } from "react-native";
-import ModifySplitNamesCard from "../ModifySplitNamesScreenComponents/ModifySplitNamesCard";
+import React, { useEffect, useState } from "react";
+import { Alert, Dimensions, Text, View } from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";
-import GradientedGoToButton from "../../GradientedGoToButton";
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
-import useWorkoutSplits from "../../../hooks/useWorkoutSplits";
+import { useDeleteWorkout } from "../../../hooks/useDeleteWorkout";
 import useSplitExercises from "../../../hooks/useSplitExercises";
 import useWorkouts from "../../../hooks/useWorkouts";
-import { deleteWorkout } from "../../../services/WorkoutService";
-import { useDeleteWorkout } from "../../../hooks/useDeleteWorkout";
+import useWorkoutSplits from "../../../hooks/useWorkoutSplits";
+import GradientedGoToButton from "../../GradientedGoToButton";
+import ModifySplitNamesCard from "../ModifySplitNamesScreenComponents/ModifySplitNamesCard";
 
 const { width, height } = Dimensions.get("window");
 
@@ -139,7 +138,7 @@ function ModifySplitNamesScreen({
       >
         <Text
           style={{
-            fontFamily: "PoppinsBold",
+            fontFamily: "Inter_700Bold",
             fontSize: RFValue(17),
             color: "white",
           }}
@@ -148,7 +147,7 @@ function ModifySplitNamesScreen({
         </Text>
         <Text
           style={{
-            fontFamily: "PoppinsRegular",
+            fontFamily: "Inter_400Regular",
             fontSize: RFValue(12),
             opacity: 0.5,
             color: "white",
@@ -198,7 +197,7 @@ function ModifySplitNamesScreen({
               />
               <Text
                 style={{
-                  fontFamily: "PoppinsBold",
+                  fontFamily: "Inter_700Bold",
                   color: "white",
                   fontSize: RFValue(15),
                 }}
@@ -227,7 +226,7 @@ function ModifySplitNamesScreen({
             >
               <Text
                 style={{
-                  fontFamily: "PoppinsBold",
+                  fontFamily: "Inter_700Bold",
                   color: "white",
                   fontSize: RFValue(15),
                 }}

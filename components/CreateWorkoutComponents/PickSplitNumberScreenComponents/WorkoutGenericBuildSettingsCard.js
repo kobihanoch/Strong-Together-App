@@ -1,19 +1,8 @@
-import React from "react";
-import { useState, useEffect } from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  Dimensions,
-  ScrollView,
-  TouchableOpacity,
-  Image,
-  TextInput,
-  Button,
-} from "react-native";
+import { LinearGradient } from "expo-linear-gradient";
+import React, { useState } from "react";
+import { Dimensions, Text, TouchableOpacity, View } from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
-import { LinearGradient } from "expo-linear-gradient";
 
 const { width, height } = Dimensions.get("window");
 
@@ -44,7 +33,7 @@ function WorkoutGenericBuildSettingsCard({ setSplitsNumber }) {
       <View style={{ flexDirection: "column", gap: height * 0.02 }}>
         <Text
           style={{
-            fontFamily: "PoppinsRegular",
+            fontFamily: "Inter_400Regular",
             fontSize: RFValue(15),
             color: "#0d2540",
             textAlign: "center",
@@ -72,7 +61,7 @@ function WorkoutGenericBuildSettingsCard({ setSplitsNumber }) {
         <Text
           style={{
             fontSize: RFValue(30),
-            fontFamily: "PoppinsBold",
+            fontFamily: "Inter_700Bold",
             width: width * 0.05,
             color: "black",
           }}
