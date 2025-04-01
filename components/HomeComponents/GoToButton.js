@@ -1,17 +1,16 @@
-import React from 'react';
-import { TouchableOpacity, StyleSheet } from 'react-native';
+import React from "react";
+import { StyleSheet, TouchableOpacity } from "react-native";
 
 const GoToButton = ({
-  backgroundColor = '#F3F4F6',
+  backgroundColor = "#F3F4F6",
   borderRadius = 10,
-  borderColor = '#000',
+  borderColor = "#000",
   borderWidth = 0,
   shadowEnabled = true,
   shadow = {},
   onPress,
-  children
+  children,
 }) => {
-  // הגדרות צל ברירת מחדל
   const defaultShadow = {
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 0 },
@@ -32,7 +31,7 @@ const GoToButton = ({
           borderWidth,
           // אם shadowEnabled שווה ל-true נוסיף את הצל, אחרת נשתמש במערך ריק
           ...(shadowEnabled ? { ...defaultShadow, ...shadow } : {}),
-        }
+        },
       ]}
     >
       {children}
@@ -42,10 +41,10 @@ const GoToButton = ({
 
 const styles = StyleSheet.create({
   button: {
-    height: '100%',
-    width: '100%',
-    justifyContent: 'center',
-    alignItems: 'center',
+    height: "100%",
+    width: "100%",
+    justifyContent: "center",
+    alignItems: "center",
   },
 });
 
