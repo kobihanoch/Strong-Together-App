@@ -51,16 +51,18 @@ export const useMyWorkoutPlanPageLogic = (user) => {
   };
 
   return {
-    workout,
-    workoutSplits,
-    allExercises,
+    data: {
+      workout,
+      workoutSplits,
+      allExercises,
+      selectedSplit,
+      setSelectedSplit,
+      handleWorkoutSplitPress,
+      filteredExercises,
+      countExercisesForSplit,
+      buttonOpacity,
+    },
     loading,
     error,
-    selectedSplit,
-    setSelectedSplit,
-    handleWorkoutSplitPress,
-    filteredExercises,
-    countExercisesForSplit,
-    buttonOpacity,
   };
 };

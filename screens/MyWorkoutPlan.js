@@ -21,134 +21,66 @@ const { width, height } = Dimensions.get("window");
 const MyWorkoutPlan = () => {
   const navigation = useNavigation();
   const { user } = useAuth();
-  const {
-    workout,
-    workoutSplits,
-    allExercises,
-    loading,
-    error,
-    selectedSplit,
-    handleWorkoutSplitPress,
-    filteredExercises,
-    countExercisesForSplit,
-    buttonOpacity,
-  } = useMyWorkoutPlanPageLogic(user);
+  const { data: workoutData, loading, error } = useMyWorkoutPlanPageLogic(user);
 
   if (loading) {
     return <LoadingPage message="Getting your workout..." />;
   }
 
   return (
-    <View style={{ flex: 1, paddingVertical: height * 0.02 }}>
-      {workout ? (
+    <View
+      style={{ flex: 1, paddingVertical: height * 0.02, alignItems: "center" }}
+    >
+      {workoutData.workout ? (
         <>
           <View
             style={{
-              flex: 0.15,
-              flexDirection: "row",
-              justifyContent: "space-between",
-              alignItems: "center",
-              paddingHorizontal: width * 0.06,
-            }}
-          >
-            <View>
-              <Text
-                style={{
-                  fontFamily: "Inter_700Bold",
-                  fontSize: RFValue(16),
-                  color: "black",
-                }}
-              >
-                Your workouts
-              </Text>
-              <Text
-                style={{
-                  fontFamily: "Inter_400Regular",
-                  fontSize: RFValue(13),
-                  color: "#999999",
-                }}
-              >
-                Select a workout to start
-              </Text>
-            </View>
-            <View style={{ justifyContent: "center", alignItems: "center" }}>
-              <TouchableOpacity
-                style={{
-                  height: height * 0.07,
-                  width: height * 0.13,
-                  backgroundColor: "#0d2540",
-                  justifyContent: "center",
-                  alignItems: "center",
-                  borderRadius: width * 0.5,
-                  opacity: buttonOpacity,
-                  shadowColor: "#00142a",
-                  shadowOffset: { width: 0, height: 0 },
-                  shadowOpacity: 0.5,
-                  shadowRadius: 5,
-                  elevation: 5,
-                }}
-                onPress={() =>
-                  navigation.navigate("StartWorkout", {
-                    workoutSplit: selectedSplit,
-                  })
-                }
-              >
-                <View
-                  style={{
-                    flexDirection: "row",
-                    justifyContent: "center",
-                    alignItems: "center",
-                  }}
-                >
-                  <FontAwesome5 name="bolt" size={15} color="#FACC15" />
-                  <Text
-                    style={{
-                      fontFamily: "Inter_400Regular",
-                      fontSize: RFValue(12),
-                      color: "white",
-                      marginLeft: 10,
-                    }}
-                  >
-                    Start
-                  </Text>
-                </View>
-              </TouchableOpacity>
-            </View>
-          </View>
-
-          <View
-            style={{
-              flex: 0.3,
+              flex: 0.25,
+              width: "80%",
               justifyContent: "center",
-              alignItems: "flex-start",
+              alignItems: "center",
             }}
           >
             <FlatList
-              data={workoutSplits}
+              data={workoutData.workoutSplits}
               keyExtractor={(item) => item.id.toString()}
               showsHorizontalScrollIndicator={false}
-              pagingEnabled
               horizontal={true}
+              centerContent={true}
               renderItem={({ item }) => (
                 <WorkoutSplitItem
                   item={item}
-                  exercise_count={countExercisesForSplit(allExercises, item.id)}
-                  isSelected={item.id === selectedSplit?.id}
-                  onPress={() => handleWorkoutSplitPress(item)}
+                  exercise_count={workoutData.countExercisesForSplit(
+                    workoutData.allExercises,
+                    item.id
+                  )}
+                  isSelected={item.id === workoutData.selectedSplit?.id}
+                  onPress={() => workoutData.handleWorkoutSplitPress(item)}
                 />
               )}
+              snapToInterval={width * 0.8}
+              decelerationRate="fast"
+              snapToAlignment="center"
+              onMomentumScrollEnd={(event) => {
+                const offsetX = event.nativeEvent.contentOffset.x;
+                const index = Math.round(offsetX / (width * 0.8));
+                const selected = workoutData.workoutSplits[index];
+                if (selected) {
+                  workoutData.handleWorkoutSplitPress(selected);
+                }
+              }}
             />
           </View>
 
-          <View style={{ flex: 0.55 }}>
-            <FlatList
-              data={filteredExercises}
-              showsVerticalScroll
-              showsVerticalScrollIndicator={false}
-              keyExtractor={(item, index) => index.toString()}
-              renderItem={({ item }) => <ExerciseItem exercise={item} />}
-            />
-          </View>
+          {/*<View style={{ flex: 0.6 }}>
+              <FlatList
+                data={workoutData.filteredExercises}
+                showsVerticalScroll
+                showsVerticalScrollIndicator={false}
+                keyExtractor={(item, index) => index.toString()}
+                renderItem={({ item }) => <ExerciseItem exercise={item} />
+              />
+            </View>*/}
         </>
       ) : (
         <>

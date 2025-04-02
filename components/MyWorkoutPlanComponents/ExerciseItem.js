@@ -17,16 +17,14 @@ const ExerciseItem = ({ exercise }) => {
     <View style={styles.exerciseContainer}>
       <View style={{ flex: 1, flexDirection: "row" }}>
         <View style={{ flex: 0.4, justifyContent: "center" }}>
-          <LinearGradient
-            colors={["#00142a", "#0d2540"]}
+          <View
+            /*colors={["#00142a", "#0d2540"]}*/
             style={{
               flex: 1,
               borderRadius: 10,
               alignItems: "center",
               justifyContent: "center",
               margin: width * 0.02,
-              borderWidth: 2,
-              borderColor: "#666d75",
             }}
           >
             <View>
@@ -40,7 +38,7 @@ const ExerciseItem = ({ exercise }) => {
                 }}
               />
             </View>
-          </LinearGradient>
+          </View>
         </View>
         <View
           style={{
@@ -96,14 +94,6 @@ const ExerciseItem = ({ exercise }) => {
                 : "N/A"}
             </Text>
           </View>
-          <View style={{ margin: width * 0.04 }}>
-            <FontAwesome5
-              name="info-circle"
-              size={15}
-              color="#00142a"
-              opacity={0.7}
-            />
-          </View>
         </View>
       </View>
     </View>
@@ -112,7 +102,7 @@ const ExerciseItem = ({ exercise }) => {
 
 const styles = StyleSheet.create({
   exerciseContainer: {
-    backgroundColor: "#fafafa",
+    backgroundColor: "white",
     width: "90%",
     alignSelf: "center",
     height: height * 0.14,
