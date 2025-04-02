@@ -29,10 +29,12 @@ const Home = ({ navigation }) => {
   const { user } = useAuth();
   // Hook handling
   const { data: userData, loading, error } = useHomePageLogic(user);
+  console.log("userData", userData);
 
-  return loading ? (
-    <LoadingPage message="Loading user data..." />
-  ) : (
+  if (loading || !userData) {
+    return <LoadingPage message="Loading user data..." />;
+  }
+  return (
     <View style={{ flex: 1, paddingVertical: height * 0.02 }}>
       <View style={styles.midContainer}>
         {/*flex 2*/}
@@ -52,7 +54,7 @@ const Home = ({ navigation }) => {
             elevation: 1,
           }}
         >
-          <Text style={styles.headerText}>Hello, {userData.firstName}!</Text>
+          <Text style={styles.headerText}>Hello, {userData?.firstName}!</Text>
           <StartWorkoutButton></StartWorkoutButton>
         </View>
 

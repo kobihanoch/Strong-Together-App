@@ -50,7 +50,12 @@ export const getMostFrequentSplitNameByUserId = async (userId) => {
       .eq("user_id", userId);
 
     if (error) throw error;
-    if (!data || data.length === 0) return null;
+    if (!data || data.length === 0)
+      return {
+        workoutsplit_id: "N/A",
+        splitname: "N/A",
+        maxCount: 0,
+      };
 
     const frequencyMap = {};
 

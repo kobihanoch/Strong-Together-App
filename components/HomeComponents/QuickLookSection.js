@@ -44,10 +44,9 @@ const QuickLookSection = ({ data, navigation }) => {
         <WorkoutCountCard
           totalWorkoutNumber={data.totalWorkoutNumber}
         ></WorkoutCountCard>
-        <MostCommonWorkoutSummaryCard
-          totalWorkoutNumber={data.totalWorkoutNumber}
-          mostFrequentSplit={data.mostFrequentSplit}
-        />
+        <CreateOrEditWorkoutCard
+          hasAssignedWorkout={data.hasAssignedWorkout}
+        ></CreateOrEditWorkoutCard>
       </View>
       <View
         style={{

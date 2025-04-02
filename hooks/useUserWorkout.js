@@ -57,22 +57,18 @@ export const useUserWorkout = (userId) => {
   };
 
   useEffect(() => {
-    if (userWorkout) {
-      // Sets workout only from userWorkout
+    if (userWorkout && userWorkout.length > 0 && userWorkout[0]) {
       const workoutObj = Object.fromEntries(
         Object.entries(userWorkout[0]).slice(0, 7)
       );
       setWorkout(workoutObj);
 
-      // Sets workout splits only from userWorkout
-      const fullWorkoutSplits = userWorkout[0].workoutsplits;
-      const splits = [];
-      fullWorkoutSplits.forEach((split) => {
-        splits.push(Object.fromEntries(Object.entries(split).slice(0, 5)));
-      });
+      const fullWorkoutSplits = userWorkout[0].workoutsplits || [];
+      const splits = fullWorkoutSplits.map((split) =>
+        Object.fromEntries(Object.entries(split).slice(0, 5))
+      );
       setWorkoutSplits(splits);
 
-      // Sets exercises only from userWorkout
       const allExercises = fullWorkoutSplits.flatMap((split) =>
         (split.exercisetoworkoutsplit ?? []).map((item) => {
           const { exercises, ...itemWithoutExercises } = item;
@@ -83,6 +79,10 @@ export const useUserWorkout = (userId) => {
         })
       );
       setExercises(allExercises);
+    } else {
+      setWorkout(null);
+      setWorkoutSplits([]);
+      setExercises([]);
     }
   }, [userWorkout]);
 

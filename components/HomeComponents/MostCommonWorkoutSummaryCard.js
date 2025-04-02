@@ -49,7 +49,7 @@ const MostCommonWorkoutSummaryCard = ({
       >
         Common
       </Text>
-      {mostFrequentSplit ? (
+      {mostFrequentSplit.splitname ? (
         <>
           <View
             style={{
@@ -102,7 +102,7 @@ const MostCommonWorkoutSummaryCard = ({
                   color: "black",
                 }}
               >
-                {mostFrequentSplit.splitname}
+                {mostFrequentSplit?.splitname}
               </Text>
               <Text
                 style={{
@@ -110,7 +110,7 @@ const MostCommonWorkoutSummaryCard = ({
                   color: "#666",
                 }}
               >
-                {mostFrequentSplit.maxCount} / {totalWorkoutNumber}
+                {mostFrequentSplit?.maxCount} / {totalWorkoutNumber}
               </Text>
             </View>
           </View>
