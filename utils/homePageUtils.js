@@ -1,8 +1,10 @@
 export const getUserLastWorkoutDate = (exercisesArr) => {
+  if (!exercisesArr || exercisesArr.length == 0) {
+    return "No data yet";
+  }
   const sortedEtArr = [...exercisesArr].sort(
     (a, b) => new Date(b.workoutdate) - new Date(a.workoutdate)
   );
-  console.log("Asdasdsdassasddsdsd" + sortedEtArr[0].workoutdate);
   return sortedEtArr[0].workoutdate;
 };
 

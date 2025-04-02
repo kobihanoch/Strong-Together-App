@@ -73,9 +73,7 @@ const useHomePageLogic = (user) => {
 
   // Get last workout date
   useEffect(() => {
-    if (Array.isArray(exerciseTracking) && exerciseTracking.length > 0) {
-      setLastWorkoutDate(getUserLastWorkoutDate(exerciseTracking));
-    }
+    setLastWorkoutDate(getUserLastWorkoutDate(exerciseTracking));
   }, [exerciseTracking]);
 
   // Counter for workouts made
@@ -108,6 +106,7 @@ const useHomePageLogic = (user) => {
       workoutSplitsNumber: workoutSplitsNumber ?? 0,
       mostFrequentSplit: mostFrequentSplit,
       PR: PR ?? null,
+      exerciseTracking: exerciseTracking ?? null,
     },
     loading,
     error,
