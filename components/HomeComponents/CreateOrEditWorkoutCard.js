@@ -67,16 +67,15 @@ function CreateOrEditWorkoutCard({ hasAssignedWorkout }) {
                 <TouchableOpacity
                   onPress={() => navigation.navigate("CreateWorkout")}
                   style={{
-                    borderWidth: 1,
-                    borderColor: "rgba(1, 1, 1, 0.61)",
                     borderRadius: height * 0.03,
+                    backgroundColor: "#2979FF",
                     padding: height * 0.01,
                   }}
                 >
                   <View>
                     <MaterialCommunityIcons
                       name="pencil-outline"
-                      color="black"
+                      color="white"
                       size={RFValue(20)}
                     />
                   </View>
@@ -103,7 +102,7 @@ function CreateOrEditWorkoutCard({ hasAssignedWorkout }) {
                   marginBottom: height * 0.015,
                 }}
               >
-                Create workout
+                New Workout
               </Text>
 
               <View
@@ -117,16 +116,15 @@ function CreateOrEditWorkoutCard({ hasAssignedWorkout }) {
                 <TouchableOpacity
                   onPress={() => navigation.navigate("CreateWorkout")}
                   style={{
-                    borderWidth: 1,
-                    borderColor: "rgba(1, 1, 1, 0.61)",
+                    backgroundColor: "#2979FF",
                     borderRadius: height * 0.03,
                     padding: height * 0.01,
                   }}
                 >
                   <View>
                     <MaterialCommunityIcons
-                      name="pencil-outline"
-                      color="black"
+                      name="plus"
+                      color="white"
                       size={RFValue(20)}
                     />
                   </View>

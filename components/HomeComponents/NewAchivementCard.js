@@ -6,6 +6,11 @@ import useExerciseTracking from "../../hooks/useExerciseTracking";
 
 const { width, height } = Dimensions.get("window");
 
+/*<Image
+              source={require("../../assets/gold-medal.png")}
+              style={{ height: height * 0.12, width: height * 0.12 }}
+            ></Image>*/
+
 function NewAchivementCard({ hasAssignedWorkout, PR }) {
   return (
     <View
@@ -23,122 +28,95 @@ function NewAchivementCard({ hasAssignedWorkout, PR }) {
         justifyContent: "center",
       }}
     >
-      <View
-        style={{
-          alignItems: "center",
-          flexDirection: "column",
-          justifyContent: "space-around",
-        }}
-      >
-        {hasAssignedWorkout ? (
-          <View style={{ flexDirection: "column" }}>
-            <View
-              style={{
-                flex: 6,
-                justifyContent: "center",
-                alignItems: "center",
-                marginTop: height * 0.01,
-                gap: height * 0.01,
-              }}
-            >
-              <Text
-                style={{
-                  color: "black",
-                  textAlign: "center",
-                  fontFamily: "Inter_700Bold",
-                  fontSize: RFValue(13),
-                }}
-              >
-                Personal Record
-              </Text>
-              <View
-                style={{
-                  shadowColor: "#FFD700",
-                  shadowOffset: { width: 0, height: 0 },
-                  shadowOpacity: 0.7,
-                  shadowRadius: 20,
-                  elevation: 20,
-                  alignItems: "center",
-                  justifyContent: "center",
-                  height: "50%",
-                  width: "50%",
-                }}
-              >
-                <Image
-                  source={require("../../assets/gold-medal.png")}
-                  style={{ height: "100%", width: "100%" }}
-                ></Image>
-              </View>
-            </View>
-            <View
-              style={{
-                flex: 4,
-                flexDirection: "column",
-                justifyContent: "flex-start",
-                alignItems: "center",
-              }}
-            >
-              <Text
-                style={{
-                  color: "black",
-                  fontSize: RFValue(12),
-                  marginTop: height * 0.0,
-                  fontFamily: "Inter_700Bold",
-                  opacity: 0.8,
-                }}
-              >
-                {PR.maxExercise}
-              </Text>
-              <Text
-                style={{
-                  color: "black",
-                  fontFamily: "Inter_400Regular",
-                  fontSize: RFValue(13),
-                  marginTop: height * 0.01,
-                  opacity: 0.8,
-                }}
-              >
-                {PR.maxWeight} kg
-              </Text>
-              <Text
-                style={{
-                  color: "black",
-                  fontFamily: "Inter_400Regular",
-                  fontSize: RFValue(13),
-                  opacity: 0.8,
-                }}
-              >
-                {" "}
-                for {PR.maxReps} reps
-              </Text>
-            </View>
-          </View>
-        ) : (
+      <View style={{ flex: 1, flexDirection: "row" }}>
+        <View
+          style={{
+            flex: 6.3,
+            alignItems: "center",
+            flexDirection: "column",
+            justifyContent: "center",
+          }}
+        >
+          <Text
+            style={{ fontFamily: "Inter_600SemiBold", fontSize: RFValue(12) }}
+          >
+            Personal Record
+          </Text>
+          <Image
+            source={require("../../assets/gold-medal.png")}
+            style={{ height: height * 0.08, aspectRatio: 1 }}
+          ></Image>
+          <Text
+            style={{ fontFamily: "Inter_600SemiBold", fontSize: RFValue(14) }}
+          >
+            {hasAssignedWorkout ? PR.maxExercise : "No data yet"}
+          </Text>
+        </View>
+        <View
+          style={{ flex: 0.2, alignItems: "center", justifyContent: "center" }}
+        >
+          <View
+            style={{
+              height: "90%",
+              width: 1,
+              backgroundColor: "rgba(156, 156, 156, 0.4)",
+            }}
+          ></View>
+        </View>
+        <View
+          style={{
+            flex: 3.9,
+            flexDirection: "column",
+            justifyContent: "center",
+            alignItems: "center",
+            gap: height * 0.02,
+          }}
+        >
           <View
             style={{
               flexDirection: "column",
-              gap: height * 0.02,
-              opacity: 0.6,
               justifyContent: "center",
               alignItems: "center",
             }}
           >
-            <Image
-              source={require("../../assets/gold-medal.png")}
-              style={{ height: height * 0.12, width: height * 0.12 }}
-            ></Image>
             <Text
               style={{
-                fontFamily: "Inter_700Bold",
-                color: "white",
-                fontSize: RFValue(11),
-                textAlign: "center",
+                fontFamily: "Inter_400Regular",
+                fontSize: RFValue(13),
+                color: "rgb(137, 137, 137)",
               }}
             >
-              No personal record yet
+              {hasAssignedWorkout ? PR.maxWeight + " kg" : "N/A"}
+            </Text>
+            <Text
+              style={{ fontFamily: "Inter_600SemiBold", fontSize: RFValue(14) }}
+            >
+              Weight
             </Text>
           </View>
-        )}
+          <View
+            style={{
+              flexDirection: "column",
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
+            <Text
+              style={{
+                fontFamily: "Inter_400Regular",
+                fontSize: RFValue(13),
+                color: "rgb(137, 137, 137)",
+              }}
+            >
+              {hasAssignedWorkout ? PR.maxReps : "N/A"}
+            </Text>
+            <Text
+              style={{ fontFamily: "Inter_600SemiBold", fontSize: RFValue(14) }}
+            >
+              Reps
+            </Text>
+          </View>
+        </View>
       </View>
     </View>
   );
