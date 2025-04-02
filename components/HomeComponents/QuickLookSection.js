@@ -7,7 +7,7 @@ import CreateOrEditWorkoutCard from "./CreateOrEditWorkoutCard";
 import WorkoutCountCard from "./WorkoutCountCard";
 
 const { width, height } = Dimensions.get("window");
-const QuickLookSection = ({ user, hasAssignedWorkout, navigation }) => {
+const QuickLookSection = ({ data, navigation }) => {
   return (
     <View
       style={{
@@ -38,19 +38,15 @@ const QuickLookSection = ({ user, hasAssignedWorkout, navigation }) => {
         }}
       >
         <MostCommonWorkoutSummaryCard
-          userId={user?.id}
-          height={height}
-          width={width}
+          totalWorkoutNumber={data.totalWorkoutNumber}
+          mostFrequentSplit={data.mostFrequentSplit}
         />
+        <WorkoutCountCard
+          totalWorkoutNumber={data.totalWorkoutNumber}
+        ></WorkoutCountCard>
         <MostCommonWorkoutSummaryCard
-          userId={user?.id}
-          height={height}
-          width={width}
-        />
-        <MostCommonWorkoutSummaryCard
-          userId={user?.id}
-          height={height}
-          width={width}
+          totalWorkoutNumber={data.totalWorkoutNumber}
+          mostFrequentSplit={data.mostFrequentSplit}
         />
       </View>
       <View
@@ -63,9 +59,8 @@ const QuickLookSection = ({ user, hasAssignedWorkout, navigation }) => {
         }}
       >
         <MostCommonWorkoutSummaryCard
-          userId={user?.id}
-          height={height}
-          width={width}
+          totalWorkoutNumber={data.totalWorkoutNumber}
+          mostFrequentSplit={data.mostFrequentSplit}
         />
       </View>
     </View>

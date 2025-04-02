@@ -3,6 +3,7 @@ import {
   getUserExerciseTracking,
   getUserWorkout,
 } from "../services/WorkoutService";
+import { getMostFrequentSplitNameByUserId } from "../services/ExerciseTrackingService";
 
 export const useUserWorkout = (userId) => {
   const [userWorkout, setUserWorkout] = useState(null);
@@ -12,6 +13,7 @@ export const useUserWorkout = (userId) => {
   const [workoutSplits, setWorkoutSplits] = useState(null);
   const [exercises, setExercises] = useState(null);
   const [exerciseTracking, setExerciseTracking] = useState(null);
+  const [mostFrequentSplit, setMostFrequentSplit] = useState(null);
 
   const fetchUserWorkout = async () => {
     if (!userId) return;
@@ -40,6 +42,8 @@ export const useUserWorkout = (userId) => {
       const data = await getUserExerciseTracking(userId);
       console.log(JSON.stringify(data));
       setExerciseTracking(data);
+      const frequentSplit = await getMostFrequentSplitNameByUserId(userId);
+      setMostFrequentSplit(frequentSplit);
     } catch (err) {
       setError(err);
       console.log("Failed. Error: " + err);
@@ -96,5 +100,6 @@ export const useUserWorkout = (userId) => {
     workout,
     workoutSplits,
     exercises,
+    mostFrequentSplit,
   };
 };

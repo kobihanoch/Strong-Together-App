@@ -1,43 +1,27 @@
-import { FontAwesome5, MaterialCommunityIcons } from "@expo/vector-icons";
-import { LinearGradient } from "expo-linear-gradient";
 import React, { useEffect, useState } from "react";
-import { Text, View } from "react-native";
+import { Text, View, Dimensions } from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";
+import Svg, { Circle } from "react-native-svg";
 import useExerciseTracking from "../../hooks/useExerciseTracking";
 import useWorkoutSplits from "../../hooks/useWorkoutSplits";
 
+const { width, height } = Dimensions.get("window");
+
 const MostCommonWorkoutSummaryCard = ({
-  userId,
-  height,
-  width,
-  onStartWorkout,
+  totalWorkoutNumber,
+  mostFrequentSplit,
 }) => {
-  const [
-    mostFrequentWorkoutSplitMuscleGroup,
-    setMostFrequentWorkoutSplitMuscleGroup,
-  ] = useState(null);
+  const radius = width * 0.1;
+  const strokeWidth = width * 0.02;
+  const normalizedRadius = radius - strokeWidth / 2;
+  const circumference = 2 * Math.PI * normalizedRadius;
 
-  // Fetch functions from hooks
-  const { fetchWorkoutSplit } = useWorkoutSplits();
-  const { mostFrequentSplit, loading, error } = useExerciseTracking(userId);
+  const progress = totalWorkoutNumber
+    ? Math.min(mostFrequentSplit.maxCount / totalWorkoutNumber, 1)
+    : 0;
 
-  // Extract workout split ID and name from mostFrequentSplit
-  const {
-    workoutsplit_id: mostFreqWorkoutsplit_id,
-    splitname: mostFreqWorkoutSplitName,
-  } = mostFrequentSplit || {};
-
-  // Fetch the most frequent workout split's muscle group when its ID changes
-  useEffect(() => {
-    if (!mostFreqWorkoutsplit_id) return;
-
-    fetchWorkoutSplit(mostFreqWorkoutsplit_id).then((splitData) => {
-      console.log("Fetched Workout Split Data:", splitData);
-      if (splitData) {
-        setMostFrequentWorkoutSplitMuscleGroup(splitData.muscle_group);
-      }
-    });
-  }, [mostFreqWorkoutsplit_id]);
+  console.log(mostFrequentSplit);
+  const strokeDashoffset = circumference * (1 - progress);
 
   return (
     <View
@@ -51,57 +35,82 @@ const MostCommonWorkoutSummaryCard = ({
         shadowOpacity: 0.05,
         shadowRadius: 5,
         elevation: 1,
+        alignItems: "center",
+        justifyContent: "center",
       }}
     >
+      <Text
+        style={{
+          fontFamily: "Inter_600SemiBold",
+          fontSize: RFValue(12),
+          color: "black",
+          marginBottom: height * 0.015,
+        }}
+      >
+        Common
+      </Text>
       {mostFrequentSplit ? (
         <>
           <View
             style={{
-              flex: 1,
-              flexDirection: "column",
-              justifyContent: "flex-start",
+              width: radius * 2,
+              height: radius * 2,
+              justifyContent: "center",
+              alignItems: "center",
+              position: "relative",
             }}
           >
-            <View
-              style={{
-                flexDirection: "row",
-                justifyContent: "space-between",
-                paddingHorizontal: width * 0.04,
-                marginTop: height * 0.02,
-              }}
-            >
-              <Text
-                style={{
-                  fontFamily: "Inter_600SemiBold",
-                  fontSize: RFValue(12),
-                  color: "black",
-                }}
-              >
-                Common
-              </Text>
-            </View>
+            <Svg height={radius * 2} width={radius * 2}>
+              <Circle
+                stroke="#e6e6e6"
+                fill="transparent"
+                strokeWidth={strokeWidth}
+                r={normalizedRadius}
+                cx={radius}
+                cy={radius}
+              />
+              <Circle
+                stroke="#2979FF"
+                fill="transparent"
+                strokeWidth={strokeWidth}
+                strokeLinecap="round"
+                strokeDasharray={circumference}
+                strokeDashoffset={strokeDashoffset}
+                r={normalizedRadius}
+                cx={radius}
+                cy={radius}
+                rotation="-90"
+                origin={`${radius}, ${radius}`}
+              />
+            </Svg>
 
             <View
               style={{
-                alignSelf: "center",
-                marginTop: height * 0.015,
-                borderWidth: width * 0.02,
-                padding: height * 0.01,
-                borderRadius: height * 0.08,
-                borderColor: "#2979FF",
+                position: "absolute",
+                top: 0,
+                left: 0,
+                width: radius * 2,
+                height: radius * 2,
                 justifyContent: "center",
                 alignItems: "center",
-                aspectRatio: 1,
               }}
             >
               <Text
                 style={{
                   fontFamily: "Inter_600SemiBold",
-                  fontSize: RFValue(20),
+                  fontSize: RFValue(15),
                   color: "black",
                 }}
               >
-                {mostFreqWorkoutSplitName}
+                {mostFrequentSplit.splitname}
+              </Text>
+              <Text
+                style={{
+                  fontSize: RFValue(10),
+                  color: "#666",
+                }}
+              >
+                {mostFrequentSplit.maxCount} / {totalWorkoutNumber}
               </Text>
             </View>
           </View>

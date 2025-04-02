@@ -5,7 +5,7 @@ import { formatDate } from "../../utils/statisticsUtils";
 import { getDaysSince } from "../../utils/homePageUtils";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 
-const LastWorkoutSection = ({ lastWorkoutDate }) => {
+const LastWorkoutSection = ({ data }) => {
   return (
     <View
       style={{
@@ -29,9 +29,9 @@ const LastWorkoutSection = ({ lastWorkoutDate }) => {
           color="#1A1A1A"
           opacity={0.7}
         ></MaterialCommunityIcons>{" "}
-        Last workout at: {formatDate(lastWorkoutDate).split(",")[0]}
+        Last workout at: {formatDate(data.lastWorkoutDate).split(",")[0]}
         {"\n"}
-        {formatDate(lastWorkoutDate).split(",")[1].trim()}
+        {formatDate(data.lastWorkoutDate).split(",")[1].trim()}
       </Text>
       <Text
         style={{
@@ -41,7 +41,7 @@ const LastWorkoutSection = ({ lastWorkoutDate }) => {
           fontSize: RFValue(12),
         }}
       >
-        {getDaysSince(lastWorkoutDate)}
+        {getDaysSince(data.lastWorkoutDate)}
       </Text>
     </View>
   );

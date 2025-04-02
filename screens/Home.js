@@ -28,16 +28,7 @@ const { width, height } = Dimensions.get("window");
 const Home = ({ navigation }) => {
   const { user } = useAuth();
   // Hook handling
-  const {
-    username,
-    userId,
-    hasAssignedWorkout,
-    profileImageUrl,
-    loading,
-    firstName,
-    lastWorkoutDate,
-    error,
-  } = useHomePageLogic(user);
+  const { data: userData, loading, error } = useHomePageLogic(user);
 
   return loading ? (
     <LoadingPage message="Loading user data..." />
@@ -61,20 +52,15 @@ const Home = ({ navigation }) => {
             elevation: 1,
           }}
         >
-          <Text style={styles.headerText}>Hello, {firstName}!</Text>
+          <Text style={styles.headerText}>Hello, {userData.firstName}!</Text>
           <StartWorkoutButton></StartWorkoutButton>
         </View>
 
         {/*flex 1*/}
-        <LastWorkoutSection
-          lastWorkoutDate={lastWorkoutDate}
-        ></LastWorkoutSection>
+        <LastWorkoutSection data={userData}></LastWorkoutSection>
 
         {/*flex 6*/}
-        <QuickLookSection
-          user={user}
-          hasAssignedWorkout={hasAssignedWorkout}
-        ></QuickLookSection>
+        <QuickLookSection data={userData}></QuickLookSection>
         {/*<View
           style={{
             flex: 4,
