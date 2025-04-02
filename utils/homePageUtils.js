@@ -6,6 +6,29 @@ export const getUserLastWorkoutDate = (exercisesArr) => {
   return sortedEtArr[0].workoutdate;
 };
 
+export const getUserGeneralPR = (exercisesLogsForUser) => {
+  const PRS = {};
+  let maxWeight = 0;
+  let maxExercise = null;
+  let maxReps = 0;
+  exercisesLogsForUser.forEach((exerciseInTrackingData) => {
+    const weightArr = exerciseInTrackingData.weight;
+    const repsArr = exerciseInTrackingData.reps;
+    const maxWeightInArray = Math.max(...weightArr);
+    if (maxWeightInArray > maxWeight) {
+      maxWeight = maxWeightInArray;
+      maxExercise = exerciseInTrackingData.exercise;
+      const index = weightArr.indexOf(maxWeightInArray);
+      maxReps = repsArr[index];
+    }
+  });
+  return {
+    maxWeight,
+    maxReps,
+    maxExercise,
+  };
+};
+
 export const getDaysSince = (lastDateString) => {
   const lastDate = new Date(lastDateString);
   const today = new Date();

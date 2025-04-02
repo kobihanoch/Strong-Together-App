@@ -29,7 +29,6 @@ const Home = ({ navigation }) => {
   const { user } = useAuth();
   // Hook handling
   const { data: userData, loading, error } = useHomePageLogic(user);
-  console.log("userData", userData);
 
   if (loading || !userData) {
     return <LoadingPage message="Loading user data..." />;

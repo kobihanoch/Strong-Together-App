@@ -57,10 +57,10 @@ const QuickLookSection = ({ data, navigation }) => {
           gap: width * 0.02,
         }}
       >
-        <MostCommonWorkoutSummaryCard
-          totalWorkoutNumber={data.totalWorkoutNumber}
-          mostFrequentSplit={data.mostFrequentSplit}
-        />
+        <NewAchivementCard
+          PR={data.PR}
+          hasAssignedWorkout={data.hasAssignedWorkout}
+        ></NewAchivementCard>
       </View>
     </View>
   );

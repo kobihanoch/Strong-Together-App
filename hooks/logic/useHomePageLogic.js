@@ -2,7 +2,10 @@ import { useEffect, useState } from "react";
 import { useFocusEffect } from "@react-navigation/native";
 import { useUserWorkout } from "../useUserWorkout";
 import React from "react";
-import { getUserLastWorkoutDate } from "../../utils/homePageUtils";
+import {
+  getUserGeneralPR,
+  getUserLastWorkoutDate,
+} from "../../utils/homePageUtils";
 
 const useHomePageLogic = (user) => {
   const [username, setUsername] = useState(null);
@@ -25,6 +28,7 @@ const useHomePageLogic = (user) => {
   const [loading, setLoading] = useState(true);
   const [totalWorkoutNumber, setTotalWorkoutNumber] = useState(0);
   const [workoutSplitsNumber, setWorkoutSplitsNumber] = useState(0);
+  const [PR, setPR] = useState({});
 
   // Set username after user is loaded
   useEffect(() => {
@@ -47,6 +51,12 @@ const useHomePageLogic = (user) => {
 
     loadData();
   }, [user]);
+
+  useEffect(() => {
+    if (exerciseTracking && exerciseTracking.length > 0) {
+      setPR(getUserGeneralPR(exerciseTracking));
+    }
+  }, [exerciseTracking]);
 
   useFocusEffect(
     React.useCallback(() => {
@@ -97,6 +107,7 @@ const useHomePageLogic = (user) => {
       totalWorkoutNumber: totalWorkoutNumber ?? 0,
       workoutSplitsNumber: workoutSplitsNumber ?? 0,
       mostFrequentSplit: mostFrequentSplit,
+      PR: PR ?? null,
     },
     loading,
     error,
