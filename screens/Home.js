@@ -43,23 +43,34 @@ const Home = ({ navigation }) => {
     <LoadingPage message="Loading user data..." />
   ) : (
     <View style={{ flex: 1, paddingVertical: height * 0.02 }}>
-      {/* Header */}
-      <View style={styles.headerContainer}>
-        <View style={{ justifyContent: "center", flex: 8.5 }}>
-          <Text style={styles.headerText}>Hello, {firstName}!</Text>
-        </View>
-      </View>
-
       <View style={styles.midContainer}>
-        {/*flex 1.1*/}
-        <StartWorkoutButton></StartWorkoutButton>
+        {/*flex 2*/}
+        <View
+          style={{
+            flex: 3,
+            flexDirection: "column",
+            gap: height * 0.03,
+            justifyContent: "center",
+            width: "100%",
+            padding: height * 0.03,
+            borderRadius: height * 0.04,
+            shadowColor: "#000",
+            shadowOffset: { width: 0, height: 0 },
+            shadowOpacity: 0.05,
+            shadowRadius: 5,
+            elevation: 1,
+          }}
+        >
+          <Text style={styles.headerText}>Hello, {firstName}!</Text>
+          <StartWorkoutButton></StartWorkoutButton>
+        </View>
 
         {/*flex 1*/}
         <LastWorkoutSection
           lastWorkoutDate={lastWorkoutDate}
         ></LastWorkoutSection>
 
-        {/*flex 2.7*/}
+        {/*flex 6*/}
         <QuickLookSection
           user={user}
           hasAssignedWorkout={hasAssignedWorkout}
@@ -114,6 +125,7 @@ const styles = StyleSheet.create({
     fontFamily: "Inter_600SemiBold",
     color: "black",
     fontSize: RFValue(35),
+    alignItems: "flex-start",
   },
   semiHeaderText: {
     fontFamily: "Inter_400Regular",
@@ -122,7 +134,7 @@ const styles = StyleSheet.create({
   },
 
   midContainer: {
-    flex: 8.5,
+    flex: 1,
     flexDirection: "column",
     justifyContent: "flex-start",
     alignItems: "center",

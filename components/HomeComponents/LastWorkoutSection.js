@@ -11,7 +11,7 @@ const LastWorkoutSection = ({ lastWorkoutDate }) => {
       style={{
         flex: 1,
         width: "80%",
-        alignItems: "center",
+        alignItems: "flex-start",
         flexDirection: "row",
         justifyContent: "space-between",
       }}

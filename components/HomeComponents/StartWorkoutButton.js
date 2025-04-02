@@ -7,7 +7,7 @@ const { width, height } = Dimensions.get("window");
 
 const StartWorkoutButton = () => {
   return (
-    <View style={{ flex: 1.1, width: "85%" }}>
+    <View style={{ flex: 1, width: "85%", alignSelf: "center" }}>
       {/*<WorkoutCountCard userId={userId} height={height} width={width} />*/}
       <TouchableOpacity
         style={{
@@ -16,8 +16,8 @@ const StartWorkoutButton = () => {
           alignItems: "center",
           backgroundColor: "#2979FF",
           borderRadius: height * 0.02,
-          flex: 1,
           width: "100%",
+          height: "80%",
           gap: width * 0.03,
         }}
       >

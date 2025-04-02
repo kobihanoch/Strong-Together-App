@@ -11,20 +11,21 @@ const QuickLookSection = ({ user, hasAssignedWorkout, navigation }) => {
   return (
     <View
       style={{
-        flex: 5,
+        flex: 6,
         width: "85%",
-        justifyContent: "center",
+        justifyContent: "flex-start",
         flexDirection: "column",
-        gap: height * 0.02,
+        gap: height * 0.01,
       }}
     >
       <Text
         style={{
           fontFamily: "Inter_700Bold",
           fontSize: RFValue(20),
+          flex: 1,
         }}
       >
-        Quick Look
+        Insights
       </Text>
 
       <View
@@ -32,8 +33,8 @@ const QuickLookSection = ({ user, hasAssignedWorkout, navigation }) => {
           flexDirection: "row",
           justifyContent: "center",
           alignItems: "flex-start",
-          height: "30%",
           gap: width * 0.02,
+          flex: 4.5,
         }}
       >
         <MostCommonWorkoutSummaryCard
@@ -52,11 +53,21 @@ const QuickLookSection = ({ user, hasAssignedWorkout, navigation }) => {
           width={width}
         />
       </View>
-      <MostCommonWorkoutSummaryCard
-        userId={user?.id}
-        height={height}
-        width={width}
-      />
+      <View
+        style={{
+          flexDirection: "row",
+          justifyContent: "center",
+          alignItems: "flex-start",
+          flex: 4.5,
+          gap: width * 0.02,
+        }}
+      >
+        <MostCommonWorkoutSummaryCard
+          userId={user?.id}
+          height={height}
+          width={width}
+        />
+      </View>
     </View>
   );
 };

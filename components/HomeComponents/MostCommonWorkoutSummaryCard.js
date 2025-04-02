@@ -59,51 +59,55 @@ const MostCommonWorkoutSummaryCard = ({
             style={{
               flex: 1,
               flexDirection: "column",
-              justifyContent: "center",
-              gap: height * 0.03,
+              justifyContent: "flex-start",
             }}
           >
             <View
               style={{
                 flexDirection: "row",
                 justifyContent: "space-between",
-                paddingHorizontal: width * 0.02,
+                paddingHorizontal: width * 0.04,
+                marginTop: height * 0.02,
               }}
             >
               <Text
                 style={{
                   fontFamily: "Inter_600SemiBold",
                   fontSize: RFValue(12),
-
                   color: "black",
                 }}
               >
                 Common
               </Text>
-              <MaterialCommunityIcons
-                name={"star"}
-                color="#2979FF"
-                backgroundColor="rgba(41, 121, 255, 0.2)"
-                borderRadius={height * 0.005}
-                padding={height * 0.002}
-                size={RFValue(12)}
-              ></MaterialCommunityIcons>
             </View>
 
-            <Text
+            <View
               style={{
-                fontFamily: "Inter_600SemiBold",
-                fontSize: RFValue(25),
-                color: "black",
                 alignSelf: "center",
+                marginTop: height * 0.015,
+                borderWidth: width * 0.02,
+                padding: height * 0.01,
+                borderRadius: height * 0.08,
+                borderColor: "#2979FF",
+                justifyContent: "center",
+                alignItems: "center",
+                aspectRatio: 1,
               }}
             >
-              {mostFreqWorkoutSplitName}
-            </Text>
+              <Text
+                style={{
+                  fontFamily: "Inter_600SemiBold",
+                  fontSize: RFValue(20),
+                  color: "black",
+                }}
+              >
+                {mostFreqWorkoutSplitName}
+              </Text>
+            </View>
           </View>
         </>
       ) : (
-        <Text>asdad</Text>
+        <Text>No records</Text>
       )}
     </View>
   );
