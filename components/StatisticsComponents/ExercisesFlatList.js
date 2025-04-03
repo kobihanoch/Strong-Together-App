@@ -26,7 +26,7 @@ const ExercisesFlatList = ({ data, dataToCompare, exerciseTracking }) => {
         <Text
           style={{
             fontFamily: "Inter_700Bold",
-            color: "white",
+            color: "black",
             fontSize: RFValue(18),
           }}
         >
