@@ -21,39 +21,23 @@ const WorkoutSplitItem = ({ item, exercise_count, isSelected, onPress }) => {
       ]}
       onPress={onPress}
     >
-      <View
-        style={{
-          flex: 1,
-          flexDirection: "column",
-          justifyContent: "center",
-        }}
+      <Text
+        style={[styles.splitName, { color: isSelected ? "white" : "black" }]}
       >
-        <Text
-          style={[styles.splitName, { color: isSelected ? "white" : "black" }]}
-        >
-          {item.name}
-        </Text>
-
-        <Text
-          style={[
-            styles.splitExercises,
-            { color: isSelected ? "white" : "black" },
-          ]}
-        >
-          {exercise_count} exercises
-        </Text>
-      </View>
+        {item.name}
+      </Text>
     </TouchableOpacity>
   );
 };
 
 const styles = StyleSheet.create({
   splitContainer: {
-    padding: height * 0.01,
     flex: 1,
-    height: "100%",
-    width: width * 0.8,
-    backgroundColor: "white",
+    height: "85%",
+    width: width * 0.2,
+    backgroundColor: "rgb(234, 240, 246)",
+    justifyContent: "center",
+    alignItems: "center",
     borderRadius: width * 0.04,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 0 },
@@ -65,8 +49,8 @@ const styles = StyleSheet.create({
     backgroundColor: "#2979FF",
   },
   splitName: {
-    fontFamily: "Inter_700Bold",
-    fontSize: RFValue(40),
+    fontFamily: "Inter_600SemiBold",
+    fontSize: RFValue(20),
   },
   splitExercises: {
     fontFamily: "Inter_400Regular",

@@ -15,6 +15,9 @@ import ExerciseItem from "../components/MyWorkoutPlanComponents/ExerciseItem";
 import WorkoutSplitItem from "../components/MyWorkoutPlanComponents/WorkoutSplitItem";
 import { useAuth } from "../context/AuthContext";
 import { useMyWorkoutPlanPageLogic } from "../hooks/logic/useMyWorkoutPlanPageLogic.js";
+import HeaderSection from "../components/MyWorkoutPlanComponents/HeaderSection.js";
+import ExercisesSection from "../components/MyWorkoutPlanComponents/ExercisesSection.js";
+import WorkoutSplitsList from "../components/MyWorkoutPlanComponents/WorkoutSplitsList.js";
 
 const { width, height } = Dimensions.get("window");
 
@@ -26,61 +29,20 @@ const MyWorkoutPlan = () => {
   if (loading) {
     return <LoadingPage message="Getting your workout..." />;
   }
-
   return (
     <View
-      style={{ flex: 1, paddingVertical: height * 0.02, alignItems: "center" }}
+      style={{
+        flex: 1,
+        alignItems: "center",
+        flexDirection: "column",
+        gap: height * 0.02,
+      }}
     >
       {workoutData.workout ? (
         <>
-          <View
-            style={{
-              flex: 0.25,
-              width: "80%",
-              justifyContent: "center",
-              alignItems: "center",
-            }}
-          >
-            <FlatList
-              data={workoutData.workoutSplits}
-              keyExtractor={(item) => item.id.toString()}
-              showsHorizontalScrollIndicator={false}
-              horizontal={true}
-              centerContent={true}
-              renderItem={({ item }) => (
-                <WorkoutSplitItem
-                  item={item}
-                  exercise_count={workoutData.countExercisesForSplit(
-                    workoutData.allExercises,
-                    item.id
-                  )}
-                  isSelected={item.id === workoutData.selectedSplit?.id}
-                  onPress={() => workoutData.handleWorkoutSplitPress(item)}
-                />
-              )}
-              snapToInterval={width * 0.8}
-              decelerationRate="fast"
-              snapToAlignment="center"
-              onMomentumScrollEnd={(event) => {
-                const offsetX = event.nativeEvent.contentOffset.x;
-                const index = Math.round(offsetX / (width * 0.8));
-                const selected = workoutData.workoutSplits[index];
-                if (selected) {
-                  workoutData.handleWorkoutSplitPress(selected);
-                }
-              }}
-            />
-          </View>
-
-          {/*<View style={{ flex: 0.6 }}>
-              <FlatList
-                data={workoutData.filteredExercises}
-                showsVerticalScroll
-                showsVerticalScrollIndicator={false}
-                keyExtractor={(item, index) => index.toString()}
-                renderItem={({ item }) => <ExerciseItem exercise={item} />
-              />
-            </View>*/}
+          <HeaderSection user={user}></HeaderSection>
+          <WorkoutSplitsList data={workoutData}></WorkoutSplitsList>
+          <ExercisesSection data={workoutData}></ExercisesSection>
         </>
       ) : (
         <>

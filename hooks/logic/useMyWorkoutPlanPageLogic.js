@@ -12,12 +12,15 @@ import { useUserWorkout } from "../useUserWorkout";
 import {
   filterExercises,
   countExercisesForSplit,
+  getWorkoutSplitCounter,
 } from "../../utils/myWorkoutPlanUtils";
 
 export const useMyWorkoutPlanPageLogic = (user) => {
   const {
     workout,
     workoutSplits,
+    exerciseTracking,
+    fetchUserExerciseTracking,
     exercises: allExercises,
     loading,
     error,
@@ -26,26 +29,39 @@ export const useMyWorkoutPlanPageLogic = (user) => {
   const [selectedSplit, setSelectedSplit] = useState(null);
   const [buttonOpacity, setButtonOpacity] = useState(1);
   const [filteredExercises, setFilteredExercises] = useState(null);
+  const [splitTrainedCount, setSplitTrainedCount] = useState(0);
 
+  // Initialize exercise tracking fetch
+  useEffect(() => {
+    if (user) {
+      fetchUserExerciseTracking();
+    }
+  }, [user]);
+
+  // Set selected split at startup
   useEffect(() => {
     if (workoutSplits && workoutSplits.length > 0) {
       setSelectedSplit(workoutSplits[0]);
     }
   }, [workoutSplits]);
 
+  // Gets preformed split count
+  useEffect(() => {
+    if (exerciseTracking && selectedSplit) {
+      setSplitTrainedCount(
+        getWorkoutSplitCounter(selectedSplit?.name, exerciseTracking)
+      );
+    }
+  }, [exerciseTracking, selectedSplit]);
+
+  // Filter exercises by selected split
   useEffect(() => {
     if (allExercises && allExercises.length > 0) {
       setFilteredExercises(filterExercises(allExercises, selectedSplit));
     }
   }, [allExercises, selectedSplit]);
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setButtonOpacity((prev) => (prev === 1 ? 0.8 : 1));
-    }, 750);
-    return () => clearInterval(interval);
-  }, []);
-
+  // Setting selected split when button is pressed
   const handleWorkoutSplitPress = (split) => {
     setSelectedSplit(split);
   };
@@ -61,6 +77,7 @@ export const useMyWorkoutPlanPageLogic = (user) => {
       filteredExercises,
       countExercisesForSplit,
       buttonOpacity,
+      splitTrainedCount,
     },
     loading,
     error,
