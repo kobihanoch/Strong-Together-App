@@ -128,8 +128,13 @@ const CalendarStripCustom = ({
           <Text
             style={{
               fontSize: RFValue(13),
-              color: isSelected ? "black" : "rgb(148, 149, 177)",
-              fontFamily: "Inter_700Bold",
+              color: isSelected ? "white" : "#2563eb",
+              backgroundColor: isSelected
+                ? "transparent"
+                : "rgb(234, 240, 246)",
+              padding: height * 0.01,
+              borderRadius: height * 0.04,
+              fontFamily: "Inter_400Regular",
               textAlign: "center",
             }}
             numberOfLines={1}
@@ -140,7 +145,7 @@ const CalendarStripCustom = ({
           <Text
             style={{
               fontSize: RFValue(13),
-              color: isSelected ? "black" : "white",
+              color: isSelected ? "black" : "black",
               fontFamily: "Inter_400Regular",
               textAlign: "center",
               opacity: 0.2,
@@ -195,8 +200,11 @@ const styles = StyleSheet.create({
   },
   monthHeader: {
     textAlign: "center",
-    color: "white",
-    fontFamily: "Inter_700Bold",
+    backgroundColor: "rgb(234, 240, 246)",
+    padding: height * 0.01,
+    borderRadius: height * 0.04,
+    color: "black",
+    fontFamily: "Inter_600SemiBold",
     fontSize: RFValue(14),
   },
   dateItem: {
@@ -211,20 +219,20 @@ const styles = StyleSheet.create({
     backgroundColor: "transparent",
   },
   selectedItem: {
-    backgroundColor: "white",
+    backgroundColor: "#2979FF",
   },
   dayName: {
     fontSize: RFValue(12),
-    color: "white",
+    color: "black",
     fontFamily: "Inter_400Regular",
   },
   dayNumber: {
     fontSize: RFValue(20),
-    color: "white",
+    color: "black",
     fontFamily: "Inter_700Bold",
   },
   selectedText: {
-    color: "black",
+    color: "white",
     opacity: 1,
   },
 });

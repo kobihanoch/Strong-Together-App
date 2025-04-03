@@ -20,10 +20,7 @@ const ExerciseCard = ({ item, dataToCompare, exerciseTracking }) => {
   const imagePath = images[mainMuscle]?.[specificMuscle];
 
   return (
-    <LinearGradient
-      colors={["rgb(238, 245, 255)", "rgb(231, 233, 236)"]}
-      style={styles.item}
-    >
+    <View style={styles.item}>
       <View
         style={{
           flex: 2,
@@ -52,17 +49,17 @@ const ExerciseCard = ({ item, dataToCompare, exerciseTracking }) => {
             {formatDate(item.workoutdate)}
           </Text>
         </View>
-        <LinearGradient
-          colors={["#00142a", "#0d2540"]}
+        <View
           style={{
             flex: 3,
-            borderRadius: 10,
+            height: "60%",
+            borderRadius: height * 0.08,
+            aspectRatio: 1,
+            backgroundColor: "rgb(234, 240, 246)",
+            borderRadius: height * 0.02,
             alignItems: "center",
             justifyContent: "center",
             margin: width * 0.02,
-            borderWidth: 2,
-            borderColor: "#666d75",
-            height: "100%",
             opacity: 0.9,
             marginRight: -width * 0.01,
           }}
@@ -71,14 +68,14 @@ const ExerciseCard = ({ item, dataToCompare, exerciseTracking }) => {
             <Image
               source={imagePath}
               style={{
-                height: 50,
-                width: 50,
+                height: height * 0.04,
+                aspectRatio: 1,
                 resizeMode: "contain",
                 opacity: 0.8,
               }}
             />
           </View>
-        </LinearGradient>
+        </View>
       </View>
 
       <View style={{ flexDirection: "column", flex: 8, gap: height * 0.03 }}>
@@ -306,12 +303,18 @@ const ExerciseCard = ({ item, dataToCompare, exerciseTracking }) => {
           )}
         </View>
       </View>
-    </LinearGradient>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
   item: {
+    backgroundColor: "white",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.05,
+    shadowRadius: 5,
+    elevation: 1,
     marginRight: width * 0.05,
     width: width * 0.8,
     flexDirection: "column",
