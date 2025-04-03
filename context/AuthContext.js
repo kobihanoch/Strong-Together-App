@@ -13,62 +13,72 @@ export const AuthProvider = ({ children, onLogout }) => {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
+    const waitForUser = async (retries = 5, delay = 300) => {
+      for (let i = 0; i < retries; i++) {
+        const { data } = await supabase.auth.getSession();
+        const user = data?.session?.user;
+        if (user?.id) {
+          return user;
+        }
+        await new Promise((resolve) => setTimeout(resolve, delay));
+      }
+      return null;
+    };
+
+    const loadFullUser = async (userId) => {
+      const { data: fullUser, error } = await supabase
+        .from("users")
+        .select("*")
+        .eq("id", userId)
+        .single();
+
+      if (fullUser) {
+        setUser(fullUser);
+        setIsLoggedIn(true);
+        console.log("Loaded user:", fullUser);
+      } else {
+        setUser(null);
+        setIsLoggedIn(false);
+        console.warn("Failed to load user:", error?.message);
+      }
+    };
+
     const { data: listener } = supabase.auth.onAuthStateChange(
       async (event, session) => {
-        console.log("Auth event:", event);
+        console.log("Auth event:", event, session);
 
         if (session?.user?.id) {
-          setIsLoggedIn(true);
-
-          const { data: fullUser, error } = await supabase
-            .from("users")
-            .select("*")
-            .eq("id", session.user.id)
-            .single();
-
-          if (fullUser) {
-            setUser(fullUser);
-            console.log("Full user loaded:", fullUser);
+          await loadFullUser(session.user.id);
+          navigation.navigate("Home");
+        } else {
+          const recoveredUser = await waitForUser();
+          if (recoveredUser) {
+            console.log("Recovered user after TOKEN_REFRESHED delay");
+            await loadFullUser(recoveredUser.id);
           } else {
             setUser(null);
-            console.warn("Failed to load full user:", error?.message);
+            setIsLoggedIn(false);
+            console.log("Session is null or user not found after retries");
           }
-        } else {
-          setIsLoggedIn(false);
-          setUser(null);
-          console.log("Session is null or user missing:", session);
         }
       }
     );
 
-    const loadSession = async () => {
-      const { data, error } = await supabase.auth.getSession();
-      if (data?.session?.user?.id) {
-        setIsLoggedIn(true);
-        const { data: fullUser, error } = await supabase
-          .from("users")
-          .select("*")
-          .eq("id", data.session.user.id)
-          .single();
+    const loadInitialSession = async () => {
+      const { data } = await supabase.auth.getSession();
+      const user = data?.session?.user;
 
-        if (fullUser) {
-          setUser(fullUser);
-          console.log("Full user loaded on initial session check");
-        } else {
-          setUser(null);
-          console.warn(
-            "Failed to load user from initial session:",
-            error?.message
-          );
-        }
+      if (user?.id) {
+        await loadFullUser(user.id);
+        console.log("Loaded user on app start");
       } else {
-        setIsLoggedIn(false);
         setUser(null);
+        setIsLoggedIn(false);
         console.log("No session on app start");
       }
     };
 
-    loadSession();
+    loadInitialSession();
 
     return () => {
       listener.subscription.unsubscribe();
