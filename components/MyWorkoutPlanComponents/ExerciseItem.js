@@ -17,30 +17,35 @@ const ExerciseItem = ({ exercise }) => {
     <View style={styles.exerciseContainer}>
       <View style={{ flex: 1, flexDirection: "row" }}>
         <View style={{ flex: 0.4, justifyContent: "center" }}>
-          <LinearGradient
-            colors={["#00142a", "#0d2540"]}
+          <View
+            /*colors={["#00142a", "#0d2540"]}*/
             style={{
               flex: 1,
-              borderRadius: 10,
               alignItems: "center",
               justifyContent: "center",
-              margin: width * 0.02,
-              borderWidth: 2,
-              borderColor: "#666d75",
             }}
           >
-            <View>
+            <View
+              style={{
+                height: "60%",
+                borderRadius: height * 0.08,
+                aspectRatio: 1,
+                backgroundColor: "rgb(234, 240, 246)",
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
               <Image
                 source={imagePath}
                 style={{
-                  height: 50,
-                  width: 50,
+                  height: height * 0.04,
+                  aspectRatio: 1,
                   resizeMode: "contain",
                   opacity: 0.8,
                 }}
               />
             </View>
-          </LinearGradient>
+          </View>
         </View>
         <View
           style={{
@@ -53,8 +58,8 @@ const ExerciseItem = ({ exercise }) => {
           <View style={{ alignSelf: "center" }}>
             <Text
               style={{
-                fontFamily: "Inter_700Bold",
-                fontSize: RFValue(13),
+                fontFamily: "Inter_600SemiBold",
+                fontSize: RFValue(15),
                 color: "black",
               }}
             >
@@ -63,7 +68,7 @@ const ExerciseItem = ({ exercise }) => {
             <Text
               style={{
                 fontFamily: "Inter_400Regular",
-                fontSize: RFValue(12),
+                fontSize: RFValue(10),
                 color: "#919191",
               }}
             >
@@ -72,19 +77,8 @@ const ExerciseItem = ({ exercise }) => {
 
             <Text
               style={{
-                fontFamily: "Inter_400Regular",
-                fontSize: RFValue(12),
-                color: "black",
-                opacity: 0.7,
-                marginTop: height * 0.01,
-              }}
-            >
-              Reps per set
-            </Text>
-            <Text
-              style={{
                 fontFamily: "Inter_700Bold",
-                fontSize: RFValue(12),
+                fontSize: RFValue(10),
                 color: "black",
                 opacity: 0.7,
               }}
@@ -96,14 +90,6 @@ const ExerciseItem = ({ exercise }) => {
                 : "N/A"}
             </Text>
           </View>
-          <View style={{ margin: width * 0.04 }}>
-            <FontAwesome5
-              name="info-circle"
-              size={15}
-              color="#00142a"
-              opacity={0.7}
-            />
-          </View>
         </View>
       </View>
     </View>
@@ -112,10 +98,10 @@ const ExerciseItem = ({ exercise }) => {
 
 const styles = StyleSheet.create({
   exerciseContainer: {
-    backgroundColor: "#fafafa",
-    width: "90%",
+    backgroundColor: "white",
+    width: "95%",
     alignSelf: "center",
-    height: height * 0.14,
+    height: height * 0.1,
     flex: 1,
     borderRadius: width * 0.03,
     marginVertical: height * 0.005,

@@ -3,6 +3,7 @@ import {
   getUserExerciseTracking,
   getUserWorkout,
 } from "../services/WorkoutService";
+import { getMostFrequentSplitNameByUserId } from "../services/ExerciseTrackingService";
 
 export const useUserWorkout = (userId) => {
   const [userWorkout, setUserWorkout] = useState(null);
@@ -12,6 +13,7 @@ export const useUserWorkout = (userId) => {
   const [workoutSplits, setWorkoutSplits] = useState(null);
   const [exercises, setExercises] = useState(null);
   const [exerciseTracking, setExerciseTracking] = useState(null);
+  const [mostFrequentSplit, setMostFrequentSplit] = useState(null);
 
   const fetchUserWorkout = async () => {
     if (!userId) return;
@@ -40,6 +42,8 @@ export const useUserWorkout = (userId) => {
       const data = await getUserExerciseTracking(userId);
       console.log(JSON.stringify(data));
       setExerciseTracking(data);
+      const frequentSplit = await getMostFrequentSplitNameByUserId(userId);
+      setMostFrequentSplit(frequentSplit);
     } catch (err) {
       setError(err);
       console.log("Failed. Error: " + err);
@@ -53,22 +57,18 @@ export const useUserWorkout = (userId) => {
   };
 
   useEffect(() => {
-    if (userWorkout) {
-      // Sets workout only from userWorkout
+    if (userWorkout && userWorkout.length > 0 && userWorkout[0]) {
       const workoutObj = Object.fromEntries(
         Object.entries(userWorkout[0]).slice(0, 7)
       );
       setWorkout(workoutObj);
 
-      // Sets workout splits only from userWorkout
-      const fullWorkoutSplits = userWorkout[0].workoutsplits;
-      const splits = [];
-      fullWorkoutSplits.forEach((split) => {
-        splits.push(Object.fromEntries(Object.entries(split).slice(0, 5)));
-      });
+      const fullWorkoutSplits = userWorkout[0].workoutsplits || [];
+      const splits = fullWorkoutSplits.map((split) =>
+        Object.fromEntries(Object.entries(split).slice(0, 5))
+      );
       setWorkoutSplits(splits);
 
-      // Sets exercises only from userWorkout
       const allExercises = fullWorkoutSplits.flatMap((split) =>
         (split.exercisetoworkoutsplit ?? []).map((item) => {
           const { exercises, ...itemWithoutExercises } = item;
@@ -79,6 +79,10 @@ export const useUserWorkout = (userId) => {
         })
       );
       setExercises(allExercises);
+    } else {
+      setWorkout(null);
+      setWorkoutSplits([]);
+      setExercises([]);
     }
   }, [userWorkout]);
 
@@ -96,5 +100,6 @@ export const useUserWorkout = (userId) => {
     workout,
     workoutSplits,
     exercises,
+    mostFrequentSplit,
   };
 };

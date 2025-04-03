@@ -7,9 +7,12 @@ import {
   StyleSheet,
   Text,
   TouchableOpacity,
+  View,
 } from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { Feather } from "@expo/vector-icons";
 
 const { width, height } = Dimensions.get("window");
 
@@ -74,18 +77,15 @@ const BottomTabBar = ({ selectedTab, onTabPress }) => {
   };
 
   const tabs = [
-    { name: "Home", label: "Home", icon: "home" },
-    { name: "Settings", label: "Settings", icon: "cog" },
-    { name: "MyWorkoutPlan", label: "StartWorkout", icon: "dumbbell" },
-    { name: "Profile", label: "Profile", icon: "user" },
-    { name: "Statistics", label: "Statistics", icon: "chart-bar" },
+    { name: "Home", label: "Home", icon: "home-variant" },
+    { name: "Statistics", label: "Statistics", icon: "poll" },
+    { name: "MyWorkoutPlan", label: "StartWorkout", icon: "fire" },
+    { name: "Profile", label: "Profile", icon: "account" },
+    { name: "Settings", label: "Settings", icon: "wrench" },
   ];
 
   return (
-    <LinearGradient
-      colors={["#00142a", "#0d2540"]}
-      style={styles.tabBarContainer}
-    >
+    <View style={styles.tabBarContainer}>
       {tabs.map((tab, index) =>
         isWorkoutMode && tab.name === "MyWorkoutPlan" ? (
           <TouchableOpacity
@@ -110,17 +110,19 @@ const BottomTabBar = ({ selectedTab, onTabPress }) => {
               ]}
               onPress={() => handleTabPress(tab.name)}
             >
-              <FontAwesome5
+              <MaterialCommunityIcons
                 name={tab.icon}
-                size={RFValue(15)}
-                color={selectedTab === tab.name ? "white" : "#424f63"}
+                size={RFValue(20)}
+                color={
+                  selectedTab === tab.name ? "#2979FF" : "rgb(184, 184, 184)"
+                }
                 style={tab.name === "MyWorkoutPlan" && styles.specialIcon}
               />
             </TouchableOpacity>
           )
         )
       )}
-    </LinearGradient>
+    </View>
   );
 };
 
@@ -130,19 +132,15 @@ const styles = StyleSheet.create({
     alignSelf: "center",
     justifyContent: "center",
     alignItems: "center",
-    height: height * 0.115,
-    backgroundColor: "#0f1924",
-    borderTopLeftRadius: width * 0.4,
-    borderTopRightRadius: width * 0.4,
+    height: height * 0.095,
+    backgroundColor: "white",
     elevation: 5,
-    position: "absolute",
-    bottom: 0,
-    paddingBottom: height * 0.02,
-    width: "135%",
     shadowColor: "#000",
-    shadowOffset: { width: 0, height: height * 0.005 },
-    shadowOpacity: 0.3,
-    shadowRadius: height * 0.007,
+    shadowOffset: { width: 0, height: 5 },
+    shadowOpacity: 0.1,
+    shadowRadius: 10,
+    paddingBottom: height * 0.02,
+    width: "100%",
   },
   tabButton: {
     alignItems: "center",
@@ -150,14 +148,19 @@ const styles = StyleSheet.create({
     marginHorizontal: height * -0.002,
   },
   specialTabButton: {
-    backgroundColor: "#1a2c40",
+    backgroundColor: "#2979FF",
     borderRadius: width * 0.15,
-    padding: width * 0.05,
+    padding: width * 0.02,
     justifyContent: "center",
     alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.1,
+    shadowRadius: 5,
+    elevation: 1,
   },
   specialIcon: {
-    color: "#c5cfdb",
+    color: "white",
   },
   timerText: {
     color: "white",
