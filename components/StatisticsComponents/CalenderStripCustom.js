@@ -201,9 +201,10 @@ const styles = StyleSheet.create({
   monthHeader: {
     textAlign: "center",
     backgroundColor: "rgb(234, 240, 246)",
-    padding: height * 0.01,
+    paddingVertical: height * 0.01,
+    paddingHorizontal: width * 0.04,
     borderRadius: height * 0.04,
-    color: "black",
+    color: "rgb(0, 0, 0)",
     fontFamily: "Inter_600SemiBold",
     fontSize: RFValue(14),
   },
