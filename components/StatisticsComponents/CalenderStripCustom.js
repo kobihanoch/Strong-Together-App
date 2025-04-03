@@ -225,6 +225,7 @@ const styles = StyleSheet.create({
   },
   selectedText: {
     color: "black",
+    opacity: 1,
   },
 });
 
