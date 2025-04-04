@@ -1,12 +1,37 @@
+import js from "@eslint/js";
 import React, { useState, useRef, useEffect } from "react";
-import { View, Text, Dimensions } from "react-native";
+import { View, Text, Dimensions, TouchableOpacity } from "react-native";
 import { TextInput } from "react-native-gesture-handler";
 import { RFValue } from "react-native-responsive-fontsize";
+import ProgressBar from "./ProgressBar";
 
 const { width, height } = Dimensions.get("window");
 
 const ExerciseBox = ({ item, index, exerciseCount }) => {
-  const [selected, setSelected] = useState(10);
+  const [visibleSetIndex, setVisibleSetIndex] = useState(0);
+  const [repsArray, setRepsArray] = useState(() =>
+    Array(item.sets.length).fill(0)
+  );
+  const [weightsArray, setWeightsArray] = useState(() =>
+    Array(item.sets.length).fill(0)
+  );
+  const [progress, setProgress] = useState(0);
+
+  useEffect(() => {
+    console.log(
+      "Set (" + visibleSetIndex + "): Reps array " + JSON.stringify(repsArray)
+    );
+    setProgress((repsArray[visibleSetIndex] / item.sets[visibleSetIndex]) * 10);
+  }, [repsArray]);
+  useEffect(() => {
+    console.log(
+      "Set (" +
+        visibleSetIndex +
+        "): Weights array " +
+        JSON.stringify(weightsArray)
+    );
+  }, [weightsArray]);
+
   return (
     <View
       style={{
@@ -60,35 +85,190 @@ const ExerciseBox = ({ item, index, exerciseCount }) => {
             alignItems: "center",
           }}
         >
-          {item.sets &&
-            item.sets.length > 0 &&
-            item.sets.map((set) => (
-              <View
+          {item.sets && item.sets.length > 0 && (
+            <View
+              style={{
+                flexDirection: "column",
+                justifyContent: "flex-start",
+                alignItems: "flex-start",
+                gap: width * 0.02,
+                width: "100%",
+                flex: 1,
+                paddingTop: height * 0.04,
+                paddingHorizontal: width * 0.07,
+              }}
+            >
+              <Text
                 style={{
-                  flexDirection: "row",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                  gap: width * 0.02,
-                  marginHorizontal: width * 0.02,
-                  flex: 1,
+                  fontSize: RFValue(18),
+                  fontFamily: "Inter_600SemiBold",
                 }}
               >
-                <TextInput
+                Set {visibleSetIndex + 1} of {item.sets.length}
+              </Text>
+              <Text
+                style={{
+                  fontSize: RFValue(14),
+                  fontFamily: "Inter_600SemiBold",
+                  color: "rgb(130, 130, 130)",
+                }}
+              >
+                Target: {item.sets[visibleSetIndex]} reps
+              </Text>
+
+              <View
+                style={{
+                  flex: 8,
+                  width: "100%",
+                  flexDirection: "column",
+                  justifyContent: "center",
+                }}
+              >
+                <View
                   style={{
-                    backgroundColor: "red",
-                    flex: 5,
-                    height: "80%",
+                    flexDirection: "row",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    flex: 3.5,
                   }}
-                ></TextInput>
-                <TextInput
+                >
+                  <Text
+                    style={{
+                      fontSize: RFValue(15),
+                      fontFamily: "Inter_600SemiBold",
+                      flex: 5,
+                    }}
+                  >
+                    Weight
+                  </Text>
+                  <TextInput
+                    style={{
+                      flex: 5,
+                      backgroundColor: "rgb(234, 240, 246)",
+                      height: "60%",
+                      borderRadius: height * 0.02,
+                      textAlign: "center",
+                      fontSize: RFValue(15),
+                      fontFamily: "Inter_400Regular",
+                    }}
+                    value={weightsArray[visibleSetIndex].toString()}
+                    onChangeText={(text) => {
+                      const arrDup = [...weightsArray];
+                      arrDup[visibleSetIndex] =
+                        text === "" ? 0 : parseInt(text);
+                      setWeightsArray(arrDup);
+                    }}
+                  ></TextInput>
+                </View>
+                <View
                   style={{
+                    flexDirection: "row",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    flex: 3.5,
+                  }}
+                >
+                  <Text
+                    style={{
+                      fontSize: RFValue(15),
+                      fontFamily: "Inter_600SemiBold",
+                      flex: 5,
+                    }}
+                  >
+                    Reps
+                  </Text>
+                  <TextInput
+                    style={{
+                      flex: 5,
+                      backgroundColor: "rgb(234, 240, 246)",
+                      height: "60%",
+                      borderRadius: height * 0.02,
+                      textAlign: "center",
+                      fontSize: RFValue(15),
+                      fontFamily: "Inter_400Regular",
+                    }}
+                    value={repsArray[visibleSetIndex].toString()}
+                    onChangeText={(text) => {
+                      const arrDup = [...repsArray];
+                      arrDup[visibleSetIndex] =
+                        text === "" ? 0 : parseInt(text);
+                      setRepsArray(arrDup);
+                    }}
+                  ></TextInput>
+                </View>
+                <View
+                  style={{
+                    flex: 3,
+                    width: "100%",
                     backgroundColor: "black",
-                    flex: 5,
-                    height: "80%",
+                    justifyContent: "center",
+                    alignItems: "center",
                   }}
-                ></TextInput>
+                >
+                  <ProgressBar progress={progress}></ProgressBar>
+                </View>
               </View>
-            ))}
+              <View
+                style={{
+                  flex: 2,
+                  width: "100%",
+                  flexDirection: "row",
+                  gap: width * 0.02,
+                }}
+              >
+                <TouchableOpacity
+                  style={{
+                    flex: 2,
+                    width: "100%",
+                    backgroundColor:
+                      visibleSetIndex == 0 ? "rgba(1, 1, 1, 0.36)" : "green",
+                    justifyContent: "center",
+                    alignItems: "center",
+                  }}
+                  onPress={() => {
+                    setVisibleSetIndex(visibleSetIndex - 1);
+                  }}
+                  disabled={visibleSetIndex == 0}
+                >
+                  <Text
+                    style={{
+                      fontFamily: "Inter_600SemiBold",
+                      color: "white",
+                      fontSize: RFValue(18),
+                    }}
+                  >
+                    Previous Set
+                  </Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={{
+                    flex: 2,
+                    width: "100%",
+                    backgroundColor:
+                      visibleSetIndex == item.sets.length - 1
+                        ? "rgba(1, 1, 1, 0.36)"
+                        : "green",
+                    justifyContent: "center",
+                    alignItems: "center",
+                  }}
+                  onPress={() => {
+                    setVisibleSetIndex(visibleSetIndex + 1);
+                  }}
+                  disabled={visibleSetIndex == item.sets.length - 1}
+                >
+                  <Text
+                    style={{
+                      fontFamily: "Inter_600SemiBold",
+                      color: "white",
+                      fontSize: RFValue(18),
+                    }}
+                  >
+                    Next Set
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          )}
         </View>
       </View>
     </View>

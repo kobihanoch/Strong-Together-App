@@ -1,76 +1,75 @@
-import React, { useEffect, useRef } from 'react';
-import { View, StyleSheet, Dimensions, Animated } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
-
-const { width, height } = Dimensions.get('window');
+import React, { useEffect, useRef } from "react";
+import { View, StyleSheet, Animated, Text } from "react-native";
+import { RFValue } from "react-native-responsive-fontsize";
 
 const ProgressBar = ({ progress }) => {
-    const progressAnim = useRef(new Animated.Value(0)).current;
+  const animatedProgress = useRef(new Animated.Value(0)).current;
 
+  useEffect(() => {
+    Animated.timing(animatedProgress, {
+      toValue: Math.min(progress / 10, 1),
+      duration: 500,
+      useNativeDriver: false,
+    }).start();
+  }, [progress]);
 
-    useEffect(() => {
-        Animated.timing(progressAnim, {
-            toValue: progress,
-            duration: 500,
-            useNativeDriver: false,
-        }).start();
-    }, [progress]);
+  let barColor = "#ff4d4d";
+  let feedbackText = "Push harder 💪";
 
+  if (progress >= 10) {
+    barColor = "#4cd964";
+    feedbackText = "Nice! You hit the target 🎯";
+  } else if (progress >= 7.5) {
+    barColor = "#ffd60a";
+    feedbackText = "Almost there! ⏱️";
+  } else if (progress >= 5) {
+    barColor = "#ff9500";
+    feedbackText = "You can do better! 🔥";
+  }
 
-    const getGradientColors = () => {
-        if (progress <= 50) {
-            return ['#FFA500', '#FF4500']; 
-        } else if (progress <= 75) {
-            return ['#FACC15', '#FFA500']; 
-        } else {
-            return ['#006323', '#125c2c']; 
-        }
-    };
+  const animatedWidth = animatedProgress.interpolate({
+    inputRange: [0, 1],
+    outputRange: ["0%", "100%"],
+  });
 
-    return (
-        <View style={styles.container}>
-            <Animated.View
-                style={[
-                    styles.progress,
-                    {
-                        width: progressAnim.interpolate({
-                            inputRange: [0, 100],
-                            outputRange: ['0%', '100%'],
-                        }),
-                    },
-                ]}
-            >
-                <LinearGradient
-                    colors={getGradientColors()}
-                    start={{ x: 0, y: 0 }}
-                    end={{ x: 1, y: 0 }}
-                    style={styles.gradient}
-                />
-            </Animated.View>
-        </View>
-    );
+  return (
+    <View style={styles.container}>
+      <View style={styles.barBackground}>
+        <Animated.View
+          style={[
+            styles.barFill,
+            { width: animatedWidth, backgroundColor: barColor },
+          ]}
+        />
+      </View>
+      <Text style={[styles.feedbackText, { color: barColor }]}>
+        {feedbackText}
+      </Text>
+    </View>
+  );
 };
 
 const styles = StyleSheet.create({
-    container: {
-        width: '100%',
-        height: height * 0.018,
-        backgroundColor: '#16283b',
-        borderBottomRightRadius: width * 0.06,
-        borderBottomLeftRadius: width * 0.06,
-        overflow: 'hidden',
-        marginBottom: 20,
-        justifyContent: 'center',
-    },
-    progress: {
-        height: '100%',
-        overflow: 'hidden',
-        borderTopRightRadius: width * 0.06,
-    },
-    gradient: {
-        height: '100%',
-        width: '100%',
-    },
+  container: {
+    alignItems: "center",
+    width: "100%",
+  },
+  barBackground: {
+    width: "100%",
+    height: 10,
+    backgroundColor: "#e0e0e0",
+    borderRadius: 10,
+    overflow: "hidden",
+  },
+  barFill: {
+    height: "100%",
+    borderRadius: 10,
+  },
+  feedbackText: {
+    marginTop: 8,
+    fontSize: RFValue(13),
+    fontFamily: "Inter_400Regular",
+  },
 });
 
 export default ProgressBar;
