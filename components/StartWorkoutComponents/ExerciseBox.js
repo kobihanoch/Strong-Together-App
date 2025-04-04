@@ -22,7 +22,7 @@ const ExerciseBox = ({ item, index, exerciseCount }) => {
       "Set (" + visibleSetIndex + "): Reps array " + JSON.stringify(repsArray)
     );
     setProgress((repsArray[visibleSetIndex] / item.sets[visibleSetIndex]) * 10);
-  }, [repsArray]);
+  }, [repsArray, visibleSetIndex]);
   useEffect(() => {
     console.log(
       "Set (" +
@@ -158,6 +158,8 @@ const ExerciseBox = ({ item, index, exerciseCount }) => {
                         text === "" ? 0 : parseInt(text);
                       setWeightsArray(arrDup);
                     }}
+                    keyboardType="numeric"
+                    inputMode="numeric"
                   ></TextInput>
                 </View>
                 <View
@@ -188,6 +190,8 @@ const ExerciseBox = ({ item, index, exerciseCount }) => {
                       fontFamily: "Inter_400Regular",
                     }}
                     value={repsArray[visibleSetIndex].toString()}
+                    keyboardType="numeric"
+                    inputMode="numeric"
                     onChangeText={(text) => {
                       const arrDup = [...repsArray];
                       arrDup[visibleSetIndex] =
@@ -219,10 +223,11 @@ const ExerciseBox = ({ item, index, exerciseCount }) => {
                   style={{
                     flex: 2,
                     width: "100%",
-                    backgroundColor:
-                      visibleSetIndex == 0 ? "rgba(1, 1, 1, 0.36)" : "green",
+                    backgroundColor: "#2979FF",
                     justifyContent: "center",
                     alignItems: "center",
+                    opacity: visibleSetIndex == 0 ? 0 : 1,
+                    borderRadius: height * 0.02,
                   }}
                   onPress={() => {
                     setVisibleSetIndex(visibleSetIndex - 1);
@@ -233,7 +238,7 @@ const ExerciseBox = ({ item, index, exerciseCount }) => {
                     style={{
                       fontFamily: "Inter_600SemiBold",
                       color: "white",
-                      fontSize: RFValue(18),
+                      fontSize: RFValue(13),
                     }}
                   >
                     Previous Set
@@ -243,12 +248,16 @@ const ExerciseBox = ({ item, index, exerciseCount }) => {
                   style={{
                     flex: 2,
                     width: "100%",
-                    backgroundColor:
-                      visibleSetIndex == item.sets.length - 1
-                        ? "rgba(1, 1, 1, 0.36)"
-                        : "green",
+                    backgroundColor: "#2979FF",
                     justifyContent: "center",
                     alignItems: "center",
+                    opacity:
+                      (visibleSetIndex == item.sets.length - 1 &&
+                        weightsArray[visibleSetIndex] == 0) ||
+                      repsArray[visibleSetIndex] == 0
+                        ? 0
+                        : 1,
+                    borderRadius: height * 0.02,
                   }}
                   onPress={() => {
                     setVisibleSetIndex(visibleSetIndex + 1);
@@ -259,7 +268,7 @@ const ExerciseBox = ({ item, index, exerciseCount }) => {
                     style={{
                       fontFamily: "Inter_600SemiBold",
                       color: "white",
-                      fontSize: RFValue(18),
+                      fontSize: RFValue(13),
                     }}
                   >
                     Next Set
