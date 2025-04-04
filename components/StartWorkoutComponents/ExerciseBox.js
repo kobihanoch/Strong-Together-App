@@ -200,7 +200,6 @@ const ExerciseBox = ({ item, index, exerciseCount }) => {
                   style={{
                     flex: 3,
                     width: "100%",
-                    backgroundColor: "black",
                     justifyContent: "center",
                     alignItems: "center",
                   }}

@@ -1,6 +1,9 @@
 import React, { useEffect, useRef } from "react";
-import { View, StyleSheet, Animated, Text } from "react-native";
+import { View, StyleSheet, Animated, Text, Dimensions } from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";
+import { MaterialCommunityIcons, Feather } from "@expo/vector-icons";
+
+const { width, height } = Dimensions.get("window");
 
 const ProgressBar = ({ progress }) => {
   const animatedProgress = useRef(new Animated.Value(0)).current;
@@ -13,18 +16,26 @@ const ProgressBar = ({ progress }) => {
     }).start();
   }, [progress]);
 
-  let barColor = "#ff4d4d";
-  let feedbackText = "Push harder 💪";
+  let barColor = "#ff6b6b";
+  let feedbackText = "Push harder";
+  let IconComponent = MaterialCommunityIcons;
+  let iconName = "alert-circle";
 
   if (progress >= 10) {
     barColor = "#4cd964";
-    feedbackText = "Nice! You hit the target 🎯";
+    feedbackText = "Nice! You hit the target";
+    IconComponent = MaterialCommunityIcons;
+    iconName = "check-circle";
   } else if (progress >= 7.5) {
-    barColor = "#ffd60a";
-    feedbackText = "Almost there! ⏱️";
+    barColor = "#ffa94d";
+    feedbackText = "Almost there!";
+    IconComponent = MaterialCommunityIcons;
+    iconName = "progress-check";
   } else if (progress >= 5) {
-    barColor = "#ff9500";
-    feedbackText = "You can do better! 🔥";
+    barColor = "#ffe066";
+    feedbackText = "You can do better!";
+    IconComponent = MaterialCommunityIcons;
+    iconName = "alert-circle";
   }
 
   const animatedWidth = animatedProgress.interpolate({
@@ -42,16 +53,25 @@ const ProgressBar = ({ progress }) => {
           ]}
         />
       </View>
-      <Text style={[styles.feedbackText, { color: barColor }]}>
-        {feedbackText}
-      </Text>
+      <View
+        style={{
+          flexDirection: "row",
+          alignItems: "center",
+          marginTop: height * 0.01,
+          gap: width * 0.02,
+        }}
+      >
+        <IconComponent name={iconName} size={RFValue(15)} color={barColor} />
+        <Text style={[styles.feedbackText, { color: barColor }]}>
+          {feedbackText}
+        </Text>
+      </View>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    alignItems: "center",
     width: "100%",
   },
   barBackground: {
@@ -63,12 +83,11 @@ const styles = StyleSheet.create({
   },
   barFill: {
     height: "100%",
-    borderRadius: 10,
+    borderRadius: height * 0.02,
   },
   feedbackText: {
-    marginTop: 8,
     fontSize: RFValue(13),
-    fontFamily: "Inter_400Regular",
+    fontFamily: "Inter_600SemiBold",
   },
 });
 
