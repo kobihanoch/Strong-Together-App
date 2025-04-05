@@ -4,10 +4,11 @@ import { View, Text, Dimensions, TouchableOpacity } from "react-native";
 import { TextInput } from "react-native-gesture-handler";
 import { RFValue } from "react-native-responsive-fontsize";
 import ProgressBar from "./ProgressBar";
+import { MaterialCommunityIcons, Feather } from "@expo/vector-icons";
 
 const { width, height } = Dimensions.get("window");
 
-const ExerciseBox = ({ item, index, exerciseCount }) => {
+const ExerciseBox = ({ item, index, exerciseCount, onScrollNext }) => {
   const [visibleSetIndex, setVisibleSetIndex] = useState(0);
   const [repsArray, setRepsArray] = useState(() =>
     Array(item.sets.length).fill(0)
@@ -89,7 +90,7 @@ const ExerciseBox = ({ item, index, exerciseCount }) => {
             <View
               style={{
                 flexDirection: "column",
-                justifyContent: "flex-start",
+                justifyContent: "space-between",
                 alignItems: "flex-start",
                 gap: width * 0.02,
                 width: "100%",
@@ -98,23 +99,38 @@ const ExerciseBox = ({ item, index, exerciseCount }) => {
                 paddingHorizontal: width * 0.07,
               }}
             >
-              <Text
+              <View
                 style={{
-                  fontSize: RFValue(18),
-                  fontFamily: "Inter_600SemiBold",
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                  width: "100%",
                 }}
               >
-                Set {visibleSetIndex + 1} of {item.sets.length}
-              </Text>
-              <Text
-                style={{
-                  fontSize: RFValue(14),
-                  fontFamily: "Inter_600SemiBold",
-                  color: "rgb(130, 130, 130)",
-                }}
-              >
-                Target: {item.sets[visibleSetIndex]} reps
-              </Text>
+                <View style={{ flexDirection: "column", gap: height * 0.01 }}>
+                  <Text
+                    style={{
+                      fontSize: RFValue(18),
+                      fontFamily: "Inter_600SemiBold",
+                    }}
+                  >
+                    Set {visibleSetIndex + 1} of {item.sets.length}
+                  </Text>
+                  <Text
+                    style={{
+                      fontFamily: "Inter_400Regular",
+                      fontSize: RFValue(12),
+                      backgroundColor: "rgb(234, 240, 246)",
+                      borderRadius: height * 0.01,
+                      paddingHorizontal: width * 0.03,
+                      paddingVertical: height * 0.005,
+                      textAlign: "center",
+                      color: "#2563eb",
+                    }}
+                  >
+                    Target: {item.sets[visibleSetIndex]} reps
+                  </Text>
+                </View>
+              </View>
 
               <View
                 style={{
@@ -367,7 +383,9 @@ const ExerciseBox = ({ item, index, exerciseCount }) => {
                   style={{
                     flex: 2,
                     width: "100%",
-                    backgroundColor: "#2979FF",
+                    borderColor: "#2979FF",
+                    borderWidth: 2,
+                    backgroundColor: "white",
                     justifyContent: "center",
                     alignItems: "center",
                     opacity: visibleSetIndex == 0 ? 0 : 1,
@@ -381,7 +399,7 @@ const ExerciseBox = ({ item, index, exerciseCount }) => {
                   <Text
                     style={{
                       fontFamily: "Inter_600SemiBold",
-                      color: "white",
+                      color: "#2979FF",
                       fontSize: RFValue(13),
                     }}
                   >
@@ -392,21 +410,30 @@ const ExerciseBox = ({ item, index, exerciseCount }) => {
                   style={{
                     flex: 2,
                     width: "100%",
-                    backgroundColor: "#2979FF",
+                    backgroundColor:
+                      visibleSetIndex == item.sets.length - 1
+                        ? "#4cd964"
+                        : "#2979FF",
                     justifyContent: "center",
                     alignItems: "center",
                     opacity:
-                      (visibleSetIndex == item.sets.length - 1 &&
-                        weightsArray[visibleSetIndex] == 0) ||
-                      repsArray[visibleSetIndex] == 0
-                        ? 0
-                        : 1,
+                      weightsArray[visibleSetIndex] !== 0 &&
+                      repsArray[visibleSetIndex] !== 0 &&
+                      !(
+                        visibleSetIndex === item.sets.length - 1 &&
+                        index === exerciseCount - 1
+                      )
+                        ? 1
+                        : 0,
                     borderRadius: height * 0.02,
                   }}
                   onPress={() => {
-                    setVisibleSetIndex(visibleSetIndex + 1);
+                    if (visibleSetIndex < item.sets.length - 1) {
+                      setVisibleSetIndex(visibleSetIndex + 1);
+                    } else {
+                      onScrollNext?.();
+                    }
                   }}
-                  disabled={visibleSetIndex == item.sets.length - 1}
                 >
                   <Text
                     style={{
@@ -415,7 +442,9 @@ const ExerciseBox = ({ item, index, exerciseCount }) => {
                       fontSize: RFValue(13),
                     }}
                   >
-                    Next Set
+                    {visibleSetIndex == item.sets.length - 1
+                      ? "Next Exercise"
+                      : "Next Set"}
                   </Text>
                 </TouchableOpacity>
               </View>

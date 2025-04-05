@@ -34,6 +34,7 @@ const StartWorkout = ({ navigation, route }) => {
     error,
   } = useStartWorkoutPageLogic(user, route.params?.workoutSplit);
 
+  const flatListRef = useRef(null);
   const workoutTime = route.params?.workoutTime || 0;
 
   const saveWorkoutDataToDatabase = async () => {
@@ -76,6 +77,7 @@ const StartWorkout = ({ navigation, route }) => {
         <FlatList
           data={workoutData.exercisesForSelectedSplit}
           horizontal
+          ref={flatListRef}
           showsHorizontalScrollIndicator={false}
           centerContent
           pagingEnabled
@@ -87,6 +89,9 @@ const StartWorkout = ({ navigation, route }) => {
               item={item}
               index={index}
               exerciseCount={workoutData.exercisesForSelectedSplit.length}
+              onScrollNext={() => {
+                flatListRef.current?.scrollToIndex({ index: index + 1 });
+              }}
             ></ExerciseBox>
           )}
         ></FlatList>
