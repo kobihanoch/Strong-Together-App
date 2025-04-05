@@ -382,7 +382,7 @@ const ExerciseBox = ({
               </View>
               <View
                 style={{
-                  flex: 2,
+                  flex: 1,
                   width: "100%",
                   flexDirection: "row",
                   gap: width * 0.02,
@@ -391,6 +391,7 @@ const ExerciseBox = ({
                 <TouchableOpacity
                   style={{
                     flex: 2,
+                    height: height * 0.05,
                     width: "100%",
                     borderColor: "#2979FF",
                     borderWidth: 2,
@@ -418,6 +419,7 @@ const ExerciseBox = ({
                 <TouchableOpacity
                   style={{
                     flex: 2,
+                    height: height * 0.05,
                     width: "100%",
                     backgroundColor:
                       visibleSetIndex == item.sets.length - 1
