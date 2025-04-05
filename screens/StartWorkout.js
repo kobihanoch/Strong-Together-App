@@ -30,12 +30,9 @@ const StartWorkout = ({ navigation, route }) => {
   const {
     animation,
     data: workoutData,
+    saving: workoutSaving,
     loading,
     error,
-    weightArrs,
-    setWeightArrs,
-    repsArrs,
-    setRepsArrs,
   } = useStartWorkoutPageLogic(user, route.params?.workoutSplit);
 
   const flatListRef = useRef(null);
@@ -124,6 +121,7 @@ const StartWorkout = ({ navigation, route }) => {
             height: "40%",
             gap: width * 0.03,
           }}
+          onPress={() => workoutSaving.setSaveStarted(true)}
         >
           <Text
             style={{

@@ -1,6 +1,10 @@
 import { useEffect, useRef, useState } from "react";
 import { Animated } from "react-native";
 import { useUserWorkout } from "../useUserWorkout";
+import {
+  filterZeroesInArr,
+  createObjectForDataBase,
+} from "../../utils/startWorkoutUtils";
 
 const useStartWorkoutPageLogic = (user, selectedSplit) => {
   // --------------------[ Outside hooks ]--------------------------------------
@@ -24,6 +28,26 @@ const useStartWorkoutPageLogic = (user, selectedSplit) => {
   const [weightArrs, setWeightArrs] = useState([]);
   const [repsArrs, setRepsArrs] = useState([]);
 
+  // --------------------[ Save Workout ]-----------------------------------------
+
+  const [saveStarted, setSaveStarted] = useState(false);
+
+  useEffect(() => {
+    console.log("Saving started!");
+    const { reps: rDup, weights: wDup } = filterZeroesInArr(
+      repsArrs,
+      weightArrs
+    );
+    console.log("Sorted reps array: " + JSON.stringify(rDup));
+    console.log("Sorted weight array: " + JSON.stringify(wDup));
+    const obj = createObjectForDataBase(
+      user.id,
+      wDup,
+      rDup,
+      exercisesForSelectedSplit
+    );
+  }, [saveStarted]);
+
   // --------------------[ Glow Animation ]-----------------------------------------
   const glowAnimation = useRef(new Animated.Value(1)).current;
 
@@ -37,6 +61,10 @@ const useStartWorkoutPageLogic = (user, selectedSplit) => {
       setWeightArrs,
       repsArrs,
       setRepsArrs,
+    },
+    saving: {
+      saveStarted,
+      setSaveStarted,
     },
     loading,
     error,
