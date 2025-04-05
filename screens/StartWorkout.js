@@ -112,8 +112,29 @@ const StartWorkout = ({ navigation, route }) => {
           )}
         ></FlatList>
       </View>
-      <View style={{ flex: 2, backgroundColor: "blue" }}>
-        <Text>asdas</Text>
+      <View style={{ flex: 2, justifyContent: "center", alignItems: "center" }}>
+        <TouchableOpacity
+          style={{
+            flexDirection: "row",
+            justifyContent: "center",
+            alignItems: "center",
+            backgroundColor: "#2979FF",
+            borderRadius: height * 0.02,
+            width: "50%",
+            height: "40%",
+            gap: width * 0.03,
+          }}
+        >
+          <Text
+            style={{
+              fontFamily: "Inter_600SemiBold",
+              color: "white",
+              fontSize: RFValue(15),
+            }}
+          >
+            Finish Workout
+          </Text>
+        </TouchableOpacity>
       </View>
     </View>
   );
