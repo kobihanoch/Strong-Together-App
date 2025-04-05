@@ -8,7 +8,16 @@ import { MaterialCommunityIcons, Feather } from "@expo/vector-icons";
 
 const { width, height } = Dimensions.get("window");
 
-const ExerciseBox = ({ item, index, exerciseCount, onScrollNext }) => {
+const ExerciseBox = ({
+  item,
+  index,
+  exerciseCount,
+  onScrollNext,
+  weightArrs,
+  repsArrs,
+  updateWeightArrs,
+  updateRepsArrs,
+}) => {
   const [visibleSetIndex, setVisibleSetIndex] = useState(0);
   const [repsArray, setRepsArray] = useState(() =>
     Array(item.sets.length).fill(0)
@@ -17,21 +26,21 @@ const ExerciseBox = ({ item, index, exerciseCount, onScrollNext }) => {
     Array(item.sets.length).fill(0)
   );
   const [progress, setProgress] = useState(0);
-
   useEffect(() => {
-    console.log(
-      "Set (" + visibleSetIndex + "): Reps array " + JSON.stringify(repsArray)
-    );
     setProgress((repsArray[visibleSetIndex] / item.sets[visibleSetIndex]) * 10);
   }, [repsArray, visibleSetIndex]);
+
   useEffect(() => {
-    console.log(
-      "Set (" +
-        visibleSetIndex +
-        "): Weights array " +
-        JSON.stringify(weightsArray)
-    );
+    const weightDup = [...weightArrs];
+    weightDup[index] = [...weightsArray];
+    updateWeightArrs(weightDup);
   }, [weightsArray]);
+
+  useEffect(() => {
+    const repsDup = [...repsArrs];
+    repsDup[index] = [...repsArray];
+    updateRepsArrs(repsDup);
+  }, [repsArray]);
 
   return (
     <View

@@ -32,10 +32,22 @@ const StartWorkout = ({ navigation, route }) => {
     data: workoutData,
     loading,
     error,
+    weightArrs,
+    setWeightArrs,
+    repsArrs,
+    setRepsArrs,
   } = useStartWorkoutPageLogic(user, route.params?.workoutSplit);
 
   const flatListRef = useRef(null);
   const workoutTime = route.params?.workoutTime || 0;
+
+  useEffect(() => {
+    console.log("Updated weights: " + JSON.stringify(workoutData.weightArrs));
+  }, [workoutData.weightArrs]);
+
+  useEffect(() => {
+    console.log("Updated reps: " + JSON.stringify(workoutData.repsArrs));
+  }, [workoutData.repsArrs]);
 
   const saveWorkoutDataToDatabase = async () => {
     try {
@@ -92,6 +104,10 @@ const StartWorkout = ({ navigation, route }) => {
               onScrollNext={() => {
                 flatListRef.current?.scrollToIndex({ index: index + 1 });
               }}
+              updateWeightArrs={workoutData.setWeightArrs}
+              updateRepsArrs={workoutData.setRepsArrs}
+              weightArrs={workoutData.weightArrs}
+              repsArrs={workoutData.repsArrs}
             ></ExerciseBox>
           )}
         ></FlatList>

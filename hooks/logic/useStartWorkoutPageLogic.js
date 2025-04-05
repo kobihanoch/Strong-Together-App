@@ -19,6 +19,11 @@ const useStartWorkoutPageLogic = (user, selectedSplit) => {
     }
   }, [exercises]);
 
+  // --------------------[ Weight and Reps arrays ]-----------------------------------------
+
+  const [weightArrs, setWeightArrs] = useState([]);
+  const [repsArrs, setRepsArrs] = useState([]);
+
   // --------------------[ Glow Animation ]-----------------------------------------
   const glowAnimation = useRef(new Animated.Value(1)).current;
 
@@ -28,6 +33,10 @@ const useStartWorkoutPageLogic = (user, selectedSplit) => {
     },
     data: {
       exercisesForSelectedSplit,
+      weightArrs,
+      setWeightArrs,
+      repsArrs,
+      setRepsArrs,
     },
     loading,
     error,
