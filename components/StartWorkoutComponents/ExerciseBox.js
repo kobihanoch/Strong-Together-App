@@ -141,26 +141,99 @@ const ExerciseBox = ({ item, index, exerciseCount }) => {
                   >
                     Weight
                   </Text>
-                  <TextInput
+                  <View
                     style={{
+                      flexDirection: "row",
+                      alignItems: "center",
                       flex: 5,
-                      backgroundColor: "rgb(234, 240, 246)",
                       height: "60%",
-                      borderRadius: height * 0.02,
-                      textAlign: "center",
-                      fontSize: RFValue(15),
-                      fontFamily: "Inter_400Regular",
+                      borderWidth: 2,
+                      borderColor: "rgb(231, 231, 231)",
+                      borderRadius: height * 0.008,
                     }}
-                    value={weightsArray[visibleSetIndex].toString()}
-                    onChangeText={(text) => {
-                      const arrDup = [...weightsArray];
-                      arrDup[visibleSetIndex] =
-                        text === "" ? 0 : parseInt(text);
-                      setWeightsArray(arrDup);
-                    }}
-                    keyboardType="numeric"
-                    inputMode="numeric"
-                  ></TextInput>
+                  >
+                    <TouchableOpacity
+                      onPress={() => {
+                        const arrDup = [...weightsArray];
+                        const current =
+                          parseFloat(arrDup[visibleSetIndex]) || 0;
+                        arrDup[visibleSetIndex] = Math.max(0, current - 2.5);
+                        setWeightsArray(arrDup);
+                      }}
+                      style={{
+                        backgroundColor: "rgb(234, 240, 246)",
+                        paddingHorizontal: width * 0.03,
+                        aspectRatio: 1,
+                        alignItems: "center",
+                        justifyContent: "center",
+                        height: "100%",
+                        borderTopLeftRadius: height * 0.008,
+                        borderBottomLeftRadius: height * 0.008,
+                      }}
+                    >
+                      <Text
+                        style={{
+                          fontSize: RFValue(20),
+                          color: "#2563eb",
+                          fontFamily: "Inter_600SemiBold",
+                        }}
+                      >
+                        -
+                      </Text>
+                    </TouchableOpacity>
+
+                    <TextInput
+                      style={{
+                        flex: 1,
+                        backgroundColor: "white",
+                        height: "90%",
+                        textAlign: "center",
+                        fontSize: RFValue(15),
+                        fontFamily: "Inter_400Regular",
+                        paddingHorizontal: 5,
+                      }}
+                      value={weightsArray[visibleSetIndex].toString()}
+                      onChangeText={(text) => {
+                        const arrDup = [...weightsArray];
+                        const cleaned = text.replace(/[^0-9.]/g, "");
+                        arrDup[visibleSetIndex] =
+                          cleaned === "" ? 0 : parseFloat(cleaned);
+                        setWeightsArray(arrDup);
+                      }}
+                      keyboardType="numeric"
+                      inputMode="numeric"
+                    />
+
+                    <TouchableOpacity
+                      onPress={() => {
+                        const arrDup = [...weightsArray];
+                        const current =
+                          parseFloat(arrDup[visibleSetIndex]) || 0;
+                        arrDup[visibleSetIndex] = current + 2.5;
+                        setWeightsArray(arrDup);
+                      }}
+                      style={{
+                        backgroundColor: "rgb(234, 240, 246)",
+                        paddingHorizontal: width * 0.03,
+                        aspectRatio: 1,
+                        alignItems: "center",
+                        justifyContent: "center",
+                        height: "100%",
+                        borderTopRightRadius: height * 0.008,
+                        borderBottomRightRadius: height * 0.008,
+                      }}
+                    >
+                      <Text
+                        style={{
+                          fontSize: RFValue(20),
+                          color: "#2563eb",
+                          fontFamily: "Inter_600SemiBold",
+                        }}
+                      >
+                        +
+                      </Text>
+                    </TouchableOpacity>
+                  </View>
                 </View>
                 <View
                   style={{
@@ -179,26 +252,97 @@ const ExerciseBox = ({ item, index, exerciseCount }) => {
                   >
                     Reps
                   </Text>
-                  <TextInput
+                  <View
                     style={{
+                      flexDirection: "row",
+                      alignItems: "center",
                       flex: 5,
-                      backgroundColor: "rgb(234, 240, 246)",
                       height: "60%",
-                      borderRadius: height * 0.02,
-                      textAlign: "center",
-                      fontSize: RFValue(15),
-                      fontFamily: "Inter_400Regular",
+                      borderWidth: 2,
+                      borderColor: "rgb(231, 231, 231)",
+                      borderRadius: height * 0.008,
                     }}
-                    value={repsArray[visibleSetIndex].toString()}
-                    keyboardType="numeric"
-                    inputMode="numeric"
-                    onChangeText={(text) => {
-                      const arrDup = [...repsArray];
-                      arrDup[visibleSetIndex] =
-                        text === "" ? 0 : parseInt(text);
-                      setRepsArray(arrDup);
-                    }}
-                  ></TextInput>
+                  >
+                    <TouchableOpacity
+                      onPress={() => {
+                        const arrDup = [...repsArray];
+                        const current = parseInt(arrDup[visibleSetIndex]) || 0;
+                        arrDup[visibleSetIndex] = Math.max(0, current - 1);
+                        setRepsArray(arrDup);
+                      }}
+                      style={{
+                        backgroundColor: "rgb(234, 240, 246)",
+                        paddingHorizontal: width * 0.03,
+                        aspectRatio: 1,
+                        alignItems: "center",
+                        justifyContent: "center",
+                        height: "100%",
+                        borderTopLeftRadius: height * 0.008,
+                        borderBottomLeftRadius: height * 0.008,
+                      }}
+                    >
+                      <Text
+                        style={{
+                          fontSize: RFValue(20),
+                          color: "#2563eb",
+                          fontFamily: "Inter_600SemiBold",
+                        }}
+                      >
+                        -
+                      </Text>
+                    </TouchableOpacity>
+
+                    <TextInput
+                      style={{
+                        flex: 1,
+                        backgroundColor: "white",
+                        height: "90%",
+                        textAlign: "center",
+                        fontSize: RFValue(15),
+                        fontFamily: "Inter_400Regular",
+                        paddingHorizontal: 5,
+                      }}
+                      value={repsArray[visibleSetIndex].toString()}
+                      keyboardType="numeric"
+                      inputMode="numeric"
+                      onChangeText={(text) => {
+                        const arrDup = [...repsArray];
+                        const cleaned = text.replace(/[^0-9]/g, "");
+                        arrDup[visibleSetIndex] =
+                          cleaned === "" ? 0 : parseInt(cleaned);
+                        setRepsArray(arrDup);
+                      }}
+                    />
+
+                    <TouchableOpacity
+                      onPress={() => {
+                        const arrDup = [...repsArray];
+                        const current = parseInt(arrDup[visibleSetIndex]) || 0;
+                        arrDup[visibleSetIndex] = current + 1;
+                        setRepsArray(arrDup);
+                      }}
+                      style={{
+                        backgroundColor: "rgb(234, 240, 246)",
+                        paddingHorizontal: width * 0.03,
+                        aspectRatio: 1,
+                        alignItems: "center",
+                        justifyContent: "center",
+                        height: "100%",
+                        borderTopRightRadius: height * 0.008,
+                        borderBottomRightRadius: height * 0.008,
+                      }}
+                    >
+                      <Text
+                        style={{
+                          fontSize: RFValue(20),
+                          color: "#2563eb",
+                          fontFamily: "Inter_600SemiBold",
+                        }}
+                      >
+                        +
+                      </Text>
+                    </TouchableOpacity>
+                  </View>
                 </View>
                 <View
                   style={{
