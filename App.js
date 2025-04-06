@@ -1,16 +1,23 @@
 import {
+  Inter_400Regular,
+  Inter_700Bold,
+  Inter_500Medium,
+  Inter_600SemiBold,
+} from "@expo-google-fonts/inter";
+import {
+  CommonActions,
   NavigationContainer,
   useNavigationContainerRef,
-  CommonActions,
 } from "@react-navigation/native";
-import React, { useState, useEffect, useRef } from "react";
-import { View, Text, ActivityIndicator, StyleSheet } from "react-native";
-import AuthStack from "./navigation/AuthStack";
-import AppStack from "./navigation/AppStack";
+import * as Font from "expo-font";
+import React, { useEffect, useState } from "react";
+import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
 import BottomTabBar from "./components/BottomTabBar";
 import Theme1 from "./components/Theme1";
-import * as Font from "expo-font";
 import { AuthProvider, useAuth } from "./context/AuthContext";
+import AppStack from "./navigation/AppStack";
+import AuthStack from "./navigation/AuthStack";
+import { StatusBar } from "react-native";
 
 export default function App() {
   const [fontsLoaded, setFontsLoaded] = useState(false);
@@ -19,8 +26,10 @@ export default function App() {
   const loadFonts = async () => {
     await Font.loadAsync({
       PoppinsLight: require("./assets/fonts/Poppins-Light.ttf"),
-      PoppinsRegular: require("./assets/fonts/Poppins-Regular.ttf"),
-      PoppinsBold: require("./assets/fonts/Poppins-Bold.ttf"),
+      Inter_400Regular,
+      Inter_700Bold,
+      Inter_500Medium,
+      Inter_600SemiBold,
     });
     setFontsLoaded(true);
   };
@@ -60,20 +69,16 @@ export default function App() {
 
 function AuthWrapper() {
   const { isLoggedIn } = useAuth();
-  const [selectedTab, setSelectedTab] = useState("Home");
-
-  const handleTabPress = (tabName) => {
-    setSelectedTab(tabName);
-  };
 
   return (
     <View style={{ flex: 1 }}>
       {isLoggedIn ? (
         <>
+          <StatusBar barStyle="dark-content" />
           <Theme1>
             <AppStack />
           </Theme1>
-          <BottomTabBar selectedTab={selectedTab} onTabPress={handleTabPress} />
+          <BottomTabBar />
         </>
       ) : (
         <AuthStack />

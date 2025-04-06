@@ -10,13 +10,15 @@
     "release": "standard-version"
   },
   "dependencies": {
+    "@expo-google-fonts/inter": "^0.3.0",
     "@react-native-async-storage/async-storage": "^1.23.1",
+    "@react-native-picker/picker": "^2.11.0",
     "@react-navigation/native": "^6.1.18",
     "@react-navigation/stack": "^6.4.1",
     "@supabase/storage-js": "^2.7.1",
     "@supabase/supabase-js": "^2.47.2",
     "crypto-js": "^4.2.0",
-    "expo": "~52.0.41",
+    "expo": "~52.0.42",
     "expo-app-loading": "^2.1.1",
     "expo-font": "~13.0.4",
     "expo-image-picker": "~16.0.6",
@@ -25,7 +27,7 @@
     "lottie-react-native": "7.1.0",
     "moment": "^2.30.1",
     "react": "18.3.1",
-    "react-native": "0.76.7",
+    "react-native": "0.76.8",
     "react-native-calendar-strip": "^2.2.6",
     "react-native-calendars": "^1.1310.0",
     "react-native-dotenv": "^3.4.11",
@@ -40,6 +42,7 @@
     "react-native-svg": "15.8.0",
     "react-native-url-polyfill": "^2.0.0",
     "react-native-vector-icons": "^10.2.0",
+    "react-native-wheel-picker-expo": "^0.5.4",
     "use-latest-callback": "^0.2.1"
   },
   "devDependencies": {

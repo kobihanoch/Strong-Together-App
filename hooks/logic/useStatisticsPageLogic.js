@@ -19,19 +19,30 @@ const useStatisticsPageLogic = (user) => {
     fetchUserExerciseTracking();
   }, []);
 
+  // Load prev workout data for each workout
   useEffect(() => {
     setExerciseTrackingByDatePrev(
       getLastWorkoutForEachExercise(exerciseTracking, exerciseTrackingByDate)
     );
   }, [exerciseTracking, exerciseTrackingByDate]);
 
+  // Load when changing dates
   useEffect(() => {
     if (exerciseTracking && exerciseTracking.length > 0) {
       setExerciseTrackingByDate(
         filterExercisesByDate(exerciseTracking, selectedDate)
       );
     }
-  }, [exerciseTracking, selectedDate]);
+  }, [selectedDate]);
+
+  // Load selected workout on load up
+  useEffect(() => {
+    if (!loading && exerciseTracking && exerciseTracking.length > 0) {
+      const formattedDate = moment(selectedDate).format("YYYY-MM-DD");
+      const filtered = filterExercisesByDate(exerciseTracking, formattedDate);
+      setExerciseTrackingByDate(filtered);
+    }
+  }, [loading]);
 
   return {
     loading,

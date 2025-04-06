@@ -1,15 +1,14 @@
-import React, { useEffect } from "react";
+import { LinearGradient } from "expo-linear-gradient";
+import React from "react";
 import {
-  View,
+  Dimensions,
+  StyleSheet,
   Text,
   TouchableOpacity,
-  StyleSheet,
-  Dimensions,
+  View,
 } from "react-native";
-import { LinearGradient } from "expo-linear-gradient";
 import Icon from "react-native-vector-icons/FontAwesome";
 import Logo from "../components/Logo";
-import supabase from "../src/supabaseClient";
 
 const { width, height } = Dimensions.get("window");
 
@@ -109,7 +108,7 @@ const styles = StyleSheet.create({
     color: "#007bff",
     flex: 1,
     textAlign: "center",
-    fontFamily: "PoppinsBold",
+    fontFamily: "Inter_700Bold",
   },
   buttonLogin: {
     backgroundColor: "transparent",
@@ -130,7 +129,7 @@ const styles = StyleSheet.create({
     color: "white",
     flex: 1,
     textAlign: "center",
-    fontFamily: "PoppinsRegular",
+    fontFamily: "Inter_400Regular",
   },
   aboutUs: {
     marginTop: height * 0.03,

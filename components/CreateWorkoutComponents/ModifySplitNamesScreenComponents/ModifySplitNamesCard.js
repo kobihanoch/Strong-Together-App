@@ -1,14 +1,14 @@
 // ModifySplitNamesCard.js - Displays split names and their selected exercise counts
-import React, { useState } from "react";
+import { LinearGradient } from "expo-linear-gradient";
+import React from "react";
 import {
-  View,
-  Text,
-  FlatList,
   Dimensions,
+  FlatList,
+  Text,
   TouchableOpacity,
+  View,
 } from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";
-import { LinearGradient } from "expo-linear-gradient";
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 
 const { width, height } = Dimensions.get("window");
@@ -24,10 +24,7 @@ function ModifySplitNamesCard({
   );
 
   return (
-    <LinearGradient
-      colors={["rgb(255, 255, 255)", "rgb(255, 255, 255)"]}
-      start={{ x: 0, y: 0 }}
-      end={{ x: 1, y: 1 }}
+    <View
       style={{
         flex: 1,
         flexDirection: "column",
@@ -37,6 +34,12 @@ function ModifySplitNamesCard({
         gap: height * 0.04,
         paddingHorizontal: width * 0.05,
         paddingVertical: height * 0.02,
+        backgroundColor: "transparent",
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 0 },
+        shadowOpacity: 0.05,
+        shadowRadius: 5,
+        elevation: 1,
       }}
     >
       <FlatList
@@ -51,10 +54,8 @@ function ModifySplitNamesCard({
               style={{
                 flexDirection: "row",
                 borderRadius: height * 0.02,
-                shadowOffset: { height: 0, width: 0 },
-                shadowOpacity: 0.2,
-                shadowRadius: 3,
-                backgroundColor: "#0d2540",
+
+                backgroundColor: "#2979FF",
                 width: "98%",
                 alignSelf: "center",
                 justifyContent: "center",
@@ -79,7 +80,7 @@ function ModifySplitNamesCard({
                 <View style={{ flexDirection: "column" }}>
                   <Text
                     style={{
-                      fontFamily: "PoppinsBold",
+                      fontFamily: "Inter_700Bold",
                       color: "black",
                       fontSize: RFValue(30),
                     }}
@@ -88,7 +89,7 @@ function ModifySplitNamesCard({
                   </Text>
                   <Text
                     style={{
-                      fontFamily: "PoppinsRegular",
+                      fontFamily: "Inter_400Regular",
                       color: "black",
                       fontSize: RFValue(10),
                     }}
@@ -121,7 +122,7 @@ function ModifySplitNamesCard({
                 </View>
                 <Text
                   style={{
-                    fontFamily: "PoppinsRegular",
+                    fontFamily: "Inter_400Regular",
                     fontSize: RFValue(10),
                     textAlign: "center",
                     color: "white",
@@ -134,7 +135,7 @@ function ModifySplitNamesCard({
           );
         }}
       />
-    </LinearGradient>
+    </View>
   );
 }
 

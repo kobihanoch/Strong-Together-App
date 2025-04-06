@@ -1,165 +1,124 @@
-import React, { useEffect, useState } from "react";
-import { View, Text, Image, Dimensions } from "react-native";
-import useExerciseTracking from "../../hooks/useExerciseTracking";
-import { RFValue } from "react-native-responsive-fontsize";
 import { LinearGradient } from "expo-linear-gradient";
+import React, { useEffect, useState } from "react";
+import { Dimensions, Image, Text, View } from "react-native";
+import { RFValue } from "react-native-responsive-fontsize";
+import useExerciseTracking from "../../hooks/useExerciseTracking";
 
 const { width, height } = Dimensions.get("window");
 
-function NewAchivementCard({ user, hasAssignedWorkout }) {
-  const { trackingData, loading, error } = useExerciseTracking(user?.id);
-  const [prWeight, setPrWeight] = useState(0);
-  const [prExcersice, setPrExercise] = useState(null);
-  const [prReps, setPrReps] = useState(0);
+/*<Image
+              source={require("../../assets/gold-medal.png")}
+              style={{ height: height * 0.12, width: height * 0.12 }}
+            ></Image>*/
 
-  // Fetching PRS (Max weight, max exercise name of max weight, max reps of set of max weight)
-  useEffect(() => {
-    const PRS = {};
-    let maxWeight = 0;
-    let maxExercise = null;
-    let maxReps = 0;
-    trackingData.forEach((exerciseInTrackingData) => {
-      const weightArr = exerciseInTrackingData.weight;
-      const repsArr = exerciseInTrackingData.reps;
-      const maxWeightInArray = Math.max(...weightArr);
-      if (maxWeightInArray > maxWeight) {
-        maxWeight = maxWeightInArray;
-        maxExercise = exerciseInTrackingData.exercise;
-        const index = weightArr.indexOf(maxWeightInArray);
-        maxReps = repsArr[index];
-      }
-    });
-    setPrWeight(maxWeight);
-    setPrExercise(maxExercise);
-    setPrReps(maxReps);
-  }, [trackingData]);
-
+function NewAchivementCard({ hasAssignedWorkout, PR }) {
   return (
-    <LinearGradient
-      colors={["rgb(89, 67, 135)", "rgb(51, 16, 125)"]}
+    <View
       style={{
-        display: "flex",
-        width: "60%",
-        justifyContent: "center",
-        alignItems: "center",
+        flex: 3,
+        height: "100%",
         borderRadius: height * 0.02,
+        backgroundColor: "white",
         shadowColor: "#000",
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 8,
-        elevation: 4,
+        shadowOffset: { width: 0, height: 0 },
+        shadowOpacity: 0.05,
+        shadowRadius: 5,
+        elevation: 1,
+        alignItems: "center",
+        justifyContent: "center",
       }}
     >
-      {hasAssignedWorkout ? (
-        <View style={{ flexDirection: "column" }}>
-          <View
-            style={{
-              flex: 6,
-              justifyContent: "center",
-              alignItems: "center",
-              marginTop: height * 0.01,
-              gap: height * 0.01,
-            }}
-          >
-            <Text
-              style={{
-                color: "white",
-                textAlign: "center",
-                fontFamily: "PoppinsBold",
-                fontSize: RFValue(13),
-              }}
-            >
-              Personal Record
-            </Text>
-            <View
-              style={{
-                shadowColor: "#FFD700",
-                shadowOffset: { width: 0, height: 0 },
-                shadowOpacity: 0.7,
-                shadowRadius: 20,
-                elevation: 20,
-                alignItems: "center",
-                justifyContent: "center",
-                height: "50%",
-                width: "50%",
-              }}
-            >
-              <Image
-                source={require("../../assets/gold-medal.png")}
-                style={{ height: "100%", width: "100%" }}
-              ></Image>
-            </View>
-          </View>
-          <View
-            style={{
-              flex: 4,
-              flexDirection: "column",
-              justifyContent: "flex-start",
-              alignItems: "center",
-            }}
-          >
-            <Text
-              style={{
-                color: "white",
-                fontSize: RFValue(12),
-                marginTop: height * 0.0,
-                fontFamily: "PoppinsBold",
-                opacity: 0.8,
-              }}
-            >
-              {prExcersice}
-            </Text>
-            <Text
-              style={{
-                color: "white",
-                fontFamily: "PoppinsRegular",
-                fontSize: RFValue(13),
-                marginTop: height * 0.01,
-                opacity: 0.8,
-              }}
-            >
-              {prWeight} kg
-            </Text>
-            <Text
-              style={{
-                color: "white",
-                fontFamily: "PoppinsRegular",
-                fontSize: RFValue(13),
-                opacity: 0.8,
-              }}
-            >
-              {" "}
-              for {prReps} reps
-            </Text>
-          </View>
-        </View>
-      ) : (
+      <View style={{ flex: 1, flexDirection: "row" }}>
         <View
           style={{
-            flexDirection: "column",
-            gap: height * 0.02,
-            opacity: 0.6,
-            justifyContent: "center",
+            flex: 6.3,
             alignItems: "center",
+            flexDirection: "column",
+            justifyContent: "center",
           }}
         >
+          <Text
+            style={{ fontFamily: "Inter_600SemiBold", fontSize: RFValue(12) }}
+          >
+            Personal Record
+          </Text>
           <Image
             source={require("../../assets/gold-medal.png")}
-            style={{ height: height * 0.12, width: height * 0.12 }}
+            style={{ height: height * 0.08, aspectRatio: 1 }}
           ></Image>
           <Text
-            style={{
-              fontFamily: "PoppinsBold",
-              color: "white",
-              fontSize: RFValue(11),
-              textAlign: "center",
-            }}
+            style={{ fontFamily: "Inter_600SemiBold", fontSize: RFValue(14) }}
           >
-            No personal record yet
+            {hasAssignedWorkout ? PR.maxExercise : "No data yet"}
           </Text>
         </View>
-      )}
-    </LinearGradient>
+        <View
+          style={{ flex: 0.2, alignItems: "center", justifyContent: "center" }}
+        >
+          <View
+            style={{
+              height: "90%",
+              width: 1,
+              backgroundColor: "rgba(156, 156, 156, 0.4)",
+            }}
+          ></View>
+        </View>
+        <View
+          style={{
+            flex: 3.9,
+            flexDirection: "column",
+            justifyContent: "center",
+            alignItems: "center",
+            gap: height * 0.02,
+          }}
+        >
+          <View
+            style={{
+              flexDirection: "column",
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
+            <Text
+              style={{
+                fontFamily: "Inter_400Regular",
+                fontSize: RFValue(13),
+                color: "rgb(137, 137, 137)",
+              }}
+            >
+              {hasAssignedWorkout ? PR.maxWeight + " kg" : "N/A"}
+            </Text>
+            <Text
+              style={{ fontFamily: "Inter_600SemiBold", fontSize: RFValue(14) }}
+            >
+              Weight
+            </Text>
+          </View>
+          <View
+            style={{
+              flexDirection: "column",
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
+            <Text
+              style={{
+                fontFamily: "Inter_400Regular",
+                fontSize: RFValue(13),
+                color: "rgb(137, 137, 137)",
+              }}
+            >
+              {hasAssignedWorkout ? PR.maxReps : "N/A"}
+            </Text>
+            <Text
+              style={{ fontFamily: "Inter_600SemiBold", fontSize: RFValue(14) }}
+            >
+              Reps
+            </Text>
+          </View>
+        </View>
+      </View>
+    </View>
   );
 }
 

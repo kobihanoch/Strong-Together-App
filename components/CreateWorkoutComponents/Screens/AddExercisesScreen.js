@@ -1,10 +1,7 @@
 import React from "react";
-import { View, Text, Dimensions } from "react-native";
+import { Dimensions, Text, View } from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";
-import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 import ChooseExercisesCard from "../AddExercisesScreenComponents/ChooseExercisesCard";
-import GradientedGoToButton from "../../GradientedGoToButton";
-import { useState } from "react";
 
 const { width, height } = Dimensions.get("window");
 
@@ -41,19 +38,19 @@ function AddExercisesScreen({
       >
         <Text
           style={{
-            fontFamily: "PoppinsBold",
-            fontSize: RFValue(17),
-            color: "white",
+            fontFamily: "Inter_600SemiBold",
+            fontSize: RFValue(20),
+            color: "Black",
           }}
         >
           Pick your exercises
         </Text>
         <Text
           style={{
-            fontFamily: "PoppinsRegular",
-            fontSize: RFValue(12),
-            opacity: 0.5,
-            color: "white",
+            fontFamily: "Inter_400Regular",
+            fontSize: RFValue(15),
+            opacity: 1,
+            color: "rgb(97, 97, 97)",
           }}
         >
           Split {workoutSplitName}

@@ -1,16 +1,9 @@
 import React, { useEffect, useState } from "react";
-import {
-  View,
-  Text,
-  Dimensions,
-  TouchableOpacity,
-  Image,
-  ActivityIndicator,
-} from "react-native";
-import { useAuth } from "../context/AuthContext";
+import { Dimensions, Text, View } from "react-native";
+import { RFValue } from "react-native-responsive-fontsize";
 import LoadingPage from "../components/LoadingPage";
 import ImagePickerComponent from "../components/ProfileComponents/ImagePickerComponent";
-import { RFValue } from "react-native-responsive-fontsize";
+import { useAuth } from "../context/AuthContext";
 
 const { width, height } = Dimensions.get("window");
 
@@ -21,11 +14,11 @@ function Profile({ navigation }) {
   const [email, setEmail] = useState(null);
   const [fullname, setFullname] = useState(null);
 
-  useEffect (() => {
+  useEffect(() => {
     setUsername(user.username);
     setEmail(user.email);
     setFullname(user.name);
-  }, [user])
+  }, [user]);
 
   return mediaLoading ? (
     <LoadingPage message="Loading user data..." />
@@ -52,20 +45,34 @@ function Profile({ navigation }) {
           updateProfilePic={updateProfilePic}
           setMediaLoading={setMediaLoading}
         ></ImagePickerComponent>
-        
       </View>
-      <View style={{ flex: 2, width: "90%", justifyContent: "flex-start", alignItems: "center" }}>
-        <Text style={{ fontFamily: "PoppinsBold", fontSize: RFValue(17) }}>
+      <View
+        style={{
+          flex: 2,
+          width: "90%",
+          justifyContent: "flex-start",
+          alignItems: "center",
+        }}
+      >
+        <Text style={{ fontFamily: "Inter_700Bold", fontSize: RFValue(17) }}>
           {username}
         </Text>
-        <Text style={{ fontFamily: "PoppinsRegular", fontSize: RFValue(15), opacity: 0.3 }}>
+        <Text
+          style={{
+            fontFamily: "Inter_400Regular",
+            fontSize: RFValue(15),
+            opacity: 0.3,
+          }}
+        >
           {fullname}
         </Text>
-        <Text style={{ fontFamily: "PoppinsBold", fontSize: RFValue(17) }}>
+        <Text style={{ fontFamily: "Inter_700Bold", fontSize: RFValue(17) }}>
           {email}
         </Text>
       </View>
-      <View style={{flex: 5}}><Text>View</Text></View>
+      <View style={{ flex: 5 }}>
+        <Text>View</Text>
+      </View>
     </View>
   );
 }
