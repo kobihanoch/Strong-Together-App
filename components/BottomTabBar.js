@@ -16,9 +16,15 @@ const { width, height } = Dimensions.get("window");
 
 const BottomTabBar = () => {
   const navigation = useNavigation();
-  const routeName = useNavigationState(
-    (state) => state?.routes?.[state.index]?.name || ""
-  );
+  const routeName = useNavigationState((state) => {
+    const appRoute = state.routes[state.index];
+    if (appRoute.state) {
+      const nestedState = appRoute.state;
+      const innerRoute = nestedState.routes[nestedState.index];
+      return innerRoute.name;
+    }
+    return appRoute.name;
+  });
 
   const isWorkoutMode = routeName === "StartWorkout";
 

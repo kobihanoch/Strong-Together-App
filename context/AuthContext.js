@@ -50,7 +50,7 @@ export const AuthProvider = ({ children, onLogout }) => {
 
         if (session?.user?.id) {
           await loadFullUser(session.user.id);
-          navigation.navigate("Home");
+          //navigation.navigate("Home");
         } else {
           const recoveredUser = await waitForUser();
           if (recoveredUser) {
@@ -127,20 +127,19 @@ export const AuthProvider = ({ children, onLogout }) => {
   };
 
   const logout = async () => {
-    console.log("HI");
     const { data, error } = await supabase.auth.getSession();
     console.log(
       "AuthContext auth session before logout: " + JSON.stringify(data)
     );
+    setIsLoggedIn(false);
+    setUser(null);
     await supabase.auth.signOut();
     const { data: data2, error: error2 } = await supabase.auth.getSession();
     console.log(
       "AuthContext auth session after logout: " + JSON.stringify(data2)
     );
-    setIsLoggedIn(false);
-    setUser(null);
 
-    if (onLogout) onLogout();
+    //if (onLogout) onLogout();
   };
 
   return (

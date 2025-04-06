@@ -7,7 +7,7 @@ const Stack = createStackNavigator();
 
 const AuthStack = ({ setIsLoggedIn }) => {
   return (
-    <Stack.Navigator>
+    <Stack.Navigator initialRouteName="Intro">
       <Stack.Screen
         name="Intro"
         component={Intro}
