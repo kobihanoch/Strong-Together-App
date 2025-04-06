@@ -1,5 +1,4 @@
 import { useNavigation, useNavigationState } from "@react-navigation/native";
-import { LinearGradient } from "expo-linear-gradient";
 import React, { useEffect, useState } from "react";
 import {
   Alert,
@@ -12,11 +11,10 @@ import {
 import { RFValue } from "react-native-responsive-fontsize";
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { Feather } from "@expo/vector-icons";
 
 const { width, height } = Dimensions.get("window");
 
-const BottomTabBar = ({ selectedTab, onTabPress }) => {
+const BottomTabBar = () => {
   const navigation = useNavigation();
   const routeName = useNavigationState(
     (state) => state?.routes?.[state.index]?.name || ""
@@ -45,16 +43,12 @@ const BottomTabBar = ({ selectedTab, onTabPress }) => {
   };
 
   const handleTabPress = (tabName) => {
-    onTabPress(tabName);
     navigation.navigate(tabName);
   };
 
   const handleTimerPress = () => {
     setShowExitButton(true);
-
-    setTimeout(() => {
-      setShowExitButton(false);
-    }, 3000);
+    setTimeout(() => setShowExitButton(false), 3000);
   };
 
   const confirmExit = () => {
@@ -77,11 +71,11 @@ const BottomTabBar = ({ selectedTab, onTabPress }) => {
   };
 
   const tabs = [
-    { name: "Home", label: "Home", icon: "home-variant" },
-    { name: "Statistics", label: "Statistics", icon: "poll" },
+    { name: "Home", icon: "home-variant" },
+    { name: "Statistics", icon: "poll" },
     { name: "MyWorkoutPlan", label: "StartWorkout", icon: "fire" },
-    { name: "Profile", label: "Profile", icon: "account" },
-    { name: "Settings", label: "Settings", icon: "wrench" },
+    { name: "Profile", icon: "account" },
+    { name: "Settings", icon: "wrench" },
   ];
 
   return (
@@ -114,7 +108,7 @@ const BottomTabBar = ({ selectedTab, onTabPress }) => {
                 name={tab.icon}
                 size={RFValue(20)}
                 color={
-                  selectedTab === tab.name ? "#2979FF" : "rgb(184, 184, 184)"
+                  routeName === tab.name ? "#2979FF" : "rgb(184, 184, 184)"
                 }
                 style={tab.name === "MyWorkoutPlan" && styles.specialIcon}
               />

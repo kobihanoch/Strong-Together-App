@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import {
   getUserExerciseTracking,
   getUserWorkout,
+  saveWorkoutData,
 } from "../services/WorkoutService";
 import { getMostFrequentSplitNameByUserId } from "../services/ExerciseTrackingService";
 
@@ -14,6 +15,7 @@ export const useUserWorkout = (userId) => {
   const [exercises, setExercises] = useState(null);
   const [exerciseTracking, setExerciseTracking] = useState(null);
   const [mostFrequentSplit, setMostFrequentSplit] = useState(null);
+  const [saving, setSaving] = useState(false);
 
   const fetchUserWorkout = async () => {
     if (!userId) return;
@@ -90,6 +92,19 @@ export const useUserWorkout = (userId) => {
     fetchUserWorkout();
   }, [userId]);
 
+  const saveWorkoutProccess = async (workoutData) => {
+    setSaving(true);
+    try {
+      await saveWorkoutData(workoutData);
+    } catch (err) {
+      console.error(err);
+      throw err;
+    } finally {
+      console.log("Saving susccsfully workout of user!");
+      setSaving(false);
+    }
+  };
+
   return {
     userWorkout,
     loading,
@@ -101,5 +116,6 @@ export const useUserWorkout = (userId) => {
     workoutSplits,
     exercises,
     mostFrequentSplit,
+    saveWorkoutProccess,
   };
 };

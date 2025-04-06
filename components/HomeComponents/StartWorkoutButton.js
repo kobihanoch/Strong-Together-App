@@ -2,10 +2,12 @@ import { FontAwesome5 } from "@expo/vector-icons";
 import React from "react";
 import { Text, TouchableOpacity, View, Dimensions } from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";
+import { useNavigation } from "@react-navigation/native";
 
 const { width, height } = Dimensions.get("window");
 
 const StartWorkoutButton = () => {
+  const navigation = useNavigation();
   return (
     <View style={{ flex: 1, width: "85%", alignSelf: "center" }}>
       {/*<WorkoutCountCard userId={userId} height={height} width={width} />*/}
@@ -19,6 +21,9 @@ const StartWorkoutButton = () => {
           width: "100%",
           height: "80%",
           gap: width * 0.03,
+        }}
+        onPress={() => {
+          navigation.navigate("MyWorkoutPlan");
         }}
       >
         <FontAwesome5
