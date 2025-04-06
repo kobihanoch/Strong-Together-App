@@ -21,7 +21,7 @@ const MuscleTabs = ({ muscleGroups, selectedMuscleGroup, onSelectMuscle }) => {
           onPress={() => onSelectMuscle(muscle)}
           style={{
             backgroundColor:
-              selectedMuscleGroup === muscle ? "#0d2540" : "#ccc",
+              selectedMuscleGroup === muscle ? "#2979FF" : "rgb(234, 240, 246)",
             borderRadius: width * 0.02,
             marginHorizontal: width * 0.01,
             width: width * 0.2,
@@ -33,7 +33,7 @@ const MuscleTabs = ({ muscleGroups, selectedMuscleGroup, onSelectMuscle }) => {
             style={{
               fontSize: RFValue(11),
               color: selectedMuscleGroup === muscle ? "white" : "black",
-              fontFamily: "Inter_700Bold",
+              fontFamily: "Inter_600SemiBold",
             }}
           >
             {muscle}

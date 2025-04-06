@@ -97,11 +97,12 @@ function CreateWorkout({ navigation }) {
   }, [splitsNumber]);
 
   return (
-    <LinearGradient
-      colors={["#0d2540", "#123257"]}
-      start={{ x: 0, y: 0 }}
-      end={{ x: 1, y: 1 }}
-      style={{ flex: 1, paddingVertical: height * 0.02 }}
+    <View
+      style={{
+        flex: 1,
+        paddingVertical: height * 0.02,
+        backgroundColor: "transparent",
+      }}
     >
       {step === 1 && (
         <PickSplitNumberScreen
@@ -130,7 +131,7 @@ function CreateWorkout({ navigation }) {
           setSelectedExercisesBySplit={setSelectedExercisesBySplit}
         />
       )}
-    </LinearGradient>
+    </View>
   );
 }
 

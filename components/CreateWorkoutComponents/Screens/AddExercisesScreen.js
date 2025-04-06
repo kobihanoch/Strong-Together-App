@@ -38,9 +38,9 @@ function AddExercisesScreen({
       >
         <Text
           style={{
-            fontFamily: "Inter_700Bold",
-            fontSize: RFValue(17),
-            color: "white",
+            fontFamily: "Inter_600SemiBold",
+            fontSize: RFValue(20),
+            color: "Black",
           }}
         >
           Pick your exercises
@@ -48,9 +48,9 @@ function AddExercisesScreen({
         <Text
           style={{
             fontFamily: "Inter_400Regular",
-            fontSize: RFValue(12),
-            opacity: 0.5,
-            color: "white",
+            fontSize: RFValue(15),
+            opacity: 1,
+            color: "rgb(97, 97, 97)",
           }}
         >
           Split {workoutSplitName}

@@ -26,9 +26,9 @@ function PickSplitNumberScreen({ setStep, setSplitsNumber }) {
       >
         <Text
           style={{
-            fontFamily: "Inter_700Bold",
-            fontSize: RFValue(17),
-            color: "white",
+            fontFamily: "Inter_600SemiBold",
+            fontSize: RFValue(20),
+            color: "black",
           }}
         >
           Create workout
@@ -36,9 +36,9 @@ function PickSplitNumberScreen({ setStep, setSplitsNumber }) {
         <Text
           style={{
             fontFamily: "Inter_400Regular",
-            fontSize: RFValue(12),
+            fontSize: RFValue(15),
             opacity: 0.5,
-            color: "white",
+            color: "rgb(76, 76, 76)",
           }}
         >
           At first, we would like to know how many splits you want to have.
@@ -50,7 +50,7 @@ function PickSplitNumberScreen({ setStep, setSplitsNumber }) {
       <View style={{ flex: 2, alignItems: "center" }}>
         <View style={{ width: "50%" }}>
           <GradientedGoToButton
-            gradientColors={["#FF9500", "#FF6B00"]}
+            gradientColors={["#2979FF", "#2979FF"]}
             borderRadius={height * 0.1}
             onPress={() => setStep(2)}
           >

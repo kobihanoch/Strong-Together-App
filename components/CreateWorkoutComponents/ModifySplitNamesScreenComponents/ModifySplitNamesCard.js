@@ -24,10 +24,7 @@ function ModifySplitNamesCard({
   );
 
   return (
-    <LinearGradient
-      colors={["rgb(255, 255, 255)", "rgb(255, 255, 255)"]}
-      start={{ x: 0, y: 0 }}
-      end={{ x: 1, y: 1 }}
+    <View
       style={{
         flex: 1,
         flexDirection: "column",
@@ -37,6 +34,12 @@ function ModifySplitNamesCard({
         gap: height * 0.04,
         paddingHorizontal: width * 0.05,
         paddingVertical: height * 0.02,
+        backgroundColor: "transparent",
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 0 },
+        shadowOpacity: 0.05,
+        shadowRadius: 5,
+        elevation: 1,
       }}
     >
       <FlatList
@@ -51,10 +54,8 @@ function ModifySplitNamesCard({
               style={{
                 flexDirection: "row",
                 borderRadius: height * 0.02,
-                shadowOffset: { height: 0, width: 0 },
-                shadowOpacity: 0.2,
-                shadowRadius: 3,
-                backgroundColor: "#0d2540",
+
+                backgroundColor: "#2979FF",
                 width: "98%",
                 alignSelf: "center",
                 justifyContent: "center",
@@ -134,7 +135,7 @@ function ModifySplitNamesCard({
           );
         }}
       />
-    </LinearGradient>
+    </View>
   );
 }
 
