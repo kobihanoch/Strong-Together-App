@@ -5,10 +5,16 @@ import {
   filterZeroesInArr,
   createObjectForDataBase,
 } from "../../utils/startWorkoutUtils";
+import { useNavigation, useNavigationState } from "@react-navigation/native";
 
 const useStartWorkoutPageLogic = (user, selectedSplit) => {
+  // --------------------[ Navigation ]--------------------------------------
+  const navigation = useNavigation();
+
   // --------------------[ Outside hooks ]--------------------------------------
-  const { exercises, loading, error } = useUserWorkout(user?.id);
+  const { exercises, saveWorkoutProccess, loading, error } = useUserWorkout(
+    user?.id
+  );
 
   // --------------------[ Exercises ]------------------------------------------
   const [exercisesForSelectedSplit, setExercisesForSelectedSplit] =
@@ -33,17 +39,32 @@ const useStartWorkoutPageLogic = (user, selectedSplit) => {
   const [saveStarted, setSaveStarted] = useState(false);
 
   useEffect(() => {
-    console.log("Saving started!");
-    const { reps: rDup, weights: wDup } = filterZeroesInArr(
-      repsArrs,
-      weightArrs
-    );
-    const obj = createObjectForDataBase(
-      user.id,
-      wDup,
-      rDup,
-      exercisesForSelectedSplit
-    );
+    const saveData = async () => {
+      console.log("Saving started!");
+      try {
+        const { reps: rDup, weights: wDup } = filterZeroesInArr(
+          repsArrs,
+          weightArrs
+        );
+        const obj = createObjectForDataBase(
+          user.id,
+          wDup,
+          rDup,
+          exercisesForSelectedSplit
+        );
+        await saveWorkoutProccess(obj);
+      } catch (err) {
+        console.error(err);
+        throw err;
+      } finally {
+        navigation.navigate("Statistics");
+        setSaveStarted(false);
+      }
+    };
+
+    if (saveStarted) {
+      saveData();
+    }
   }, [saveStarted]);
 
   // --------------------[ Glow Animation ]-----------------------------------------

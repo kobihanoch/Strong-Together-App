@@ -89,3 +89,20 @@ export const addWorkout = async (userId, name, splitsNumber) => {
   console.log("Workout created successfully:", data[0]);
   return data[0];
 };
+
+// Saves a workout after working out - startworkout.js
+export const saveWorkoutData = async (dataOfWorkout) => {
+  if (!dataOfWorkout) {
+    return;
+  }
+  console.log(
+    "Got here and inserting " + JSON.stringify(dataOfWorkout, null, 2)
+  );
+  const { error } = await supabase
+    .from("exercisetracking")
+    .insert(dataOfWorkout);
+
+  if (error) throw error;
+
+  console.log("Workout saved succesfully");
+};

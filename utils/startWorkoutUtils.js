@@ -6,7 +6,7 @@ export const createObjectForDataBase = (
 ) => {
   if (!workoutDetails) return;
   let objs = [];
-  console.log("Workut details: " + JSON.stringify(workoutDetails, null, 2));
+  //console.log("Workut details: " + JSON.stringify(workoutDetails, null, 2));
   for (let i = 0; i < workoutDetails.length; i++) {
     if (
       weights[i] &&
@@ -23,13 +23,14 @@ export const createObjectForDataBase = (
       objs.push({
         user_id: userId,
         exercisetosplit_id: workoutDetails[i].id,
-        workoutDate: formattedDate,
+        workoutdate: formattedDate,
         weight: weights[i],
         reps: reps[i],
       });
     }
   }
-  console.log(JSON.stringify(objs, null, 2));
+  //console.log(JSON.stringify(objs, null, 2));
+  return objs;
 };
 
 export const filterZeroesInArr = (reps, weights) => {
