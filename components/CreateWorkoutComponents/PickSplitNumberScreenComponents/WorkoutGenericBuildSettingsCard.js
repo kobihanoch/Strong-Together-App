@@ -14,10 +14,7 @@ function WorkoutGenericBuildSettingsCard({ setSplitsNumber }) {
   };
 
   return (
-    <LinearGradient
-      colors={["rgb(255, 255, 255)", "rgb(255, 255, 255)"]}
-      start={{ x: 0, y: 0 }}
-      end={{ x: 1, y: 1 }}
+    <View
       style={{
         flex: 1,
         display: "flex",
@@ -28,6 +25,12 @@ function WorkoutGenericBuildSettingsCard({ setSplitsNumber }) {
         gap: height * 0.04,
         paddingHorizontal: width * 0.05,
         paddingVertical: height * 0.02,
+        backgroundColor: "white",
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 0 },
+        shadowOpacity: 0.05,
+        shadowRadius: 5,
+        elevation: 1,
       }}
     >
       <View style={{ flexDirection: "column", gap: height * 0.02 }}>
@@ -55,7 +58,7 @@ function WorkoutGenericBuildSettingsCard({ setSplitsNumber }) {
           <FontAwesome5
             name="minus"
             size={RFValue(35)}
-            color={"#0d2540"}
+            color={"#2979FF"}
           ></FontAwesome5>
         </TouchableOpacity>
         <Text
@@ -63,7 +66,7 @@ function WorkoutGenericBuildSettingsCard({ setSplitsNumber }) {
             fontSize: RFValue(30),
             fontFamily: "Inter_700Bold",
             width: width * 0.05,
-            color: "black",
+            color: "#2979FF",
           }}
         >
           {splits}
@@ -72,11 +75,11 @@ function WorkoutGenericBuildSettingsCard({ setSplitsNumber }) {
           <FontAwesome5
             name="plus"
             size={RFValue(35)}
-            color={"#0d2540"}
+            color={"#2979FF"}
           ></FontAwesome5>
         </TouchableOpacity>
       </View>
-    </LinearGradient>
+    </View>
   );
 }
 

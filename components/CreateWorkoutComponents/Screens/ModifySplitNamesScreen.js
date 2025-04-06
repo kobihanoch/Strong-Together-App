@@ -138,9 +138,9 @@ function ModifySplitNamesScreen({
       >
         <Text
           style={{
-            fontFamily: "Inter_700Bold",
-            fontSize: RFValue(17),
-            color: "white",
+            fontFamily: "Inter_600SemiBold",
+            fontSize: RFValue(20),
+            color: "black",
           }}
         >
           Manage your workout plan
@@ -148,9 +148,9 @@ function ModifySplitNamesScreen({
         <Text
           style={{
             fontFamily: "Inter_400Regular",
-            fontSize: RFValue(12),
+            fontSize: RFValue(15),
             opacity: 0.5,
-            color: "white",
+            color: "rgb(92, 92, 92)",
           }}
         >
           Add exercises to create the best plan out there!
@@ -177,7 +177,7 @@ function ModifySplitNamesScreen({
       >
         <View style={{ width: "30%" }}>
           <GradientedGoToButton
-            gradientColors={["#FF9500", "#FF6B00"]}
+            gradientColors={["#2979FF", "#2979FF"]}
             borderRadius={height * 0.1}
             onPress={() => setStep(1)}
           >
@@ -210,7 +210,7 @@ function ModifySplitNamesScreen({
 
         <View style={{ width: "30%" }}>
           <GradientedGoToButton
-            gradientColors={["rgb(0, 148, 12)", "rgb(0, 98, 8)"]}
+            gradientColors={["#2979FF", "#2979FF"]}
             borderRadius={height * 0.1}
             onPress={saveWorkoutPlan}
             disabled={saving || isSaveDisabled}

@@ -65,14 +65,14 @@ const PickExerciseItem = ({ exercise, onSelectExercise, isSelected }) => {
       onPress={() => onSelectExercise({ ...exercise, sets })}
       style={[
         styles.exerciseContainer,
-        isSelected && { borderColor: "#0d2540", borderWidth: 2 },
+        isSelected && { borderColor: "#2979FF", borderWidth: 2 },
       ]}
       activeOpacity={0.8}
     >
       <View style={{ flex: 1, flexDirection: "row" }}>
         <View style={{ flex: 0.35, justifyContent: "center" }}>
           <LinearGradient
-            colors={["#00142a", "#0d2540"]}
+            colors={["rgb(234, 240, 246)", "rgb(234, 240, 246)"]}
             style={styles.imageContainer}
           >
             <Image source={imagePath} style={styles.exerciseImage} />
@@ -124,7 +124,7 @@ const PickExerciseItem = ({ exercise, onSelectExercise, isSelected }) => {
           <FontAwesome5
             name={isSelected ? "check-circle" : "info-circle"}
             size={18}
-            color={isSelected ? "#0d2540" : "#00142a"}
+            color={isSelected ? "#2979FF" : "rgba(82, 82, 82, 0.4)"}
           />
         </View>
       </View>
@@ -151,8 +151,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     margin: width * 0.02,
-    borderWidth: 2,
-    borderColor: "#666d75",
   },
   exerciseImage: {
     height: 50,
@@ -183,7 +181,7 @@ const styles = StyleSheet.create({
     marginTop: 5,
   },
   setBubble: {
-    backgroundColor: "#0d2540",
+    backgroundColor: "#2979FF",
     paddingVertical: 5,
     paddingHorizontal: 10,
     borderRadius: 10,
@@ -208,7 +206,7 @@ const styles = StyleSheet.create({
     width: 40,
     height: 30,
     borderWidth: 2,
-    borderColor: "#0d2540",
+    borderColor: "#2979FF",
     borderRadius: 10,
     textAlign: "center",
     fontSize: RFValue(14),
@@ -216,7 +214,7 @@ const styles = StyleSheet.create({
     marginRight: 5,
   },
   saveButton: {
-    backgroundColor: "#0d2540",
+    backgroundColor: "#2979FF",
     paddingHorizontal: 12,
     paddingVertical: 5,
     borderRadius: 10,
