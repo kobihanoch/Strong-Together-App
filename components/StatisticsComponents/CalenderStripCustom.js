@@ -147,6 +147,7 @@ const CalendarStripCustom = ({
               fontSize: RFValue(13),
               color: isSelected ? "black" : "black",
               fontFamily: "Inter_400Regular",
+              padding: height * 0.01,
               textAlign: "center",
               opacity: 0.2,
             }}
