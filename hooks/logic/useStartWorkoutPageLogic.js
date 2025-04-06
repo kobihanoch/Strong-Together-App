@@ -38,8 +38,6 @@ const useStartWorkoutPageLogic = (user, selectedSplit) => {
       repsArrs,
       weightArrs
     );
-    console.log("Sorted reps array: " + JSON.stringify(rDup));
-    console.log("Sorted weight array: " + JSON.stringify(wDup));
     const obj = createObjectForDataBase(
       user.id,
       wDup,
