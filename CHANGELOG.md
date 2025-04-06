@@ -2,6 +2,35 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.0.0](https://github.com/kobihanoch/Strong-Together-App/compare/v1.6.0...v2.0.0) (2025-04-06)
+
+
+### Features
+
+* **createworkout:** changed UI for create / edit workout page ([4352e6b](https://github.com/kobihanoch/Strong-Together-App/commit/4352e6b360dc4b09f890eebeafc1dc9cf362309e))
+* **gotobutton:** stopped supporting component ([ad138ec](https://github.com/kobihanoch/Strong-Together-App/commit/ad138ecf13484bb4b39fe7abbde17cdd41fb5c7c))
+* **home:** new cards UI for home page ([79dbbbf](https://github.com/kobihanoch/Strong-Together-App/commit/79dbbbf2bddb4a506f7d266333ee1ee8a4edc848))
+* **home:** update UI ([db218a5](https://github.com/kobihanoch/Strong-Together-App/commit/db218a5aaabc343733ea6d4f2095fbaa30062dff))
+* **login:** added activity indicator to login button while logging in ([8126217](https://github.com/kobihanoch/Strong-Together-App/commit/81262173ac4073ed1f5b743b735c07064af054cb))
+* **myworkoutplan:** added feature - if user did a workout today he is not able to start another one ([ccd013d](https://github.com/kobihanoch/Strong-Together-App/commit/ccd013d7561e31700e783685815956573928eaa9))
+* **myworkoutplan:** new UI for my workout plan page ([6bafc45](https://github.com/kobihanoch/Strong-Together-App/commit/6bafc453a311d141f1b2c52e582827fbf81af46e))
+* **startworkout:** changed UI and refactor data saving ([b2df7aa](https://github.com/kobihanoch/Strong-Together-App/commit/b2df7aa00bb1f762539b06499d46f8c8ca43a0b2))
+* **statistics:** load current day workout stats on start up is working ([33b9301](https://github.com/kobihanoch/Strong-Together-App/commit/33b930130c9225bf807a6a1670f0398165541323))
+* **statistics:** update new UI for statistics page ([36f3de6](https://github.com/kobihanoch/Strong-Together-App/commit/36f3de64f4dccd46a3fd1e9588faf4cb1894181a))
+* **statistics:** updated UI of calendar strip ([9b2fa64](https://github.com/kobihanoch/Strong-Together-App/commit/9b2fa64d1ab412d4b18ab492bba3c83a4fc6cfba))
+* **tabbar:** updated UI for botton tab bar ([6787c29](https://github.com/kobihanoch/Strong-Together-App/commit/6787c29c3a4ad040ea7a0f77bc789fff7c4dc3c0))
+* **topcomponent:** updated UI for top bar ([a7e2e33](https://github.com/kobihanoch/Strong-Together-App/commit/a7e2e33b4b4f80d42353a680fd5dd3008b47b96d))
+* **ui:** changed fonts to Inter ([dbc6527](https://github.com/kobihanoch/Strong-Together-App/commit/dbc652742c5fc29d56d6038322c226c420a399a1))
+
+
+### Bug Fixes
+
+* **auth:** user trouble to stay logged in after token refresh is now solved ([c32c1e0](https://github.com/kobihanoch/Strong-Together-App/commit/c32c1e00c6ccd918910c4a821401cf535fff97b1))
+* **fonts:** loading correctly ([1a19c81](https://github.com/kobihanoch/Strong-Together-App/commit/1a19c81658f367a0300fbf711af0c913cbca0ef3))
+* **home:** fixed home page crashing with user without workout assigned ([d45073a](https://github.com/kobihanoch/Strong-Together-App/commit/d45073a37229fb54a08a0e3d61466d55adcd07b8))
+* **navigation:** BottomTabBar now highlights correct tab after logout/login flow ([a3e6179](https://github.com/kobihanoch/Strong-Together-App/commit/a3e6179b44c59e3f09f1e6e1793bc51bcdf25ac4))
+* **settings:** fixed crashing when loading settings page ([c9e6968](https://github.com/kobihanoch/Strong-Together-App/commit/c9e69682818edf4766d50cae34556c9cb1858759))
+
 ## [1.6.0](https://github.com/kobihanoch/Strong-Together-App/compare/v1.5.0...v1.6.0) (2025-03-31)
 
 
