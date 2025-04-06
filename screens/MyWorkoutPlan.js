@@ -1,30 +1,24 @@
 import { useNavigation } from "@react-navigation/native";
 import React from "react";
-import {
-  Dimensions,
-  FlatList,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { Dimensions, StyleSheet, Text, View } from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";
-import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 import LoadingPage from "../components/LoadingPage";
-import ExerciseItem from "../components/MyWorkoutPlanComponents/ExerciseItem";
-import WorkoutSplitItem from "../components/MyWorkoutPlanComponents/WorkoutSplitItem";
+import ExercisesSection from "../components/MyWorkoutPlanComponents/ExercisesSection.js";
+import HeaderSection from "../components/MyWorkoutPlanComponents/HeaderSection.js";
+import WorkoutSplitsList from "../components/MyWorkoutPlanComponents/WorkoutSplitsList.js";
 import { useAuth } from "../context/AuthContext";
 import { useMyWorkoutPlanPageLogic } from "../hooks/logic/useMyWorkoutPlanPageLogic.js";
-import HeaderSection from "../components/MyWorkoutPlanComponents/HeaderSection.js";
-import ExercisesSection from "../components/MyWorkoutPlanComponents/ExercisesSection.js";
-import WorkoutSplitsList from "../components/MyWorkoutPlanComponents/WorkoutSplitsList.js";
 
 const { width, height } = Dimensions.get("window");
 
 const MyWorkoutPlan = () => {
   const navigation = useNavigation();
-  const { user } = useAuth();
-  const { data: workoutData, loading, error } = useMyWorkoutPlanPageLogic(user);
+  const { user, hasTrainedToday } = useAuth();
+  const {
+    data: workoutData,
+    loading,
+    error,
+  } = useMyWorkoutPlanPageLogic(user, hasTrainedToday);
 
   if (loading) {
     return <LoadingPage message="Getting your workout..." />;

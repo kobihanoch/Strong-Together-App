@@ -7,7 +7,7 @@ import {
 } from "../../utils/startWorkoutUtils";
 import { useNavigation, useNavigationState } from "@react-navigation/native";
 
-const useStartWorkoutPageLogic = (user, selectedSplit) => {
+const useStartWorkoutPageLogic = (user, selectedSplit, setHasTrainedToday) => {
   // --------------------[ Navigation ]--------------------------------------
   const navigation = useNavigation();
 
@@ -53,6 +53,7 @@ const useStartWorkoutPageLogic = (user, selectedSplit) => {
           exercisesForSelectedSplit
         );
         await saveWorkoutProccess(obj);
+        setHasTrainedToday(true);
       } catch (err) {
         console.error(err);
         throw err;

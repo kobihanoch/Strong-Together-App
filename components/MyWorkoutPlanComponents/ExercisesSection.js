@@ -10,6 +10,7 @@ import { FlatList } from "react-native-gesture-handler";
 import { RFValue } from "react-native-responsive-fontsize";
 import ExerciseItem from "./ExerciseItem";
 import { useNavigation } from "@react-navigation/native";
+import { MaterialCommunityIcons, Feather } from "@expo/vector-icons";
 
 const { width, height } = Dimensions.get("window");
 
@@ -89,14 +90,24 @@ const ExercisesSection = ({ data }) => {
             alignSelf: "center",
             justifyContent: "center",
             alignItems: "center",
+            flexDirection: "row",
+            gap: width * 0.02,
             borderRadius: height * 0.02,
+            opacity: data.hasTrainedToday ? 0.7 : 1,
           }}
+          disabled={data.hasTrainedToday ? true : false}
           onPress={() =>
             navigation.navigate("StartWorkout", {
               workoutSplit: data.selectedSplit,
             })
           }
         >
+          <MaterialCommunityIcons
+            name="lock"
+            color="white"
+            size={RFValue(15)}
+            style={{ display: data.hasTrainedToday ? "flex" : "none" }}
+          ></MaterialCommunityIcons>
           <Text
             style={{
               fontFamily: "Inter_600SemiBold",

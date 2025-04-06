@@ -14,8 +14,13 @@ import {
   countExercisesForSplit,
   getWorkoutSplitCounter,
 } from "../../utils/myWorkoutPlanUtils";
+import {
+  filterExercisesByDate,
+  getLastWorkoutForEachExercise,
+} from "../../utils/statisticsUtils";
+import moment from "moment";
 
-export const useMyWorkoutPlanPageLogic = (user) => {
+export const useMyWorkoutPlanPageLogic = (user, authHasTrainedToday) => {
   const {
     workout,
     workoutSplits,
@@ -30,6 +35,7 @@ export const useMyWorkoutPlanPageLogic = (user) => {
   const [buttonOpacity, setButtonOpacity] = useState(1);
   const [filteredExercises, setFilteredExercises] = useState(null);
   const [splitTrainedCount, setSplitTrainedCount] = useState(0);
+  const [hasTrainedToday, setHasTrainedToday] = useState(false);
 
   // Initialize exercise tracking fetch
   useEffect(() => {
@@ -37,6 +43,24 @@ export const useMyWorkoutPlanPageLogic = (user) => {
       fetchUserExerciseTracking();
     }
   }, [user]);
+
+  useEffect(() => {
+    if (!loading && exerciseTracking && exerciseTracking.length > 0) {
+      const etByDate = filterExercisesByDate(
+        exerciseTracking,
+        moment().format("YYYY-MM-DD")
+      );
+      if (etByDate && etByDate.length > 0) {
+        setHasTrainedToday(true);
+      } else {
+        setHasTrainedToday(false);
+      }
+    }
+  }, [loading]);
+
+  useEffect(() => {
+    setHasTrainedToday(authHasTrainedToday);
+  }, [authHasTrainedToday]);
 
   // Set selected split at startup
   useEffect(() => {
@@ -78,6 +102,7 @@ export const useMyWorkoutPlanPageLogic = (user) => {
       countExercisesForSplit,
       buttonOpacity,
       splitTrainedCount,
+      hasTrainedToday,
     },
     loading,
     error,

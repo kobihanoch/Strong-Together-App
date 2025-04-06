@@ -26,14 +26,18 @@ import ExerciseBox from "../components/StartWorkoutComponents/ExerciseBox";
 const { width, height } = Dimensions.get("window");
 
 const StartWorkout = ({ navigation, route }) => {
-  const { user, logout } = useAuth();
+  const { user, setHasTrainedToday } = useAuth();
   const {
     animation,
     data: workoutData,
     saving: workoutSaving,
     loading,
     error,
-  } = useStartWorkoutPageLogic(user, route.params?.workoutSplit);
+  } = useStartWorkoutPageLogic(
+    user,
+    route.params?.workoutSplit,
+    setHasTrainedToday
+  );
 
   const flatListRef = useRef(null);
   const workoutTime = route.params?.workoutTime || 0;
