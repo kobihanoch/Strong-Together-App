@@ -11,6 +11,7 @@ export const AuthProvider = ({ children, onLogout }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [hasTrainedToday, setHasTrainedToday] = useState(false);
 
   useEffect(() => {
     const waitForUser = async (retries = 5, delay = 300) => {
@@ -152,6 +153,8 @@ export const AuthProvider = ({ children, onLogout }) => {
         logout,
         updateProfilePic,
         loading,
+        setHasTrainedToday,
+        hasTrainedToday,
       }}
     >
       {children}

@@ -1,9 +1,9 @@
 import React from "react";
-import { View, Text, Dimensions } from "react-native";
-import WorkoutGenericBuildSettingsCard from "../PickSplitNumberScreenComponents/WorkoutGenericBuildSettingsCard";
+import { Dimensions, Text, View } from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";
-import GradientedGoToButton from "../../GradientedGoToButton";
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
+import GradientedGoToButton from "../../GradientedGoToButton";
+import WorkoutGenericBuildSettingsCard from "../PickSplitNumberScreenComponents/WorkoutGenericBuildSettingsCard";
 
 const { width, height } = Dimensions.get("window");
 
@@ -26,19 +26,19 @@ function PickSplitNumberScreen({ setStep, setSplitsNumber }) {
       >
         <Text
           style={{
-            fontFamily: "PoppinsBold",
-            fontSize: RFValue(17),
-            color: "white",
+            fontFamily: "Inter_600SemiBold",
+            fontSize: RFValue(20),
+            color: "black",
           }}
         >
           Create workout
         </Text>
         <Text
           style={{
-            fontFamily: "PoppinsRegular",
-            fontSize: RFValue(12),
+            fontFamily: "Inter_400Regular",
+            fontSize: RFValue(15),
             opacity: 0.5,
-            color: "white",
+            color: "rgb(76, 76, 76)",
           }}
         >
           At first, we would like to know how many splits you want to have.
@@ -50,7 +50,7 @@ function PickSplitNumberScreen({ setStep, setSplitsNumber }) {
       <View style={{ flex: 2, alignItems: "center" }}>
         <View style={{ width: "50%" }}>
           <GradientedGoToButton
-            gradientColors={["#FF9500", "#FF6B00"]}
+            gradientColors={["#2979FF", "#2979FF"]}
             borderRadius={height * 0.1}
             onPress={() => setStep(2)}
           >
@@ -65,7 +65,7 @@ function PickSplitNumberScreen({ setStep, setSplitsNumber }) {
             >
               <Text
                 style={{
-                  fontFamily: "PoppinsBold",
+                  fontFamily: "Inter_700Bold",
                   color: "white",
                   fontSize: RFValue(15),
                 }}

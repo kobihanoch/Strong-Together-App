@@ -1,160 +1,42 @@
-import React, { useState, useEffect } from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  Dimensions,
-  FlatList,
-  TouchableOpacity,
-  ActivityIndicator,
-} from "react-native";
-import { useAuth } from "../context/AuthContext";
-import useWorkoutSplits from "../hooks/useWorkoutSplits";
-import useWorkouts from "../hooks/useWorkouts";
-import useSplitExercises from "../hooks/useSplitExercises";
-import { RFValue } from "react-native-responsive-fontsize";
-import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
-import Theme1 from "../components/Theme1";
 import { useNavigation } from "@react-navigation/native";
-import WorkoutSplitItem from "../components/MyWorkoutPlanComponents/WorkoutSplitItem";
-import ExerciseItem from "../components/MyWorkoutPlanComponents/ExerciseItem";
+import React from "react";
+import { Dimensions, StyleSheet, Text, View } from "react-native";
+import { RFValue } from "react-native-responsive-fontsize";
 import LoadingPage from "../components/LoadingPage";
-import { useUserWorkout } from "../hooks/useUserWorkout";
+import ExercisesSection from "../components/MyWorkoutPlanComponents/ExercisesSection.js";
+import HeaderSection from "../components/MyWorkoutPlanComponents/HeaderSection.js";
+import WorkoutSplitsList from "../components/MyWorkoutPlanComponents/WorkoutSplitsList.js";
+import { useAuth } from "../context/AuthContext";
 import { useMyWorkoutPlanPageLogic } from "../hooks/logic/useMyWorkoutPlanPageLogic.js";
 
 const { width, height } = Dimensions.get("window");
 
 const MyWorkoutPlan = () => {
   const navigation = useNavigation();
-  const { user } = useAuth();
+  const { user, hasTrainedToday } = useAuth();
   const {
-    workout,
-    workoutSplits,
-    allExercises,
+    data: workoutData,
     loading,
     error,
-    selectedSplit,
-    handleWorkoutSplitPress,
-    filteredExercises,
-    countExercisesForSplit,
-    buttonOpacity,
-  } = useMyWorkoutPlanPageLogic(user);
+  } = useMyWorkoutPlanPageLogic(user, hasTrainedToday);
 
   if (loading) {
     return <LoadingPage message="Getting your workout..." />;
   }
-
   return (
-    <View style={{ flex: 1, paddingVertical: height * 0.02 }}>
-      {workout ? (
+    <View
+      style={{
+        flex: 1,
+        alignItems: "center",
+        flexDirection: "column",
+        gap: height * 0.02,
+      }}
+    >
+      {workoutData.workout ? (
         <>
-          <View
-            style={{
-              flex: 0.15,
-              flexDirection: "row",
-              justifyContent: "space-between",
-              alignItems: "center",
-              paddingHorizontal: width * 0.06,
-            }}
-          >
-            <View>
-              <Text
-                style={{
-                  fontFamily: "PoppinsBold",
-                  fontSize: RFValue(16),
-                  color: "black",
-                }}
-              >
-                Your workouts
-              </Text>
-              <Text
-                style={{
-                  fontFamily: "PoppinsRegular",
-                  fontSize: RFValue(13),
-                  color: "#999999",
-                }}
-              >
-                Select a workout to start
-              </Text>
-            </View>
-            <View style={{ justifyContent: "center", alignItems: "center" }}>
-              <TouchableOpacity
-                style={{
-                  height: height * 0.07,
-                  width: height * 0.13,
-                  backgroundColor: "#0d2540",
-                  justifyContent: "center",
-                  alignItems: "center",
-                  borderRadius: width * 0.5,
-                  opacity: buttonOpacity,
-                  shadowColor: "#00142a",
-                  shadowOffset: { width: 0, height: 0 },
-                  shadowOpacity: 0.5,
-                  shadowRadius: 5,
-                  elevation: 5,
-                }}
-                onPress={() =>
-                  navigation.navigate("StartWorkout", {
-                    workoutSplit: selectedSplit,
-                  })
-                }
-              >
-                <View
-                  style={{
-                    flexDirection: "row",
-                    justifyContent: "center",
-                    alignItems: "center",
-                  }}
-                >
-                  <FontAwesome5 name="bolt" size={15} color="#FACC15" />
-                  <Text
-                    style={{
-                      fontFamily: "PoppinsRegular",
-                      fontSize: RFValue(12),
-                      color: "white",
-                      marginLeft: 10,
-                    }}
-                  >
-                    Start
-                  </Text>
-                </View>
-              </TouchableOpacity>
-            </View>
-          </View>
-
-          <View
-            style={{
-              flex: 0.3,
-              justifyContent: "center",
-              alignItems: "flex-start",
-            }}
-          >
-            <FlatList
-              data={workoutSplits}
-              keyExtractor={(item) => item.id.toString()}
-              showsHorizontalScrollIndicator={false}
-              pagingEnabled
-              horizontal={true}
-              renderItem={({ item }) => (
-                <WorkoutSplitItem
-                  item={item}
-                  exercise_count={countExercisesForSplit(allExercises, item.id)}
-                  isSelected={item.id === selectedSplit?.id}
-                  onPress={() => handleWorkoutSplitPress(item)}
-                />
-              )}
-            />
-          </View>
-
-          <View style={{ flex: 0.55 }}>
-            <FlatList
-              data={filteredExercises}
-              showsVerticalScroll
-              showsVerticalScrollIndicator={false}
-              keyExtractor={(item, index) => index.toString()}
-              renderItem={({ item }) => <ExerciseItem exercise={item} />}
-            />
-          </View>
+          <HeaderSection user={user}></HeaderSection>
+          <WorkoutSplitsList data={workoutData}></WorkoutSplitsList>
+          <ExercisesSection data={workoutData}></ExercisesSection>
         </>
       ) : (
         <>
@@ -166,13 +48,15 @@ const MyWorkoutPlan = () => {
               flexDirection: "column",
             }}
           >
-            <Text style={{ fontSize: RFValue(23), fontFamily: "PoppinsBold" }}>
+            <Text
+              style={{ fontSize: RFValue(23), fontFamily: "Inter_700Bold" }}
+            >
               No workout available
             </Text>
             <Text
               style={{
                 fontSize: RFValue(18),
-                fontFamily: "PoppinsRegular",
+                fontFamily: "Inter_400Regular",
                 color: "gray",
               }}
             >
@@ -207,11 +91,11 @@ const styles = StyleSheet.create({
     width: width * 0.7,
   },
   splitName: {
-    fontFamily: "PoppinsBold",
+    fontFamily: "Inter_700Bold",
     fontSize: RFValue(25),
   },
   splitExercises: {
-    fontFamily: "PoppinsRegular",
+    fontFamily: "Inter_400Regular",
     fontSize: RFValue(12),
     color: "#666",
   },
@@ -225,12 +109,12 @@ const styles = StyleSheet.create({
     marginVertical: height * 0.005,
   },
   exerciseName: {
-    fontFamily: "PoppinsBold",
+    fontFamily: "Inter_700Bold",
     fontSize: RFValue(16),
     color: "#007bff",
   },
   exerciseDetails: {
-    fontFamily: "PoppinsRegular",
+    fontFamily: "Inter_400Regular",
     fontSize: RFValue(12),
     color: "#555",
     marginTop: height * 0.005,

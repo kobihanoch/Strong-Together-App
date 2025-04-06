@@ -1,76 +1,94 @@
-import React, { useEffect, useRef } from 'react';
-import { View, StyleSheet, Dimensions, Animated } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
+import React, { useEffect, useRef } from "react";
+import { View, StyleSheet, Animated, Text, Dimensions } from "react-native";
+import { RFValue } from "react-native-responsive-fontsize";
+import { MaterialCommunityIcons, Feather } from "@expo/vector-icons";
 
-const { width, height } = Dimensions.get('window');
+const { width, height } = Dimensions.get("window");
 
 const ProgressBar = ({ progress }) => {
-    const progressAnim = useRef(new Animated.Value(0)).current;
+  const animatedProgress = useRef(new Animated.Value(0)).current;
 
+  useEffect(() => {
+    Animated.timing(animatedProgress, {
+      toValue: Math.min(progress / 10, 1),
+      duration: 500,
+      useNativeDriver: false,
+    }).start();
+  }, [progress]);
 
-    useEffect(() => {
-        Animated.timing(progressAnim, {
-            toValue: progress,
-            duration: 500,
-            useNativeDriver: false,
-        }).start();
-    }, [progress]);
+  let barColor = "#ff6b6b";
+  let feedbackText = "Push harder";
+  let IconComponent = MaterialCommunityIcons;
+  let iconName = "alert-circle";
 
+  if (progress >= 10) {
+    barColor = "#4cd964";
+    feedbackText = "Nice! You hit the target";
+    IconComponent = MaterialCommunityIcons;
+    iconName = "check-circle";
+  } else if (progress >= 7.5) {
+    barColor = "#ffa94d";
+    feedbackText = "Almost there!";
+    IconComponent = MaterialCommunityIcons;
+    iconName = "progress-check";
+  } else if (progress >= 5) {
+    barColor = "#ffe066";
+    feedbackText = "You can do better!";
+    IconComponent = MaterialCommunityIcons;
+    iconName = "alert-circle";
+  }
 
-    const getGradientColors = () => {
-        if (progress <= 50) {
-            return ['#FFA500', '#FF4500']; 
-        } else if (progress <= 75) {
-            return ['#FACC15', '#FFA500']; 
-        } else {
-            return ['#006323', '#125c2c']; 
-        }
-    };
+  const animatedWidth = animatedProgress.interpolate({
+    inputRange: [0, 1],
+    outputRange: ["0%", "100%"],
+  });
 
-    return (
-        <View style={styles.container}>
-            <Animated.View
-                style={[
-                    styles.progress,
-                    {
-                        width: progressAnim.interpolate({
-                            inputRange: [0, 100],
-                            outputRange: ['0%', '100%'],
-                        }),
-                    },
-                ]}
-            >
-                <LinearGradient
-                    colors={getGradientColors()}
-                    start={{ x: 0, y: 0 }}
-                    end={{ x: 1, y: 0 }}
-                    style={styles.gradient}
-                />
-            </Animated.View>
-        </View>
-    );
+  return (
+    <View style={styles.container}>
+      <View style={styles.barBackground}>
+        <Animated.View
+          style={[
+            styles.barFill,
+            { width: animatedWidth, backgroundColor: barColor },
+          ]}
+        />
+      </View>
+      <View
+        style={{
+          flexDirection: "row",
+          alignItems: "center",
+          marginTop: height * 0.01,
+          gap: width * 0.02,
+        }}
+      >
+        <IconComponent name={iconName} size={RFValue(15)} color={barColor} />
+        <Text style={[styles.feedbackText, { color: barColor }]}>
+          {feedbackText}
+        </Text>
+      </View>
+    </View>
+  );
 };
 
 const styles = StyleSheet.create({
-    container: {
-        width: '100%',
-        height: height * 0.018,
-        backgroundColor: '#16283b',
-        borderBottomRightRadius: width * 0.06,
-        borderBottomLeftRadius: width * 0.06,
-        overflow: 'hidden',
-        marginBottom: 20,
-        justifyContent: 'center',
-    },
-    progress: {
-        height: '100%',
-        overflow: 'hidden',
-        borderTopRightRadius: width * 0.06,
-    },
-    gradient: {
-        height: '100%',
-        width: '100%',
-    },
+  container: {
+    width: "100%",
+  },
+  barBackground: {
+    width: "100%",
+    height: 10,
+    backgroundColor: "#e0e0e0",
+    borderRadius: 10,
+    overflow: "hidden",
+  },
+  barFill: {
+    height: "100%",
+    borderRadius: height * 0.02,
+  },
+  feedbackText: {
+    fontSize: RFValue(13),
+    fontFamily: "Inter_600SemiBold",
+  },
 });
 
 export default ProgressBar;

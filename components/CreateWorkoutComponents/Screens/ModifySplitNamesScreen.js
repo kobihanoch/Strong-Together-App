@@ -1,14 +1,13 @@
-import React, { useState, useRef, useEffect } from "react";
-import { View, Text, Dimensions, Alert } from "react-native";
-import ModifySplitNamesCard from "../ModifySplitNamesScreenComponents/ModifySplitNamesCard";
+import React, { useEffect, useState } from "react";
+import { Alert, Dimensions, Text, View } from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";
-import GradientedGoToButton from "../../GradientedGoToButton";
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
-import useWorkoutSplits from "../../../hooks/useWorkoutSplits";
+import { useDeleteWorkout } from "../../../hooks/useDeleteWorkout";
 import useSplitExercises from "../../../hooks/useSplitExercises";
 import useWorkouts from "../../../hooks/useWorkouts";
-import { deleteWorkout } from "../../../services/WorkoutService";
-import { useDeleteWorkout } from "../../../hooks/useDeleteWorkout";
+import useWorkoutSplits from "../../../hooks/useWorkoutSplits";
+import GradientedGoToButton from "../../GradientedGoToButton";
+import ModifySplitNamesCard from "../ModifySplitNamesScreenComponents/ModifySplitNamesCard";
 
 const { width, height } = Dimensions.get("window");
 
@@ -139,19 +138,19 @@ function ModifySplitNamesScreen({
       >
         <Text
           style={{
-            fontFamily: "PoppinsBold",
-            fontSize: RFValue(17),
-            color: "white",
+            fontFamily: "Inter_600SemiBold",
+            fontSize: RFValue(20),
+            color: "black",
           }}
         >
           Manage your workout plan
         </Text>
         <Text
           style={{
-            fontFamily: "PoppinsRegular",
-            fontSize: RFValue(12),
+            fontFamily: "Inter_400Regular",
+            fontSize: RFValue(15),
             opacity: 0.5,
-            color: "white",
+            color: "rgb(92, 92, 92)",
           }}
         >
           Add exercises to create the best plan out there!
@@ -178,7 +177,7 @@ function ModifySplitNamesScreen({
       >
         <View style={{ width: "30%" }}>
           <GradientedGoToButton
-            gradientColors={["#FF9500", "#FF6B00"]}
+            gradientColors={["#2979FF", "#2979FF"]}
             borderRadius={height * 0.1}
             onPress={() => setStep(1)}
           >
@@ -198,7 +197,7 @@ function ModifySplitNamesScreen({
               />
               <Text
                 style={{
-                  fontFamily: "PoppinsBold",
+                  fontFamily: "Inter_700Bold",
                   color: "white",
                   fontSize: RFValue(15),
                 }}
@@ -211,7 +210,7 @@ function ModifySplitNamesScreen({
 
         <View style={{ width: "30%" }}>
           <GradientedGoToButton
-            gradientColors={["rgb(0, 148, 12)", "rgb(0, 98, 8)"]}
+            gradientColors={["#2979FF", "#2979FF"]}
             borderRadius={height * 0.1}
             onPress={saveWorkoutPlan}
             disabled={saving || isSaveDisabled}
@@ -227,7 +226,7 @@ function ModifySplitNamesScreen({
             >
               <Text
                 style={{
-                  fontFamily: "PoppinsBold",
+                  fontFamily: "Inter_700Bold",
                   color: "white",
                   fontSize: RFValue(15),
                 }}

@@ -21,7 +21,7 @@ const Settings = () => {
       <TouchableOpacity onPress={logout}>
         <Text
           style={{
-            fontFamily: "PoppinsBold",
+            fontFamily: "Inter_700Bold",
             fontSize: RFValue(14),
             color: "red",
           }}

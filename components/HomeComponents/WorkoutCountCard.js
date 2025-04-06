@@ -1,82 +1,89 @@
-import { View, Text, StyleSheet } from "react-native";
-import React, { useState, useEffect } from "react";
-import useExerciseTracking from "../../hooks/useExerciseTracking";
+import React, { useEffect, useState } from "react";
+import { StyleSheet, Text, View, Dimensions } from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";
-import { LinearGradient } from "expo-linear-gradient";
 
-function WorkoutCountCard({ userId, height, width }) {
-  const { trackingData, loading, error } = useExerciseTracking(userId);
-
-  const [totalWorkoutsNumber, setTotalWorkoutNumber] = useState(0);
-
-  // Updating workout counter
-  useEffect(() => {
-    const uniWorkouts = new Set();
-    trackingData.forEach((exerciseInTrackingData) => {
-      uniWorkouts.add(exerciseInTrackingData.workoutdate);
-    });
-    setTotalWorkoutNumber(uniWorkouts.size);
-  }, [trackingData]);
-
-  const styles = createStyles(height, width);
-
+const { width, height } = Dimensions.get("window");
+function WorkoutCountCard({ totalWorkoutNumber }) {
   return (
-    <LinearGradient
-      style={styles.workoutsContainer}
-      colors={["#1e3c72", "#2a5298"]}
+    <View
+      style={{
+        flex: 3,
+        height: "100%",
+        borderRadius: height * 0.02,
+        backgroundColor: "white",
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 0 },
+        shadowOpacity: 0.05,
+        shadowRadius: 5,
+        elevation: 1,
+      }}
     >
-      <View style={styles.workoutsContainer}>
-        <View style={{ flexDirection: "column" }}>
+      <View
+        style={{
+          flex: 1,
+          flexDirection: "column",
+          justifyContent: "flex-start",
+          alignItems: "center",
+        }}
+      >
+        <View
+          style={{
+            flexDirection: "row",
+            justifyContent: "space-between",
+            paddingHorizontal: width * 0.04,
+            marginTop: height * 0.02,
+          }}
+        >
           <Text
             style={{
-              fontFamily: "PoppinsBold",
-              color: "white",
-              fontSize: RFValue(13),
-            }}
-          >
-            Workout count
-          </Text>
-          <Text
-            style={{
-              fontFamily: "PoppinsRegular",
-              color: "white",
-              fontSize: RFValue(10),
-              opacity: 0.5,
-            }}
-          >
-            Your journy so far
-          </Text>
-        </View>
-        <View style={{}}>
-          <Text
-            style={{
-              fontFamily: "PoppinsBold",
-              color: "#FACC15",
-              fontSize: RFValue(18),
+              fontFamily: "Inter_600SemiBold",
+              fontSize: RFValue(12),
+              color: "black",
               alignSelf: "center",
             }}
           >
-            {totalWorkoutsNumber}
+            Workouts
           </Text>
         </View>
+
+        <Text
+          style={{
+            fontFamily: "Inter_600SemiBold",
+            fontSize: RFValue(20),
+            color: "black",
+            alignSelf: "center",
+            marginTop: height * 0.03,
+          }}
+        >
+          {totalWorkoutNumber}
+        </Text>
+        <Text
+          style={{
+            fontSize: RFValue(10),
+            color: "#666",
+            alignSelf: "center",
+            marginTop: height * 0.01,
+          }}
+        >
+          Total workouts
+        </Text>
       </View>
-    </LinearGradient>
+    </View>
   );
 }
 
-const createStyles = (height, width) =>
-  StyleSheet.create({
-    workoutsContainer: {
-      flex: 1,
-      height: "100%",
-      width: "90%",
-      flexDirection: "row",
-      alignItems: "center",
-      justifyContent: "space-between",
-      borderRadius: height * 0.02,
-      paddingHorizontal: width * 0.04,
-      opacity: 1,
-    },
-  });
+const styles = StyleSheet.create({
+  workoutsContainer: {
+    flex: 1,
+    height: "100%",
+    width: "90%",
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    borderRadius: height * 0.02,
+    paddingHorizontal: width * 0.04,
+    opacity: 1,
+  },
+});
 
 export default WorkoutCountCard;

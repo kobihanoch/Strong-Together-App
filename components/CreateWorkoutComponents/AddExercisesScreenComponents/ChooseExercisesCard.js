@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from "react";
-import { TouchableOpacity, View, Text, Dimensions } from "react-native";
-import { RFValue } from "react-native-responsive-fontsize";
 import { LinearGradient } from "expo-linear-gradient";
-import MuscleTabs from "./MuscleTabs";
+import React, { useEffect, useState } from "react";
+import { Dimensions, Text, TouchableOpacity, View } from "react-native";
+import { RFValue } from "react-native-responsive-fontsize";
 import ExerciseList from "./ExerciseList";
+import MuscleTabs from "./MuscleTabs";
 
 const { width, height } = Dimensions.get("window");
 
@@ -55,22 +55,27 @@ function ChooseExercisesCard({
   };
 
   return (
-    <LinearGradient
-      colors={["#ffffff", "#ffffff"]}
+    <View
       style={{
         flex: 1,
         flexDirection: "column",
         borderRadius: width * 0.09,
         paddingHorizontal: width * 0.05,
         paddingVertical: height * 0.02,
+        backgroundColor: "white",
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 0 },
+        shadowOpacity: 0.05,
+        shadowRadius: 5,
+        elevation: 1,
       }}
     >
       <View style={{ flexDirection: "column", flex: 3 }}>
         <Text
           style={{
-            fontFamily: "PoppinsBold",
+            fontFamily: "Inter_600SemiBold",
             fontSize: RFValue(16),
-            color: "#0d2540",
+            color: "black",
             textAlign: "center",
             marginBottom: height * 0.02,
           }}
@@ -94,7 +99,7 @@ function ChooseExercisesCard({
       <TouchableOpacity
         onPress={() => onSave(workoutSplitName, selectedExercises)}
         style={{
-          backgroundColor: "#0d2540",
+          backgroundColor: "#2979FF",
           padding: 10,
           borderRadius: 10,
           alignItems: "center",
@@ -103,7 +108,7 @@ function ChooseExercisesCard({
       >
         <Text style={{ color: "white", fontSize: 16 }}>Save Exercises</Text>
       </TouchableOpacity>
-    </LinearGradient>
+    </View>
   );
 }
 

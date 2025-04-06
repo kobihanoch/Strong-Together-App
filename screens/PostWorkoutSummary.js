@@ -1,11 +1,9 @@
 // PostWorkoutSummary.js
-import React, { useState, useEffect } from "react";
-import { View, Text, FlatList, StyleSheet, Dimensions } from "react-native";
+import React, { useEffect, useState } from "react";
+import { Dimensions, FlatList, StyleSheet, Text, View } from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";
-import useExerciseTrackingByDateAndSplit from "../hooks/useExerciseTrackingByDateAndSplit";
-import { useAuth } from "../context/AuthContext";
-import Theme1 from "../components/Theme1";
 import LoadingPage from "../components/LoadingPage";
+import useExerciseTrackingByDateAndSplit from "../hooks/useExerciseTrackingByDateAndSplit";
 
 const { width, height } = Dimensions.get("window");
 
@@ -72,7 +70,7 @@ const styles = StyleSheet.create({
   },
   header: {
     fontSize: RFValue(24),
-    fontFamily: "PoppinsBold",
+    fontFamily: "Inter_700Bold",
     marginBottom: 20,
     textAlign: "center",
   },
@@ -84,12 +82,12 @@ const styles = StyleSheet.create({
   },
   exerciseText: {
     fontSize: RFValue(18),
-    fontFamily: "PoppinsBold",
+    fontFamily: "Inter_700Bold",
     color: "#333",
   },
   detailsText: {
     fontSize: RFValue(14),
-    fontFamily: "PoppinsRegular",
+    fontFamily: "Inter_400Regular",
     color: "#666",
   },
 });

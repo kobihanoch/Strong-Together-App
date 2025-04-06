@@ -23,13 +23,11 @@ const StatisticsPage = () => {
   return loading ? (
     <LoadingPage message="Analyzing" />
   ) : (
-    <LinearGradient
-      colors={["#00142a", "#0d2540"]}
+    <View
       style={[
         styles.pageContainer,
         {
           flex: 6,
-          backgroundColor: "rgb(69, 0, 148)",
           borderRadius: height * 0.0,
           flexDirection: "column",
           paddingHorizontal: width * 0.05,
@@ -57,7 +55,7 @@ const StatisticsPage = () => {
           exerciseTracking={exerciseTracking}
         ></ExercisesFlatList>
       </View>
-    </LinearGradient>
+    </View>
   );
 };
 

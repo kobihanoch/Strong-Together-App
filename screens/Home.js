@@ -4,7 +4,8 @@ import {
   Image,
   StyleSheet,
   Text,
-  View
+  TouchableOpacity,
+  View,
 } from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";
 import CreateOrEditWorkoutCard from "../components/HomeComponents/CreateOrEditWorkoutCard";
@@ -14,100 +15,53 @@ import WorkoutCountCard from "../components/HomeComponents/WorkoutCountCard";
 import LoadingPage from "../components/LoadingPage";
 import { useAuth } from "../context/AuthContext";
 import useHomePageLogic from "../hooks/logic/useHomePageLogic";
+import Icon from "react-native-vector-icons/Feather";
+import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
+import { FontAwesome5 } from "@expo/vector-icons";
+import StartWorkoutButton from "../components/HomeComponents/StartWorkoutButton";
+import { formatDate } from "../utils/statisticsUtils";
+import LastWorkoutSection from "../components/HomeComponents/LastWorkoutSection";
+import QuickLookSection from "../components/HomeComponents/QuickLookSection";
 
 const { width, height } = Dimensions.get("window");
 
 const Home = ({ navigation }) => {
   const { user } = useAuth();
   // Hook handling
-  const { username,
-    userId,
-    hasAssignedWorkout,
-    profileImageUrl,
-    loading,
-    error} = useHomePageLogic(user);
+  const { data: userData, loading, error } = useHomePageLogic(user);
 
-  return loading ? (
-    <LoadingPage message="Loading user data..." />
-  ) : (
+  if (loading || !userData) {
+    return <LoadingPage message="Loading user data..." />;
+  }
+  return (
     <View style={{ flex: 1, paddingVertical: height * 0.02 }}>
-      {/* Header */}
-      <View style={styles.headerContainer}>
-        <View
-          style={{
-            justifyContent: "center",
-            alignItems: "center",
-            flex: 1.5,
-          }}
-        >
-          <Image
-            source={
-              profileImageUrl
-                ? { uri: profileImageUrl }
-                : require("../assets/profile.png")
-            }
-            style={{
-              height: height * 0.06,
-              width: height * 0.06,
-              resizeMode: "stretch",
-              borderRadius: height * 0.05,
-            }}
-          ></Image>
-        </View>
-        <View style={{ justifyContent: "center", flex: 8.5 }}>
-          <Text style={styles.headerText}>
-            Welcome,{" "}
-            <Text style={{ fontFamily: "PoppinsBold" }}>{username} </Text>!
-          </Text>
-          <Text
-            style={{
-              fontSize: RFValue(13),
-              color: "black",
-              fontFamily: "PoppinsRegular",
-            }}
-          >
-            Check out your dashboard
-          </Text>
-        </View>
-      </View>
-
       <View style={styles.midContainer}>
-        <View style={{ flex: 1.5 }}>
-          <WorkoutCountCard userId={userId} height={height} width={width} />
-        </View>
+        {/*flex 2*/}
         <View
           style={{
-            flex: 4,
-            display: "flex",
-            flexDirection: "row",
-            gap: width * 0.02,
-            width: "90%",
-          }}
-        >
-          <MostCommonWorkoutSummaryCard
-            userId={userId}
-            height={height}
-            width={width}
-          />
-        </View>
-        <View
-          style={{
-            flex: 4.5,
-            width: "88%",
-            flexDirection: "row",
-            gap: width * 0.01,
+            flex: 3,
+            flexDirection: "column",
+            gap: height * 0.03,
             justifyContent: "center",
+            width: "100%",
+            padding: height * 0.03,
+            borderRadius: height * 0.04,
+            shadowColor: "#000",
+            shadowOffset: { width: 0, height: 0 },
+            shadowOpacity: 0.05,
+            shadowRadius: 5,
+            elevation: 1,
           }}
         >
-          <NewAchivementCard
-            user={user}
-            hasAssignedWorkout={hasAssignedWorkout}
-          ></NewAchivementCard>
-          <CreateOrEditWorkoutCard
-            hasAssignedWorkout={hasAssignedWorkout}
-            navigation={navigation}
-          ></CreateOrEditWorkoutCard>
+          <Text style={styles.headerText}>Hello, {userData?.firstName}!</Text>
+          <StartWorkoutButton></StartWorkoutButton>
         </View>
+
+        {/*flex 1*/}
+        <LastWorkoutSection data={userData}></LastWorkoutSection>
+
+        {/*flex 6*/}
+        <QuickLookSection data={userData}></QuickLookSection>
       </View>
     </View>
   );
@@ -122,18 +76,19 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   headerText: {
-    fontFamily: "PoppinsRegular",
+    fontFamily: "Inter_600SemiBold",
     color: "black",
-    fontSize: RFValue(18),
+    fontSize: RFValue(35),
+    alignItems: "flex-start",
   },
   semiHeaderText: {
-    fontFamily: "PoppinsRegular",
+    fontFamily: "Inter_400Regular",
     fontSize: RFValue(13),
     marginTop: height * 0.01,
   },
 
   midContainer: {
-    flex: 8.5,
+    flex: 1,
     flexDirection: "column",
     justifyContent: "flex-start",
     alignItems: "center",
@@ -157,7 +112,7 @@ const styles = StyleSheet.create({
   },
   logoutButtonText: {
     color: "white",
-    fontFamily: "PoppinsBold",
+    fontFamily: "Inter_700Bold",
     fontSize: width * 0.04,
     textAlign: "center",
   },

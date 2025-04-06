@@ -17,7 +17,7 @@ const AppStack = () => {
       screenOptions={{
         headerShown: false,
         gestureEnabled: false,
-        cardStyle: { backgroundColor: "white", flex: 0.88 },
+        cardStyle: { backgroundColor: "#F9F9F9", flex: 1 },
       }}
     >
       <Stack.Screen name="Home" component={Home} />
