@@ -69,11 +69,6 @@ export default function App() {
 
 function AuthWrapper() {
   const { isLoggedIn } = useAuth();
-  const [selectedTab, setSelectedTab] = useState("Home");
-
-  const handleTabPress = (tabName) => {
-    setSelectedTab(tabName);
-  };
 
   return (
     <View style={{ flex: 1 }}>
@@ -83,7 +78,7 @@ function AuthWrapper() {
           <Theme1>
             <AppStack />
           </Theme1>
-          <BottomTabBar selectedTab={selectedTab} onTabPress={handleTabPress} />
+          <BottomTabBar />
         </>
       ) : (
         <AuthStack />

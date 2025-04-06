@@ -62,39 +62,6 @@ const Home = ({ navigation }) => {
 
         {/*flex 6*/}
         <QuickLookSection data={userData}></QuickLookSection>
-        {/*<View
-          style={{
-            flex: 4,
-            display: "flex",
-            flexDirection: "row",
-            gap: width * 0.02,
-            width: "90%",
-          }}
-        >
-          <MostCommonWorkoutSummaryCard
-            userId={userId}
-            height={height}
-            width={width}
-          />
-        </View>
-        <View
-          style={{
-            flex: 4.5,
-            width: "88%",
-            flexDirection: "row",
-            gap: width * 0.01,
-            justifyContent: "center",
-          }}
-        >
-          <NewAchivementCard
-            user={user}
-            hasAssignedWorkout={hasAssignedWorkout}
-          ></NewAchivementCard>
-          <CreateOrEditWorkoutCard
-            hasAssignedWorkout={hasAssignedWorkout}
-            navigation={navigation}
-          ></CreateOrEditWorkoutCard>
-        </View>*/}
       </View>
     </View>
   );
