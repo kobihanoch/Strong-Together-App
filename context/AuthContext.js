@@ -2,10 +2,13 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { loginUser, registerUser } from "../services/AuthService";
 import supabase from "../src/supabaseClient";
+import * as Updates from "expo-updates";
 
 const AuthContext = createContext();
 
 export const useAuth = () => useContext(AuthContext);
+
+let authListener = null;
 
 export const AuthProvider = ({ children, onLogout }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -44,13 +47,12 @@ export const AuthProvider = ({ children, onLogout }) => {
       }
     };
 
-    const { data: listener } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
+    if (!authListener) {
+      authListener = supabase.auth.onAuthStateChange(async (event, session) => {
         console.log("Auth event:", event, session);
 
         if (session?.user?.id) {
           await loadFullUser(session.user.id);
-          //navigation.navigate("Home");
         } else {
           const recoveredUser = await waitForUser();
           if (recoveredUser) {
@@ -62,8 +64,8 @@ export const AuthProvider = ({ children, onLogout }) => {
             console.log("Session is null or user not found after retries");
           }
         }
-      }
-    );
+      }).data.subscription;
+    }
 
     const loadInitialSession = async () => {
       const { data } = await supabase.auth.getSession();
@@ -80,10 +82,6 @@ export const AuthProvider = ({ children, onLogout }) => {
     };
 
     loadInitialSession();
-
-    return () => {
-      listener.subscription.unsubscribe();
-    };
   }, []);
 
   const updateProfilePic = (picUrl) => {
@@ -117,10 +115,11 @@ export const AuthProvider = ({ children, onLogout }) => {
       if (!result.success) {
         throw new Error(result.reason);
       }
-      setIsLoggedIn(true);
-      setUser(result.user);
+      const userId = result.user.id;
+      await loadFullUser(userId);
+      console.log("✅ Login successful - waiting for onAuthStateChange...");
     } catch (err) {
-      console.log("Error logging in: " + err);
+      console.log("Error logging in: " + err.message);
     } finally {
       setLoading(false);
     }
@@ -133,13 +132,9 @@ export const AuthProvider = ({ children, onLogout }) => {
     );
     setIsLoggedIn(false);
     setUser(null);
+    await Updates.reloadAsync();
+    await AsyncStorage.clear();
     await supabase.auth.signOut();
-    const { data: data2, error: error2 } = await supabase.auth.getSession();
-    console.log(
-      "AuthContext auth session after logout: " + JSON.stringify(data2)
-    );
-
-    //if (onLogout) onLogout();
   };
 
   return (
