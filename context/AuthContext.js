@@ -1,6 +1,7 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { loginUser, registerUser } from "../services/AuthService";
+import { getUserData } from "../services/UserService";
 import supabase from "../src/supabaseClient";
 import * as Updates from "expo-updates";
 
@@ -25,11 +26,7 @@ export const AuthProvider = ({ children, onLogout }) => {
 
       if (session) {
         console.log("Session exists");
-        const { data: userData, error } = await supabase
-          .from("users")
-          .select("*")
-          .eq("id", session.user.id)
-          .single();
+        const userData = await getUserData(session.user.id);
 
         if (!userData) {
           console.log("USER NOT FOUND");
