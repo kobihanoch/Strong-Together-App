@@ -2,10 +2,13 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { loginUser, registerUser } from "../services/AuthService";
 import supabase from "../src/supabaseClient";
+import * as Updates from "expo-updates";
 
 const AuthContext = createContext();
 
 export const useAuth = () => useContext(AuthContext);
+
+let authListener = null;
 
 export const AuthProvider = ({ children, onLogout }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -14,76 +17,36 @@ export const AuthProvider = ({ children, onLogout }) => {
   const [hasTrainedToday, setHasTrainedToday] = useState(false);
 
   useEffect(() => {
-    const waitForUser = async (retries = 5, delay = 300) => {
-      for (let i = 0; i < retries; i++) {
-        const { data } = await supabase.auth.getSession();
-        const user = data?.session?.user;
-        if (user?.id) {
-          return user;
+    const checkIfUserSession = async () => {
+      const {
+        data: { session },
+        error,
+      } = await supabase.auth.getSession();
+
+      if (session) {
+        console.log("Session exists");
+        const { data: userData, error } = await supabase
+          .from("users")
+          .select("*")
+          .eq("id", session.user.id)
+          .single();
+
+        if (!userData) {
+          console.log("USER NOT FOUND");
+          return;
         }
-        await new Promise((resolve) => setTimeout(resolve, delay));
-      }
-      return null;
-    };
 
-    const loadFullUser = async (userId) => {
-      const { data: fullUser, error } = await supabase
-        .from("users")
-        .select("*")
-        .eq("id", userId)
-        .single();
-
-      if (fullUser) {
-        setUser(fullUser);
+        console.log("User found: " + JSON.stringify(userData, null, 2));
         setIsLoggedIn(true);
-        console.log("Loaded user:", fullUser);
+        setUser(userData);
       } else {
-        setUser(null);
+        console.log("Session doesn't exist");
         setIsLoggedIn(false);
-        console.warn("Failed to load user:", error?.message);
-      }
-    };
-
-    const { data: listener } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
-        console.log("Auth event:", event, session);
-
-        if (session?.user?.id) {
-          await loadFullUser(session.user.id);
-          navigation.navigate("Home");
-        } else {
-          const recoveredUser = await waitForUser();
-          if (recoveredUser) {
-            console.log("Recovered user after TOKEN_REFRESHED delay");
-            await loadFullUser(recoveredUser.id);
-          } else {
-            setUser(null);
-            setIsLoggedIn(false);
-            console.log("Session is null or user not found after retries");
-          }
-        }
-      }
-    );
-
-    const loadInitialSession = async () => {
-      const { data } = await supabase.auth.getSession();
-      const user = data?.session?.user;
-
-      if (user?.id) {
-        await loadFullUser(user.id);
-        console.log("Loaded user on app start");
-      } else {
         setUser(null);
-        setIsLoggedIn(false);
-        console.log("No session on app start");
       }
     };
 
-    loadInitialSession();
-
-    return () => {
-      listener.subscription.unsubscribe();
-    };
+    checkIfUserSession();
   }, []);
 
   const updateProfilePic = (picUrl) => {
@@ -117,30 +80,23 @@ export const AuthProvider = ({ children, onLogout }) => {
       if (!result.success) {
         throw new Error(result.reason);
       }
+      const user = result.user;
       setIsLoggedIn(true);
-      setUser(result.user);
+      setUser(user);
+      console.log("✅ Login successful - waiting for onAuthStateChange...");
     } catch (err) {
-      console.log("Error logging in: " + err);
+      console.log("Error logging in: " + err.message);
     } finally {
       setLoading(false);
     }
   };
 
   const logout = async () => {
-    console.log("HI");
-    const { data, error } = await supabase.auth.getSession();
-    console.log(
-      "AuthContext auth session before logout: " + JSON.stringify(data)
-    );
-    await supabase.auth.signOut();
-    const { data: data2, error: error2 } = await supabase.auth.getSession();
-    console.log(
-      "AuthContext auth session after logout: " + JSON.stringify(data2)
-    );
     setIsLoggedIn(false);
     setUser(null);
-
-    if (onLogout) onLogout();
+    //await Updates.reloadAsync();
+    //await AsyncStorage.clear();
+    await supabase.auth.signOut();
   };
 
   return (

@@ -85,14 +85,24 @@ const TopComponent = () => {
           </Text>
         </View>
       </View>
-      <TouchableOpacity style={{ paddingBottom: height * 0.02 }}>
-        <MaterialCommunityIcons
-          name={"bell"}
-          size={RFValue(18)}
-          color={"#1A1A1A"}
-          opacity={0.8}
-        ></MaterialCommunityIcons>
-      </TouchableOpacity>
+      <View style={{ flexDirection: "row", gap: width * 0.02 }}>
+        <TouchableOpacity style={{ paddingBottom: height * 0.02 }}>
+          <MaterialCommunityIcons
+            name={"bell"}
+            size={RFValue(18)}
+            color={"#1A1A1A"}
+            opacity={0.8}
+          ></MaterialCommunityIcons>
+        </TouchableOpacity>
+        <TouchableOpacity style={{ paddingBottom: height * 0.02 }}>
+          <MaterialCommunityIcons
+            name={"calendar"}
+            size={RFValue(18)}
+            color={"#1A1A1A"}
+            opacity={0.8}
+          ></MaterialCommunityIcons>
+        </TouchableOpacity>
+      </View>
 
       {/* Modal */}
       <Modal

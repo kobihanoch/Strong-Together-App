@@ -18,6 +18,9 @@ import { AuthProvider, useAuth } from "./context/AuthContext";
 import AppStack from "./navigation/AppStack";
 import AuthStack from "./navigation/AuthStack";
 import { StatusBar } from "react-native";
+import { createStackNavigator } from "@react-navigation/stack";
+
+const RootStack = createStackNavigator();
 
 export default function App() {
   const [fontsLoaded, setFontsLoaded] = useState(false);
@@ -43,7 +46,7 @@ export default function App() {
       navigationRef.dispatch(
         CommonActions.reset({
           index: 0,
-          routes: [{ name: "AuthStack" }],
+          routes: [{ name: "Auth" }],
         })
       );
     }
@@ -61,30 +64,36 @@ export default function App() {
   return (
     <AuthProvider onLogout={handleLogoutReset}>
       <NavigationContainer ref={navigationRef}>
-        <AuthWrapper />
+        <MainNavigator />
       </NavigationContainer>
     </AuthProvider>
   );
 }
 
-function AuthWrapper() {
+function MainNavigator() {
   const { isLoggedIn } = useAuth();
+  console.log("🧠 isLoggedIn value:", isLoggedIn);
 
   return (
-    <View style={{ flex: 1 }}>
+    <RootStack.Navigator screenOptions={{ headerShown: false }}>
       {isLoggedIn ? (
-        <>
-          <StatusBar barStyle="dark-content" />
-          <Theme1>
-            <AppStack />
-          </Theme1>
-          <BottomTabBar />
-        </>
+        <RootStack.Screen name="App" component={AppWrapper} />
       ) : (
-        <AuthStack />
+        <RootStack.Screen name="Auth" component={AuthStack} />
       )}
-    </View>
+    </RootStack.Navigator>
   );
+  function AppWrapper() {
+    return (
+      <>
+        <StatusBar barStyle="dark-content" />
+        <Theme1>
+          <AppStack />
+        </Theme1>
+        <BottomTabBar />
+      </>
+    );
+  }
 }
 
 const styles = StyleSheet.create({

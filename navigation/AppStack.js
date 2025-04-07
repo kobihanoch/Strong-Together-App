@@ -17,8 +17,10 @@ const AppStack = () => {
       screenOptions={{
         headerShown: false,
         gestureEnabled: false,
+
         cardStyle: { backgroundColor: "#F9F9F9", flex: 1 },
       }}
+      initialRouteName="Home"
     >
       <Stack.Screen name="Home" component={Home} />
       <Stack.Screen name="Settings" component={Settings} />

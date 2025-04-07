@@ -18,7 +18,11 @@ const Settings = () => {
 
   return (
     <View style={{ flex: 1, paddingVertical: height * 0.02 }}>
-      <TouchableOpacity onPress={logout}>
+      <TouchableOpacity
+        onPress={async () => {
+          await logout();
+        }}
+      >
         <Text
           style={{
             fontFamily: "Inter_700Bold",
