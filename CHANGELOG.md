@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2.0.1](https://github.com/kobihanoch/Strong-Together-App/compare/v2.0.0...v2.0.1) (2025-04-07)
+
+
+### Features
+
+* **topcomponent:** added calendar button ([2dd89e5](https://github.com/kobihanoch/Strong-Together-App/commit/2dd89e5680dafca374f56ee9973a190d0f81b429))
+
+
+### Bug Fixes
+
+* **auth:** log in / log out is now working without errors/warnings ([a8d37fb](https://github.com/kobihanoch/Strong-Together-App/commit/a8d37fbf33d94860ac83920e886ada4be0e5a7ba))
+* **auth:** log in and log out / auth load user has changed ([40a60c6](https://github.com/kobihanoch/Strong-Together-App/commit/40a60c6e863626bc882ac348a4e1354b92120dd6))
+* **auth:** smooth log in and log out - app is refreshing after log out ([0fce59f](https://github.com/kobihanoch/Strong-Together-App/commit/0fce59f7ce9629611c89d44d89e193810755f425))
+* **login:** redirect to home page after log in function deleted, handled now by App.js and by isLoggedIn ([7569137](https://github.com/kobihanoch/Strong-Together-App/commit/7569137c2ae9de5d74f50129487a0cdc0fccbb97))
+* **tabbar:** now tab bar is showing home page is selected after log in ([f3d8ac2](https://github.com/kobihanoch/Strong-Together-App/commit/f3d8ac2767e35f2e84c88c4e781698b394f955d0))
+
 ## [2.0.0](https://github.com/kobihanoch/Strong-Together-App/compare/v1.6.0...v2.0.0) (2025-04-06)
 
 
