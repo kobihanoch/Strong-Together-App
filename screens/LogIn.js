@@ -26,7 +26,6 @@ const Login = ({ navigation }) => {
     try {
       console.log("Calling login from useAuth");
       await login(username, password);
-      navigation.navigate("Home");
     } catch (error) {
       console.log("Login failed:", error.message);
     }
