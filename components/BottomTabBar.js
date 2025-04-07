@@ -18,12 +18,14 @@ const BottomTabBar = () => {
   const navigation = useNavigation();
   const routeName = useNavigationState((state) => {
     const appRoute = state.routes[state.index];
-    if (appRoute.state) {
-      const nestedState = appRoute.state;
+    const nestedState = appRoute.state;
+
+    if (nestedState && nestedState.routes && nestedState.routes.length > 0) {
       const innerRoute = nestedState.routes[nestedState.index];
       return innerRoute.name;
     }
-    return appRoute.name;
+
+    return "Home";
   });
 
   const isWorkoutMode = routeName === "StartWorkout";
