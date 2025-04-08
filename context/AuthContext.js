@@ -4,7 +4,8 @@ import { loginUser, registerUser } from "../services/AuthService";
 import { getUserData } from "../services/UserService";
 import supabase from "../src/supabaseClient";
 import * as Updates from "expo-updates";
-import useUserData from "../hooks/useUserData";
+import { getUserExerciseTracking } from "../services/WorkoutService";
+import { hasWorkoutForToday } from "../utils/authUtils";
 
 const AuthContext = createContext();
 
@@ -17,41 +18,49 @@ export const AuthProvider = ({ children, onLogout }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(false);
   const [hasTrainedToday, setHasTrainedToday] = useState(false);
-  const { fetchUserData, userData } = useUserData();
 
+  // Sessions and fetch user
   useEffect(() => {
     const checkIfUserSession = async () => {
-      const {
-        data: { session },
-        error,
-      } = await supabase.auth.getSession();
+      setLoading(true);
+      try {
+        const {
+          data: { session },
+          error,
+        } = await supabase.auth.getSession();
 
-      if (session) {
-        console.log("Session exists");
-        fetchUserData(session.user.id);
-      } else {
-        console.log("Session doesn't exist");
-        setIsLoggedIn(false);
-        setUser(null);
+        if (session) {
+          console.log("Session exists");
+          // Get user data for user found
+          const userData = await getUserData(session.user.id);
+
+          // Get the exercise tracking for user
+          const exerciseTracking = await getUserExerciseTracking(
+            session.user.id
+          );
+
+          // Check if user trained today
+          setHasTrainedToday(hasWorkoutForToday(exerciseTracking));
+
+          // Update states
+          setIsLoggedIn(true);
+          setUser(userData);
+        } else {
+          console.log("Session doesn't exist");
+          setIsLoggedIn(false);
+          setUser(null);
+        }
+      } catch (err) {
+        throw err;
+      } finally {
+        setLoading(false);
       }
     };
 
     checkIfUserSession();
   }, []);
 
-  // If gets any userData
-  useEffect(() => {
-    if (!userData) {
-      if (!userData) {
-        console.log("USER NOT FOUND");
-        return;
-      }
-    }
-    console.log("User found: " + JSON.stringify(userData, null, 2));
-    setIsLoggedIn(true);
-    setUser(userData);
-  }, [userData]);
-
+  // Load profile pic
   const updateProfilePic = (picUrl) => {
     setUser((prevUser) => {
       const updatedUser = { ...prevUser, profile_image_url: picUrl };
