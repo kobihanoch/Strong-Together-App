@@ -15,6 +15,7 @@ export const updateProfilePictureURL = async (userId, picURL) => {
   }
 };
 
+// Get user data
 export const getUserData = async (userId) => {
   const { data, error } = await supabase
     .from("users")
