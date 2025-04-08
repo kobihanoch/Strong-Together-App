@@ -4,6 +4,7 @@ import { loginUser, registerUser } from "../services/AuthService";
 import { getUserData } from "../services/UserService";
 import supabase from "../src/supabaseClient";
 import * as Updates from "expo-updates";
+import useUserData from "../hooks/useUserData";
 
 const AuthContext = createContext();
 
@@ -16,6 +17,7 @@ export const AuthProvider = ({ children, onLogout }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(false);
   const [hasTrainedToday, setHasTrainedToday] = useState(false);
+  const { fetchUserData, userData } = useUserData();
 
   useEffect(() => {
     const checkIfUserSession = async () => {
@@ -26,16 +28,7 @@ export const AuthProvider = ({ children, onLogout }) => {
 
       if (session) {
         console.log("Session exists");
-        const userData = await getUserData(session.user.id);
-
-        if (!userData) {
-          console.log("USER NOT FOUND");
-          return;
-        }
-
-        console.log("User found: " + JSON.stringify(userData, null, 2));
-        setIsLoggedIn(true);
-        setUser(userData);
+        fetchUserData(session.user.id);
       } else {
         console.log("Session doesn't exist");
         setIsLoggedIn(false);
@@ -45,6 +38,19 @@ export const AuthProvider = ({ children, onLogout }) => {
 
     checkIfUserSession();
   }, []);
+
+  // If gets any userData
+  useEffect(() => {
+    if (!userData) {
+      if (!userData) {
+        console.log("USER NOT FOUND");
+        return;
+      }
+    }
+    console.log("User found: " + JSON.stringify(userData, null, 2));
+    setIsLoggedIn(true);
+    setUser(userData);
+  }, [userData]);
 
   const updateProfilePic = (picUrl) => {
     setUser((prevUser) => {
