@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.1.0](https://github.com/kobihanoch/Strong-Together-App/compare/v2.0.2...v2.1.0) (2025-04-08)
+
+
+### Features
+
+* **profile:** recreated profile page ([6c5177d](https://github.com/kobihanoch/Strong-Together-App/commit/6c5177d12055315dfc9e5dfa174614535481c074))
+* **settings:** created settings page ([3cadb99](https://github.com/kobihanoch/Strong-Together-App/commit/3cadb99a3a918c828c31143e631c1228556cce05))
+
 ### [2.0.2](https://github.com/kobihanoch/Strong-Together-App/compare/v2.0.1...v2.0.2) (2025-04-08)
 
 
