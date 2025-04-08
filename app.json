@@ -16,10 +16,9 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/icon.png",
-        "backgroundColor": "#ffffff"
-      },
-      "package": "com.kobihanoch.strongtogether"
+        "foregroundImage": "./assets/logo.png",
+        "backgroundColor": "#2979ff"
+      }
     },
     "web": {
       "favicon": "./assets/favicon.png"
