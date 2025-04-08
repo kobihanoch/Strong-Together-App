@@ -1,9 +1,7 @@
-import React, { useEffect, useState } from "react";
-import { Text, View, Dimensions } from "react-native";
+import React from "react";
+import { Dimensions, Text, View } from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";
 import Svg, { Circle } from "react-native-svg";
-import useExerciseTracking from "../../hooks/useExerciseTracking";
-import useWorkoutSplits from "../../hooks/useWorkoutSplits";
 
 const { width, height } = Dimensions.get("window");
 
