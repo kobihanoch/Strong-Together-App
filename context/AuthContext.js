@@ -1,8 +1,11 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { loginUser, registerUser } from "../services/AuthService";
+import { getUserData } from "../services/UserService";
 import supabase from "../src/supabaseClient";
 import * as Updates from "expo-updates";
+import { getUserExerciseTracking } from "../services/WorkoutService";
+import { hasWorkoutForToday } from "../utils/authUtils";
 
 const AuthContext = createContext();
 
@@ -16,39 +19,48 @@ export const AuthProvider = ({ children, onLogout }) => {
   const [loading, setLoading] = useState(false);
   const [hasTrainedToday, setHasTrainedToday] = useState(false);
 
+  // Sessions and fetch user
   useEffect(() => {
     const checkIfUserSession = async () => {
-      const {
-        data: { session },
-        error,
-      } = await supabase.auth.getSession();
+      setLoading(true);
+      try {
+        const {
+          data: { session },
+          error,
+        } = await supabase.auth.getSession();
 
-      if (session) {
-        console.log("Session exists");
-        const { data: userData, error } = await supabase
-          .from("users")
-          .select("*")
-          .eq("id", session.user.id)
-          .single();
+        if (session) {
+          console.log("Session exists");
+          // Get user data for user found
+          const userData = await getUserData(session.user.id);
 
-        if (!userData) {
-          console.log("USER NOT FOUND");
-          return;
+          // Get the exercise tracking for user
+          const exerciseTracking = await getUserExerciseTracking(
+            session.user.id
+          );
+
+          // Check if user trained today
+          setHasTrainedToday(hasWorkoutForToday(exerciseTracking));
+
+          // Update states
+          setIsLoggedIn(true);
+          setUser(userData);
+        } else {
+          console.log("Session doesn't exist");
+          setIsLoggedIn(false);
+          setUser(null);
         }
-
-        console.log("User found: " + JSON.stringify(userData, null, 2));
-        setIsLoggedIn(true);
-        setUser(userData);
-      } else {
-        console.log("Session doesn't exist");
-        setIsLoggedIn(false);
-        setUser(null);
+      } catch (err) {
+        throw err;
+      } finally {
+        setLoading(false);
       }
     };
 
     checkIfUserSession();
   }, []);
 
+  // Load profile pic
   const updateProfilePic = (picUrl) => {
     setUser((prevUser) => {
       const updatedUser = { ...prevUser, profile_image_url: picUrl };

@@ -14,3 +14,18 @@ export const updateProfilePictureURL = async (userId, picURL) => {
     console.log("Service profile pic URL updated successfully");
   }
 };
+
+// Get user data
+export const getUserData = async (userId) => {
+  const { data, error } = await supabase
+    .from("users")
+    .select("*")
+    .eq("id", userId)
+    .single();
+
+  if (error) {
+    console.log("Service error while fetching user data: " + error);
+    throw error;
+  }
+  return data;
+};

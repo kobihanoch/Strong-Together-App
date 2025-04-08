@@ -94,14 +94,6 @@ const TopComponent = () => {
             opacity={0.8}
           ></MaterialCommunityIcons>
         </TouchableOpacity>
-        <TouchableOpacity style={{ paddingBottom: height * 0.02 }}>
-          <MaterialCommunityIcons
-            name={"calendar"}
-            size={RFValue(18)}
-            color={"#1A1A1A"}
-            opacity={0.8}
-          ></MaterialCommunityIcons>
-        </TouchableOpacity>
       </View>
 
       {/* Modal */}
