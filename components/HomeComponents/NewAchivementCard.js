@@ -1,8 +1,6 @@
-import { LinearGradient } from "expo-linear-gradient";
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { Dimensions, Image, Text, View } from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";
-import useExerciseTracking from "../../hooks/useExerciseTracking";
 
 const { width, height } = Dimensions.get("window");
 

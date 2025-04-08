@@ -9,43 +9,90 @@ import {
 } from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";
 import { useAuth } from "../context/AuthContext";
+import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
+import ToggleSetting from "../components/ToggleSetting";
 
 const { width, height } = Dimensions.get("window");
 
 const Settings = () => {
   const { user, logout } = useAuth();
-  const navigation = useNavigation();
 
   return (
-    <View style={{ flex: 1, paddingVertical: height * 0.02 }}>
-      <TouchableOpacity
-        onPress={async () => {
-          await logout();
+    <View
+      style={{
+        flex: 1,
+        paddingHorizontal: width * 0.04,
+        paddingVertical: height * 0.04,
+      }}
+    >
+      <Text style={{ fontFamily: "Inter_600SemiBold", fontSize: RFValue(25) }}>
+        Settings
+      </Text>
+      <View
+        style={{
+          flexDirection: "column",
+          width: "90%",
+          alignSelf: "center",
+          marginTop: height * 0.04,
+          gap: height * 0.02,
         }}
       >
-        <Text
-          style={{
-            fontFamily: "Inter_700Bold",
-            fontSize: RFValue(14),
-            color: "red",
-          }}
-        >
-          Log Out
-        </Text>
-      </TouchableOpacity>
+        <View style={[styles.box, { height: height * 0.1 }]}>
+          <View style={{ flexDirection: "column", justifyContent: "center" }}>
+            <Text
+              style={{ fontFamily: "Inter_400Regular", fontSize: RFValue(15) }}
+            >
+              Notifications
+            </Text>
+            <Text
+              style={{
+                fontFamily: "Inter_400Regular",
+                fontSize: RFValue(12),
+                color: "rgb(187, 187, 187)",
+              }}
+            >
+              Allow push notifications
+            </Text>
+          </View>
+
+          <ToggleSetting></ToggleSetting>
+        </View>
+
+        <TouchableOpacity style={styles.box} onPress={() => logout()}>
+          <Text
+            style={{
+              fontFamily: "Inter_400Regular",
+              fontSize: RFValue(15),
+              color: "rgb(184, 33, 33)",
+            }}
+          >
+            Log Out
+          </Text>
+          <MaterialCommunityIcons
+            name="logout"
+            size={RFValue(15)}
+            color="rgb(166, 51, 51)"
+          ></MaterialCommunityIcons>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
   box: {
-    width: 50,
-    height: 50,
-    backgroundColor: "skyblue",
-    marginBottom: 10,
+    backgroundColor: "white",
+    borderRadius: height * 0.012,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.05,
+    shadowRadius: 5,
+    elevation: 1,
+    height: height * 0.06,
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingHorizontal: width * 0.04,
+    flexDirection: "row",
   },
 });
 
