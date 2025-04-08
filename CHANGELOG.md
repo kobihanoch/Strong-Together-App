@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2.0.2](https://github.com/kobihanoch/Strong-Together-App/compare/v2.0.1...v2.0.2) (2025-04-08)
+
+
+### Bug Fixes
+
+* **auth:** user is loaded with new state of has worked out today, supported by using new utils file ([76001cc](https://github.com/kobihanoch/Strong-Together-App/commit/76001cc0d0267c31e943d9466b63bb9d8030044c))
+
 ### [2.0.1](https://github.com/kobihanoch/Strong-Together-App/compare/v2.0.0...v2.0.1) (2025-04-07)
 
 
