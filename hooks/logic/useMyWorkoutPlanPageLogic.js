@@ -45,20 +45,6 @@ export const useMyWorkoutPlanPageLogic = (user, authHasTrainedToday) => {
   }, [user]);
 
   useEffect(() => {
-    if (!loading && exerciseTracking && exerciseTracking.length > 0) {
-      const etByDate = filterExercisesByDate(
-        exerciseTracking,
-        moment().format("YYYY-MM-DD")
-      );
-      if (etByDate && etByDate.length > 0) {
-        setHasTrainedToday(true);
-      } else {
-        setHasTrainedToday(false);
-      }
-    }
-  }, [loading]);
-
-  useEffect(() => {
     setHasTrainedToday(authHasTrainedToday);
   }, [authHasTrainedToday]);
 
