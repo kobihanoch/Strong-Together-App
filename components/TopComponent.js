@@ -18,17 +18,19 @@ const { width, height } = Dimensions.get("window");
 
 const TopComponent = () => {
   const { user, notifications } = useAuth();
+  const [msgCount, setMsgCount] = useState();
   const [username, setUsername] = useState(null);
   const [fullname, setFullname] = useState(null);
-  const [profileImageUrl, SetProfileImageUrl] = useState(null);
+  const [profileImageUrl, setProfileImageUrl] = useState(null);
 
   useEffect(() => {
-    if (user) {
+    if (user && notifications) {
       setUsername(user.username);
       setFullname(user.name);
-      SetProfileImageUrl(user.profile_image_url);
+      setProfileImageUrl(user.profile_image_url);
+      setMsgCount(notifications.unreadMessages.length);
     }
-  });
+  }, [user, notifications]);
 
   const [isModalVisible, setIsModalVisible] = useState(false);
 
@@ -104,7 +106,7 @@ const TopComponent = () => {
               right: 0,
               justifyContent: "center",
               alignItems: "center",
-              opacity: notifications.unreadMessages == 0 ? 0 : 1,
+              opacity: msgCount == 0 ? 0 : 1,
             }}
           >
             <Text
@@ -114,11 +116,8 @@ const TopComponent = () => {
                 fontFamily: "Inter_600SemiBold",
               }}
             >
-              {notifications.unreadMessages > 99
-                ? "!"
-                : String(notifications.unreadMessages)}
+              {msgCount > 99 ? "!" : msgCount}
             </Text>
-            {/*In the future contains the real messages so do .count!!!!!*/}
           </View>
         </TouchableOpacity>
       </View>
