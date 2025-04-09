@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.2.0](https://github.com/kobihanoch/Strong-Together-App/compare/v2.1.0...v2.2.0) (2025-04-09)
+
+
+### Features
+
+* **auth:** added real time updates for new messages ([ce3870a](https://github.com/kobihanoch/Strong-Together-App/commit/ce3870a889237aecfb0ce4edfe2d3ac3ff541b15))
+* **auth:** added user notifications counter to top component, wip: full support of data base ([58a7188](https://github.com/kobihanoch/Strong-Together-App/commit/58a71880cb8370559df3f5eab8bfd25174924872))
+* **auth:** get messages from DB and filter by read / unread ([7ad40dd](https://github.com/kobihanoch/Strong-Together-App/commit/7ad40dd65f9290f37ae8e9bab9599ece67bcf209))
+* **notifications:** added push notifications when receiving a message. Only work after build ([7dcf2d6](https://github.com/kobihanoch/Strong-Together-App/commit/7dcf2d6a4e9ce3b1ea9a2a90fd37bc1341acfae9))
+* **service:** added new service for UserService to load use messages ([4c73c47](https://github.com/kobihanoch/Strong-Together-App/commit/4c73c472d4755b6a1d3e31ab0aa95341bf47b0d3))
+* **topcomponent:** added icon bump when getting a new message ([cefe3be](https://github.com/kobihanoch/Strong-Together-App/commit/cefe3be4d52d80df9b18646ea3a38ca59c2c6b74))
+* **topcomponent:** count unread messages to display number on bell icon ([2e7dace](https://github.com/kobihanoch/Strong-Together-App/commit/2e7daced4b1dd4747efcc5d2cb9f9f14ae002e50))
+
 ## [2.1.0](https://github.com/kobihanoch/Strong-Together-App/compare/v2.0.2...v2.1.0) (2025-04-08)
 
 
