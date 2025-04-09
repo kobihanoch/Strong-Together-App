@@ -18,6 +18,7 @@ export const AuthProvider = ({ children, onLogout }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(false);
   const [hasTrainedToday, setHasTrainedToday] = useState(false);
+  const [unreadMessages, setUnreadMessages] = useState(null);
 
   // Sessions and fetch user
   useEffect(() => {
@@ -41,6 +42,9 @@ export const AuthProvider = ({ children, onLogout }) => {
 
           // Check if user trained today
           setHasTrainedToday(hasWorkoutForToday(exerciseTracking));
+
+          // NEW - CHECKS INBOX - FOR NOW ONLY EXAMPLE OF 1 MESSAGE >>>>>>>>>>>>>>
+          setUnreadMessages(1); // => In the future will contain an object of messages
 
           // Update states
           setIsLoggedIn(true);
@@ -123,6 +127,10 @@ export const AuthProvider = ({ children, onLogout }) => {
         loading,
         setHasTrainedToday,
         hasTrainedToday,
+        notifications: {
+          unreadMessages,
+          setUnreadMessages,
+        },
       }}
     >
       {children}

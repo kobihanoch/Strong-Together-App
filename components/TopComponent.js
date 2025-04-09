@@ -17,7 +17,7 @@ import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityI
 const { width, height } = Dimensions.get("window");
 
 const TopComponent = () => {
-  const { user } = useAuth();
+  const { user, notifications } = useAuth();
   const [username, setUsername] = useState(null);
   const [fullname, setFullname] = useState(null);
   const [profileImageUrl, SetProfileImageUrl] = useState(null);
@@ -86,13 +86,40 @@ const TopComponent = () => {
         </View>
       </View>
       <View style={{ flexDirection: "row", gap: width * 0.02 }}>
-        <TouchableOpacity style={{ paddingBottom: height * 0.02 }}>
+        <TouchableOpacity style={{ marginBottom: height * 0.02 }}>
           <MaterialCommunityIcons
             name={"bell"}
-            size={RFValue(18)}
+            size={RFValue(20)}
             color={"#1A1A1A"}
             opacity={0.8}
           ></MaterialCommunityIcons>
+          <View
+            style={{
+              backgroundColor: "#EF4444",
+              height: height * 0.015,
+              borderRadius: height * 0.05,
+              aspectRatio: 1,
+              position: "absolute",
+              bottom: 0,
+              right: 0,
+              justifyContent: "center",
+              alignItems: "center",
+              opacity: notifications.unreadMessages == 0 ? 0 : 1,
+            }}
+          >
+            <Text
+              style={{
+                color: "white",
+                fontSize: RFValue(6),
+                fontFamily: "Inter_600SemiBold",
+              }}
+            >
+              {notifications.unreadMessages > 99
+                ? "!"
+                : String(notifications.unreadMessages)}
+            </Text>
+            {/*In the future contains the real messages so do .count!!!!!*/}
+          </View>
         </TouchableOpacity>
       </View>
 
