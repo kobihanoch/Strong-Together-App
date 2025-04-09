@@ -29,3 +29,32 @@ export const getUserData = async (userId) => {
   }
   return data;
 };
+
+// Get messages
+export const getUserMessages = async (userId) => {
+  const { data, error } = await supabase
+    .from("messages")
+    .select("*")
+    .eq("receiver_id", userId)
+    .order("sent_at", { ascending: false });
+
+  if (error) {
+    console.error("Failed to fetch messages:", error.message);
+    return [];
+  }
+  return data ?? [];
+};
+
+// Update push token
+export const savePushTokenToDB = async (userId, token) => {
+  const { error } = await supabase
+    .from("users")
+    .update({ push_token: token })
+    .eq("id", userId);
+
+  if (error) {
+    console.error("Failed to save push token:", error.message);
+  } else {
+    console.log("Push token saved successfully");
+  }
+};
