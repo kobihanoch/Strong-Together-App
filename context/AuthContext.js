@@ -6,6 +6,7 @@ import supabase from "../src/supabaseClient";
 import * as Updates from "expo-updates";
 import { getUserExerciseTracking } from "../services/WorkoutService";
 import { hasWorkoutForToday, filterMessagesByUnread } from "../utils/authUtils";
+import { listenToMessags } from "../utils/realTimeUtils";
 
 const AuthContext = createContext();
 
@@ -65,6 +66,20 @@ export const AuthProvider = ({ children, onLogout }) => {
 
     checkIfUserSession();
   }, []);
+
+  // listen to messages
+  useEffect(() => {
+    const channel = listenToMessags(
+      user,
+      setAllReceivedMessages,
+      setUnreadMessages
+    );
+
+    // If caught a new message delete the channel
+    return () => {
+      if (channel) supabase.removeChannel(channel);
+    };
+  }, [allReceivedMessages]);
 
   // Load profile pic
   const updateProfilePic = (picUrl) => {
