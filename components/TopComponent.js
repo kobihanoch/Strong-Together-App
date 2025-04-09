@@ -11,26 +11,28 @@ import {
 } from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";
 import { useAuth } from "../context/AuthContext";
+import { useNotifications } from "../context/NotificationsContext";
 import Icon from "react-native-vector-icons/Feather";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 
 const { width, height } = Dimensions.get("window");
 
 const TopComponent = () => {
-  const { user, notifications } = useAuth();
+  const { user } = useAuth();
+  const { unreadMessages } = useNotifications();
   const [msgCount, setMsgCount] = useState();
   const [username, setUsername] = useState(null);
   const [fullname, setFullname] = useState(null);
   const [profileImageUrl, setProfileImageUrl] = useState(null);
 
   useEffect(() => {
-    if (user && notifications) {
+    if (user && unreadMessages) {
       setUsername(user.username);
       setFullname(user.name);
       setProfileImageUrl(user.profile_image_url);
-      setMsgCount(notifications.unreadMessages.length);
+      setMsgCount(unreadMessages.length);
     }
-  }, [user, notifications]);
+  }, [user, unreadMessages]);
 
   const [isModalVisible, setIsModalVisible] = useState(false);
 

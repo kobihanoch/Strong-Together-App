@@ -19,6 +19,7 @@ import AppStack from "./navigation/AppStack";
 import AuthStack from "./navigation/AuthStack";
 import { StatusBar } from "react-native";
 import { createStackNavigator } from "@react-navigation/stack";
+import { NotificationsProvider } from "./context/NotificationsContext";
 
 const RootStack = createStackNavigator();
 
@@ -63,15 +64,31 @@ export default function App() {
 
   return (
     <AuthProvider onLogout={handleLogoutReset}>
-      <NavigationContainer ref={navigationRef}>
-        <MainNavigator />
-      </NavigationContainer>
+      <WrappedWithNotifications />
     </AuthProvider>
   );
 }
 
+const WrappedWithNotifications = () => {
+  const { user } = useAuth();
+  const navigationRef = useNavigationContainerRef();
+
+  return (
+    <NotificationsProvider user={user}>
+      <NavigationContainer ref={navigationRef}>
+        <MainNavigator />
+      </NavigationContainer>
+    </NotificationsProvider>
+  );
+};
+
 function MainNavigator() {
-  const { isLoggedIn } = useAuth();
+  const { isLoggedIn, initial } = useAuth();
+  useEffect(() => {
+    (async () => {
+      await initial.checkIfUserSession();
+    })();
+  }, []);
   console.log("🧠 isLoggedIn value:", isLoggedIn);
 
   return (
