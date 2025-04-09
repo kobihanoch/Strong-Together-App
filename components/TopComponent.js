@@ -14,17 +14,41 @@ import { useAuth } from "../context/AuthContext";
 import { useNotifications } from "../context/NotificationsContext";
 import Icon from "react-native-vector-icons/Feather";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
+import { Animated } from "react-native";
 
 const { width, height } = Dimensions.get("window");
 
 const TopComponent = () => {
+  // Context
   const { user } = useAuth();
   const { unreadMessages } = useNotifications();
+
+  // Properties
   const [msgCount, setMsgCount] = useState();
   const [username, setUsername] = useState(null);
   const [fullname, setFullname] = useState(null);
   const [profileImageUrl, setProfileImageUrl] = useState(null);
 
+  // Animations
+  const scaleAnim = useState(new Animated.Value(1))[0];
+  useEffect(() => {
+    if (unreadMessages) {
+      Animated.sequence([
+        Animated.timing(scaleAnim, {
+          toValue: 1.4,
+          duration: 150,
+          useNativeDriver: true,
+        }),
+        Animated.timing(scaleAnim, {
+          toValue: 1,
+          duration: 150,
+          useNativeDriver: true,
+        }),
+      ]).start();
+    }
+  }, [unreadMessages.length]);
+
+  // On load
   useEffect(() => {
     if (user && unreadMessages) {
       setUsername(user.username);
@@ -97,8 +121,9 @@ const TopComponent = () => {
             color={"#1A1A1A"}
             opacity={0.8}
           ></MaterialCommunityIcons>
-          <View
+          <Animated.View
             style={{
+              transform: [{ scale: scaleAnim }],
               backgroundColor: "#EF4444",
               height: height * 0.015,
               borderRadius: height * 0.05,
@@ -120,7 +145,7 @@ const TopComponent = () => {
             >
               {msgCount > 99 ? "!" : msgCount}
             </Text>
-          </View>
+          </Animated.View>
         </TouchableOpacity>
       </View>
 

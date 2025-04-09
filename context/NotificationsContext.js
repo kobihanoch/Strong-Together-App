@@ -12,6 +12,7 @@ export const NotificationsProvider = ({ user, children }) => {
   const [unreadMessages, setUnreadMessages] = useState([]);
   const [allReceivedMessages, setAllReceivedMessages] = useState([]);
 
+  // Update messages on live with listener
   useEffect(() => {
     if (!user) return;
 
@@ -26,6 +27,7 @@ export const NotificationsProvider = ({ user, children }) => {
     };
   }, [allReceivedMessages]);
 
+  // Load messages on start
   useEffect(() => {
     (async () => {
       if (user) {
