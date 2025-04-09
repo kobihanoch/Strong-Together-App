@@ -1,6 +1,8 @@
 import supabase from "../src/supabaseClient";
 import { getUserMessages } from "../services/UserService";
 import { filterMessagesByUnread } from "./authUtils";
+import * as Notifications from "expo-notifications";
+import { sendPushNotification } from "../notifications/NotificationsManager";
 
 // New message
 export const listenToMessags = async (
@@ -26,6 +28,11 @@ export const listenToMessags = async (
         const userMessages = await getUserMessages(user.id);
         setAllReceivedMessages(userMessages);
         setUnreadMessages(filterMessagesByUnread(userMessages));
+        await sendPushNotification(
+          user.push_token,
+          payload.new.subject,
+          payload.new.msg
+        );
       }
     )
 

@@ -20,12 +20,23 @@ import AuthStack from "./navigation/AuthStack";
 import { StatusBar } from "react-native";
 import { createStackNavigator } from "@react-navigation/stack";
 import { NotificationsProvider } from "./context/NotificationsContext";
+import NotificationsSetup from "./notifications/NotificationsSetup";
+import * as Notifications from "expo-notifications";
 
 const RootStack = createStackNavigator();
 
 export default function App() {
   const [fontsLoaded, setFontsLoaded] = useState(false);
   const navigationRef = useNavigationContainerRef();
+
+  // This tells Expo to show the notification even when app is in foreground
+  Notifications.setNotificationHandler({
+    handleNotification: async () => ({
+      shouldShowAlert: false,
+      shouldPlaySound: false,
+      shouldSetBadge: false, // CHANGE ALL TO TRUE ON BUILD
+    }),
+  });
 
   const loadFonts = async () => {
     await Font.loadAsync({
@@ -106,6 +117,7 @@ function MainNavigator() {
         <StatusBar barStyle="dark-content" />
         <Theme1>
           <AppStack />
+          <NotificationsSetup />
         </Theme1>
         <BottomTabBar />
       </>
