@@ -29,3 +29,18 @@ export const getUserData = async (userId) => {
   }
   return data;
 };
+
+export const getUserMessages = async (userId) => {
+  const { data, error } = await supabase
+    .from("messages")
+    .select("*")
+    .eq("receiver_id", userId)
+    .order("sent_at", { ascending: false });
+
+  if (error) {
+    console.error("Failed to fetch messages:", error.message);
+    return [];
+  }
+
+  return data ?? [];
+};
