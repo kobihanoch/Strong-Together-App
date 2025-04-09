@@ -30,6 +30,7 @@ export const getUserData = async (userId) => {
   return data;
 };
 
+// Get messages
 export const getUserMessages = async (userId) => {
   const { data, error } = await supabase
     .from("messages")
@@ -42,4 +43,18 @@ export const getUserMessages = async (userId) => {
     return [];
   }
   return data ?? [];
+};
+
+// Update push token
+export const savePushTokenToDB = async (userId, token) => {
+  const { error } = await supabase
+    .from("users")
+    .update({ push_token: token })
+    .eq("id", userId);
+
+  if (error) {
+    console.error("Failed to save push token:", error.message);
+  } else {
+    console.log("Push token saved successfully");
+  }
 };
