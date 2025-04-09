@@ -4,7 +4,7 @@
     "slug": "strong-together",
     "version": "2.1.0",
     "orientation": "portrait",
-    "icon": "./assets/AppIcon.png",
+    "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
     "splash": {
       "image": "./assets/logo.png",
@@ -16,13 +16,18 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/AppIcon.png",
-        "backgroundColor": "#ffffff"
+        "foregroundImage": "./assets/logo.png",
+        "backgroundColor": "#2979ff"
       }
     },
     "web": {
       "favicon": "./assets/favicon.png"
     },
-    "plugins": ["expo-font"]
+    "plugins": ["expo-font"],
+    "extra": {
+      "eas": {
+        "projectId": "c2039946-58ec-44b1-beb0-cb0a69f01873"
+      }
+    }
   }
 }

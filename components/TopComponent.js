@@ -11,24 +11,52 @@ import {
 } from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";
 import { useAuth } from "../context/AuthContext";
+import { useNotifications } from "../context/NotificationsContext";
 import Icon from "react-native-vector-icons/Feather";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
+import { Animated } from "react-native";
 
 const { width, height } = Dimensions.get("window");
 
 const TopComponent = () => {
+  // Context
   const { user } = useAuth();
+  const { unreadMessages } = useNotifications();
+
+  // Properties
+  const [msgCount, setMsgCount] = useState();
   const [username, setUsername] = useState(null);
   const [fullname, setFullname] = useState(null);
-  const [profileImageUrl, SetProfileImageUrl] = useState(null);
+  const [profileImageUrl, setProfileImageUrl] = useState(null);
 
+  // Animations
+  const scaleAnim = useState(new Animated.Value(1))[0];
   useEffect(() => {
-    if (user) {
+    if (unreadMessages) {
+      Animated.sequence([
+        Animated.timing(scaleAnim, {
+          toValue: 1.4,
+          duration: 150,
+          useNativeDriver: true,
+        }),
+        Animated.timing(scaleAnim, {
+          toValue: 1,
+          duration: 150,
+          useNativeDriver: true,
+        }),
+      ]).start();
+    }
+  }, [unreadMessages.length]);
+
+  // On load
+  useEffect(() => {
+    if (user && unreadMessages) {
       setUsername(user.username);
       setFullname(user.name);
-      SetProfileImageUrl(user.profile_image_url);
+      setProfileImageUrl(user.profile_image_url);
+      setMsgCount(unreadMessages.length);
     }
-  });
+  }, [user, unreadMessages]);
 
   const [isModalVisible, setIsModalVisible] = useState(false);
 
@@ -86,13 +114,38 @@ const TopComponent = () => {
         </View>
       </View>
       <View style={{ flexDirection: "row", gap: width * 0.02 }}>
-        <TouchableOpacity style={{ paddingBottom: height * 0.02 }}>
+        <TouchableOpacity style={{ marginBottom: height * 0.02 }}>
           <MaterialCommunityIcons
             name={"bell"}
-            size={RFValue(18)}
+            size={RFValue(20)}
             color={"#1A1A1A"}
             opacity={0.8}
           ></MaterialCommunityIcons>
+          <Animated.View
+            style={{
+              transform: [{ scale: scaleAnim }],
+              backgroundColor: "#EF4444",
+              height: height * 0.015,
+              borderRadius: height * 0.05,
+              aspectRatio: 1,
+              position: "absolute",
+              bottom: 0,
+              right: 0,
+              justifyContent: "center",
+              alignItems: "center",
+              opacity: msgCount == 0 ? 0 : 1,
+            }}
+          >
+            <Text
+              style={{
+                color: "white",
+                fontSize: RFValue(6),
+                fontFamily: "Inter_600SemiBold",
+              }}
+            >
+              {msgCount > 99 ? "!" : msgCount}
+            </Text>
+          </Animated.View>
         </TouchableOpacity>
       </View>
 

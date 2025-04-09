@@ -17,3 +17,7 @@ export const hasWorkoutForToday = (exerciseTracking) => {
     }
   }
 };
+
+export const filterMessagesByUnread = (messagesArr) => {
+  return messagesArr.filter((msg) => msg.is_read === false);
+};

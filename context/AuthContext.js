@@ -1,11 +1,12 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { loginUser, registerUser } from "../services/AuthService";
-import { getUserData } from "../services/UserService";
+import { getUserData, getUserMessages } from "../services/UserService";
 import supabase from "../src/supabaseClient";
 import * as Updates from "expo-updates";
 import { getUserExerciseTracking } from "../services/WorkoutService";
-import { hasWorkoutForToday } from "../utils/authUtils";
+import { hasWorkoutForToday, filterMessagesByUnread } from "../utils/authUtils";
+import { NotificationsContext } from "./NotificationsContext";
 
 const AuthContext = createContext();
 
@@ -19,46 +20,41 @@ export const AuthProvider = ({ children, onLogout }) => {
   const [loading, setLoading] = useState(false);
   const [hasTrainedToday, setHasTrainedToday] = useState(false);
 
+  // Method for initializaztion
+  const initializeUserSession = async (sessionUserId) => {
+    const userData = await getUserData(sessionUserId);
+    const exerciseTracking = await getUserExerciseTracking(sessionUserId);
+
+    setUser(userData);
+    setHasTrainedToday(hasWorkoutForToday(exerciseTracking));
+
+    // Logged in state for navigating
+    setIsLoggedIn(true);
+  };
+
   // Sessions and fetch user
-  useEffect(() => {
-    const checkIfUserSession = async () => {
-      setLoading(true);
-      try {
-        const {
-          data: { session },
-          error,
-        } = await supabase.auth.getSession();
+  const checkIfUserSession = async () => {
+    setLoading(true);
+    try {
+      const {
+        data: { session },
+        error,
+      } = await supabase.auth.getSession();
 
-        if (session) {
-          console.log("Session exists");
-          // Get user data for user found
-          const userData = await getUserData(session.user.id);
-
-          // Get the exercise tracking for user
-          const exerciseTracking = await getUserExerciseTracking(
-            session.user.id
-          );
-
-          // Check if user trained today
-          setHasTrainedToday(hasWorkoutForToday(exerciseTracking));
-
-          // Update states
-          setIsLoggedIn(true);
-          setUser(userData);
-        } else {
-          console.log("Session doesn't exist");
-          setIsLoggedIn(false);
-          setUser(null);
-        }
-      } catch (err) {
-        throw err;
-      } finally {
-        setLoading(false);
+      if (session) {
+        console.log("Session exists");
+        initializeUserSession(session.user.id);
+      } else {
+        console.log("Session doesn't exist");
+        setIsLoggedIn(false);
+        setUser(null);
       }
-    };
-
-    checkIfUserSession();
-  }, []);
+    } catch (err) {
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  };
 
   // Load profile pic
   const updateProfilePic = (picUrl) => {
@@ -92,9 +88,7 @@ export const AuthProvider = ({ children, onLogout }) => {
       if (!result.success) {
         throw new Error(result.reason);
       }
-      const user = result.user;
-      setIsLoggedIn(true);
-      setUser(user);
+      initializeUserSession(result.user.id);
       console.log("✅ Login successful - waiting for onAuthStateChange...");
     } catch (err) {
       console.log("Error logging in: " + err.message);
@@ -123,6 +117,10 @@ export const AuthProvider = ({ children, onLogout }) => {
         loading,
         setHasTrainedToday,
         hasTrainedToday,
+        initial: {
+          checkIfUserSession,
+          initializeUserSession,
+        },
       }}
     >
       {children}
