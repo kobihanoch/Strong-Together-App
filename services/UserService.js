@@ -41,6 +41,5 @@ export const getUserMessages = async (userId) => {
     console.error("Failed to fetch messages:", error.message);
     return [];
   }
-
   return data ?? [];
 };

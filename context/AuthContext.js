@@ -5,7 +5,7 @@ import { getUserData, getUserMessages } from "../services/UserService";
 import supabase from "../src/supabaseClient";
 import * as Updates from "expo-updates";
 import { getUserExerciseTracking } from "../services/WorkoutService";
-import { hasWorkoutForToday } from "../utils/authUtils";
+import { hasWorkoutForToday, filterMessagesByUnread } from "../utils/authUtils";
 
 const AuthContext = createContext();
 
@@ -29,10 +29,12 @@ export const AuthProvider = ({ children, onLogout }) => {
 
     setUser(userData);
     setHasTrainedToday(hasWorkoutForToday(exerciseTracking));
-    // NEW - CHECKS INBOX - FOR NOW ONLY EXAMPLE OF 1 MESSAGE >>>>>>>>>>>>>>
-    setAllReceivedMessages(messages);
-    setUnreadMessages(1); // Here make a sort function that sorts by is_read
 
+    // Messages
+    setAllReceivedMessages(messages);
+    setUnreadMessages(filterMessagesByUnread(messages), null, 2);
+
+    // Logged in state for navigating
     setIsLoggedIn(true);
   };
 
