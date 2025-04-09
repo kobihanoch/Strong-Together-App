@@ -1,7 +1,7 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { loginUser, registerUser } from "../services/AuthService";
-import { getUserData } from "../services/UserService";
+import { getUserData, getUserMessages } from "../services/UserService";
 import supabase from "../src/supabaseClient";
 import * as Updates from "expo-updates";
 import { getUserExerciseTracking } from "../services/WorkoutService";
@@ -19,6 +19,22 @@ export const AuthProvider = ({ children, onLogout }) => {
   const [loading, setLoading] = useState(false);
   const [hasTrainedToday, setHasTrainedToday] = useState(false);
   const [unreadMessages, setUnreadMessages] = useState(null);
+  const [allReceivedMessages, setAllReceivedMessages] = useState(null);
+
+  // Method for initializaztion
+  const initializeUserSession = async (sessionUserId) => {
+    const userData = await getUserData(sessionUserId);
+    const exerciseTracking = await getUserExerciseTracking(sessionUserId);
+    const messages = await getUserMessages(sessionUserId);
+
+    setUser(userData);
+    setHasTrainedToday(hasWorkoutForToday(exerciseTracking));
+    // NEW - CHECKS INBOX - FOR NOW ONLY EXAMPLE OF 1 MESSAGE >>>>>>>>>>>>>>
+    setAllReceivedMessages(messages);
+    setUnreadMessages(1); // Here make a sort function that sorts by is_read
+
+    setIsLoggedIn(true);
+  };
 
   // Sessions and fetch user
   useEffect(() => {
@@ -32,23 +48,7 @@ export const AuthProvider = ({ children, onLogout }) => {
 
         if (session) {
           console.log("Session exists");
-          // Get user data for user found
-          const userData = await getUserData(session.user.id);
-
-          // Get the exercise tracking for user
-          const exerciseTracking = await getUserExerciseTracking(
-            session.user.id
-          );
-
-          // Check if user trained today
-          setHasTrainedToday(hasWorkoutForToday(exerciseTracking));
-
-          // NEW - CHECKS INBOX - FOR NOW ONLY EXAMPLE OF 1 MESSAGE >>>>>>>>>>>>>>
-          setUnreadMessages(1); // => In the future will contain an object of messages
-
-          // Update states
-          setIsLoggedIn(true);
-          setUser(userData);
+          initializeUserSession(session.user.id);
         } else {
           console.log("Session doesn't exist");
           setIsLoggedIn(false);
@@ -96,9 +96,7 @@ export const AuthProvider = ({ children, onLogout }) => {
       if (!result.success) {
         throw new Error(result.reason);
       }
-      const user = result.user;
-      setIsLoggedIn(true);
-      setUser(user);
+      initializeUserSession(result.user.id);
       console.log("✅ Login successful - waiting for onAuthStateChange...");
     } catch (err) {
       console.log("Error logging in: " + err.message);
@@ -130,6 +128,8 @@ export const AuthProvider = ({ children, onLogout }) => {
         notifications: {
           unreadMessages,
           setUnreadMessages,
+          allReceivedMessages,
+          setAllReceivedMessages,
         },
       }}
     >
