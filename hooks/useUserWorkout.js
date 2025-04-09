@@ -42,7 +42,7 @@ export const useUserWorkout = (userId) => {
     try {
       console.log("Trying to fetch data from hook...");
       const data = await getUserExerciseTracking(userId);
-      console.log(JSON.stringify(data));
+      //console.log(JSON.stringify(data));
       setExerciseTracking(data);
       const frequentSplit = await getMostFrequentSplitNameByUserId(userId);
       setMostFrequentSplit(frequentSplit);
