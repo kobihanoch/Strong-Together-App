@@ -6,7 +6,7 @@ import supabase from "../src/supabaseClient";
 import * as Updates from "expo-updates";
 import { getUserExerciseTracking } from "../services/WorkoutService";
 import { hasWorkoutForToday, filterMessagesByUnread } from "../utils/authUtils";
-import { listenToMessags } from "../utils/realTimeUtils";
+import { NotificationsContext } from "./NotificationsContext";
 
 const AuthContext = createContext();
 
@@ -19,67 +19,42 @@ export const AuthProvider = ({ children, onLogout }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(false);
   const [hasTrainedToday, setHasTrainedToday] = useState(false);
-  const [unreadMessages, setUnreadMessages] = useState(null);
-  const [allReceivedMessages, setAllReceivedMessages] = useState(null);
 
   // Method for initializaztion
   const initializeUserSession = async (sessionUserId) => {
     const userData = await getUserData(sessionUserId);
     const exerciseTracking = await getUserExerciseTracking(sessionUserId);
-    const messages = await getUserMessages(sessionUserId);
 
     setUser(userData);
     setHasTrainedToday(hasWorkoutForToday(exerciseTracking));
-
-    // Messages
-    setAllReceivedMessages(messages);
-    setUnreadMessages(filterMessagesByUnread(messages), null, 2);
 
     // Logged in state for navigating
     setIsLoggedIn(true);
   };
 
   // Sessions and fetch user
-  useEffect(() => {
-    const checkIfUserSession = async () => {
-      setLoading(true);
-      try {
-        const {
-          data: { session },
-          error,
-        } = await supabase.auth.getSession();
+  const checkIfUserSession = async () => {
+    setLoading(true);
+    try {
+      const {
+        data: { session },
+        error,
+      } = await supabase.auth.getSession();
 
-        if (session) {
-          console.log("Session exists");
-          initializeUserSession(session.user.id);
-        } else {
-          console.log("Session doesn't exist");
-          setIsLoggedIn(false);
-          setUser(null);
-        }
-      } catch (err) {
-        throw err;
-      } finally {
-        setLoading(false);
+      if (session) {
+        console.log("Session exists");
+        initializeUserSession(session.user.id);
+      } else {
+        console.log("Session doesn't exist");
+        setIsLoggedIn(false);
+        setUser(null);
       }
-    };
-
-    checkIfUserSession();
-  }, []);
-
-  // listen to messages
-  useEffect(() => {
-    const channel = listenToMessags(
-      user,
-      setAllReceivedMessages,
-      setUnreadMessages
-    );
-
-    // If caught a new message delete the channel
-    return () => {
-      if (channel) supabase.removeChannel(channel);
-    };
-  }, [allReceivedMessages]);
+    } catch (err) {
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  };
 
   // Load profile pic
   const updateProfilePic = (picUrl) => {
@@ -142,11 +117,9 @@ export const AuthProvider = ({ children, onLogout }) => {
         loading,
         setHasTrainedToday,
         hasTrainedToday,
-        notifications: {
-          unreadMessages,
-          setUnreadMessages,
-          allReceivedMessages,
-          setAllReceivedMessages,
+        initial: {
+          checkIfUserSession,
+          initializeUserSession,
         },
       }}
     >
