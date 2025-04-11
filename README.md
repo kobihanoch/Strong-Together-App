@@ -1,6 +1,6 @@
 # 🌟 Strong-Together-App 🌟
 
-![Fitness App](https://img.shields.io/badge/Fitness-App-blue) ![JavaScript](https://img.shields.io/badge/Made%20With-JavaScript-yellow) ![Contributions](https://img.shields.io/badge/Contributions-Welcome-brightgreen)
+![Fitness App](https://img.shields.io/badge/Fitness-App-blue) ![JavaScript](https://img.shields.io/badge/Made%20With-JavaScript-yellow) ![Contributions](https://img.shields.io/badge/Contributions-Welcome-brightgreen) ![Version](https://img.shields.io/badge/Version-2.5.0-blue)
 
 <p align="center">
   <img src="assets/icon.png" alt="Strong-Together-App Icon" width="150" />
