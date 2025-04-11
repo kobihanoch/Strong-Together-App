@@ -3,7 +3,7 @@
 ![Fitness App](https://img.shields.io/badge/Fitness-App-blue) ![JavaScript](https://img.shields.io/badge/Made%20With-JavaScript-yellow) ![Contributions](https://img.shields.io/badge/Contributions-Welcome-brightgreen)
 
 <p align="center">
-  <img src="assets/app_banner.png" alt="Strong-Together-App Banner" width="100%" />
+  <img src="icon.png" alt="Strong-Together-App Icon" width="150" />
 </p>
 
 **Strong-Together-App** is the ultimate fitness companion designed to help users achieve their health and fitness goals. From personalized workout plans to real-time progress tracking, this app makes fitness accessible, engaging, and rewarding.
@@ -40,19 +40,36 @@ The aim of **Strong-Together-App** is to create a seamless fitness platform that
 
 ## 🛠️ Tech Stack
 
-<p align="center">
-  <img src="assets/tech_stack.png" alt="Tech Stack" width="800" />
-</p>
-
 #### Frontend
 
-- ⚛️ **React Native**: Cross-platform mobile app development.
-- 📦 **Expo**: Simplified development and testing.
+- ⚛️ **React Native**: Cross-platform mobile app development.  
+  <img src="https://img.icons8.com/color/48/react-native.png" alt="React Icon" width="50"/>
+
+- 📦 **Expo**: Simplified development and testing.  
+  <img src="https://img.icons8.com/ios-filled/50/000000/expo.png" alt="Expo Icon" width="50"/>
 
 #### Backend
 
 - 🧱 **Supabase**: Real-time database, authentication, and hosting.
-- **PostgreSQL**: Relational database for structured data storage.
+- **PostgreSQL**: Relational database for structured data storage.  
+  <img src="https://img.icons8.com/color/48/javascript.png" alt="JavaScript Icon" width="50"/>
+
+---
+
+## 🗄️ Database Schema
+
+The database is designed to handle complex relationships efficiently. Below is the schema for **Strong-Together-App**:
+
+### Key Tables:
+
+- **Users**: Stores user details, preferences, and progress.
+- **Workout Plans**: Defines personalized or trainer-assigned plans.
+- **Exercises**: Manages individual exercises and their metadata.
+- **Tracking**: Logs user progress for each workout session.
+
+<p align="center">
+  <img src="assets/dbdiagram.png" alt="Database Schema" width="800" />
+</p>
 
 ---
 
@@ -241,13 +258,68 @@ We welcome contributions from developers and fitness enthusiasts alike! Here’s
 
 ---
 
-## 🌐 Contact
+## ⚖️ Copyright Notice
 
-For any questions or support, feel free to reach out:
+© 2025 Kobi Hanoch. All rights reserved.
 
-- **GitHub**: [@kobihanoch](https://github.com/kobihanoch)
-- **Email**: [kobihanoch@example.com](mailto:kobikobi622@gmail.com)
+This repository and its code are the intellectual property of **Kobi Hanoch**. The following terms apply to this project:
+
+1. **Strict Prohibition**:  
+   Unauthorized use, copying, modification, or distribution of any part of this repository is **strictly prohibited**.
+
+2. **Purpose of the Code**:  
+   This code is provided **only for observation and learning purposes**. It cannot be used for any commercial or non-commercial purposes without explicit written permission from the author.
+
+3. **Intellectual Property Rights**:  
+   All ideas, implementations, and designs in this repository are the intellectual property of the author. Any violations of these rights may lead to legal action.
+
+4. **License**:  
+   This project is not open source. Any usage, even partial, must be authorized by **Kobi Hanoch**.
+
+---
+
+## 🙌 Credits
+
+This project was made possible with the help of the following tools, technologies, and resources:
+
+### **Technologies**
+
+- [**React Native**](https://reactnative.dev/)  
+   A framework for building cross-platform mobile applications.  
+   <img src="https://img.icons8.com/color/48/react-native.png" alt="React Icon" width="25"/>
+
+- [**Expo**](https://expo.dev/)  
+   A powerful toolchain for React Native that simplifies development and testing.  
+   <img src="https://img.icons8.com/ios-filled/50/000000/expo.png" alt="Expo Icon" width="25"/>
+
+- [**Supabase**](https://supabase.com/)  
+   An open-source backend as a service for real-time database management and authentication.
+
+- [**PostgreSQL**](https://www.postgresql.org/)  
+   A robust, open-source relational database system.
+
+### **Additional Resources**
+
+- Icons provided by [**Icons8**](https://icons8.com/):  
+   React Native, JavaScript, Expo, and other icons.
+- Shields.io for generating the badges used in this README.
+- Markdown formatting references from [**CommonMark**](https://commonmark.org/).
+
+### **Database Schema Design**
+
+- Database schema designed and visualized using [**dbdiagram.io**](https://dbdiagram.io/).
+
+### Inspiration & Learning
+
+- Tutorials and guides from the [React Native Documentation](https://reactnative.dev/docs/getting-started).
+- Community insights and discussions on [Stack Overflow](https://stackoverflow.com/).
+- Database schema concepts from [dbdiagram.io](https://dbdiagram.io/).
 
 ---
 
 ⭐ If you like this project, don’t forget to give it a star! ⭐
+
+For any questions or support, feel free to reach out:
+
+- **GitHub**: [@kobihanoch](https://github.com/kobihanoch)
+- **Email**: [kobikobi622@gmail.com](mailto:kobikobi622@gmail.com)
