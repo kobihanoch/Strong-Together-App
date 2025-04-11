@@ -3,7 +3,7 @@
 ![Fitness App](https://img.shields.io/badge/Fitness-App-blue) ![JavaScript](https://img.shields.io/badge/Made%20With-JavaScript-yellow) ![Contributions](https://img.shields.io/badge/Contributions-Welcome-brightgreen)
 
 <p align="center">
-  <img src="icon.png" alt="Strong-Together-App Icon" width="150" />
+  <img src="assets/icon.png" alt="Strong-Together-App Icon" width="150" />
 </p>
 
 **Strong-Together-App** is the ultimate fitness companion designed to help users achieve their health and fitness goals. From personalized workout plans to real-time progress tracking, this app makes fitness accessible, engaging, and rewarding.
@@ -94,10 +94,6 @@ The database is designed to handle complex relationships efficiently. Below is t
    npm start
    ```
 
-<p align="center">
-  <img src="assets/installation_guide.png" alt="Installation Guide" width="800" />
-</p>
-
 ---
 
 ## 🗄️ Database Schema
@@ -119,11 +115,10 @@ The database is designed to handle complex relationships efficiently. Here’s t
 
 ## 🗂️ Folder Structure
 
-The project is well-organized and modular. Below is a detailed overview of the folder structure:
+Below is the complete folder structure for **Strong-Together-App**, organized and modular. Click the arrow to expand and view all details.
 
-## 🗂️ Folder Structure
-
-Below is the updated and complete folder structure for **Strong-Together-App**, with detailed descriptions of each folder and file.
+<details>
+<summary>📁 Full Folder Structure (Click to Expand)</summary>
 
 | **Folder/File**                       | **Description**                                                                |
 | ------------------------------------- | ------------------------------------------------------------------------------ |
@@ -200,7 +195,7 @@ Below is the updated and complete folder structure for **Strong-Together-App**, 
 | 📁 **src/**                           | Core configuration files for the app.                                          |
 | ┗ 📄 **supabaseClient.js**            | Supabase client instance for API interactions.                                 |
 
----
+</details>
 
 ## 🤝 Contributing
 
@@ -235,10 +230,6 @@ We welcome contributions from developers and fitness enthusiasts alike! Here’s
 
 6. **Open a Pull Request**:
    Go to the original repository and open a pull request from your fork.
-
-<p align="center">
-  <img src="assets/contributing_steps.png" alt="Contributing Steps" width="800" />
-</p>
 
 ---
 
