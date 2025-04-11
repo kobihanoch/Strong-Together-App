@@ -96,23 +96,6 @@ The database is designed to handle complex relationships efficiently. Below is t
 
 ---
 
-## 🗄️ Database Schema
-
-The database is designed to handle complex relationships efficiently. Here’s the schema for Strong-Together-App:
-
-<p align="center">
-  <img src="assets/dbdiagram.png" alt="Database Schema" width="800" />
-</p>
-
-### Key Tables:
-
-- **Users**: Stores user details, preferences, and progress.
-- **Workout Plans**: Defines personalized or trainer-assigned plans.
-- **Exercises**: Manages individual exercises and their metadata.
-- **Tracking**: Logs user progress for each workout session.
-
----
-
 ## 🗂️ Folder Structure
 
 Below is the complete folder structure for **Strong-Together-App**, organized and modular. Click the arrow to expand and view all details.
