@@ -23,7 +23,9 @@ function ImagePickerComponent({ user, updateProfilePic, setMediaLoading }) {
     loading: mediaLoading,
   } = useMediaUploads();
 
-  const { updateProfilePictureURLForUser, loading, error } = useUserData();
+  const { updateProfilePictureURLForUser, loading, error } = useUserData(
+    user?.id
+  );
 
   const [profileImageUrl, setProfileImageUrl] = useState(
     user?.profile_image_url
@@ -113,7 +115,9 @@ function ImagePickerComponent({ user, updateProfilePic, setMediaLoading }) {
             source={
               profileImageUrl
                 ? { uri: profileImageUrl }
-                : require("../../assets/profile.png")
+                : user?.gender == "Male"
+                ? require("../../assets/man.png")
+                : require("../../assets/woman.png")
             }
             style={styles.image}
           />
