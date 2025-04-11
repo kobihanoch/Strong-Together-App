@@ -6,8 +6,36 @@ import {
   getUserGeneralPR,
   getUserLastWorkoutDate,
 } from "../../utils/homePageUtils";
+import useSystemMessages from "../Automations/useSystemMessages";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const useHomePageLogic = (user) => {
+  // Send welcome message for the first time
+  const { sendSystemMessage, isSending } = useSystemMessages(user?.id);
+  const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+  useEffect(() => {
+    (async () => {
+      if (user) {
+        if (await AsyncStorage.getItem("firstLogin")) {
+          console.log(
+            "First login detected for ",
+            user.username,
+            ", 2 seconds to message."
+          );
+          await sleep(3000);
+          await sendSystemMessage(
+            "Welcome to Strong Together!",
+            "We're excited to have you here. Your fitness journey starts now — let's make it count!"
+          );
+          await AsyncStorage.removeItem("firstLogin");
+          console.log("Message sent and asyncstorage item deleted!");
+        } else {
+          console.log("Not first login - not sending message.");
+        }
+      }
+    })();
+  }, [user]);
   const [username, setUsername] = useState(null);
   const [userId, setUserId] = useState(null);
   const [firstName, setFirstName] = useState(null);

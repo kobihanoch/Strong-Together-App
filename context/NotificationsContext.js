@@ -29,7 +29,7 @@ export const NotificationsProvider = ({ user, children }) => {
       setAllReceivedMessages,
       setUnreadMessages
     );
-
+    console.log("LISNTERLOADED!");
     return () => {
       if (channel) supabase.removeChannel(channel);
     };
@@ -50,10 +50,26 @@ export const NotificationsProvider = ({ user, children }) => {
           setAllSendersUsersArr(allUsersArray);
         } finally {
           setLoadingMessages(false);
+          console.log("SENDERSLOADED");
         }
       }
     })();
   }, [user]);
+
+  // When getting a new message
+  useEffect(() => {
+    if (allReceivedMessages.length === 0) return;
+
+    const loadSenders = async () => {
+      const { allUsersArray, imageMap } = await loadAllUsers(
+        allReceivedMessages
+      );
+      setAllSendersUsersArr(allUsersArray);
+      setProfileImagesCache(imageMap);
+    };
+
+    loadSenders();
+  }, [allReceivedMessages.length]);
 
   const loadAllUsers = async (messages) => {
     let allUsrsIdSet = new Set();
@@ -79,8 +95,6 @@ export const NotificationsProvider = ({ user, children }) => {
     );
 
     return { allUsersArray, imageMap };
-
-    return allUsersArray;
   };
 
   return (
