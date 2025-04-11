@@ -14,6 +14,7 @@ import { useAuth } from "../context/AuthContext";
 import { useNotifications } from "../context/NotificationsContext";
 import Icon from "react-native-vector-icons/Feather";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
+import { useNavigation } from "@react-navigation/native";
 import { Animated } from "react-native";
 
 const { width, height } = Dimensions.get("window");
@@ -22,6 +23,9 @@ const TopComponent = () => {
   // Context
   const { user } = useAuth();
   const { unreadMessages } = useNotifications();
+
+  // Navigation
+  const navigation = useNavigation();
 
   // Properties
   const [msgCount, setMsgCount] = useState();
@@ -114,7 +118,10 @@ const TopComponent = () => {
         </View>
       </View>
       <View style={{ flexDirection: "row", gap: width * 0.02 }}>
-        <TouchableOpacity style={{ marginBottom: height * 0.02 }}>
+        <TouchableOpacity
+          style={{ marginBottom: height * 0.02 }}
+          onPress={() => navigation.navigate("Inbox")}
+        >
           <MaterialCommunityIcons
             name={"bell"}
             size={RFValue(20)}

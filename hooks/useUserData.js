@@ -53,7 +53,7 @@ export const useUserData = (userId) => {
   };
 
   useEffect(() => {
-    fetchUserNameByUserId(userId);
+    fetchUserData(userId);
   }, [userId]);
 
   return {

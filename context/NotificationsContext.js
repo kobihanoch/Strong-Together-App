@@ -11,6 +11,7 @@ export const useNotifications = () => useContext(NotificationsContext);
 export const NotificationsProvider = ({ user, children }) => {
   const [unreadMessages, setUnreadMessages] = useState([]);
   const [allReceivedMessages, setAllReceivedMessages] = useState([]);
+  const [loadingMessages, setLoadingMessages] = useState(false);
 
   // Update messages on live with listener
   useEffect(() => {
@@ -31,9 +32,14 @@ export const NotificationsProvider = ({ user, children }) => {
   useEffect(() => {
     (async () => {
       if (user) {
-        const messages = await getUserMessages(user?.id);
-        setAllReceivedMessages(messages);
-        setUnreadMessages(filterMessagesByUnread(messages));
+        setLoadingMessages(true);
+        try {
+          const messages = await getUserMessages(user?.id);
+          setAllReceivedMessages(messages);
+          setUnreadMessages(filterMessagesByUnread(messages));
+        } finally {
+          setLoadingMessages(false);
+        }
       }
     })();
   }, [user]);
@@ -45,6 +51,7 @@ export const NotificationsProvider = ({ user, children }) => {
         setUnreadMessages,
         allReceivedMessages,
         setAllReceivedMessages,
+        loadingMessages,
       }}
     >
       {children}
