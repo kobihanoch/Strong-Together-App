@@ -6,8 +6,8 @@ import {
   getUserGeneralPR,
   getUserLastWorkoutDate,
 } from "../../utils/homePageUtils";
-import useSystemMessages from "../Automations/useSystemMessages";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import useSystemMessages from "../automations/useSystemMessages";
 
 const useHomePageLogic = (user) => {
   // Send welcome message for the first time
