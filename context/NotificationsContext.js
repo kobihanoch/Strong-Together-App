@@ -69,7 +69,11 @@ export const NotificationsProvider = ({ user, children }) => {
           await Image.prefetch(user.profile_image_url);
           imageMap[user.id] = { uri: user.profile_image_url };
         } else {
-          imageMap[user.id] = require("../assets/profile.png");
+          if (user.gender == "Male") {
+            imageMap[user.id] = require("../assets/man.png");
+          } else {
+            imageMap[user.id] = require("../assets/woman.png");
+          }
         }
       })
     );

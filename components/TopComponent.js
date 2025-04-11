@@ -90,7 +90,9 @@ const TopComponent = () => {
             source={
               profileImageUrl
                 ? { uri: profileImageUrl }
-                : require("../assets/profile.png")
+                : user?.gender == "Male"
+                ? require("../assets/man.png")
+                : require("../assets/woman.png")
             }
             style={styles.profileImage}
           />
@@ -169,7 +171,9 @@ const TopComponent = () => {
               source={
                 profileImageUrl
                   ? { uri: profileImageUrl }
-                  : require("../assets/profile.png")
+                  : user?.gender == "Male"
+                  ? require("../assets/man.png")
+                  : require("../assets/woman.png")
               }
               style={styles.enlargedImage}
             />

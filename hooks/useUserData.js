@@ -52,10 +52,6 @@ export const useUserData = (userId) => {
     }
   };
 
-  useEffect(() => {
-    fetchUserData(userId);
-  }, [userId]);
-
   return {
     updateProfilePictureURLForUser,
     fetchUserData,
