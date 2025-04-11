@@ -56,20 +56,83 @@ The aim of **Strong-Together-App** is to create a seamless fitness platform that
 
 ---
 
+---
+
 ## 🗄️ Database Schema
 
-The database is designed to handle complex relationships efficiently. Below is the schema for **Strong-Together-App**:
+The database has been divided into three main flows for clarity: **Workout Flow**, **Messages Flow**, and **Tracking Flow**. Each section provides an explanation and visual representation of the database relationships for its respective flow.
 
-### Key Tables:
+---
 
-- **Users**: Stores user details, preferences, and progress.
-- **Workout Plans**: Defines personalized or trainer-assigned plans.
-- **Exercises**: Manages individual exercises and their metadata.
-- **Tracking**: Logs user progress for each workout session.
+### 1️⃣ **Workout Flow**
+
+The **Workout Flow** is responsible for managing users, workout plans, workout splits, and exercises. It outlines how workout plans are created, divided into splits, and associated with specific exercises.
 
 <p align="center">
-  <img src="assets/dbdiagram.png" alt="Database Schema" width="800" />
+  <img src="assets/workout.png" alt="Workout Flow Diagram" width="800" />
 </p>
+
+#### Key Tables:
+
+- **Users**:
+  - Stores user information such as ID, name, email, and profile image.
+- **Workout Plans**:
+  - Created by users or trainers and includes attributes like workout level, number of splits, and name.
+- **Workout Splits**:
+  - Represents divisions of a workout plan, targeting specific muscle groups.
+- **Exercises**:
+  - Contains information about individual exercises, including target muscles and descriptions.
+- **Exercise to Workout Splits**:
+  - Links exercises to specific workout splits, specifying the number of sets.
+
+---
+
+### 2️⃣ **Tracking Flow**
+
+The **Tracking Flow** manages the tracking of exercises completed by users during specific workouts. It also handles scheduling workouts with notifications.
+
+<p align="center">
+  <img src="assets/tracking.png" alt="Tracking Flow Diagram" width="800" />
+</p>
+
+#### Key Tables:
+
+- **Users**:
+  - Tracks the progress of each user.
+- **Exercise Tracking**:
+  - Logs the completion of exercises, including weights, reps, and the date of the workout.
+- **Workout Splits**:
+  - Connects tracked exercises to the respective workout split.
+- **Scheduled Workouts**:
+  - Allows users to schedule workout activities with notifications and reminders.
+
+#### Flow Details:
+
+1. Users log their progress for specific exercises in **Exercise Tracking**.
+2. **Scheduled Workouts** is used to set up notifications for upcoming workout splits.
+
+---
+
+### 3️⃣ **Messages Flow**
+
+The **Messages Flow** handles the communication between users. It allows users to send and receive messages, with data about senders, receivers, and the content of the messages.
+
+<p align="center">
+  <img src="assets/messages.png" alt="Messages Flow Diagram" width="800" />
+</p>
+
+#### Key Tables:
+
+- **Users**:
+  - Acts as both the sender and receiver of messages.
+- **Messages**:
+  - Stores the content of the message, the subject, and metadata like whether the message has been read.
+
+#### Flow Details:
+
+1. A **sender** (user) initiates a message.
+2. The **receiver** (user) gets the message.
+3. The `is_read` field tracks whether the message has been opened.
 
 ---
 
