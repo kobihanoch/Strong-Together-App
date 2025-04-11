@@ -35,7 +35,6 @@ export const listenToMessags = async (
         );
       }
     )
-
     .on(
       "postgres_changes",
       {
@@ -46,6 +45,22 @@ export const listenToMessags = async (
       },
       async (payload) => {
         console.log("MSG DELETED! ", payload.old);
+
+        const userMessages = await getUserMessages(user.id);
+        setAllReceivedMessages(userMessages);
+        setUnreadMessages(filterMessagesByUnread(userMessages));
+      }
+    )
+    .on(
+      "postgres_changes",
+      {
+        event: "UPDATE",
+        schema: "public",
+        table: "messages",
+        filter: `receiver_id=eq.${user.id}`,
+      },
+      async (payload) => {
+        console.log("MSG READ! ", payload.new.subject);
 
         const userMessages = await getUserMessages(user.id);
         setAllReceivedMessages(userMessages);

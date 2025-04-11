@@ -30,6 +30,21 @@ export const getUserData = async (userId) => {
   return data;
 };
 
+// Get username
+export const getUsername = async (userId) => {
+  const { data, error } = await supabase
+    .from("users")
+    .select("username")
+    .eq("id", userId)
+    .single();
+
+  if (error) {
+    throw error;
+  }
+
+  return data;
+};
+
 // Get messages
 export const getUserMessages = async (userId) => {
   const { data, error } = await supabase
