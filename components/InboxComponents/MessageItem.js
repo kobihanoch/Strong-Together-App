@@ -11,12 +11,13 @@ import { RFValue } from "react-native-responsive-fontsize";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { formatDate } from "../../utils/statisticsUtils";
 import { useUserData } from "../../hooks/useUserData";
+import { updateMsgReadStatus } from "../../services/MessagesService";
 
 const { width, height } = Dimensions.get("window");
 
 const MessageItem = ({ item }) => {
   // Sender details
-  const { fetchUserData, userData } = useUserData(item.sender_id);
+  const { userData } = useUserData(item.sender_id);
 
   return (
     <TouchableOpacity
@@ -29,6 +30,7 @@ const MessageItem = ({ item }) => {
         borderBottomWidth: 0.5,
         borderColor: "rgba(93, 93, 93, 0.3)",
       }}
+      onPress={() => updateMsgReadStatus(item.id)}
     >
       <View
         style={{
