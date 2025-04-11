@@ -14,6 +14,7 @@ import Icon from "react-native-vector-icons/FontAwesome";
 import InputField from "../components/InputField";
 import Validators from "../components/Validators";
 import { useAuth } from "../context/AuthContext";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const { width, height } = Dimensions.get("window");
 
@@ -33,6 +34,8 @@ const Register = ({ navigation }) => {
     if (errorMessages.length === 0) {
       try {
         await register(email, password, username, fullName, gender);
+        // Save one time asyncstorage
+        await AsyncStorage.setItem("firstLogin", "true");
       } catch (error) {
         console.log("Registration failed:", error.message);
       }
