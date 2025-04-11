@@ -7,7 +7,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { RFValue } from "react-native-responsive-fontsize";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { formatDate } from "../../utils/statisticsUtils";
@@ -16,10 +16,7 @@ import { updateMsgReadStatus } from "../../services/MessagesService";
 
 const { width, height } = Dimensions.get("window");
 
-const MessageItem = ({ item }) => {
-  // Sender details
-  const { userData } = useUserData(item.sender_id);
-
+const MessageItem = ({ item, profileImages, sender }) => {
   // Modal of message
   const [isModalVisible, setIsModalVisible] = useState(false);
 
@@ -55,23 +52,20 @@ const MessageItem = ({ item }) => {
           }}
         >
           <Image
-            source={
-              userData?.profile_image_url
-                ? { uri: userData?.profile_image_url }
-                : require("../../assets/profile.png")
-            }
+            source={profileImages?.[sender?.id]}
             resizeMode="contain"
             style={{
               height: height * 0.03,
-              aspectRatio: 1,
+              width: height * 0.03,
               borderRadius: height * 0.04,
-              backgroundColor: "blue",
+              backgroundColor: "#E0E0E0",
             }}
           ></Image>
+
           <Text
             style={{ fontFamily: "Inter_600SemiBold", fontSize: RFValue(10) }}
           >
-            {String(userData?.name)}
+            {String(sender?.name)}
           </Text>
         </View>
         <Text
@@ -127,20 +121,64 @@ const MessageItem = ({ item }) => {
               backgroundColor: "white",
               borderRadius: height * 0.02,
               padding: width * 0.05,
+              elevation: 5,
             }}
           >
+            {/* HEADER - SENDER INFO */}
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                marginBottom: height * 0.02,
+              }}
+            >
+              <Image
+                source={profileImages?.[sender?.id]}
+                style={{
+                  width: height * 0.05,
+                  height: height * 0.05,
+                  borderRadius: height * 0.025,
+                  marginRight: width * 0.03,
+                }}
+              />
+              <View>
+                <Text
+                  style={{
+                    fontFamily: "Inter_600SemiBold",
+                    fontSize: RFValue(14),
+                    color: "#111",
+                  }}
+                >
+                  {sender?.name}
+                </Text>
+                <Text
+                  style={{
+                    fontFamily: "Inter_400Regular",
+                    fontSize: RFValue(11),
+                    color: "#666",
+                  }}
+                >
+                  {formatDate(item.sent_at.split("T")[0])}
+                </Text>
+              </View>
+            </View>
+
+            {/* SUBJECT */}
             <Text
               style={{
-                fontSize: RFValue(18),
-                fontFamily: "Inter_600SemiBold",
-                marginBottom: height * 0.01,
+                fontSize: RFValue(16),
+                fontFamily: "Inter_700Bold",
+                marginBottom: height * 0.015,
+                color: "#222",
               }}
             >
               {item.subject}
             </Text>
+
+            {/* MESSAGE */}
             <Text
               style={{
-                fontSize: RFValue(15),
+                fontSize: RFValue(14),
                 fontFamily: "Inter_400Regular",
                 color: "#333",
               }}
@@ -148,10 +186,11 @@ const MessageItem = ({ item }) => {
               {item.msg}
             </Text>
 
+            {/* CLOSE BUTTON */}
             <TouchableOpacity
               onPress={() => setIsModalVisible(false)}
               style={{
-                marginTop: height * 0.02,
+                marginTop: height * 0.025,
                 alignSelf: "flex-end",
               }}
             >

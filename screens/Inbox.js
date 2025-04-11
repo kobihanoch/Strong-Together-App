@@ -8,7 +8,7 @@ import { RFValue } from "react-native-responsive-fontsize";
 const { width, height } = Dimensions.get("window");
 
 const Inbox = () => {
-  const { messages } = useInboxLogic();
+  const { messages, media } = useInboxLogic();
 
   if (messages.loadingMessages) {
     return <LoadingPage message="Loading messages"></LoadingPage>;
@@ -27,14 +27,36 @@ const Inbox = () => {
         </Text>
       </View>
       <View style={{ flex: 8.5 }}>
-        <FlatList
-          data={[...messages.allReceivedMessages].sort(
-            (a, b) => new Date(b.sent_at) - new Date(a.sent_at)
-          )}
-          renderItem={({ item }) => <MessageItem item={item}></MessageItem>}
-          keyExtractor={(item) => item.id}
-          style={{ width: "100%" }}
-        ></FlatList>
+        {messages.allReceivedMessages.length != 0 ? (
+          <FlatList
+            data={[...messages.allReceivedMessages].sort(
+              (a, b) => new Date(b.sent_at) - new Date(a.sent_at)
+            )}
+            renderItem={({ item }) => (
+              <MessageItem
+                item={item}
+                profileImages={media.profileImagesCache}
+                sender={
+                  messages?.allSendersUsersArr?.filter(
+                    (usr) => usr.id === item.sender_id
+                  )[0]
+                }
+              ></MessageItem>
+            )}
+            keyExtractor={(item) => item.id}
+            style={{ width: "100%" }}
+          ></FlatList>
+        ) : (
+          <View
+            style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
+          >
+            <Text
+              style={{ fontFamily: "Inter_600SemiBold", fontSize: RFValue(18) }}
+            >
+              No messages yet
+            </Text>
+          </View>
+        )}
       </View>
     </View>
   );

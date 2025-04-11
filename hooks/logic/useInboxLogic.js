@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "../../context/AuthContext";
 import { useNotifications } from "../../context/NotificationsContext";
+import { getUserData } from "../../services/UserService";
 
 const useInboxLogic = () => {
   const { user } = useAuth();
@@ -9,11 +10,9 @@ const useInboxLogic = () => {
     unreadMessages,
     setUnreadMessages,
     loadingMessages,
+    profileImagesCache,
+    allSendersUsersArr,
   } = useNotifications(user);
-
-  useEffect(() => {
-    // TODO: fetch or logic here
-  }, []);
 
   return {
     messages: {
@@ -21,6 +20,10 @@ const useInboxLogic = () => {
       unreadMessages,
       setUnreadMessages,
       loadingMessages,
+      allSendersUsersArr,
+    },
+    media: {
+      profileImagesCache,
     },
   };
 };
