@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.3.0](https://github.com/kobihanoch/Strong-Together-App/compare/v2.2.0...v2.3.0) (2025-04-11)
+
+
+### Features
+
+* **inbox:** created inbox with new UI ([639567f](https://github.com/kobihanoch/Strong-Together-App/commit/639567f8b26938e5c74049bc41112c7db30bbe40))
+* **messages:** added modals to watch full message ([fb67c5a](https://github.com/kobihanoch/Strong-Together-App/commit/fb67c5ae90ba39f8609e75b4abc01974998bc120))
+* **messages:** added profile pics near each message of sender, with a new modal UI ([4e54162](https://github.com/kobihanoch/Strong-Together-App/commit/4e54162b125c74b301299f7cf83941e7d5e1c4d5))
+* **messages:** added realtime to update read state of message ([d8cab09](https://github.com/kobihanoch/Strong-Together-App/commit/d8cab09833ef8913d5ab2d056fe67c7b40721f23))
+* **profilepicture:** defualt profile picture changes between male and female ([e0c3e6f](https://github.com/kobihanoch/Strong-Together-App/commit/e0c3e6f160aae3157382c44be4c82ad23f5604e3))
+* **service:** added function in UserService to fetch username by user id ([ce6b426](https://github.com/kobihanoch/Strong-Together-App/commit/ce6b42680e6a839559558589966c144a0b54351c))
+* **useuserdata:** added auto detch for username by inserting user id ([056bdc5](https://github.com/kobihanoch/Strong-Together-App/commit/056bdc5757eade609b1aa718d3b1a13360b8d658))
+
 ## [2.2.0](https://github.com/kobihanoch/Strong-Together-App/compare/v2.1.0...v2.2.0) (2025-04-09)
 
 
