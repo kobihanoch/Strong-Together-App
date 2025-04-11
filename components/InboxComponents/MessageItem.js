@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { useState } from "react";
 import { RFValue } from "react-native-responsive-fontsize";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { formatDate } from "../../utils/statisticsUtils";
@@ -19,6 +20,9 @@ const MessageItem = ({ item }) => {
   // Sender details
   const { userData } = useUserData(item.sender_id);
 
+  // Modal of message
+  const [isModalVisible, setIsModalVisible] = useState(false);
+
   return (
     <TouchableOpacity
       style={{
@@ -30,7 +34,10 @@ const MessageItem = ({ item }) => {
         borderBottomWidth: 0.5,
         borderColor: "rgba(93, 93, 93, 0.3)",
       }}
-      onPress={() => updateMsgReadStatus(item.id)}
+      onPress={() => {
+        updateMsgReadStatus(item.id);
+        setIsModalVisible(true);
+      }}
     >
       <View
         style={{
@@ -98,6 +105,69 @@ const MessageItem = ({ item }) => {
           size={RFValue(15)}
         ></MaterialCommunityIcons>
       </View>
+      {/*MODAL*/}
+      <Modal
+        visible={isModalVisible}
+        transparent={true}
+        animationType="fade"
+        onRequestClose={() => setIsModalVisible(false)}
+      >
+        <View
+          style={{
+            flex: 1,
+            backgroundColor: "rgba(0,0,0,0.7)",
+            justifyContent: "center",
+            alignItems: "center",
+            padding: width * 0.05,
+          }}
+        >
+          <View
+            style={{
+              width: "100%",
+              backgroundColor: "white",
+              borderRadius: height * 0.02,
+              padding: width * 0.05,
+            }}
+          >
+            <Text
+              style={{
+                fontSize: RFValue(18),
+                fontFamily: "Inter_600SemiBold",
+                marginBottom: height * 0.01,
+              }}
+            >
+              {item.subject}
+            </Text>
+            <Text
+              style={{
+                fontSize: RFValue(15),
+                fontFamily: "Inter_400Regular",
+                color: "#333",
+              }}
+            >
+              {item.msg}
+            </Text>
+
+            <TouchableOpacity
+              onPress={() => setIsModalVisible(false)}
+              style={{
+                marginTop: height * 0.02,
+                alignSelf: "flex-end",
+              }}
+            >
+              <Text
+                style={{
+                  fontFamily: "Inter_600SemiBold",
+                  fontSize: RFValue(12),
+                  color: "#007AFF",
+                }}
+              >
+                Close
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     </TouchableOpacity>
   );
 };
