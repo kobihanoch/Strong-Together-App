@@ -61,11 +61,14 @@ export const registerUser = async (
 
 export const loginUser = async (username, password) => {
   try {
-    const { data: userRow, error: fetchEmailError } = await supabase
-      .from("users")
-      .select("email")
-      .eq("username", username)
-      .single();
+    const { data: userRow, error: fetchEmailError } = await supabase.rpc(
+      "get_email_by_username",
+      {
+        input_username: username,
+      }
+    );
+
+    console.log("Got email: " + userRow);
 
     if (fetchEmailError || !userRow) {
       Alert.alert("Username or password are incorrect");
@@ -74,7 +77,7 @@ export const loginUser = async (username, password) => {
 
     const { data: authData, error: loginError } =
       await supabase.auth.signInWithPassword({
-        email: userRow.email,
+        email: userRow,
         password,
       });
 
