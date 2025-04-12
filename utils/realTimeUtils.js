@@ -94,7 +94,6 @@ export const listenToMessags = async (
       },
       async (payload) => {
         console.log("MSG DELETED! ", payload.old);
-
         const userMessages = await getUserMessages(user.id);
         setAllReceivedMessages(userMessages);
         setUnreadMessages(filterMessagesByUnread(userMessages));

@@ -1,7 +1,7 @@
-import { useState, useEffect } from "react";
 import { useAuth } from "../../context/AuthContext";
 import { useNotifications } from "../../context/NotificationsContext";
-import { getUserData } from "../../services/UserService";
+import { deleteMessage } from "../../services/SystemMessagesService";
+import { Alert } from "react-native";
 
 const useInboxLogic = () => {
   const { user } = useAuth();
@@ -14,6 +14,31 @@ const useInboxLogic = () => {
     allSendersUsersArr,
   } = useNotifications(user);
 
+  const confirmAndDeleteMessage = (msgId) => {
+    Alert.alert(
+      "Delete Message",
+      "Are you sure you want to delete this message?",
+      [
+        {
+          text: "Cancel",
+          style: "cancel",
+        },
+        {
+          text: "Yes",
+          onPress: async () => {
+            try {
+              await deleteMessage(msgId);
+            } catch (err) {
+              console.log("Delete failed:", err);
+            }
+          },
+          style: "destructive",
+        },
+      ],
+      { cancelable: true }
+    );
+  };
+
   return {
     messages: {
       allReceivedMessages,
@@ -21,6 +46,7 @@ const useInboxLogic = () => {
       setUnreadMessages,
       loadingMessages,
       allSendersUsersArr,
+      confirmAndDeleteMessage,
     },
     media: {
       profileImagesCache,
