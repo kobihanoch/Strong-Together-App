@@ -106,7 +106,6 @@ const MessageItem = ({ item, profileImages, sender }) => {
           size={RFValue(15)}
         ></MaterialCommunityIcons>
       </View>
-      {/*MODAL*/}
       <Modal
         visible={isModalVisible}
         transparent={true}
@@ -116,7 +115,7 @@ const MessageItem = ({ item, profileImages, sender }) => {
         <View
           style={{
             flex: 1,
-            backgroundColor: "rgba(0,0,0,0.7)",
+            backgroundColor: "rgba(0,0,0,0.4)",
             justifyContent: "center",
             alignItems: "center",
             padding: width * 0.05,
@@ -125,13 +124,46 @@ const MessageItem = ({ item, profileImages, sender }) => {
           <View
             style={{
               width: "100%",
-              backgroundColor: "white",
-              borderRadius: height * 0.02,
-              padding: width * 0.05,
-              elevation: 5,
+              backgroundColor: "#fff",
+              borderRadius: height * 0.025,
+              padding: width * 0.06,
+              shadowColor: "#000",
+              shadowOffset: { width: 0, height: 4 },
+              shadowOpacity: 0.15,
+              shadowRadius: 10,
+              elevation: 8,
+              position: "relative",
             }}
           >
-            {/* HEADER - SENDER INFO */}
+            {/* כפתור סגירה עגול עם X טקסט */}
+            <TouchableOpacity
+              onPress={() => setIsModalVisible(false)}
+              style={{
+                position: "absolute",
+                top: 10,
+                right: 10,
+                zIndex: 10,
+                width: 28,
+                height: 28,
+                borderRadius: 14,
+                backgroundColor: "#e0e0e0",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <Text
+                style={{
+                  fontSize: RFValue(14),
+                  fontWeight: "bold",
+                  color: "#333",
+                  lineHeight: RFValue(14),
+                }}
+              >
+                ×
+              </Text>
+            </TouchableOpacity>
+
+            {/* מידע על השולח */}
             <View
               style={{
                 flexDirection: "row",
@@ -142,18 +174,19 @@ const MessageItem = ({ item, profileImages, sender }) => {
               <Image
                 source={profileImages?.[sender?.id]}
                 style={{
-                  width: height * 0.05,
-                  height: height * 0.05,
-                  borderRadius: height * 0.025,
-                  marginRight: width * 0.03,
+                  width: height * 0.055,
+                  height: height * 0.055,
+                  borderRadius: height * 0.0275,
+                  marginRight: width * 0.04,
+                  backgroundColor: "#F0F0F0",
                 }}
               />
               <View>
                 <Text
                   style={{
                     fontFamily: "Inter_600SemiBold",
-                    fontSize: RFValue(14),
-                    color: "#111",
+                    fontSize: RFValue(15),
+                    color: "#222",
                   }}
                 >
                   {sender?.name}
@@ -162,7 +195,8 @@ const MessageItem = ({ item, profileImages, sender }) => {
                   style={{
                     fontFamily: "Inter_400Regular",
                     fontSize: RFValue(11),
-                    color: "#666",
+                    color: "#999",
+                    marginTop: 2,
                   }}
                 >
                   {formatDate(item.sent_at.split("T")[0])}
@@ -170,45 +204,50 @@ const MessageItem = ({ item, profileImages, sender }) => {
               </View>
             </View>
 
-            {/* SUBJECT */}
+            {/* נושא ההודעה */}
             <Text
               style={{
-                fontSize: RFValue(16),
+                fontSize: RFValue(17),
                 fontFamily: "Inter_700Bold",
+                color: "#111",
                 marginBottom: height * 0.015,
-                color: "#222",
               }}
             >
               {item.subject}
             </Text>
 
-            {/* MESSAGE */}
+            {/* גוף ההודעה */}
             <Text
               style={{
                 fontSize: RFValue(14),
                 fontFamily: "Inter_400Regular",
-                color: "#333",
+                color: "#444",
+                lineHeight: RFValue(20),
+                marginBottom: height * 0.025,
               }}
             >
               {item.msg}
             </Text>
 
-            {/* CLOSE BUTTON */}
+            {/* כפתור סגירה תחתון */}
             <TouchableOpacity
               onPress={() => setIsModalVisible(false)}
               style={{
-                marginTop: height * 0.025,
-                alignSelf: "flex-end",
+                alignSelf: "center",
+                backgroundColor: "#007AFF",
+                paddingVertical: height * 0.012,
+                paddingHorizontal: width * 0.2,
+                borderRadius: 50,
               }}
             >
               <Text
                 style={{
                   fontFamily: "Inter_600SemiBold",
-                  fontSize: RFValue(12),
-                  color: "#007AFF",
+                  fontSize: RFValue(13),
+                  color: "white",
                 }}
               >
-                Close
+                Got it
               </Text>
             </TouchableOpacity>
           </View>
