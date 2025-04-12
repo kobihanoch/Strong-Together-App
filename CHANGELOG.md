@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.7.0](https://github.com/kobihanoch/Strong-Together-App/compare/v2.6.0...v2.7.0) (2025-04-12)
+
+
+### Features
+
+* **messages:** user now can delete messages from inbox ([10fb100](https://github.com/kobihanoch/Strong-Together-App/commit/10fb10025a2a08fadb93c240c6a8bbd7b01441a9))
+* **messages:** user now gets a cheering message after completed workout ([bdc89ed](https://github.com/kobihanoch/Strong-Together-App/commit/bdc89ed5448a50ef16bcd3238627ac9bed143bdd))
+
 ## [2.6.0](https://github.com/kobihanoch/Strong-Together-App/compare/v2.5.0...v2.6.0) (2025-04-12)
 
 
