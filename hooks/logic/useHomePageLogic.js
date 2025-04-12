@@ -5,6 +5,7 @@ import React from "react";
 import {
   getUserGeneralPR,
   getUserLastWorkoutDate,
+  getWelcomeMessageString,
 } from "../../utils/homePageUtils";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import useSystemMessages from "../automations/useSystemMessages";
@@ -24,10 +25,9 @@ const useHomePageLogic = (user) => {
             ", 2 seconds to message."
           );
           await sleep(3000);
-          await sendSystemMessage(
-            "Welcome to Strong Together!",
-            "We're excited to have you here. Your fitness journey starts now — let's make it count!"
-          );
+          const welcomeMsg = getWelcomeMessageString(user?.name);
+          await sendSystemMessage(welcomeMsg.header, welcomeMsg.text);
+
           await AsyncStorage.removeItem("firstLogin");
           console.log("Message sent and asyncstorage item deleted!");
         } else {

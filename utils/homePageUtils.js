@@ -60,3 +60,10 @@ export const getDaysSince = (lastDateString) => {
       }
   }
 };
+
+export const getWelcomeMessageString = (fullName) => {
+  return {
+    header: `Welcome to Strong Together, ${fullName.split(" ")[0]}!`,
+    text: "We're happy to have you with us. Your fitness journey begins now — let’s make it count!\n\nYou don’t have an active workout plan yet. To get started, go to the Home page and create one.\n\nYou can choose between 1 to 6 workout splits and add your favorite exercises to each.\n\nIf you have any questions, feel free to ask our AI trainer anytime.\n\nGood luck!\nThe Strong Together Team",
+  };
+};
