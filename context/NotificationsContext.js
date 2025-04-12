@@ -27,7 +27,10 @@ export const NotificationsProvider = ({ user, children }) => {
     const channel = listenToMessags(
       user,
       setAllReceivedMessages,
-      setUnreadMessages
+      setUnreadMessages,
+      setAllSendersUsersArr,
+      allSendersUsersArr,
+      setProfileImagesCache
     );
     console.log("LISNTERLOADED!");
     return () => {
@@ -56,7 +59,7 @@ export const NotificationsProvider = ({ user, children }) => {
     })();
   }, [user]);
 
-  // When getting a new message
+  /*// When getting a new message
   useEffect(() => {
     if (allReceivedMessages.length === 0) return;
 
@@ -69,7 +72,7 @@ export const NotificationsProvider = ({ user, children }) => {
     };
 
     loadSenders();
-  }, [allReceivedMessages.length]);
+  }, [allReceivedMessages.length]);*/
 
   const loadAllUsers = async (messages) => {
     let allUsrsIdSet = new Set();

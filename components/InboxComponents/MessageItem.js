@@ -19,6 +19,13 @@ const { width, height } = Dimensions.get("window");
 const MessageItem = ({ item, profileImages, sender }) => {
   // Modal of message
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const imageSource =
+    profileImages?.[sender?.id] ??
+    (sender?.gender === "Male"
+      ? require("../../assets/man.png")
+      : require("../../assets/woman.png"));
+
+  console.log("UI: Image source for sender:", imageSource);
 
   return (
     <TouchableOpacity
@@ -52,7 +59,7 @@ const MessageItem = ({ item, profileImages, sender }) => {
           }}
         >
           <Image
-            source={profileImages?.[sender?.id]}
+            source={imageSource}
             resizeMode="contain"
             style={{
               height: height * 0.03,
