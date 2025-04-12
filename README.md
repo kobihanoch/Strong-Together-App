@@ -56,6 +56,26 @@ The aim of **Strong-Together-App** is to create a seamless fitness platform that
 
 ---
 
+## 📸 Screenshots
+
+### App Previews
+
+|                 ![Active Workout](assets/sssw.PNG)                 |        ![After Workout Statistics](assets/sss.PNG)        |
+| :----------------------------------------------------------------: | :-------------------------------------------------------: |
+| **Active Workout**: Real-time tracking of sets, reps, and weights. | **After Workout Statistics**: Summarized session results. |
+
+|            ![Home Screen](assets/ssh.png)            |       ![Inbox](assets/ssi.png)       |
+| :--------------------------------------------------: | :----------------------------------: |
+| **Home Screen**: Access fitness summaries and plans. | **Inbox**: View and manage messages. |
+
+|   ![Message Modal](assets/ssmsgmodal.png)    |    ![Intro Screen](assets/ssintro.png)    |
+| :------------------------------------------: | :---------------------------------------: |
+| **Message Modal**: Compose or view messages. | **Intro Screen**: Onboarding walkthrough. |
+
+|        ![Watch the Program Plan](assets/ssmyp.png)         |     |
+| :--------------------------------------------------------: | :-- |
+| **Watch the Program Plan**: View and manage workout plans. |     |
+
 ---
 
 ## 🗄️ Database Schema
@@ -242,22 +262,6 @@ Below is the complete folder structure for **Strong-Together-App**, organized an
 | ┗ 📄 **supabaseClient.js**            | Supabase client instance for API interactions.                                 |
 
 </details>
-
----
-
-## 📸 Screenshots
-
-### Home Screen
-
-<p align="center">
-  <img src="assets/screenshot_home.png" alt="Home Screen" width="400" />
-</p>
-
-### Workout Tracking
-
-<p align="center">
-  <img src="assets/screenshot_workout_tracking.png" alt="Workout Tracking" width="400" />
-</p>
 
 ---
 
