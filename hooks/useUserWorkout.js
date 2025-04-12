@@ -21,7 +21,7 @@ export const useUserWorkout = (userId) => {
     if (!userId) return;
     setLoading(true);
     try {
-      console.log("Trying to fetch data from hook...");
+      //console.log("Trying to fetch data from hook...");
       const data = await getUserWorkout(userId);
       setUserWorkout(data);
     } catch (err) {
@@ -40,7 +40,7 @@ export const useUserWorkout = (userId) => {
     if (!userId) return;
     setLoading(true);
     try {
-      console.log("Trying to fetch data from hook...");
+      //console.log("Trying to fetch data from hook...");
       const data = await getUserExerciseTracking(userId);
       //console.log(JSON.stringify(data));
       setExerciseTracking(data);
