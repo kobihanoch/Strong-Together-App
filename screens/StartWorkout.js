@@ -50,30 +50,6 @@ const StartWorkout = ({ navigation, route }) => {
     console.log("Updated reps: " + JSON.stringify(workoutData.repsArrs));
   }, [workoutData.repsArrs]);
 
-  const saveWorkoutDataToDatabase = async () => {
-    try {
-      const { error } = await supabase.from("exercisetracking").insert(
-        workoutData.map(({ weights, reps, ...rest }) => ({
-          ...rest,
-          weight: weights,
-          reps: reps,
-        }))
-      );
-
-      if (error) throw error;
-      console.log("Data inserted successfully:", workoutData);
-      Alert.alert("Success", "Workout saved successfully!");
-
-      navigation.navigate("PostWorkoutSummary", {
-        workoutData: workoutData,
-        workoutSplitID: workoutSplitID,
-        userId: userId,
-      });
-    } catch (error) {
-      console.error("Error inserting data:", error.message);
-    }
-  };
-
   if (loading) {
     return <LoadingPage message="Starting workout"></LoadingPage>;
   }

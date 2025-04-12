@@ -4,8 +4,10 @@ import { useUserWorkout } from "../useUserWorkout";
 import {
   filterZeroesInArr,
   createObjectForDataBase,
+  getWorkoutCompleteMessageString,
 } from "../../utils/startWorkoutUtils";
 import { useNavigation, useNavigationState } from "@react-navigation/native";
+import useSystemMessages from "../automations/useSystemMessages";
 
 const useStartWorkoutPageLogic = (user, selectedSplit, setHasTrainedToday) => {
   // --------------------[ Navigation ]--------------------------------------
@@ -15,6 +17,8 @@ const useStartWorkoutPageLogic = (user, selectedSplit, setHasTrainedToday) => {
   const { exercises, saveWorkoutProccess, loading, error } = useUserWorkout(
     user?.id
   );
+
+  const { sendSystemMessage } = useSystemMessages(user?.id);
 
   // --------------------[ Exercises ]------------------------------------------
   const [exercisesForSelectedSplit, setExercisesForSelectedSplit] =
@@ -54,6 +58,11 @@ const useStartWorkoutPageLogic = (user, selectedSplit, setHasTrainedToday) => {
         );
         await saveWorkoutProccess(obj);
         setHasTrainedToday(true);
+        // Send a message to user
+        await sendSystemMessage(
+          getWorkoutCompleteMessageString().header,
+          getWorkoutCompleteMessageString().text
+        );
       } catch (err) {
         console.error(err);
         throw err;
