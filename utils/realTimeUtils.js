@@ -3,7 +3,7 @@ import { getUserMessages } from "../services/UserService";
 import { filterMessagesByUnread } from "./authUtils";
 import * as Notifications from "expo-notifications";
 import { sendPushNotification } from "../notifications/NotificationsManager";
-import { getUserData } from "../services/UserService";
+import { getUserData, getAnotherUserData } from "../services/UserService";
 import { Image } from "react-native";
 
 // New message
@@ -45,10 +45,10 @@ export const listenToMessags = async (
         // If not in array add him
         if (!inArr) {
           //console.log(">>>>>>>>>>Getting user data");
-          const fullUser = await getUserData(userIdSent);
-          /*console.log(
+          const fullUser = await getAnotherUserData(userIdSent);
+          console.log(
             ">>>>>>>>>>User got: " + JSON.stringify(fullUser, null, 2)
-          );*/
+          );
           setAllSendersUsersArr((prev) => [...prev, fullUser]);
           //console.log(">>>>>>>>>>Updated set array!");
 

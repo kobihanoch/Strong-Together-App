@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useState } from "react";
-import { getUserData, getUserMessages } from "../services/UserService";
+import { getAnotherUserData, getUserMessages } from "../services/UserService";
 import { filterMessagesByUnread } from "../utils/authUtils";
 import { listenToMessags } from "../utils/realTimeUtils";
 import supabase from "../src/supabaseClient";
@@ -78,7 +78,9 @@ export const NotificationsProvider = ({ user, children }) => {
     let allUsrsIdSet = new Set();
     messages.forEach((msg) => allUsrsIdSet.add(msg.sender_id));
 
-    const userPromises = [...allUsrsIdSet].map((usrid) => getUserData(usrid));
+    const userPromises = [...allUsrsIdSet].map((usrid) =>
+      getAnotherUserData(usrid)
+    );
     const allUsersArray = await Promise.all(userPromises);
 
     const imageMap = {};
