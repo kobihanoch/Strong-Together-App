@@ -30,6 +30,20 @@ export const getUserData = async (userId) => {
   return data;
 };
 
+// Get another user data by RPC (returning only username, profilepic_url by uuid)
+export const getAnotherUserData = async (userId) => {
+  const { data, error } = await supabase.rpc("get_user_profile_by_id", {
+    input_id: userId,
+  });
+
+  if (error) {
+    console.error("Failed to load profile", error);
+    return null;
+  }
+
+  return data[0];
+};
+
 // Get username
 export const getUsername = async (userId) => {
   const { data, error } = await supabase
