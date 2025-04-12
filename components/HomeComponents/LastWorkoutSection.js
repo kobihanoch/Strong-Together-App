@@ -29,9 +29,9 @@ const LastWorkoutSection = ({ data }) => {
           color="#1A1A1A"
           opacity={0.7}
         ></MaterialCommunityIcons>{" "}
-        Last workout at:{" "}
-        {data.exerciseTracking
-          ? formatDate(data.lastWorkoutDate).split(",")[0] +
+        {data.exerciseTracking && data.exerciseTracking.length > 0
+          ? "Last workout at: " +
+            formatDate(data.lastWorkoutDate).split(",")[0] +
             "\n" +
             formatDate(data.lastWorkoutDate).split(",")[1].trim()
           : data.lastWorkoutDate}
@@ -44,7 +44,9 @@ const LastWorkoutSection = ({ data }) => {
           fontSize: RFValue(12),
         }}
       >
-        {data.exerciseTracking ? getDaysSince(data.lastWorkoutDate) : "N/A"}
+        {data.exerciseTracking && data.exerciseTracking.length > 0
+          ? getDaysSince(data.lastWorkoutDate)
+          : ""}
       </Text>
     </View>
   );

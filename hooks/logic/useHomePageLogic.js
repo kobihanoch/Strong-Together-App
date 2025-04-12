@@ -132,7 +132,7 @@ const useHomePageLogic = (user) => {
       lastWorkoutDate: lastWorkoutDate ?? "none",
       totalWorkoutNumber: totalWorkoutNumber ?? 0,
       workoutSplitsNumber: workoutSplitsNumber ?? 0,
-      mostFrequentSplit: mostFrequentSplit,
+      mostFrequentSplit: mostFrequentSplit ?? null,
       PR: PR ?? null,
       exerciseTracking: exerciseTracking ?? null,
     },

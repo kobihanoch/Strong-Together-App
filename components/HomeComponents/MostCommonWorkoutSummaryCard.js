@@ -18,7 +18,7 @@ const MostCommonWorkoutSummaryCard = ({
     ? Math.min(mostFrequentSplit.maxCount / totalWorkoutNumber, 1)
     : 0;
 
-  console.log(mostFrequentSplit);
+  //console.log(mostFrequentSplit);
   const strokeDashoffset = circumference * (1 - progress);
 
   return (
