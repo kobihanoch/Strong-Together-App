@@ -224,85 +224,17 @@ The **Messages Flow** handles the communication between users. It allows users t
 
 Below is the complete folder structure for **Strong-Together-App**, organized and modular. Click the arrow to expand and view all details.
 
-<details>
-<summary>📁 Full Folder Structure (Click to Expand)</summary>
-
-| **Folder/File**                       | **Description**                                                                |
-| ------------------------------------- | ------------------------------------------------------------------------------ |
-| 📁 **components/**                    | Contains reusable UI components used across the app.                           |
-| ┣ 📂 **CreateWorkoutComponents/**     | Components specific to creating workout plans.                                 |
-| ┣ 📂 **HomeComponents/**              | Components for the home screen.                                                |
-| ┣ 📂 **MyWorkoutPlanComponents/**     | Components for managing user workout plans.                                    |
-| ┣ 📂 **ProfileComponents/**           | Components for the user profile section.                                       |
-| ┣ 📂 **StartWorkoutComponents/**      | Components for initiating and tracking workouts.                               |
-| ┣ 📂 **StatisticsComponents/**        | Components for displaying user statistics.                                     |
-| ┣ 📄 **BottomTabBar.js**              | A custom bottom tab navigation bar.                                            |
-| ┣ 📄 **CountdownComponent.js**        | A countdown timer component for workouts.                                      |
-| ┣ 📄 **GradientedGoToButton.js**      | A styled button with gradient effects.                                         |
-| ┣ 📄 **InputField.js**                | A reusable input field component.                                              |
-| ┣ 📄 **LoadingPage.js**               | A loading screen displayed during data fetches.                                |
-| ┣ 📄 **Logo.js**                      | The app’s logo component.                                                      |
-| ┣ 📄 **PageIndicator.js**             | Displays pagination or steps in a process.                                     |
-| ┣ 📄 **Theme1.js**                    | Defines the theme and styles for the app.                                      |
-| ┣ 📄 **ToggleSetting.js**             | A toggle switch component for user settings.                                   |
-| ┣ 📄 **TopComponent.js**              | A reusable top header component.                                               |
-| ┗ 📄 **Validators.js**                | Utility functions for input validation.                                        |
-| 📁 **context/**                       | React Context for managing global state like authentication and notifications. |
-| ┣ 📄 **AuthContext.js**               | Handles user authentication state.                                             |
-| ┗ 📄 **NotificationsContext.js**      | Manages in-app notifications logic.                                            |
-| 📁 **hooks/**                         | Custom reusable hooks for logic and API calls.                                 |
-| ┣ 📁 **logic/**                       | Screen-specific logic for managing state and behavior.                         |
-| ┣ 📄 **useHomePageLogic.js**          | Logic for the home page.                                                       |
-| ┣ 📄 **useProfilePageLogic.js**       | Logic for the profile page.                                                    |
-| ┣ 📄 **useStartWorkoutPageLogic.js**  | Logic for the start workout page.                                              |
-| ┣ 📄 **useStatisticsPageLogic.js**    | Logic for the statistics page.                                                 |
-| ┣ 📄 **useMyWorkoutPlanPageLogic.js** | Logic for managing workout plans.                                              |
-| ┣ 📄 **useDeleteWorkout.js**          | Handles workout deletion logic.                                                |
-| ┣ 📄 **useExercises.js**              | Fetches and manages exercise-related data.                                     |
-| ┣ 📄 **useMediaUploads.js**           | Handles media uploads like images or videos.                                   |
-| ┣ 📄 **useSplitExercises.js**         | Splits exercises into manageable sections.                                     |
-| ┣ 📄 **useUserData.js**               | Fetches and manages user-related data.                                         |
-| ┣ 📄 **useUserWorkout.js**            | Fetches and manages user workout data.                                         |
-| ┣ 📄 **useWorkouts.js**               | Custom hook for fetching and managing workout plans.                           |
-| ┗ 📄 **useWorkoutSplits.js**          | Manages splits in workout routines.                                            |
-| 📁 **navigation/**                    | Contains navigation stacks for authenticated and unauthenticated users.        |
-| ┣ 📄 **AppStack.js**                  | Navigation for logged-in users.                                                |
-| ┗ 📄 **AuthStack.js**                 | Authentication-related navigation flow.                                        |
-| 📁 **notifications/**                 | Handles push notifications and notification logic.                             |
-| ┣ 📄 **NotificationsManager.js**      | Handles push notification delivery.                                            |
-| ┗ 📄 **NotificationsSetup.js**        | Configuration for notifications.                                               |
-| 📁 **screens/**                       | Individual screens for the application.                                        |
-| ┣ 📄 **CreateWorkout.js**             | Screen for creating workout plans.                                             |
-| ┣ 📄 **Home.js**                      | Main home screen with workout summaries.                                       |
-| ┣ 📄 **Intro.js**                     | Introductory screen for first-time users.                                      |
-| ┣ 📄 **LogIn.js**                     | Login screen for user authentication.                                          |
-| ┣ 📄 **MyWorkoutPlan.js**             | Screen for managing and viewing workout plans.                                 |
-| ┣ 📄 **Profile.js**                   | User profile screen.                                                           |
-| ┣ 📄 **Register.js**                  | Registration screen for new users.                                             |
-| ┣ 📄 **Settings.js**                  | Screen for managing user settings.                                             |
-| ┣ 📄 **StartWorkout.js**              | Screen for initiating and tracking workouts.                                   |
-| ┗ 📄 **Statistics.js**                | Displays user workout statistics and progress.                                 |
-| 📁 **services/**                      | Backend service logic for interacting with APIs and databases.                 |
-| ┣ 📄 **AuthService.js**               | Handles user authentication requests to Supabase.                              |
-| ┣ 📄 **ExercisesService.js**          | Manages API calls related to exercises.                                        |
-| ┣ 📄 **ExerciseTrackingService.js**   | Handles tracking user workout sessions and progress.                           |
-| ┣ 📄 **MediaService.js**              | Manages media-related operations like uploads.                                 |
-| ┣ 📄 **SplitExerciseService.js**      | Handles splitting exercises into segments.                                     |
-| ┣ 📄 **UserService.js**               | Manages user-related API calls.                                                |
-| ┣ 📄 **WorkoutService.js**            | Handles workout-related API calls.                                             |
-| ┗ 📄 **WorkoutSplitsService.js**      | Manages splits in workout routines.                                            |
-| 📁 **utils/**                         | Utility functions for common logic and helpers.                                |
-| ┣ 📄 **authUtils.js**                 | Contains helper functions for authentication.                                  |
-| ┣ 📄 **homePageUtils.js**             | Utility functions for the home page.                                           |
-| ┣ 📄 **myWorkoutPlanUtils.js**        | Functions for managing workout plans.                                          |
-| ┣ 📄 **profilePageUtils.js**          | Utility functions for the profile page.                                        |
-| ┣ 📄 **realTimeUtils.js**             | Utilities for managing real-time data from Supabase.                           |
-| ┣ 📄 **startWorkoutUtils.js**         | Functions for starting workouts.                                               |
-| ┗ 📄 **statisticsUtils.js**           | Functions for managing statistics data.                                        |
-| 📁 **src/**                           | Core configuration files for the app.                                          |
-| ┗ 📄 **supabaseClient.js**            | Supabase client instance for API interactions.                                 |
-
-</details>
+| **Folder**            | **Description**                                                                |
+| --------------------- | ------------------------------------------------------------------------------ |
+| 📁 **components/**    | Contains reusable UI components used across the app.                           |
+| 📁 **context/**       | React Context for managing global state like authentication and notifications. |
+| 📁 **hooks/**         | Custom reusable hooks for logic and API calls.                                 |
+| 📁 **navigation/**    | Contains navigation stacks for authenticated and unauthenticated users.        |
+| 📁 **notifications/** | Handles push notifications and notification logic.                             |
+| 📁 **screens/**       | Individual screens for the application.                                        |
+| 📁 **services/**      | Backend service logic for interacting with APIs and databases.                 |
+| 📁 **utils/**         | Utility functions for common logic and helpers.                                |
+| 📁 **src/**           | Core configuration files for the app.                                          |
 
 ---
 
