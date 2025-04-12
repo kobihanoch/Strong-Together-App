@@ -41,6 +41,7 @@ const Inbox = () => {
                     (usr) => usr.id === item.sender_id
                   )[0]
                 }
+                deleteMessage={messages.confirmAndDeleteMessage}
               ></MessageItem>
             )}
             keyExtractor={(item) => item.id}

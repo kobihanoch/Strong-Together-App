@@ -17,7 +17,7 @@ import { useRef } from "react";
 
 const { width, height } = Dimensions.get("window");
 
-const MessageItem = ({ item, profileImages, sender }) => {
+const MessageItem = ({ item, profileImages, sender, deleteMessage }) => {
   // Modal of message
   const [isModalVisible, setIsModalVisible] = useState(false);
   const imageSource =
@@ -31,6 +31,7 @@ const MessageItem = ({ item, profileImages, sender }) => {
     <TouchableOpacity
       onPress={() => {
         console.log("🗑️ Del msg", item.id);
+        deleteMessage(item.id);
       }}
       style={{
         backgroundColor: "rgb(198, 16, 16)",
