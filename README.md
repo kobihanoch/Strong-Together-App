@@ -1,6 +1,18 @@
-# 🌟 Strong-Together-App 🌟
+# 🌟 Strong Together 🌟
 
-![Fitness App](https://img.shields.io/badge/Fitness-App-blue) ![JavaScript](https://img.shields.io/badge/Made%20With-JavaScript-yellow) ![Contributions](https://img.shields.io/badge/Contributions-Welcome-brightgreen) ![Version](https://img.shields.io/badge/Version-2.6.0-blue)
+**Your Ultimate Gym Tracking Companion**
+
+---
+
+<div align="center">
+
+  <img src="https://img.shields.io/badge/Version-2.6.0-blue" alt="Version 2.6.0" />
+  <img src="https://img.shields.io/badge/Technologies-React%20Native%2C%20JavaScript%2C%20Expo%20Go%2C%20Supabase-green" alt="Technologies" />
+  <img src="https://img.shields.io/badge/License-Personal%20Use-orange" alt="Personal Use License" />
+  <img src="https://img.shields.io/badge/Status-In%20Progress-yellow" alt="Status In Progress" />
+  <img src="https://img.shields.io/badge/Type-Side%20Project-lightgrey" alt="Side Project" />
+
+## </div>
 
 <p align="center">
   <img src="assets/icon.png" alt="Strong-Together-App Icon" width="150" />
@@ -60,21 +72,50 @@ The aim of **Strong-Together-App** is to create a seamless fitness platform that
 
 ### App Previews
 
-|                 ![Active Workout](assets/sssw.PNG)                 |        ![After Workout Statistics](assets/sss.PNG)        |
-| :----------------------------------------------------------------: | :-------------------------------------------------------: |
-| **Active Workout**: Real-time tracking of sets, reps, and weights. | **After Workout Statistics**: Summarized session results. |
+---
 
-|            ![Home Screen](assets/ssh.png)            |       ![Inbox](assets/ssi.png)       |
-| :--------------------------------------------------: | :----------------------------------: |
-| **Home Screen**: Access fitness summaries and plans. | **Inbox**: View and manage messages. |
+<div align="center">
+  <img src="assets/sshome.png" alt="Home Screen" width="200" style="margin-right: 20px;"/>
+  <img src="assets/ssintroduction.png" alt="Intro Screen" width="200"/>
+</div>
+<p align="center">
+  <strong>Home Screen</strong>: Access fitness summaries and plans.  
+  <br>
+  <strong>Intro Screen</strong>: Onboarding walkthrough.
+</p>
 
-|   ![Message Modal](assets/ssmsgmodal.png)    |    ![Intro Screen](assets/ssintro.png)    |
-| :------------------------------------------: | :---------------------------------------: |
-| **Message Modal**: Compose or view messages. | **Intro Screen**: Onboarding walkthrough. |
+---
 
-|        ![Watch the Program Plan](assets/ssmyp.png)         |     |
-| :--------------------------------------------------------: | :-- |
-| **Watch the Program Plan**: View and manage workout plans. |     |
+<div align="center">
+  <img src="assets/ssmyplan.png" alt="Watch the Program Plan" width="200"/>
+</div>
+<p align="center">
+  <strong>Watch the Program Plan</strong>: View and manage workout plans.
+</p>
+
+---
+
+<div align="center">
+  <img src="assets/sss.PNG" alt="After Workout Statistics" width="200" style="margin-right: 20px;"/>
+  <img src="assets/sssw.PNG" alt="Active Workout" width="200"/>
+</div>
+<p align="center">
+  <strong>After Workout Statistics</strong>: Summarized session results.  
+  <br>
+  <strong>Active Workout</strong>: Real-time tracking of sets, reps, and weights.
+</p>
+
+---
+
+<div align="center">
+  <img src="assets/ssinbox.png" alt="Inbox" width="200" style="margin-right: 20px;"/>
+  <img src="assets/ssmessagemodal.png" alt="Message Modal" width="200"/>
+</div>
+<p align="center">
+  <strong>Inbox</strong>: View and manage messages.  
+  <br>
+  <strong>Message Modal</strong>: Compose or view messages.
+</p>
 
 ---
 
