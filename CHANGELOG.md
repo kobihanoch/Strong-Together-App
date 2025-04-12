@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.6.0](https://github.com/kobihanoch/Strong-Together-App/compare/v2.5.0...v2.6.0) (2025-04-12)
+
+
+### Features
+
+* **messages:** new user gets a greetin message to inbox after register ([d8aa113](https://github.com/kobihanoch/Strong-Together-App/commit/d8aa113d3d6d298ee3daff8c1840aec5f2d68827))
+* **messages:** new welcome message to new user ([7c2a74c](https://github.com/kobihanoch/Strong-Together-App/commit/7c2a74cf88918f6eeb5d46317ce64a09212ebdbc))
+* **messages:** system can now send messages to user ([9625136](https://github.com/kobihanoch/Strong-Together-App/commit/9625136eedf415eb5c4b9ce33f135bba91cb3da8))
+
+
+### Bug Fixes
+
+* **homelogic:** fix import crashing ([63631c3](https://github.com/kobihanoch/Strong-Together-App/commit/63631c3f68f4a741f96be7563b9afd61a0f43b24))
+* **home:** UI is now showing no data instead of N/A ([6132e59](https://github.com/kobihanoch/Strong-Together-App/commit/6132e59d6049f990325489a8d1c15b3182ad9d75))
+* **messages:** optimize sender insertion & ensure correct profile image loading ([8697039](https://github.com/kobihanoch/Strong-Together-App/commit/8697039ab2aaa8edd75d24958dd3c6ebeafb46c9))
+
 ## [2.5.0](https://github.com/kobihanoch/Strong-Together-App/compare/v2.4.0...v2.5.0) (2025-04-11)
 
 
