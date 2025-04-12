@@ -10,11 +10,12 @@ export const registerUser = async (
   gender
 ) => {
   try {
-    const { data: existingUser, error: checkUserError } = await supabase
-      .from("users")
-      .select("*")
-      .eq("username", username)
-      .maybeSingle();
+    const { data: existingUser, error: checkUserError } = await supabase.rpc(
+      "get_email_by_username",
+      {
+        input_username: username,
+      }
+    );
 
     if (checkUserError) {
       console.log(checkUserError);
@@ -36,17 +37,13 @@ export const registerUser = async (
 
     const userId = authData.user.id;
 
-    const { error: insertError } = await supabase.from("users").insert([
-      {
-        id: userId,
-        email,
-        username,
-        name: fullName,
-        gender,
-        level: 0,
-        created_at: new Date().toISOString(),
-      },
-    ]);
+    const { error: insertError } = await supabase.rpc("register_user", {
+      input_id: userId,
+      input_email: email,
+      input_username: username,
+      input_name: fullName,
+      input_gender: gender,
+    });
 
     if (insertError) {
       console.log(insertError);
