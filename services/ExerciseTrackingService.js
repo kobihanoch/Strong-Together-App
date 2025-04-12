@@ -52,8 +52,8 @@ export const getMostFrequentSplitNameByUserId = async (userId) => {
     if (error) throw error;
     if (!data || data.length === 0)
       return {
-        workoutsplit_id: "N/A",
-        splitname: "N/A",
+        workoutsplit_id: null,
+        splitname: null,
         maxCount: 0,
       };
 

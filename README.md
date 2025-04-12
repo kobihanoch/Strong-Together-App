@@ -1,6 +1,6 @@
 # 🌟 Strong-Together-App 🌟
 
-![Fitness App](https://img.shields.io/badge/Fitness-App-blue) ![JavaScript](https://img.shields.io/badge/Made%20With-JavaScript-yellow) ![Contributions](https://img.shields.io/badge/Contributions-Welcome-brightgreen) ![Version](https://img.shields.io/badge/Version-2.5.0-blue)
+![Fitness App](https://img.shields.io/badge/Fitness-App-blue) ![JavaScript](https://img.shields.io/badge/Made%20With-JavaScript-yellow) ![Contributions](https://img.shields.io/badge/Contributions-Welcome-brightgreen) ![Version](https://img.shields.io/badge/Version-2.6.0-blue)
 
 <p align="center">
   <img src="assets/icon.png" alt="Strong-Together-App Icon" width="150" />
@@ -55,6 +55,26 @@ The aim of **Strong-Together-App** is to create a seamless fitness platform that
   <img src="https://img.icons8.com/color/48/javascript.png" alt="JavaScript Icon" width="50"/>
 
 ---
+
+## 📸 Screenshots
+
+### App Previews
+
+|                 ![Active Workout](assets/sssw.PNG)                 |        ![After Workout Statistics](assets/sss.PNG)        |
+| :----------------------------------------------------------------: | :-------------------------------------------------------: |
+| **Active Workout**: Real-time tracking of sets, reps, and weights. | **After Workout Statistics**: Summarized session results. |
+
+|            ![Home Screen](assets/ssh.png)            |       ![Inbox](assets/ssi.png)       |
+| :--------------------------------------------------: | :----------------------------------: |
+| **Home Screen**: Access fitness summaries and plans. | **Inbox**: View and manage messages. |
+
+|   ![Message Modal](assets/ssmsgmodal.png)    |    ![Intro Screen](assets/ssintro.png)    |
+| :------------------------------------------: | :---------------------------------------: |
+| **Message Modal**: Compose or view messages. | **Intro Screen**: Onboarding walkthrough. |
+
+|        ![Watch the Program Plan](assets/ssmyp.png)         |     |
+| :--------------------------------------------------------: | :-- |
+| **Watch the Program Plan**: View and manage workout plans. |     |
 
 ---
 
@@ -242,56 +262,6 @@ Below is the complete folder structure for **Strong-Together-App**, organized an
 | ┗ 📄 **supabaseClient.js**            | Supabase client instance for API interactions.                                 |
 
 </details>
-
-## 🤝 Contributing
-
-We welcome contributions from developers and fitness enthusiasts alike! Here’s how you can contribute:
-
-1. **Fork the Repository**:
-   Click the "Fork" button in the top-right corner of this page.
-
-2. **Clone Your Fork**:
-
-   ```bash
-   git clone https://github.com/your-username/Strong-Together-App.git
-   ```
-
-3. **Create a New Branch**:
-
-   ```bash
-   git checkout -b feature/YourFeatureName
-   ```
-
-4. **Commit Your Changes**:
-
-   ```bash
-   git commit -m "Add YourFeatureName"
-   ```
-
-5. **Push to Your Branch**:
-
-   ```bash
-   git push origin feature/YourFeatureName
-   ```
-
-6. **Open a Pull Request**:
-   Go to the original repository and open a pull request from your fork.
-
----
-
-## 📸 Screenshots
-
-### Home Screen
-
-<p align="center">
-  <img src="assets/screenshot_home.png" alt="Home Screen" width="400" />
-</p>
-
-### Workout Tracking
-
-<p align="center">
-  <img src="assets/screenshot_workout_tracking.png" alt="Workout Tracking" width="400" />
-</p>
 
 ---
 
