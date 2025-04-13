@@ -100,6 +100,10 @@ export const CreateWorkoutProvider = ({ children }) => {
     return musclesArray;
   };
 
+  const filterExercisesByFirstMuscle = () => {
+    setFilteredExercises(filterExercisesByMuscle(muscles[0], dbExercises));
+  };
+
   //------------------------------------------------------------------------------------
 
   return (
@@ -133,6 +137,7 @@ export const CreateWorkoutProvider = ({ children }) => {
         utils: {
           filterExercisesByMuscle,
           getMuscles,
+          filterExercisesByFirstMuscle,
         },
       }}
     >
