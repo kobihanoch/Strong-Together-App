@@ -41,6 +41,19 @@ export const CreateWorkoutProvider = ({ children }) => {
   const [splitsNumber, setSplitsNumber] = useState(1);
   const [selectedExercises, setSelectedExercises] = useState([]);
   const [focusedSplit, setFocusedSplit] = useState(null);
+  const [filteredExercises, setFilteredExercises] = useState(null);
+  const [muscles, setMuscles] = useState(null);
+
+  // Update muscles
+  useEffect(() => {
+    setMuscles(getMuscles(dbExercises));
+  }, [dbExercises]);
+
+  // Set filtered exercises by muscle (first)
+  useEffect(() => {
+    console.log(filterExercisesByMuscle(muscles[0], dbExercises));
+    setFilteredExercises(filterExercisesByMuscle(muscles[0], dbExercises));
+  }, [muscles, dbExercises]);
 
   // Update the selected exercises array
   useEffect(() => {
@@ -66,6 +79,25 @@ export const CreateWorkoutProvider = ({ children }) => {
     });
   };
 
+  // ----------------------------Utils----------------------------
+
+  const filterExercisesByMuscle = (muscle, exercises) => {
+    const dup = exercises.filter((ex) => ex.targetmuscle === muscle);
+    console.log(dup);
+    return dup;
+  };
+
+  const getMuscles = (exercises) => {
+    let musclesSet = new Set();
+    exercises.forEach((ex) => {
+      musclesSet.add(ex.targetmuscle);
+    });
+
+    const musclesArray = Array.from(musclesSet);
+    console.log(musclesArray);
+    return musclesArray;
+  };
+
   //------------------------------------------------------------------------------------
 
   return (
@@ -80,6 +112,9 @@ export const CreateWorkoutProvider = ({ children }) => {
           setSelectedExercises,
           focusedSplit,
           setFocusedSplit,
+          filteredExercises,
+          setFilteredExercises,
+          muscles,
         },
         userWorkout: {
           workout,
@@ -92,6 +127,10 @@ export const CreateWorkoutProvider = ({ children }) => {
           dbExercises,
           exLoading,
           exError,
+        },
+        utils: {
+          filterExercisesByMuscle,
+          getMuscles,
         },
       }}
     >
