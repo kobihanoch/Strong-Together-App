@@ -25,6 +25,8 @@ export const AuthProvider = ({ children, onLogout }) => {
     const userData = await getUserData(sessionUserId);
     const exerciseTracking = await getUserExerciseTracking(sessionUserId);
 
+    console.log("Userdata: ", userData);
+
     setUser(userData);
     setHasTrainedToday(hasWorkoutForToday(exerciseTracking));
 
@@ -88,7 +90,16 @@ export const AuthProvider = ({ children, onLogout }) => {
       if (!result.success) {
         throw new Error(result.reason);
       }
-      initializeUserSession(result.user.id);
+
+      // Set session returned from server
+      await supabase.auth.setSession({
+        access_token: result.session.access_token,
+        refresh_token: result.session.refresh_token,
+      });
+      setUser(result.user);
+      setIsLoggedIn(true);
+      //console.log(result.user.id);
+      //initializeUserSession(result.user.id);
       console.log("✅ Login successful - waiting for onAuthStateChange...");
     } catch (err) {
       console.log("Error logging in: " + err.message);
