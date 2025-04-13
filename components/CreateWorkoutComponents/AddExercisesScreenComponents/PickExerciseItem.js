@@ -42,6 +42,7 @@ const PickExerciseItem = ({ exercise, exercisesInCurrentSplit }) => {
           : (split.exercises = isNotSelectedArr);
       }
     });
+    //console.log("Array of split: ", JSON.stringify(arrayOfSplits, 2));
     properties.setSelectedExercises(arrayOfSplits);
   };
 
@@ -52,7 +53,7 @@ const PickExerciseItem = ({ exercise, exercisesInCurrentSplit }) => {
         isSelected && { borderColor: "#2979FF", borderWidth: 2 },
       ]}
       onPress={() => {
-        toggleExerciseInSplit(properties.focusedSplit, exercise);
+        toggleExerciseInSplit(exercise);
         if (isSelected) {
           setIsSelected(false);
         } else {
