@@ -1,7 +1,7 @@
 import supabase from "../src/supabaseClient";
 import { SUPABASE_EDGE_URL } from "@env";
 
-// Update profile pic URL of user
+// Update profile pic URL of user - RLS ENABLED
 export const updateProfilePictureURL = async (userId, picURL) => {
   const { data, error } = await supabase
     .from("users")
@@ -16,7 +16,7 @@ export const updateProfilePictureURL = async (userId, picURL) => {
   }
 };
 
-// Get user data
+// Get user data - RLS ENABLED
 export const getUserData = async (userId) => {
   const { data, error } = await supabase
     .from("users")
