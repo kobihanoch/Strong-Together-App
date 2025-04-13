@@ -3,13 +3,25 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 serve(async (req) => {
   if (req.method !== "POST") {
-    return new Response("Method Not Allowed", { status: 405 });
+    return new Response(
+      JSON.stringify({ reason: "METHOD_NOT_ALLOWED" }),
+      {
+        headers: { "Content-Type": "application/json" },
+        status: 405,
+      }
+    );
   }
 
   const { username } = await req.json();
 
   if (!username) {
-    return new Response("Missing username", { status: 400 });
+    return new Response(
+      JSON.stringify({ reason: "MISSING_USERNAME" }),
+      {
+        headers: { "Content-Type": "application/json" },
+        status: 400,
+      }
+    );
   }
 
   const supabase = createClient(
@@ -24,9 +36,13 @@ serve(async (req) => {
     .single();
 
   if (error || !data) {
-    return new Response(JSON.stringify({ error: "User not found" }), {
-      status: 404,
-    });
+    return new Response(
+      JSON.stringify({ reason: "USER_NOT_FOUND", error }),
+      {
+        headers: { "Content-Type": "application/json" },
+        status: 404,
+      }
+    );
   }
 
   return new Response(JSON.stringify({ email: data.email }), {
