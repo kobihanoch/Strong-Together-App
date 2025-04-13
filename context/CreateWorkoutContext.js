@@ -33,13 +33,23 @@ export const CreateWorkoutProvider = ({ children }) => {
   const [splitsNumber, setSplitsNumber] = useState(1);
   const [selectedExercises, setSelectedExercises] = useState([]);
 
+  // Update the selected exercises array
   useEffect(() => {
     console.log("🟡 splitsNumber changed:", splitsNumber);
+    const newSelectedExercisesArr = createNamedLetterArray(splitsNumber);
+    setSelectedExercises(newSelectedExercisesArr);
   }, [splitsNumber]);
 
   useEffect(() => {
     console.log("🔵 selectedExercises changed:", selectedExercises);
   }, [selectedExercises]);
+
+  const createNamedLetterArray = (count) => {
+    return Array.from({ length: count }, (_, i) => {
+      const letter = String.fromCharCode(65 + i); // 65 = 'A'
+      return { name: letter };
+    });
+  };
 
   //------------------------------------------------------------------------------------
 
