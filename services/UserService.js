@@ -25,7 +25,7 @@ export const getUserData = async (userId) => {
     .single();
 
   if (error) {
-    console.log("Service error while fetching user data: " + error);
+    console.log("Service error while fetching user data: ", error);
     throw error;
   }
   return data;
