@@ -85,7 +85,7 @@ export const loginUser = async (username, password) => {
         error: data.error,
       };
     }
-    return { success: true, user: data.user };
+    return { success: true, user: data.user, session: data.session };
   } catch (error) {
     console.error("Login error (EDGE):", error.message);
     return { success: false, reason: "EDGE_CALL_FAILED", error };

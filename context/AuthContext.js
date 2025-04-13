@@ -90,6 +90,12 @@ export const AuthProvider = ({ children, onLogout }) => {
       if (!result.success) {
         throw new Error(result.reason);
       }
+
+      // Set session returned from server
+      await supabase.auth.setSession({
+        access_token: result.session.access_token,
+        refresh_token: result.session.refresh_token,
+      });
       setUser(result.user);
       setIsLoggedIn(true);
       //console.log(result.user.id);

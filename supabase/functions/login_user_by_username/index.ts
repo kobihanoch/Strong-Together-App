@@ -100,7 +100,7 @@ serve(async (req) => {
     }
 
     return new Response(
-      JSON.stringify({ success: true, user: fullUser }),
+      JSON.stringify({ success: true, user: fullUser, session: authData.session }),
       {
         headers: { "Content-Type": "application/json" },
         status: 200,
