@@ -127,7 +127,7 @@ The database has been divided into three main flows for clarity: **Workout Flow*
 
 ## 🧠 Edge Functions, Security, and Deno
 
-To ensure sensitive operations are handled securely and efficiently, **Strong-Together** leverages **Supabase Edge Functions**, powered by **Deno**, a modern runtime for JavaScript and TypeScript. This combination enhances both **security**, **scalability**, and **developer productivity**.
+To ensure sensitive operations are handled securely and efficiently, **Strong-Together** leverages **Supabase Edge Functions**, powered by **Deno**, a modern runtime for JavaScript and TypeScript. This combination enhances both **security**, **scalability**, and **developer productivity**. Additionally, all database tables are protected using **Row Level Security (RLS)**, **Edge Functions**, or **RPC Functions**, ensuring end-to-end security and controlled data access.
 
 ---
 
@@ -137,6 +137,7 @@ To ensure sensitive operations are handled securely and efficiently, **Strong-To
 - **Secure by Default**: Deno's secure runtime provides built-in protections, such as strict permissions for file access, network calls, and environment variables.
 - **Elevated Privileges**: Supabase Edge Functions use `SUPABASE_SERVICE_ROLE_KEY` to perform privileged operations that regular users cannot.
 - **Seamless TypeScript Support**: Deno natively supports TypeScript, making development faster and easier for modern JavaScript developers.
+- **Enhanced Table Protection**: Every database table is safeguarded with RLS policies or accessed through controlled Edge or RPC Functions.
 
 ---
 
@@ -147,6 +148,7 @@ To ensure sensitive operations are handled securely and efficiently, **Strong-To
 | 🔒 **Secure Authentication**    | Handles login, token management, and sensitive data retrieval securely.       |
 | 🚀 **Deno-Powered Performance** | Fast and lightweight execution of backend logic with modern tooling.          |
 | 🌐 **Expandable Architecture**  | Prepares the app for future integrations like AI-driven workouts or trainers. |
+| 🛡️ **Strong Data Protection**   | Combines RLS, Edge Functions, and RPC Functions to enforce strict access.     |
 
 ---
 
@@ -156,7 +158,9 @@ While exact implementations aren’t disclosed for security reasons, here are so
 
 - **User Management**: Securely manage authentication, registration, and session persistence.
 - **Workout Operations**: Handle workout tracking and plan updates without exposing the logic to the client.
-- **Advanced Features**: Enable features like real-time syncing and AI-assisted workflows with server-side logic.
+- **Sensitive Data Retrieval**: Fetch information (e.g., user statistics, workout history) safely via server-side logic.
+- **Controlled Access**: Ensure that all database interactions respect RLS policies or are routed through secure RPC Functions.
+- **Advanced Features**: Enable real-time syncing and AI-assisted workflows with server-side logic.
 
 ---
 
@@ -166,7 +170,9 @@ While exact implementations aren’t disclosed for security reasons, here are so
 - **Stronger Security**: Sensitive operations are isolated on the backend, minimizing attack vectors.
 - **Future-Proof**: Adding more advanced features becomes easier without compromising security.
 
-> As the project scales, more edge functions will be added to support new features and improve existing workflows.
+> With the combination of RLS, Edge Functions, and RPC Functions, **Strong-Together** ensures a robust and secure backend that scales with your needs.
+
+> As the project evolves, more edge functions will be added to support new features and improve existing workflows.
 
 ---
 
