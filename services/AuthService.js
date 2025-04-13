@@ -1,6 +1,7 @@
 // services/AuthService.js
 import { Alert } from "react-native";
 import supabase from "../src/supabaseClient";
+import { getEmailByUsername } from "./UserService";
 
 export const registerUser = async (
   email,
@@ -10,16 +11,7 @@ export const registerUser = async (
   gender
 ) => {
   try {
-    const { data: existingUser, error: checkUserError } = await supabase.rpc(
-      "get_email_by_username",
-      {
-        input_username: username,
-      }
-    );
-
-    if (checkUserError) {
-      console.log(checkUserError);
-    }
+    const existingUser = await getEmailByUsername(username);
 
     if (existingUser) {
       Alert.alert("Username is taken.");
@@ -58,16 +50,11 @@ export const registerUser = async (
 
 export const loginUser = async (username, password) => {
   try {
-    const { data: userRow, error: fetchEmailError } = await supabase.rpc(
-      "get_email_by_username",
-      {
-        input_username: username,
-      }
-    );
+    const userRow = await getEmailByUsername(username);
 
     console.log("Got email: " + userRow);
 
-    if (fetchEmailError || !userRow) {
+    if (!userRow) {
       Alert.alert("Username or password are incorrect");
       return { success: false, reason: "USERNAME_NOT_FOUND" };
     }

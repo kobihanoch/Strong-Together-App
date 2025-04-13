@@ -1,4 +1,5 @@
 import supabase from "../src/supabaseClient";
+import { SUPABASE_EDGE_URL } from "@env";
 
 // Update profile pic URL of user
 export const updateProfilePictureURL = async (userId, picURL) => {
@@ -42,6 +43,33 @@ export const getAnotherUserData = async (userId) => {
   }
 
   return data[0];
+};
+
+// Get email of user (Before auth - has edge function)
+/**
+ * Calls Supabase Edge Function: getEmailByUsername
+ */
+export const getEmailByUsername = async (username) => {
+  try {
+    const response = await fetch(`${SUPABASE_EDGE_URL}/getEmailByUsername`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ username }),
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to fetch email");
+    }
+
+    const data = await response.json();
+    console.log("Data from service: ", data);
+    return data.email;
+  } catch (error) {
+    console.error("getEmailByUsername error:", error);
+    return null;
+  }
 };
 
 // Get username
