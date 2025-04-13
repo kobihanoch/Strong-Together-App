@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.8.0](https://github.com/kobihanoch/Strong-Together-App/compare/v2.7.0...v2.8.0) (2025-04-13)
+
+
+### Bug Fixes
+
+* **auth:** get email with RPC function, no fetch for full user before logging in ([0f91115](https://github.com/kobihanoch/Strong-Together-App/commit/0f9111578dfc933cacb58ee569671e505a8510ef))
+* **auth:** using edge function instead of RPC to get email by username before auth ([7bb9fdc](https://github.com/kobihanoch/Strong-Together-App/commit/7bb9fdc677a149c41234f621ee97c0187a041c73))
+* **login:** login is now secured with edge functions ([f408274](https://github.com/kobihanoch/Strong-Together-App/commit/f40827420861d7edfb5160f0c8b8b22e9bcbc09e))
+* **session:** edg function is now returning session details to use on client ([9e3c35c](https://github.com/kobihanoch/Strong-Together-App/commit/9e3c35c80ca94d60a942b2152a9e619654fc798f))
+
 ## [2.7.0](https://github.com/kobihanoch/Strong-Together-App/compare/v2.6.0...v2.7.0) (2025-04-12)
 
 
