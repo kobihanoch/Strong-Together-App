@@ -1,6 +1,7 @@
 import { LinearGradient } from "expo-linear-gradient";
 import React, { useState } from "react";
 import {
+  ActivityIndicator,
   Alert,
   Dimensions,
   Image,
@@ -27,7 +28,7 @@ const Register = ({ navigation }) => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [errors, setErrors] = useState([]);
 
-  const { register } = useAuth();
+  const { register, loading } = useAuth();
 
   const handleRegister = async () => {
     const errorMessages = validateInputs();
@@ -140,7 +141,11 @@ const Register = ({ navigation }) => {
                 onPress={handleRegister}
               >
                 <View style={styles.buttonContent}>
-                  <Text style={styles.buttonRegisterText}>Register</Text>
+                  {loading ? (
+                    <ActivityIndicator></ActivityIndicator>
+                  ) : (
+                    <Text style={styles.buttonRegisterText}>Register</Text>
+                  )}
                 </View>
               </TouchableOpacity>
             </View>
