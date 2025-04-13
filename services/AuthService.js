@@ -4,6 +4,7 @@ import supabase from "../src/supabaseClient";
 import { getEmailByUsername } from "./UserService";
 import { SUPABASE_EDGE_URL } from "@env";
 
+// Using edge function to register
 export const registerUser = async (
   email,
   password,
@@ -12,40 +13,40 @@ export const registerUser = async (
   gender
 ) => {
   try {
-    const existingUser = await getEmailByUsername(username);
-
-    if (existingUser) {
-      Alert.alert("Username is taken.");
-      return { success: false, reason: "USERNAME_TAKEN" };
-    }
-
-    const { data: authData, error: signUpError } = await supabase.auth.signUp({
-      email,
-      password,
+    const response = await fetch(`${SUPABASE_EDGE_URL}/register_user`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        email,
+        password,
+        username,
+        fullName,
+        gender,
+      }),
     });
 
-    if (signUpError) {
-      console.log(signUpError);
+    const result = await response.json();
+
+    if (!response.ok) {
+      console.log("❌ REGISTER_USER EDGE ERROR:", result);
+      return {
+        success: false,
+        reason: result.reason || "UNKNOWN_ERROR",
+        error: result.error,
+      };
     }
 
-    const userId = authData.user.id;
-
-    const { error: insertError } = await supabase.rpc("register_user", {
-      input_id: userId,
-      input_email: email,
-      input_username: username,
-      input_name: fullName,
-      input_gender: gender,
-    });
-
-    if (insertError) {
-      console.log(insertError);
-    }
-
-    return { success: true, email, username, password };
+    console.log(result.error);
+    return result;
   } catch (error) {
-    console.log("Error during registration:", error.message);
-    return { success: false, reason: "REGISTRATION_FAILED", error };
+    console.error(error.message);
+    return {
+      success: false,
+      reason: "NETWORK_ERROR",
+      error: error.message,
+    };
   }
 };
 
