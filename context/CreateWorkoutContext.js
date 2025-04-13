@@ -1,4 +1,6 @@
 import React, { createContext, useContext, useState } from "react";
+import { useAuth } from "./AuthContext";
+import { useUserWorkout } from "../hooks/useUserWorkout";
 
 const CreateWorkoutContext = createContext();
 
@@ -6,7 +8,17 @@ export const useCreateWorkout = () => useContext(CreateWorkoutContext);
 
 // Provider
 export const CreateWorkoutProvider = ({ children }) => {
+  // User
+  const { user } = useAuth();
+
+  // Fetched workout
+  const { workout, workoutSplits, exercises, loading, error } = useUserWorkout(
+    user?.id
+  );
+
+  // Step
   const [currentStep, setCurrentStep] = useState(0);
+
   // Workout properties
   const [splitsNumber, setSplitsNumber] = useState(0);
 
@@ -16,13 +28,21 @@ export const CreateWorkoutProvider = ({ children }) => {
   return (
     <CreateWorkoutContext.Provider
       value={{
-        currentStep,
-        setCurrentStep,
-        workoutName,
-        splitsNumber,
-        setSplitsNumber,
-        selectedExercises,
-        setSelectedExercises,
+        properties: {
+          currentStep,
+          setCurrentStep,
+          splitsNumber,
+          setSplitsNumber,
+          selectedExercises,
+          setSelectedExercises,
+        },
+        userWorkout: {
+          workout,
+          workoutSplits,
+          exercises,
+          loading,
+          error,
+        },
       }}
     >
       {children}
