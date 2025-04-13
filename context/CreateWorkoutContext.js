@@ -8,6 +8,9 @@ const CreateWorkoutContext = createContext();
 export const useCreateWorkout = () => useContext(CreateWorkoutContext);
 
 export const CreateWorkoutProvider = ({ children }) => {
+  // ----------------------------Saving----------------------------
+  const [canSave, setCanSave] = useState(false);
+
   // ----------------------------User----------------------------
   const { user } = useAuth();
 
@@ -65,14 +68,20 @@ export const CreateWorkoutProvider = ({ children }) => {
   }, [splitsNumber]);
 
   useEffect(() => {
-    console.log("🔵 selectedExercises changed:", selectedExercises);
-  }, [selectedExercises]);
-
-  useEffect(() => {
     if (focusedSplit) {
       console.log("🎯 focusedSplit changed:", focusedSplit?.name);
     }
   }, [focusedSplit]);
+
+  // Updates when all the splits are not empty
+  useEffect(() => {
+    const allSplitsHaveExercises = selectedExercises.every(
+      (split) => split.exercises.length > 0
+    );
+
+    setCanSave(allSplitsHaveExercises);
+    console.log("🔵 selectedExercises changed:", selectedExercises);
+  }, [selectedExercises]);
 
   const createNamedLetterArray = (count) => {
     return Array.from({ length: count }, (_, i) => {
@@ -138,6 +147,9 @@ export const CreateWorkoutProvider = ({ children }) => {
           filterExercisesByMuscle,
           getMuscles,
           filterExercisesByFirstMuscle,
+        },
+        saving: {
+          canSave,
         },
       }}
     >
