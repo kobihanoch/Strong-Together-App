@@ -52,8 +52,9 @@ function ChooseExercisesCard() {
           alignItems: "center",
           marginTop: 10,
         }}
+        onPress={() => properties.setCurrentStep(2)}
       >
-        <Text style={{ color: "white", fontSize: 16 }}>Save Exercises</Text>
+        <Text style={{ color: "white", fontSize: 16 }}>Back</Text>
       </TouchableOpacity>
     </View>
   );

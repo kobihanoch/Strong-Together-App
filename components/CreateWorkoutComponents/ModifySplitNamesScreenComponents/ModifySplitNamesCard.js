@@ -40,14 +40,18 @@ function ModifySplitNamesCard({}) {
         data={properties.selectedExercises}
         keyExtractor={(item, index) => index.toString()}
         renderItem={({ item }) => {
-          const exercisesCount = 0; //selectedExercisesBySplit[item]?.length || 0;
+          let exercisesCount = 0; //selectedExercisesBySplit[item]?.length || 0;
+          properties.selectedExercises.forEach((split) => {
+            if (split.name == item.name) {
+              exercisesCount = split.exercises.length;
+            }
+          });
 
           return (
             <View
               style={{
                 flexDirection: "row",
                 borderRadius: height * 0.02,
-
                 backgroundColor: "#2979FF",
                 width: "98%",
                 alignSelf: "center",
@@ -102,7 +106,6 @@ function ModifySplitNamesCard({}) {
                   gap: height * 0.01,
                 }}
                 onPress={() => {
-                  //setEditWorkoutSplitName(item);
                   properties.setCurrentStep(3);
                   properties.setFocusedSplit(item);
                 }}
