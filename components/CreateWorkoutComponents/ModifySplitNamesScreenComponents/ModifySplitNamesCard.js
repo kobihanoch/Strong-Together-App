@@ -104,6 +104,7 @@ function ModifySplitNamesCard({}) {
                 onPress={() => {
                   //setEditWorkoutSplitName(item);
                   properties.setCurrentStep(3);
+                  properties.setFocusedSplit(item);
                 }}
               >
                 <View>
