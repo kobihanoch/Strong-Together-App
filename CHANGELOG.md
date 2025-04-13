@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2.8.1](https://github.com/kobihanoch/Strong-Together-App/compare/v2.8.0...v2.8.1) (2025-04-13)
+
+
+### Features
+
+* **register:** new UI feture activity indicator while loading registeration ([4a297b6](https://github.com/kobihanoch/Strong-Together-App/commit/4a297b6cfe1a28f2524e2b2f87d49c046e3808d1))
+
+
+### Bug Fixes
+
+* **register:** fixed guest unable to register ([f5bd51b](https://github.com/kobihanoch/Strong-Together-App/commit/f5bd51b0a0d0998afbb30dd7c33308e9fec57591))
+
 ## [2.8.0](https://github.com/kobihanoch/Strong-Together-App/compare/v2.7.0...v2.8.0) (2025-04-13)
 
 
