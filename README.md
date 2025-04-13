@@ -6,7 +6,7 @@
 
 <div align="center">
 
-  <img src="https://img.shields.io/badge/Version-2.6.0-blue" alt="Version 2.7.0" />
+  <img src="https://img.shields.io/badge/Version-2.6.0-blue" alt="Version 2.8.0" />
   <img src="https://img.shields.io/badge/Technologies-React%20Native%2C%20JavaScript%2C%20Expo%20Go%2C%20Supabase-green" alt="Technologies" />
   <img src="https://img.shields.io/badge/License-Personal%20Use-orange" alt="Personal Use License" />
   <img src="https://img.shields.io/badge/Status-In%20Progress-yellow" alt="Status In Progress" />
@@ -122,6 +122,57 @@ The aim of **Strong-Together-App** is to create a seamless fitness platform that
 ## 🗄️ Database Schema
 
 The database has been divided into three main flows for clarity: **Workout Flow**, **Messages Flow**, and **Tracking Flow**. Each section provides an explanation and visual representation of the database relationships for its respective flow.
+
+---
+
+## 🧠 Edge Functions, Security, and Deno
+
+To ensure sensitive operations are handled securely and efficiently, **Strong-Together** leverages **Supabase Edge Functions**, powered by **Deno**, a modern runtime for JavaScript and TypeScript. This combination enhances both **security**, **scalability**, and **developer productivity**. Additionally, all database tables are protected using **Row Level Security (RLS)**, **Edge Functions**, or **RPC Functions**, ensuring end-to-end security and controlled data access.
+
+---
+
+### 🔐 **Why Use Edge Functions with Deno?**
+
+- **Prevent Data Leaks**: Sensitive logic, like authentication or user profile operations, is moved to the backend, away from the client.
+- **Secure by Default**: Deno's secure runtime provides built-in protections, such as strict permissions for file access, network calls, and environment variables.
+- **Elevated Privileges**: Supabase Edge Functions use `SUPABASE_SERVICE_ROLE_KEY` to perform privileged operations that regular users cannot.
+- **Seamless TypeScript Support**: Deno natively supports TypeScript, making development faster and easier for modern JavaScript developers.
+- **Enhanced Table Protection**: Every database table is safeguarded with RLS policies or accessed through controlled Edge or RPC Functions.
+
+---
+
+### 🛠️ **How Deno and Edge Functions Add Value**
+
+| **Feature**                     | **Benefit**                                                                   |
+| ------------------------------- | ----------------------------------------------------------------------------- |
+| 🔒 **Secure Authentication**    | Handles login, token management, and sensitive data retrieval securely.       |
+| 🚀 **Deno-Powered Performance** | Fast and lightweight execution of backend logic with modern tooling.          |
+| 🌐 **Expandable Architecture**  | Prepares the app for future integrations like AI-driven workouts or trainers. |
+| 🛡️ **Strong Data Protection**   | Combines RLS, Edge Functions, and RPC Functions to enforce strict access.     |
+
+---
+
+### 🧩 **Examples of Edge Function Use Cases**
+
+While exact implementations aren’t disclosed for security reasons, here are some examples of what **Deno-powered Edge Functions** enable:
+
+- **User Management**: Securely manage authentication, registration, and session persistence.
+- **Workout Operations**: Handle workout tracking and plan updates without exposing the logic to the client.
+- **Sensitive Data Retrieval**: Fetch information (e.g., user statistics, workout history) safely via server-side logic.
+- **Controlled Access**: Ensure that all database interactions respect RLS policies or are routed through secure RPC Functions.
+- **Advanced Features**: Enable real-time syncing and AI-assisted workflows with server-side logic.
+
+---
+
+### ✅ **Benefits of Backend Delegation**
+
+- **Cleaner Code**: Client-side logic is simpler and safer, focusing only on UI and basic workflows.
+- **Stronger Security**: Sensitive operations are isolated on the backend, minimizing attack vectors.
+- **Future-Proof**: Adding more advanced features becomes easier without compromising security.
+
+> With the combination of RLS, Edge Functions, and RPC Functions, **Strong-Together** ensures a robust and secure backend that scales with your needs.
+
+> As the project evolves, more edge functions will be added to support new features and improve existing workflows.
 
 ---
 

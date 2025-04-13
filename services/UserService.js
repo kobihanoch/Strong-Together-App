@@ -1,6 +1,7 @@
 import supabase from "../src/supabaseClient";
+import { SUPABASE_EDGE_URL } from "@env";
 
-// Update profile pic URL of user
+// Update profile pic URL of user - RLS ENABLED
 export const updateProfilePictureURL = async (userId, picURL) => {
   const { data, error } = await supabase
     .from("users")
@@ -15,7 +16,7 @@ export const updateProfilePictureURL = async (userId, picURL) => {
   }
 };
 
-// Get user data
+// Get user data - RLS ENABLED
 export const getUserData = async (userId) => {
   const { data, error } = await supabase
     .from("users")
@@ -24,10 +25,24 @@ export const getUserData = async (userId) => {
     .single();
 
   if (error) {
-    console.log("Service error while fetching user data: " + error);
+    console.log("Service error while fetching user data: ", error);
     throw error;
   }
   return data;
+};
+
+// Get another user data by RPC (returning only username, profilepic_url by uuid)
+export const getAnotherUserData = async (userId) => {
+  const { data, error } = await supabase.rpc("get_user_profile_by_id", {
+    input_id: userId,
+  });
+
+  if (error) {
+    console.error("Failed to load profile", error);
+    return null;
+  }
+
+  return data[0];
 };
 
 // Get username

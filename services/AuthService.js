@@ -1,6 +1,8 @@
 // services/AuthService.js
 import { Alert } from "react-native";
 import supabase from "../src/supabaseClient";
+import { getEmailByUsername } from "./UserService";
+import { SUPABASE_EDGE_URL } from "@env";
 
 export const registerUser = async (
   email,
@@ -10,15 +12,7 @@ export const registerUser = async (
   gender
 ) => {
   try {
-    const { data: existingUser, error: checkUserError } = await supabase
-      .from("users")
-      .select("*")
-      .eq("username", username)
-      .maybeSingle();
-
-    if (checkUserError) {
-      console.log(checkUserError);
-    }
+    const existingUser = await getEmailByUsername(username);
 
     if (existingUser) {
       Alert.alert("Username is taken.");
@@ -36,17 +30,13 @@ export const registerUser = async (
 
     const userId = authData.user.id;
 
-    const { error: insertError } = await supabase.from("users").insert([
-      {
-        id: userId,
-        email,
-        username,
-        name: fullName,
-        gender,
-        level: 0,
-        created_at: new Date().toISOString(),
-      },
-    ]);
+    const { error: insertError } = await supabase.rpc("register_user", {
+      input_id: userId,
+      input_email: email,
+      input_username: username,
+      input_name: fullName,
+      input_gender: gender,
+    });
 
     if (insertError) {
       console.log(insertError);
@@ -59,51 +49,46 @@ export const registerUser = async (
   }
 };
 
+// Using edge function to login
 export const loginUser = async (username, password) => {
   try {
-    const { data: userRow, error: fetchEmailError } = await supabase
-      .from("users")
-      .select("email")
-      .eq("username", username)
-      .single();
+    const url = `${SUPABASE_EDGE_URL}/login_user_by_username`;
+    //console.log("FULL URL:", url);
 
-    if (fetchEmailError || !userRow) {
-      Alert.alert("Username or password are incorrect");
-      return { success: false, reason: "USERNAME_NOT_FOUND" };
-    }
+    const response = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ username, password }),
+    });
 
-    const { data: authData, error: loginError } =
-      await supabase.auth.signInWithPassword({
-        email: userRow.email,
-        password,
-      });
+    const text = await response.text();
+    console.log("RAW response:", text);
 
-    if (loginError || !authData.session) {
+    let data = null;
+    try {
+      data = JSON.parse(text);
+    } catch (e) {
+      console.error("❌ JSON Parse Error:", e.message);
       return {
         success: false,
-        reason: "INVALID_CREDENTIALS",
-        error: loginError,
+        reason: "INVALID_JSON_FROM_EDGE",
+        raw: text,
       };
     }
 
-    const { data: fullUser, error: fetchUserError } = await supabase
-      .from("users")
-      .select("*")
-      .eq("username", username)
-      .single();
-
-    if (fetchUserError || !fullUser) {
+    if (!response.ok || !data.success) {
       return {
         success: false,
-        reason: "FAILED_TO_LOAD_USER",
-        error: fetchUserError,
+        reason: data.reason || "UNKNOWN_ERROR",
+        error: data.error,
       };
     }
-
-    return { success: true, user: fullUser };
+    return { success: true, user: data.user, session: data.session };
   } catch (error) {
-    console.error("Login error:", error.message);
-    return { success: false, reason: "UNEXPECTED_ERROR", error };
+    console.error("Login error (EDGE):", error.message);
+    return { success: false, reason: "EDGE_CALL_FAILED", error };
   }
 };
 
