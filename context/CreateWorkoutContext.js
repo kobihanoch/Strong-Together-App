@@ -40,6 +40,7 @@ export const CreateWorkoutProvider = ({ children }) => {
   // ----------------------------Workout properties----------------------------
   const [splitsNumber, setSplitsNumber] = useState(1);
   const [selectedExercises, setSelectedExercises] = useState([]);
+  const [focusedSplit, setFocusedSplit] = useState(null);
 
   // Update the selected exercises array
   useEffect(() => {
@@ -51,6 +52,12 @@ export const CreateWorkoutProvider = ({ children }) => {
   useEffect(() => {
     console.log("🔵 selectedExercises changed:", selectedExercises);
   }, [selectedExercises]);
+
+  useEffect(() => {
+    if (focusedSplit) {
+      console.log("🎯 focusedSplit changed:", focusedSplit?.name);
+    }
+  }, [focusedSplit]);
 
   const createNamedLetterArray = (count) => {
     return Array.from({ length: count }, (_, i) => {
@@ -71,6 +78,8 @@ export const CreateWorkoutProvider = ({ children }) => {
           setSplitsNumber,
           selectedExercises,
           setSelectedExercises,
+          focusedSplit,
+          setFocusedSplit,
         },
         userWorkout: {
           workout,
