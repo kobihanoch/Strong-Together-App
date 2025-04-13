@@ -77,7 +77,7 @@ export const CreateWorkoutProvider = ({ children }) => {
   const createNamedLetterArray = (count) => {
     return Array.from({ length: count }, (_, i) => {
       const letter = String.fromCharCode(65 + i); // 65 = 'A'
-      return { name: letter };
+      return { name: letter, exercises: [] };
     });
   };
 
