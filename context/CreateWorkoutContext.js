@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { useAuth } from "./AuthContext";
 import { useUserWorkout } from "../hooks/useUserWorkout";
+import useExercises from "../hooks/useExercises";
 
 const CreateWorkoutContext = createContext();
 
@@ -9,6 +10,13 @@ export const useCreateWorkout = () => useContext(CreateWorkoutContext);
 export const CreateWorkoutProvider = ({ children }) => {
   // ----------------------------User----------------------------
   const { user } = useAuth();
+
+  // ----------------------------Exercises in DB----------------------------
+  const {
+    exercises: dbExercises,
+    error: exError,
+    loading: exLoading,
+  } = useExercises();
 
   // ----------------------------Fetched workout--------------------------------
   const { workout, workoutSplits, exercises, loading, error } = useUserWorkout(
@@ -70,6 +78,11 @@ export const CreateWorkoutProvider = ({ children }) => {
           exercises,
           loading,
           error,
+        },
+        DB: {
+          dbExercises,
+          exLoading,
+          exError,
         },
       }}
     >
