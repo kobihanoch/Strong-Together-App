@@ -12,61 +12,53 @@ import {
 import { RFValue } from "react-native-responsive-fontsize";
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 import images from "../../images";
+import { useCreateWorkout } from "../../../context/CreateWorkoutContext";
 
 const { width, height } = Dimensions.get("window");
 
-const PickExerciseItem = ({ exercise, onSelectExercise, isSelected }) => {
+const PickExerciseItem = ({ exercise, exercisesInCurrentSplit }) => {
+  const { properties } = useCreateWorkout();
+  const [isSelected, setIsSelected] = useState(
+    exercisesInCurrentSplit.some((ex) => ex.id === exercise.id)
+  );
+
   const mainMuscle = exercise.targetmuscle;
   const specificMuscle = exercise.specifictargetmuscle;
   const imagePath = images[mainMuscle]?.[specificMuscle];
 
-  const getInitialSets = (exerciseSets) => {
-    if (
-      !exerciseSets ||
-      !Array.isArray(exerciseSets) ||
-      exerciseSets.length === 0
-    ) {
-      return ["10", "10", "10"];
-    }
-    return exerciseSets.map((set) =>
-      isNaN(set) || set === "" ? "10" : set.toString()
+  // Adds to context array
+  const toggleExerciseInSplit = (exercise) => {
+    const arrayOfSplits = JSON.parse(
+      JSON.stringify(properties.selectedExercises)
     );
-  };
-
-  const [sets, setSets] = useState(getInitialSets(exercise.sets));
-  const [isEditing, setIsEditing] = useState(false);
-
-  useEffect(() => {
-    if (
-      exercise.sets &&
-      JSON.stringify(exercise.sets) !== JSON.stringify(sets)
-    ) {
-      setSets(getInitialSets(exercise.sets));
-    }
-  }, [exercise.sets]);
-
-  const handleSetChange = (index, value) => {
-    setSets((prevSets) => {
-      const newSets = [...prevSets];
-      newSets[index] = value;
-      return newSets;
+    arrayOfSplits.forEach((split) => {
+      if (split.name == properties.focusedSplit.name) {
+        const isSelectedArr = split.exercises.filter(
+          (ex) => ex.id !== exercise.id
+        );
+        const isNotSelectedArr = [...split.exercises, exercise];
+        isSelected
+          ? (split.exercises = isSelectedArr)
+          : (split.exercises = isNotSelectedArr);
+      }
     });
-  };
-
-  const handleSaveSets = () => {
-    const sanitizedSets = sets.map((set) => (set.trim() === "" ? "10" : set));
-    setSets(sanitizedSets);
-    onSelectExercise({ ...exercise, sets: sanitizedSets });
-    setIsEditing(false);
+    properties.setSelectedExercises(arrayOfSplits);
   };
 
   return (
     <TouchableOpacity
-      onPress={() => onSelectExercise({ ...exercise, sets })}
       style={[
         styles.exerciseContainer,
         isSelected && { borderColor: "#2979FF", borderWidth: 2 },
       ]}
+      onPress={() => {
+        toggleExerciseInSplit(properties.focusedSplit, exercise);
+        if (isSelected) {
+          setIsSelected(false);
+        } else {
+          setIsSelected(true);
+        }
+      }}
       activeOpacity={0.8}
     >
       <View style={{ flex: 1, flexDirection: "row" }}>
@@ -84,40 +76,6 @@ const PickExerciseItem = ({ exercise, onSelectExercise, isSelected }) => {
           <Text style={styles.muscleText}>
             {exercise.targetmuscle}, {exercise.specifictargetmuscle}
           </Text>
-
-          {isEditing ? (
-            <View style={styles.editingContainer}>
-              <View style={styles.inputsRow}>
-                {sets.map((set, index) => (
-                  <TextInput
-                    key={index}
-                    style={styles.editingInput}
-                    keyboardType="numeric"
-                    value={set}
-                    onChangeText={(value) => handleSetChange(index, value)}
-                    maxLength={2}
-                  />
-                ))}
-                <TouchableOpacity
-                  style={styles.saveButton}
-                  onPress={handleSaveSets}
-                >
-                  <FontAwesome5 name="check" style={styles.saveButtonText} />
-                </TouchableOpacity>
-              </View>
-            </View>
-          ) : (
-            <TouchableOpacity
-              style={styles.setsContainer}
-              onPress={() => setIsEditing(true)}
-            >
-              {sets.map((set, index) => (
-                <View key={index} style={styles.setBubble}>
-                  <Text style={styles.setText}>{set}</Text>
-                </View>
-              ))}
-            </TouchableOpacity>
-          )}
         </View>
 
         <View style={styles.iconContainer}>

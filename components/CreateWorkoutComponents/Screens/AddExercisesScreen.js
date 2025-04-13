@@ -2,32 +2,12 @@ import React from "react";
 import { Dimensions, Text, View } from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";
 import ChooseExercisesCard from "../AddExercisesScreenComponents/ChooseExercisesCard";
+import { useCreateWorkout } from "../../../context/CreateWorkoutContext";
 
 const { width, height } = Dimensions.get("window");
 
-function AddExercisesScreen({
-  setStep,
-  workoutSplitName,
-  exercises,
-  setSelectedExercisesBySplit,
-  selectedExercisesBySplit,
-}) {
-  const initialSelectedExercises =
-    selectedExercisesBySplit[workoutSplitName] || [];
-
-  const handleSaveExercises = (splitName, selectedExercises) => {
-    setSelectedExercisesBySplit((prev) => ({
-      ...prev,
-      [splitName]: Array.isArray(selectedExercises) ? selectedExercises : [],
-    }));
-    setStep(2);
-  };
-
-  console.log(
-    "Selected exercise by split: " +
-      JSON.stringify(selectedExercisesBySplit, null, 2)
-  );
-
+function AddExercisesScreen() {
+  const { properties, DB } = useCreateWorkout();
   return (
     <View style={{ flex: 1, paddingHorizontal: width * 0.05 }}>
       <View
@@ -53,18 +33,12 @@ function AddExercisesScreen({
             color: "rgb(97, 97, 97)",
           }}
         >
-          Split {workoutSplitName}
+          Split {properties.focusedSplit.name}
         </Text>
       </View>
 
       <View style={{ flex: 9, marginBottom: height * 0.04 }}>
-        <ChooseExercisesCard
-          key={workoutSplitName}
-          workoutSplitName={workoutSplitName}
-          exercises={exercises}
-          initialSelectedExercises={initialSelectedExercises}
-          onSave={handleSaveExercises}
-        />
+        <ChooseExercisesCard />
       </View>
     </View>
   );

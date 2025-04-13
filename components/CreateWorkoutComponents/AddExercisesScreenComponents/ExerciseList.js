@@ -1,21 +1,26 @@
 import React from "react";
 import { View, FlatList } from "react-native";
 import PickExerciseItem from "./PickExerciseItem";
+import { useCreateWorkout } from "../../../context/CreateWorkoutContext";
 
-const ExerciseList = ({ exercises, onSelectExercise, selectedExercises }) => {
+const ExerciseList = () => {
+  const { properties } = useCreateWorkout();
+  const selectedSplitIndexInArray = properties.selectedExercises.findIndex(
+    (split) => split.name === properties.focusedSplit.name
+  );
+
   return (
     <View style={{ flex: 7 }}>
       <FlatList
-        data={exercises}
-        keyExtractor={(item, index) => index.toString()}
+        data={properties.filteredExercises}
+        keyExtractor={(item) => item.id}
         showsVerticalScrollIndicator={false}
         renderItem={({ item }) => (
           <PickExerciseItem
             exercise={item}
-            onSelectExercise={onSelectExercise}
-            isSelected={selectedExercises.some(
-              (ex) => ex.id === item.id || ex.id === item.exercise_id
-            )}
+            exercisesInCurrentSplit={
+              properties.selectedExercises[selectedSplitIndexInArray].exercises
+            }
           />
         )}
       />
