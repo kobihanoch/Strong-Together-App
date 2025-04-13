@@ -6,7 +6,7 @@
 
 <div align="center">
 
-  <img src="https://img.shields.io/badge/Version-2.8.0-blue" alt="Version 2.8.0" />
+  <img src="https://img.shields.io/badge/Version-2.8.1-blue" alt="Version 2.8.1" />
   <img src="https://img.shields.io/badge/Technologies-React%20Native%2C%20JavaScript%2C%20Expo%20Go%2C%20Supabase-green" alt="Technologies" />
   <img src="https://img.shields.io/badge/License-Personal%20Use-orange" alt="Personal Use License" />
   <img src="https://img.shields.io/badge/Status-In%20Progress-yellow" alt="Status In Progress" />
