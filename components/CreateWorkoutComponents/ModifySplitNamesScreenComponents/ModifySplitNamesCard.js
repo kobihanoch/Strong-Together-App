@@ -10,19 +10,12 @@ import {
 } from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
+import { useCreateWorkout } from "../../../context/CreateWorkoutContext";
 
 const { width, height } = Dimensions.get("window");
 
-function ModifySplitNamesCard({
-  splitsNumber,
-  setEditWorkoutSplitName,
-  setStep,
-  selectedExercisesBySplit,
-}) {
-  const splitNames = Array.from({ length: splitsNumber }, (_, i) =>
-    String.fromCharCode(65 + i)
-  );
-
+function ModifySplitNamesCard({}) {
+  const { properties } = useCreateWorkout();
   return (
     <View
       style={{
@@ -44,10 +37,10 @@ function ModifySplitNamesCard({
     >
       <FlatList
         style={{ flex: 1, width: "100%" }}
-        data={splitNames}
+        data={properties.selectedExercises}
         keyExtractor={(item, index) => index.toString()}
         renderItem={({ item }) => {
-          const exercisesCount = selectedExercisesBySplit[item]?.length || 0;
+          const exercisesCount = 0; //selectedExercisesBySplit[item]?.length || 0;
 
           return (
             <View
@@ -85,7 +78,7 @@ function ModifySplitNamesCard({
                       fontSize: RFValue(30),
                     }}
                   >
-                    {item}
+                    {item.name}
                   </Text>
                   <Text
                     style={{
@@ -109,8 +102,8 @@ function ModifySplitNamesCard({
                   gap: height * 0.01,
                 }}
                 onPress={() => {
-                  setEditWorkoutSplitName(item);
-                  setStep(3);
+                  //setEditWorkoutSplitName(item);
+                  properties.setCurrentStep(3);
                 }}
               >
                 <View>
