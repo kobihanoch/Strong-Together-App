@@ -5,6 +5,7 @@ import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 import GradientedGoToButton from "../../GradientedGoToButton";
 import WorkoutGenericBuildSettingsCard from "../PickSplitNumberScreenComponents/WorkoutGenericBuildSettingsCard";
 import { useCreateWorkout } from "../../../context/CreateWorkoutContext";
+import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 
 const { width, height } = Dimensions.get("window");
 
@@ -67,14 +68,14 @@ function PickSplitNumberScreen() {
             >
               <Text
                 style={{
-                  fontFamily: "Inter_700Bold",
+                  fontFamily: "Inter_600SemiBold",
                   color: "white",
                   fontSize: RFValue(15),
                 }}
               >
                 Next step
               </Text>
-              <FontAwesome5
+              <MaterialCommunityIcons
                 name="arrow-right"
                 color="white"
                 size={RFValue(17)}

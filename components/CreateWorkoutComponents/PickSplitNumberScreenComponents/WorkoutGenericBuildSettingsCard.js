@@ -38,7 +38,9 @@ function WorkoutGenericBuildSettingsCard({ setSplitsNumber }) {
             color: "#0d2540",
             textAlign: "center",
           }}
-        ></Text>
+        >
+          Choose your amount of workouts
+        </Text>
       </View>
       <View
         style={{

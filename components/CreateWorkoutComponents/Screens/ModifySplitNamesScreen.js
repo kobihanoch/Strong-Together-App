@@ -9,12 +9,12 @@ import useWorkoutSplits from "../../../hooks/useWorkoutSplits";
 import GradientedGoToButton from "../../GradientedGoToButton";
 import ModifySplitNamesCard from "../ModifySplitNamesScreenComponents/ModifySplitNamesCard";
 import { useCreateWorkout } from "../../../context/CreateWorkoutContext";
+import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 
 const { width, height } = Dimensions.get("window");
 
 function ModifySplitNamesScreen() {
-  const { properties } = useCreateWorkout();
-  const [isSaveDisabled, setIsSaveDisabled] = useState(true);
+  const { properties, saving } = useCreateWorkout();
 
   return (
     <View
@@ -81,14 +81,14 @@ function ModifySplitNamesScreen() {
                 opacity: 1,
               }}
             >
-              <FontAwesome5
+              <MaterialCommunityIcons
                 name="arrow-left"
                 color="white"
                 size={RFValue(17)}
               />
               <Text
                 style={{
-                  fontFamily: "Inter_700Bold",
+                  fontFamily: "Inter_600SemiBold",
                   color: "white",
                   fontSize: RFValue(15),
                 }}
@@ -104,7 +104,7 @@ function ModifySplitNamesScreen() {
             gradientColors={["#2979FF", "#2979FF"]}
             borderRadius={height * 0.1}
             //onPress={saveWorkoutPlan}
-            //disabled={saving || isSaveDisabled}
+            disabled={!saving.canSave}
           >
             <View
               style={{
@@ -117,14 +117,18 @@ function ModifySplitNamesScreen() {
             >
               <Text
                 style={{
-                  fontFamily: "Inter_700Bold",
+                  fontFamily: "Inter_600SemiBold",
                   color: "white",
                   fontSize: RFValue(15),
                 }}
               >
                 {/*saving ? "Saving..." : "Save"*/}Save
               </Text>
-              <FontAwesome5 name="check" color="white" size={RFValue(17)} />
+              <MaterialCommunityIcons
+                name="check"
+                color="white"
+                size={RFValue(17)}
+              />
             </View>
           </GradientedGoToButton>
         </View>
