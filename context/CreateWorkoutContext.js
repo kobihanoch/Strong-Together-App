@@ -23,7 +23,7 @@ export const CreateWorkoutProvider = ({ children }) => {
     user?.id
   );
 
-  // If user has a workout
+  // If user has a workout: NEED TO ADD A FUNCTION THAT ARRANGES THE GIVEN DATA OF USER AND TRANSLATES IT TO THIS DATA STRUCTURE
   useEffect(() => {
     if (workout && workoutSplits && exercises) {
       setCurrentStep(2);
