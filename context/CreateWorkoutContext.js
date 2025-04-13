@@ -51,8 +51,10 @@ export const CreateWorkoutProvider = ({ children }) => {
 
   // Set filtered exercises by muscle (first)
   useEffect(() => {
-    console.log(filterExercisesByMuscle(muscles[0], dbExercises));
-    setFilteredExercises(filterExercisesByMuscle(muscles[0], dbExercises));
+    if (dbExercises && muscles) {
+      //console.log(filterExercisesByMuscle(muscles[0], dbExercises));
+      setFilteredExercises(filterExercisesByMuscle(muscles[0], dbExercises));
+    }
   }, [muscles, dbExercises]);
 
   // Update the selected exercises array
@@ -83,7 +85,7 @@ export const CreateWorkoutProvider = ({ children }) => {
 
   const filterExercisesByMuscle = (muscle, exercises) => {
     const dup = exercises.filter((ex) => ex.targetmuscle === muscle);
-    console.log(dup);
+    //console.log(dup);
     return dup;
   };
 
