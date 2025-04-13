@@ -14,15 +14,17 @@ export const fetchWorkoutsByUserId = async (userId) => {
 // Gets user workout learning
 export const getUserWorkout = async (userId) => {
   const { data, error } = await supabase
-    .from("users")
+    .from("workoutplans")
     .select(
-      "*, workoutplans!workoutplans_user_id_fkey(*, workoutsplits(*, exercisetoworkoutsplit(*, exercises (description, targetmuscle, specifictargetmuscle))))"
+      "*, workoutsplits(*, exercisetoworkoutsplit(*, exercises (description, targetmuscle, specifictargetmuscle)))"
     )
-    .eq("id", userId);
-  console.log(
-    "WorkoutService: User + Workout + Splits + Exercises were fetched successfully!"
-  );
-  return data[0].workoutplans;
+    .eq("user_id", userId)
+    .single();
+  if (error) {
+    console.log(error);
+  }
+  //console.log(">>>>>>>>>>>>>>>>>>>", data);
+  return data;
 };
 
 // Gets user workout learning
