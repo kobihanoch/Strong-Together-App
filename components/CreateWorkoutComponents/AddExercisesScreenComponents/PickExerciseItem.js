@@ -17,7 +17,7 @@ import { useCreateWorkout } from "../../../context/CreateWorkoutContext";
 const { width, height } = Dimensions.get("window");
 
 const PickExerciseItem = ({ exercise, exercisesInCurrentSplit }) => {
-  const { properties } = useCreateWorkout();
+  const { properties, utils } = useCreateWorkout();
   const [isSelected, setIsSelected] = useState(
     exercisesInCurrentSplit.some((ex) => ex.id === exercise.id)
   );
@@ -26,25 +26,7 @@ const PickExerciseItem = ({ exercise, exercisesInCurrentSplit }) => {
   const specificMuscle = exercise.specifictargetmuscle;
   const imagePath = images[mainMuscle]?.[specificMuscle];
 
-  // Adds to context array
-  const toggleExerciseInSplit = (exercise) => {
-    const arrayOfSplits = JSON.parse(
-      JSON.stringify(properties.selectedExercises)
-    );
-    arrayOfSplits.forEach((split) => {
-      if (split.name == properties.focusedSplit.name) {
-        const isSelectedArr = split.exercises.filter(
-          (ex) => ex.id !== exercise.id
-        );
-        const isNotSelectedArr = [...split.exercises, exercise];
-        isSelected
-          ? (split.exercises = isSelectedArr)
-          : (split.exercises = isNotSelectedArr);
-      }
-    });
-    //console.log("Array of split: ", JSON.stringify(arrayOfSplits, 2));
-    properties.setSelectedExercises(arrayOfSplits);
-  };
+  const [isModalVisible, setIsModalVisible] = useState(false);
 
   return (
     <TouchableOpacity
@@ -53,7 +35,7 @@ const PickExerciseItem = ({ exercise, exercisesInCurrentSplit }) => {
         isSelected && { borderColor: "#2979FF", borderWidth: 2 },
       ]}
       onPress={() => {
-        toggleExerciseInSplit(exercise);
+        utils.toggleExerciseInSplit(exercise, isSelected);
         if (isSelected) {
           setIsSelected(false);
         } else {

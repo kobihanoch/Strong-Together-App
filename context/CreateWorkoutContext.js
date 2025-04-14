@@ -113,6 +113,22 @@ export const CreateWorkoutProvider = ({ children }) => {
     setFilteredExercises(filterExercisesByMuscle(muscles[0], dbExercises));
   };
 
+  const toggleExerciseInSplit = (exercise, isSelected) => {
+    const arrayOfSplits = JSON.parse(JSON.stringify(selectedExercises));
+    arrayOfSplits.forEach((split) => {
+      if (split.name == focusedSplit.name) {
+        const isSelectedArr = split.exercises.filter(
+          (ex) => ex.id !== exercise.id
+        );
+        const isNotSelectedArr = [...split.exercises, exercise];
+        isSelected
+          ? (split.exercises = isSelectedArr)
+          : (split.exercises = isNotSelectedArr);
+      }
+      setSelectedExercises(arrayOfSplits);
+    });
+  };
+
   //------------------------------------------------------------------------------------
 
   return (
@@ -147,6 +163,7 @@ export const CreateWorkoutProvider = ({ children }) => {
           filterExercisesByMuscle,
           getMuscles,
           filterExercisesByFirstMuscle,
+          toggleExerciseInSplit,
         },
         saving: {
           canSave,
