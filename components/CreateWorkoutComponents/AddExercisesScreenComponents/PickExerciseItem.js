@@ -19,7 +19,7 @@ const { width, height } = Dimensions.get("window");
 const PickExerciseItem = ({ exercise, exercisesInCurrentSplit }) => {
   const { properties, utils } = useCreateWorkout();
   const [isSelected, setIsSelected] = useState(
-    exercisesInCurrentSplit.some((ex) => ex.id === exercise.id)
+    exercisesInCurrentSplit.some((ex) => ex.exercise_id === exercise.id)
   );
 
   const mainMuscle = exercise.targetmuscle;
