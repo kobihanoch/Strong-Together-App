@@ -120,7 +120,14 @@ export const CreateWorkoutProvider = ({ children }) => {
         const isSelectedArr = split.exercises.filter(
           (ex) => ex.id !== exercise.id
         );
-        const isNotSelectedArr = [...split.exercises, exercise];
+        const isNotSelectedArr = [
+          ...split.exercises,
+          {
+            exercise_id: exercise.id,
+            workoutsplit_id: null,
+            sets: [0, 0, 0],
+          },
+        ];
         isSelected
           ? (split.exercises = isSelectedArr)
           : (split.exercises = isNotSelectedArr);
