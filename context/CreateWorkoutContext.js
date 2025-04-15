@@ -46,6 +46,23 @@ export const CreateWorkoutProvider = ({ children }) => {
   const [focusedSplit, setFocusedSplit] = useState(null);
   const [filteredExercises, setFilteredExercises] = useState(null);
   const [muscles, setMuscles] = useState(null);
+  const [focusedExercise, setFocusedExercise] = useState(null);
+  const [focusedExerciseSets, setFocusedExerciseSets] = useState(null);
+
+  // Print focused exercise when updated
+  useEffect(() => {
+    if (focusedExercise) {
+      console.log("🎯 focusedExercise changed:", focusedExercise);
+      const sets = // Filter selected exercises array to set
+        selectedExercises
+          .find((split) => split.name === focusedSplit?.name)
+          ?.exercises.find((ex) => ex.exercise_id === focusedExercise?.id)
+          ?.sets || [];
+
+      //console.log(sets);
+      setFocusedExerciseSets(sets);
+    }
+  }, [focusedExercise]);
 
   // Update muscles
   useEffect(() => {
@@ -80,7 +97,10 @@ export const CreateWorkoutProvider = ({ children }) => {
     );
 
     setCanSave(allSplitsHaveExercises);
-    console.log("🔵 selectedExercises changed:", selectedExercises);
+    console.log(
+      "🔵 selectedExercises changed:",
+      JSON.stringify(selectedExercises, null, 2)
+    );
   }, [selectedExercises]);
 
   const createNamedLetterArray = (count) => {
@@ -153,6 +173,8 @@ export const CreateWorkoutProvider = ({ children }) => {
           filteredExercises,
           setFilteredExercises,
           muscles,
+          focusedExercise,
+          setFocusedExercise,
         },
         userWorkout: {
           workout,
