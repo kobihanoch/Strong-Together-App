@@ -36,6 +36,7 @@ const PickExerciseItem = ({ exercise, exercisesInCurrentSplit }) => {
       ]}
       onPress={() => {
         utils.toggleExerciseInSplit(exercise, isSelected);
+        properties.setFocusedExercise(exercise);
         if (isSelected) {
           setIsSelected(false);
         } else {
