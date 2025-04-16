@@ -38,7 +38,7 @@ const ExerciseItem = ({ exercise }) => {
               <Image
                 source={imagePath}
                 style={{
-                  height: height * 0.04,
+                  height: height * 0.06,
                   aspectRatio: 1,
                   resizeMode: "contain",
                   opacity: 0.8,

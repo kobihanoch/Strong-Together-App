@@ -1,10 +1,9 @@
-import { LinearGradient } from "expo-linear-gradient";
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { Dimensions, Text, TouchableOpacity, View } from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";
+import { useCreateWorkout } from "../../../context/CreateWorkoutContext";
 import ExerciseList from "./ExerciseList";
 import MuscleTabs from "./MuscleTabs";
-import { useCreateWorkout } from "../../../context/CreateWorkoutContext";
 
 const { width, height } = Dimensions.get("window");
 
