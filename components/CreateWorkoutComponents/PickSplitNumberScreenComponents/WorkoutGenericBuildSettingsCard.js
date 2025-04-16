@@ -52,9 +52,14 @@ function WorkoutGenericBuildSettingsCard({ setSplitsNumber }) {
         }}
       >
         <TouchableOpacity
-          onPress={() =>
-            properties.setSplitsNumber(Math.max(1, properties.splitsNumber - 1))
-          }
+          onPress={() => {
+            properties.setSplitsNumber(
+              Math.max(1, properties.splitsNumber - 1)
+            );
+            if (!properties.isNewWorkout) {
+              properties.setIsNewWorkout(true);
+            }
+          }}
         >
           <FontAwesome5
             name="minus"
@@ -73,9 +78,14 @@ function WorkoutGenericBuildSettingsCard({ setSplitsNumber }) {
           {properties.splitsNumber}
         </Text>
         <TouchableOpacity
-          onPress={() =>
-            properties.setSplitsNumber(Math.min(6, properties.splitsNumber + 1))
-          }
+          onPress={() => {
+            properties.setSplitsNumber(
+              Math.min(6, properties.splitsNumber + 1)
+            );
+            if (!properties.isNewWorkout) {
+              properties.setIsNewWorkout(true);
+            }
+          }}
         >
           <FontAwesome5
             name="plus"
