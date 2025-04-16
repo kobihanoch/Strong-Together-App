@@ -90,7 +90,7 @@ export const addWorkout = async (userId, name, splitsNumber) => {
   }
 
   //console.log("Workout created successfully:", data);
-  return data;
+  return { data };
 };
 
 // Saves a workout after working out - startworkout.js
