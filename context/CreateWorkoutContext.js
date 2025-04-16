@@ -49,15 +49,16 @@ export const CreateWorkoutProvider = ({ children }) => {
   const [focusedExercise, setFocusedExercise] = useState(null);
   const [focusedExerciseSets, setFocusedExerciseSets] = useState(null);
 
-  // Print focused exercise when updated
+  // When an exercise is being selected, autoomatifly update the focused exercise sets state
   useEffect(() => {
     if (focusedExercise) {
       console.log("🎯 focusedExercise changed:", focusedExercise);
       const sets = // Filter selected exercises array to set
         selectedExercises
           .find((split) => split.name === focusedSplit?.name)
-          ?.exercises.find((ex) => ex.exercise_id === focusedExercise?.id)
-          ?.sets || [];
+          ?.exercises.find(
+            (ex) => ex.exercise_id === focusedExercise?.id
+          )?.sets;
 
       //console.log(sets);
       setFocusedExerciseSets(sets);
@@ -133,28 +134,54 @@ export const CreateWorkoutProvider = ({ children }) => {
     setFilteredExercises(filterExercisesByMuscle(muscles[0], dbExercises));
   };
 
+  // When toggling from not selected, default value for sets is [10, 10, 10]
   const toggleExerciseInSplit = (exercise, isSelected) => {
-    const arrayOfSplits = JSON.parse(JSON.stringify(selectedExercises));
-    arrayOfSplits.forEach((split) => {
-      if (split.name == focusedSplit.name) {
-        const isSelectedArr = split.exercises.filter(
-          (ex) => ex.exercise_id !== exercise.id
-        );
-        const isNotSelectedArr = [
-          ...split.exercises,
-          {
-            exercise_id: exercise.id,
-            workoutsplit_id: null,
-            sets: [10, 10, 10],
-          },
-        ];
-        isSelected
-          ? (split.exercises = isSelectedArr)
-          : (split.exercises = isNotSelectedArr);
-      }
-      setSelectedExercises(arrayOfSplits);
+    const updated = selectedExercises.map((split) => {
+      if (split.name !== focusedSplit.name) return split;
+
+      const isExerciseAlreadyInSplit = split.exercises.some(
+        (ex) => ex.exercise_id === exercise.id
+      );
+
+      const newExercises = isSelected
+        ? split.exercises.filter((ex) => ex.exercise_id !== exercise.id)
+        : [
+            ...split.exercises,
+            {
+              exercise_id: exercise.id,
+              workoutsplit_id: null,
+              sets: [10, 10, 10],
+            },
+          ];
+
+      return { ...split, exercises: newExercises };
     });
+
+    setSelectedExercises(updated);
   };
+
+  // Focused sets is updated after setting focused exercise - after entering the modal
+  const updateSetsForExercise = (exercise, inputSets) => {
+    const updated = selectedExercises.map((split) => {
+      if (split.name !== focusedSplit.name) return split;
+      const updatedExercises = split.exercises.map((ex) =>
+        ex.exercise_id === exercise.id ? { ...ex, sets: inputSets } : ex
+      );
+
+      return { ...split, exercises: updatedExercises };
+    });
+
+    setSelectedExercises(updated);
+  };
+
+  useEffect(() => {
+    console.log(
+      "Current sets for exercise",
+      focusedExercise?.name,
+      ":",
+      focusedExerciseSets
+    );
+  }, [focusedExerciseSets]);
 
   //------------------------------------------------------------------------------------
 
@@ -175,6 +202,8 @@ export const CreateWorkoutProvider = ({ children }) => {
           muscles,
           focusedExercise,
           setFocusedExercise,
+          focusedExerciseSets,
+          setFocusedExerciseSets,
         },
         userWorkout: {
           workout,
@@ -193,6 +222,7 @@ export const CreateWorkoutProvider = ({ children }) => {
           getMuscles,
           filterExercisesByFirstMuscle,
           toggleExerciseInSplit,
+          updateSetsForExercise,
         },
         saving: {
           canSave,
