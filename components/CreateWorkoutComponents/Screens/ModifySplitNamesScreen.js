@@ -1,15 +1,10 @@
-import React, { useEffect, useState } from "react";
-import { Alert, Dimensions, Text, View } from "react-native";
+import React from "react";
+import { Dimensions, Text, View } from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";
-import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
-import { useDeleteWorkout } from "../../../hooks/useDeleteWorkout";
-import useSplitExercises from "../../../hooks/useSplitExercises";
-import useWorkouts from "../../../hooks/useWorkouts";
-import useWorkoutSplits from "../../../hooks/useWorkoutSplits";
+import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
+import { useCreateWorkout } from "../../../context/CreateWorkoutContext";
 import GradientedGoToButton from "../../GradientedGoToButton";
 import ModifySplitNamesCard from "../ModifySplitNamesScreenComponents/ModifySplitNamesCard";
-import { useCreateWorkout } from "../../../context/CreateWorkoutContext";
-import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 
 const { width, height } = Dimensions.get("window");
 

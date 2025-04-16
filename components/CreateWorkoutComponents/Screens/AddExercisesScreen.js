@@ -1,8 +1,8 @@
 import React from "react";
 import { Dimensions, Text, View } from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";
-import ChooseExercisesCard from "../AddExercisesScreenComponents/ChooseExercisesCard";
 import { useCreateWorkout } from "../../../context/CreateWorkoutContext";
+import ChooseExercisesCard from "../AddExercisesScreenComponents/ChooseExercisesCard";
 
 const { width, height } = Dimensions.get("window");
 

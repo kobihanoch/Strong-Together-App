@@ -1,5 +1,4 @@
 // ModifySplitNamesCard.js - Displays split names and their selected exercise counts
-import { LinearGradient } from "expo-linear-gradient";
 import React from "react";
 import {
   Dimensions,

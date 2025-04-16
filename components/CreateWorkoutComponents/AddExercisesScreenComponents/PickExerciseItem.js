@@ -1,21 +1,20 @@
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import {
   Dimensions,
   Image,
+  Modal,
   StyleSheet,
   Text,
-  TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
-import images from "../../images";
 import { useCreateWorkout } from "../../../context/CreateWorkoutContext";
-import { Modal } from "react-native";
+import images from "../../images";
 import StepperInput from "../../StepperInput";
-import { MaterialCommunityIcons, Feather } from "@expo/vector-icons";
 
 const { width, height } = Dimensions.get("window");
 
