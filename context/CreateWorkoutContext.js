@@ -28,10 +28,29 @@ export const CreateWorkoutProvider = ({ children }) => {
 
   // If user has a workout: NEED TO ADD A FUNCTION THAT ARRANGES THE GIVEN DATA OF USER AND TRANSLATES IT TO THIS DATA STRUCTURE
   useEffect(() => {
-    if (workout && workoutSplits && exercises) {
+    //console.log("User has workout?", workout != null);
+    if (exercises) {
+      setIsNewWorkout(false);
+      const newSeletecExercises = [];
+      const exCopy = JSON.parse(JSON.stringify(exercises));
+
+      workoutSplits.forEach((split) =>
+        newSeletecExercises.push({
+          name: split.name,
+          exercises: exCopy
+            .filter((ex) => ex.workoutsplit === split.name)
+            .map(({ exercise_id, sets, workoutsplit_id }) => ({
+              exercise_id,
+              sets,
+              workoutsplit_id,
+            })),
+        })
+      );
+      //console.log(JSON.stringify(newSeletecExercises, null, 2));
+      setSelectedExercises(newSeletecExercises);
       setCurrentStep(2);
     }
-  }, [workout, workoutSplits, exercises]);
+  }, [exercises]);
 
   // ----------------------------Step----------------------------
   const [currentStep, setCurrentStep] = useState(1);
@@ -41,6 +60,7 @@ export const CreateWorkoutProvider = ({ children }) => {
   }, [currentStep]);
 
   // ----------------------------Workout properties----------------------------
+  const [isNewWorkout, setIsNewWorkout] = useState(true);
   const [splitsNumber, setSplitsNumber] = useState(1);
   const [selectedExercises, setSelectedExercises] = useState([]);
   const [focusedSplit, setFocusedSplit] = useState(null);
@@ -189,6 +209,7 @@ export const CreateWorkoutProvider = ({ children }) => {
     <CreateWorkoutContext.Provider
       value={{
         properties: {
+          isNewWorkout,
           currentStep,
           setCurrentStep,
           splitsNumber,
