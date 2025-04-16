@@ -12,7 +12,8 @@ const GradientedGoToButton = ({
 }) => {
   return (
     <TouchableOpacity
-      onPress={disabled ? null : onPress}
+      onPress={onPress}
+      disabled={disabled}
       style={[styles.buttonContainer, { opacity: disabled ? 0.5 : 1 }]}
       pointerEvents={disabled ? "none" : "auto"}
     >

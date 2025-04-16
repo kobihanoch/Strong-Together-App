@@ -4,10 +4,13 @@ import { RFValue } from "react-native-responsive-fontsize";
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 import GradientedGoToButton from "../../GradientedGoToButton";
 import WorkoutGenericBuildSettingsCard from "../PickSplitNumberScreenComponents/WorkoutGenericBuildSettingsCard";
+import { useCreateWorkout } from "../../../context/CreateWorkoutContext";
+import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 
 const { width, height } = Dimensions.get("window");
 
-function PickSplitNumberScreen({ setStep, setSplitsNumber }) {
+function PickSplitNumberScreen() {
+  const { properties } = useCreateWorkout();
   return (
     <View
       style={{
@@ -45,14 +48,14 @@ function PickSplitNumberScreen({ setStep, setSplitsNumber }) {
         </Text>
       </View>
       <View style={{ flex: 6 }}>
-        <WorkoutGenericBuildSettingsCard setSplitsNumber={setSplitsNumber} />
+        <WorkoutGenericBuildSettingsCard />
       </View>
       <View style={{ flex: 2, alignItems: "center" }}>
         <View style={{ width: "50%" }}>
           <GradientedGoToButton
             gradientColors={["#2979FF", "#2979FF"]}
             borderRadius={height * 0.1}
-            onPress={() => setStep(2)}
+            onPress={() => properties.setCurrentStep(2)}
           >
             <View
               style={{
@@ -65,14 +68,14 @@ function PickSplitNumberScreen({ setStep, setSplitsNumber }) {
             >
               <Text
                 style={{
-                  fontFamily: "Inter_700Bold",
+                  fontFamily: "Inter_600SemiBold",
                   color: "white",
                   fontSize: RFValue(15),
                 }}
               >
                 Next step
               </Text>
-              <FontAwesome5
+              <MaterialCommunityIcons
                 name="arrow-right"
                 color="white"
                 size={RFValue(17)}

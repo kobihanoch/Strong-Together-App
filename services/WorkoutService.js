@@ -14,15 +14,17 @@ export const fetchWorkoutsByUserId = async (userId) => {
 // Gets user workout learning
 export const getUserWorkout = async (userId) => {
   const { data, error } = await supabase
-    .from("users")
+    .from("workoutplans")
     .select(
-      "*, workoutplans!workoutplans_user_id_fkey(*, workoutsplits(*, exercisetoworkoutsplit(*, exercises (description, targetmuscle, specifictargetmuscle))))"
+      "*, workoutsplits(*, exercisetoworkoutsplit(*, exercises (description, targetmuscle, specifictargetmuscle)))"
     )
-    .eq("id", userId);
-  console.log(
-    "WorkoutService: User + Workout + Splits + Exercises were fetched successfully!"
-  );
-  return data[0].workoutplans;
+    .eq("user_id", userId)
+    .single();
+  if (error) {
+    console.log(error);
+  }
+  //console.log(">>>>>>>>>>>>>>>>>>>", data);
+  return data;
 };
 
 // Gets user workout learning
@@ -43,7 +45,7 @@ export const deleteWorkout = async (userId) => {
     console.log("Error: user not found.");
     return;
   }
-  const { data, error } = await supabase
+  const { error } = await supabase
     .from("workoutplans")
     .delete()
     .eq("user_id", userId);
@@ -51,7 +53,6 @@ export const deleteWorkout = async (userId) => {
     console.log("Error occured deleting a workout: " + error);
     throw error;
   }
-  return data;
 };
 
 // Add a new workout plan
@@ -69,25 +70,26 @@ export const addWorkout = async (userId, name, splitsNumber) => {
       {
         user_id: userId,
         trainer_id: userId,
-        name: name || "My Custom Workout",
+        name: name,
         numberofsplits: splitsNumber,
-        created_at: new Date().toISOString(),
+        //created_at: new Date().toISOString(),
       },
     ])
-    .select("*");
+    .select("id")
+    .single();
 
   if (error) {
-    console.error("Error inserting workout:", error.message);
+    //console.error("Error inserting workout:", error.message);
     throw error;
   }
 
   if (!data || data.length === 0) {
-    console.error("Error: No data returned after inserting workout.");
+    //console.error("Error: No data returned after inserting workout.");
     throw new Error("Workout creation failed.");
   }
 
-  console.log("Workout created successfully:", data[0]);
-  return data[0];
+  //console.log("Workout created successfully:", data);
+  return { data };
 };
 
 // Saves a workout after working out - startworkout.js

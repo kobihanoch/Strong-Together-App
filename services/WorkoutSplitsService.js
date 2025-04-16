@@ -22,23 +22,24 @@ export const fetchWorkoutSplitsByUserId = async (userId) => {
   return data;
 };
 
-// Add a new workout split (without muscle_group)
-export const addWorkoutSplit = async (workoutId, name, createdAt) => {
+// Add multiple workout splits - aeach obj with workout_id and name
+export const addWorkoutSplits = async (splitsArray) => {
   const { data, error } = await supabase
     .from("workoutsplits")
-    .insert([{ workout_id: workoutId, name: name, created_at: createdAt }])
-    .select("id, created_at, name, workout_id");
+    .insert(splitsArray)
+    .select("id");
 
   if (error) {
-    console.error("Error inserting workout split:", error.message);
+    console.error("❌ Error inserting workout splits:", error.message);
     throw error;
   }
 
   if (!data || data.length === 0) {
-    console.error("Error: Workout split not returned from Supabase.");
-    throw new Error("Workout split creation failed. No data returned.");
+    console.error("❌ No workout splits returned from Supabase.");
+    throw new Error("Insert failed. No data returned.");
   }
-  return data;
+  //console.log(data.map((item) => item.id));
+  return data.map((item) => item.id);
 };
 
 // Update an existing workout split by ID (without muscle_group)

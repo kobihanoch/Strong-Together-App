@@ -41,7 +41,7 @@ const useHomePageLogic = (user) => {
   const [firstName, setFirstName] = useState(null);
   const {
     refetch,
-    userWorkout,
+    workout,
     workoutSplits,
     loading: workoutLoading,
     error,
@@ -96,8 +96,8 @@ const useHomePageLogic = (user) => {
 
   // Set user's assigned workout state after user is loaded
   useEffect(() => {
-    setHasAssignedWorkout(userWorkout && userWorkout.length > 0);
-  }, [userWorkout]);
+    setHasAssignedWorkout(!!workout);
+  }, [workout]);
 
   // Get last workout date
   useEffect(() => {

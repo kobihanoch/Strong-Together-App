@@ -1,10 +1,18 @@
 import React from "react";
 import { Dimensions, ScrollView, Text, TouchableOpacity } from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";
+import { useCreateWorkout } from "../../../context/CreateWorkoutContext";
+import { filterExercises } from "../../../utils/myWorkoutPlanUtils";
+import { useState } from "react";
 
 const { width, height } = Dimensions.get("window");
 
-const MuscleTabs = ({ muscleGroups, selectedMuscleGroup, onSelectMuscle }) => {
+const MuscleTabs = () => {
+  const { properties, utils, DB } = useCreateWorkout();
+  const [selectedMuscleGroup, setSelectedMuscleGroup] = useState(
+    properties.muscles[0]
+  );
+
   return (
     <ScrollView
       horizontal
@@ -15,10 +23,16 @@ const MuscleTabs = ({ muscleGroups, selectedMuscleGroup, onSelectMuscle }) => {
         marginBottom: height * 0.02,
       }}
     >
-      {muscleGroups.map((muscle, index) => (
+      {properties.muscles.map((muscle, index) => (
         <TouchableOpacity
           key={index}
-          onPress={() => onSelectMuscle(muscle)}
+          onPress={() => {
+            // Filter the viewd exercises by muscle
+            properties.setFilteredExercises(
+              utils.filterExercisesByMuscle(muscle, DB.dbExercises)
+            );
+            setSelectedMuscleGroup(muscle);
+          }}
           style={{
             backgroundColor:
               selectedMuscleGroup === muscle ? "#2979FF" : "rgb(234, 240, 246)",
