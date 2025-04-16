@@ -1,17 +1,24 @@
-import React, { createContext, useContext, useState, useEffect } from "react";
-import { useAuth } from "./AuthContext";
-import { useUserWorkout } from "../hooks/useUserWorkout";
-import useExercises from "../hooks/useExercises";
-import { addWorkout } from "../services/WorkoutService";
+import React, { createContext, useContext, useEffect, useState } from "react";
 import { Alert } from "react-native";
+import useExercises from "../hooks/useExercises";
+import { useUserWorkout } from "../hooks/useUserWorkout";
+import {
+  addExercisesToSplit,
+  updateExercisesToSplit,
+} from "../services/SplitExerciseService";
+import { addWorkout, deleteWorkout } from "../services/WorkoutService";
 import { addWorkoutSplits } from "../services/WorkoutSplitsService";
-import { addExercisesToSplit } from "../services/SplitExerciseService";
+import { useAuth } from "./AuthContext";
+import { useNavigation } from "@react-navigation/native";
 
 const CreateWorkoutContext = createContext();
 
 export const useCreateWorkout = () => useContext(CreateWorkoutContext);
 
 export const CreateWorkoutProvider = ({ children }) => {
+  // ----------------------------Navigation----------------------------
+  const navigation = useNavigation();
+
   // ----------------------------Saving----------------------------
   const [canSave, setCanSave] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -44,7 +51,8 @@ export const CreateWorkoutProvider = ({ children }) => {
           name: split.name,
           exercises: exCopy
             .filter((ex) => ex.workoutsplit === split.name)
-            .map(({ exercise_id, sets, workoutsplit_id }) => ({
+            .map(({ id, exercise_id, sets, workoutsplit_id }) => ({
+              id,
               exercise_id,
               sets,
               workoutsplit_id,
@@ -201,10 +209,14 @@ export const CreateWorkoutProvider = ({ children }) => {
 
   const saveWorkout = async () => {
     setIsSaving(true);
+    let hasError = false;
     try {
+      // Create new
       if (isNewWorkout) {
-        // Create new
-
+        // If has already workout delete the first one
+        if (workout) {
+          await deleteWorkout(user.id);
+        }
         // Create a new workout plan and get the id
         try {
           const { data: workoutPlan } = await addWorkout(
@@ -235,16 +247,30 @@ export const CreateWorkoutProvider = ({ children }) => {
 
           console.log("V!!!!!!!! :)");
         } catch (e) {
+          hasError = true;
           console.error(e);
           Alert.alert(e);
         }
-      } else {
-        // Update existing workout
+      }
+      // Update existing workout
+      else {
+        const allExercisesEditedAndNotEditedArr = selectedExercises.flatMap(
+          (split) => {
+            return split.exercises.map((exercise) => ({
+              id: exercise.id, // Exercise to split id
+              sets: exercise.sets,
+            }));
+          }
+        );
+        updateExercisesToSplit(allExercisesEditedAndNotEditedArr);
       }
     } catch (e) {
       console.error(e);
       Alert.alert(e);
     } finally {
+      if (!hasError) {
+        navigation.navigate("MyWorkoutPlan");
+      }
       setIsSaving(false);
     }
   };
@@ -271,6 +297,7 @@ export const CreateWorkoutProvider = ({ children }) => {
           setFocusedExercise,
           focusedExerciseSets,
           setFocusedExerciseSets,
+          setIsNewWorkout,
         },
         userWorkout: {
           workout,

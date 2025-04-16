@@ -104,7 +104,7 @@ function ModifySplitNamesScreen() {
             gradientColors={["#2979FF", "#2979FF"]}
             borderRadius={height * 0.1}
             onPress={saving.saveWorkout}
-            disabled={!saving.canSave}
+            disabled={!saving.canSave || saving.isSaving}
           >
             <View
               style={{
@@ -122,7 +122,7 @@ function ModifySplitNamesScreen() {
                   fontSize: RFValue(15),
                 }}
               >
-                {/*saving ? "Saving..." : "Save"*/}Save
+                {saving.isSaving ? "Saving..." : "Save"}
               </Text>
               <MaterialCommunityIcons
                 name="check"
