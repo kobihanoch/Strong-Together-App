@@ -1,9 +1,7 @@
-import React from "react";
+import React, { useState } from "react";
 import { Dimensions, ScrollView, Text, TouchableOpacity } from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";
 import { useCreateWorkout } from "../../../context/CreateWorkoutContext";
-import { filterExercises } from "../../../utils/myWorkoutPlanUtils";
-import { useState } from "react";
 
 const { width, height } = Dimensions.get("window");
 
