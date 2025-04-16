@@ -2,6 +2,10 @@ import React, { createContext, useContext, useState, useEffect } from "react";
 import { useAuth } from "./AuthContext";
 import { useUserWorkout } from "../hooks/useUserWorkout";
 import useExercises from "../hooks/useExercises";
+import { addWorkout } from "../services/WorkoutService";
+import { Alert } from "react-native";
+import { addWorkoutSplits } from "../services/WorkoutSplitsService";
+import { addExercisesToSplit } from "../services/SplitExerciseService";
 
 const CreateWorkoutContext = createContext();
 
@@ -10,6 +14,7 @@ export const useCreateWorkout = () => useContext(CreateWorkoutContext);
 export const CreateWorkoutProvider = ({ children }) => {
   // ----------------------------Saving----------------------------
   const [canSave, setCanSave] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
 
   // ----------------------------User----------------------------
   const { user } = useAuth();
@@ -194,14 +199,55 @@ export const CreateWorkoutProvider = ({ children }) => {
     setSelectedExercises(updated);
   };
 
-  useEffect(() => {
-    console.log(
-      "Current sets for exercise",
-      focusedExercise?.name,
-      ":",
-      focusedExerciseSets
-    );
-  }, [focusedExerciseSets]);
+  const saveWorkout = async () => {
+    setIsSaving(true);
+    try {
+      if (isNewWorkout) {
+        // Create new
+
+        // Create a new workout plan and get the id
+        try {
+          const { data: workoutPlan } = await addWorkout(
+            user.id,
+            "Power",
+            splitsNumber
+          );
+          //const newWorkoutId = workoutPlan?.id;
+          console.log("New workout plan created with id: ", workoutPlan.id);
+
+          // Create new workout splits and get IDs
+          const splitsArray = selectedExercises.map((split) => {
+            return { name: split.name, workout_id: workoutPlan.id };
+          });
+          const workoutSplitsIds = await addWorkoutSplits(splitsArray);
+          console.log("New workout splits ids: ", workoutSplitsIds);
+
+          // Add the exercises to it
+          const exercisesArray = selectedExercises.flatMap((split, index) => {
+            const splitId = workoutSplitsIds[index];
+
+            return split.exercises.map((exercise) => ({
+              ...exercise,
+              workoutsplit_id: splitId,
+            }));
+          });
+          await addExercisesToSplit(exercisesArray);
+
+          console.log("V!!!!!!!! :)");
+        } catch (e) {
+          console.error(e);
+          Alert.alert(e);
+        }
+      } else {
+        // Update existing workout
+      }
+    } catch (e) {
+      console.error(e);
+      Alert.alert(e);
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
   //------------------------------------------------------------------------------------
 
@@ -247,6 +293,8 @@ export const CreateWorkoutProvider = ({ children }) => {
         },
         saving: {
           canSave,
+          isSaving,
+          saveWorkout,
         },
       }}
     >

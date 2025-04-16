@@ -103,7 +103,7 @@ function ModifySplitNamesScreen() {
           <GradientedGoToButton
             gradientColors={["#2979FF", "#2979FF"]}
             borderRadius={height * 0.1}
-            //onPress={saveWorkoutPlan}
+            onPress={saving.saveWorkout}
             disabled={!saving.canSave}
           >
             <View
