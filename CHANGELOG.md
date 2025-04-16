@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.9.0](https://github.com/kobihanoch/Strong-Together-App/compare/v2.8.1...v2.9.0) (2025-04-16)
+
+
+### Features
+
+* **createworkout:** refactored logic flow to use context instead of parent-child props flow ([1784230](https://github.com/kobihanoch/Strong-Together-App/commit/17842300f80a86b9a5fd874f2b93c0a7862c9bf3))
+
 ### [2.8.1](https://github.com/kobihanoch/Strong-Together-App/compare/v2.8.0...v2.8.1) (2025-04-13)
 
 
