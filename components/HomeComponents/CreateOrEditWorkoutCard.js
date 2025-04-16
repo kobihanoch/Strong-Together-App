@@ -69,14 +69,14 @@ function CreateOrEditWorkoutCard({ hasAssignedWorkout }) {
                   style={{
                     borderRadius: height * 0.03,
                     backgroundColor: "#2979FF",
-                    padding: height * 0.01,
+                    padding: height * 0.017,
                   }}
                 >
                   <View>
                     <MaterialCommunityIcons
                       name="pencil-outline"
                       color="white"
-                      size={RFValue(20)}
+                      size={RFValue(15)}
                     />
                   </View>
                 </TouchableOpacity>
