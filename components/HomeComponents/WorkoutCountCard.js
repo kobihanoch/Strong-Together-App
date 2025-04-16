@@ -1,9 +1,41 @@
-import React, { useEffect, useState } from "react";
-import { StyleSheet, Text, View, Dimensions } from "react-native";
+import React, { useEffect, useState, useRef } from "react";
+import { StyleSheet, Text, View, Dimensions, Animated } from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";
 
 const { width, height } = Dimensions.get("window");
 function WorkoutCountCard({ totalWorkoutNumber }) {
+  const animatedValue = useRef(new Animated.Value(0)).current;
+  const [displayValue, setDisplayValue] = useState(0);
+  const scaleAnim = useRef(new Animated.Value(1)).current;
+  useEffect(() => {
+    Animated.timing(animatedValue, {
+      toValue: totalWorkoutNumber,
+      duration: 1200,
+      useNativeDriver: false,
+    }).start(() => {
+      Animated.sequence([
+        Animated.timing(scaleAnim, {
+          toValue: 1.2,
+          duration: 150,
+          useNativeDriver: true,
+        }),
+        Animated.timing(scaleAnim, {
+          toValue: 1,
+          duration: 150,
+          useNativeDriver: true,
+        }),
+      ]).start();
+    });
+
+    const listener = animatedValue.addListener(({ value }) => {
+      setDisplayValue(Math.floor(value));
+    });
+
+    return () => {
+      animatedValue.removeListener(listener);
+    };
+  }, [totalWorkoutNumber]);
+
   return (
     <View
       style={{
@@ -46,17 +78,20 @@ function WorkoutCountCard({ totalWorkoutNumber }) {
           </Text>
         </View>
 
-        <Text
-          style={{
-            fontFamily: "Inter_600SemiBold",
-            fontSize: RFValue(20),
-            color: "black",
-            alignSelf: "center",
-            marginTop: height * 0.03,
-          }}
-        >
-          {totalWorkoutNumber}
-        </Text>
+        <Animated.View style={{ transform: [{ scale: scaleAnim }] }}>
+          <Text
+            style={{
+              fontFamily: "Inter_600SemiBold",
+              fontSize: RFValue(20),
+              color: "black",
+              alignSelf: "center",
+              marginTop: height * 0.03,
+            }}
+          >
+            {displayValue}
+          </Text>
+        </Animated.View>
+
         <Text
           style={{
             fontSize: RFValue(10),
