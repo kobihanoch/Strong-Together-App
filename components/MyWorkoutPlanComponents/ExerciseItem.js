@@ -16,7 +16,7 @@ const ExerciseItem = ({ exercise }) => {
   return (
     <View style={styles.exerciseContainer}>
       <View style={{ flex: 1, flexDirection: "row" }}>
-        <View style={{ flex: 0.4, justifyContent: "center" }}>
+        <View style={{ flex: 0.3, justifyContent: "center" }}>
           <View
             /*colors={["#00142a", "#0d2540"]}*/
             style={{
@@ -27,8 +27,8 @@ const ExerciseItem = ({ exercise }) => {
           >
             <View
               style={{
-                height: "60%",
-                borderRadius: height * 0.08,
+                height: "70%",
+                borderRadius: height * 0.02,
                 aspectRatio: 1,
                 backgroundColor: "rgb(234, 240, 246)",
                 justifyContent: "center",
@@ -49,7 +49,7 @@ const ExerciseItem = ({ exercise }) => {
         </View>
         <View
           style={{
-            flex: 0.6,
+            flex: 0.7,
             flexDirection: "row",
             justifyContent: "space-between",
             marginLeft: width * 0.05,
@@ -101,7 +101,7 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
     width: "95%",
     alignSelf: "center",
-    height: height * 0.1,
+    height: height * 0.12,
     flex: 1,
     borderRadius: width * 0.03,
     marginVertical: height * 0.005,
