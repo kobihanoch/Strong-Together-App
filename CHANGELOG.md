@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.10.0](https://github.com/kobihanoch/Strong-Together-App/compare/v2.9.0...v2.10.0) (2025-04-16)
+
+
+### Features
+
+* **muscles:** update various asset images for improved quality ([03eb0af](https://github.com/kobihanoch/Strong-Together-App/commit/03eb0afaa4cc33d8ae828277f64296584bd99b77))
+
 ## [2.9.0](https://github.com/kobihanoch/Strong-Together-App/compare/v2.8.1...v2.9.0) (2025-04-16)
 
 
