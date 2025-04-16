@@ -13,6 +13,7 @@ export const getUserGeneralPR = (exercisesLogsForUser) => {
   let maxWeight = 0;
   let maxExercise = null;
   let maxReps = 0;
+  let dateOfPr = null;
   exercisesLogsForUser.forEach((exerciseInTrackingData) => {
     const weightArr = exerciseInTrackingData.weight;
     const repsArr = exerciseInTrackingData.reps;
@@ -22,12 +23,14 @@ export const getUserGeneralPR = (exercisesLogsForUser) => {
       maxExercise = exerciseInTrackingData.exercise;
       const index = weightArr.indexOf(maxWeightInArray);
       maxReps = repsArr[index];
+      dateOfPr = exerciseInTrackingData.workoutdate;
     }
   });
   return {
     maxWeight,
     maxReps,
     maxExercise,
+    dateOfPr,
   };
 };
 
