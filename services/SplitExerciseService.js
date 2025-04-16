@@ -42,31 +42,14 @@ export const getExercisesBySplitId = async (splitId) => {
   }
 };
 
-// Add multiple exercises to a specific workout split
-export const addExercisesToSplit = async (splitId, exercises) => {
-  if (!Array.isArray(exercises) || exercises.length === 0) {
-    console.warn(`⚠️ No exercises to insert for split ID: ${splitId}`);
-    return;
-  }
+// Add multiple exercises to a specific workout split - {id, workoutsplit_id}
+export const addExercisesToSplit = async (exArray) => {
+  const { data, error } = await supabase
+    .from("exercisetoworkoutsplit")
+    .insert(exArray);
 
-  const exercisesToInsert = exercises.map((exercise) => ({
-    workoutsplit_id: splitId,
-    exercise_id: exercise.id,
-  }));
-
-  try {
-    const { data, error } = await supabase
-      .from("exercisetoworkoutsplit")
-      .insert(exercisesToInsert)
-      .select("*");
-
-    if (error) throw error;
-    console.log(`✅ Successfully added exercises to split ${splitId}:`, data);
-    return data;
-  } catch (err) {
-    console.error("❌ Error adding exercises to workout split:", err.message);
-    throw err;
-  }
+  if (error) throw error;
+  console.log(`✅ Successfully added exercises to split.`);
 };
 
 // Add a single exercise to a workout split
