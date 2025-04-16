@@ -23,6 +23,8 @@ export const useUserWorkout = (userId) => {
     try {
       //console.log("Trying to fetch data from hook...");
       const data = await getUserWorkout(userId);
+      splitTheWorkout(data);
+      //console.log(JSON.stringify(data, null, 2));
       setUserWorkout(data);
     } catch (err) {
       setError(err);
@@ -58,14 +60,14 @@ export const useUserWorkout = (userId) => {
     }
   };
 
-  useEffect(() => {
-    if (userWorkout && userWorkout.length > 0 && userWorkout[0]) {
+  const splitTheWorkout = (userWorkout) => {
+    if (userWorkout) {
       const workoutObj = Object.fromEntries(
-        Object.entries(userWorkout[0]).slice(0, 7)
+        Object.entries(userWorkout).slice(0, 7)
       );
       setWorkout(workoutObj);
 
-      const fullWorkoutSplits = userWorkout[0].workoutsplits || [];
+      const fullWorkoutSplits = userWorkout.workoutsplits || [];
       const splits = fullWorkoutSplits.map((split) =>
         Object.fromEntries(Object.entries(split).slice(0, 5))
       );
@@ -83,10 +85,10 @@ export const useUserWorkout = (userId) => {
       setExercises(allExercises);
     } else {
       setWorkout(null);
-      setWorkoutSplits([]);
-      setExercises([]);
+      setWorkoutSplits(null);
+      setExercises(null);
     }
-  }, [userWorkout]);
+  };
 
   useEffect(() => {
     fetchUserWorkout();

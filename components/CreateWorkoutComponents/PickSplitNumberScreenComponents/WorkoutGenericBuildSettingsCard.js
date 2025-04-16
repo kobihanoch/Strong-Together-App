@@ -3,15 +3,12 @@ import React, { useState } from "react";
 import { Dimensions, Text, TouchableOpacity, View } from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
+import { useCreateWorkout } from "../../../context/CreateWorkoutContext";
 
 const { width, height } = Dimensions.get("window");
 
 function WorkoutGenericBuildSettingsCard({ setSplitsNumber }) {
-  const [splits, setSplits] = useState(1);
-  const updateSplits = (newSplits) => {
-    setSplits(newSplits);
-    setSplitsNumber(newSplits);
-  };
+  const { properties } = useCreateWorkout();
 
   return (
     <View
@@ -42,7 +39,7 @@ function WorkoutGenericBuildSettingsCard({ setSplitsNumber }) {
             textAlign: "center",
           }}
         >
-          How many workout splits do you want?
+          Choose your amount of workouts
         </Text>
       </View>
       <View
@@ -54,7 +51,16 @@ function WorkoutGenericBuildSettingsCard({ setSplitsNumber }) {
           gap: width * 0.08,
         }}
       >
-        <TouchableOpacity onPress={() => updateSplits(Math.max(1, splits - 1))}>
+        <TouchableOpacity
+          onPress={() => {
+            properties.setSplitsNumber(
+              Math.max(1, properties.splitsNumber - 1)
+            );
+            if (!properties.isNewWorkout) {
+              properties.setIsNewWorkout(true);
+            }
+          }}
+        >
           <FontAwesome5
             name="minus"
             size={RFValue(35)}
@@ -69,9 +75,18 @@ function WorkoutGenericBuildSettingsCard({ setSplitsNumber }) {
             color: "#2979FF",
           }}
         >
-          {splits}
+          {properties.splitsNumber}
         </Text>
-        <TouchableOpacity onPress={() => updateSplits(Math.min(6, splits + 1))}>
+        <TouchableOpacity
+          onPress={() => {
+            properties.setSplitsNumber(
+              Math.min(6, properties.splitsNumber + 1)
+            );
+            if (!properties.isNewWorkout) {
+              properties.setIsNewWorkout(true);
+            }
+          }}
+        >
           <FontAwesome5
             name="plus"
             size={RFValue(35)}

@@ -4,56 +4,12 @@ import { Dimensions, Text, TouchableOpacity, View } from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";
 import ExerciseList from "./ExerciseList";
 import MuscleTabs from "./MuscleTabs";
+import { useCreateWorkout } from "../../../context/CreateWorkoutContext";
 
 const { width, height } = Dimensions.get("window");
 
-function ChooseExercisesCard({
-  workoutSplitName,
-  exercises,
-  initialSelectedExercises = [],
-  onSave,
-}) {
-  const [groupedExercises, setGroupedExercises] = useState({});
-  const [selectedMuscleGroup, setSelectedMuscleGroup] = useState(null);
-  const [selectedExercises, setSelectedExercises] = useState([]);
-
-  const normalizeExercise = (exercise) => ({
-    id: exercise.exercise_id || exercise.id,
-    name: exercise.name || exercise.exercise || "Unnamed Exercise",
-    sets: Array.isArray(exercise.sets)
-      ? exercise.sets.map((s) => s.toString())
-      : ["10", "10", "10"],
-    targetmuscle: exercise.targetmuscle || null,
-    specifictargetmuscle: exercise.specifictargetmuscle || null,
-  });
-
-  useEffect(() => {
-    const normalized = initialSelectedExercises.map(normalizeExercise);
-    setSelectedExercises(normalized);
-  }, [initialSelectedExercises, workoutSplitName]);
-
-  useEffect(() => {
-    const grouped = exercises.reduce((acc, exercise) => {
-      const muscleGroup = exercise.targetmuscle || "Other";
-      if (!acc[muscleGroup]) acc[muscleGroup] = [];
-      acc[muscleGroup].push(exercise);
-      return acc;
-    }, {});
-    setGroupedExercises(grouped);
-    setSelectedMuscleGroup(Object.keys(grouped)[0]);
-  }, [exercises]);
-
-  const toggleExerciseSelection = (exercise) => {
-    const normalized = normalizeExercise(exercise);
-    setSelectedExercises((prevSelected) => {
-      const exists = prevSelected.some((ex) => ex.id === normalized.id);
-      if (exists) {
-        return prevSelected.filter((ex) => ex.id !== normalized.id);
-      }
-      return [...prevSelected, normalized];
-    });
-  };
-
+function ChooseExercisesCard() {
+  const { properties, utils } = useCreateWorkout();
   return (
     <View
       style={{
@@ -80,24 +36,15 @@ function ChooseExercisesCard({
             marginBottom: height * 0.02,
           }}
         >
-          {workoutSplitName} Exercises
+          {properties.focusedSplit.name} Exercises
         </Text>
 
-        <MuscleTabs
-          muscleGroups={Object.keys(groupedExercises)}
-          selectedMuscleGroup={selectedMuscleGroup}
-          onSelectMuscle={setSelectedMuscleGroup}
-        />
+        <MuscleTabs />
       </View>
 
-      <ExerciseList
-        exercises={groupedExercises[selectedMuscleGroup] || []}
-        onSelectExercise={toggleExerciseSelection}
-        selectedExercises={selectedExercises}
-      />
+      <ExerciseList />
 
       <TouchableOpacity
-        onPress={() => onSave(workoutSplitName, selectedExercises)}
         style={{
           backgroundColor: "#2979FF",
           padding: 10,
@@ -105,8 +52,9 @@ function ChooseExercisesCard({
           alignItems: "center",
           marginTop: 10,
         }}
+        onPress={() => properties.setCurrentStep(2)}
       >
-        <Text style={{ color: "white", fontSize: 16 }}>Save Exercises</Text>
+        <Text style={{ color: "white", fontSize: 16 }}>Back</Text>
       </TouchableOpacity>
     </View>
   );
