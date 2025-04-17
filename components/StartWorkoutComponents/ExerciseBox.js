@@ -377,7 +377,9 @@ const ExerciseBox = ({
                     alignItems: "center",
                   }}
                 >
-                  <ProgressBar progress={progress}></ProgressBar>
+                  {repsArray[visibleSetIndex].toString() == "0" ? null : (
+                    <ProgressBar progress={progress}></ProgressBar>
+                  )}
                 </View>
               </View>
               <View
