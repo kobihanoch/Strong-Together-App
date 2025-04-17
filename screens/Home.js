@@ -1,27 +1,12 @@
 import React from "react";
-import {
-  Dimensions,
-  Image,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { Dimensions, StyleSheet, Text, View } from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";
-import CreateOrEditWorkoutCard from "../components/HomeComponents/CreateOrEditWorkoutCard";
-import MostCommonWorkoutSummaryCard from "../components/HomeComponents/MostCommonWorkoutSummaryCard";
-import NewAchivementCard from "../components/HomeComponents/NewAchivementCard";
-import WorkoutCountCard from "../components/HomeComponents/WorkoutCountCard";
+import LastWorkoutSection from "../components/HomeComponents/LastWorkoutSection";
+import QuickLookSection from "../components/HomeComponents/QuickLookSection";
+import StartWorkoutButton from "../components/HomeComponents/StartWorkoutButton";
 import LoadingPage from "../components/LoadingPage";
 import { useAuth } from "../context/AuthContext";
 import useHomePageLogic from "../hooks/logic/useHomePageLogic";
-import Icon from "react-native-vector-icons/Feather";
-import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
-import { FontAwesome5 } from "@expo/vector-icons";
-import StartWorkoutButton from "../components/HomeComponents/StartWorkoutButton";
-import { formatDate } from "../utils/statisticsUtils";
-import LastWorkoutSection from "../components/HomeComponents/LastWorkoutSection";
-import QuickLookSection from "../components/HomeComponents/QuickLookSection";
 
 const { width, height } = Dimensions.get("window");
 

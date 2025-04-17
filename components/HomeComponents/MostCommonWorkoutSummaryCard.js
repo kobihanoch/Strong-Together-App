@@ -1,7 +1,9 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import { Dimensions, Text, View } from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";
 import Svg, { Circle } from "react-native-svg";
+import { Animated } from "react-native";
+const AnimatedCircle = Animated.createAnimatedComponent(Circle);
 
 const { width, height } = Dimensions.get("window");
 
@@ -19,7 +21,20 @@ const MostCommonWorkoutSummaryCard = ({
     : 0;
 
   //console.log(mostFrequentSplit);
-  const strokeDashoffset = circumference * (1 - progress);
+  const animatedValue = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    Animated.timing(animatedValue, {
+      toValue: progress,
+      duration: 600,
+      useNativeDriver: false,
+    }).start();
+  }, [progress]);
+
+  const strokeDashoffset = animatedValue.interpolate({
+    inputRange: [0, 1],
+    outputRange: [circumference, 0],
+  });
 
   return (
     <View
@@ -67,7 +82,7 @@ const MostCommonWorkoutSummaryCard = ({
                 cx={radius}
                 cy={radius}
               />
-              <Circle
+              <AnimatedCircle
                 stroke="#2979FF"
                 fill="transparent"
                 strokeWidth={strokeWidth}

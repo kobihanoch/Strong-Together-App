@@ -10,6 +10,7 @@ import { addWorkout, deleteWorkout } from "../services/WorkoutService";
 import { addWorkoutSplits } from "../services/WorkoutSplitsService";
 import { useAuth } from "./AuthContext";
 import { useNavigation } from "@react-navigation/native";
+import MyWorkoutPlan from "../screens/MyWorkoutPlan";
 
 const CreateWorkoutContext = createContext();
 
@@ -181,6 +182,7 @@ export const CreateWorkoutProvider = ({ children }) => {
         : [
             ...split.exercises,
             {
+              id: null, // New exercise id is null
               exercise_id: exercise.id,
               workoutsplit_id: null,
               sets: [10, 10, 10],
@@ -239,7 +241,8 @@ export const CreateWorkoutProvider = ({ children }) => {
             const splitId = workoutSplitsIds[index];
 
             return split.exercises.map((exercise) => ({
-              ...exercise,
+              exercise_id: exercise.exercise_id,
+              sets: exercise.sets,
               workoutsplit_id: splitId,
             }));
           });
@@ -254,15 +257,7 @@ export const CreateWorkoutProvider = ({ children }) => {
       }
       // Update existing workout
       else {
-        const allExercisesEditedAndNotEditedArr = selectedExercises.flatMap(
-          (split) => {
-            return split.exercises.map((exercise) => ({
-              id: exercise.id, // Exercise to split id
-              sets: exercise.sets,
-            }));
-          }
-        );
-        updateExercisesToSplit(allExercisesEditedAndNotEditedArr);
+        await updateExercisesToSplit(selectedExercises, exercises, user.id); // Give new and old arrays to compare
       }
     } catch (e) {
       console.error(e);

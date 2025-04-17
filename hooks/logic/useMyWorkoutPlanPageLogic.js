@@ -1,24 +1,10 @@
-import React, { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import {
-  View,
-  Text,
-  StyleSheet,
-  Dimensions,
-  FlatList,
-  TouchableOpacity,
-  ActivityIndicator,
-} from "react-native";
-import { useUserWorkout } from "../useUserWorkout";
-import {
-  filterExercises,
   countExercisesForSplit,
+  filterExercises,
   getWorkoutSplitCounter,
 } from "../../utils/myWorkoutPlanUtils";
-import {
-  filterExercisesByDate,
-  getLastWorkoutForEachExercise,
-} from "../../utils/statisticsUtils";
-import moment from "moment";
+import { useUserWorkout } from "../useUserWorkout";
 
 export const useMyWorkoutPlanPageLogic = (user, authHasTrainedToday) => {
   const {
@@ -29,6 +15,7 @@ export const useMyWorkoutPlanPageLogic = (user, authHasTrainedToday) => {
     exercises: allExercises,
     loading,
     error,
+    refetch,
   } = useUserWorkout(user?.id);
 
   const [selectedSplit, setSelectedSplit] = useState(null);
@@ -92,5 +79,6 @@ export const useMyWorkoutPlanPageLogic = (user, authHasTrainedToday) => {
     },
     loading,
     error,
+    refetch,
   };
 };

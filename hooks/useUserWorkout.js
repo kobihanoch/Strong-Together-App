@@ -68,9 +68,14 @@ export const useUserWorkout = (userId) => {
       setWorkout(workoutObj);
 
       const fullWorkoutSplits = userWorkout.workoutsplits || [];
-      const splits = fullWorkoutSplits.map((split) =>
-        Object.fromEntries(Object.entries(split).slice(0, 5))
-      );
+      const splits = fullWorkoutSplits
+        .map((split) => Object.fromEntries(Object.entries(split).slice(0, 5)))
+        .sort((a, b) => {
+          if (a.name < b.name) return -1;
+          if (a.name > b.name) return 1;
+          return 0;
+        });
+
       setWorkoutSplits(splits);
 
       const allExercises = fullWorkoutSplits.flatMap((split) =>
