@@ -51,7 +51,11 @@ function NewAchivementCard({ hasAssignedWorkout, PR }) {
           <Text
             style={{ fontFamily: "Inter_600SemiBold", fontSize: RFValue(14) }}
           >
-            {hasAssignedWorkout ? PR.maxExercise : "No data yet"}
+            {hasAssignedWorkout
+              ? PR.maxExercise
+                ? PR.maxExercise
+                : "N/A"
+              : "No data"}
           </Text>
 
           {/* Here will be the button fo the modal */}
@@ -107,7 +111,11 @@ function NewAchivementCard({ hasAssignedWorkout, PR }) {
                 fontSize: RFValue(14),
               }}
             >
-              {hasAssignedWorkout ? PR.maxWeight + " kg" : "N/A"}
+              {hasAssignedWorkout
+                ? PR.maxWeight
+                  ? PR.maxWeight + " kg"
+                  : "N/A"
+                : "N/A"}
             </Text>
             <Text
               style={{
@@ -127,7 +135,7 @@ function NewAchivementCard({ hasAssignedWorkout, PR }) {
                 fontSize: RFValue(14),
               }}
             >
-              {hasAssignedWorkout ? PR.maxReps : "N/A"}
+              {hasAssignedWorkout ? (PR.maxReps ? PR.maxReps : "N/A") : "N/A"}
             </Text>
             <Text
               style={{
