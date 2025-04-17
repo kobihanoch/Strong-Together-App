@@ -1,5 +1,5 @@
-import { useNavigation } from "@react-navigation/native";
-import React from "react";
+import { useFocusEffect, useNavigation } from "@react-navigation/native";
+import React, { useCallback } from "react";
 import { Dimensions, StyleSheet, Text, View } from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";
 import LoadingPage from "../components/LoadingPage";
@@ -18,7 +18,15 @@ const MyWorkoutPlan = () => {
     data: workoutData,
     loading,
     error,
+    refetch: refetchWorkoutData,
   } = useMyWorkoutPlanPageLogic(user, hasTrainedToday);
+
+  useFocusEffect(
+    useCallback(() => {
+      console.log("🔄 Refetching workout...");
+      refetchWorkoutData();
+    }, [])
+  );
 
   if (loading) {
     return <LoadingPage message="Getting your workout..." />;
