@@ -2,6 +2,24 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.11.0](https://github.com/kobihanoch/Strong-Together-App/compare/v2.10.0...v2.11.0) (2025-04-17)
+
+
+### Features
+
+* **home:** add animated display for total workout count in workout count card ([7a07abf](https://github.com/kobihanoch/Strong-Together-App/commit/7a07abfa397b52799d344fc0fa28517eeac9d2ed))
+* **home:** add animation to most common card progress indicator ([af4a9c0](https://github.com/kobihanoch/Strong-Together-App/commit/af4a9c0d834fdcf255f4e7ce7d7d1ba1191c7bae))
+* **home:** add modal for displaying personal record details in PR section ([f6e8de5](https://github.com/kobihanoch/Strong-Together-App/commit/f6e8de57407ee965ff9a79d75b4803987856a064))
+* **workout:** sort workout splits by name and add refetch logic on focus ([a56cd39](https://github.com/kobihanoch/Strong-Together-App/commit/a56cd3921b96d723afdc85fbb907e79a949236f2))
+
+
+### Bug Fixes
+
+* ensure dateOfPr is set correctly in getUserGeneralPR function ([c920278](https://github.com/kobihanoch/Strong-Together-App/commit/c920278470cbb367c048004a5f058a6ba96fb2e7))
+* **exercise:** conditionally render progress bar based on reps for visible set ([c8b75c3](https://github.com/kobihanoch/Strong-Together-App/commit/c8b75c3b5fd8abc867096582b18227d4ead899ed))
+* **home:** improve handling of personal record display in NewAchivementCard ([4e79a15](https://github.com/kobihanoch/Strong-Together-App/commit/4e79a1506467a2112ce13d9ac741bfb532cf51af))
+* **workout:** exercise management by adding new exercise handling and synchronization logic ([da4e6b5](https://github.com/kobihanoch/Strong-Together-App/commit/da4e6b541791761aedf04c06dcdca6bc8c9e74f1))
+
 ## [2.10.0](https://github.com/kobihanoch/Strong-Together-App/compare/v2.9.0...v2.10.0) (2025-04-16)
 
 
