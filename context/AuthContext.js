@@ -45,7 +45,7 @@ export const AuthProvider = ({ children, onLogout }) => {
 
       if (session) {
         console.log("Session exists");
-        initializeUserSession(session.user.id);
+        await initializeUserSession(session.user.id);
       } else {
         console.log("Session doesn't exist");
         setIsLoggedIn(false);
@@ -57,6 +57,27 @@ export const AuthProvider = ({ children, onLogout }) => {
       setLoading(false);
     }
   };
+
+  // Refresh token auto
+  useEffect(() => {
+    const { data: listener } = supabase.auth.onAuthStateChange(
+      async (event, session) => {
+        console.log("🔄 Auth state changed: ", event);
+        if (event === "TOKEN_REFRESHED") {
+          await initializeUserSession(session.user.id);
+        } else if (event === "USER_DELETED" || event === "SIGNED_OUT") {
+          setIsLoggedIn(false);
+          setUser(null);
+        }
+      }
+    );
+
+    authListener = listener;
+
+    return () => {
+      listener?.subscription?.unsubscribe?.();
+    };
+  }, []);
 
   // Load profile pic
   const updateProfilePic = (picUrl) => {
@@ -103,8 +124,10 @@ export const AuthProvider = ({ children, onLogout }) => {
         access_token: result.session.access_token,
         refresh_token: result.session.refresh_token,
       });
-      setUser(result.user);
-      setIsLoggedIn(true);
+
+      await initializeUserSession(result.user.id);
+      //setUser(result.user);
+      //setIsLoggedIn(true);
       //console.log(result.user.id);
       //initializeUserSession(result.user.id);
       console.log("✅ Login successful - waiting for onAuthStateChange...");
@@ -118,6 +141,8 @@ export const AuthProvider = ({ children, onLogout }) => {
   const logout = async () => {
     setIsLoggedIn(false);
     setUser(null);
+    setHasTrainedToday(false);
+    await AsyncStorage.clear();
     //await Updates.reloadAsync();
     //await AsyncStorage.clear();
     await supabase.auth.signOut();
