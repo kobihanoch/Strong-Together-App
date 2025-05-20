@@ -2,6 +2,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import React, { useState } from "react";
 import {
   ActivityIndicator,
+  Alert,
   Dimensions,
   Image,
   StyleSheet,
@@ -23,31 +24,26 @@ const Login = ({ navigation }) => {
   const { login, loading } = useAuth();
 
   const handleLogin = async () => {
+    // Validate inputs
+    if (password.length == 0 || username.length == 0) {
+      Alert.alert("Error", "Please fill username and password");
+      return;
+    }
+
     try {
       console.log("Calling login from useAuth");
       await login(username, password);
-    } catch (error) {
-      console.log("Login failed:", error.message);
+    } catch (err) {
+      // Show server or network errors
+      Alert.alert("Error", err.message);
     }
-  };
-
-  const validateInputs = () => {
-    let errorMessages = [];
-
-    const usernameError = Validators({ value: username, type: "username" });
-    if (usernameError) errorMessages.push(usernameError);
-
-    const passwordError = Validators({ value: password, type: "password" });
-    if (passwordError) errorMessages.push(passwordError);
-
-    return errorMessages;
   };
 
   return (
     <KeyboardAwareScrollView
       contentContainerStyle={{ flex: 1 }}
       resetScrollToCoords={{ x: 0, y: 0 }}
-      scrollEnabled={true}
+      scrollEnabled
     >
       <LinearGradient colors={["#007bff", "#004fa3"]} style={{ flex: 1 }}>
         <View style={{ flex: 1, marginTop: height * 0.08 }}>
@@ -80,18 +76,19 @@ const Login = ({ navigation }) => {
               <View style={{ marginTop: 0 }} />
               <InputField
                 placeholder="Password"
-                secureTextEntry={true}
+                secureTextEntry
                 value={password}
                 onChangeText={setPassword}
-                iconName={"lock"}
+                iconName="lock"
               />
               <TouchableOpacity
                 style={styles.buttonLogin}
                 onPress={handleLogin}
+                disabled={loading}
               >
                 <View style={styles.buttonContent}>
                   {loading ? (
-                    <ActivityIndicator></ActivityIndicator>
+                    <ActivityIndicator />
                   ) : (
                     <Text style={styles.buttonLoginText}>Log in</Text>
                   )}
@@ -163,6 +160,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     marginTop: height * 0.04,
+    opacity: 1,
   },
   buttonContent: {
     flexDirection: "row",

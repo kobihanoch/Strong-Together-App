@@ -114,25 +114,22 @@ export const AuthProvider = ({ children, onLogout }) => {
   const login = async (username, password) => {
     try {
       setLoading(true);
-      const result = await loginUser(username, password);
-      if (!result.success) {
-        throw new Error(result.reason);
-      }
+      // Will throw on network, parse, or invalid creds
+      const { user, session } = await loginUser(username, password);
 
-      // Set session returned from server
+      // Save session in Supabase SDK
       await supabase.auth.setSession({
-        access_token: result.session.access_token,
-        refresh_token: result.session.refresh_token,
+        access_token: session.access_token,
+        refresh_token: session.refresh_token,
       });
 
-      await initializeUserSession(result.user.id);
-      //setUser(result.user);
-      //setIsLoggedIn(true);
-      //console.log(result.user.id);
-      //initializeUserSession(result.user.id);
-      console.log("✅ Login successful - waiting for onAuthStateChange...");
+      // Initialize user context
+      await initializeUserSession(user.id);
+      console.log("✅ Login successful");
     } catch (err) {
-      console.log("Error logging in: " + err.message);
+      console.log("Error logging in:", err.message);
+      // Rethrow so the calling UI can catch and display an alert
+      throw err;
     } finally {
       setLoading(false);
     }
