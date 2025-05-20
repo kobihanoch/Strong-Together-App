@@ -5,32 +5,23 @@ import {
   getWorkoutSplitCounter,
 } from "../../utils/myWorkoutPlanUtils";
 import { useUserWorkout } from "../useUserWorkout";
+import { useAuth } from "../../context/AuthContext";
 
-export const useMyWorkoutPlanPageLogic = (user, authHasTrainedToday) => {
+export const useMyWorkoutPlanPageLogic = () => {
   const {
     workout,
     workoutSplits,
     exerciseTracking,
-    fetchUserExerciseTracking,
     exercises: allExercises,
-    loading,
-    error,
-    refetch,
-  } = useUserWorkout(user?.id);
-
+  } = useAuth().workout;
+  const { hasTrainedToday: authHasTrainedToday } = useAuth();
   const [selectedSplit, setSelectedSplit] = useState(null);
   const [buttonOpacity, setButtonOpacity] = useState(1);
   const [filteredExercises, setFilteredExercises] = useState(null);
   const [splitTrainedCount, setSplitTrainedCount] = useState(0);
   const [hasTrainedToday, setHasTrainedToday] = useState(false);
 
-  // Initialize exercise tracking fetch
-  useEffect(() => {
-    if (user) {
-      fetchUserExerciseTracking();
-    }
-  }, [user]);
-
+  // Updating has trained today state
   useEffect(() => {
     setHasTrainedToday(authHasTrainedToday);
   }, [authHasTrainedToday]);
@@ -77,8 +68,5 @@ export const useMyWorkoutPlanPageLogic = (user, authHasTrainedToday) => {
       splitTrainedCount,
       hasTrainedToday,
     },
-    loading,
-    error,
-    refetch,
   };
 };
