@@ -54,17 +54,6 @@ export default function App() {
     loadFonts();
   }, []);
 
-  const handleLogoutReset = () => {
-    if (navigationRef.isReady()) {
-      navigationRef.dispatch(
-        CommonActions.reset({
-          index: 0,
-          routes: [{ name: "Auth" }],
-        })
-      );
-    }
-  };
-
   if (!fontsLoaded) {
     return (
       <View style={styles.loadingContainer}>
@@ -75,7 +64,7 @@ export default function App() {
   }
 
   return (
-    <AuthProvider onLogout={handleLogoutReset}>
+    <AuthProvider>
       <WrappedWithNotifications />
     </AuthProvider>
   );
