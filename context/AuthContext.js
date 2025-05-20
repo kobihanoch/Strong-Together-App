@@ -205,9 +205,13 @@ export const AuthProvider = ({ children, onLogout }) => {
         },
         workout: {
           workout,
+          setWorkout,
           workoutSplits,
+          setWorkoutSplits,
           exercises,
+          setExercises,
           exerciseTracking,
+          setExerciseTracking,
         },
       }}
     >
