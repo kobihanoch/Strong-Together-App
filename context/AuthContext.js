@@ -18,20 +18,28 @@ export const AuthProvider = ({ children, onLogout }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [sessionLoading, setSessionLoading] = useState(false);
   const [hasTrainedToday, setHasTrainedToday] = useState(false);
 
   // Method for initializaztion
   const initializeUserSession = async (sessionUserId) => {
-    const userData = await getUserData(sessionUserId);
-    const exerciseTracking = await getUserExerciseTracking(sessionUserId);
+    try {
+      setSessionLoading(true);
+      const userData = await getUserData(sessionUserId);
+      const exerciseTracking = await getUserExerciseTracking(sessionUserId);
 
-    console.log("Userdata: ", userData);
+      console.log("Userdata: ", userData);
 
-    setUser(userData);
-    setHasTrainedToday(hasWorkoutForToday(exerciseTracking));
+      setUser(userData);
+      setHasTrainedToday(hasWorkoutForToday(exerciseTracking));
 
-    // Logged in state for navigating
-    setIsLoggedIn(true);
+      // Logged in state for navigating
+      setIsLoggedIn(true);
+    } catch (e) {
+      throw e;
+    } finally {
+      setSessionLoading(false);
+    }
   };
 
   // Sessions and fetch user
@@ -155,6 +163,7 @@ export const AuthProvider = ({ children, onLogout }) => {
         logout,
         updateProfilePic,
         loading,
+        sessionLoading,
         setHasTrainedToday,
         hasTrainedToday,
         initial: {
