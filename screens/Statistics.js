@@ -14,15 +14,12 @@ const StatisticsPage = () => {
   const {
     selectedDate,
     setSelectedDate,
-    loading,
     exerciseTracking,
     exerciseTrackingByDate,
     exerciseTrackingByDatePrev,
   } = useStatisticsPageLogic(user);
 
-  return loading ? (
-    <LoadingPage message="Analyzing" />
-  ) : (
+  return (
     <View
       style={[
         styles.pageContainer,
