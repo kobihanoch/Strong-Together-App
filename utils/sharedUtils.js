@@ -33,6 +33,6 @@ export const splitTheWorkout = (userWorkout) => {
       exercises: allExercises,
     };
   } else {
-    return null;
+    return {};
   }
 };
