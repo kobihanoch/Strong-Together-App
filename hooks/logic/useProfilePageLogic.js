@@ -4,10 +4,8 @@ import { useUserWorkout } from "../useUserWorkout";
 import { getDaysSince } from "../../utils/homePageUtils";
 
 const useProfilePageLogic = (user) => {
-  const { updateProfilePic } = useAuth();
-  const { exerciseTracking, fetchUserExerciseTracking } = useUserWorkout(
-    user?.id
-  );
+  const { updateProfilePic, workout } = useAuth();
+  const { exerciseTracking } = workout;
   const [mediaLoading, setMediaLoading] = useState(false);
   const [username, setUsername] = useState(null);
   const [email, setEmail] = useState(null);
@@ -26,7 +24,6 @@ const useProfilePageLogic = (user) => {
         setFullname(user.name);
         const dataOfCreation = user.created_at.split("T")[0];
         setDaysOnline(getDaysSince(dataOfCreation));
-        await fetchUserExerciseTracking();
       } catch (err) {
         console.log(err);
         throw err;

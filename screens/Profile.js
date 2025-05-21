@@ -162,16 +162,16 @@ function Profile({ navigation }) {
             <Text
               style={{ fontFamily: "Inter_600SemiBold", fontSize: RFValue(14) }}
             >
-              Days Online
+              Online since
             </Text>
             <Text
               style={{
                 fontFamily: "Inter_400Regular",
-                fontSize: RFValue(20),
+                fontSize: RFValue(18),
                 color: "rgb(128, 128, 128)",
               }}
             >
-              {data.daysOnline.toString().split(" ")[0]}
+              {data.daysOnline.toString()}
             </Text>
           </View>
         </View>
