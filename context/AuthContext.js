@@ -100,11 +100,8 @@ export const AuthProvider = ({ children, onLogout }) => {
     const { data: listener } = supabase.auth.onAuthStateChange(
       async (event, session) => {
         console.log("🔄 Auth state changed: ", event);
-        if (event === "TOKEN_REFRESHED") {
-          await initializeUserSession(session.user.id);
-        } else if (event === "USER_DELETED" || event === "SIGNED_OUT") {
-          setIsLoggedIn(false);
-          setUser(null);
+        if (event === "USER_DELETED" || event === "SIGNED_OUT") {
+          logout();
         }
       }
     );
