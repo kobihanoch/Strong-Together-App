@@ -25,7 +25,7 @@ export const CreateWorkoutProvider = ({ children }) => {
   const [isSaving, setIsSaving] = useState(false);
 
   // ----------------------------User----------------------------
-  const { user } = useAuth();
+  const { user, workout: workoutFromAuth } = useAuth();
 
   // ----------------------------Exercises in DB----------------------------
   const {
@@ -35,10 +35,7 @@ export const CreateWorkoutProvider = ({ children }) => {
   } = useExercises();
 
   // ----------------------------Fetched workout--------------------------------
-  const { workout, workoutSplits, exercises, loading, error } = useUserWorkout(
-    user?.id
-  );
-
+  const { workout, workoutSplits, exercises } = workoutFromAuth;
   // If user has a workout: NEED TO ADD A FUNCTION THAT ARRANGES THE GIVEN DATA OF USER AND TRANSLATES IT TO THIS DATA STRUCTURE
   useEffect(() => {
     //console.log("User has workout?", workout != null);
@@ -63,8 +60,10 @@ export const CreateWorkoutProvider = ({ children }) => {
       //console.log(JSON.stringify(newSeletecExercises, null, 2));
       setSelectedExercises(newSeletecExercises);
       setCurrentStep(2);
+    } else {
+      setIsNewWorkout(true);
     }
-  }, [exercises]);
+  }, [workoutFromAuth]);
 
   // ----------------------------Step----------------------------
   const [currentStep, setCurrentStep] = useState(1);
@@ -74,7 +73,7 @@ export const CreateWorkoutProvider = ({ children }) => {
   }, [currentStep]);
 
   // ----------------------------Workout properties----------------------------
-  const [isNewWorkout, setIsNewWorkout] = useState(true);
+  const [isNewWorkout, setIsNewWorkout] = useState(false);
   const [splitsNumber, setSplitsNumber] = useState(1);
   const [selectedExercises, setSelectedExercises] = useState([]);
   const [focusedSplit, setFocusedSplit] = useState(null);
@@ -114,10 +113,12 @@ export const CreateWorkoutProvider = ({ children }) => {
 
   // Update the selected exercises array
   useEffect(() => {
-    console.log("🟡 splitsNumber changed:", splitsNumber);
-    const newSelectedExercisesArr = createNamedLetterArray(splitsNumber);
-    setSelectedExercises(newSelectedExercisesArr);
-  }, [splitsNumber]);
+    if (isNewWorkout) {
+      console.log("🟡 splitsNumber changed:", splitsNumber);
+      const newSelectedExercisesArr = createNamedLetterArray(splitsNumber);
+      setSelectedExercises(newSelectedExercisesArr);
+    }
+  }, [splitsNumber, isNewWorkout]);
 
   useEffect(() => {
     if (focusedSplit) {
@@ -298,8 +299,6 @@ export const CreateWorkoutProvider = ({ children }) => {
           workout,
           workoutSplits,
           exercises,
-          loading,
-          error,
         },
         DB: {
           dbExercises,
