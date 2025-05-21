@@ -14,23 +14,8 @@ const { width, height } = Dimensions.get("window");
 const MyWorkoutPlan = () => {
   const navigation = useNavigation();
   const { user, hasTrainedToday } = useAuth();
-  const {
-    data: workoutData,
-    loading,
-    error,
-    refetch: refetchWorkoutData,
-  } = useMyWorkoutPlanPageLogic(user, hasTrainedToday);
+  const { data: workoutData } = useMyWorkoutPlanPageLogic();
 
-  useFocusEffect(
-    useCallback(() => {
-      console.log("🔄 Refetching workout...");
-      refetchWorkoutData();
-    }, [])
-  );
-
-  if (loading) {
-    return <LoadingPage message="Getting your workout..." />;
-  }
   return (
     <View
       style={{

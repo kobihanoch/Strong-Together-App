@@ -4,9 +4,14 @@ import { loginUser, registerUser } from "../services/AuthService";
 import { getUserData, getUserMessages } from "../services/UserService";
 import supabase from "../src/supabaseClient";
 import * as Updates from "expo-updates";
-import { getUserExerciseTracking } from "../services/WorkoutService";
+import {
+  getUserExerciseTracking,
+  getUserWorkout,
+} from "../services/WorkoutService";
 import { hasWorkoutForToday, filterMessagesByUnread } from "../utils/authUtils";
 import { NotificationsContext } from "./NotificationsContext";
+import { useUserWorkout } from "../hooks/useUserWorkout";
+import { splitTheWorkout } from "../utils/sharedUtils";
 
 const AuthContext = createContext();
 
@@ -15,23 +20,47 @@ export const useAuth = () => useContext(AuthContext);
 let authListener = null;
 
 export const AuthProvider = ({ children, onLogout }) => {
+  // Auth states
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(false);
   const [sessionLoading, setSessionLoading] = useState(false);
-  const [hasTrainedToday, setHasTrainedToday] = useState(false);
 
+  // User data
+  const [user, setUser] = useState(null);
+  const [hasTrainedToday, setHasTrainedToday] = useState(false);
+  const [workout, setWorkout] = useState(null);
+  const [workoutSplits, setWorkoutSplits] = useState(null);
+  const [exercises, setExercises] = useState(null);
+  const [exerciseTracking, setExerciseTracking] = useState(null);
+
+  // -------------------------------------------------------------------------------
   // Method for initializaztion
   const initializeUserSession = async (sessionUserId) => {
+    setSessionLoading(true);
     try {
-      setSessionLoading(true);
+      // Fetch data
       const userData = await getUserData(sessionUserId);
-      const exerciseTracking = await getUserExerciseTracking(sessionUserId);
+      const userWorkoutData = await getUserWorkout(sessionUserId);
+      const exerciseTrackingData = await getUserExerciseTracking(sessionUserId);
+      const {
+        workout: wData,
+        workoutSplits: sData,
+        exercises: eData,
+      } = splitTheWorkout(userWorkoutData);
 
-      console.log("Userdata: ", userData);
-
+      // Assign to states
       setUser(userData);
-      setHasTrainedToday(hasWorkoutForToday(exerciseTracking));
+      if (userWorkoutData) {
+        // Workout
+        setWorkout(wData);
+        setWorkoutSplits(sData);
+        setExercises(eData);
+      }
+      if (exerciseTrackingData) {
+        // Tracking
+        setExerciseTracking(exerciseTrackingData);
+        setHasTrainedToday(hasWorkoutForToday(exerciseTrackingData));
+      }
 
       // Logged in state for navigating
       setIsLoggedIn(true);
@@ -144,12 +173,16 @@ export const AuthProvider = ({ children, onLogout }) => {
   };
 
   const logout = async () => {
+    // Clear older data
     setIsLoggedIn(false);
     setUser(null);
-    setHasTrainedToday(false);
+    setWorkout(null);
+    setWorkoutSplits(null);
+    setExercises(null);
+    setExerciseTracking(null);
+    setHasTrainedToday(hasWorkoutForToday(null));
+
     await AsyncStorage.clear();
-    //await Updates.reloadAsync();
-    //await AsyncStorage.clear();
     await supabase.auth.signOut();
   };
 
@@ -169,6 +202,16 @@ export const AuthProvider = ({ children, onLogout }) => {
         initial: {
           checkIfUserSession,
           initializeUserSession,
+        },
+        workout: {
+          workout,
+          setWorkout,
+          workoutSplits,
+          setWorkoutSplits,
+          exercises,
+          setExercises,
+          exerciseTracking,
+          setExerciseTracking,
         },
       }}
     >
