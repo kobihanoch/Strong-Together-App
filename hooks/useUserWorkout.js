@@ -77,9 +77,9 @@ export const useUserWorkout = (userId) => {
     }
   };
 
-  useEffect(() => {
+  /*useEffect(() => {
     fetchUserWorkout();
-  }, [userId]);
+  }, [userId]);*/
 
   const saveWorkoutProccess = async (workoutData) => {
     setSaving(true);

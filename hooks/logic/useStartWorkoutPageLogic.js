@@ -1,26 +1,31 @@
+import { useNavigation } from "@react-navigation/native";
 import { useEffect, useRef, useState } from "react";
 import { Animated } from "react-native";
-import { useUserWorkout } from "../useUserWorkout";
+import { useAuth } from "../../context/AuthContext";
+import { getUserExerciseTracking } from "../../services/WorkoutService";
 import {
-  filterZeroesInArr,
   createObjectForDataBase,
+  filterZeroesInArr,
   getWorkoutCompleteMessageString,
 } from "../../utils/startWorkoutUtils";
-import { useNavigation, useNavigationState } from "@react-navigation/native";
 import useSystemMessages from "../automations/useSystemMessages";
+import { useUserWorkout } from "../useUserWorkout";
 
 const useStartWorkoutPageLogic = (user, selectedSplit, setHasTrainedToday) => {
+  // --------------------[ Auth Context ]--------------------------------------
+  const { workout } = useAuth();
+
   // --------------------[ Navigation ]--------------------------------------
   const navigation = useNavigation();
 
   // --------------------[ Outside hooks ]--------------------------------------
-  const { exercises, saveWorkoutProccess, loading, error } = useUserWorkout(
-    user?.id
-  );
+  const { saveWorkoutProccess } = useUserWorkout(user?.id);
 
   const { sendSystemMessage } = useSystemMessages(user?.id);
 
   // --------------------[ Exercises ]------------------------------------------
+  const { exercises, setExerciseTracking } = workout;
+
   const [exercisesForSelectedSplit, setExercisesForSelectedSplit] =
     useState(null);
 
@@ -57,6 +62,10 @@ const useStartWorkoutPageLogic = (user, selectedSplit, setHasTrainedToday) => {
           exercisesForSelectedSplit
         );
         await saveWorkoutProccess(obj);
+
+        // Update cache
+        const etUpdated = await getUserExerciseTracking(user.id);
+        setExerciseTracking(etUpdated);
         setHasTrainedToday(true);
         // Send a message to user
         await sendSystemMessage(
@@ -95,8 +104,6 @@ const useStartWorkoutPageLogic = (user, selectedSplit, setHasTrainedToday) => {
       saveStarted,
       setSaveStarted,
     },
-    loading,
-    error,
   };
 };
 
