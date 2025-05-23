@@ -19,7 +19,7 @@
     "@react-navigation/stack": "^6.4.1",
     "@supabase/realtime-js": "^2.11.8-next.1",
     "@supabase/storage-js": "^2.7.1",
-    "@supabase/supabase-js": "^2.49.5-next.1",
+    "@supabase/supabase-js": "^2.49.5-next.5",
     "base-64": "^1.0.0",
     "crypto-js": "^4.2.0",
     "expo": "^53.0.0",
