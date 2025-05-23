@@ -4,7 +4,7 @@
   "main": "expo/AppEntry.js",
   "scripts": {
     "start": "expo start",
-    "eas-build-pre-install": "echo 'PWD:' && pwd && echo 'CONTENTS:' && ls -la . && echo 'PARENT CONTENTS:' && ls -la ../",
+    "eas-build-pre-install": "echo '=== eas-build-pre-install ===' && echo 'NODE:' $(node --version) && echo 'NPM:' $(npm --version) && echo 'PWD:' $(pwd) && echo 'FILES:' && ls -1a .",
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web",
