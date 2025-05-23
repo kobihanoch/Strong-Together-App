@@ -1,16 +1,13 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { loginUser, registerUser } from "../services/AuthService";
-import { getUserData, getUserMessages } from "../services/UserService";
-import supabase from "../src/supabaseClient";
-import * as Updates from "expo-updates";
+import { getUserData } from "../services/UserService";
 import {
   getUserExerciseTracking,
   getUserWorkout,
 } from "../services/WorkoutService";
-import { hasWorkoutForToday, filterMessagesByUnread } from "../utils/authUtils";
-import { NotificationsContext } from "./NotificationsContext";
-import { useUserWorkout } from "../hooks/useUserWorkout";
+import supabase from "../src/supabaseClient";
+import { hasWorkoutForToday } from "../utils/authUtils";
 import { splitTheWorkout } from "../utils/sharedUtils";
 
 const AuthContext = createContext();
@@ -108,7 +105,7 @@ export const AuthProvider = ({ children, onLogout }) => {
       async (event, session) => {
         console.log("🔄 Auth state changed: ", event);
         if (event === "USER_DELETED" || event === "SIGNED_OUT") {
-          logout();
+          clearStates();
         }
       }
     );
@@ -177,6 +174,13 @@ export const AuthProvider = ({ children, onLogout }) => {
   };
 
   const logout = async () => {
+    clearStates();
+
+    await AsyncStorage.clear();
+    await supabase.auth.signOut();
+  };
+
+  const clearStates = () => {
     // Clear older data
     setIsLoggedIn(false);
     setUser(null);
@@ -186,9 +190,6 @@ export const AuthProvider = ({ children, onLogout }) => {
     setExerciseTracking(null);
     setHasTrainedToday(hasWorkoutForToday(null));
     setIsWorkoutMode(false);
-
-    await AsyncStorage.clear();
-    await supabase.auth.signOut();
   };
 
   return (
