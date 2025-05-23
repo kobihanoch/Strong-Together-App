@@ -33,6 +33,13 @@ export const AuthProvider = ({ children, onLogout }) => {
   const [exercises, setExercises] = useState(null);
   const [exerciseTracking, setExerciseTracking] = useState(null);
 
+  // Modes
+  const [isWorkoutMode, setIsWorkoutMode] = useState(false);
+
+  useEffect(() => {
+    console.log("is workout mode? ", isWorkoutMode);
+  }, [isWorkoutMode]);
+
   // -------------------------------------------------------------------------------
   // Method for initializaztion
   const initializeUserSession = async (sessionUserId) => {
@@ -178,6 +185,7 @@ export const AuthProvider = ({ children, onLogout }) => {
     setExercises(null);
     setExerciseTracking(null);
     setHasTrainedToday(hasWorkoutForToday(null));
+    setIsWorkoutMode(false);
 
     await AsyncStorage.clear();
     await supabase.auth.signOut();
@@ -210,6 +218,8 @@ export const AuthProvider = ({ children, onLogout }) => {
           exerciseTracking,
           setExerciseTracking,
         },
+        isWorkoutMode,
+        setIsWorkoutMode,
       }}
     >
       {children}

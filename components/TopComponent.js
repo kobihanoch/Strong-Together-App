@@ -21,7 +21,7 @@ const { width, height } = Dimensions.get("window");
 
 const TopComponent = () => {
   // Context
-  const { user } = useAuth();
+  const { user, isWorkoutMode } = useAuth();
   const { unreadMessages } = useNotifications();
 
   // Navigation
@@ -123,12 +123,13 @@ const TopComponent = () => {
         <TouchableOpacity
           style={{ marginBottom: height * 0.02 }}
           onPress={() => navigation.navigate("Inbox")}
+          disabled={isWorkoutMode ? true : false}
         >
           <MaterialCommunityIcons
             name={"bell"}
             size={RFValue(20)}
             color={"#1A1A1A"}
-            opacity={0.8}
+            opacity={isWorkoutMode ? 0 : 0.8}
           ></MaterialCommunityIcons>
           <Animated.View
             style={{
@@ -142,7 +143,7 @@ const TopComponent = () => {
               right: 0,
               justifyContent: "center",
               alignItems: "center",
-              opacity: msgCount == 0 ? 0 : 1,
+              opacity: isWorkoutMode ? 0 : msgCount == 0 ? 0 : 1,
             }}
           >
             <Text
