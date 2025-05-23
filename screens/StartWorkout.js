@@ -22,37 +22,33 @@ import { useAuth } from "../context/AuthContext";
 import useStartWorkoutPageLogic from "../hooks/logic/useStartWorkoutPageLogic";
 import LoadingPage from "../components/LoadingPage";
 import ExerciseBox from "../components/StartWorkoutComponents/ExerciseBox";
+import { useFocusEffect } from "@react-navigation/native";
+import { BackHandler } from "react-native";
+import BottomModal from "../components/BottomModal";
 
 const { width, height } = Dimensions.get("window");
 
 const StartWorkout = ({ navigation, route }) => {
   const { user, setHasTrainedToday } = useAuth();
-  const {
-    animation,
-    data: workoutData,
-    saving: workoutSaving,
-    loading,
-    error,
-  } = useStartWorkoutPageLogic(
+  const { data: workoutData, saving: workoutSaving } = useStartWorkoutPageLogic(
     user,
     route.params?.workoutSplit,
     setHasTrainedToday
   );
 
   const flatListRef = useRef(null);
-  const workoutTime = route.params?.workoutTime || 0;
 
-  useEffect(() => {
+  /*useEffect(() => {
     console.log("Updated weights: " + JSON.stringify(workoutData.weightArrs));
-  }, [workoutData.weightArrs]);
+  }, [workoutData.weightArrs]);*/
 
-  useEffect(() => {
+  /*useEffect(() => {
     console.log("Updated reps: " + JSON.stringify(workoutData.repsArrs));
-  }, [workoutData.repsArrs]);
+  }, [workoutData.repsArrs]);*/
 
-  if (loading) {
+  /*if (loading) {
     return <LoadingPage message="Starting workout"></LoadingPage>;
-  }
+  }*/
 
   return (
     <View

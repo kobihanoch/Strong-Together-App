@@ -1,5 +1,5 @@
-import { useNavigation } from "@react-navigation/native";
-import { useEffect, useRef, useState } from "react";
+import { useFocusEffect, useNavigation } from "@react-navigation/native";
+import React, { useEffect, useRef, useState } from "react";
 import { Animated } from "react-native";
 import { useAuth } from "../../context/AuthContext";
 import { getUserExerciseTracking } from "../../services/WorkoutService";
@@ -13,7 +13,7 @@ import { useUserWorkout } from "../useUserWorkout";
 
 const useStartWorkoutPageLogic = (user, selectedSplit, setHasTrainedToday) => {
   // --------------------[ Auth Context ]--------------------------------------
-  const { workout } = useAuth();
+  const { workout, setIsWorkoutMode } = useAuth();
 
   // --------------------[ Navigation ]--------------------------------------
   const navigation = useNavigation();
@@ -22,6 +22,17 @@ const useStartWorkoutPageLogic = (user, selectedSplit, setHasTrainedToday) => {
   const { saveWorkoutProccess } = useUserWorkout(user?.id);
 
   const { sendSystemMessage } = useSystemMessages(user?.id);
+
+  // --------------------[ Set workout mode ]--------------------------------------
+  useFocusEffect(
+    React.useCallback(() => {
+      setIsWorkoutMode(true);
+
+      return () => {
+        setIsWorkoutMode(false);
+      };
+    }, [])
+  );
 
   // --------------------[ Exercises ]------------------------------------------
   const { exercises, setExerciseTracking } = workout;
@@ -67,6 +78,7 @@ const useStartWorkoutPageLogic = (user, selectedSplit, setHasTrainedToday) => {
         const etUpdated = await getUserExerciseTracking(user.id);
         setExerciseTracking(etUpdated);
         setHasTrainedToday(true);
+        setIsWorkoutMode(false);
         // Send a message to user
         await sendSystemMessage(
           getWorkoutCompleteMessageString().header,
