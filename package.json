@@ -4,7 +4,7 @@
   "main": "expo/AppEntry.js",
   "scripts": {
     "start": "expo start",
-    "eas-build-pre-install": "cp ../package-lock.json ./ || echo 'no lockfile to copy'",
+    "eas-build-pre-install": "echo 'PWD:' && pwd && echo 'CONTENTS:' && ls -la . && echo 'PARENT CONTENTS:' && ls -la ../",
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web",
