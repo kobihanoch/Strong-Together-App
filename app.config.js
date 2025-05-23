@@ -15,6 +15,7 @@ export default {
     },
     ios: {
       supportsTablet: true,
+      bundleIdentifier: "com.kobihanoch.strongtogether",
     },
     android: {
       adaptiveIcon: {
