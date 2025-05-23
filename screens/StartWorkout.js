@@ -97,7 +97,22 @@ const StartWorkout = ({ navigation, route }) => {
             height: "40%",
             gap: width * 0.03,
           }}
-          onPress={() => workoutSaving.setSaveStarted(true)}
+          onPress={() => {
+            Alert.alert(
+              "Finish Workout?",
+              "Are you sure you’ve completed your workout?",
+              [
+                {
+                  text: "Cancel",
+                  style: "cancel",
+                },
+                {
+                  text: "Yes, Finish",
+                  onPress: () => workoutSaving.setSaveStarted(true),
+                },
+              ]
+            );
+          }}
         >
           <Text
             style={{
