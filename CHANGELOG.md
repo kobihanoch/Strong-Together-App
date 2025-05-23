@@ -2,6 +2,39 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.12.0](https://github.com/kobihanoch/Strong-Together-App/compare/v2.11.0...v2.12.0) (2025-05-23)
+
+
+### Features
+
+* **auth:** add loading state during user session initialization ([7f0e544](https://github.com/kobihanoch/Strong-Together-App/commit/7f0e544fc35cc4dcf6454f8d93bfa1c593c9ae2f))
+* **auth:** enhance user session initialization with workout data and tracking ([b18474b](https://github.com/kobihanoch/Strong-Together-App/commit/b18474b57f344ec90a4db0fc9cf61da00f4deadf))
+* **auth:** expose workout state setters in AuthContext ([3381819](https://github.com/kobihanoch/Strong-Together-App/commit/3381819092e511e5201778c9c86f3444dfbf4097))
+* **CreateWorkoutContext:** integrate workout data from useAuth ([44da6d7](https://github.com/kobihanoch/Strong-Together-App/commit/44da6d7017a4bb1d49e8d60599d9117e34519d67))
+* **CreateWorkoutContext:** supports cache updating on modifying workout ([b8939bf](https://github.com/kobihanoch/Strong-Together-App/commit/b8939bfbe8b98cc0338b1d5bfa378650a57f5067))
+* **homepage:** getting user workout data from context ([5908ff4](https://github.com/kobihanoch/Strong-Together-App/commit/5908ff437d987c8e8a822429d1e4a73ff2982fe3))
+* **ModifySplitNamesScreen:** add confirmation alert for resetting workout on back navigation ([049cde3](https://github.com/kobihanoch/Strong-Together-App/commit/049cde3b970b70586d12f52ec72f26cb617fce8c))
+* **StartWorkout:** add confirmation alert before finishing workout ([f41d81d](https://github.com/kobihanoch/Strong-Together-App/commit/f41d81d774c626409ce714fd840a8af49e3ff7df))
+* **startworkout:** implement BottomModal component for displaying last workout data ([e7db59d](https://github.com/kobihanoch/Strong-Together-App/commit/e7db59dd5089a9e4da2854ef98c07f66b243e650))
+* **startworkout:** new workout mode is ensuring that user can't leave to inbox page in the middle of workout ([9748e5f](https://github.com/kobihanoch/Strong-Together-App/commit/9748e5f221137cdbc70f1b99f249501dfe367793))
+* **statistics:** getting user workout data from context ([e95f4ed](https://github.com/kobihanoch/Strong-Together-App/commit/e95f4ed1d0078d74034f786fe1b357ab52641ebf))
+* **useLastWorkoutExerciseTrackingData:** add custom hook for tracking last workout exercise data ([9788386](https://github.com/kobihanoch/Strong-Together-App/commit/97883864fc83f9122862729b16f2e48c33d6c54a))
+* **useStartWorkoutPageLogic:** update exercise tracking and cache on workout save ([e1580d8](https://github.com/kobihanoch/Strong-Together-App/commit/e1580d803f9dad2b18b6e00c8811be9e6c57a37b))
+* **useUserWorkout:** improve data fetching and state management ([440e8dd](https://github.com/kobihanoch/Strong-Together-App/commit/440e8dd93aa71e95cfe870770bc01e97b12a7087))
+* **workout:** getting user workout data from context ([28d7cd3](https://github.com/kobihanoch/Strong-Together-App/commit/28d7cd36549bb442c011caa57ddb1e224772dd31))
+
+
+### Bug Fixes
+
+* add eas.json to .gitignore ([066cbf4](https://github.com/kobihanoch/Strong-Together-App/commit/066cbf4ab26d86f29074e1a897ccfb20f775fd29))
+* **auth:** fixed auth listener ([990b45c](https://github.com/kobihanoch/Strong-Together-App/commit/990b45cdc5ff102cdefd99710b22cc34fc14375b))
+* **AuthProvider:** enhance logout process and clear states on user sign out ([303195d](https://github.com/kobihanoch/Strong-Together-App/commit/303195d536716ece401b8399a9c001c2630edf47))
+* await user session initialization and handle auth state changes with refresh token ([061f238](https://github.com/kobihanoch/Strong-Together-App/commit/061f238bd272d82463eba1ccb499675aa7d6bc0d))
+* improve login error handling and input validation ([c5df7ba](https://github.com/kobihanoch/Strong-Together-App/commit/c5df7ba701dc8b6aafc3d9ef0fbeaded5afbb00c))
+* **Profile:** update label and format for days online display ([5c04003](https://github.com/kobihanoch/Strong-Together-App/commit/5c040039ddb02c3cf266907ae01ab2df264abce0))
+* **sharedUtils:** return an empty object instead of null for splitTheWorkout ([82cd62a](https://github.com/kobihanoch/Strong-Together-App/commit/82cd62a4bee3986942b24ee72f6bd6cd3c57a5da))
+* **startworkout:** workout timer is working even if screen is not focused in app ([413fba4](https://github.com/kobihanoch/Strong-Together-App/commit/413fba4add42ca4e1bc8921133dcc7a5d6997e3b))
+
 ## [2.11.0](https://github.com/kobihanoch/Strong-Together-App/compare/v2.10.0...v2.11.0) (2025-04-17)
 
 
