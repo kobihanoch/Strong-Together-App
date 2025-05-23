@@ -16,7 +16,11 @@ export default {
     ios: {
       supportsTablet: true,
       bundleIdentifier: "com.kobihanoch.strongtogether",
+      infoPlist: {
+        ITSAppUsesNonExemptEncryption: false,
+      },
     },
+
     android: {
       adaptiveIcon: {
         foregroundImage: "./assets/logo.png",
