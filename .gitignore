@@ -1,8 +1,6 @@
 # Ignore environment variables
 .env
 
-eas.json
-
 # Ignore dependencies
 node_modules/
 
