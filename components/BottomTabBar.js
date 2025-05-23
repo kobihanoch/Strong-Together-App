@@ -28,28 +28,42 @@ const BottomTabBar = () => {
     return "Home";
   });
 
+  //----------------- [ Workout mode ]-----------------
   const isWorkoutMode = routeName === "StartWorkout";
 
-  const [seconds, setSeconds] = useState(0);
+  // Start time as timestamp
+  const [startTime, setStartTime] = useState(null);
+  // Current time refreshed each second
+  const [currentTime, setCurrentTime] = useState(Date.now());
   const [showExitButton, setShowExitButton] = useState(false);
 
   useEffect(() => {
     if (isWorkoutMode) {
-      setSeconds(0);
-      setShowExitButton(false);
+      const now = Date.now();
+      setStartTime(now); // Save the moment workout started
+
       const timer = setInterval(() => {
-        setSeconds((prev) => prev + 1);
+        setCurrentTime(Date.now());
       }, 1000);
+
+      setShowExitButton(false);
+
       return () => clearInterval(timer);
     }
   }, [isWorkoutMode]);
 
+  // Calculate how many seconds have passed
+  const elapsedSeconds = startTime
+    ? Math.floor((currentTime - startTime) / 1000)
+    : 0;
+
   const formatTime = () => {
-    const minutes = String(Math.floor(seconds / 60)).padStart(2, "0");
-    const remainingSeconds = String(seconds % 60).padStart(2, "0");
+    const minutes = String(Math.floor(elapsedSeconds / 60)).padStart(2, "0");
+    const remainingSeconds = String(elapsedSeconds % 60).padStart(2, "0");
     return `${minutes}:${remainingSeconds}`;
   };
 
+  //-----------------[ Regular tab bar ]-----------------
   const handleTabPress = (tabName) => {
     navigation.navigate(tabName);
   };
