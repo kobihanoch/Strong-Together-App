@@ -5,6 +5,7 @@ import { TextInput } from "react-native-gesture-handler";
 import { RFValue } from "react-native-responsive-fontsize";
 import ProgressBar from "./ProgressBar";
 import { MaterialCommunityIcons, Feather } from "@expo/vector-icons";
+import BottomModal from "../BottomModal";
 
 const { width, height } = Dimensions.get("window");
 
@@ -18,6 +19,7 @@ const ExerciseBox = ({
   updateWeightArrs,
   updateRepsArrs,
 }) => {
+  const [isModalVisible, setIsModalVisible] = useState(false);
   const [visibleSetIndex, setVisibleSetIndex] = useState(0);
   const [repsArray, setRepsArray] = useState(() =>
     Array(item.sets.length).fill(0)
@@ -139,6 +141,19 @@ const ExerciseBox = ({
                     Target: {item.sets[visibleSetIndex]} reps
                   </Text>
                 </View>
+                <TouchableOpacity onPress={() => setIsModalVisible(true)}>
+                  <MaterialCommunityIcons
+                    name="history"
+                    size={RFValue(25)}
+                    color="#2563eb"
+                  />
+                </TouchableOpacity>
+                <BottomModal
+                  isVisible={isModalVisible}
+                  onClose={() => setIsModalVisible(false)}
+                  exerciseId={item.id}
+                  setIndex={visibleSetIndex}
+                />
               </View>
 
               <View

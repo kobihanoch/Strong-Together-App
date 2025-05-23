@@ -24,6 +24,7 @@ import LoadingPage from "../components/LoadingPage";
 import ExerciseBox from "../components/StartWorkoutComponents/ExerciseBox";
 import { useFocusEffect } from "@react-navigation/native";
 import { BackHandler } from "react-native";
+import BottomModal from "../components/BottomModal";
 
 const { width, height } = Dimensions.get("window");
 
@@ -36,7 +37,6 @@ const StartWorkout = ({ navigation, route }) => {
   );
 
   const flatListRef = useRef(null);
-  const workoutTime = route.params?.workoutTime || 0;
 
   /*useEffect(() => {
     console.log("Updated weights: " + JSON.stringify(workoutData.weightArrs));
