@@ -6,11 +6,16 @@ import {
   addExercisesToSplit,
   updateExercisesToSplit,
 } from "../services/SplitExerciseService";
-import { addWorkout, deleteWorkout } from "../services/WorkoutService";
+import {
+  addWorkout,
+  deleteWorkout,
+  getUserWorkout,
+} from "../services/WorkoutService";
 import { addWorkoutSplits } from "../services/WorkoutSplitsService";
 import { useAuth } from "./AuthContext";
 import { useNavigation } from "@react-navigation/native";
 import MyWorkoutPlan from "../screens/MyWorkoutPlan";
+import { splitTheWorkout } from "../utils/sharedUtils";
 
 const CreateWorkoutContext = createContext();
 
@@ -25,7 +30,7 @@ export const CreateWorkoutProvider = ({ children }) => {
   const [isSaving, setIsSaving] = useState(false);
 
   // ----------------------------User----------------------------
-  const { user } = useAuth();
+  const { user, workout: workoutFromAuth } = useAuth();
 
   // ----------------------------Exercises in DB----------------------------
   const {
@@ -35,10 +40,14 @@ export const CreateWorkoutProvider = ({ children }) => {
   } = useExercises();
 
   // ----------------------------Fetched workout--------------------------------
-  const { workout, workoutSplits, exercises, loading, error } = useUserWorkout(
-    user?.id
-  );
-
+  const {
+    workout,
+    setWorkout,
+    workoutSplits,
+    setWorkoutSplits,
+    exercises,
+    setExercises,
+  } = workoutFromAuth;
   // If user has a workout: NEED TO ADD A FUNCTION THAT ARRANGES THE GIVEN DATA OF USER AND TRANSLATES IT TO THIS DATA STRUCTURE
   useEffect(() => {
     //console.log("User has workout?", workout != null);
@@ -63,8 +72,10 @@ export const CreateWorkoutProvider = ({ children }) => {
       //console.log(JSON.stringify(newSeletecExercises, null, 2));
       setSelectedExercises(newSeletecExercises);
       setCurrentStep(2);
+    } else {
+      setIsNewWorkout(true);
     }
-  }, [exercises]);
+  }, [workoutFromAuth]);
 
   // ----------------------------Step----------------------------
   const [currentStep, setCurrentStep] = useState(1);
@@ -74,7 +85,7 @@ export const CreateWorkoutProvider = ({ children }) => {
   }, [currentStep]);
 
   // ----------------------------Workout properties----------------------------
-  const [isNewWorkout, setIsNewWorkout] = useState(true);
+  const [isNewWorkout, setIsNewWorkout] = useState(false);
   const [splitsNumber, setSplitsNumber] = useState(1);
   const [selectedExercises, setSelectedExercises] = useState([]);
   const [focusedSplit, setFocusedSplit] = useState(null);
@@ -114,10 +125,12 @@ export const CreateWorkoutProvider = ({ children }) => {
 
   // Update the selected exercises array
   useEffect(() => {
-    console.log("🟡 splitsNumber changed:", splitsNumber);
-    const newSelectedExercisesArr = createNamedLetterArray(splitsNumber);
-    setSelectedExercises(newSelectedExercisesArr);
-  }, [splitsNumber]);
+    if (isNewWorkout) {
+      console.log("🟡 splitsNumber changed:", splitsNumber);
+      const newSelectedExercisesArr = createNamedLetterArray(splitsNumber);
+      setSelectedExercises(newSelectedExercisesArr);
+    }
+  }, [splitsNumber, isNewWorkout]);
 
   useEffect(() => {
     if (focusedSplit) {
@@ -217,7 +230,9 @@ export const CreateWorkoutProvider = ({ children }) => {
       if (isNewWorkout) {
         // If has already workout delete the first one
         if (workout) {
+          console.log("Got here");
           await deleteWorkout(user.id);
+          console.log("Got here 2");
         }
         // Create a new workout plan and get the id
         try {
@@ -226,6 +241,7 @@ export const CreateWorkoutProvider = ({ children }) => {
             "Power",
             splitsNumber
           );
+
           //const newWorkoutId = workoutPlan?.id;
           console.log("New workout plan created with id: ", workoutPlan.id);
 
@@ -233,7 +249,7 @@ export const CreateWorkoutProvider = ({ children }) => {
           const splitsArray = selectedExercises.map((split) => {
             return { name: split.name, workout_id: workoutPlan.id };
           });
-          const workoutSplitsIds = await addWorkoutSplits(splitsArray);
+          const workoutSplitsIds = await addWorkoutSplits(splitsArray); // Returns all object, not only id
           console.log("New workout splits ids: ", workoutSplitsIds);
 
           // Add the exercises to it
@@ -248,7 +264,7 @@ export const CreateWorkoutProvider = ({ children }) => {
           });
           await addExercisesToSplit(exercisesArray);
 
-          console.log("V!!!!!!!! :)");
+          //console.log("V!!!!!!!! :)");
         } catch (e) {
           hasError = true;
           console.error(e);
@@ -257,8 +273,24 @@ export const CreateWorkoutProvider = ({ children }) => {
       }
       // Update existing workout
       else {
-        await updateExercisesToSplit(selectedExercises, exercises, user.id); // Give new and old arrays to compare
+        try {
+          await updateExercisesToSplit(selectedExercises, exercises, user.id); // Give new and old arrays to compare
+        } catch (e) {
+          console.error(e);
+        }
       }
+
+      // Fetch all from DB and assign to cache
+      const fetchedWorkoutPlan = await getUserWorkout(user.id);
+      const {
+        workout: w,
+        workoutSplits: ws,
+        exercises: exs,
+      } = splitTheWorkout(fetchedWorkoutPlan);
+      // Add to cache (Auth context)
+      setWorkout(w);
+      setWorkoutSplits(ws);
+      setExercises(exs);
     } catch (e) {
       console.error(e);
       Alert.alert(e);
@@ -298,8 +330,6 @@ export const CreateWorkoutProvider = ({ children }) => {
           workout,
           workoutSplits,
           exercises,
-          loading,
-          error,
         },
         DB: {
           dbExercises,

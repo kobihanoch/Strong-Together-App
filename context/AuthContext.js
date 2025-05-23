@@ -1,12 +1,14 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { loginUser, registerUser } from "../services/AuthService";
-import { getUserData, getUserMessages } from "../services/UserService";
+import { getUserData } from "../services/UserService";
+import {
+  getUserExerciseTracking,
+  getUserWorkout,
+} from "../services/WorkoutService";
 import supabase from "../src/supabaseClient";
-import * as Updates from "expo-updates";
-import { getUserExerciseTracking } from "../services/WorkoutService";
-import { hasWorkoutForToday, filterMessagesByUnread } from "../utils/authUtils";
-import { NotificationsContext } from "./NotificationsContext";
+import { hasWorkoutForToday } from "../utils/authUtils";
+import { splitTheWorkout } from "../utils/sharedUtils";
 
 const AuthContext = createContext();
 
@@ -15,23 +17,62 @@ export const useAuth = () => useContext(AuthContext);
 let authListener = null;
 
 export const AuthProvider = ({ children, onLogout }) => {
+  // Auth states
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [hasTrainedToday, setHasTrainedToday] = useState(false);
+  const [sessionLoading, setSessionLoading] = useState(false);
 
+  // User data
+  const [user, setUser] = useState(null);
+  const [hasTrainedToday, setHasTrainedToday] = useState(false);
+  const [workout, setWorkout] = useState(null);
+  const [workoutSplits, setWorkoutSplits] = useState(null);
+  const [exercises, setExercises] = useState(null);
+  const [exerciseTracking, setExerciseTracking] = useState(null);
+
+  // Modes
+  const [isWorkoutMode, setIsWorkoutMode] = useState(false);
+
+  useEffect(() => {
+    console.log("is workout mode? ", isWorkoutMode);
+  }, [isWorkoutMode]);
+
+  // -------------------------------------------------------------------------------
   // Method for initializaztion
   const initializeUserSession = async (sessionUserId) => {
-    const userData = await getUserData(sessionUserId);
-    const exerciseTracking = await getUserExerciseTracking(sessionUserId);
+    setSessionLoading(true);
+    try {
+      // Fetch data
+      const userData = await getUserData(sessionUserId);
+      const userWorkoutData = await getUserWorkout(sessionUserId);
+      const exerciseTrackingData = await getUserExerciseTracking(sessionUserId);
+      const {
+        workout: wData,
+        workoutSplits: sData,
+        exercises: eData,
+      } = splitTheWorkout(userWorkoutData);
 
-    console.log("Userdata: ", userData);
+      // Assign to states
+      setUser(userData);
+      if (userWorkoutData) {
+        // Workout
+        setWorkout(wData);
+        setWorkoutSplits(sData);
+        setExercises(eData);
+      }
+      if (exerciseTrackingData) {
+        // Tracking
+        setExerciseTracking(exerciseTrackingData);
+        setHasTrainedToday(hasWorkoutForToday(exerciseTrackingData));
+      }
 
-    setUser(userData);
-    setHasTrainedToday(hasWorkoutForToday(exerciseTracking));
-
-    // Logged in state for navigating
-    setIsLoggedIn(true);
+      // Logged in state for navigating
+      setIsLoggedIn(true);
+    } catch (e) {
+      throw e;
+    } finally {
+      setSessionLoading(false);
+    }
   };
 
   // Sessions and fetch user
@@ -45,7 +86,7 @@ export const AuthProvider = ({ children, onLogout }) => {
 
       if (session) {
         console.log("Session exists");
-        initializeUserSession(session.user.id);
+        await initializeUserSession(session.user.id);
       } else {
         console.log("Session doesn't exist");
         setIsLoggedIn(false);
@@ -57,6 +98,24 @@ export const AuthProvider = ({ children, onLogout }) => {
       setLoading(false);
     }
   };
+
+  // Refresh token auto
+  useEffect(() => {
+    const { data: listener } = supabase.auth.onAuthStateChange(
+      async (event, session) => {
+        console.log("🔄 Auth state changed: ", event);
+        if (event === "USER_DELETED" || event === "SIGNED_OUT") {
+          clearStates();
+        }
+      }
+    );
+
+    authListener = listener;
+
+    return () => {
+      listener?.subscription?.unsubscribe?.();
+    };
+  }, []);
 
   // Load profile pic
   const updateProfilePic = (picUrl) => {
@@ -93,34 +152,44 @@ export const AuthProvider = ({ children, onLogout }) => {
   const login = async (username, password) => {
     try {
       setLoading(true);
-      const result = await loginUser(username, password);
-      if (!result.success) {
-        throw new Error(result.reason);
-      }
+      // Will throw on network, parse, or invalid creds
+      const { user, session } = await loginUser(username, password);
 
-      // Set session returned from server
+      // Save session in Supabase SDK
       await supabase.auth.setSession({
-        access_token: result.session.access_token,
-        refresh_token: result.session.refresh_token,
+        access_token: session.access_token,
+        refresh_token: session.refresh_token,
       });
-      setUser(result.user);
-      setIsLoggedIn(true);
-      //console.log(result.user.id);
-      //initializeUserSession(result.user.id);
-      console.log("✅ Login successful - waiting for onAuthStateChange...");
+
+      // Initialize user context
+      await initializeUserSession(user.id);
+      console.log("✅ Login successful");
     } catch (err) {
-      console.log("Error logging in: " + err.message);
+      console.log("Error logging in:", err.message);
+      // Rethrow so the calling UI can catch and display an alert
+      throw err;
     } finally {
       setLoading(false);
     }
   };
 
   const logout = async () => {
+    clearStates();
+
+    await AsyncStorage.clear();
+    await supabase.auth.signOut();
+  };
+
+  const clearStates = () => {
+    // Clear older data
     setIsLoggedIn(false);
     setUser(null);
-    //await Updates.reloadAsync();
-    //await AsyncStorage.clear();
-    await supabase.auth.signOut();
+    setWorkout(null);
+    setWorkoutSplits(null);
+    setExercises(null);
+    setExerciseTracking(null);
+    setHasTrainedToday(hasWorkoutForToday(null));
+    setIsWorkoutMode(false);
   };
 
   return (
@@ -133,12 +202,25 @@ export const AuthProvider = ({ children, onLogout }) => {
         logout,
         updateProfilePic,
         loading,
+        sessionLoading,
         setHasTrainedToday,
         hasTrainedToday,
         initial: {
           checkIfUserSession,
           initializeUserSession,
         },
+        workout: {
+          workout,
+          setWorkout,
+          workoutSplits,
+          setWorkoutSplits,
+          exercises,
+          setExercises,
+          exerciseTracking,
+          setExerciseTracking,
+        },
+        isWorkoutMode,
+        setIsWorkoutMode,
       }}
     >
       {children}

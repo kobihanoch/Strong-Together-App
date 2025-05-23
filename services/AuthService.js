@@ -50,47 +50,59 @@ export const registerUser = async (
   }
 };
 
-// Using edge function to login
+// Login
 export const loginUser = async (username, password) => {
-  try {
-    const url = `${SUPABASE_EDGE_URL}/login_user_by_username`;
-    //console.log("FULL URL:", url);
+  const url = `${SUPABASE_EDGE_URL}/login_user_by_username`;
 
-    const response = await fetch(url, {
+  // 0. Client-side missing fields
+  if (!username || !password) {
+    // Treat empty credentials as invalid
+    throw new Error("Username or password are incorrect.");
+  }
+
+  // 1. Network request
+  let response;
+  try {
+    response = await fetch(url, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ username, password }),
     });
-
-    const text = await response.text();
-    console.log("RAW response:", text);
-
-    let data = null;
-    try {
-      data = JSON.parse(text);
-    } catch (e) {
-      console.error("❌ JSON Parse Error:", e.message);
-      return {
-        success: false,
-        reason: "INVALID_JSON_FROM_EDGE",
-        raw: text,
-      };
-    }
-
-    if (!response.ok || !data.success) {
-      return {
-        success: false,
-        reason: data.reason || "UNKNOWN_ERROR",
-        error: data.error,
-      };
-    }
-    return { success: true, user: data.user, session: data.session };
   } catch (error) {
     console.error("Login error (EDGE):", error.message);
-    return { success: false, reason: "EDGE_CALL_FAILED", error };
+    // Network failure
+    throw new Error(
+      "Network error: please check your internet connection and try again."
+    );
   }
+
+  // 2. Parse response text
+  const text = await response.text();
+  let data;
+  try {
+    data = JSON.parse(text);
+  } catch (e) {
+    console.error("JSON Parse Error:", e.message);
+    // Malformed server response
+    throw new Error("Server error: received invalid response.");
+  }
+
+  // 3. Application-level success flag
+  if (!data.success || data.reason === "USERNAME_NOT_FOUND") {
+    console.error("Edge function returned failure:", data);
+    // Map any failure to credential mismatch
+    throw new Error("Username or password are incorrect.");
+  }
+
+  // 4. HTTP status errors
+  if (!response.ok) {
+    console.error("Edge function returned HTTP error:", data);
+    // Always treat as generic server error
+    throw new Error("Server error: please try again later.");
+  }
+
+  // 5. Return user and session on success
+  return { user: data.user, session: data.session };
 };
 
 export const logoutUser = async () => {

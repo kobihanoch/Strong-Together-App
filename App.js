@@ -22,6 +22,7 @@ import { createStackNavigator } from "@react-navigation/stack";
 import { NotificationsProvider } from "./context/NotificationsContext";
 import NotificationsSetup from "./notifications/NotificationsSetup";
 import * as Notifications from "expo-notifications";
+import LoadingPage from "./components/LoadingPage";
 
 const RootStack = createStackNavigator();
 
@@ -53,17 +54,6 @@ export default function App() {
     loadFonts();
   }, []);
 
-  const handleLogoutReset = () => {
-    if (navigationRef.isReady()) {
-      navigationRef.dispatch(
-        CommonActions.reset({
-          index: 0,
-          routes: [{ name: "Auth" }],
-        })
-      );
-    }
-  };
-
   if (!fontsLoaded) {
     return (
       <View style={styles.loadingContainer}>
@@ -74,7 +64,7 @@ export default function App() {
   }
 
   return (
-    <AuthProvider onLogout={handleLogoutReset}>
+    <AuthProvider>
       <WrappedWithNotifications />
     </AuthProvider>
   );
@@ -94,7 +84,7 @@ const WrappedWithNotifications = () => {
 };
 
 function MainNavigator() {
-  const { isLoggedIn, initial } = useAuth();
+  const { isLoggedIn, initial, sessionLoading } = useAuth();
   useEffect(() => {
     (async () => {
       await initial.checkIfUserSession();
@@ -102,6 +92,10 @@ function MainNavigator() {
   }, []);
   console.log("🧠 isLoggedIn value:", isLoggedIn);
 
+  // If session is initialized - don't show auth screen but loading screen instead - can be customized in future
+  if (sessionLoading) {
+    return <LoadingPage message="Logging in..."></LoadingPage>;
+  }
   return (
     <RootStack.Navigator screenOptions={{ headerShown: false }}>
       {isLoggedIn ? (

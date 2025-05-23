@@ -26,26 +26,8 @@ export const useUserWorkout = (userId) => {
       splitTheWorkout(data);
       //console.log(JSON.stringify(data, null, 2));
       setUserWorkout(data);
-    } catch (err) {
-      setError(err);
-      console.log("Failed. Error: " + err);
-    } finally {
-      //await new Promise((resolve) => setTimeout(resolve, 2000));
-      setLoading(false);
-      console.log(
-        "useUserWorkout: Data fetched from hook succesfully! State was updated."
-      );
-    }
-  };
-
-  const fetchUserExerciseTracking = async () => {
-    if (!userId) return;
-    setLoading(true);
-    try {
-      //console.log("Trying to fetch data from hook...");
-      const data = await getUserExerciseTracking(userId);
-      //console.log(JSON.stringify(data));
-      setExerciseTracking(data);
+      const data2 = await getUserExerciseTracking(userId);
+      setExerciseTracking(data2);
       const frequentSplit = await getMostFrequentSplitNameByUserId(userId);
       setMostFrequentSplit(frequentSplit);
     } catch (err) {
@@ -95,9 +77,9 @@ export const useUserWorkout = (userId) => {
     }
   };
 
-  useEffect(() => {
+  /*useEffect(() => {
     fetchUserWorkout();
-  }, [userId]);
+  }, [userId]);*/
 
   const saveWorkoutProccess = async (workoutData) => {
     setSaving(true);
@@ -117,7 +99,6 @@ export const useUserWorkout = (userId) => {
     loading,
     error,
     refetch: fetchUserWorkout,
-    fetchUserExerciseTracking,
     exerciseTracking,
     workout,
     workoutSplits,

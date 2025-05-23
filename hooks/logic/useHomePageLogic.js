@@ -9,6 +9,8 @@ import {
 } from "../../utils/homePageUtils";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import useSystemMessages from "../automations/useSystemMessages";
+import { useAuth } from "../../context/AuthContext";
+import { getMostFrequentSplitNameByUserId } from "../../services/ExerciseTrackingService";
 
 const useHomePageLogic = (user) => {
   // Send welcome message for the first time
@@ -36,21 +38,18 @@ const useHomePageLogic = (user) => {
       }
     })();
   }, [user]);
+
+  // User data
   const [username, setUsername] = useState(null);
   const [userId, setUserId] = useState(null);
   const [firstName, setFirstName] = useState(null);
-  const {
-    refetch,
-    workout,
-    workoutSplits,
-    loading: workoutLoading,
-    error,
-    exerciseTracking,
-    fetchUserExerciseTracking,
-    mostFrequentSplit,
-  } = useUserWorkout(user?.id);
 
+  // Workout from context and unpack
+  const { workout, workoutSplits, exerciseTracking } = useAuth().workout;
+
+  // Inner states
   const [hasAssignedWorkout, setHasAssignedWorkout] = useState(false);
+  const [mostFrequentSplit, setMostFrequentSplit] = useState(null);
   const [profileImageUrl, setProfileImageUrl] = useState(null);
   const [lastWorkoutDate, setLastWorkoutDate] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -64,7 +63,8 @@ const useHomePageLogic = (user) => {
       if (user && user.username && user.id) {
         setLoading(true);
         try {
-          await fetchUserExerciseTracking();
+          const freSplit = await getMostFrequentSplitNameByUserId(user.id);
+          setMostFrequentSplit(freSplit);
           setUsername(user.username);
           setFirstName(user.name.split(" ")[0]);
           setUserId(user.id);
@@ -80,19 +80,12 @@ const useHomePageLogic = (user) => {
     loadData();
   }, [user]);
 
+  // Sets PR
   useEffect(() => {
     if (exerciseTracking && exerciseTracking.length > 0) {
       setPR(getUserGeneralPR(exerciseTracking));
     }
   }, [exerciseTracking]);
-
-  useFocusEffect(
-    React.useCallback(() => {
-      if (user?.id) {
-        refetch();
-      }
-    }, [user?.id])
-  );
 
   // Set user's assigned workout state after user is loaded
   useEffect(() => {
@@ -137,7 +130,6 @@ const useHomePageLogic = (user) => {
       exerciseTracking: exerciseTracking ?? null,
     },
     loading,
-    error,
   };
 };
 

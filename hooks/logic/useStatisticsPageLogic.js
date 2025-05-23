@@ -4,20 +4,14 @@ import {
   filterExercisesByDate,
   getLastWorkoutForEachExercise,
 } from "../../utils/statisticsUtils";
-import { useUserWorkout } from "../useUserWorkout";
+import { useAuth } from "../../context/AuthContext";
 
 const useStatisticsPageLogic = (user) => {
-  const { loading, fetchUserExerciseTracking, exerciseTracking } =
-    useUserWorkout(user?.id);
+  const { exerciseTracking } = useAuth().workout;
   const [selectedDate, setSelectedDate] = useState(moment());
   const [exerciseTrackingByDate, setExerciseTrackingByDate] = useState(null);
   const [exerciseTrackingByDatePrev, setExerciseTrackingByDatePrev] =
     useState(null);
-
-  // Gets all exercise tracking of user
-  useEffect(() => {
-    fetchUserExerciseTracking();
-  }, []);
 
   // Load prev workout data for each workout
   useEffect(() => {
@@ -37,15 +31,14 @@ const useStatisticsPageLogic = (user) => {
 
   // Load selected workout on load up
   useEffect(() => {
-    if (!loading && exerciseTracking && exerciseTracking.length > 0) {
+    if (exerciseTracking && exerciseTracking.length > 0) {
       const formattedDate = moment(selectedDate).format("YYYY-MM-DD");
       const filtered = filterExercisesByDate(exerciseTracking, formattedDate);
       setExerciseTrackingByDate(filtered);
     }
-  }, [loading]);
+  }, []);
 
   return {
-    loading,
     selectedDate,
     setSelectedDate,
     exerciseTracking,

@@ -1,5 +1,5 @@
 import React from "react";
-import { Dimensions, Text, View } from "react-native";
+import { Alert, Dimensions, Text, View } from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import { useCreateWorkout } from "../../../context/CreateWorkoutContext";
@@ -65,7 +65,23 @@ function ModifySplitNamesScreen() {
           <GradientedGoToButton
             gradientColors={["#2979FF", "#2979FF"]}
             borderRadius={height * 0.1}
-            onPress={() => properties.setCurrentStep(1)}
+            onPress={() => {
+              Alert.alert(
+                "Reset workout?",
+                "Going back will reset your current workout and delete all sets you've logged so far.\n\nThis action is only finalized if you save again.",
+                [
+                  {
+                    text: "Cancel",
+                    style: "cancel",
+                  },
+                  {
+                    text: "Continue",
+                    style: "destructive",
+                    onPress: () => properties.setCurrentStep(1),
+                  },
+                ]
+              );
+            }}
           >
             <View
               style={{
@@ -88,7 +104,7 @@ function ModifySplitNamesScreen() {
                   fontSize: RFValue(15),
                 }}
               >
-                Back
+                Splits
               </Text>
             </View>
           </GradientedGoToButton>
