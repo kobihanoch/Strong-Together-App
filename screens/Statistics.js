@@ -49,7 +49,7 @@ const StatisticsPage = () => {
         <ExercisesFlatList
           data={exerciseTrackingByDate}
           dataToCompare={exerciseTrackingByDatePrev || []}
-          exerciseTracking={exerciseTracking}
+          exerciseTracking={exerciseTracking ?? []}
         ></ExercisesFlatList>
       </View>
     </View>

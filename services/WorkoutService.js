@@ -1,3 +1,4 @@
+import api from "../api/api";
 import supabase from "../src/supabaseClient";
 
 // Fetch workouts by user ID
@@ -11,32 +12,24 @@ export const fetchWorkoutsByUserId = async (userId) => {
   return data;
 };
 
-// Gets user workout learning
-export const getUserWorkout = async (userId) => {
-  const { data, error } = await supabase
-    .from("workoutplans")
-    .select(
-      "*, workoutsplits(*, exercisetoworkoutsplit(*, exercises (description, targetmuscle, specifictargetmuscle)))"
-    )
-    .eq("user_id", userId)
-    .single();
-  if (error) {
-    console.log(error);
+// Fetch self workout plan
+export const getUserWorkout = async () => {
+  try {
+    const response = await api.get("/api/workouts/getworkout");
+    return response;
+  } catch (error) {
+    throw error;
   }
-  //console.log(">>>>>>>>>>>>>>>>>>>", data);
-  return data;
 };
 
 // Gets user workout learning
 export const getUserExerciseTracking = async (userId) => {
-  const { data, error } = await supabase
-    .from("exercisetracking")
-    .select(
-      "*, exercisetoworkoutsplit(exercises(targetmuscle, specifictargetmuscle))"
-    )
-    .eq("user_id", userId);
-  console.log("WorkoutService: exercisetracking were fetched successfully!");
-  return data;
+  try {
+    const response = await api.get("/api/workouts/gettracking");
+    return response;
+  } catch (error) {
+    throw error;
+  }
 };
 
 // Removes a workout plan

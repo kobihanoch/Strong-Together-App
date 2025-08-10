@@ -8,7 +8,10 @@ import { useAuth } from "../../context/AuthContext";
 
 const useStatisticsPageLogic = (user) => {
   const { exerciseTracking } = useAuth().workout;
-  const [selectedDate, setSelectedDate] = useState(moment());
+  const [selectedDate, setSelectedDate] = useState(
+    moment().format("YYYY-MM-DD")
+  );
+
   const [exerciseTrackingByDate, setExerciseTrackingByDate] = useState(null);
   const [exerciseTrackingByDatePrev, setExerciseTrackingByDatePrev] =
     useState(null);
@@ -27,7 +30,7 @@ const useStatisticsPageLogic = (user) => {
         filterExercisesByDate(exerciseTracking, selectedDate)
       );
     }
-  }, [selectedDate]);
+  }, [selectedDate, exerciseTracking]);
 
   // Load selected workout on load up
   useEffect(() => {
