@@ -18,7 +18,7 @@ const SetItem = ({
 
   const handleRepsChange = (text) => {
     const reps = parseInt(text, 10) || 0;
-    handleUpdateSet(exercisetosplit_id, null, reps, index); // שליחת ערך החזרות ל-ExerciseItem
+    handleUpdateSet(exercisetosplit_id, null, reps, index);
   };
 
   return (
