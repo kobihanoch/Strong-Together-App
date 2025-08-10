@@ -9,10 +9,23 @@ import { getRefreshToken } from "../utils/tokenStore";
 // Check auth
 export const checkAuth = async () => {
   try {
-    const response = await api.post("/api/auth/checkauth", {
-      username,
-      password,
+    const refreshToken = await getRefreshToken();
+    const response = await api.get("/api/auth/checkauth", {
+      headers: {
+        "x-refresh-token": `Bearer ${refreshToken}`,
+      },
     });
+    return response;
+  } catch (error) {
+    throw error;
+  }
+};
+
+// Fetch self data
+export const fetchSelfUserData = async () => {
+  try {
+    console.log("Calling fetch self");
+    const response = await api.get("/api/users/get");
     return response;
   } catch (error) {
     throw error;

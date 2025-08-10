@@ -1,6 +1,12 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import React, { createContext, useContext, useEffect, useState } from "react";
-import { loginUser, logoutUser, registerUser } from "../services/AuthService";
+import {
+  checkAuth,
+  fetchSelfUserData,
+  loginUser,
+  logoutUser,
+  registerUser,
+} from "../services/AuthService";
 import { getUserData } from "../services/UserService";
 import {
   getUserExerciseTracking,
@@ -110,45 +116,28 @@ export const AuthProvider = ({ children, onLogout }) => {
 
   // Sessions and fetch user
   const checkIfUserSession = async () => {
-    setLoading(true);
+    setSessionLoading(true);
     try {
-      const {
-        data: { session },
-        error,
-      } = await supabase.auth.getSession();
+      const res = await checkAuth();
+      const accessTokenRes = res.data.accessToken;
+      const refreshTokenRes = res.data.refreshToken;
 
-      if (session) {
-        console.log("Session exists");
-        await initializeUserSession(session.user.id);
-      } else {
-        console.log("Session doesn't exist");
-        setIsLoggedIn(false);
-        setUser(null);
-      }
+      // Save tokens
+      GlobalAuth.getAccessToken = () => accessTokenRes;
+      setAccessToken(accessTokenRes);
+      saveRefreshToken(refreshTokenRes);
+
+      // Fetch user meta data
+      const user = await fetchSelfUserData();
+      setIsLoggedIn(true);
+      setUser(user.data);
+      // Need to fetch workout data
     } catch (err) {
       throw err;
     } finally {
-      setLoading(false);
+      setSessionLoading(false);
     }
   };
-
-  // Refresh token auto
-  useEffect(() => {
-    const { data: listener } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
-        console.log("🔄 Auth state changed: ", event);
-        if (event === "USER_DELETED" || event === "SIGNED_OUT") {
-          clearStates();
-        }
-      }
-    );
-
-    authListener = listener;
-
-    return () => {
-      listener?.subscription?.unsubscribe?.();
-    };
-  }, []);
 
   // Load profile pic
   const updateProfilePic = (picUrl) => {
@@ -191,6 +180,7 @@ export const AuthProvider = ({ children, onLogout }) => {
       const { accessToken: resAT, refreshToken: resRT } = userData.data;
       setAccessToken(resAT);
       GlobalAuth.getAccessToken = () => resAT;
+      // Save to cache
       saveRefreshToken(resRT);
       // Need to add fetch data
     } catch (err) {
@@ -204,7 +194,6 @@ export const AuthProvider = ({ children, onLogout }) => {
     try {
       setLoading(true);
       await logoutUser();
-      // Need to add fetch data
     } catch (err) {
       console.log(err.response.data);
     } finally {
