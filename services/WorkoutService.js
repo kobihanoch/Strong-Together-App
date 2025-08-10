@@ -24,14 +24,12 @@ export const getUserWorkout = async () => {
 
 // Gets user workout learning
 export const getUserExerciseTracking = async (userId) => {
-  const { data, error } = await supabase
-    .from("exercisetracking")
-    .select(
-      "*, exercisetoworkoutsplit(exercises(targetmuscle, specifictargetmuscle))"
-    )
-    .eq("user_id", userId);
-  console.log("WorkoutService: exercisetracking were fetched successfully!");
-  return data;
+  try {
+    const response = await api.get("/api/workouts/gettracking");
+    return response;
+  } catch (error) {
+    throw error;
+  }
 };
 
 // Removes a workout plan

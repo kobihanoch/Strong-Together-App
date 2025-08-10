@@ -83,7 +83,7 @@ export const AuthProvider = ({ children, onLogout }) => {
     try {
       // Fetch user workout
       const userWorkoutData = await getUserWorkout();
-      const exerciseTrackingData = await getUserExerciseTracking(sessionUserId);
+      const exerciseTrackingData = await getUserExerciseTracking();
       const {
         workout: wData,
         workoutSplits: sData,
@@ -92,7 +92,6 @@ export const AuthProvider = ({ children, onLogout }) => {
 
       // Assign to states
       if (userWorkoutData) {
-        console.log("here");
         // Workout
         setWorkout(wData);
         setWorkoutSplits(sData);
@@ -100,12 +99,9 @@ export const AuthProvider = ({ children, onLogout }) => {
       }
       if (exerciseTrackingData) {
         // Tracking
-        setExerciseTracking(exerciseTrackingData);
-        setHasTrainedToday(hasWorkoutForToday(exerciseTrackingData));
+        setExerciseTracking(exerciseTrackingData.data);
+        setHasTrainedToday(hasWorkoutForToday(exerciseTrackingData.data));
       }
-
-      // Logged in state for navigating
-      setIsLoggedIn(true);
     } catch (e) {
       throw e;
     } finally {
