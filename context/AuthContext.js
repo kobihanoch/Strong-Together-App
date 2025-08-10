@@ -1,41 +1,41 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import React, { createContext, useContext, useEffect, useState } from "react";
 import {
-  checkAuth,
   fetchSelfUserData,
   loginUser,
   logoutUser,
+  refreshAndRotateTokens,
   registerUser,
 } from "../services/AuthService";
-import { getUserData } from "../services/UserService";
 import {
   getUserExerciseTracking,
   getUserWorkout,
 } from "../services/WorkoutService";
-import supabase from "../src/supabaseClient";
 import { hasWorkoutForToday } from "../utils/authUtils";
 import { splitTheWorkout } from "../utils/sharedUtils";
 import { clearRefreshToken, saveRefreshToken } from "../utils/tokenStore";
 
 const AuthContext = createContext();
-
 export const useAuth = () => useContext(AuthContext);
 
-let authListener = null;
+// Single source of truth for access token across app and interceptors.
+let _accessToken = null;
+
 export const GlobalAuth = {
+  getAccessToken: () => _accessToken,
+  setAccessToken: (t) => {
+    _accessToken = t;
+  },
   setUser: null,
   setIsLoggedIn: null,
   logout: null,
 };
 
 export const AuthProvider = ({ children, onLogout }) => {
-  // Auth states
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [loading, setLoading] = useState(false);
   const [sessionLoading, setSessionLoading] = useState(false);
-  const [accessToken, setAccessToken] = useState(null);
 
-  // User data
   const [user, setUser] = useState(null);
   const [hasTrainedToday, setHasTrainedToday] = useState(false);
   const [workout, setWorkout] = useState(null);
@@ -43,18 +43,11 @@ export const AuthProvider = ({ children, onLogout }) => {
   const [exercises, setExercises] = useState(null);
   const [exerciseTracking, setExerciseTracking] = useState(null);
 
-  // Modes
   const [isWorkoutMode, setIsWorkoutMode] = useState(false);
 
-  useEffect(() => {
-    console.log("is workout mode? ", isWorkoutMode);
-  }, [isWorkoutMode]);
-
-  // -------------------------------------------------------------------------------
-  // Export global auth
+  // Expose global callbacks once (do not depend on accessToken to avoid resetting closures).
   useEffect(() => {
     GlobalAuth.setUser = setUser;
-    GlobalAuth.getAccessToken = () => accessToken;
     GlobalAuth.setIsLoggedIn = setIsLoggedIn;
     GlobalAuth.logout = async () => {
       setIsLoggedIn(false);
@@ -65,9 +58,10 @@ export const AuthProvider = ({ children, onLogout }) => {
       setExerciseTracking(null);
       setHasTrainedToday(hasWorkoutForToday(null));
       setIsWorkoutMode(false);
+      GlobalAuth.setAccessToken(null);
+      api.defaults.headers.common.Authorization = undefined;
 
-      await AsyncStorage.clear();
-      await supabase.auth.signOut();
+      await clearRefreshToken();
     };
 
     return () => {
@@ -75,59 +69,50 @@ export const AuthProvider = ({ children, onLogout }) => {
       GlobalAuth.setIsLoggedIn = null;
       GlobalAuth.logout = null;
     };
-  }, [accessToken]);
+  }, []);
 
-  // Method for initializaztion
-  const initializeUserSession = async (sessionUserId) => {
+  const initializeUserSession = async () => {
     setSessionLoading(true);
     try {
-      // Fetch user workout
       const userWorkoutData = await getUserWorkout();
       const exerciseTrackingData = await getUserExerciseTracking();
       const {
         workout: wData,
         workoutSplits: sData,
         exercises: eData,
-      } = splitTheWorkout(userWorkoutData.data);
+      } = splitTheWorkout(userWorkoutData?.data);
 
-      // Assign to states
       if (userWorkoutData) {
-        // Workout
         setWorkout(wData);
         setWorkoutSplits(sData);
         setExercises(eData);
       }
       if (exerciseTrackingData) {
-        // Tracking
         setExerciseTracking(exerciseTrackingData.data);
         setHasTrainedToday(hasWorkoutForToday(exerciseTrackingData.data));
       }
-    } catch (e) {
-      throw e;
     } finally {
       setSessionLoading(false);
     }
   };
 
-  // Sessions and fetch user
+  // On app start: rotate tokens via checkAuth and only then load data.
   const checkIfUserSession = async () => {
     setSessionLoading(true);
     try {
-      const res = await checkAuth();
-      const accessTokenRes = res.data.accessToken;
-      const refreshTokenRes = res.data.refreshToken;
+      const { accessToken: at, refreshToken: rt } =
+        await refreshAndRotateTokens(); // server rotates both tokens here
 
-      // Save tokens
-      GlobalAuth.getAccessToken = () => accessTokenRes;
-      setAccessToken(accessTokenRes);
-      saveRefreshToken(refreshTokenRes);
+      console.log(at, rt);
 
-      // Fetch user meta data
-      const user = await fetchSelfUserData();
+      // Persist refresh first, then update in-memory and state access.
+      await saveRefreshToken(rt);
+      GlobalAuth.setAccessToken(at);
+
+      const u = await fetchSelfUserData();
       setIsLoggedIn(true);
-      setUser(user.data);
+      setUser(u.data);
 
-      // Initialize data
       await initializeUserSession();
     } catch (err) {
       throw err;
@@ -136,7 +121,6 @@ export const AuthProvider = ({ children, onLogout }) => {
     }
   };
 
-  // Load profile pic
   const updateProfilePic = (picUrl) => {
     setUser((prevUser) => {
       const updatedUser = { ...prevUser, profile_image_url: picUrl };
@@ -155,65 +139,46 @@ export const AuthProvider = ({ children, onLogout }) => {
         fullName,
         gender
       );
-
-      if (!result.success) {
-        console.log(result.reason);
-      } else {
+      if (result?.success) {
         await login(username, password);
+      } else {
+        console.log(result?.reason);
       }
-    } catch (e) {
-      console.log(e);
     } finally {
       setLoading(false);
     }
   };
 
   const login = async (username, password) => {
+    setLoading(true);
     try {
-      setLoading(true);
       const userData = await loginUser(username, password);
       setIsLoggedIn(true);
       setUser(userData.data.user);
-      const { accessToken: resAT, refreshToken: resRT } = userData.data;
-      setAccessToken(resAT);
-      GlobalAuth.getAccessToken = () => resAT;
 
-      // Save to cache
-      saveRefreshToken(resRT);
+      const { accessToken: at, refreshToken: rt } = userData.data;
+      await saveRefreshToken(rt);
+      GlobalAuth.setAccessToken(at);
 
-      // Initialize data
       await initializeUserSession();
     } catch (err) {
-      console.log(err.response.data);
+      console.log(err?.response?.data || err.message);
+      throw err;
     } finally {
       setLoading(false);
     }
   };
 
   const logout = async () => {
+    setLoading(true);
     try {
-      setLoading(true);
       await logoutUser();
     } catch (err) {
-      console.log(err.response.data);
+      console.log(err?.response?.data || err.message);
     } finally {
-      clearStates();
+      if (GlobalAuth.logout) await GlobalAuth.logout();
       setLoading(false);
     }
-  };
-
-  const clearStates = () => {
-    // Clear older data
-    setIsLoggedIn(false);
-    setUser(null);
-    setWorkout(null);
-    setWorkoutSplits(null);
-    setExercises(null);
-    setExerciseTracking(null);
-    setHasTrainedToday(hasWorkoutForToday(null));
-    setIsWorkoutMode(false);
-    setAccessToken(null);
-    clearRefreshToken();
   };
 
   return (
@@ -221,8 +186,6 @@ export const AuthProvider = ({ children, onLogout }) => {
       value={{
         isLoggedIn,
         user,
-        accessToken,
-        setAccessToken,
         register,
         login,
         logout,

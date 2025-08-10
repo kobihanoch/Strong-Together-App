@@ -1,63 +1,109 @@
 import axios from "axios";
 import { API_BASE_URL } from "./apiConfig";
 import { GlobalAuth } from "../context/AuthContext.js";
+import { getRefreshToken, saveRefreshToken } from "../utils/tokenStore";
+import { refreshAndRotateTokens } from "../services/AuthService";
 
-const api = axios.create({
-  baseURL: API_BASE_URL,
-});
+const api = axios.create({ baseURL: API_BASE_URL });
 
-// Interceptor for requests
+// Concurrency guard for refresh
+let refreshingPromise = null;
+let refreshSubscribers = [];
+const subscribeTokenRefresh = (cb) => refreshSubscribers.push(cb);
+const onTokenRefreshed = (newToken) => {
+  refreshSubscribers.forEach((cb) => cb(newToken));
+  refreshSubscribers = [];
+};
+
+// Attach access token to every outgoing request (if present)
 api.interceptors.request.use(
-  (config) => {
-    // If user is logged in => join access token to requests
-    const at = GlobalAuth.getAccessToken();
+  async (config) => {
+    const at = GlobalAuth.getAccessToken && GlobalAuth.getAccessToken();
     if (at) {
       config.headers = config.headers || {};
       config.headers.Authorization = `Bearer ${at}`;
     }
     return config;
   },
-  (error) => {
-    return Promise.reject(error);
-  }
+  (error) => Promise.reject(error)
 );
 
-// Interceptor for responses
+// Handle 401 responses with single-flight refresh and retry
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config;
 
-    // Skip beacuse if there are errors -
-    // don't catch them by refresh token error (The will pass the condition because user is not authenticated yet)
-    const skipRefreshRoutes = ["/api/auth/login", "/api/users/create"];
+    // Network/timeout errors without a response object
+    if (!error.response) {
+      return Promise.reject(error);
+    }
+
+    const skipRefreshRoutes = [
+      "/api/auth/login",
+      "/api/users/create",
+      "/api/auth/checkauth",
+      "/api/auth/logout",
+    ];
     if (
-      skipRefreshRoutes.some((route) => originalRequest.url.includes(route))
+      originalRequest?.url &&
+      skipRefreshRoutes.some((r) => originalRequest.url.includes(r))
     ) {
       return Promise.reject(error);
     }
 
-    // If refreshing 2nd time - don't try again - set user to null - for refresh token failures
-    if (originalRequest.url.includes("/api/auth/refresh")) {
-      GlobalAuth.logout();
-      return Promise.reject(error); // Throw error
+    // If refresh endpoint itself failed → force logout
+    if (originalRequest?.url?.includes("/api/auth/refresh")) {
+      if (GlobalAuth.logout) GlobalAuth.logout();
+      return Promise.reject(error);
     }
 
-    // If first time - try to refresh if not already retried - try to generate a new access token
-    if (
-      error.response &&
-      error.response.status === 401 &&
-      !originalRequest._retry
-    ) {
+    if (error.response.status === 401) {
+      // If we've already retried this request, logout to avoid loops
+      if (originalRequest._retry) {
+        if (GlobalAuth.logout) GlobalAuth.logout();
+        return Promise.reject(error);
+      }
       originalRequest._retry = true;
 
       try {
-        await api.post("/api/auth/refresh");
+        // If a refresh is already in-flight, wait and then retry with the new token
+        if (refreshingPromise) {
+          return new Promise((resolve) => {
+            subscribeTokenRefresh((newToken) => {
+              originalRequest.headers = originalRequest.headers || {};
+              originalRequest.headers.Authorization = `Bearer ${newToken}`;
+              resolve(api(originalRequest));
+            });
+          });
+        }
+
+        refreshingPromise = (async () => {
+          // get new tokens
+          const { accessToken, refreshToken } = await refreshAndRotateTokens();
+
+          // save & publish
+          GlobalAuth.setAccessToken && GlobalAuth.setAccessToken(accessToken);
+          if (refreshToken) await saveRefreshToken(refreshToken);
+
+          // make sure new requests use the fresh token
+          api.defaults.headers.common.Authorization = `Bearer ${accessToken}`;
+
+          onTokenRefreshed(accessToken);
+          return accessToken;
+        })();
+
+        const newToken = await refreshingPromise;
+        refreshingPromise = null;
+
+        // Retry the original request with the fresh token
+        originalRequest.headers = originalRequest.headers || {};
+        originalRequest.headers.Authorization = `Bearer ${newToken}`;
         return api(originalRequest);
-      } catch (refreshError) {
-        console.error("Refresh token failed:", refreshError);
-        GlobalAuth.logout();
-        return Promise.reject(refreshError);
+      } catch (refreshErr) {
+        refreshingPromise = null;
+        if (GlobalAuth.logout) GlobalAuth.logout();
+        return Promise.reject(refreshErr);
       }
     }
 
