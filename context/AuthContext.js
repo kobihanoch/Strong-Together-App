@@ -9,18 +9,25 @@ import {
 import supabase from "../src/supabaseClient";
 import { hasWorkoutForToday } from "../utils/authUtils";
 import { splitTheWorkout } from "../utils/sharedUtils";
+import { clearRefreshToken, saveRefreshToken } from "../utils/tokenStore";
 
 const AuthContext = createContext();
 
 export const useAuth = () => useContext(AuthContext);
 
 let authListener = null;
+export const GlobalAuth = {
+  setUser: null,
+  setIsLoggedIn: null,
+  logout: null,
+};
 
 export const AuthProvider = ({ children, onLogout }) => {
   // Auth states
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [loading, setLoading] = useState(false);
   const [sessionLoading, setSessionLoading] = useState(false);
+  const [accessToken, setAccessToken] = useState(null);
 
   // User data
   const [user, setUser] = useState(null);
@@ -38,6 +45,32 @@ export const AuthProvider = ({ children, onLogout }) => {
   }, [isWorkoutMode]);
 
   // -------------------------------------------------------------------------------
+  // Export global auth
+  useEffect(() => {
+    GlobalAuth.setUser = setUser;
+    GlobalAuth.accessToken = accessToken;
+    GlobalAuth.setIsLoggedIn = setIsLoggedIn;
+    GlobalAuth.logout = async () => {
+      setIsLoggedIn(false);
+      setUser(null);
+      setWorkout(null);
+      setWorkoutSplits(null);
+      setExercises(null);
+      setExerciseTracking(null);
+      setHasTrainedToday(hasWorkoutForToday(null));
+      setIsWorkoutMode(false);
+
+      await AsyncStorage.clear();
+      await supabase.auth.signOut();
+    };
+
+    return () => {
+      GlobalAuth.setUser = null;
+      GlobalAuth.setIsLoggedIn = null;
+      GlobalAuth.logout = null;
+    };
+  }, []);
+
   // Method for initializaztion
   const initializeUserSession = async (sessionUserId) => {
     setSessionLoading(true);
@@ -152,32 +185,31 @@ export const AuthProvider = ({ children, onLogout }) => {
   const login = async (username, password) => {
     try {
       setLoading(true);
-      // Will throw on network, parse, or invalid creds
-      const { user, session } = await loginUser(username, password);
-
-      // Save session in Supabase SDK
-      await supabase.auth.setSession({
-        access_token: session.access_token,
-        refresh_token: session.refresh_token,
-      });
-
-      // Initialize user context
-      await initializeUserSession(user.id);
-      console.log("✅ Login successful");
+      const userData = await loginUser(username, password);
+      setIsLoggedIn(true);
+      setUser(userData.data.user);
+      const { accessToken: resAT, refreshToken: resRT } = userData.data;
+      setAccessToken(resAT);
+      saveRefreshToken(resRT);
+      // Need to add fetch data
     } catch (err) {
-      console.log("Error logging in:", err.message);
-      // Rethrow so the calling UI can catch and display an alert
-      throw err;
+      console.log(err.response.data);
     } finally {
       setLoading(false);
     }
   };
 
   const logout = async () => {
-    clearStates();
-
-    await AsyncStorage.clear();
-    await supabase.auth.signOut();
+    try {
+      setLoading(true);
+      const userData = await logoutUser();
+      // Need to add fetch data
+    } catch (err) {
+      console.log(err.response.data);
+    } finally {
+      clearStates();
+      setLoading(false);
+    }
   };
 
   const clearStates = () => {
@@ -190,6 +222,8 @@ export const AuthProvider = ({ children, onLogout }) => {
     setExerciseTracking(null);
     setHasTrainedToday(hasWorkoutForToday(null));
     setIsWorkoutMode(false);
+    setAccessToken(null);
+    clearRefreshToken();
   };
 
   return (
@@ -197,6 +231,8 @@ export const AuthProvider = ({ children, onLogout }) => {
       value={{
         isLoggedIn,
         user,
+        accessToken,
+        setAccessToken,
         register,
         login,
         logout,

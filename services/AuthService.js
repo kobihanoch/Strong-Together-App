@@ -3,6 +3,40 @@ import { Alert } from "react-native";
 import supabase from "../src/supabaseClient";
 import { getEmailByUsername } from "./UserService";
 import { SUPABASE_EDGE_URL } from "@env";
+import api from "../api/api";
+
+// Check auth
+export const checkAuth = async () => {
+  try {
+    const response = await api.post("/api/auth/checkauth", {
+      username,
+      password,
+    });
+    return response;
+  } catch (error) {
+    throw error;
+  }
+};
+
+// Login
+export const loginUser = async (username, password) => {
+  try {
+    const response = await api.post("/api/auth/login", { username, password });
+    return response;
+  } catch (error) {
+    throw error;
+  }
+};
+
+// Log out a user
+export const logoutUser = async () => {
+  try {
+    const response = await api.post("/api/auth/logout");
+    return response;
+  } catch (error) {
+    throw error;
+  }
+};
 
 // Using edge function to register
 export const registerUser = async (
@@ -47,80 +81,5 @@ export const registerUser = async (
       reason: "NETWORK_ERROR",
       error: error.message,
     };
-  }
-};
-
-// Login
-export const loginUser = async (username, password) => {
-  const url = `${SUPABASE_EDGE_URL}/login_user_by_username`;
-
-  // 0. Client-side missing fields
-  if (!username || !password) {
-    // Treat empty credentials as invalid
-    throw new Error("Username or password are incorrect.");
-  }
-
-  // 1. Network request
-  let response;
-  try {
-    response = await fetch(url, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ username, password }),
-    });
-  } catch (error) {
-    console.error("Login error (EDGE):", error.message);
-    // Network failure
-    throw new Error(
-      "Network error: please check your internet connection and try again."
-    );
-  }
-
-  // 2. Parse response text
-  const text = await response.text();
-  let data;
-  try {
-    data = JSON.parse(text);
-  } catch (e) {
-    console.error("JSON Parse Error:", e.message);
-    // Malformed server response
-    throw new Error("Server error: received invalid response.");
-  }
-
-  // 3. Application-level success flag
-  if (!data.success || data.reason === "USERNAME_NOT_FOUND") {
-    console.error("Edge function returned failure:", data);
-    // Map any failure to credential mismatch
-    throw new Error("Username or password are incorrect.");
-  }
-
-  // 4. HTTP status errors
-  if (!response.ok) {
-    console.error("Edge function returned HTTP error:", data);
-    // Always treat as generic server error
-    throw new Error("Server error: please try again later.");
-  }
-
-  // 5. Return user and session on success
-  return { user: data.user, session: data.session };
-};
-
-export const logoutUser = async () => {
-  try {
-    const { data: sessionBefore } = await supabase.auth.getSession();
-    console.log("Session before logout:", sessionBefore);
-
-    const { error } = await supabase.auth.signOut();
-    if (error) {
-      return { success: false, error };
-    }
-
-    const { data: sessionAfter } = await supabase.auth.getSession();
-    console.log("Session after logout:", sessionAfter);
-
-    return { success: true };
-  } catch (error) {
-    console.error("Logout error:", error.message);
-    return { success: false, error };
   }
 };
