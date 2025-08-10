@@ -103,8 +103,6 @@ export const AuthProvider = ({ children, onLogout }) => {
       const { accessToken: at, refreshToken: rt } =
         await refreshAndRotateTokens(); // server rotates both tokens here
 
-      console.log(at, rt);
-
       // Persist refresh first, then update in-memory and state access.
       await saveRefreshToken(rt);
       GlobalAuth.setAccessToken(at);
