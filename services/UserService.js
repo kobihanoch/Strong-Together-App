@@ -1,3 +1,4 @@
+import api from "../api/api";
 import supabase from "../src/supabaseClient";
 import { SUPABASE_EDGE_URL } from "@env";
 
@@ -61,18 +62,14 @@ export const getUsername = async (userId) => {
 };
 
 // Get messages
-export const getUserMessages = async (userId) => {
-  const { data, error } = await supabase
-    .from("messages")
-    .select("*")
-    .eq("receiver_id", userId)
-    .order("sent_at", { ascending: false });
-
-  if (error) {
-    console.error("Failed to fetch messages:", error.message);
-    return [];
+export const getUserMessages = async () => {
+  try {
+    const response = await api.get("/api/messages/getmessages");
+    return response.data;
+  } catch (error) {
+    console.log(error);
+    throw error;
   }
-  return data ?? [];
 };
 
 // Update push token

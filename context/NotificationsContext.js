@@ -44,7 +44,7 @@ export const NotificationsProvider = ({ user, children }) => {
       if (user) {
         setLoadingMessages(true);
         try {
-          const messages = await getUserMessages(user?.id);
+          const messages = await getUserMessages();
           const { allUsersArray, imageMap } = await loadAllUsers(messages);
 
           setProfileImagesCache(imageMap);
