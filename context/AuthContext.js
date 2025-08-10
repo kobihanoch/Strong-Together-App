@@ -1,6 +1,6 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import React, { createContext, useContext, useEffect, useState } from "react";
-import { loginUser, registerUser } from "../services/AuthService";
+import { loginUser, logoutUser, registerUser } from "../services/AuthService";
 import { getUserData } from "../services/UserService";
 import {
   getUserExerciseTracking,
@@ -48,7 +48,7 @@ export const AuthProvider = ({ children, onLogout }) => {
   // Export global auth
   useEffect(() => {
     GlobalAuth.setUser = setUser;
-    GlobalAuth.accessToken = accessToken;
+    GlobalAuth.getAccessToken = () => accessToken;
     GlobalAuth.setIsLoggedIn = setIsLoggedIn;
     GlobalAuth.logout = async () => {
       setIsLoggedIn(false);
@@ -69,7 +69,7 @@ export const AuthProvider = ({ children, onLogout }) => {
       GlobalAuth.setIsLoggedIn = null;
       GlobalAuth.logout = null;
     };
-  }, []);
+  }, [accessToken]);
 
   // Method for initializaztion
   const initializeUserSession = async (sessionUserId) => {
@@ -190,6 +190,7 @@ export const AuthProvider = ({ children, onLogout }) => {
       setUser(userData.data.user);
       const { accessToken: resAT, refreshToken: resRT } = userData.data;
       setAccessToken(resAT);
+      GlobalAuth.getAccessToken = () => resAT;
       saveRefreshToken(resRT);
       // Need to add fetch data
     } catch (err) {
@@ -202,7 +203,7 @@ export const AuthProvider = ({ children, onLogout }) => {
   const logout = async () => {
     try {
       setLoading(true);
-      const userData = await logoutUser();
+      await logoutUser();
       // Need to add fetch data
     } catch (err) {
       console.log(err.response.data);

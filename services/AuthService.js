@@ -4,6 +4,7 @@ import supabase from "../src/supabaseClient";
 import { getEmailByUsername } from "./UserService";
 import { SUPABASE_EDGE_URL } from "@env";
 import api from "../api/api";
+import { getRefreshToken } from "../utils/tokenStore";
 
 // Check auth
 export const checkAuth = async () => {
@@ -31,7 +32,16 @@ export const loginUser = async (username, password) => {
 // Log out a user
 export const logoutUser = async () => {
   try {
-    const response = await api.post("/api/auth/logout");
+    const refreshToken = await getRefreshToken();
+    const response = await api.post(
+      "/api/auth/logout",
+      {},
+      {
+        headers: {
+          "x-refresh-token": `Bearer ${refreshToken}`,
+        },
+      }
+    );
     return response;
   } catch (error) {
     throw error;

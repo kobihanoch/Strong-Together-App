@@ -9,6 +9,12 @@ const api = axios.create({
 // Interceptor for requests
 api.interceptors.request.use(
   (config) => {
+    // If user is logged in => join access token to requests
+    const at = GlobalAuth.getAccessToken();
+    if (at) {
+      config.headers = config.headers || {};
+      config.headers.Authorization = `Bearer ${at}`;
+    }
     return config;
   },
   (error) => {
