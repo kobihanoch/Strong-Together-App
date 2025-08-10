@@ -81,19 +81,18 @@ export const AuthProvider = ({ children, onLogout }) => {
   const initializeUserSession = async (sessionUserId) => {
     setSessionLoading(true);
     try {
-      // Fetch data
-      const userData = await getUserData(sessionUserId);
-      const userWorkoutData = await getUserWorkout(sessionUserId);
+      // Fetch user workout
+      const userWorkoutData = await getUserWorkout();
       const exerciseTrackingData = await getUserExerciseTracking(sessionUserId);
       const {
         workout: wData,
         workoutSplits: sData,
         exercises: eData,
-      } = splitTheWorkout(userWorkoutData);
+      } = splitTheWorkout(userWorkoutData.data);
 
       // Assign to states
-      setUser(userData);
       if (userWorkoutData) {
+        console.log("here");
         // Workout
         setWorkout(wData);
         setWorkoutSplits(sData);
@@ -131,7 +130,9 @@ export const AuthProvider = ({ children, onLogout }) => {
       const user = await fetchSelfUserData();
       setIsLoggedIn(true);
       setUser(user.data);
-      // Need to fetch workout data
+
+      // Initialize data
+      await initializeUserSession();
     } catch (err) {
       throw err;
     } finally {
@@ -180,9 +181,12 @@ export const AuthProvider = ({ children, onLogout }) => {
       const { accessToken: resAT, refreshToken: resRT } = userData.data;
       setAccessToken(resAT);
       GlobalAuth.getAccessToken = () => resAT;
+
       // Save to cache
       saveRefreshToken(resRT);
-      // Need to add fetch data
+
+      // Initialize data
+      await initializeUserSession();
     } catch (err) {
       console.log(err.response.data);
     } finally {
