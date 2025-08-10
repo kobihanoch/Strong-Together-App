@@ -50,6 +50,8 @@ export const AuthProvider = ({ children, onLogout }) => {
     GlobalAuth.setUser = setUser;
     GlobalAuth.setIsLoggedIn = setIsLoggedIn;
     GlobalAuth.logout = async () => {
+      setLoading(false);
+      setSessionLoading(false);
       setIsLoggedIn(false);
       setUser(null);
       setWorkout(null);
@@ -168,14 +170,12 @@ export const AuthProvider = ({ children, onLogout }) => {
   };
 
   const logout = async () => {
-    setLoading(true);
     try {
       await logoutUser();
     } catch (err) {
       console.log(err?.response?.data || err.message);
     } finally {
       if (GlobalAuth.logout) await GlobalAuth.logout();
-      setLoading(false);
     }
   };
 
