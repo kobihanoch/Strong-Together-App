@@ -1,6 +1,12 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import React, { createContext, useContext, useEffect, useState } from "react";
-import { loginUser, registerUser } from "../services/AuthService";
+import {
+  checkAuth,
+  fetchSelfUserData,
+  loginUser,
+  logoutUser,
+  registerUser,
+} from "../services/AuthService";
 import { getUserData } from "../services/UserService";
 import {
   getUserExerciseTracking,
@@ -9,18 +15,25 @@ import {
 import supabase from "../src/supabaseClient";
 import { hasWorkoutForToday } from "../utils/authUtils";
 import { splitTheWorkout } from "../utils/sharedUtils";
+import { clearRefreshToken, saveRefreshToken } from "../utils/tokenStore";
 
 const AuthContext = createContext();
 
 export const useAuth = () => useContext(AuthContext);
 
 let authListener = null;
+export const GlobalAuth = {
+  setUser: null,
+  setIsLoggedIn: null,
+  logout: null,
+};
 
 export const AuthProvider = ({ children, onLogout }) => {
   // Auth states
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [loading, setLoading] = useState(false);
   const [sessionLoading, setSessionLoading] = useState(false);
+  const [accessToken, setAccessToken] = useState(null);
 
   // User data
   const [user, setUser] = useState(null);
@@ -38,6 +51,32 @@ export const AuthProvider = ({ children, onLogout }) => {
   }, [isWorkoutMode]);
 
   // -------------------------------------------------------------------------------
+  // Export global auth
+  useEffect(() => {
+    GlobalAuth.setUser = setUser;
+    GlobalAuth.getAccessToken = () => accessToken;
+    GlobalAuth.setIsLoggedIn = setIsLoggedIn;
+    GlobalAuth.logout = async () => {
+      setIsLoggedIn(false);
+      setUser(null);
+      setWorkout(null);
+      setWorkoutSplits(null);
+      setExercises(null);
+      setExerciseTracking(null);
+      setHasTrainedToday(hasWorkoutForToday(null));
+      setIsWorkoutMode(false);
+
+      await AsyncStorage.clear();
+      await supabase.auth.signOut();
+    };
+
+    return () => {
+      GlobalAuth.setUser = null;
+      GlobalAuth.setIsLoggedIn = null;
+      GlobalAuth.logout = null;
+    };
+  }, [accessToken]);
+
   // Method for initializaztion
   const initializeUserSession = async (sessionUserId) => {
     setSessionLoading(true);
@@ -77,45 +116,28 @@ export const AuthProvider = ({ children, onLogout }) => {
 
   // Sessions and fetch user
   const checkIfUserSession = async () => {
-    setLoading(true);
+    setSessionLoading(true);
     try {
-      const {
-        data: { session },
-        error,
-      } = await supabase.auth.getSession();
+      const res = await checkAuth();
+      const accessTokenRes = res.data.accessToken;
+      const refreshTokenRes = res.data.refreshToken;
 
-      if (session) {
-        console.log("Session exists");
-        await initializeUserSession(session.user.id);
-      } else {
-        console.log("Session doesn't exist");
-        setIsLoggedIn(false);
-        setUser(null);
-      }
+      // Save tokens
+      GlobalAuth.getAccessToken = () => accessTokenRes;
+      setAccessToken(accessTokenRes);
+      saveRefreshToken(refreshTokenRes);
+
+      // Fetch user meta data
+      const user = await fetchSelfUserData();
+      setIsLoggedIn(true);
+      setUser(user.data);
+      // Need to fetch workout data
     } catch (err) {
       throw err;
     } finally {
-      setLoading(false);
+      setSessionLoading(false);
     }
   };
-
-  // Refresh token auto
-  useEffect(() => {
-    const { data: listener } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
-        console.log("🔄 Auth state changed: ", event);
-        if (event === "USER_DELETED" || event === "SIGNED_OUT") {
-          clearStates();
-        }
-      }
-    );
-
-    authListener = listener;
-
-    return () => {
-      listener?.subscription?.unsubscribe?.();
-    };
-  }, []);
 
   // Load profile pic
   const updateProfilePic = (picUrl) => {
@@ -152,32 +174,32 @@ export const AuthProvider = ({ children, onLogout }) => {
   const login = async (username, password) => {
     try {
       setLoading(true);
-      // Will throw on network, parse, or invalid creds
-      const { user, session } = await loginUser(username, password);
-
-      // Save session in Supabase SDK
-      await supabase.auth.setSession({
-        access_token: session.access_token,
-        refresh_token: session.refresh_token,
-      });
-
-      // Initialize user context
-      await initializeUserSession(user.id);
-      console.log("✅ Login successful");
+      const userData = await loginUser(username, password);
+      setIsLoggedIn(true);
+      setUser(userData.data.user);
+      const { accessToken: resAT, refreshToken: resRT } = userData.data;
+      setAccessToken(resAT);
+      GlobalAuth.getAccessToken = () => resAT;
+      // Save to cache
+      saveRefreshToken(resRT);
+      // Need to add fetch data
     } catch (err) {
-      console.log("Error logging in:", err.message);
-      // Rethrow so the calling UI can catch and display an alert
-      throw err;
+      console.log(err.response.data);
     } finally {
       setLoading(false);
     }
   };
 
   const logout = async () => {
-    clearStates();
-
-    await AsyncStorage.clear();
-    await supabase.auth.signOut();
+    try {
+      setLoading(true);
+      await logoutUser();
+    } catch (err) {
+      console.log(err.response.data);
+    } finally {
+      clearStates();
+      setLoading(false);
+    }
   };
 
   const clearStates = () => {
@@ -190,6 +212,8 @@ export const AuthProvider = ({ children, onLogout }) => {
     setExerciseTracking(null);
     setHasTrainedToday(hasWorkoutForToday(null));
     setIsWorkoutMode(false);
+    setAccessToken(null);
+    clearRefreshToken();
   };
 
   return (
@@ -197,6 +221,8 @@ export const AuthProvider = ({ children, onLogout }) => {
       value={{
         isLoggedIn,
         user,
+        accessToken,
+        setAccessToken,
         register,
         login,
         logout,

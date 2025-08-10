@@ -94,7 +94,7 @@ function MainNavigator() {
 
   // If session is initialized - don't show auth screen but loading screen instead - can be customized in future
   if (sessionLoading) {
-    return <LoadingPage message="Logging in..."></LoadingPage>;
+    return <LoadingPage message="Getting you there..."></LoadingPage>;
   }
   return (
     <RootStack.Navigator screenOptions={{ headerShown: false }}>
