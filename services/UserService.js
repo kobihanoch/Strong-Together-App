@@ -32,18 +32,17 @@ export const getUserData = async (userId) => {
   return data;
 };
 
-// Get another user data by RPC (returning only username, profilepic_url by uuid)
+// Get another user data
 export const getAnotherUserData = async (userId) => {
-  const { data, error } = await supabase.rpc("get_user_profile_by_id", {
-    input_id: userId,
-  });
-
-  if (error) {
-    console.error("Failed to load profile", error);
-    return null;
+  try {
+    const response = await api.get(
+      `/api/users/getusernamepicandname/${userId}`
+    );
+    return response.data;
+  } catch (error) {
+    console.log(error);
+    throw error;
   }
-
-  return data[0];
 };
 
 // Get username
@@ -59,17 +58,6 @@ export const getUsername = async (userId) => {
   }
 
   return data;
-};
-
-// Get messages
-export const getUserMessages = async () => {
-  try {
-    const response = await api.get("/api/messages/getmessages");
-    return response.data;
-  } catch (error) {
-    console.log(error);
-    throw error;
-  }
 };
 
 // Update push token
