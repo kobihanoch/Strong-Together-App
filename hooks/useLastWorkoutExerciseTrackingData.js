@@ -10,7 +10,7 @@ const useLastWorkoutExerciseTrackingData = (exerciseToSplitId) => {
     if (exerciseTracking) {
       setLastWorkoutData(() => {
         return exerciseTracking
-          .filter((et) => et.exercisetosplit_id === exerciseToSplitId)
+          .filter((et) => Number(et.exercisetosplit_id) === exerciseToSplitId)
           .pop();
       });
     }
