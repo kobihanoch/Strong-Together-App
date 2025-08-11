@@ -1,9 +1,8 @@
 // services/AuthService.js
-import { Alert } from "react-native";
-import supabase from "../src/supabaseClient";
-import { getEmailByUsername } from "./UserService";
 import { SUPABASE_EDGE_URL } from "@env";
+import axios from "axios";
 import api from "../api/api";
+import { API_BASE_URL } from "../api/apiConfig";
 import { getRefreshToken } from "../utils/tokenStore";
 
 // Rotate tokens
@@ -11,8 +10,8 @@ export const refreshAndRotateTokens = async () => {
   const rt = await getRefreshToken();
   if (!rt) throw new Error("No stored refresh token");
 
-  const { data } = await api.post("/api/auth/refresh", null, {
-    headers: { "X-Refresh-Token": `Bearer ${rt}` },
+  const { data } = await axios.post(`${API_BASE_URL}/api/auth/refresh`, null, {
+    headers: { "x-refresh-token": `Bearer ${rt}` },
   });
   return data;
 };

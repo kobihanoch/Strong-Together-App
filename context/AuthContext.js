@@ -13,7 +13,12 @@ import {
 } from "../services/WorkoutService";
 import { hasWorkoutForToday } from "../utils/authUtils";
 import { splitTheWorkout } from "../utils/sharedUtils";
-import { clearRefreshToken, saveRefreshToken } from "../utils/tokenStore";
+import {
+  clearRefreshToken,
+  getRefreshToken,
+  saveRefreshToken,
+} from "../utils/tokenStore.js";
+import api from "../api/api";
 
 const AuthContext = createContext();
 export const useAuth = () => useContext(AuthContext);
@@ -34,7 +39,7 @@ export const GlobalAuth = {
 export const AuthProvider = ({ children, onLogout }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [sessionLoading, setSessionLoading] = useState(false);
+  const [sessionLoading, setSessionLoading] = useState(true);
 
   const [user, setUser] = useState(null);
   const [hasTrainedToday, setHasTrainedToday] = useState(false);
@@ -62,7 +67,6 @@ export const AuthProvider = ({ children, onLogout }) => {
       setIsWorkoutMode(false);
       GlobalAuth.setAccessToken(null);
       api.defaults.headers.common.Authorization = undefined;
-
       await clearRefreshToken();
     };
 
@@ -99,9 +103,21 @@ export const AuthProvider = ({ children, onLogout }) => {
   };
 
   // On app start: rotate tokens via checkAuth and only then load data.
+  // Restore session on provider mount BEFORE children render critical stuff
+  useEffect(() => {
+    checkIfUserSession().catch(() => setSessionLoading(false));
+  }, []);
+
   const checkIfUserSession = async () => {
     setSessionLoading(true);
     try {
+      // First check if there any refresh token stored
+      const existingRt = await getRefreshToken();
+      if (!existingRt) {
+        // no token => no refresh call
+        setIsLoggedIn(false);
+        return;
+      }
       const { accessToken: at, refreshToken: rt } =
         await refreshAndRotateTokens(); // server rotates both tokens here
 
@@ -115,7 +131,6 @@ export const AuthProvider = ({ children, onLogout }) => {
 
       await initializeUserSession();
     } catch (err) {
-      throw err;
     } finally {
       setSessionLoading(false);
     }
@@ -153,12 +168,13 @@ export const AuthProvider = ({ children, onLogout }) => {
     setLoading(true);
     try {
       const userData = await loginUser(username, password);
-      setIsLoggedIn(true);
-      setUser(userData.data.user);
 
       const { accessToken: at, refreshToken: rt } = userData.data;
       await saveRefreshToken(rt);
       GlobalAuth.setAccessToken(at);
+
+      setIsLoggedIn(true);
+      setUser(userData.data.user);
 
       await initializeUserSession();
     } catch (err) {
