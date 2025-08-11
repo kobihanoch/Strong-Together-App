@@ -1,7 +1,7 @@
 import { useAuth } from "../../context/AuthContext";
 import { useNotifications } from "../../context/NotificationsContext";
-import { deleteMessage } from "../../services/SystemMessagesService";
 import { Alert } from "react-native";
+import { deleteMessage } from "../../services/MessagesService";
 
 const useInboxLogic = () => {
   const { user } = useAuth();

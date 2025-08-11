@@ -1,13 +1,10 @@
 import api from "../api/api";
-import supabase from "../src/supabaseClient";
 
 export const updateMsgReadStatus = async (msgId) => {
-  const { error } = await supabase
-    .from("messages")
-    .update({ is_read: true })
-    .eq("id", msgId);
-
-  if (error) {
+  try {
+    const response = await api.put(`/api/messages/markasread/${msgId}`);
+    return response.data.id;
+  } catch (error) {
     throw error;
   }
 };
@@ -17,6 +14,17 @@ export const getUserMessages = async () => {
   try {
     const response = await api.get("/api/messages/getmessages");
     return response.data;
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+};
+
+// Delete a message
+export const deleteMessage = async (msgId) => {
+  try {
+    const { data } = await api.delete(`/api/messages/delete/${msgId}`);
+    console.log(`Message ${data.id} deleted.`);
   } catch (error) {
     console.log(error);
     throw error;

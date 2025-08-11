@@ -1,23 +1,24 @@
+import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { useState } from "react";
 import {
   Dimensions,
   Image,
   Modal,
-  StyleSheet,
   Text,
   TouchableOpacity,
   View,
 } from "react-native";
-import { useEffect, useState } from "react";
-import { RFValue } from "react-native-responsive-fontsize";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { formatDate } from "../../utils/statisticsUtils";
 import { Swipeable } from "react-native-gesture-handler";
+import { RFValue } from "react-native-responsive-fontsize";
+import useInboxLogic from "../../hooks/logic/useInboxLogic";
 import { updateMsgReadStatus } from "../../services/MessagesService";
-import { useRef } from "react";
+import { formatDate } from "../../utils/statisticsUtils";
+import { useNotifications } from "../../context/NotificationsContext";
 
 const { width, height } = Dimensions.get("window");
 
 const MessageItem = ({ item, profileImages, sender, deleteMessage }) => {
+  const { markAsRead } = useNotifications();
   // Modal of message
   const [isModalVisible, setIsModalVisible] = useState(false);
   const imageSource =
@@ -67,9 +68,9 @@ const MessageItem = ({ item, profileImages, sender, deleteMessage }) => {
           borderBottomWidth: 0.5,
           borderColor: "rgba(93, 93, 93, 0.3)",
         }}
-        onPress={() => {
-          updateMsgReadStatus(item.id);
+        onPress={async () => {
           setIsModalVisible(true);
+          if (!item.is_read) await markAsRead(item.id);
         }}
       >
         <View
