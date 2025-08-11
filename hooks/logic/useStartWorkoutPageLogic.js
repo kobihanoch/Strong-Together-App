@@ -79,11 +79,6 @@ const useStartWorkoutPageLogic = (user, selectedSplit, setHasTrainedToday) => {
         setExerciseTracking(etUpdated);
         setHasTrainedToday(true);
         setIsWorkoutMode(false);
-        // Send a message to user
-        await sendSystemMessage(
-          getWorkoutCompleteMessageString().header,
-          getWorkoutCompleteMessageString().text
-        );
       } catch (err) {
         console.error(err);
         throw err;

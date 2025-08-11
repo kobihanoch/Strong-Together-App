@@ -13,32 +13,6 @@ import { useAuth } from "../../context/AuthContext";
 import { getMostFrequentSplitNameByUserId } from "../../services/ExerciseTrackingService";
 
 const useHomePageLogic = (user) => {
-  // Send welcome message for the first time
-  const { sendSystemMessage, isSending } = useSystemMessages(user?.id);
-  const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
-
-  useEffect(() => {
-    (async () => {
-      if (user) {
-        if (await AsyncStorage.getItem("firstLogin")) {
-          console.log(
-            "First login detected for ",
-            user.username,
-            ", 2 seconds to message."
-          );
-          await sleep(3000);
-          const welcomeMsg = getWelcomeMessageString(user?.name);
-          await sendSystemMessage(welcomeMsg.header, welcomeMsg.text);
-
-          await AsyncStorage.removeItem("firstLogin");
-          console.log("Message sent and asyncstorage item deleted!");
-        } else {
-          console.log("Not first login - not sending message.");
-        }
-      }
-    })();
-  }, [user]);
-
   // User data
   const [username, setUsername] = useState(null);
   const [userId, setUserId] = useState(null);
