@@ -23,6 +23,7 @@ import { NotificationsProvider } from "./context/NotificationsContext";
 import NotificationsSetup from "./notifications/NotificationsSetup";
 import * as Notifications from "expo-notifications";
 import LoadingPage from "./components/LoadingPage";
+import MainLoadingScreen from "./components/MainLoadingScreen";
 
 const RootStack = createStackNavigator();
 
@@ -84,11 +85,11 @@ const WrappedWithNotifications = () => {
 };
 
 function MainNavigator() {
-  const { isLoggedIn, initial, sessionLoading } = useAuth();
+  const { isLoggedIn, sessionLoading } = useAuth();
 
   // If session is initialized - don't show auth screen but loading screen instead - can be customized in future
   if (sessionLoading) {
-    return <LoadingPage message="Getting you there..."></LoadingPage>;
+    return <MainLoadingScreen />;
   }
   return (
     <RootStack.Navigator screenOptions={{ headerShown: false }}>
