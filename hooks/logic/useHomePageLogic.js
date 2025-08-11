@@ -1,16 +1,10 @@
 import { useEffect, useState } from "react";
-import { useFocusEffect } from "@react-navigation/native";
-import { useUserWorkout } from "../useUserWorkout";
-import React from "react";
+import { useAuth } from "../../context/AuthContext";
+import { getMostFrequentSplitNameByUserId } from "../../services/ExerciseTrackingService";
 import {
   getUserGeneralPR,
   getUserLastWorkoutDate,
-  getWelcomeMessageString,
 } from "../../utils/homePageUtils";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import useSystemMessages from "../automations/useSystemMessages";
-import { useAuth } from "../../context/AuthContext";
-import { getMostFrequentSplitNameByUserId } from "../../services/ExerciseTrackingService";
 
 const useHomePageLogic = (user) => {
   // User data
