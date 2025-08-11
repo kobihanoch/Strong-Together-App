@@ -1,12 +1,13 @@
 import { useAuth } from "../../context/AuthContext";
 import { useNotifications } from "../../context/NotificationsContext";
-import { deleteMessage } from "../../services/SystemMessagesService";
 import { Alert } from "react-native";
+import { deleteMessage } from "../../services/MessagesService";
 
 const useInboxLogic = () => {
   const { user } = useAuth();
   const {
     allReceivedMessages,
+    setAllReceivedMessages,
     unreadMessages,
     setUnreadMessages,
     loadingMessages,
@@ -28,6 +29,9 @@ const useInboxLogic = () => {
           onPress: async () => {
             try {
               await deleteMessage(msgId);
+              setAllReceivedMessages((prev) =>
+                prev.filter((m) => m.id !== msgId)
+              );
             } catch (err) {
               console.log("Delete failed:", err);
             }

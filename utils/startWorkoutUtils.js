@@ -64,10 +64,3 @@ export const filterZeroesInArr = (reps, weights) => {
   }
   return { reps: filteredReps, weights: filteredWeights };
 };
-
-export const getWorkoutCompleteMessageString = () => {
-  return {
-    header: "Workout Done!",
-    text: "Great work today!\nPlease note that you can't start a new training session until tomorrow, so take a good rest.\n\nIn the meantime, feel free to check your progress on the Statistics page.\n\nKeep pushing forward!",
-  };
-};

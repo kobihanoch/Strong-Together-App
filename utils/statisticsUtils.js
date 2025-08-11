@@ -1,13 +1,12 @@
-export const filterExercisesByDate = (exerciseTracking, selectedDate) => {
-  if (exerciseTracking) {
-    const arr = [];
-    exerciseTracking.forEach((et) => {
-      if (et.workoutdate == selectedDate) {
-        arr.push(et);
-      }
-    });
-    return arr;
-  }
+export const filterExercisesByDate = (exerciseTracking = [], selectedDate) => {
+  const target =
+    typeof selectedDate === "string" ? selectedDate.slice(0, 10) : "";
+
+  return exerciseTracking.filter((et) => {
+    const day =
+      typeof et?.workoutdate === "string" ? et.workoutdate.slice(0, 10) : "";
+    return day === target;
+  });
 };
 
 export const formatDate = (dateToFormat) => {

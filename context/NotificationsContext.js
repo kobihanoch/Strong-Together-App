@@ -1,9 +1,13 @@
 import { createContext, useContext, useEffect, useState } from "react";
-import { getAnotherUserData, getUserMessages } from "../services/UserService";
+import { getAnotherUserData } from "../services/UserService";
 import { filterMessagesByUnread } from "../utils/authUtils";
 import { listenToMessags } from "../utils/realTimeUtils";
 import supabase from "../src/supabaseClient";
 import { Image } from "react-native";
+import {
+  getUserMessages,
+  updateMsgReadStatus,
+} from "../services/MessagesService.js";
 
 export const NotificationsContext = createContext();
 
@@ -20,31 +24,14 @@ export const NotificationsProvider = ({ user, children }) => {
   // ALl profile images
   const [profileImagesCache, setProfileImagesCache] = useState({});
 
-  // Update messages on live with listener
-  useEffect(() => {
-    if (!user) return;
-
-    const channel = listenToMessags(
-      user,
-      setAllReceivedMessages,
-      setUnreadMessages,
-      setAllSendersUsersArr,
-      allSendersUsersArr,
-      setProfileImagesCache
-    );
-    console.log("LISNTERLOADED!");
-    return () => {
-      if (channel) supabase.removeChannel(channel);
-    };
-  }, [allReceivedMessages]);
-
   // Load messages on start
   useEffect(() => {
     (async () => {
       if (user) {
         setLoadingMessages(true);
         try {
-          const messages = await getUserMessages(user?.id);
+          const messages = await getUserMessages();
+          // Load profile pics
           const { allUsersArray, imageMap } = await loadAllUsers(messages);
 
           setProfileImagesCache(imageMap);
@@ -102,6 +89,13 @@ export const NotificationsProvider = ({ user, children }) => {
     return { allUsersArray, imageMap };
   };
 
+  const markAsRead = async (msgId) => {
+    await updateMsgReadStatus(msgId);
+    setAllReceivedMessages((prev) =>
+      prev.map((m) => (m.id === msgId ? { ...m, is_read: true } : m))
+    );
+  };
+
   return (
     <NotificationsContext.Provider
       value={{
@@ -112,6 +106,7 @@ export const NotificationsProvider = ({ user, children }) => {
         loadingMessages,
         profileImagesCache,
         allSendersUsersArr,
+        markAsRead,
       }}
     >
       {children}
