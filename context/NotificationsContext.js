@@ -4,7 +4,10 @@ import { filterMessagesByUnread } from "../utils/authUtils";
 import { listenToMessags } from "../utils/realTimeUtils";
 import supabase from "../src/supabaseClient";
 import { Image } from "react-native";
-import { getUserMessages } from "../services/MessagesService.js";
+import {
+  getUserMessages,
+  updateMsgReadStatus,
+} from "../services/MessagesService.js";
 
 export const NotificationsContext = createContext();
 
@@ -86,6 +89,13 @@ export const NotificationsProvider = ({ user, children }) => {
     return { allUsersArray, imageMap };
   };
 
+  const markAsRead = async (msgId) => {
+    await updateMsgReadStatus(msgId);
+    setAllReceivedMessages((prev) =>
+      prev.map((m) => (m.id === msgId ? { ...m, is_read: true } : m))
+    );
+  };
+
   return (
     <NotificationsContext.Provider
       value={{
@@ -96,6 +106,7 @@ export const NotificationsProvider = ({ user, children }) => {
         loadingMessages,
         profileImagesCache,
         allSendersUsersArr,
+        markAsRead,
       }}
     >
       {children}

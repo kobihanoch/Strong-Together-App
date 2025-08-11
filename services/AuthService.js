@@ -1,9 +1,8 @@
 // services/AuthService.js
-import { Alert } from "react-native";
-import supabase from "../src/supabaseClient";
-import { getEmailByUsername } from "./UserService";
 import { SUPABASE_EDGE_URL } from "@env";
+import axios from "axios";
 import api from "../api/api";
+import { API_BASE_URL } from "../api/apiConfig";
 import { getRefreshToken } from "../utils/tokenStore";
 
 // Rotate tokens
@@ -11,8 +10,8 @@ export const refreshAndRotateTokens = async () => {
   const rt = await getRefreshToken();
   if (!rt) throw new Error("No stored refresh token");
 
-  const { data } = await api.post("/api/auth/refresh", null, {
-    headers: { "X-Refresh-Token": `Bearer ${rt}` },
+  const { data } = await axios.post(`${API_BASE_URL}/api/auth/refresh`, null, {
+    headers: { "x-refresh-token": `Bearer ${rt}` },
   });
   return data;
 };
@@ -66,39 +65,14 @@ export const registerUser = async (
   gender
 ) => {
   try {
-    const response = await fetch(`${SUPABASE_EDGE_URL}/register_user`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        email,
-        password,
-        username,
-        fullName,
-        gender,
-      }),
+    await api.post("/api/users/create", {
+      username,
+      fullName,
+      email,
+      password,
+      gender,
     });
-
-    const result = await response.json();
-
-    if (!response.ok) {
-      console.log("❌ REGISTER_USER EDGE ERROR:", result);
-      return {
-        success: false,
-        reason: result.reason || "UNKNOWN_ERROR",
-        error: result.error,
-      };
-    }
-
-    console.log(result.error);
-    return result;
   } catch (error) {
-    console.error(error.message);
-    return {
-      success: false,
-      reason: "NETWORK_ERROR",
-      error: error.message,
-    };
+    throw error;
   }
 };

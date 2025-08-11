@@ -85,12 +85,6 @@ const WrappedWithNotifications = () => {
 
 function MainNavigator() {
   const { isLoggedIn, initial, sessionLoading } = useAuth();
-  useEffect(() => {
-    (async () => {
-      await initial.checkIfUserSession();
-    })();
-  }, []);
-  console.log("🧠 isLoggedIn value:", isLoggedIn);
 
   // If session is initialized - don't show auth screen but loading screen instead - can be customized in future
   if (sessionLoading) {

@@ -6,9 +6,7 @@ import { getUserExerciseTracking } from "../../services/WorkoutService";
 import {
   createObjectForDataBase,
   filterZeroesInArr,
-  getWorkoutCompleteMessageString,
 } from "../../utils/startWorkoutUtils";
-import useSystemMessages from "../automations/useSystemMessages";
 import { useUserWorkout } from "../useUserWorkout";
 
 const useStartWorkoutPageLogic = (user, selectedSplit, setHasTrainedToday) => {
@@ -20,8 +18,6 @@ const useStartWorkoutPageLogic = (user, selectedSplit, setHasTrainedToday) => {
 
   // --------------------[ Outside hooks ]--------------------------------------
   const { saveWorkoutProccess } = useUserWorkout(user?.id);
-
-  const { sendSystemMessage } = useSystemMessages(user?.id);
 
   // --------------------[ Set workout mode ]--------------------------------------
   useFocusEffect(
@@ -79,11 +75,6 @@ const useStartWorkoutPageLogic = (user, selectedSplit, setHasTrainedToday) => {
         setExerciseTracking(etUpdated);
         setHasTrainedToday(true);
         setIsWorkoutMode(false);
-        // Send a message to user
-        await sendSystemMessage(
-          getWorkoutCompleteMessageString().header,
-          getWorkoutCompleteMessageString().text
-        );
       } catch (err) {
         console.error(err);
         throw err;
