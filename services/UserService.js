@@ -17,21 +17,6 @@ export const updateProfilePictureURL = async (userId, picURL) => {
   }
 };
 
-// Get user data - RLS ENABLED
-export const getUserData = async (userId) => {
-  const { data, error } = await supabase
-    .from("users")
-    .select("*")
-    .eq("id", userId)
-    .single();
-
-  if (error) {
-    console.log("Service error while fetching user data: ", error);
-    throw error;
-  }
-  return data;
-};
-
 // Get another user data
 export const getAnotherUserData = async (userId) => {
   try {
@@ -43,21 +28,6 @@ export const getAnotherUserData = async (userId) => {
     console.log(error);
     throw error;
   }
-};
-
-// Get username
-export const getUsername = async (userId) => {
-  const { data, error } = await supabase
-    .from("users")
-    .select("username")
-    .eq("id", userId)
-    .single();
-
-  if (error) {
-    throw error;
-  }
-
-  return data;
 };
 
 // Update push token
