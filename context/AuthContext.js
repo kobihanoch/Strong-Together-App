@@ -147,18 +147,9 @@ export const AuthProvider = ({ children, onLogout }) => {
   const register = async (email, password, username, fullName, gender) => {
     setLoading(true);
     try {
-      const result = await registerUser(
-        email,
-        password,
-        username,
-        fullName,
-        gender
-      );
-      if (result?.success) {
-        await login(username, password);
-      } else {
-        console.log(result?.reason);
-      }
+      await registerUser(email, password, username, fullName, gender);
+      await login(username, password);
+    } catch (e) {
     } finally {
       setLoading(false);
     }

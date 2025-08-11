@@ -65,39 +65,14 @@ export const registerUser = async (
   gender
 ) => {
   try {
-    const response = await fetch(`${SUPABASE_EDGE_URL}/register_user`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        email,
-        password,
-        username,
-        fullName,
-        gender,
-      }),
+    await api.post("/api/users/create", {
+      username,
+      fullName,
+      email,
+      password,
+      gender,
     });
-
-    const result = await response.json();
-
-    if (!response.ok) {
-      console.log("❌ REGISTER_USER EDGE ERROR:", result);
-      return {
-        success: false,
-        reason: result.reason || "UNKNOWN_ERROR",
-        error: result.error,
-      };
-    }
-
-    console.log(result.error);
-    return result;
   } catch (error) {
-    console.error(error.message);
-    return {
-      success: false,
-      reason: "NETWORK_ERROR",
-      error: error.message,
-    };
+    throw error;
   }
 };
