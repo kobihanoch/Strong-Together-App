@@ -1,67 +1,90 @@
 import axios from "axios";
 import { API_BASE_URL } from "./apiConfig";
 import { GlobalAuth } from "../context/AuthContext.js";
+import { getRefreshToken, saveRefreshToken } from "../utils/tokenStore";
+import { refreshAndRotateTokens } from "../services/AuthService";
 
-const api = axios.create({
-  baseURL: API_BASE_URL,
-});
+const api = axios.create({ baseURL: API_BASE_URL });
 
-// Interceptor for requests
+// Attach access token to every outgoing request (if present)
 api.interceptors.request.use(
-  (config) => {
-    // If user is logged in => join access token to requests
-    const at = GlobalAuth.getAccessToken();
+  async (config) => {
+    const at = GlobalAuth.getAccessToken && GlobalAuth.getAccessToken();
     if (at) {
       config.headers = config.headers || {};
       config.headers.Authorization = `Bearer ${at}`;
     }
     return config;
   },
-  (error) => {
-    return Promise.reject(error);
-  }
+  (error) => Promise.reject(error)
 );
 
-// Interceptor for responses
-api.interceptors.response.use(
-  (response) => response,
-  async (error) => {
-    const originalRequest = error.config;
+// Flow:
+// Client -> Request -> Server
+// CLient <- Response <- Server
+//   ---If error---
+//   V          V
+// SKIP?   DO NOT SKIP?
+//   V          V
+// Throw      401 => -----Try to refresh---------
+//                       V            V
+//             Error => Log out /   Good => Call API again
+//                       Reject
 
-    // Skip beacuse if there are errors -
-    // don't catch them by refresh token error (The will pass the condition because user is not authenticated yet)
-    const skipRefreshRoutes = ["/api/auth/login", "/api/users/create"];
+api.interceptors.response.use(
+  (res) => res,
+  async (error) => {
+    const original = error.config || {};
+    const status = error.response?.status;
+    const data = error.response?.data;
+
+    if (status === 401) {
+      console.log("401 from API:", {
+        url: original.url,
+        method: original.method,
+        resp: data,
+        authHeader: original.headers?.Authorization?.slice(0, 32) + "...",
+      });
+    }
+
+    if (!error.response || error.response.status !== 401)
+      return Promise.reject(error);
+
+    // Don't refresh for these
+    const url = original?.url || "";
     if (
-      skipRefreshRoutes.some((route) => originalRequest.url.includes(route))
+      original?._retry ||
+      url.includes("/api/auth/refresh") ||
+      url.includes("/api/auth/login") ||
+      url.includes("/api/users/create") ||
+      url.includes("/api/auth/checkauth") ||
+      url.includes("/api/auth/logout")
     ) {
+      GlobalAuth.logout?.();
       return Promise.reject(error);
     }
 
-    // If refreshing 2nd time - don't try again - set user to null - for refresh token failures
-    if (originalRequest.url.includes("/api/auth/refresh")) {
-      GlobalAuth.logout();
-      return Promise.reject(error); // Throw error
-    }
+    // Flag for second retry
+    original._retry = true;
 
-    // If first time - try to refresh if not already retried - try to generate a new access token
-    if (
-      error.response &&
-      error.response.status === 401 &&
-      !originalRequest._retry
-    ) {
-      originalRequest._retry = true;
-
+    // If got 401 no access
+    if (error.response.status === 401) {
       try {
-        await api.post("/api/auth/refresh");
-        return api(originalRequest);
-      } catch (refreshError) {
-        console.error("Refresh token failed:", refreshError);
-        GlobalAuth.logout();
-        return Promise.reject(refreshError);
+        // Try to refresh
+        const { refreshToken, accessToken } = await refreshAndRotateTokens();
+        await saveRefreshToken(refreshToken);
+        GlobalAuth.setAccessToken(accessToken);
+        original.headers = original.headers || {};
+        original.headers.Authorization = `Bearer ${accessToken}`;
+        return api(original);
+      } catch (refreshErr) {
+        // If got here failed at refresh
+        if (refreshErr?.response?.status === 401) {
+          if (GlobalAuth.logout) GlobalAuth.logout();
+        }
+        return Promise.reject(error);
       }
     }
-
-    return Promise.reject(error);
   }
 );
 

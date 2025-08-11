@@ -1,3 +1,4 @@
+import api from "../api/api";
 import supabase from "../src/supabaseClient";
 import { SUPABASE_EDGE_URL } from "@env";
 
@@ -16,63 +17,17 @@ export const updateProfilePictureURL = async (userId, picURL) => {
   }
 };
 
-// Get user data - RLS ENABLED
-export const getUserData = async (userId) => {
-  const { data, error } = await supabase
-    .from("users")
-    .select("*")
-    .eq("id", userId)
-    .single();
-
-  if (error) {
-    console.log("Service error while fetching user data: ", error);
-    throw error;
-  }
-  return data;
-};
-
-// Get another user data by RPC (returning only username, profilepic_url by uuid)
+// Get another user data
 export const getAnotherUserData = async (userId) => {
-  const { data, error } = await supabase.rpc("get_user_profile_by_id", {
-    input_id: userId,
-  });
-
-  if (error) {
-    console.error("Failed to load profile", error);
-    return null;
-  }
-
-  return data[0];
-};
-
-// Get username
-export const getUsername = async (userId) => {
-  const { data, error } = await supabase
-    .from("users")
-    .select("username")
-    .eq("id", userId)
-    .single();
-
-  if (error) {
+  try {
+    const response = await api.get(
+      `/api/users/getusernamepicandname/${userId}`
+    );
+    return response.data;
+  } catch (error) {
+    console.log(error);
     throw error;
   }
-
-  return data;
-};
-
-// Get messages
-export const getUserMessages = async (userId) => {
-  const { data, error } = await supabase
-    .from("messages")
-    .select("*")
-    .eq("receiver_id", userId)
-    .order("sent_at", { ascending: false });
-
-  if (error) {
-    console.error("Failed to fetch messages:", error.message);
-    return [];
-  }
-  return data ?? [];
 };
 
 // Update push token
