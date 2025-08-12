@@ -86,6 +86,7 @@ export default function App() {
         <AuthProvider>
           <RootProviders navigationRef={navigationRef} />
           <NotifierRoot />
+          <NotificationsSetup />
         </AuthProvider>
       </GestureHandlerRootView>
     </AlertNotificationRoot>
