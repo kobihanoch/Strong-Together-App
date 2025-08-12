@@ -19,6 +19,7 @@ import {
   getRefreshToken,
   saveRefreshToken,
 } from "../utils/tokenStore.js";
+import { connectSocket, disconnectSocket } from "../src/socket";
 
 const AuthContext = createContext();
 export const useAuth = () => useContext(AuthContext);
@@ -57,6 +58,7 @@ export const AuthProvider = ({ children, onLogout }) => {
     GlobalAuth.setUser = setUser;
     GlobalAuth.setIsLoggedIn = setIsLoggedIn;
     GlobalAuth.logout = async () => {
+      disconnectSocket();
       setLoading(false);
       setSessionLoading(false);
       setIsLoggedIn(false);
@@ -106,7 +108,7 @@ export const AuthProvider = ({ children, onLogout }) => {
       setIsLoggedIn(true);
       setUser(u.data);
 
-      await initializeUserSession();
+      await initializeUserSession(u.data.id);
     } catch (err) {
     } finally {
       setSessionLoading(false);
@@ -114,9 +116,10 @@ export const AuthProvider = ({ children, onLogout }) => {
   };
 
   // After checking authentication, load all user's workouts data
-  const initializeUserSession = async () => {
+  const initializeUserSession = async (userId) => {
     setSessionLoading(true);
     try {
+      await connectSocket(userId);
       const userWorkoutData = await getUserWorkout();
       const exerciseTrackingData = await getUserExerciseTracking();
       const {
@@ -168,7 +171,7 @@ export const AuthProvider = ({ children, onLogout }) => {
       setIsLoggedIn(true);
       setUser(userData.data.user);
 
-      await initializeUserSession();
+      await initializeUserSession(userData.data.user.id);
     } catch (err) {
       throw err;
     } finally {
