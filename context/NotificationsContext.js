@@ -74,8 +74,12 @@ export const NotificationsProvider = ({ user, children }) => {
     await Promise.all(
       allUsersArray.map(async (user) => {
         if (user?.profile_image_url) {
-          await Image.prefetch(user.profile_image_url);
-          imageMap[user.id] = { uri: user.profile_image_url };
+          await Image.prefetch(
+            `${process.env.EXPO_PUBLIC_SUPABASE_URL}/storage/v1/object/public/${user.profile_image_url}`
+          );
+          imageMap[user.id] = {
+            uri: `${process.env.EXPO_PUBLIC_SUPABASE_URL}/storage/v1/object/public/${user.profile_image_url}`,
+          };
         } else {
           if (user.gender == "Male") {
             imageMap[user.id] = require("../assets/man.png");
