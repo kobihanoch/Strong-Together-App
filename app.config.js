@@ -13,6 +13,10 @@ export default {
       resizeMode: "contain",
       backgroundColor: "#2979ff",
     },
+    notification: {
+      icon: "./assets/icon.png",
+      color: "#FFFFFF",
+    },
     ios: {
       supportsTablet: true,
       bundleIdentifier: "com.kobihanoch.strongtogether",
