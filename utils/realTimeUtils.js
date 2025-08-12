@@ -1,4 +1,4 @@
-import supabase from "../src/supabaseClient";
+/*import supabase from "../src/supabaseClient";
 import { getUserMessages } from "../services/UserService";
 import { filterMessagesByUnread } from "./authUtils";
 import * as Notifications from "expo-notifications";
@@ -59,7 +59,7 @@ export const listenToMessags = async (
             fullUser.profile_image_url?.trim() === ""
           );*/
 
-          // Prefetch + add to imageMap
+/*// Prefetch + add to imageMap
           if (
             typeof fullUser.profile_image_url === "string" &&
             fullUser.profile_image_url.trim() !== ""
@@ -119,4 +119,4 @@ export const listenToMessags = async (
     .subscribe();
 
   return channel;
-};
+};*/
