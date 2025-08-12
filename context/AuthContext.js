@@ -12,10 +12,7 @@ import {
   getUserExerciseTracking,
   getUserWorkout,
 } from "../services/WorkoutService";
-import {
-  hasWorkoutForToday,
-  unpackFromExerciseTrackingData,
-} from "../utils/authUtils";
+import { unpackFromExerciseTrackingData } from "../utils/authUtils";
 import { splitTheWorkout } from "../utils/sharedUtils";
 import {
   clearRefreshToken,
@@ -68,7 +65,7 @@ export const AuthProvider = ({ children, onLogout }) => {
       setWorkoutSplits(null);
       setExercises(null);
       setExerciseTracking(null);
-      setHasTrainedToday(hasWorkoutForToday(null));
+      setHasTrainedToday(null);
       setIsWorkoutMode(false);
       GlobalAuth.setAccessToken(null);
       api.defaults.headers.common.Authorization = undefined;
