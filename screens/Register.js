@@ -13,9 +13,8 @@ import {
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import Icon from "react-native-vector-icons/FontAwesome";
 import InputField from "../components/InputField";
-import Validators from "../components/Validators";
 import { useAuth } from "../context/AuthContext";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import { showErrorAlert } from "../errors/errorAlerts";
 
 const { width, height } = Dimensions.get("window");
 
@@ -31,41 +30,20 @@ const Register = ({ navigation }) => {
   const { register, loading } = useAuth();
 
   const handleRegister = async () => {
-    const errorMessages = validateInputs();
-    if (errorMessages.length === 0) {
-      try {
-        await register(email, password, username, fullName, gender);
-        // Save one time asyncstorage
-        await AsyncStorage.setItem("firstLogin", "true");
-      } catch (error) {
-        console.log("Registration failed:", error.message);
-      }
-    } else {
-      Alert.alert("Registration Failed", errorMessages.join("\n"));
+    if (!hasErrors()) {
+      await register(email, password, username, fullName, gender);
     }
   };
 
-  const validateInputs = () => {
-    let errorMessages = [];
-
-    // Validate username
-    const usernameError = Validators({ value: username, type: "username" });
-    if (usernameError) errorMessages.push(usernameError);
-
-    // Validate email
-    const emailError = Validators({ value: email.trim(), type: "email" });
-    if (emailError) errorMessages.push(emailError);
-
-    // Validate password
-    const passwordError = Validators({ value: password, type: "password" });
-    if (passwordError) errorMessages.push(passwordError);
-
-    // Validate confirm password
-    if (password !== confirmPassword) {
-      errorMessages.push("Passwords do not match.");
+  const hasErrors = () => {
+    if (!username || !email || !password || !gender || !fullName) {
+      showErrorAlert("Error", "Please fill all fields.");
+      return true;
+    } else if (password != confirmPassword) {
+      showErrorAlert("Error", "Passwords don't match");
+      return true;
     }
-
-    return errorMessages;
+    return false;
   };
 
   return (

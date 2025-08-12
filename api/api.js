@@ -3,8 +3,14 @@ import { API_BASE_URL } from "./apiConfig";
 import { GlobalAuth } from "../context/AuthContext.js";
 import { getRefreshToken, saveRefreshToken } from "../utils/tokenStore";
 import { refreshAndRotateTokens } from "../services/AuthService";
+import { showErrorAlert } from "../errors/errorAlerts";
+import {
+  isDeviceOnline,
+  notifyOffline,
+  notifyServerDown,
+} from "./networkCheck";
 
-const api = axios.create({ baseURL: API_BASE_URL });
+const api = axios.create({ baseURL: API_BASE_URL, timeout: 12000 });
 
 // Attach access token to every outgoing request (if present)
 api.interceptors.request.use(
@@ -47,6 +53,17 @@ api.interceptors.response.use(
       });
     }*/
 
+    // Detect if network error - no response
+    if (!error.response) {
+      const online = await isDeviceOnline();
+      if (!online) {
+        notifyOffline();
+      } else {
+        notifyServerDown();
+      }
+      return Promise.reject(error);
+    }
+
     // Don't go for refresh logic for them - just logout or keep logged out and reject
     const url = original?.url || "";
     if (
@@ -56,6 +73,8 @@ api.interceptors.response.use(
       url.includes("/api/users/create") ||
       url.includes("/api/auth/logout")
     ) {
+      // Some toast to show error
+      showErrorAlert("Error", data?.message);
       return Promise.reject(error);
     }
 
@@ -76,14 +95,11 @@ api.interceptors.response.use(
         if (refreshErr?.response?.status === 401) {
           if (GlobalAuth.logout) GlobalAuth.logout();
         }
+        // Some toast to show error
+        showErrorAlert("Error", data?.message);
         // Block
         Promise.reject(refreshErr);
       }
-    }
-
-    // Show toast to error if its not 403 or 401
-    if (status != 401 && status != 403 && !original._retry) {
-      // Some toast to show error
     }
 
     // Bloack all types of error
