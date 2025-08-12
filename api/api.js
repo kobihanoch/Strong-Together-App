@@ -38,39 +38,33 @@ api.interceptors.response.use(
     const status = error.response?.status;
     const data = error.response?.data;
 
-    if (status === 401) {
+    /*if (status === 401) {
       console.log("401 from API:", {
         url: original.url,
         method: original.method,
         resp: data,
         authHeader: original.headers?.Authorization?.slice(0, 32) + "...",
       });
-    }
+    }*/
 
-    if (!error.response || error.response.status !== 401)
-      return Promise.reject(error);
-
-    // Don't refresh for these
+    // Don't go for refresh logic for them - just logout or keep logged out and reject
     const url = original?.url || "";
     if (
       original?._retry ||
       url.includes("/api/auth/refresh") ||
       url.includes("/api/auth/login") ||
       url.includes("/api/users/create") ||
-      url.includes("/api/auth/checkauth") ||
       url.includes("/api/auth/logout")
     ) {
-      GlobalAuth.logout?.();
       return Promise.reject(error);
     }
 
-    // Flag for second retry
-    original._retry = true;
-
     // If got 401 no access
-    if (error.response.status === 401) {
+    if (status === 401) {
       try {
         // Try to refresh
+        // Flag for second retry
+        original._retry = true;
         const { refreshToken, accessToken } = await refreshAndRotateTokens();
         await saveRefreshToken(refreshToken);
         GlobalAuth.setAccessToken(accessToken);
@@ -82,9 +76,18 @@ api.interceptors.response.use(
         if (refreshErr?.response?.status === 401) {
           if (GlobalAuth.logout) GlobalAuth.logout();
         }
-        return Promise.reject(error);
+        // Block
+        Promise.reject(refreshErr);
       }
     }
+
+    // Show toast to error if its not 403 or 401
+    if (status != 401 && status != 403 && !original._retry) {
+      // Some toast to show error
+    }
+
+    // Bloack all types of error
+    return Promise.reject(error);
   }
 );
 
