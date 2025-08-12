@@ -1,64 +1,75 @@
+import React, { useEffect, useState } from "react";
+import {
+  ActivityIndicator,
+  StyleSheet,
+  Text,
+  View,
+  StatusBar,
+} from "react-native";
+import {
+  NavigationContainer,
+  useNavigationContainerRef,
+} from "@react-navigation/native";
+import { createStackNavigator } from "@react-navigation/stack";
+import * as Notifications from "expo-notifications";
+import * as Font from "expo-font";
+
 import {
   Inter_400Regular,
   Inter_700Bold,
   Inter_500Medium,
   Inter_600SemiBold,
 } from "@expo-google-fonts/inter";
-import {
-  CommonActions,
-  NavigationContainer,
-  useNavigationContainerRef,
-} from "@react-navigation/native";
-import * as Font from "expo-font";
-import React, { useEffect, useState } from "react";
-import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
-import BottomTabBar from "./components/BottomTabBar";
-import Theme1 from "./components/Theme1";
+
 import { AuthProvider, useAuth } from "./context/AuthContext";
-import AppStack from "./navigation/AppStack";
-import AuthStack from "./navigation/AuthStack";
-import { StatusBar } from "react-native";
-import { createStackNavigator } from "@react-navigation/stack";
 import { NotificationsProvider } from "./context/NotificationsContext";
 import NotificationsSetup from "./notifications/NotificationsSetup";
-import * as Notifications from "expo-notifications";
-import LoadingPage from "./components/LoadingPage";
+
+import Theme1 from "./components/Theme1";
+import BottomTabBar from "./components/BottomTabBar";
 import MainLoadingScreen from "./components/MainLoadingScreen";
+
+import AppStack from "./navigation/AppStack";
+import AuthStack from "./navigation/AuthStack";
 
 const RootStack = createStackNavigator();
 
+/** ---------- Notifications: set once (outside components) ---------- */
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowAlert: false,
+    shouldPlaySound: false,
+    shouldSetBadge: false, // TODO: הפוך ל-true בבילד
+  }),
+});
+
+/** ---------- Fonts Loader Hook ---------- */
+function useFontsReady() {
+  const [ready, setReady] = useState(false);
+  useEffect(() => {
+    (async () => {
+      await Font.loadAsync({
+        PoppinsLight: require("./assets/fonts/Poppins-Light.ttf"),
+        Inter_400Regular,
+        Inter_700Bold,
+        Inter_500Medium,
+        Inter_600SemiBold,
+      });
+      setReady(true);
+    })();
+  }, []);
+  return ready;
+}
+
+/** ---------- App Root ---------- */
 export default function App() {
-  const [fontsLoaded, setFontsLoaded] = useState(false);
+  const fontsReady = useFontsReady();
   const navigationRef = useNavigationContainerRef();
 
-  // This tells Expo to show the notification even when app is in foreground
-  Notifications.setNotificationHandler({
-    handleNotification: async () => ({
-      shouldShowAlert: false,
-      shouldPlaySound: false,
-      shouldSetBadge: false, // CHANGE ALL TO TRUE ON BUILD
-    }),
-  });
-
-  const loadFonts = async () => {
-    await Font.loadAsync({
-      PoppinsLight: require("./assets/fonts/Poppins-Light.ttf"),
-      Inter_400Regular,
-      Inter_700Bold,
-      Inter_500Medium,
-      Inter_600SemiBold,
-    });
-    setFontsLoaded(true);
-  };
-
-  useEffect(() => {
-    loadFonts();
-  }, []);
-
-  if (!fontsLoaded) {
+  if (!fontsReady) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#0000ff" />
+        <ActivityIndicator size="large" />
         <Text>Loading...</Text>
       </View>
     );
@@ -66,54 +77,56 @@ export default function App() {
 
   return (
     <AuthProvider>
-      <WrappedWithNotifications />
+      <RootProviders navigationRef={navigationRef} />
     </AuthProvider>
   );
 }
 
-const WrappedWithNotifications = () => {
-  const { user } = useAuth();
-  const navigationRef = useNavigationContainerRef();
+/** ---------- Providers chain kept minimal ---------- */
+function RootProviders({ navigationRef }) {
+  const { user } = useAuth(); // מועבר ל-NotificationsProvider
 
   return (
     <NotificationsProvider user={user}>
       <NavigationContainer ref={navigationRef}>
-        <MainNavigator />
+        <RootNavigator />
       </NavigationContainer>
     </NotificationsProvider>
   );
-};
+}
 
-function MainNavigator() {
+/** ---------- Navigation Logic (single place) ---------- */
+function RootNavigator() {
   const { isLoggedIn, sessionLoading } = useAuth();
 
-  // If session is initialized - don't show auth screen but loading screen instead - can be customized in future
-  if (sessionLoading) {
-    return <MainLoadingScreen />;
-  }
+  if (sessionLoading) return <MainLoadingScreen />;
+
   return (
     <RootStack.Navigator screenOptions={{ headerShown: false }}>
       {isLoggedIn ? (
-        <RootStack.Screen name="App" component={AppWrapper} />
+        <RootStack.Screen name="App" component={MainApp} />
       ) : (
         <RootStack.Screen name="Auth" component={AuthStack} />
       )}
     </RootStack.Navigator>
   );
-  function AppWrapper() {
-    return (
-      <>
-        <StatusBar barStyle="dark-content" />
-        <Theme1>
-          <AppStack />
-          <NotificationsSetup />
-        </Theme1>
-        <BottomTabBar />
-      </>
-    );
-  }
 }
 
+/** ---------- Logged-in Shell UI ---------- */
+function MainApp() {
+  return (
+    <>
+      <StatusBar barStyle="dark-content" />
+      <Theme1>
+        <AppStack />
+        <NotificationsSetup />
+      </Theme1>
+      <BottomTabBar />
+    </>
+  );
+}
+
+/** ---------- Styles ---------- */
 const styles = StyleSheet.create({
   loadingContainer: {
     flex: 1,
