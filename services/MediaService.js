@@ -1,8 +1,3 @@
-// Uploads profile pic to public Supabase Storage via REST API
-// Change name
-// Upload file
-// Update URL in DB
-
 import api from "../api/api";
 
 // Return URL

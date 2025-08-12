@@ -12,6 +12,7 @@ import {
 import useMediaUploads from "../../hooks/useMediaUploads";
 import supabase from "../../src/supabaseClient";
 import { useAuth } from "../../context/AuthContext";
+import api from "../../api/api";
 
 const { width, height } = Dimensions.get("window");
 
@@ -20,7 +21,7 @@ function ImagePickerComponent({ user, setMediaLoading }) {
   const { uploadToStorageAndReturnPath, loading: mediaLoading } =
     useMediaUploads();
 
-  const [profileImageUrl, setProfileImageUrl] = useState(
+  const [profileimagePath, setProfileimagePath] = useState(
     user?.profile_image_url
   );
 
@@ -57,7 +58,7 @@ function ImagePickerComponent({ user, setMediaLoading }) {
           profile_image_url: path,
         }));
 
-        setProfileImageUrl(path);
+        setProfileimagePath(path);
       }
     } catch (err) {
       console.log("Error handling profile image upload:", err);
@@ -67,21 +68,16 @@ function ImagePickerComponent({ user, setMediaLoading }) {
   };
 
   const deleteProfilePicture = async () => {
-    /*try {
-      const fileName = `${user.id}.jpg`;
+    await api.delete(`/api/users/deleteprofilepic`, {
+      data: { path: profileimagePath },
+    });
+    // Update in auth context
+    setUser((prev) => ({
+      ...prev,
+      profile_image_url: null,
+    }));
 
-      await supabase.storage.from("profile_pics").remove([fileName]);
-
-      await updateProfilePictureURLForUser(user.id, "");
-      updateProfilePic("");
-      setProfileImageUrl("");
-
-      console.log("Profile picture deleted successfully.");
-    } catch (err) {
-      console.log("Error deleting profile picture:", err);
-    } finally {
-      setMediaLoading(false);
-    }*/
+    setProfileimagePath(null);
   };
 
   return (
@@ -92,7 +88,7 @@ function ImagePickerComponent({ user, setMediaLoading }) {
         gap: height * 0.02,
       }}
     >
-      {profileImageUrl ? (
+      {profileimagePath ? (
         <TouchableOpacity
           onPress={deleteProfilePicture}
           style={styles.deleteButton}
@@ -106,9 +102,9 @@ function ImagePickerComponent({ user, setMediaLoading }) {
         ) : (
           <Image
             source={
-              profileImageUrl
+              profileimagePath
                 ? {
-                    uri: `${process.env.EXPO_PUBLIC_SUPABASE_URL}/storage/v1/object/public/${profileImageUrl}`,
+                    uri: `${process.env.EXPO_PUBLIC_SUPABASE_URL}/storage/v1/object/public/${profileimagePath}`,
                   }
                 : user?.gender == "Male"
                 ? require("../../assets/man.png")
