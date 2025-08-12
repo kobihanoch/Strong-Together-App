@@ -1,5 +1,6 @@
 import { NotifierRoot, NotifierWrapper } from "react-native-notifier";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { AlertNotificationRoot } from "react-native-alert-notification";
 
 import React, { useEffect, useState } from "react";
 import {
@@ -42,7 +43,7 @@ Notifications.setNotificationHandler({
   handleNotification: async () => ({
     shouldShowAlert: false,
     shouldPlaySound: false,
-    shouldSetBadge: false, // TODO: הפוך ל-true בבילד
+    shouldSetBadge: false, // TODO: Show TRUE on build
   }),
 });
 
@@ -80,12 +81,14 @@ export default function App() {
 
   return (
     // The package
-    <GestureHandlerRootView style={{ flex: 1 }}>
-      <AuthProvider>
-        <RootProviders navigationRef={navigationRef} />
-        <NotifierRoot />
-      </AuthProvider>
-    </GestureHandlerRootView>
+    <AlertNotificationRoot>
+      <GestureHandlerRootView style={{ flex: 1 }}>
+        <AuthProvider>
+          <RootProviders navigationRef={navigationRef} />
+          <NotifierRoot />
+        </AuthProvider>
+      </GestureHandlerRootView>
+    </AlertNotificationRoot>
   );
 }
 

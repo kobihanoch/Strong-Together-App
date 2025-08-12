@@ -25,6 +25,7 @@ import ExerciseBox from "../components/StartWorkoutComponents/ExerciseBox";
 import { useFocusEffect } from "@react-navigation/native";
 import { BackHandler } from "react-native";
 import BottomModal from "../components/BottomModal";
+import { Dialog } from "react-native-alert-notification";
 
 const { width, height } = Dimensions.get("window");
 
@@ -98,20 +99,24 @@ const StartWorkout = ({ navigation, route }) => {
             gap: width * 0.03,
           }}
           onPress={() => {
-            Alert.alert(
-              "Finish Workout?",
-              "Are you sure you’ve completed your workout?",
-              [
-                {
-                  text: "Cancel",
-                  style: "cancel",
-                },
-                {
-                  text: "Yes, Finish",
-                  onPress: () => workoutSaving.setSaveStarted(true),
-                },
-              ]
-            );
+            let pressedYes = false;
+
+            Dialog.show({
+              type: "SUCCESS",
+              title: "Finish Workout?",
+              textBody: "Are you sure you’ve completed your workout?",
+              button: "Yes, Finish",
+              closeOnOverlayTap: true,
+              onPressButton: () => {
+                pressedYes = true;
+                Dialog.hide();
+                workoutSaving.setSaveStarted(true);
+              },
+              onHide: () => {
+                if (!pressedYes) {
+                }
+              },
+            });
           }}
         >
           <Text

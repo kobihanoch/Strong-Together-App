@@ -5,6 +5,7 @@ import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityI
 import { useCreateWorkout } from "../../../context/CreateWorkoutContext";
 import GradientedGoToButton from "../../GradientedGoToButton";
 import ModifySplitNamesCard from "../ModifySplitNamesScreenComponents/ModifySplitNamesCard";
+import { Dialog } from "react-native-alert-notification";
 
 const { width, height } = Dimensions.get("window");
 
@@ -66,21 +67,26 @@ function ModifySplitNamesScreen() {
             gradientColors={["#2979FF", "#2979FF"]}
             borderRadius={height * 0.1}
             onPress={() => {
-              Alert.alert(
-                "Reset workout?",
-                "Going back will reset your current workout and delete all sets you've logged so far.\n\nThis action is only finalized if you save again.",
-                [
-                  {
-                    text: "Cancel",
-                    style: "cancel",
-                  },
-                  {
-                    text: "Continue",
-                    style: "destructive",
-                    onPress: () => properties.setCurrentStep(1),
-                  },
-                ]
-              );
+              let pressedContinue = false;
+
+              Dialog.show({
+                type: "WARNING",
+                title: "Reset workout?",
+                textBody:
+                  "Going back will reset your current workout and delete all sets you've logged so far.\n\nThis action is only finalized if you save again.",
+                button: "Continue",
+                closeOnOverlayTap: true,
+                onPressButton: () => {
+                  pressedContinue = true;
+                  Dialog.hide();
+                  properties.setCurrentStep(1);
+                },
+                onHide: () => {
+                  if (!pressedContinue) {
+                    // כאן זה ה-Cancel
+                  }
+                },
+              });
             }}
           >
             <View
