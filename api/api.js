@@ -4,8 +4,13 @@ import { GlobalAuth } from "../context/AuthContext.js";
 import { getRefreshToken, saveRefreshToken } from "../utils/tokenStore";
 import { refreshAndRotateTokens } from "../services/AuthService";
 import { showErrorAlert } from "../errors/errorAlerts";
+import {
+  isDeviceOnline,
+  notifyOffline,
+  notifyServerDown,
+} from "./networkCheck";
 
-const api = axios.create({ baseURL: API_BASE_URL });
+const api = axios.create({ baseURL: API_BASE_URL, timeout: 12000 });
 
 // Attach access token to every outgoing request (if present)
 api.interceptors.request.use(
@@ -47,6 +52,17 @@ api.interceptors.response.use(
         authHeader: original.headers?.Authorization?.slice(0, 32) + "...",
       });
     }*/
+
+    // Detect if network error - no response
+    if (!error.response) {
+      const online = await isDeviceOnline();
+      if (!online) {
+        notifyOffline();
+      } else {
+        notifyServerDown();
+      }
+      return Promise.reject(error);
+    }
 
     // Don't go for refresh logic for them - just logout or keep logged out and reject
     const url = original?.url || "";
