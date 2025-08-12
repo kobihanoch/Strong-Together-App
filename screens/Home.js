@@ -4,7 +4,6 @@ import { RFValue } from "react-native-responsive-fontsize";
 import LastWorkoutSection from "../components/HomeComponents/LastWorkoutSection";
 import QuickLookSection from "../components/HomeComponents/QuickLookSection";
 import StartWorkoutButton from "../components/HomeComponents/StartWorkoutButton";
-import LoadingPage from "../components/LoadingPage";
 import { useAuth } from "../context/AuthContext";
 import useHomePageLogic from "../hooks/logic/useHomePageLogic";
 
@@ -13,10 +12,10 @@ const { width, height } = Dimensions.get("window");
 const Home = ({ navigation }) => {
   const { user } = useAuth();
   // Hook handling
-  const { data: userData, loading, error } = useHomePageLogic(user);
+  const { data: userData, loading } = useHomePageLogic(user);
 
   if (loading || !userData) {
-    return <LoadingPage message="Loading user data..." />;
+    return null;
   }
   return (
     <View style={{ flex: 1, paddingVertical: height * 0.02 }}>

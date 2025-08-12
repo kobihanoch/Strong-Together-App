@@ -1,5 +1,6 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import React, { createContext, useContext, useEffect, useState } from "react";
+import api from "../api/api";
 import {
   fetchSelfUserData,
   loginUser,
@@ -11,14 +12,16 @@ import {
   getUserExerciseTracking,
   getUserWorkout,
 } from "../services/WorkoutService";
-import { hasWorkoutForToday } from "../utils/authUtils";
+import {
+  hasWorkoutForToday,
+  unpackFromExerciseTrackingData,
+} from "../utils/authUtils";
 import { splitTheWorkout } from "../utils/sharedUtils";
 import {
   clearRefreshToken,
   getRefreshToken,
   saveRefreshToken,
 } from "../utils/tokenStore.js";
-import api from "../api/api";
 
 const AuthContext = createContext();
 export const useAuth = () => useContext(AuthContext);
@@ -47,6 +50,8 @@ export const AuthProvider = ({ children, onLogout }) => {
   const [workoutSplits, setWorkoutSplits] = useState(null);
   const [exercises, setExercises] = useState(null);
   const [exerciseTracking, setExerciseTracking] = useState(null);
+  const [analyzedExerciseTrackingData, setAnalyzedExerciseTrackingData] =
+    useState(null);
 
   const [isWorkoutMode, setIsWorkoutMode] = useState(false);
 
@@ -77,31 +82,6 @@ export const AuthProvider = ({ children, onLogout }) => {
     };
   }, []);
 
-  const initializeUserSession = async () => {
-    setSessionLoading(true);
-    try {
-      const userWorkoutData = await getUserWorkout();
-      const exerciseTrackingData = await getUserExerciseTracking();
-      const {
-        workout: wData,
-        workoutSplits: sData,
-        exercises: eData,
-      } = splitTheWorkout(userWorkoutData?.data);
-
-      if (userWorkoutData) {
-        setWorkout(wData);
-        setWorkoutSplits(sData);
-        setExercises(eData);
-      }
-      if (exerciseTrackingData) {
-        setExerciseTracking(exerciseTrackingData.data);
-        setHasTrainedToday(hasWorkoutForToday(exerciseTrackingData.data));
-      }
-    } finally {
-      setSessionLoading(false);
-    }
-  };
-
   // On app start: rotate tokens via checkAuth and only then load data.
   // Restore session on provider mount BEFORE children render critical stuff
   useEffect(() => {
@@ -131,6 +111,38 @@ export const AuthProvider = ({ children, onLogout }) => {
 
       await initializeUserSession();
     } catch (err) {
+    } finally {
+      setSessionLoading(false);
+    }
+  };
+
+  // After checking authentication, load all user's workouts data
+  const initializeUserSession = async () => {
+    setSessionLoading(true);
+    try {
+      const userWorkoutData = await getUserWorkout();
+      const exerciseTrackingData = await getUserExerciseTracking();
+      const {
+        workout: wData,
+        workoutSplits: sData,
+        exercises: eData,
+      } = splitTheWorkout(userWorkoutData?.data);
+
+      // Set user workout
+      if (userWorkoutData) {
+        setWorkout(wData);
+        setWorkoutSplits(sData);
+        setExercises(eData);
+      }
+      // Set exercisetracking and analysis
+      if (exerciseTrackingData) {
+        setExerciseTracking(exerciseTrackingData.exercisetracking);
+        // All home page data
+        setAnalyzedExerciseTrackingData(
+          unpackFromExerciseTrackingData(exerciseTrackingData)
+        );
+        setHasTrainedToday(exerciseTrackingData.hasTrainedToday);
+      }
     } finally {
       setSessionLoading(false);
     }
@@ -212,6 +224,7 @@ export const AuthProvider = ({ children, onLogout }) => {
           setExercises,
           exerciseTracking,
           setExerciseTracking,
+          analyzedExerciseTrackingData,
         },
         isWorkoutMode,
         setIsWorkoutMode,
