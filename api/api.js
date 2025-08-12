@@ -3,6 +3,7 @@ import { API_BASE_URL } from "./apiConfig";
 import { GlobalAuth } from "../context/AuthContext.js";
 import { getRefreshToken, saveRefreshToken } from "../utils/tokenStore";
 import { refreshAndRotateTokens } from "../services/AuthService";
+import { showErrorAlert } from "../errors/errorAlerts";
 
 const api = axios.create({ baseURL: API_BASE_URL });
 
@@ -56,6 +57,8 @@ api.interceptors.response.use(
       url.includes("/api/users/create") ||
       url.includes("/api/auth/logout")
     ) {
+      // Some toast to show error
+      showErrorAlert("Error", data?.message);
       return Promise.reject(error);
     }
 
@@ -76,14 +79,11 @@ api.interceptors.response.use(
         if (refreshErr?.response?.status === 401) {
           if (GlobalAuth.logout) GlobalAuth.logout();
         }
+        // Some toast to show error
+        showErrorAlert("Error", data?.message);
         // Block
         Promise.reject(refreshErr);
       }
-    }
-
-    // Show toast to error if its not 403 or 401
-    if (status != 401 && status != 403 && !original._retry) {
-      // Some toast to show error
     }
 
     // Bloack all types of error

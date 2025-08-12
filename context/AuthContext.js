@@ -181,7 +181,6 @@ export const AuthProvider = ({ children, onLogout }) => {
 
       await initializeUserSession();
     } catch (err) {
-      console.log(err?.response?.data || err.message);
       throw err;
     } finally {
       setLoading(false);

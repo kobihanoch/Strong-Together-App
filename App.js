@@ -1,4 +1,4 @@
-import { NotifierWrapper } from "react-native-notifier";
+import { NotifierRoot, NotifierWrapper } from "react-native-notifier";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 import React, { useEffect, useState } from "react";
@@ -83,6 +83,7 @@ export default function App() {
     <GestureHandlerRootView style={{ flex: 1 }}>
       <AuthProvider>
         <RootProviders navigationRef={navigationRef} />
+        <NotifierRoot />
       </AuthProvider>
     </GestureHandlerRootView>
   );
