@@ -1,4 +1,3 @@
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import React, { createContext, useContext, useEffect, useState } from "react";
 import api from "../api/api";
 import {
@@ -19,7 +18,7 @@ import {
   getRefreshToken,
   saveRefreshToken,
 } from "../utils/tokenStore.js";
-import { connectSocket, disconnectSocket } from "../src/socket";
+import { connectSocket, disconnectSocket } from "../webSockets/socketConfig";
 
 const AuthContext = createContext();
 export const useAuth = () => useContext(AuthContext);
