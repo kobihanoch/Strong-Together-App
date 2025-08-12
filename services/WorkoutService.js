@@ -1,17 +1,6 @@
 import api from "../api/api";
 import supabase from "../src/supabaseClient";
 
-// Fetch workouts by user ID
-export const fetchWorkoutsByUserId = async (userId) => {
-  const { data, error } = await supabase
-    .from("workoutplans")
-    .select("*")
-    .eq("user_id", userId);
-
-  if (error) throw error;
-  return data;
-};
-
 // Fetch self workout plan
 export const getUserWorkout = async () => {
   try {
@@ -22,11 +11,11 @@ export const getUserWorkout = async () => {
   }
 };
 
-// Gets user workout learning
+// Gets user exercise tracking data - including home page ata PR most common etc...
 export const getUserExerciseTracking = async (userId) => {
   try {
     const response = await api.get("/api/workouts/gettracking");
-    return response;
+    return response.data;
   } catch (error) {
     throw error;
   }

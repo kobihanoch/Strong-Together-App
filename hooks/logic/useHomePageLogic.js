@@ -1,10 +1,5 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "../../context/AuthContext";
-import { getMostFrequentSplitNameByUserId } from "../../services/ExerciseTrackingService";
-import {
-  getUserGeneralPR,
-  getUserLastWorkoutDate,
-} from "../../utils/homePageUtils";
 
 const useHomePageLogic = (user) => {
   // User data
@@ -13,7 +8,12 @@ const useHomePageLogic = (user) => {
   const [firstName, setFirstName] = useState(null);
 
   // Workout from context and unpack
-  const { workout, workoutSplits, exerciseTracking } = useAuth().workout;
+  const {
+    workout,
+    workoutSplits,
+    exerciseTracking,
+    analyzedExerciseTrackingData,
+  } = useAuth().workout;
 
   // Inner states
   const [hasAssignedWorkout, setHasAssignedWorkout] = useState(false);
@@ -28,15 +28,19 @@ const useHomePageLogic = (user) => {
   // Set username after user is loaded
   useEffect(() => {
     const loadData = async () => {
-      if (user && user.username && user.id) {
+      if (user && analyzedExerciseTrackingData) {
         setLoading(true);
         try {
-          const freSplit = await getMostFrequentSplitNameByUserId(user.id);
-          setMostFrequentSplit(freSplit);
           setUsername(user.username);
           setFirstName(user.name.split(" ")[0]);
           setUserId(user.id);
           setProfileImageUrl(user.profile_image_url);
+          // Workout data
+          setPR(analyzedExerciseTrackingData.pr);
+          setTotalWorkoutNumber(analyzedExerciseTrackingData.workoutCount);
+          setMostFrequentSplit(analyzedExerciseTrackingData.mostFrequentSplit);
+          setTotalWorkoutNumber(analyzedExerciseTrackingData.workoutCount);
+          setLastWorkoutDate(analyzedExerciseTrackingData.lastWorkoutDate);
         } catch (err) {
           console.error("Error fetching exercise tracking:", err);
         } finally {
@@ -46,35 +50,12 @@ const useHomePageLogic = (user) => {
     };
 
     loadData();
-  }, [user]);
-
-  // Sets PR
-  useEffect(() => {
-    if (exerciseTracking && exerciseTracking.length > 0) {
-      setPR(getUserGeneralPR(exerciseTracking));
-    }
-  }, [exerciseTracking]);
+  }, [user, analyzedExerciseTrackingData]);
 
   // Set user's assigned workout state after user is loaded
   useEffect(() => {
     setHasAssignedWorkout(!!workout);
   }, [workout]);
-
-  // Get last workout date
-  useEffect(() => {
-    setLastWorkoutDate(getUserLastWorkoutDate(exerciseTracking));
-  }, [exerciseTracking]);
-
-  // Counter for workouts made
-  useEffect(() => {
-    const uniWorkouts = new Set();
-    if (exerciseTracking && exerciseTracking.length > 0) {
-      exerciseTracking.forEach((exerciseInTrackingData) => {
-        uniWorkouts.add(exerciseInTrackingData.workoutdate);
-      });
-      setTotalWorkoutNumber(uniWorkouts.size);
-    }
-  }, [exerciseTracking]);
 
   // Set workout splits count
   useEffect(() => {

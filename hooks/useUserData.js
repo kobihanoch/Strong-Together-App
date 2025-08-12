@@ -1,10 +1,5 @@
-import { useEffect, useState } from "react";
-import { useAuth } from "../context/AuthContext";
-import {
-  updateProfilePictureURL,
-  getUserData,
-  getUsername,
-} from "../services/UserService";
+import { useState } from "react";
+import { updateProfilePictureURL } from "../services/UserService";
 
 export const useUserData = (userId) => {
   const [loading, setLoading] = useState(false);
@@ -26,35 +21,8 @@ export const useUserData = (userId) => {
     }
   };
 
-  const fetchUserData = async (userId) => {
-    setLoading(true);
-    try {
-      const userData = await getUserData(userId);
-      setUserData(userData);
-    } catch (err) {
-      console.log(err);
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const fetchUserNameByUserId = async (userId) => {
-    setLoading(true);
-    try {
-      const userData = await getUsername(userId);
-      setUsername(userData.username);
-    } catch (err) {
-      console.log(err);
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  };
-
   return {
     updateProfilePictureURLForUser,
-    fetchUserData,
     username,
     userData,
     error,

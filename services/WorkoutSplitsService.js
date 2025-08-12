@@ -1,27 +1,5 @@
 import supabase from "../src/supabaseClient";
 
-// Fetch all workout splits by workout ID
-export const fetchWorkoutSplitsByWorkoutId = async (workoutId) => {
-  const { data, error } = await supabase
-    .from("workoutsplits")
-    .select("*")
-    .eq("workout_id", workoutId);
-
-  if (error) throw error;
-  return data;
-};
-
-// Fetch all workout splits by user ID
-export const fetchWorkoutSplitsByUserId = async (userId) => {
-  const { data, error } = await supabase
-    .from("workoutsplits")
-    .select("*, workoutplans!inner(user_id)")
-    .eq("workoutplans.user_id", userId);
-
-  if (error) throw error;
-  return data;
-};
-
 // Add multiple workout splits - aeach obj with workout_id and name
 export const addWorkoutSplits = async (splitsArray) => {
   const { data, error } = await supabase
@@ -59,18 +37,6 @@ export const deleteWorkoutSplit = async (id) => {
     .from("workoutsplits")
     .delete()
     .eq("id", id);
-
-  if (error) throw error;
-  return data;
-};
-
-// Fetch all workout split data by workoutsplit_id
-export const fetchWorkoutSplitById = async (workoutsplit_id) => {
-  const { data, error } = await supabase
-    .from("workoutsplits")
-    .select("*")
-    .eq("id", workoutsplit_id)
-    .single();
 
   if (error) throw error;
   return data;
