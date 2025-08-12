@@ -1,41 +1,35 @@
+import * as ImagePicker from "expo-image-picker";
 import React, { useEffect, useState } from "react";
 import {
-  View,
-  Text,
-  Dimensions,
-  TouchableOpacity,
-  Image,
   ActivityIndicator,
+  Dimensions,
+  Image,
   StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
-import * as ImagePicker from "expo-image-picker";
 import useMediaUploads from "../../hooks/useMediaUploads";
-import useUserData from "../../hooks/useUserData";
 import supabase from "../../src/supabaseClient";
+import { useAuth } from "../../context/AuthContext";
+import api from "../../api/api";
 
 const { width, height } = Dimensions.get("window");
 
-function ImagePickerComponent({ user, updateProfilePic, setMediaLoading }) {
-  const {
-    uploadToStorage,
-    fetchPublicUrl,
-    publicPicUrl,
-    loading: mediaLoading,
-  } = useMediaUploads();
+function ImagePickerComponent({ user, setMediaLoading }) {
+  const { setUser } = useAuth();
+  const { uploadToStorageAndReturnPath, loading: mediaLoading } =
+    useMediaUploads();
 
-  const { updateProfilePictureURLForUser, loading, error } = useUserData(
-    user?.id
-  );
-
-  const [profileImageUrl, setProfileImageUrl] = useState(
+  const [profileimagePath, setProfileimagePath] = useState(
     user?.profile_image_url
   );
 
   useEffect(() => {
     if (setMediaLoading) {
-      setMediaLoading(mediaLoading || loading);
+      setMediaLoading(mediaLoading);
     }
-  }, [mediaLoading, loading]);
+  }, [mediaLoading]);
 
   const pickAndUploadImage = async () => {
     try {
@@ -56,15 +50,15 @@ function ImagePickerComponent({ user, updateProfilePic, setMediaLoading }) {
           type: "image/jpeg",
         };
 
-        await uploadToStorage(file.name, file);
+        const { path } = await uploadToStorageAndReturnPath(file);
 
-        const publicUrl = await fetchPublicUrl(file.name);
-        const fullUrl = `${publicUrl}?t=${Date.now()}`;
+        // Update in auth context
+        setUser((prev) => ({
+          ...prev,
+          profile_image_url: path,
+        }));
 
-        await updateProfilePictureURLForUser(user.id, publicUrl);
-
-        setProfileImageUrl(fullUrl);
-        updateProfilePic(fullUrl);
+        setProfileimagePath(path);
       }
     } catch (err) {
       console.log("Error handling profile image upload:", err);
@@ -74,21 +68,16 @@ function ImagePickerComponent({ user, updateProfilePic, setMediaLoading }) {
   };
 
   const deleteProfilePicture = async () => {
-    try {
-      const fileName = `${user.id}.jpg`;
+    await api.delete(`/api/users/deleteprofilepic`, {
+      data: { path: profileimagePath },
+    });
+    // Update in auth context
+    setUser((prev) => ({
+      ...prev,
+      profile_image_url: null,
+    }));
 
-      await supabase.storage.from("profile_pics").remove([fileName]);
-
-      await updateProfilePictureURLForUser(user.id, "");
-      updateProfilePic("");
-      setProfileImageUrl("");
-
-      console.log("Profile picture deleted successfully.");
-    } catch (err) {
-      console.log("Error deleting profile picture:", err);
-    } finally {
-      setMediaLoading(false);
-    }
+    setProfileimagePath(null);
   };
 
   return (
@@ -99,7 +88,7 @@ function ImagePickerComponent({ user, updateProfilePic, setMediaLoading }) {
         gap: height * 0.02,
       }}
     >
-      {profileImageUrl ? (
+      {profileimagePath ? (
         <TouchableOpacity
           onPress={deleteProfilePicture}
           style={styles.deleteButton}
@@ -113,8 +102,10 @@ function ImagePickerComponent({ user, updateProfilePic, setMediaLoading }) {
         ) : (
           <Image
             source={
-              profileImageUrl
-                ? { uri: profileImageUrl }
+              profileimagePath
+                ? {
+                    uri: `${process.env.EXPO_PUBLIC_SUPABASE_URL}/storage/v1/object/public/${profileimagePath}`,
+                  }
                 : user?.gender == "Male"
                 ? require("../../assets/man.png")
                 : require("../../assets/woman.png")

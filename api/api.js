@@ -102,6 +102,7 @@ api.interceptors.response.use(
       }
     }
 
+    showErrorAlert("Error", data?.message);
     // Bloack all types of error
     return Promise.reject(error);
   }

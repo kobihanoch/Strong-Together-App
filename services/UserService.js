@@ -1,21 +1,5 @@
 import api from "../api/api";
 import supabase from "../src/supabaseClient";
-import { SUPABASE_EDGE_URL } from "@env";
-
-// Update profile pic URL of user - RLS ENABLED
-export const updateProfilePictureURL = async (userId, picURL) => {
-  const { data, error } = await supabase
-    .from("users")
-    .update({ profile_image_url: picURL })
-    .eq("id", userId);
-
-  if (error) {
-    console.log("Service error while updating profile pic URL: " + error);
-    throw error;
-  } else {
-    console.log("Service profile pic URL updated successfully");
-  }
-};
 
 // Get another user data
 export const getAnotherUserData = async (userId) => {
