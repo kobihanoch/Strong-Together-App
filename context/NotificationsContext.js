@@ -8,6 +8,7 @@ import {
   getUserMessages,
   updateMsgReadStatus,
 } from "../services/MessagesService.js";
+import { registerToMessagesListener } from "../webSockets/socketListeners";
 
 export const NotificationsContext = createContext();
 
@@ -23,6 +24,15 @@ export const NotificationsProvider = ({ user, children }) => {
 
   // ALl profile images
   const [profileImagesCache, setProfileImagesCache] = useState({});
+
+  // Load listener
+  useEffect(() => {
+    const cleanup = registerToMessagesListener(
+      setAllReceivedMessages,
+      setUnreadMessages
+    );
+    return cleanup;
+  }, []);
 
   // Load messages on start
   useEffect(() => {
