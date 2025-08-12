@@ -1,31 +1,24 @@
+import * as ImagePicker from "expo-image-picker";
 import React, { useEffect, useState } from "react";
 import {
-  View,
-  Text,
-  Dimensions,
-  TouchableOpacity,
-  Image,
   ActivityIndicator,
+  Dimensions,
+  Image,
   StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
-import * as ImagePicker from "expo-image-picker";
 import useMediaUploads from "../../hooks/useMediaUploads";
-import useUserData from "../../hooks/useUserData";
 import supabase from "../../src/supabaseClient";
+import { useAuth } from "../../context/AuthContext";
 
 const { width, height } = Dimensions.get("window");
 
-function ImagePickerComponent({ user, updateProfilePic, setMediaLoading }) {
-  const {
-    uploadToStorage,
-    fetchPublicUrl,
-    publicPicUrl,
-    loading: mediaLoading,
-  } = useMediaUploads();
-
-  const { updateProfilePictureURLForUser, loading, error } = useUserData(
-    user?.id
-  );
+function ImagePickerComponent({ user, setMediaLoading }) {
+  const { setUser } = useAuth();
+  const { uploadToStorageAndReturnPath, loading: mediaLoading } =
+    useMediaUploads();
 
   const [profileImageUrl, setProfileImageUrl] = useState(
     user?.profile_image_url
@@ -33,9 +26,9 @@ function ImagePickerComponent({ user, updateProfilePic, setMediaLoading }) {
 
   useEffect(() => {
     if (setMediaLoading) {
-      setMediaLoading(mediaLoading || loading);
+      setMediaLoading(mediaLoading);
     }
-  }, [mediaLoading, loading]);
+  }, [mediaLoading]);
 
   const pickAndUploadImage = async () => {
     try {
@@ -56,15 +49,15 @@ function ImagePickerComponent({ user, updateProfilePic, setMediaLoading }) {
           type: "image/jpeg",
         };
 
-        await uploadToStorage(file.name, file);
+        const { path } = await uploadToStorageAndReturnPath(file);
 
-        const publicUrl = await fetchPublicUrl(file.name);
-        const fullUrl = `${publicUrl}?t=${Date.now()}`;
+        // Update in auth context
+        setUser((prev) => ({
+          ...prev,
+          profile_image_url: path,
+        }));
 
-        await updateProfilePictureURLForUser(user.id, publicUrl);
-
-        setProfileImageUrl(fullUrl);
-        updateProfilePic(fullUrl);
+        setProfileImageUrl(path);
       }
     } catch (err) {
       console.log("Error handling profile image upload:", err);
@@ -74,7 +67,7 @@ function ImagePickerComponent({ user, updateProfilePic, setMediaLoading }) {
   };
 
   const deleteProfilePicture = async () => {
-    try {
+    /*try {
       const fileName = `${user.id}.jpg`;
 
       await supabase.storage.from("profile_pics").remove([fileName]);
@@ -88,7 +81,7 @@ function ImagePickerComponent({ user, updateProfilePic, setMediaLoading }) {
       console.log("Error deleting profile picture:", err);
     } finally {
       setMediaLoading(false);
-    }
+    }*/
   };
 
   return (
@@ -114,7 +107,9 @@ function ImagePickerComponent({ user, updateProfilePic, setMediaLoading }) {
           <Image
             source={
               profileImageUrl
-                ? { uri: profileImageUrl }
+                ? {
+                    uri: `${process.env.EXPO_PUBLIC_SUPABASE_URL}/storage/v1/object/public/${profileImageUrl}`,
+                  }
                 : user?.gender == "Male"
                 ? require("../../assets/man.png")
                 : require("../../assets/woman.png")

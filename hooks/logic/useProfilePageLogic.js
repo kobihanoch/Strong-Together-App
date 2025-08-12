@@ -1,10 +1,9 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useAuth } from "../../context/AuthContext";
-import { useUserWorkout } from "../useUserWorkout";
 import { getDaysSince } from "../../utils/homePageUtils";
 
 const useProfilePageLogic = (user) => {
-  const { updateProfilePic, workout } = useAuth();
+  const { workout } = useAuth();
   const { exerciseTracking } = workout;
   const [mediaLoading, setMediaLoading] = useState(false);
   const [username, setUsername] = useState(null);
@@ -30,6 +29,8 @@ const useProfilePageLogic = (user) => {
       }
     })();
   }, [user]);
+
+  // Change
   useEffect(() => {
     const uniWorkouts = new Set();
     if (exerciseTracking && exerciseTracking.length > 0) {
@@ -49,7 +50,6 @@ const useProfilePageLogic = (user) => {
       workoutCount,
       daysOnline,
     },
-    updateProfilePic,
     loading,
     mediaLoading,
     setMediaLoading,

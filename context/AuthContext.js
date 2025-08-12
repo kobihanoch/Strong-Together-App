@@ -145,14 +145,6 @@ export const AuthProvider = ({ children, onLogout }) => {
     }
   };
 
-  const updateProfilePic = (picUrl) => {
-    setUser((prevUser) => {
-      const updatedUser = { ...prevUser, profile_image_url: picUrl };
-      AsyncStorage.setItem("user", JSON.stringify(updatedUser));
-      return updatedUser;
-    });
-  };
-
   const register = async (email, password, username, fullName, gender) => {
     setLoading(true);
     try {
@@ -199,10 +191,10 @@ export const AuthProvider = ({ children, onLogout }) => {
       value={{
         isLoggedIn,
         user,
+        setUser,
         register,
         login,
         logout,
-        updateProfilePic,
         loading,
         sessionLoading,
         setHasTrainedToday,

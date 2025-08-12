@@ -10,8 +10,7 @@ const { width, height } = Dimensions.get("window");
 
 function Profile({ navigation }) {
   const { user } = useAuth();
-  const { data, loading, mediaLoading, updateProfilePic, setMediaLoading } =
-    useProfilePageLogic(user);
+  const { data, mediaLoading, setMediaLoading } = useProfilePageLogic(user);
 
   return mediaLoading ? (
     <LoadingPage message="Loading user data..." />
@@ -35,7 +34,6 @@ function Profile({ navigation }) {
       >
         <ImagePickerComponent
           user={user}
-          updateProfilePic={updateProfilePic}
           setMediaLoading={setMediaLoading}
         ></ImagePickerComponent>
       </View>
