@@ -1,3 +1,6 @@
+import { NotifierWrapper } from "react-native-notifier";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
+
 import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
@@ -76,9 +79,12 @@ export default function App() {
   }
 
   return (
-    <AuthProvider>
-      <RootProviders navigationRef={navigationRef} />
-    </AuthProvider>
+    // The package
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <AuthProvider>
+        <RootProviders navigationRef={navigationRef} />
+      </AuthProvider>
+    </GestureHandlerRootView>
   );
 }
 
