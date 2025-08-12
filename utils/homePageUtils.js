@@ -1,13 +1,3 @@
-export const getUserLastWorkoutDate = (exercisesArr) => {
-  if (!exercisesArr || exercisesArr.length == 0) {
-    return "No data yet";
-  }
-  const sortedEtArr = [...exercisesArr].sort(
-    (a, b) => new Date(b.workoutdate) - new Date(a.workoutdate)
-  );
-  return sortedEtArr[0].workoutdate;
-};
-
 export const getDaysSince = (lastDateString) => {
   const lastDate = new Date(lastDateString);
   const today = new Date();
