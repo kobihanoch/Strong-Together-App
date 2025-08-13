@@ -8,6 +8,7 @@ const useLastWorkoutExerciseTrackingData = (exerciseToSplitId) => {
 
   useEffect(() => {
     if (exerciseTracking) {
+      // Get last performence of the specific exercise
       setLastWorkoutData(() => {
         return exerciseTracking
           .filter((et) => Number(et.exercisetosplit_id) === exerciseToSplitId)
