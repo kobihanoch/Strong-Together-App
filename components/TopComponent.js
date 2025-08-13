@@ -173,7 +173,9 @@ const TopComponent = () => {
             <Image
               source={
                 profileImageUrl
-                  ? { uri: profileImageUrl }
+                  ? {
+                      uri: `${process.env.EXPO_PUBLIC_SUPABASE_URL}/storage/v1/object/public/${profileImageUrl}`,
+                    }
                   : user?.gender == "Male"
                   ? require("../assets/man.png")
                   : require("../assets/woman.png")
