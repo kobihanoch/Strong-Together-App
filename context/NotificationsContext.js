@@ -27,12 +27,14 @@ export const NotificationsProvider = ({ user, children }) => {
 
   // Load listener
   useEffect(() => {
-    const cleanup = registerToMessagesListener(
-      setAllReceivedMessages,
-      setUnreadMessages
-    );
-    return cleanup;
-  }, []);
+    if (user) {
+      const cleanup = registerToMessagesListener(
+        setAllReceivedMessages,
+        setUnreadMessages
+      );
+      return cleanup;
+    }
+  }, [user]);
 
   // Load messages on start
   useEffect(() => {
@@ -55,6 +57,12 @@ export const NotificationsProvider = ({ user, children }) => {
       }
     })();
   }, [user]);
+
+  useEffect(() => {
+    (async () => {
+      await loadAllUsers(allReceivedMessages);
+    })();
+  }, [allReceivedMessages]);
 
   /*// When getting a new message
   useEffect(() => {
@@ -108,6 +116,7 @@ export const NotificationsProvider = ({ user, children }) => {
     setAllReceivedMessages((prev) =>
       prev.map((m) => (m.id === msgId ? { ...m, is_read: true } : m))
     );
+    setUnreadMessages((prev) => prev.filter((m) => m.id !== msgId));
   };
 
   return (

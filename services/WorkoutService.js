@@ -79,14 +79,8 @@ export const saveWorkoutData = async (dataOfWorkout) => {
   if (!dataOfWorkout) {
     return;
   }
-  console.log(
-    "Got here and inserting " + JSON.stringify(dataOfWorkout, null, 2)
-  );
-  const { error } = await supabase
-    .from("exercisetracking")
-    .insert(dataOfWorkout);
-
-  if (error) throw error;
-
-  console.log("Workout saved succesfully");
+  const { data } = await api.post("/api/workouts/finishworkout", {
+    workout: dataOfWorkout,
+  });
+  return data;
 };

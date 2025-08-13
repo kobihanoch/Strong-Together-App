@@ -68,11 +68,11 @@ const useStartWorkoutPageLogic = (user, selectedSplit, setHasTrainedToday) => {
           rDup,
           exercisesForSelectedSplit
         );
-        await saveWorkoutProccess(obj);
+        // Need to get exercise trackigg back for cache
+        const addedEt = await saveWorkoutProccess(obj);
 
         // Update cache
-        const etUpdated = await getUserExerciseTracking(user.id);
-        setExerciseTracking(etUpdated);
+        setExerciseTracking((prev) => [...prev, ...addedEt]);
         setHasTrainedToday(true);
         setIsWorkoutMode(false);
       } catch (err) {
