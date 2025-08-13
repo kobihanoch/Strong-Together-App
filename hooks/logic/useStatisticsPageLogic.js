@@ -1,45 +1,35 @@
 import moment from "moment";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   filterExercisesByDate,
   getLastWorkoutForEachExercise,
 } from "../../utils/statisticsUtils";
 import { useAuth } from "../../context/AuthContext";
 
-const useStatisticsPageLogic = (user) => {
+const useStatisticsPageLogic = () => {
   const { exerciseTracking } = useAuth().workout;
+  // Start as today's date
   const [selectedDate, setSelectedDate] = useState(
     moment().format("YYYY-MM-DD")
   );
 
-  const [exerciseTrackingByDate, setExerciseTrackingByDate] = useState(null);
-  const [exerciseTrackingByDatePrev, setExerciseTrackingByDatePrev] =
-    useState(null);
-
-  // Load prev workout data for each workout
-  useEffect(() => {
-    setExerciseTrackingByDatePrev(
-      getLastWorkoutForEachExercise(exerciseTracking, exerciseTrackingByDate)
-    );
-  }, [exerciseTracking, exerciseTrackingByDate]);
-
-  // Load when changing dates
-  useEffect(() => {
-    if (exerciseTracking && exerciseTracking.length > 0) {
-      setExerciseTrackingByDate(
-        filterExercisesByDate(exerciseTracking, selectedDate)
-      );
-    }
+  // Calculate formatted date for each change of date
+  const formattedDate = useMemo(() => {
+    return moment(selectedDate).format("YYYY-MM-DD");
   }, [selectedDate, exerciseTracking]);
 
-  // Load selected workout on load up
-  useEffect(() => {
-    if (exerciseTracking && exerciseTracking.length > 0) {
-      const formattedDate = moment(selectedDate).format("YYYY-MM-DD");
-      const filtered = filterExercisesByDate(exerciseTracking, formattedDate);
-      setExerciseTrackingByDate(filtered);
-    }
-  }, []);
+  // Change records when a date selection is aplied
+  const exerciseTrackingByDate = useMemo(() => {
+    return filterExercisesByDate(exerciseTracking, formattedDate);
+  }, [selectedDate, exerciseTracking]);
+
+  // Load prev workout data for each workout
+  const exerciseTrackingByDatePrev = useMemo(() => {
+    return getLastWorkoutForEachExercise(
+      exerciseTracking,
+      exerciseTrackingByDate
+    );
+  }, [exerciseTracking, exerciseTrackingByDate]);
 
   return {
     selectedDate,
