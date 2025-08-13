@@ -108,6 +108,7 @@ export const NotificationsProvider = ({ user, children }) => {
     setAllReceivedMessages((prev) =>
       prev.map((m) => (m.id === msgId ? { ...m, is_read: true } : m))
     );
+    setUnreadMessages((prev) => prev.filter((m) => m.id !== msgId));
   };
 
   return (
