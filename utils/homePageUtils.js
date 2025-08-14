@@ -8,8 +8,6 @@ export const getDaysSince = (lastDateString) => {
   const diffTime = today - lastDate;
   const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
 
-  console.log(diffDays);
-
   switch (diffDays) {
     case 0:
       return "today";
