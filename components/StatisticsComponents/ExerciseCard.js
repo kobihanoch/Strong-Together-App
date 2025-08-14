@@ -5,10 +5,12 @@ import { Dimensions, Image, StyleSheet, Text, View } from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";
 import images from "../../components/images";
 import { formatDate, isSetPR } from "../../utils/statisticsUtils";
+import useStatisticsPageLogic from "../../hooks/logic/useStatisticsPageLogic";
 
 const { width, height } = Dimensions.get("window");
 
-const ExerciseCard = ({ item, dataToCompare, exerciseTracking }) => {
+const ExerciseCard = ({ item, dataToCompare, byETSId }) => {
+  // Same exercise in last workout
   const previousExercise = useMemo(() => {
     return Array.isArray(dataToCompare)
       ? dataToCompare.find((prev) => prev.exercise_id == item.exercise_id)
@@ -108,7 +110,7 @@ const ExerciseCard = ({ item, dataToCompare, exerciseTracking }) => {
             {item.weight.map((w, index) => {
               const prevWeight = previousExercise?.weight?.[index];
               const isImproved = prevWeight !== undefined && w > prevWeight;
-              const isPr = isSetPR(exerciseTracking, w);
+              const isPr = isSetPR(item.exercisetosplit_id, w, byETSId);
               const color = isPr
                 ? "rgb(170, 122, 2)"
                 : prevWeight === undefined

@@ -17,6 +17,7 @@ const StatisticsPage = () => {
     exerciseTracking,
     exerciseTrackingByDate,
     exerciseTrackingByDatePrev,
+    exerciseTrackingWithETSIdKey,
   } = useStatisticsPageLogic(user);
 
   return (
@@ -50,6 +51,7 @@ const StatisticsPage = () => {
           data={exerciseTrackingByDate}
           dataToCompare={exerciseTrackingByDatePrev || []}
           exerciseTracking={exerciseTracking ?? []}
+          byETSId={exerciseTrackingWithETSIdKey}
         ></ExercisesFlatList>
       </View>
     </View>
