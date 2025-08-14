@@ -15,16 +15,6 @@ export const refreshAndRotateTokens = async () => {
   return data;
 };
 
-// Fetch self data
-export const fetchSelfUserData = async () => {
-  try {
-    const response = await api.get("/api/users/get");
-    return response;
-  } catch (error) {
-    throw error;
-  }
-};
-
 // Login
 export const loginUser = async (username, password) => {
   try {
