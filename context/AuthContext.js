@@ -1,7 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import api from "../api/api";
 import {
-  fetchSelfUserData,
   loginUser,
   logoutUser,
   refreshAndRotateTokens,
@@ -19,6 +18,7 @@ import {
   saveRefreshToken,
 } from "../utils/tokenStore.js";
 import { connectSocket, disconnectSocket } from "../webSockets/socketConfig";
+import { fetchSelfUserData } from "../services/UserService";
 
 const AuthContext = createContext();
 export const useAuth = () => useContext(AuthContext);
