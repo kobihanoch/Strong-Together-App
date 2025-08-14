@@ -1,13 +1,17 @@
 import moment from "moment";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
+import { useAuth } from "../../context/AuthContext";
 import {
-  filterExercisesByDate,
+  getExerciseTrackingMappedByDate,
   getLastWorkoutForEachExercise,
 } from "../../utils/statisticsUtils";
-import { useAuth } from "../../context/AuthContext";
 
 const useStatisticsPageLogic = () => {
   const { exerciseTracking } = useAuth().workout;
+  const exerciseTrackingWithDateKey = useMemo(() => {
+    return getExerciseTrackingMappedByDate(exerciseTracking);
+  }, [exerciseTracking]);
+
   // Start as today's date
   const [selectedDate, setSelectedDate] = useState(
     moment().format("YYYY-MM-DD")
@@ -20,8 +24,8 @@ const useStatisticsPageLogic = () => {
 
   // Change records when a date selection is aplied
   const exerciseTrackingByDate = useMemo(() => {
-    return filterExercisesByDate(exerciseTracking, formattedDate);
-  }, [selectedDate, exerciseTracking]);
+    return exerciseTrackingWithDateKey[formattedDate];
+  }, [formattedDate, exerciseTrackingWithDateKey]);
 
   // Load prev workout data for each workout
   const exerciseTrackingByDatePrev = useMemo(() => {

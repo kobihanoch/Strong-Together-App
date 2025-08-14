@@ -108,7 +108,7 @@ export const AuthProvider = ({ children }) => {
     try {
       await connectSocket(userId);
       const userWorkoutData = await getUserWorkout();
-      const exerciseTrackingData = await getUserExerciseTracking();
+      const exerciseTrackingData = await getUserExerciseTracking(); // workoutdate is a string
 
       const {
         workout: wData,

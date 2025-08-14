@@ -1,14 +1,3 @@
-export const filterExercisesByDate = (exerciseTracking = [], selectedDate) => {
-  const target =
-    typeof selectedDate === "string" ? selectedDate.slice(0, 10) : "";
-
-  return exerciseTracking.filter((et) => {
-    const day =
-      typeof et?.workoutdate === "string" ? et.workoutdate.slice(0, 10) : "";
-    return day === target;
-  });
-};
-
 export const formatDate = (dateToFormat) => {
   const monthNames = [
     "Jan",
@@ -121,4 +110,14 @@ export const getLastWorkoutWithSameType = (
 export const isSetPR = (exerciseTracking, weight) => {
   let allWeightArr = exerciseTracking.flatMap((et) => et.weight);
   return weight == Math.max(...allWeightArr);
+};
+
+// Mapping exercise tracking with key(date):value(all records)
+export const getExerciseTrackingMappedByDate = (exerciseTracking) => {
+  return exerciseTracking.reduce((acc, record) => {
+    acc[record.workoutdate]
+      ? acc[record.workoutdate].push(record)
+      : (acc[record.workoutdate] = [record]);
+    return acc;
+  }, {});
 };
