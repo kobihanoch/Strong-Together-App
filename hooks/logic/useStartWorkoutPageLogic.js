@@ -1,8 +1,6 @@
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
-import React, { useEffect, useRef, useState } from "react";
-import { Animated } from "react-native";
+import { useCallback, useMemo, useState } from "react";
 import { useAuth } from "../../context/AuthContext";
-import { getUserExerciseTracking } from "../../services/WorkoutService";
 import {
   createObjectForDataBase,
   filterZeroesInArr,
@@ -17,11 +15,11 @@ const useStartWorkoutPageLogic = (user, selectedSplit, setHasTrainedToday) => {
   const navigation = useNavigation();
 
   // --------------------[ Outside hooks ]--------------------------------------
-  const { saveWorkoutProccess } = useUserWorkout(user?.id);
+  const { saveWorkoutProcess } = useUserWorkout();
 
   // --------------------[ Set workout mode ]--------------------------------------
   useFocusEffect(
-    React.useCallback(() => {
+    useCallback(() => {
       setIsWorkoutMode(true);
 
       return () => {
@@ -33,16 +31,9 @@ const useStartWorkoutPageLogic = (user, selectedSplit, setHasTrainedToday) => {
   // --------------------[ Exercises ]------------------------------------------
   const { exercises, setExerciseTracking } = workout;
 
-  const [exercisesForSelectedSplit, setExercisesForSelectedSplit] =
-    useState(null);
-
   // Set exercises array for selected split
-  useEffect(() => {
-    if (exercises) {
-      setExercisesForSelectedSplit(
-        exercises.filter((ex) => ex.workoutsplit_id === selectedSplit.id)
-      );
-    }
+  const exercisesForSelectedSplit = useMemo(() => {
+    return exercises.filter((ex) => ex.workoutsplit_id === selectedSplit.id);
   }, [exercises]);
 
   // --------------------[ Weight and Reps arrays ]-----------------------------------------
@@ -54,48 +45,37 @@ const useStartWorkoutPageLogic = (user, selectedSplit, setHasTrainedToday) => {
 
   const [saveStarted, setSaveStarted] = useState(false);
 
-  useEffect(() => {
-    const saveData = async () => {
-      console.log("Saving started!");
-      try {
-        const { reps: rDup, weights: wDup } = filterZeroesInArr(
-          repsArrs,
-          weightArrs
-        );
-        const obj = createObjectForDataBase(
-          user.id,
-          wDup,
-          rDup,
-          exercisesForSelectedSplit
-        );
-        // Need to get exercise trackigg back for cache
-        const addedEt = await saveWorkoutProccess(obj);
+  const saveData = useCallback(async () => {
+    setSaveStarted(true);
+    console.log("Saving started!");
+    try {
+      const { reps: rDup, weights: wDup } = filterZeroesInArr(
+        repsArrs,
+        weightArrs
+      );
+      const obj = createObjectForDataBase(
+        user.id,
+        wDup,
+        rDup,
+        exercisesForSelectedSplit
+      );
+      // Need to get exercise trackigg back for cache
+      const addedEt = await saveWorkoutProcess(obj);
 
-        // Update cache
-        setExerciseTracking((prev) => [...prev, ...addedEt]);
-        setHasTrainedToday(true);
-        setIsWorkoutMode(false);
-      } catch (err) {
-        console.error(err);
-        throw err;
-      } finally {
-        navigation.navigate("Statistics");
-        setSaveStarted(false);
-      }
-    };
-
-    if (saveStarted) {
-      saveData();
+      // Update cache
+      setExerciseTracking((prev) => [...prev, ...addedEt]);
+      setHasTrainedToday(true);
+      setIsWorkoutMode(false);
+    } catch (err) {
+      console.error(err);
+      throw err;
+    } finally {
+      navigation.navigate("Statistics");
+      setSaveStarted(false);
     }
-  }, [saveStarted]);
-
-  // --------------------[ Glow Animation ]-----------------------------------------
-  const glowAnimation = useRef(new Animated.Value(1)).current;
+  });
 
   return {
-    animation: {
-      glowAnimation,
-    },
     data: {
       exercisesForSelectedSplit,
       weightArrs,
@@ -105,7 +85,7 @@ const useStartWorkoutPageLogic = (user, selectedSplit, setHasTrainedToday) => {
     },
     saving: {
       saveStarted,
-      setSaveStarted,
+      saveData,
     },
   };
 };
