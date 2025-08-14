@@ -30,6 +30,15 @@ import { fetchSelfUserData } from "../services/UserService";
 const AuthContext = createContext();
 export const useAuth = () => useContext(AuthContext);
 
+/**
+ * Auth Context Value Flow:
+ * - Authentication state: isLoggedIn, user, loading flags
+ * - Auth actions: register, login, logout
+ * - Session init functions: checkIfUserSession, initializeUserSession
+ * - Workout state & tracking data
+ * - Workout mode state
+ */
+
 // Single source of truth for access token across app and interceptors.
 let _accessToken = null;
 
@@ -152,18 +161,6 @@ export const AuthProvider = ({ children }) => {
   }, [initializeUserSession]);
 
   // ---------------- AUTH ACTIONS ----------------
-  const register = useCallback(
-    async (email, password, username, fullName, gender) => {
-      setLoading(true);
-      try {
-        await registerUser(email, password, username, fullName, gender);
-        await login(username, password);
-      } finally {
-        setLoading(false);
-      }
-    },
-    []
-  ); // Depends on `login` if defined before
 
   const login = useCallback(
     async (username, password) => {
@@ -184,6 +181,19 @@ export const AuthProvider = ({ children }) => {
     [initializeUserSession]
   );
 
+  const register = useCallback(
+    async (email, password, username, fullName, gender) => {
+      setLoading(true);
+      try {
+        await registerUser(email, password, username, fullName, gender);
+        await login(username, password);
+      } finally {
+        setLoading(false);
+      }
+    },
+    [login]
+  );
+
   const logout = useCallback(async () => {
     try {
       await logoutUser();
@@ -202,14 +212,6 @@ export const AuthProvider = ({ children }) => {
   // ---------------- CONTEXT VALUE (MEMOIZED) ----------------
   const value = useMemo(
     () => ({
-      /**
-       * Auth Context Value Flow:
-       * - Authentication state: isLoggedIn, user, loading flags
-       * - Auth actions: register, login, logout
-       * - Session init functions: checkIfUserSession, initializeUserSession
-       * - Workout state & tracking data
-       * - Workout mode state
-       */
       isLoggedIn,
       user,
       setUser,
