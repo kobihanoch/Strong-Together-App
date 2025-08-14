@@ -1,6 +1,5 @@
-import { useState, useEffect } from "react";
-import supabase from "../src/supabaseClient";
-import { getAllExercises } from "../services/ExercisesService";
+import { useEffect, useState } from "react";
+import api from "../api/api";
 
 const useExercises = () => {
   const [exercises, setExercises] = useState([]);
@@ -10,11 +9,11 @@ const useExercises = () => {
   useEffect(() => {
     const fetchExercises = async () => {
       try {
-        const exc = await getAllExercises();
-        setExercises(exc);
+        const { data } = await api.get("/api/exercises/getall");
+        setExercises(data);
       } catch (e) {
         console.log(e);
-        setError(error);
+        setError(e);
       } finally {
         setLoading(false);
       }
