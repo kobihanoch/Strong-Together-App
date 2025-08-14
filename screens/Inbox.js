@@ -36,11 +36,10 @@ const Inbox = () => {
               <MessageItem
                 item={item}
                 profileImages={media.profileImagesCache}
-                sender={
-                  messages?.allSendersUsersArr?.filter(
-                    (usr) => usr.id === item.sender_id
-                  )[0]
-                }
+                sender={{
+                  id: item.sender_id,
+                  name: item.sender_full_name,
+                }}
                 deleteMessage={messages.confirmAndDeleteMessage}
               ></MessageItem>
             )}

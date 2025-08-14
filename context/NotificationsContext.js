@@ -1,129 +1,102 @@
-import { createContext, useContext, useEffect, useState } from "react";
-import { getAnotherUserData } from "../services/UserService";
-import { filterMessagesByUnread } from "../utils/authUtils";
-import { listenToMessags } from "../utils/realTimeUtils";
-import supabase from "../src/supabaseClient";
-import { Image } from "react-native";
+import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import {
   getUserMessages,
   updateMsgReadStatus,
 } from "../services/MessagesService.js";
+import { filterMessagesByUnread } from "../utils/authUtils";
+import { cacheProfileImagesAndGetMap } from "../utils/notificationsUtils.js";
 import { registerToMessagesListener } from "../webSockets/socketListeners";
+
+/**
+ * Notifications Flow:
+ * 1. On mount (if user exists) → fetch messages + senders in one API call.
+ * 2. Store messages in allReceivedMessages, senders in allSendersUsersArr.
+ * 3. Derive unreadMessages via useMemo(filterMessagesByUnread).
+ * 4. Prefetch profile images on senders change → build profileImagesCache.
+ * 5. Listen to "new_message" socket events → append message/sender if new.
+ * 6. markAsRead → API call + local state update.
+ * 7. On logout → clear all state.
+ */
 
 export const NotificationsContext = createContext();
 
 export const useNotifications = () => useContext(NotificationsContext);
 
 export const NotificationsProvider = ({ user, children }) => {
-  const [unreadMessages, setUnreadMessages] = useState([]);
+  // All user's received messages
   const [allReceivedMessages, setAllReceivedMessages] = useState([]);
-  const [loadingMessages, setLoadingMessages] = useState(false);
 
-  // All senders
-  const [allSendersUsersArr, setAllSendersUsersArr] = useState(null);
+  // Filter messages to read/unread => Everytime all messages is updated (when receiving a new message), filter is executed
+  const unreadMessages = useMemo(() => {
+    return filterMessagesByUnread(allReceivedMessages);
+  }, [allReceivedMessages]);
+
+  /// All senders
+  const [allSendersUsersArr, setAllSendersUsersArr] = useState([]);
 
   // ALl profile images
   const [profileImagesCache, setProfileImagesCache] = useState({});
+
+  // Loading
+  const [loadingMessages, setLoadingMessages] = useState(false);
 
   // Load listener
   useEffect(() => {
     if (user) {
       const cleanup = registerToMessagesListener(
         setAllReceivedMessages,
-        setUnreadMessages
+        setAllSendersUsersArr
       );
       return cleanup;
     }
   }, [user]);
 
   // Load messages on start
+  // Load senders on start (same API call)
   useEffect(() => {
     (async () => {
       if (user) {
         setLoadingMessages(true);
         try {
           const messages = await getUserMessages();
-          // Load profile pics
-          const { allUsersArray, imageMap } = await loadAllUsers(messages);
-
-          setProfileImagesCache(imageMap);
-          setAllReceivedMessages(messages);
-          setUnreadMessages(filterMessagesByUnread(messages));
-          setAllSendersUsersArr(allUsersArray);
+          setAllReceivedMessages(messages.messages);
+          setAllSendersUsersArr(messages.senders);
         } finally {
           setLoadingMessages(false);
-          console.log("SENDERSLOADED");
         }
       }
     })();
   }, [user]);
 
+  // Clear on logout
+  useEffect(() => {
+    if (!user) {
+      setAllReceivedMessages([]);
+      setAllSendersUsersArr([]);
+      setProfileImagesCache({});
+    }
+  }, [user]);
+
+  // Prefetch images and return mapping of profile images when senders updated
   useEffect(() => {
     (async () => {
-      await loadAllUsers(allReceivedMessages);
+      const map = await cacheProfileImagesAndGetMap(allSendersUsersArr);
+      setProfileImagesCache(map);
     })();
-  }, [allReceivedMessages]);
-
-  /*// When getting a new message
-  useEffect(() => {
-    if (allReceivedMessages.length === 0) return;
-
-    const loadSenders = async () => {
-      const { allUsersArray, imageMap } = await loadAllUsers(
-        allReceivedMessages
-      );
-      setAllSendersUsersArr(allUsersArray);
-      setProfileImagesCache(imageMap);
-    };
-
-    loadSenders();
-  }, [allReceivedMessages.length]);*/
-
-  const loadAllUsers = async (messages) => {
-    let allUsrsIdSet = new Set();
-    messages.forEach((msg) => allUsrsIdSet.add(msg.sender_id));
-
-    const userPromises = [...allUsrsIdSet].map((usrid) =>
-      getAnotherUserData(usrid)
-    );
-    const allUsersArray = await Promise.all(userPromises);
-
-    const imageMap = {};
-    await Promise.all(
-      allUsersArray.map(async (user) => {
-        if (user?.profile_image_url) {
-          await Image.prefetch(
-            `${process.env.EXPO_PUBLIC_SUPABASE_URL}/storage/v1/object/public/${user.profile_image_url}`
-          );
-          imageMap[user.id] = {
-            uri: `${process.env.EXPO_PUBLIC_SUPABASE_URL}/storage/v1/object/public/${user.profile_image_url}`,
-          };
-        } else {
-          if (user.gender == "Male") {
-            imageMap[user.id] = require("../assets/man.png");
-          } else {
-            imageMap[user.id] = require("../assets/woman.png");
-          }
-        }
-      })
-    );
-
-    return { allUsersArray, imageMap };
-  };
+  }, [allSendersUsersArr]);
 
   const markAsRead = async (msgId) => {
     await updateMsgReadStatus(msgId);
+    // Update state
     setAllReceivedMessages((prev) =>
       prev.map((m) => (m.id === msgId ? { ...m, is_read: true } : m))
     );
-    setUnreadMessages((prev) => prev.filter((m) => m.id !== msgId));
   };
 
   return (
     <NotificationsContext.Provider
       value={{
         unreadMessages,
-        setUnreadMessages,
         allReceivedMessages,
         setAllReceivedMessages,
         loadingMessages,

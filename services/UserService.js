@@ -1,15 +1,12 @@
 import api from "../api/api";
 import supabase from "../src/supabaseClient";
 
-// Get another user data
-export const getAnotherUserData = async (userId) => {
+// Fetch self data
+export const fetchSelfUserData = async () => {
   try {
-    const response = await api.get(
-      `/api/users/getusernamepicandname/${userId}`
-    );
-    return response.data;
+    const response = await api.get("/api/users/get");
+    return response;
   } catch (error) {
-    console.log(error);
     throw error;
   }
 };
