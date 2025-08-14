@@ -1,6 +1,6 @@
 import { FontAwesome5 } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
-import React from "react";
+import React, { useMemo } from "react";
 import { Dimensions, Image, StyleSheet, Text, View } from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";
 import images from "../../components/images";
@@ -9,15 +9,21 @@ import { formatDate, isSetPR } from "../../utils/statisticsUtils";
 const { width, height } = Dimensions.get("window");
 
 const ExerciseCard = ({ item, dataToCompare, exerciseTracking }) => {
-  const previousExercise = Array.isArray(dataToCompare)
-    ? dataToCompare.find((prev) => prev.exercise_id == item.exercise_id)
-    : null;
-  //console.log(JSON.stringify(previousExercise));
-  const mainMuscle = item.exercisetoworkoutsplit.exercises.targetmuscle;
-  const specificMuscle =
-    item.exercisetoworkoutsplit.exercises.specifictargetmuscle;
+  const previousExercise = useMemo(() => {
+    return Array.isArray(dataToCompare)
+      ? dataToCompare.find((prev) => prev.exercise_id == item.exercise_id)
+      : null;
+  }, [dataToCompare, item]);
+  const mainMuscle = useMemo(() => {
+    return item.exercisetoworkoutsplit.exercises.targetmuscle;
+  }, [item]);
+  const specificMuscle = useMemo(() => {
+    return item.exercisetoworkoutsplit.exercises.specifictargetmuscle;
+  }, [item]);
 
-  const imagePath = images[mainMuscle]?.[specificMuscle];
+  const imagePath = useMemo(() => {
+    return images[mainMuscle]?.[specificMuscle];
+  }, [mainMuscle, specificMuscle]);
 
   return (
     <View style={styles.item}>
