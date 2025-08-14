@@ -64,7 +64,8 @@
     "stream-browserify": "^3.0.0",
     "stream-http": "^3.2.0",
     "tls-browserify": "^0.2.2",
-    "use-latest-callback": "^0.2.1"
+    "use-latest-callback": "^0.2.1",
+    "expo-image": "~2.4.0"
   },
   "devDependencies": {
     "@babel/core": "^7.26.0",

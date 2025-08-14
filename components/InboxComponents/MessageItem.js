@@ -1,13 +1,7 @@
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useState } from "react";
-import {
-  Dimensions,
-  Image,
-  Modal,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { Dimensions, Modal, Text, TouchableOpacity, View } from "react-native";
+import { Image } from "expo-image";
 import { Swipeable } from "react-native-gesture-handler";
 import { RFValue } from "react-native-responsive-fontsize";
 import useInboxLogic from "../../hooks/logic/useInboxLogic";
@@ -21,11 +15,7 @@ const MessageItem = ({ item, profileImages, sender, deleteMessage }) => {
   const { markAsRead } = useNotifications();
   // Modal of message
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const imageSource =
-    profileImages?.[sender?.id] ??
-    (sender?.gender === "Male"
-      ? require("../../assets/man.png")
-      : require("../../assets/woman.png"));
+  const imageSource = profileImages[sender.id];
 
   // UI when swiping right
   const renderRightActions = () => (
@@ -90,13 +80,14 @@ const MessageItem = ({ item, profileImages, sender, deleteMessage }) => {
           >
             <Image
               source={imageSource}
-              resizeMode="contain"
               style={{
                 height: height * 0.03,
                 width: height * 0.03,
                 borderRadius: height * 0.04,
                 backgroundColor: "#E0E0E0",
               }}
+              cachePolicy={imageSource ? "disk" : "none"}
+              transition={150}
             ></Image>
 
             <Text
