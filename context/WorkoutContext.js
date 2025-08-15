@@ -1,4 +1,4 @@
-import { createContext, useContext, useMemo, useState } from "react";
+import { createContext, useContext, useMemo, useState, useEffect } from "react";
 import { getUserWorkout } from "../services/WorkoutService";
 import { extractWorkoutSplits } from "../utils/sharedUtils";
 import { useAuth } from "./AuthContext";
@@ -12,14 +12,17 @@ export const WorkoutProvider = ({ children }) => {
     return extractWorkoutSplits(workout);
   }, [workout]);
   const [workoutForEdit, setWorkoutForEdit] = useState(null); // Same workout with map, for easier handling in edit workout mode
+  const [loading, setLoading] = useState(false);
 
   // Fetch workout on load
   useEffect(() => {
     (async () => {
+      setLoading(true);
       const { data } = await getUserWorkout();
       const { workoutPlan, workoutPlanForEditWorkout } = data;
       setWorkout(workoutPlan);
       setWorkoutForEdit(workoutPlanForEditWorkout);
+      setLoading(false);
     })();
   }, [user]);
 
@@ -31,8 +34,9 @@ export const WorkoutProvider = ({ children }) => {
       exercises,
       workoutForEdit,
       setWorkoutForEdit,
+      loading,
     }),
-    [workout, workoutSplits, exercises, workoutForEdit]
+    [workout, workoutSplits, exercises, workoutForEdit, loading]
   );
 
   return (

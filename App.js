@@ -35,7 +35,11 @@ import MainLoadingScreen from "./components/MainLoadingScreen";
 
 import AppStack from "./navigation/AppStack";
 import AuthStack from "./navigation/AuthStack";
-import { WorkoutProvider } from "./context/WorkoutContext";
+import { useWorkoutContext, WorkoutProvider } from "./context/WorkoutContext";
+import {
+  AnalysisProvider,
+  useAnalysisContext,
+} from "./context/AnalysisContext";
 
 const RootStack = createStackNavigator();
 
@@ -86,9 +90,11 @@ export default function App() {
       <GestureHandlerRootView style={{ flex: 1 }}>
         <AuthProvider>
           <WorkoutProvider>
-            <RootProviders navigationRef={navigationRef} />
-            <NotifierRoot />
-            <NotificationsSetup />
+            <AnalysisProvider>
+              <RootProviders navigationRef={navigationRef} />
+              <NotifierRoot />
+              <NotificationsSetup />
+            </AnalysisProvider>
           </WorkoutProvider>
         </AuthProvider>
       </GestureHandlerRootView>
@@ -112,8 +118,11 @@ function RootProviders({ navigationRef }) {
 /** ---------- Navigation Logic (single place) ---------- */
 function RootNavigator() {
   const { isLoggedIn, sessionLoading } = useAuth();
+  const { loading: loadingWorkout } = useWorkoutContext();
+  const { loading: loadingAnalysis } = useAnalysisContext();
 
-  if (sessionLoading) return <MainLoadingScreen />;
+  if (sessionLoading || loadingWorkout || loadingAnalysis)
+    return <MainLoadingScreen />;
 
   return (
     <RootStack.Navigator screenOptions={{ headerShown: false }}>
