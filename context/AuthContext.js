@@ -114,7 +114,7 @@ export const AuthProvider = ({ children }) => {
         workout: wData,
         workoutSplits: sData,
         exercises: eData,
-      } = splitTheWorkout(userWorkoutData?.data);
+      } = splitTheWorkout(userWorkoutData?.data.workoutPlan);
 
       if (userWorkoutData) {
         setWorkout(wData);
