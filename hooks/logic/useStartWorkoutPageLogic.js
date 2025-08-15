@@ -6,10 +6,14 @@ import {
   filterZeroesInArr,
 } from "../../utils/startWorkoutUtils";
 import { useUserWorkout } from "../useUserWorkout";
+import { useWorkoutContext } from "../../context/WorkoutContext";
+import { useAnalysisContext } from "../../context/AnalysisContext";
 
 const useStartWorkoutPageLogic = (user, selectedSplit, setHasTrainedToday) => {
   // --------------------[ Auth Context ]--------------------------------------
-  const { workout, setIsWorkoutMode } = useAuth();
+  const { setIsWorkoutMode } = useAuth();
+  const { exercises } = useWorkoutContext();
+  const { setExerciseTracking } = useAnalysisContext();
 
   // --------------------[ Navigation ]--------------------------------------
   const navigation = useNavigation();
@@ -29,11 +33,10 @@ const useStartWorkoutPageLogic = (user, selectedSplit, setHasTrainedToday) => {
   );
 
   // --------------------[ Exercises ]------------------------------------------
-  const { exercises, setExerciseTracking } = workout;
 
   // Set exercises array for selected split
   const exercisesForSelectedSplit = useMemo(() => {
-    return exercises.filter((ex) => ex.workoutsplit_id === selectedSplit.id);
+    return exercises[selectedSplit.name];
   }, [exercises]);
 
   // --------------------[ Weight and Reps arrays ]-----------------------------------------

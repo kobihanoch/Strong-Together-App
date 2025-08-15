@@ -56,6 +56,7 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(false); // UI loading for login/register
   const [sessionLoading, setSessionLoading] = useState(true); // App boot/silent refresh
   const [user, setUser] = useState(null);
+  const [isWorkoutMode, setIsWorkoutMode] = useState(false); // For start workout
 
   /**
    * initializeUserSession
@@ -198,6 +199,8 @@ export const AuthProvider = ({ children }) => {
         checkIfUserSession,
         initializeUserSession,
       },
+      isWorkoutMode,
+      setIsWorkoutMode,
     }),
     [
       isLoggedIn,
@@ -209,6 +212,8 @@ export const AuthProvider = ({ children }) => {
       logout,
       checkIfUserSession,
       initializeUserSession,
+      isWorkoutMode,
+      setIsWorkoutMode,
     ]
   );
 

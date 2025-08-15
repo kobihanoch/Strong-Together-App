@@ -1,13 +1,13 @@
 import moment from "moment";
 import { useMemo, useState } from "react";
-import { useAuth } from "../../context/AuthContext";
+import { useAnalysisContext } from "../../context/AnalysisContext";
 import {
   getExerciseTrackingMapped,
   getLastWorkoutForEachExercise,
 } from "../../utils/statisticsUtils";
 
 const useStatisticsPageLogic = () => {
-  const { exerciseTracking } = useAuth().workout;
+  const { exerciseTracking } = useAnalysisContext();
 
   // Map with date keys: Date, ETSId, splitName
   const {

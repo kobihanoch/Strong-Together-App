@@ -12,7 +12,7 @@ import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 
 const { width, height } = Dimensions.get("window");
 
-const WorkoutSplitItem = ({ item, exercise_count, isSelected, onPress }) => {
+const WorkoutSplitItem = ({ item, isSelected, onPress }) => {
   return (
     <TouchableOpacity
       style={[

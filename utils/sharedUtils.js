@@ -1,5 +1,8 @@
 // Returns an obj
-// {workoutSplits = [A,B,C,...], exercises = {A: [exercises...], B: [exercises...]}}
+// {
+//  workoutSplits = [{name: A, id: 1, muscle_group:...}, {name: B, id: 2. muscle_group:...},....]
+//  exercises = {A: [exercises...], B: [exercises...]}
+// }
 export const extractWorkoutSplits = (workout) => {
   if (!workout) return { workoutSplits: null, exercises: null };
 
@@ -7,5 +10,18 @@ export const extractWorkoutSplits = (workout) => {
     acc[split.name] = [...split.exercisetoworkoutsplit];
     return acc;
   }, {});
-  return { workoutSplits: Object.keys(map), exercises: map };
+
+  const arr = workout.workoutsplits.reduce(
+    (acc, split) => {
+      acc.arr.push({
+        name: split.name,
+        id: split.id,
+        muscleGroup: split.muscle_group,
+      });
+      return acc;
+    },
+    { arr: [] }
+  );
+
+  return { workoutSplits: arr.arr, exercises: map };
 };

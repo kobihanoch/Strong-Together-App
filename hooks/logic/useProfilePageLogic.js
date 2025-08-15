@@ -1,10 +1,9 @@
 import { useMemo, useState } from "react";
-import { useAuth } from "../../context/AuthContext";
+import { useAnalysisContext } from "../../context/AnalysisContext";
 import { getDaysSince } from "../../utils/homePageUtils";
 
 const useProfilePageLogic = (user) => {
-  const { workout } = useAuth();
-  const { analyzedExerciseTrackingData } = workout;
+  const { analyzedExerciseTrackingData } = useAnalysisContext();
   const username = useMemo(() => {
     return user.username;
   }, [user]);

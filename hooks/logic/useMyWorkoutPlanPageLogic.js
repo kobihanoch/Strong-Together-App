@@ -5,15 +5,17 @@ import {
   filterExercises,
   getWorkoutSplitCounter,
 } from "../../utils/myWorkoutPlanUtils";
+import { useWorkoutContext } from "../../context/WorkoutContext";
+import { useAnalysisContext } from "../../context/AnalysisContext";
 
 export const useMyWorkoutPlanPageLogic = () => {
   const {
     workout,
     workoutSplits,
-    exerciseTracking,
     exercises: allExercises,
-  } = useAuth().workout;
-  const { hasTrainedToday } = useAuth();
+  } = useWorkoutContext();
+
+  const { exerciseTracking, hasTrainedToday } = useAnalysisContext();
   const [selectedSplit, setSelectedSplit] = useState(null);
   const [buttonOpacity, setButtonOpacity] = useState(1);
 
@@ -26,7 +28,8 @@ export const useMyWorkoutPlanPageLogic = () => {
 
   // Filter exercises by selected split
   const filteredExercises = useMemo(() => {
-    return filterExercises(allExercises, selectedSplit);
+    if (!selectedSplit) return;
+    return allExercises[selectedSplit.name];
   }, [allExercises, selectedSplit]);
 
   // Gets preformed split count

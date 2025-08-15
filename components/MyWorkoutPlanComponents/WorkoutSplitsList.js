@@ -25,10 +25,6 @@ const WorkoutSplitsList = ({ data }) => {
         renderItem={({ item }) => (
           <WorkoutSplitItem
             item={item}
-            exercise_count={data.countExercisesForSplit(
-              data.allExercises,
-              item.id
-            )}
             isSelected={item.id === data.selectedSplit?.id}
             onPress={() => data.handleWorkoutSplitPress(item)}
           />

@@ -46,7 +46,7 @@ export const AnalysisProvider = ({ children }) => {
   useEffect(() => {
     if (sessionLoading) {
       setLoading(true);
-      return; // Skip any data fetches
+      return;
     }
     (async () => {
       // On logout, clear and stop
@@ -58,7 +58,6 @@ export const AnalysisProvider = ({ children }) => {
         return;
       }
 
-      console.log("Here");
       setLoading(true);
       try {
         const res = await getUserExerciseTracking();

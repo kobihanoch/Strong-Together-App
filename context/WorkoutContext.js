@@ -48,10 +48,9 @@ export const WorkoutProvider = ({ children }) => {
   useEffect(() => {
     if (sessionLoading) {
       setLoading(true);
-      return; // Skip any data fetches
+      return;
     }
     (async () => {
-      console.log("Workout context: ", user);
       // When user is not available (e.g., after logout), reset and stop
       if (!user?.id) {
         setWorkout(null);
@@ -76,7 +75,7 @@ export const WorkoutProvider = ({ children }) => {
     () => ({
       workout,
       setWorkout,
-      workoutSplits, // [A, B, C..]
+      workoutSplits, // [{name: A, id: 1, muscle_group:...}, {name: B, id: 2. muscle_group:...},....], exercises = {A: [exercises...], B: [exercises...]}}
       exercises, // { A: [...], B: [...], ... }
       workoutForEdit,
       setWorkoutForEdit,
