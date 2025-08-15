@@ -42,7 +42,7 @@ export const WorkoutProvider = ({ children }) => {
   const [workoutForEdit, setWorkoutForEdit] = useState(null);
 
   // Loading flag for this context
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   // Fetch on mount and whenever user changes
   useEffect(() => {
@@ -60,6 +60,7 @@ export const WorkoutProvider = ({ children }) => {
       }
 
       try {
+        setLoading(true);
         const { data } = await getUserWorkout();
         const { workoutPlan, workoutPlanForEditWorkout } = data || {};
         setWorkout(workoutPlan ?? null);
@@ -68,7 +69,7 @@ export const WorkoutProvider = ({ children }) => {
         setLoading(false);
       }
     })();
-  }, [user?.id]);
+  }, [user?.id, sessionLoading]);
 
   // Memoized context value
   const value = useMemo(

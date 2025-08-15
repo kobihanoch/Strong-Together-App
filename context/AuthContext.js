@@ -1,10 +1,10 @@
 import React, {
   createContext,
+  useCallback,
   useContext,
   useEffect,
-  useState,
   useMemo,
-  useCallback,
+  useState,
 } from "react";
 import api from "../api/api";
 import {
@@ -13,13 +13,13 @@ import {
   refreshAndRotateTokens,
   registerUser,
 } from "../services/AuthService";
+import { fetchSelfUserData } from "../services/UserService";
 import {
   clearRefreshToken,
   getRefreshToken,
   saveRefreshToken,
 } from "../utils/tokenStore.js";
 import { connectSocket, disconnectSocket } from "../webSockets/socketConfig";
-import { fetchSelfUserData } from "../services/UserService";
 
 const AuthContext = createContext(null);
 export const useAuth = () => useContext(AuthContext);
@@ -167,10 +167,11 @@ export const AuthProvider = ({ children }) => {
       try {
         disconnectSocket();
       } catch {}
-      GlobalAuth.setAccessToken(null);
+      GlobalAuth.logout;
       await clearRefreshToken();
       setIsLoggedIn(false);
       setUser(null);
+      setIsWorkoutMode(false);
     }
   }, []);
 

@@ -41,7 +41,7 @@ export const AnalysisProvider = ({ children }) => {
   const [hasTrainedToday, setHasTrainedToday] = useState(false);
 
   // Loading flag for this context
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (sessionLoading) {
@@ -58,8 +58,8 @@ export const AnalysisProvider = ({ children }) => {
         return;
       }
 
-      setLoading(true);
       try {
+        setLoading(true);
         const res = await getUserExerciseTracking();
         setExerciseTracking(res?.exercisetracking ?? []);
         setAnalyzedExerciseTrackingData(unpackFromExerciseTrackingData(res));
@@ -68,7 +68,7 @@ export const AnalysisProvider = ({ children }) => {
         setLoading(false);
       }
     })();
-  }, [user?.id]);
+  }, [user?.id, sessionLoading]);
 
   // Memoized context value
   const value = useMemo(
