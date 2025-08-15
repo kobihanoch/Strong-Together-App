@@ -35,6 +35,7 @@ import MainLoadingScreen from "./components/MainLoadingScreen";
 
 import AppStack from "./navigation/AppStack";
 import AuthStack from "./navigation/AuthStack";
+import { WorkoutProvider } from "./context/WorkoutContext";
 
 const RootStack = createStackNavigator();
 
@@ -84,9 +85,11 @@ export default function App() {
     <AlertNotificationRoot>
       <GestureHandlerRootView style={{ flex: 1 }}>
         <AuthProvider>
-          <RootProviders navigationRef={navigationRef} />
-          <NotifierRoot />
-          <NotificationsSetup />
+          <WorkoutProvider>
+            <RootProviders navigationRef={navigationRef} />
+            <NotifierRoot />
+            <NotificationsSetup />
+          </WorkoutProvider>
         </AuthProvider>
       </GestureHandlerRootView>
     </AlertNotificationRoot>

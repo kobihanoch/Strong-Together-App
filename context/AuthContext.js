@@ -18,7 +18,7 @@ import {
   getUserWorkout,
 } from "../services/WorkoutService";
 import { unpackFromExerciseTrackingData } from "../utils/authUtils";
-import { splitTheWorkout } from "../utils/sharedUtils";
+import { extractWorkoutSplits, splitTheWorkout } from "../utils/sharedUtils";
 import {
   clearRefreshToken,
   getRefreshToken,
@@ -107,27 +107,14 @@ export const AuthProvider = ({ children }) => {
     setSessionLoading(true);
     try {
       await connectSocket(userId);
-      const userWorkoutData = await getUserWorkout();
-      const exerciseTrackingData = await getUserExerciseTracking(); // workoutdate is a string
 
-      const {
-        workout: wData,
-        workoutSplits: sData,
-        exercises: eData,
-      } = splitTheWorkout(userWorkoutData?.data.workoutPlan);
-
-      if (userWorkoutData) {
-        setWorkout(wData);
-        setWorkoutSplits(sData);
-        setExercises(eData);
-      }
-      if (exerciseTrackingData) {
+      /*if (exerciseTrackingData) {
         setExerciseTracking(exerciseTrackingData.exercisetracking);
         setAnalyzedExerciseTrackingData(
           unpackFromExerciseTrackingData(exerciseTrackingData)
         );
         setHasTrainedToday(exerciseTrackingData.hasTrainedToday);
-      }
+      }*/
     } finally {
       setSessionLoading(false);
     }
