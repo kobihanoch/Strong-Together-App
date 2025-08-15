@@ -1,37 +1,83 @@
-import { createContext, useContext, useMemo, useState, useEffect } from "react";
+import React, {
+  createContext,
+  useContext,
+  useMemo,
+  useState,
+  useEffect,
+} from "react";
 import { getUserWorkout } from "../services/WorkoutService";
 import { extractWorkoutSplits } from "../utils/sharedUtils";
 import { useAuth } from "./AuthContext";
 
-const WorkoutContext = createContext();
+const WorkoutContext = createContext(null);
+export const useWorkoutContext = () => {
+  const ctx = useContext(WorkoutContext);
+  if (!ctx)
+    throw new Error("useWorkoutContext must be used within a WorkoutProvider");
+  return ctx;
+};
+
+/**
+ * Workout Context
+ * ----------------
+ * Responsibilities:
+ * - Fetch and hold the user's active workout plan
+ * - Derive mapped splits + flat exercises
+ * - Provide an editable copy (workoutForEdit)
+ * - Reset state when user logs out (user becomes null)
+ */
 
 export const WorkoutProvider = ({ children }) => {
-  const { user } = useAuth();
+  const { user, sessionLoading } = useAuth();
+
+  // Raw workout plan from API
   const [workout, setWorkout] = useState(null);
+
+  // Derived data from workout
   const { workoutSplits, exercises } = useMemo(() => {
-    return extractWorkoutSplits(workout);
+    return extractWorkoutSplits(workout); // must be null-safe
   }, [workout]);
-  const [workoutForEdit, setWorkoutForEdit] = useState(null); // Same workout with map, for easier handling in edit workout mode
-  const [loading, setLoading] = useState(false);
 
-  // Fetch workout on load
+  // Editable version for edit workout
+  const [workoutForEdit, setWorkoutForEdit] = useState(null);
+
+  // Loading flag for this context
+  const [loading, setLoading] = useState(true);
+
+  // Fetch on mount and whenever user changes
   useEffect(() => {
-    (async () => {
+    if (sessionLoading) {
       setLoading(true);
-      const { data } = await getUserWorkout();
-      const { workoutPlan, workoutPlanForEditWorkout } = data;
-      setWorkout(workoutPlan);
-      setWorkoutForEdit(workoutPlanForEditWorkout);
-      setLoading(false);
-    })();
-  }, [user]);
+      return; // Skip any data fetches
+    }
+    (async () => {
+      console.log("Workout context: ", user);
+      // When user is not available (e.g., after logout), reset and stop
+      if (!user?.id) {
+        setWorkout(null);
+        setWorkoutForEdit(null);
+        setLoading(false);
+        return;
+      }
 
+      try {
+        const { data } = await getUserWorkout();
+        const { workoutPlan, workoutPlanForEditWorkout } = data || {};
+        setWorkout(workoutPlan ?? null);
+        setWorkoutForEdit(workoutPlanForEditWorkout ?? null);
+      } finally {
+        setLoading(false);
+      }
+    })();
+  }, [user?.id]);
+
+  // Memoized context value
   const value = useMemo(
     () => ({
       workout,
       setWorkout,
-      workoutSplits,
-      exercises,
+      workoutSplits, // [A, B, C..]
+      exercises, // { A: [...], B: [...], ... }
       workoutForEdit,
       setWorkoutForEdit,
       loading,
@@ -42,12 +88,4 @@ export const WorkoutProvider = ({ children }) => {
   return (
     <WorkoutContext.Provider value={value}>{children}</WorkoutContext.Provider>
   );
-};
-
-export const useWorkoutContext = () => {
-  const context = useContext(WorkoutContext);
-  if (!context) {
-    throw new Error("useWorkoutContext must be used within a WorkoutProvider");
-  }
-  return context;
 };

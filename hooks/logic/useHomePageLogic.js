@@ -1,83 +1,102 @@
-import { useEffect, useState } from "react";
+import { useMemo, useCallback } from "react";
 import { useAuth } from "../../context/AuthContext";
+import { useWorkoutContext } from "../../context/WorkoutContext";
+import { useAnalysisContext } from "../../context/AnalysisContext";
 
-const useHomePageLogic = (user) => {
-  // User data
-  const [username, setUsername] = useState(null);
-  const [userId, setUserId] = useState(null);
-  const [firstName, setFirstName] = useState(null);
+const useHomePageLogic = () => {
+  // Auth state (user + global session loading)
+  const { user, sessionLoading } = useAuth();
 
-  // Workout from context and unpack
+  // Workout state (plan + derived maps + loading)
   const {
     workout,
-    workoutSplits,
+    workoutSplits, // [A,B,C...]
+    loading: workoutLoading,
+  } = useWorkoutContext();
+
+  // Analysis state (tracking + derived analytics + loading)
+  const {
     exerciseTracking,
     analyzedExerciseTrackingData,
-  } = useAuth().workout;
+    loading: analysisLoading,
+  } = useAnalysisContext();
 
-  // Inner states
-  const [hasAssignedWorkout, setHasAssignedWorkout] = useState(false);
-  const [mostFrequentSplit, setMostFrequentSplit] = useState(null);
-  const [profileImageUrl, setProfileImageUrl] = useState(null);
-  const [lastWorkoutDate, setLastWorkoutDate] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [totalWorkoutNumber, setTotalWorkoutNumber] = useState(0);
-  const [workoutSplitsNumber, setWorkoutSplitsNumber] = useState(0);
-  const [PR, setPR] = useState({});
-
-  // Set username after user is loaded
-  useEffect(() => {
-    const loadData = async () => {
-      if (user && analyzedExerciseTrackingData) {
-        setLoading(true);
-        try {
-          setUsername(user.username);
-          setFirstName(user.name.split(" ")[0]);
-          setUserId(user.id);
-          setProfileImageUrl(user.profile_image_url);
-          // Workout data
-          setPR(analyzedExerciseTrackingData.pr);
-          setTotalWorkoutNumber(analyzedExerciseTrackingData.workoutCount);
-          setMostFrequentSplit(analyzedExerciseTrackingData.mostFrequentSplit);
-          setTotalWorkoutNumber(analyzedExerciseTrackingData.workoutCount);
-          setLastWorkoutDate(analyzedExerciseTrackingData.lastWorkoutDate);
-        } catch (err) {
-          console.error("Error fetching exercise tracking:", err);
-        } finally {
-          setLoading(false);
-        }
-      }
+  // Derive stable user fields
+  const { username, userId, firstName, profileImageUrl } = useMemo(() => {
+    const u = user ?? {};
+    // Safe split for first name
+    const fName =
+      typeof u.name === "string" && u.name.trim().length
+        ? u.name.trim().split(" ")[0]
+        : "";
+    return {
+      username: u.username ?? "",
+      userId: u.id ?? "",
+      firstName: fName,
+      profileImageUrl: u.profile_image_url ?? "",
     };
+  }, [user]);
 
-    loadData();
-  }, [user, analyzedExerciseTrackingData]);
+  // Derived workout flags/counters
+  const { hasAssignedWorkout, workoutSplitsNumber } = useMemo(() => {
+    const hasWorkout = !!workout;
+    // workoutSplits is a map in the new context; count keys safely
+    const splitsCount = workoutSplits ? Object.keys(workoutSplits).length : 0;
+    return { hasAssignedWorkout: hasWorkout, workoutSplitsNumber: splitsCount };
+  }, [workout, workoutSplits]);
 
-  // Set user's assigned workout state after user is loaded
-  useEffect(() => {
-    setHasAssignedWorkout(!!workout);
-  }, [workout]);
+  // Derived analysis fields
+  const { PR, totalWorkoutNumber, mostFrequentSplit, lastWorkoutDate } =
+    useMemo(() => {
+      const a = analyzedExerciseTrackingData ?? {};
+      return {
+        PR: a.pr ?? null,
+        totalWorkoutNumber: a.workoutCount ?? 0,
+        mostFrequentSplit: a.mostFrequentSplit ?? null,
+        lastWorkoutDate: a.lastWorkoutDate ?? "none",
+      };
+    }, [analyzedExerciseTrackingData]);
 
-  // Set workout splits count
-  useEffect(() => {
-    if (workoutSplits) {
-      setWorkoutSplitsNumber(workoutSplits.length);
-    }
-  }, [workoutSplits]);
+  // Unified loading for the Home screen
+  const loading = useMemo(() => {
+    // Show loading while any provider is still loading or
+    // (optionally) while user exists but analysis is not yet ready.
+    const baseLoading = sessionLoading || workoutLoading || analysisLoading;
+    return baseLoading;
+  }, [sessionLoading, workoutLoading, analysisLoading]);
+
+  // Stable data object for easy consumption in components
+  const data = useMemo(
+    () => ({
+      username,
+      userId,
+      hasAssignedWorkout,
+      profileImageUrl,
+      firstName,
+      lastWorkoutDate,
+      totalWorkoutNumber,
+      workoutSplitsNumber,
+      mostFrequentSplit,
+      PR,
+      exerciseTracking: exerciseTracking ?? null,
+    }),
+    [
+      username,
+      userId,
+      hasAssignedWorkout,
+      profileImageUrl,
+      firstName,
+      lastWorkoutDate,
+      totalWorkoutNumber,
+      workoutSplitsNumber,
+      mostFrequentSplit,
+      PR,
+      exerciseTracking,
+    ]
+  );
 
   return {
-    data: {
-      username: username ?? "",
-      userId: userId ?? "",
-      hasAssignedWorkout: hasAssignedWorkout ?? false,
-      profileImageUrl: profileImageUrl ?? "",
-      firstName: firstName ?? "",
-      lastWorkoutDate: lastWorkoutDate ?? "none",
-      totalWorkoutNumber: totalWorkoutNumber ?? 0,
-      workoutSplitsNumber: workoutSplitsNumber ?? 0,
-      mostFrequentSplit: mostFrequentSplit ?? null,
-      PR: PR ?? null,
-      exerciseTracking: exerciseTracking ?? null,
-    },
+    data,
     loading,
   };
 };
