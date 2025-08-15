@@ -1,14 +1,6 @@
-import React, { useEffect } from "react";
-import {
-  Dimensions,
-  Image,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import React from "react";
+import { Dimensions, StyleSheet, Text, TouchableOpacity } from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";
-import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 
 const { width, height } = Dimensions.get("window");
 
