@@ -25,7 +25,7 @@ const MyWorkoutPlan = () => {
         gap: height * 0.02,
       }}
     >
-      {workoutData.workout ? (
+      {workoutData?.workout ? (
         <>
           <HeaderSection user={user}></HeaderSection>
           <WorkoutSplitsList data={workoutData}></WorkoutSplitsList>

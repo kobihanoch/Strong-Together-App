@@ -10,17 +10,13 @@ import {
 import { Dialog } from "react-native-alert-notification";
 import { RFValue } from "react-native-responsive-fontsize";
 import ExerciseBox from "../components/StartWorkoutComponents/ExerciseBox";
-import { useAuth } from "../context/AuthContext";
 import useStartWorkoutPageLogic from "../hooks/logic/useStartWorkoutPageLogic";
 
 const { width, height } = Dimensions.get("window");
 
 const StartWorkout = ({ navigation, route }) => {
-  const { user, setHasTrainedToday } = useAuth();
   const { data: workoutData, saving: workoutSaving } = useStartWorkoutPageLogic(
-    user,
-    route.params?.workoutSplit,
-    setHasTrainedToday
+    route.params?.workoutSplit
   );
 
   const flatListRef = useRef(null);
@@ -45,18 +41,6 @@ const StartWorkout = ({ navigation, route }) => {
       },
     });
   }, [workoutSaving]);
-
-  /*useEffect(() => {
-    console.log("Updated weights: " + JSON.stringify(workoutData.weightArrs));
-  }, [workoutData.weightArrs]);*/
-
-  /*useEffect(() => {
-    console.log("Updated reps: " + JSON.stringify(workoutData.repsArrs));
-  }, [workoutData.repsArrs]);*/
-
-  /*if (loading) {
-    return <LoadingPage message="Starting workout"></LoadingPage>;
-  }*/
 
   return (
     <View
