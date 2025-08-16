@@ -22,7 +22,7 @@ export const getExerciseTrackingMapped = (exerciseTracking = []) => {
     Object.keys(mapped.byDate)
       .sort()
       .reverse()
-      .map((d) => [d, [...mapped.byDate[d]].reverse()])
+      .map((d) => [d, [...mapped.byDate[d]]])
   );
 
   const byETSId = {};

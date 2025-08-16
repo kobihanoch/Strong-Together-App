@@ -13,7 +13,7 @@ const { width, height } = Dimensions.get("window");
 
 const MyWorkoutPlan = () => {
   const navigation = useNavigation();
-  const { user, hasTrainedToday } = useAuth();
+  const { user } = useAuth();
   const { data: workoutData } = useMyWorkoutPlanPageLogic();
 
   return (
@@ -25,7 +25,7 @@ const MyWorkoutPlan = () => {
         gap: height * 0.02,
       }}
     >
-      {workoutData.workout ? (
+      {workoutData?.workout ? (
         <>
           <HeaderSection user={user}></HeaderSection>
           <WorkoutSplitsList data={workoutData}></WorkoutSplitsList>

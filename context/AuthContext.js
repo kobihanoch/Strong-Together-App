@@ -1,10 +1,10 @@
 import React, {
   createContext,
+  useCallback,
   useContext,
   useEffect,
-  useState,
   useMemo,
-  useCallback,
+  useState,
 } from "react";
 import api from "../api/api";
 import {
@@ -13,167 +13,120 @@ import {
   refreshAndRotateTokens,
   registerUser,
 } from "../services/AuthService";
-import {
-  getUserExerciseTracking,
-  getUserWorkout,
-} from "../services/WorkoutService";
-import { unpackFromExerciseTrackingData } from "../utils/authUtils";
-import { splitTheWorkout } from "../utils/sharedUtils";
+import { fetchSelfUserData } from "../services/UserService";
 import {
   clearRefreshToken,
   getRefreshToken,
   saveRefreshToken,
 } from "../utils/tokenStore.js";
 import { connectSocket, disconnectSocket } from "../webSockets/socketConfig";
-import { fetchSelfUserData } from "../services/UserService";
 
-const AuthContext = createContext();
+const AuthContext = createContext(null);
 export const useAuth = () => useContext(AuthContext);
 
 /**
- * Auth Context Value Flow:
- * - Authentication state: isLoggedIn, user, loading flags
- * - Auth actions: register, login, logout
- * - Session init functions: checkIfUserSession, initializeUserSession
- * - Workout state & tracking data
- * - Workout mode state
+ * Auth Context
+ * -------------
+ * Responsibilities:
+ * - Hold authentication & session state (user, isLoggedIn, loading flags)
+ * - Expose auth actions (register, login, logout)
+ * - Handle session bootstrap (checkIfUserSession, initializeUserSession)
+ * - DO NOT hold workout/analysis state here (separate contexts handle them)
  */
 
-// Single source of truth for access token across app and interceptors.
+// Single, app-wide in-memory access token (used by Axios interceptors)
 let _accessToken = null;
 
 export const GlobalAuth = {
   getAccessToken: () => _accessToken,
   setAccessToken: (t) => {
     _accessToken = t;
+    if (t) {
+      api.defaults.headers.common.Authorization = `Bearer ${t}`;
+    } else {
+      delete api.defaults.headers.common.Authorization;
+    }
   },
-  setUser: null,
-  setIsLoggedIn: null,
   logout: null,
 };
 
 export const AuthProvider = ({ children }) => {
-  // ---------------- STATE ----------------
+  // --- Auth & session state ---
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [sessionLoading, setSessionLoading] = useState(true);
-
+  const [loading, setLoading] = useState(false); // UI loading for login/register
+  const [sessionLoading, setSessionLoading] = useState(true); // App boot/silent refresh
   const [user, setUser] = useState(null);
-  const [hasTrainedToday, setHasTrainedToday] = useState(false);
-  const [workout, setWorkout] = useState(null);
-  const [workoutSplits, setWorkoutSplits] = useState(null);
-  const [exercises, setExercises] = useState(null);
-  const [exerciseTracking, setExerciseTracking] = useState(null);
-  const [analyzedExerciseTrackingData, setAnalyzedExerciseTrackingData] =
-    useState(null);
-  const [isWorkoutMode, setIsWorkoutMode] = useState(false);
+  const [isWorkoutMode, setIsWorkoutMode] = useState(false); // For start workout
 
-  // ---------------- GLOBAL CALLBACKS INIT ----------------
-  // Expose global setters for use outside React tree (e.g., API interceptors)
-  useEffect(() => {
-    GlobalAuth.setUser = setUser;
-    GlobalAuth.setIsLoggedIn = setIsLoggedIn;
-    GlobalAuth.logout = async () => {
-      // Disconnect WS + clear all state + remove tokens
-      disconnectSocket();
-      setLoading(false);
-      setSessionLoading(false);
-      setIsLoggedIn(false);
-      setUser(null);
-      setWorkout(null);
-      setWorkoutSplits(null);
-      setExercises(null);
-      setExerciseTracking(null);
-      setHasTrainedToday(null);
-      setIsWorkoutMode(false);
-      GlobalAuth.setAccessToken(null);
-      api.defaults.headers.common.Authorization = undefined;
-      await clearRefreshToken();
-    };
-
-    return () => {
-      GlobalAuth.setUser = null;
-      GlobalAuth.setIsLoggedIn = null;
-      GlobalAuth.logout = null;
-    };
-  }, []);
-
-  // ---------------- SESSION CHECK ----------------
-  // On mount → check if user session exists via refresh token
+  /**
+   * initializeUserSession
+   * - Called after we have a valid user + tokens.
+   * - Responsible for one-time side effects (e.g., socket connect).
+   */
   const initializeUserSession = useCallback(async (userId) => {
-    // Step 1: Connect socket
-    // Step 2: Load workout data
-    // Step 3: Load exercise tracking data
-    setSessionLoading(true);
-    try {
-      await connectSocket(userId);
-      const userWorkoutData = await getUserWorkout();
-      const exerciseTrackingData = await getUserExerciseTracking(); // workoutdate is a string
-
-      const {
-        workout: wData,
-        workoutSplits: sData,
-        exercises: eData,
-      } = splitTheWorkout(userWorkoutData?.data.workoutPlan);
-
-      if (userWorkoutData) {
-        setWorkout(wData);
-        setWorkoutSplits(sData);
-        setExercises(eData);
-      }
-      if (exerciseTrackingData) {
-        setExerciseTracking(exerciseTrackingData.exercisetracking);
-        setAnalyzedExerciseTrackingData(
-          unpackFromExerciseTrackingData(exerciseTrackingData)
-        );
-        setHasTrainedToday(exerciseTrackingData.hasTrainedToday);
-      }
-    } finally {
-      setSessionLoading(false);
-    }
+    await connectSocket(userId);
   }, []);
 
+  /**
+   * checkIfUserSession
+   * - Called on mount.
+   * - Tries to silently restore session using a refresh token.
+   * - On success: sets user, tokens, and runs initializeUserSession.
+   */
   const checkIfUserSession = useCallback(async () => {
-    // Step 1: Look for refresh token
-    // Step 2: Rotate tokens if exists
-    // Step 3: Load user data
-    // Step 4: Initialize session (workout, tracking, sockets)
     setSessionLoading(true);
     try {
       const existingRt = await getRefreshToken();
       if (!existingRt) {
+        // No refresh token -> no session
         setIsLoggedIn(false);
+        setUser(null);
+        GlobalAuth.setAccessToken(null);
         return;
       }
+
+      // Rotate tokens
       const { accessToken: at, refreshToken: rt } =
         await refreshAndRotateTokens();
       await saveRefreshToken(rt);
       GlobalAuth.setAccessToken(at);
 
+      // Fetch self user
       const u = await fetchSelfUserData();
       setIsLoggedIn(true);
       setUser(u.data);
 
+      // Initialize side effects
       await initializeUserSession(u.data.id);
     } finally {
       setSessionLoading(false);
     }
   }, [initializeUserSession]);
 
-  // ---------------- AUTH ACTIONS ----------------
+  // Run the silent session check at app start
+  useEffect(() => {
+    checkIfUserSession().catch(() => setSessionLoading(false));
+  }, [checkIfUserSession]);
 
+  /**
+   * login
+   * - Logs in with username/password.
+   * - Saves refresh token, sets access token, sets user, runs initializeUserSession.
+   */
   const login = useCallback(
     async (username, password) => {
       setLoading(true);
       try {
-        const userData = await loginUser(username, password);
-        const { accessToken: at, refreshToken: rt } = userData.data;
+        const res = await loginUser(username, password);
+        const { accessToken: at, refreshToken: rt, user: u } = res.data;
+
         await saveRefreshToken(rt);
         GlobalAuth.setAccessToken(at);
 
         setIsLoggedIn(true);
-        setUser(userData.data.user);
-        await initializeUserSession(userData.data.user.id);
+        setUser(u);
+
+        await initializeUserSession(u.id);
       } finally {
         setLoading(false);
       }
@@ -181,6 +134,10 @@ export const AuthProvider = ({ children }) => {
     [initializeUserSession]
   );
 
+  /**
+   * register
+   * - Registers a new user, then logs in.
+   */
   const register = useCallback(
     async (email, password, username, fullName, gender) => {
       setLoading(true);
@@ -194,48 +151,54 @@ export const AuthProvider = ({ children }) => {
     [login]
   );
 
+  /**
+   * logout
+   * - Server-side logout attempt (best-effort)
+   * - Always clears local session (tokens, user, sockets)
+   * - Workout/Analysis providers will observe user=null and reset themselves
+   */
   const logout = useCallback(async () => {
     try {
-      await logoutUser();
+      await logoutUser(); // best-effort
     } catch (err) {
+      // Log but do not block local cleanup
       console.log(err?.response?.data || err.message);
     } finally {
-      if (GlobalAuth.logout) await GlobalAuth.logout();
+      try {
+        disconnectSocket();
+      } catch {}
+      GlobalAuth.logout;
+      await clearRefreshToken();
+      setIsLoggedIn(false);
+      setUser(null);
+      setIsWorkoutMode(false);
     }
   }, []);
 
-  // ---------------- INITIAL SESSION LOAD ----------------
+  // Expose the real logout to axios interceptors via GlobalAuth.logout
   useEffect(() => {
-    checkIfUserSession().catch(() => setSessionLoading(false));
-  }, [checkIfUserSession]);
+    GlobalAuth.logout = logout;
+    return () => {
+      GlobalAuth.logout = null;
+    };
+  }, [logout]);
 
-  // ---------------- CONTEXT VALUE (MEMOIZED) ----------------
+  // Memoized context value
   const value = useMemo(
     () => ({
+      // state
       isLoggedIn,
       user,
-      setUser,
+      loading,
+      sessionLoading,
+      // actions
       register,
       login,
       logout,
-      loading,
-      sessionLoading,
-      setHasTrainedToday,
-      hasTrainedToday,
+      // init fns (exposed for bootstrappers if needed)
       initial: {
         checkIfUserSession,
         initializeUserSession,
-      },
-      workout: {
-        workout,
-        setWorkout,
-        workoutSplits,
-        setWorkoutSplits,
-        exercises,
-        setExercises,
-        exerciseTracking,
-        setExerciseTracking,
-        analyzedExerciseTrackingData,
       },
       isWorkoutMode,
       setIsWorkoutMode,
@@ -243,20 +206,15 @@ export const AuthProvider = ({ children }) => {
     [
       isLoggedIn,
       user,
+      loading,
+      sessionLoading,
       register,
       login,
       logout,
-      loading,
-      sessionLoading,
-      hasTrainedToday,
       checkIfUserSession,
       initializeUserSession,
-      workout,
-      workoutSplits,
-      exercises,
-      exerciseTracking,
-      analyzedExerciseTrackingData,
       isWorkoutMode,
+      setIsWorkoutMode,
     ]
   );
 
