@@ -13,7 +13,7 @@ const { width, height } = Dimensions.get("window");
 
 const MyWorkoutPlan = () => {
   const navigation = useNavigation();
-  const { user, hasTrainedToday } = useAuth();
+  const { user } = useAuth();
   const { data: workoutData } = useMyWorkoutPlanPageLogic();
 
   return (

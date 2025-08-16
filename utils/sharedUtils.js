@@ -4,7 +4,7 @@
 //  exercises = {A: [exercises...], B: [exercises...]}
 // }
 export const extractWorkoutSplits = (workout) => {
-  if (!workout) return { workoutSplits: null, exercises: null };
+  if (!workout) return { workoutSplits: [], exercises: [] };
 
   const map = workout.workoutsplits.reduce((acc, split) => {
     acc[split.name] = [...split.exercisetoworkoutsplit];

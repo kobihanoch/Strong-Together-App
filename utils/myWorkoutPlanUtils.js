@@ -15,6 +15,7 @@ export const countExercisesForSplit = (allExercises, splitId) => {
 
 // Count each split performed
 export const getWorkoutSplitCounter = (splitName, exerciseLogs) => {
+  if (!exerciseLogs) return 0;
   let etLogsUnique = new Set();
   let etLogsFilteredBySplitName = exerciseLogs.filter(
     (el) => el.splitname === splitName
