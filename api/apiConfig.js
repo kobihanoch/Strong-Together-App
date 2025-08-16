@@ -10,4 +10,6 @@
 //export const API_BASE_URL = process.env.REACT_NATIVE_APP_API_BASE_URL;
 
 // ------{DEVELOPMENT}-------
-export const API_BASE_URL = `http://10.0.0.41:5000`;
+//export const API_BASE_URL = `http://10.0.0.41:5000`;
+
+export const API_BASE_URL = `http://192.168.1.136:5000`;
