@@ -20,6 +20,7 @@ import {
   saveRefreshToken,
 } from "../utils/tokenStore.js";
 import { connectSocket, disconnectSocket } from "../webSockets/socketConfig";
+import { useGlobalAppLoadingContext } from "./GlobalAppLoadingContext";
 
 const AuthContext = createContext(null);
 export const useAuth = () => useContext(AuthContext);
@@ -51,6 +52,9 @@ export const GlobalAuth = {
 };
 
 export const AuthProvider = ({ children }) => {
+  // Global loading
+  const { setLoading: setGlobalLoading } = useGlobalAppLoadingContext();
+
   // --- Auth & session state ---
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [loading, setLoading] = useState(false); // UI loading for login/register
@@ -102,6 +106,12 @@ export const AuthProvider = ({ children }) => {
       setSessionLoading(false);
     }
   }, [initializeUserSession]);
+
+  // Report auth session loading to global loading
+  useEffect(() => {
+    setGlobalLoading("auth", sessionLoading);
+    return () => setGlobalLoading("auth", false); // ensure cleanup on unmount
+  }, [sessionLoading]);
 
   // Run the silent session check at app start
   useEffect(() => {

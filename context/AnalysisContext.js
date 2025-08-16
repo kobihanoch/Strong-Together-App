@@ -9,6 +9,7 @@ import React, {
 import { useAuth } from "./AuthContext";
 import { getUserExerciseTracking } from "../services/WorkoutService";
 import { unpackFromExerciseTrackingData } from "../utils/authUtils";
+import { useGlobalAppLoadingContext } from "./GlobalAppLoadingContext";
 
 const AnalysisContext = createContext(null);
 export const useAnalysisContext = () => {
@@ -33,6 +34,9 @@ export const useAnalysisContext = () => {
  */
 
 export const AnalysisProvider = ({ children }) => {
+  // Global loading
+  const { setLoading: setGlobalLoading } = useGlobalAppLoadingContext();
+
   const { user, sessionLoading } = useAuth();
 
   // Raw and derived analysis state
@@ -45,10 +49,6 @@ export const AnalysisProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (sessionLoading) {
-      setLoading(true);
-      return;
-    }
     (async () => {
       if (user) {
         try {
@@ -64,7 +64,12 @@ export const AnalysisProvider = ({ children }) => {
     })();
 
     return logoutCleanup;
-  }, [user, sessionLoading]);
+  }, [user]);
+
+  useEffect(() => {
+    setGlobalLoading("analysis", loading);
+    return () => setGlobalLoading("analysis", false);
+  }, [loading, setGlobalLoading]);
 
   const logoutCleanup = useCallback(() => {
     setExerciseTracking(null);

@@ -1,47 +1,44 @@
 // App.js
 // English comments only inside code
 
-import React, { useEffect, useState, useRef } from "react";
-import {
-  ActivityIndicator,
-  StyleSheet,
-  Text,
-  View,
-  StatusBar,
-} from "react-native";
-import { GestureHandlerRootView } from "react-native-gesture-handler";
-import { AlertNotificationRoot } from "react-native-alert-notification";
 import {
   NavigationContainer,
   useNavigationContainerRef,
 } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
-import * as Notifications from "expo-notifications";
 import * as Font from "expo-font";
+import React, { useEffect, useState } from "react";
+import {
+  ActivityIndicator,
+  StatusBar,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
+import { AlertNotificationRoot } from "react-native-alert-notification";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 import {
   Inter_400Regular,
-  Inter_700Bold,
   Inter_500Medium,
   Inter_600SemiBold,
+  Inter_700Bold,
 } from "@expo-google-fonts/inter";
 
+import { AnalysisProvider } from "./context/AnalysisContext";
 import { AuthProvider, useAuth } from "./context/AuthContext";
-import {
-  NotificationsProvider,
-  useNotifications,
-} from "./context/NotificationsContext";
-import { WorkoutProvider, useWorkoutContext } from "./context/WorkoutContext";
-import {
-  AnalysisProvider,
-  useAnalysisContext,
-} from "./context/AnalysisContext";
+import { NotificationsProvider } from "./context/NotificationsContext";
+import { WorkoutProvider } from "./context/WorkoutContext";
 
-import AppStack from "./navigation/AppStack";
-import AuthStack from "./navigation/AuthStack";
-import Theme1 from "./components/Theme1";
 import BottomTabBar from "./components/BottomTabBar";
 import MainLoadingScreen from "./components/MainLoadingScreen";
+import Theme1 from "./components/Theme1";
+import {
+  GlobalAppLoadingProvider,
+  useGlobalAppLoadingContext,
+} from "./context/GlobalAppLoadingContext";
+import AppStack from "./navigation/AppStack";
+import AuthStack from "./navigation/AuthStack";
 import NotificationsSetup from "./notifications/NotificationsSetup";
 
 // ---------- Fonts Loader Hook ----------
@@ -81,12 +78,14 @@ export default function App() {
   return (
     <AlertNotificationRoot>
       <GestureHandlerRootView style={{ flex: 1 }}>
-        <AuthProvider>
-          <NavigationContainer ref={navigationRef}>
-            <RootNavigator />
-          </NavigationContainer>
-          {/* <NotifierRoot /> */}
-        </AuthProvider>
+        <GlobalAppLoadingProvider>
+          <AuthProvider>
+            <NavigationContainer ref={navigationRef}>
+              <RootNavigator />
+            </NavigationContainer>
+            {/* <NotifierRoot /> */}
+          </AuthProvider>
+        </GlobalAppLoadingProvider>
       </GestureHandlerRootView>
     </AlertNotificationRoot>
   );
@@ -94,13 +93,22 @@ export default function App() {
 
 // ---------- Navigation Logic (auth-only here) ----------
 function RootNavigator() {
-  const { isLoggedIn, sessionLoading, user } = useAuth();
+  const { isLoggedIn, user } = useAuth();
+  const { isLoading } = useGlobalAppLoadingContext();
 
-  // While session is resolving, show the global loader
-  if (sessionLoading) return <MainLoadingScreen />;
+  return (
+    <>
+      {/* Always render the tree so providers can mount */}
+      {isLoggedIn ? <AppWithProviders key={user?.id} /> : <AuthStack />}
 
-  // When logged in, mount the app-scoped providers branch
-  return isLoggedIn ? <AppWithProviders key={user?.id} /> : <AuthStack />;
+      {/* Full-screen overlay while restoring session */}
+      {isLoading && (
+        <View style={[StyleSheet.absoluteFill, { zIndex: 9999 }]}>
+          <MainLoadingScreen />
+        </View>
+      )}
+    </>
+  );
 }
 
 // ---------- App branch wrapped with app-scoped providers ----------
@@ -118,18 +126,6 @@ function AppWithProviders() {
 
 // ---------- Loading gate that waits for app providers ----------
 function AppLoadingGate() {
-  // Read loading flags from app providers
-  const { loadingMessages } = useNotifications();
-  const { loading: loadingWorkout } = useWorkoutContext();
-  const { loading: loadingAnalysis } = useAnalysisContext();
-
-  // Keep a singleton instance of the loader to avoid flicker on transitions
-  const loaderRef = useRef(<MainLoadingScreen />);
-
-  if (loadingMessages || loadingWorkout || loadingAnalysis) {
-    return loaderRef.current;
-  }
-
   return <MainApp />;
 }
 

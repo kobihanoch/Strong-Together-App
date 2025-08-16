@@ -14,6 +14,7 @@ import { filterMessagesByUnread } from "../utils/authUtils";
 import { cacheProfileImagesAndGetMap } from "../utils/notificationsUtils.js";
 import { registerToMessagesListener } from "../webSockets/socketListeners";
 import { useAuth } from "./AuthContext.js";
+import { useGlobalAppLoadingContext } from "./GlobalAppLoadingContext.js";
 
 /**
  * Notifications Flow:
@@ -31,6 +32,9 @@ export const NotificationsContext = createContext();
 export const useNotifications = () => useContext(NotificationsContext);
 
 export const NotificationsProvider = ({ children }) => {
+  // Global loading
+  const { setLoading: setGlobalLoading } = useGlobalAppLoadingContext();
+
   const { user, sessionLoading } = useAuth();
 
   // All user's received messages
@@ -64,10 +68,6 @@ export const NotificationsProvider = ({ children }) => {
   // Load messages on start
   // Load senders on start (same API call)
   useEffect(() => {
-    if (sessionLoading) {
-      setLoading(true);
-      return;
-    }
     (async () => {
       if (user) {
         setLoadingMessages(true);
@@ -83,6 +83,11 @@ export const NotificationsProvider = ({ children }) => {
 
     return logoutCleanup;
   }, [user, sessionLoading]);
+
+  useEffect(() => {
+    setGlobalLoading("notifications", loadingMessages);
+    return () => setGlobalLoading("notifications", false);
+  }, [loadingMessages]);
 
   const logoutCleanup = useCallback(() => {
     setAllReceivedMessages([]);

@@ -9,6 +9,7 @@ import React, {
 import { getUserWorkout } from "../services/WorkoutService";
 import { extractWorkoutSplits } from "../utils/sharedUtils";
 import { useAuth } from "./AuthContext";
+import { useGlobalAppLoadingContext } from "./GlobalAppLoadingContext";
 
 const WorkoutContext = createContext(null);
 export const useWorkoutContext = () => {
@@ -29,6 +30,9 @@ export const useWorkoutContext = () => {
  */
 
 export const WorkoutProvider = ({ children }) => {
+  // Global loading
+  const { setLoading: setGlobalLoading } = useGlobalAppLoadingContext();
+
   const { user, sessionLoading } = useAuth();
 
   // Raw workout plan from API
@@ -47,10 +51,6 @@ export const WorkoutProvider = ({ children }) => {
 
   // Fetch on mount and whenever user changes
   useEffect(() => {
-    if (sessionLoading) {
-      setLoading(true);
-      return;
-    }
     (async () => {
       if (user) {
         try {
@@ -67,6 +67,11 @@ export const WorkoutProvider = ({ children }) => {
 
     return logoutCleanup;
   }, [user, sessionLoading]);
+
+  useEffect(() => {
+    setGlobalLoading("workout", loading);
+    return () => setGlobalLoading("workout", false);
+  }, [loading]);
 
   const logoutCleanup = useCallback(() => {
     setWorkout(null);
