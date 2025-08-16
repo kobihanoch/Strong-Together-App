@@ -170,6 +170,7 @@ export const AuthProvider = ({ children }) => {
       GlobalAuth.logout;
       await clearRefreshToken();
       setIsLoggedIn(false);
+      setLoading(false);
       setUser(null);
       setIsWorkoutMode(false);
     }

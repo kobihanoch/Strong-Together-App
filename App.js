@@ -1,8 +1,7 @@
-import { NotifierRoot, NotifierWrapper } from "react-native-notifier";
-import { GestureHandlerRootView } from "react-native-gesture-handler";
-import { AlertNotificationRoot } from "react-native-alert-notification";
+// App.js
+// English comments only inside code
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import {
   ActivityIndicator,
   StyleSheet,
@@ -10,6 +9,8 @@ import {
   View,
   StatusBar,
 } from "react-native";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { AlertNotificationRoot } from "react-native-alert-notification";
 import {
   NavigationContainer,
   useNavigationContainerRef,
@@ -26,33 +27,24 @@ import {
 } from "@expo-google-fonts/inter";
 
 import { AuthProvider, useAuth } from "./context/AuthContext";
-import { NotificationsProvider } from "./context/NotificationsContext";
-import NotificationsSetup from "./notifications/NotificationsSetup";
-
-import Theme1 from "./components/Theme1";
-import BottomTabBar from "./components/BottomTabBar";
-import MainLoadingScreen from "./components/MainLoadingScreen";
-
-import AppStack from "./navigation/AppStack";
-import AuthStack from "./navigation/AuthStack";
-import { useWorkoutContext, WorkoutProvider } from "./context/WorkoutContext";
+import {
+  NotificationsProvider,
+  useNotifications,
+} from "./context/NotificationsContext";
+import { WorkoutProvider, useWorkoutContext } from "./context/WorkoutContext";
 import {
   AnalysisProvider,
   useAnalysisContext,
 } from "./context/AnalysisContext";
 
-const RootStack = createStackNavigator();
+import AppStack from "./navigation/AppStack";
+import AuthStack from "./navigation/AuthStack";
+import Theme1 from "./components/Theme1";
+import BottomTabBar from "./components/BottomTabBar";
+import MainLoadingScreen from "./components/MainLoadingScreen";
+import NotificationsSetup from "./notifications/NotificationsSetup";
 
-/** ---------- Notifications: set once (outside components) ---------- */
-Notifications.setNotificationHandler({
-  handleNotification: async () => ({
-    shouldShowAlert: false,
-    shouldPlaySound: false,
-    shouldSetBadge: false, // TODO: Show TRUE on build
-  }),
-});
-
-/** ---------- Fonts Loader Hook ---------- */
+// ---------- Fonts Loader Hook ----------
 function useFontsReady() {
   const [ready, setReady] = useState(false);
   useEffect(() => {
@@ -70,7 +62,9 @@ function useFontsReady() {
   return ready;
 }
 
-/** ---------- App Root ---------- */
+const RootStack = createStackNavigator();
+
+// ---------- App Root ----------
 export default function App() {
   const fontsReady = useFontsReady();
   const navigationRef = useNavigationContainerRef();
@@ -85,57 +79,61 @@ export default function App() {
   }
 
   return (
-    // The package
     <AlertNotificationRoot>
       <GestureHandlerRootView style={{ flex: 1 }}>
         <AuthProvider>
-          <WorkoutProvider>
-            <AnalysisProvider>
-              <RootProviders navigationRef={navigationRef} />
-              <NotifierRoot />
-              <NotificationsSetup />
-            </AnalysisProvider>
-          </WorkoutProvider>
+          <NavigationContainer ref={navigationRef}>
+            <RootNavigator />
+          </NavigationContainer>
+          {/* <NotifierRoot /> */}
         </AuthProvider>
       </GestureHandlerRootView>
     </AlertNotificationRoot>
   );
 }
 
-/** ---------- Providers chain kept minimal ---------- */
-function RootProviders({ navigationRef }) {
-  const { user } = useAuth(); // מועבר ל-NotificationsProvider
+// ---------- Navigation Logic (auth-only here) ----------
+function RootNavigator() {
+  const { isLoggedIn, sessionLoading, user } = useAuth();
 
+  // While session is resolving, show the global loader
+  if (sessionLoading) return <MainLoadingScreen />;
+
+  // When logged in, mount the app-scoped providers branch
+  return isLoggedIn ? <AppWithProviders key={user?.id} /> : <AuthStack />;
+}
+
+// ---------- App branch wrapped with app-scoped providers ----------
+function AppWithProviders() {
   return (
-    <NotificationsProvider user={user}>
-      <NavigationContainer ref={navigationRef}>
-        <RootNavigator />
-      </NavigationContainer>
+    <NotificationsProvider>
+      <WorkoutProvider>
+        <AnalysisProvider>
+          <AppLoadingGate />
+        </AnalysisProvider>
+      </WorkoutProvider>
     </NotificationsProvider>
   );
 }
 
-/** ---------- Navigation Logic (single place) ---------- */
-function RootNavigator() {
-  const { isLoggedIn, sessionLoading } = useAuth();
+// ---------- Loading gate that waits for app providers ----------
+function AppLoadingGate() {
+  // Read loading flags from app providers
+  const { loadingMessages } = useNotifications();
   const { loading: loadingWorkout } = useWorkoutContext();
   const { loading: loadingAnalysis } = useAnalysisContext();
 
-  if (sessionLoading || loadingWorkout || loadingAnalysis)
-    return <MainLoadingScreen />;
+  // Keep a singleton instance of the loader to avoid flicker on transitions
+  const loaderRef = useRef(<MainLoadingScreen />);
 
-  return (
-    <RootStack.Navigator screenOptions={{ headerShown: false }}>
-      {isLoggedIn ? (
-        <RootStack.Screen name="App" component={MainApp} />
-      ) : (
-        <RootStack.Screen name="Auth" component={AuthStack} />
-      )}
-    </RootStack.Navigator>
-  );
+  if (loadingMessages || loadingWorkout || loadingAnalysis) {
+    return loaderRef.current;
+  }
+
+  return <MainApp />;
 }
 
-/** ---------- Logged-in Shell UI ---------- */
+// ---------- Logged-in shell UI ----------
 function MainApp() {
   return (
     <>
@@ -149,7 +147,7 @@ function MainApp() {
   );
 }
 
-/** ---------- Styles ---------- */
+// ---------- Styles ----------
 const styles = StyleSheet.create({
   loadingContainer: {
     flex: 1,

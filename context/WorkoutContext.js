@@ -4,6 +4,7 @@ import React, {
   useMemo,
   useState,
   useEffect,
+  useCallback,
 } from "react";
 import { getUserWorkout } from "../services/WorkoutService";
 import { extractWorkoutSplits } from "../utils/sharedUtils";
@@ -42,7 +43,7 @@ export const WorkoutProvider = ({ children }) => {
   const [workoutForEdit, setWorkoutForEdit] = useState(null);
 
   // Loading flag for this context
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   // Fetch on mount and whenever user changes
   useEffect(() => {
@@ -51,25 +52,27 @@ export const WorkoutProvider = ({ children }) => {
       return;
     }
     (async () => {
-      // When user is not available (e.g., after logout), reset and stop
-      if (!user?.id) {
-        setWorkout(null);
-        setWorkoutForEdit(null);
-        setLoading(false);
-        return;
-      }
-
-      try {
-        setLoading(true);
-        const { data } = await getUserWorkout();
-        const { workoutPlan, workoutPlanForEditWorkout } = data || {};
-        setWorkout(workoutPlan ?? null);
-        setWorkoutForEdit(workoutPlanForEditWorkout ?? null);
-      } finally {
-        setLoading(false);
+      if (user) {
+        try {
+          setLoading(true);
+          const { data } = await getUserWorkout();
+          const { workoutPlan, workoutPlanForEditWorkout } = data || {};
+          setWorkout(workoutPlan ?? null);
+          setWorkoutForEdit(workoutPlanForEditWorkout ?? null);
+        } finally {
+          setLoading(false);
+        }
       }
     })();
-  }, [user?.id, sessionLoading]);
+
+    return logoutCleanup;
+  }, [user, sessionLoading]);
+
+  const logoutCleanup = useCallback(() => {
+    setWorkout(null);
+    setWorkoutForEdit(null);
+    setLoading(false);
+  }, []);
 
   // Memoized context value
   const value = useMemo(

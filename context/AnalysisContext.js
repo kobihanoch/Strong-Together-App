@@ -1,5 +1,6 @@
 import React, {
   createContext,
+  useCallback,
   useContext,
   useEffect,
   useMemo,
@@ -41,7 +42,7 @@ export const AnalysisProvider = ({ children }) => {
   const [hasTrainedToday, setHasTrainedToday] = useState(false);
 
   // Loading flag for this context
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (sessionLoading) {
@@ -49,26 +50,28 @@ export const AnalysisProvider = ({ children }) => {
       return;
     }
     (async () => {
-      // On logout, clear and stop
-      if (!user?.id) {
-        setExerciseTracking(null);
-        setAnalyzedExerciseTrackingData(null);
-        setHasTrainedToday(false);
-        setLoading(false);
-        return;
-      }
-
-      try {
-        setLoading(true);
-        const res = await getUserExerciseTracking();
-        setExerciseTracking(res?.exercisetracking ?? []);
-        setAnalyzedExerciseTrackingData(unpackFromExerciseTrackingData(res));
-        setHasTrainedToday(!!res?.hasTrainedToday);
-      } finally {
-        setLoading(false);
+      if (user) {
+        try {
+          setLoading(true);
+          const res = await getUserExerciseTracking();
+          setExerciseTracking(res?.exercisetracking ?? []);
+          setAnalyzedExerciseTrackingData(unpackFromExerciseTrackingData(res));
+          setHasTrainedToday(!!res?.hasTrainedToday);
+        } finally {
+          setLoading(false);
+        }
       }
     })();
-  }, [user?.id, sessionLoading]);
+
+    return logoutCleanup;
+  }, [user, sessionLoading]);
+
+  const logoutCleanup = useCallback(() => {
+    setExerciseTracking(null);
+    setAnalyzedExerciseTrackingData(null);
+    setHasTrainedToday(false);
+    setLoading(false);
+  }, []);
 
   // Memoized context value
   const value = useMemo(

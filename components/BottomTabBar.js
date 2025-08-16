@@ -18,11 +18,11 @@ const { width, height } = Dimensions.get("window");
 const BottomTabBar = () => {
   const navigation = useNavigation();
   const routeName = useNavigationState((state) => {
-    const appRoute = state.routes[state.index];
-    const nestedState = appRoute.state;
+    const appRoute = state?.routes[state.index];
+    const nestedState = appRoute?.state;
 
     if (nestedState && nestedState.routes && nestedState.routes.length > 0) {
-      const innerRoute = nestedState.routes[nestedState.index];
+      const innerRoute = nestedState?.routes[nestedState?.index];
       return innerRoute.name;
     }
 

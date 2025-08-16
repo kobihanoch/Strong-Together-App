@@ -1,4 +1,11 @@
-import { createContext, useContext, useEffect, useMemo, useState } from "react";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import {
   getUserMessages,
   updateMsgReadStatus,
@@ -6,6 +13,7 @@ import {
 import { filterMessagesByUnread } from "../utils/authUtils";
 import { cacheProfileImagesAndGetMap } from "../utils/notificationsUtils.js";
 import { registerToMessagesListener } from "../webSockets/socketListeners";
+import { useAuth } from "./AuthContext.js";
 
 /**
  * Notifications Flow:
@@ -22,7 +30,9 @@ export const NotificationsContext = createContext();
 
 export const useNotifications = () => useContext(NotificationsContext);
 
-export const NotificationsProvider = ({ user, children }) => {
+export const NotificationsProvider = ({ children }) => {
+  const { user, sessionLoading } = useAuth();
+
   // All user's received messages
   const [allReceivedMessages, setAllReceivedMessages] = useState([]);
 
@@ -38,7 +48,7 @@ export const NotificationsProvider = ({ user, children }) => {
   const [profileImagesCache, setProfileImagesCache] = useState({});
 
   // Loading
-  const [loadingMessages, setLoadingMessages] = useState(false);
+  const [loadingMessages, setLoadingMessages] = useState(true);
 
   // Load listener
   useEffect(() => {
@@ -54,6 +64,10 @@ export const NotificationsProvider = ({ user, children }) => {
   // Load messages on start
   // Load senders on start (same API call)
   useEffect(() => {
+    if (sessionLoading) {
+      setLoading(true);
+      return;
+    }
     (async () => {
       if (user) {
         setLoadingMessages(true);
@@ -66,16 +80,16 @@ export const NotificationsProvider = ({ user, children }) => {
         }
       }
     })();
-  }, [user]);
 
-  // Clear on logout
-  useEffect(() => {
-    if (!user) {
-      setAllReceivedMessages([]);
-      setAllSendersUsersArr([]);
-      setProfileImagesCache({});
-    }
-  }, [user]);
+    return logoutCleanup;
+  }, [user, sessionLoading]);
+
+  const logoutCleanup = useCallback(() => {
+    setAllReceivedMessages([]);
+    setAllSendersUsersArr([]);
+    setProfileImagesCache({});
+    setLoadingMessages(false);
+  }, []);
 
   // Prefetch images and return mapping of profile images when senders updated
   useEffect(() => {
