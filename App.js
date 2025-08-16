@@ -40,6 +40,7 @@ import {
 import AppStack from "./navigation/AppStack";
 import AuthStack from "./navigation/AuthStack";
 import NotificationsSetup from "./notifications/NotificationsSetup";
+import { NotifierRoot } from "react-native-notifier";
 
 // ---------- Fonts Loader Hook ----------
 function useFontsReady() {
@@ -82,8 +83,8 @@ export default function App() {
           <AuthProvider>
             <NavigationContainer ref={navigationRef}>
               <RootNavigator />
+              <NotifierRoot />
             </NavigationContainer>
-            {/* <NotifierRoot /> */}
           </AuthProvider>
         </GlobalAppLoadingProvider>
       </GestureHandlerRootView>
@@ -117,16 +118,11 @@ function AppWithProviders() {
     <NotificationsProvider>
       <WorkoutProvider>
         <AnalysisProvider>
-          <AppLoadingGate />
+          <MainApp />
         </AnalysisProvider>
       </WorkoutProvider>
     </NotificationsProvider>
   );
-}
-
-// ---------- Loading gate that waits for app providers ----------
-function AppLoadingGate() {
-  return <MainApp />;
 }
 
 // ---------- Logged-in shell UI ----------

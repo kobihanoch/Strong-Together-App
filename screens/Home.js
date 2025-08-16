@@ -10,11 +10,8 @@ const { width, height } = Dimensions.get("window");
 
 const Home = ({ navigation }) => {
   // Hook handling
-  const { data: userData, loading } = useHomePageLogic();
+  const { data: userData } = useHomePageLogic();
 
-  if (loading || !userData) {
-    return null;
-  }
   return (
     <View style={{ flex: 1, paddingVertical: height * 0.02 }}>
       <View style={styles.midContainer}>

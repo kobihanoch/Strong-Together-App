@@ -1,7 +1,7 @@
-import { useMemo, useCallback } from "react";
+import { useMemo } from "react";
+import { useAnalysisContext } from "../../context/AnalysisContext";
 import { useAuth } from "../../context/AuthContext";
 import { useWorkoutContext } from "../../context/WorkoutContext";
-import { useAnalysisContext } from "../../context/AnalysisContext";
 
 const useHomePageLogic = () => {
   // Auth state (user + global session loading)
@@ -57,14 +57,6 @@ const useHomePageLogic = () => {
       };
     }, [analyzedExerciseTrackingData]);
 
-  // Unified loading for the Home screen
-  const loading = useMemo(() => {
-    // Show loading while any provider is still loading or
-    // (optionally) while user exists but analysis is not yet ready.
-    const baseLoading = sessionLoading || workoutLoading || analysisLoading;
-    return baseLoading;
-  }, [sessionLoading, workoutLoading, analysisLoading]);
-
   // Stable data object for easy consumption in components
   const data = useMemo(
     () => ({
@@ -97,7 +89,6 @@ const useHomePageLogic = () => {
 
   return {
     data,
-    loading,
   };
 };
 

@@ -18,15 +18,13 @@ const { width, height } = Dimensions.get("window");
 const BottomTabBar = () => {
   const navigation = useNavigation();
   const routeName = useNavigationState((state) => {
-    const appRoute = state?.routes[state.index];
-    const nestedState = appRoute?.state;
-
-    if (nestedState && nestedState.routes && nestedState.routes.length > 0) {
-      const innerRoute = nestedState?.routes[nestedState?.index];
-      return innerRoute.name;
+    const appRoute = state?.routes?.[state.index];
+    const nested = appRoute?.state;
+    if (nested?.routes?.length) {
+      const inner = nested.routes[nested.index];
+      return inner?.name ?? appRoute?.name ?? "Home";
     }
-
-    return "Home";
+    return appRoute?.name ?? "Home";
   });
 
   //----------------- [ Workout mode ]-----------------
@@ -41,13 +39,13 @@ const BottomTabBar = () => {
   useEffect(() => {
     if (isWorkoutMode) {
       const now = Date.now();
-      setStartTime(now); // Save the moment workout started
+      setStartTime(now); // align start
+      setCurrentTime(now); // align current so diff starts at 0
+      setShowExitButton(false);
 
-      const timer = setInterval(() => {
+      timer = setInterval(() => {
         setCurrentTime(Date.now());
       }, 1000);
-
-      setShowExitButton(false);
 
       return () => clearInterval(timer);
     }
