@@ -1,5 +1,3 @@
-// English comments only inside code
-
 import { useNavigation } from "@react-navigation/native";
 import React, {
   createContext,

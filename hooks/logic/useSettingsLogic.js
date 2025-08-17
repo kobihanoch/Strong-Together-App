@@ -1,4 +1,3 @@
-// English comments only inside code
 import { useCallback, useEffect, useMemo, useState } from "react";
 import * as Notifications from "expo-notifications";
 

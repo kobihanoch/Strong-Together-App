@@ -1,7 +1,3 @@
-// English comments only inside code
-
-// components/CreateWorkoutComponents/MuscleTabs.tsx
-// This version adds two optional props so the modal can control the selected tab without mutating global state.
 import React, { useEffect, useState } from "react";
 import {
   Dimensions,

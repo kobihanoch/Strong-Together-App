@@ -1,5 +1,3 @@
-// English comments only inside code
-
 import React, {
   useCallback,
   useEffect,

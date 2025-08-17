@@ -1,5 +1,3 @@
-// context/GlobalAppLoadingContext.js
-// English comments only inside code
 import {
   createContext,
   useContext,
