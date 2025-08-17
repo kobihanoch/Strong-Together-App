@@ -16,7 +16,7 @@ import { useCreateWorkout } from "../../context/CreateWorkoutContext";
 const { width, height } = Dimensions.get("window");
 
 // Slightly larger tabs for better touch targets and to de-bulk the menu button
-const TAB_H = Math.max(64, height * 0.12);
+const TAB_H = Math.max(64, height * 0.11);
 const TAB_W = Math.max(92, width * 0.3);
 const GAP_W = Math.max(20, width * 0.055);
 
@@ -203,9 +203,6 @@ const SplitTabsRow = () => {
             left: 0,
             right: 0,
             height: Math.max(6, TAB_H * 0.08),
-            backgroundColor: selected
-              ? "rgba(255,255,255,0.15)"
-              : "rgba(255,255,255,0.5)",
           }}
         />
 

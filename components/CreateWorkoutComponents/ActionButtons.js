@@ -1,13 +1,16 @@
+// English comments only inside code
+
 import React from "react";
 import { Dimensions, Text, View, Pressable, Platform } from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 
 const { width, height } = Dimensions.get("window");
 const BTN_H = Math.max(48, height * 0.058);
 const RADIUS = width * 0.035;
 
 // Reusable primary button (filled)
-const PrimaryButton = ({ title, onPress, disabled }) => {
+const PrimaryButton = ({ title, onPress, disabled, rightIconName }) => {
   return (
     <Pressable
       onPress={onPress}
@@ -20,6 +23,8 @@ const PrimaryButton = ({ title, onPress, disabled }) => {
         backgroundColor: disabled ? "#9BB9FF" : "#2979FF",
         alignItems: "center",
         justifyContent: "center",
+        flexDirection: "row", // place text + icon in a row
+        gap: 6,
         shadowColor: "#000",
         shadowOpacity: 0.12,
         shadowRadius: 6,
@@ -27,6 +32,7 @@ const PrimaryButton = ({ title, onPress, disabled }) => {
         transform: [{ scale: pressed ? 0.985 : 1 }],
       })}
     >
+      {/* Text first */}
       <Text
         style={{
           fontSize: RFValue(14),
@@ -36,6 +42,16 @@ const PrimaryButton = ({ title, onPress, disabled }) => {
       >
         {title}
       </Text>
+
+      {/* Icon after text (on the right) */}
+      {rightIconName ? (
+        <MaterialCommunityIcons
+          name={rightIconName}
+          size={RFValue(16)}
+          color="white"
+          style={{ marginLeft: 2 }}
+        />
+      ) : null}
     </Pressable>
   );
 };
@@ -67,6 +83,7 @@ const SecondaryButton = ({ title, onPress, disabled, loading }) => {
         borderColor: isDisabled ? "#CFE0FF" : "#BFD3FF",
         transform: [{ scale: pressed ? 0.985 : 1 }],
         minWidth: Platform.OS === "ios" ? width * 0.36 : undefined,
+        flexDirection: "row",
       })}
     >
       <Text
@@ -93,7 +110,12 @@ const ActionButtons = ({ onAdd, onSave, saving, disableSave = false }) => {
         gap: width * 0.03,
       }}
     >
-      <PrimaryButton title="Add exercise" onPress={onAdd} disabled={false} />
+      <PrimaryButton
+        title="Add exercise"
+        onPress={onAdd}
+        disabled={false}
+        rightIconName="plus" // white plus icon on the right
+      />
       <SecondaryButton
         title="Save workout"
         onPress={onSave}
