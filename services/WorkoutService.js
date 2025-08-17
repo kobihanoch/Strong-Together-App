@@ -1,5 +1,4 @@
 import api from "../api/api";
-import supabase from "../src/supabaseClient";
 
 // Fetch self workout plan
 export const getUserWorkout = async () => {
