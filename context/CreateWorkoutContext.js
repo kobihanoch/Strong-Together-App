@@ -41,12 +41,10 @@ export const CreateWorkoutProvider = ({ children }) => {
         const exists = ex.id
           ? current.some((e) => e.id === ex.id)
           : current.some((e) => e.exercise === ex.exercise);
-        if (exists) return prev; // no change
+        if (exists) return prev;
 
-        return {
-          ...prev,
-          [editedSplit]: [...current, ex],
-        };
+        const next = [...current, { ...ex, order_index: current.length }]; // 0-based at append
+        return { ...prev, [editedSplit]: next };
       });
     },
     [editedSplit]
@@ -82,9 +80,9 @@ export const CreateWorkoutProvider = ({ children }) => {
     }
   }, [workout]);
 
-  useEffect(() => {
+  /*useEffect(() => {
     console.log(JSON.stringify(selectedExercises, null, 2));
-  }, [selectedExercises]);
+  }, [selectedExercises]);*/
 
   // Extract all the splits from selected exercises
   const workoutSplits = useMemo(() => {
