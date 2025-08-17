@@ -10,6 +10,7 @@ import { useAuth } from "./AuthContext";
 import { getUserExerciseTracking } from "../services/WorkoutService";
 import { unpackFromExerciseTrackingData } from "../utils/authUtils";
 import { useGlobalAppLoadingContext } from "./GlobalAppLoadingContext";
+import { getExerciseTrackingMapped } from "../utils/statisticsUtils";
 
 const AnalysisContext = createContext(null);
 export const useAnalysisContext = () => {
@@ -41,6 +42,9 @@ export const AnalysisProvider = ({ children }) => {
 
   // Raw and derived analysis state
   const [exerciseTracking, setExerciseTracking] = useState(null);
+  const exerciseTrackingMaps = useMemo(() => {
+    return getExerciseTrackingMapped(exerciseTracking);
+  }, [exerciseTracking]);
   const [analyzedExerciseTrackingData, setAnalyzedExerciseTrackingData] =
     useState(null);
   const [hasTrainedToday, setHasTrainedToday] = useState(false);
@@ -85,13 +89,20 @@ export const AnalysisProvider = ({ children }) => {
     () => ({
       exerciseTracking,
       setExerciseTracking,
+      exerciseTrackingMaps,
       analyzedExerciseTrackingData,
       setAnalyzedExerciseTrackingData,
       hasTrainedToday,
       setHasTrainedToday,
       loading,
     }),
-    [exerciseTracking, analyzedExerciseTrackingData, hasTrainedToday, loading]
+    [
+      exerciseTracking,
+      exerciseTrackingMaps,
+      analyzedExerciseTrackingData,
+      hasTrainedToday,
+      loading,
+    ]
   );
 
   return (

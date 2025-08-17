@@ -1,20 +1,13 @@
-import { useEffect, useState } from "react";
+import { useMemo } from "react";
 import { useAnalysisContext } from "../context/AnalysisContext";
 
 const useLastWorkoutExerciseTrackingData = (exerciseToSplitId) => {
-  const [lastWorkoutData, setLastWorkoutData] = useState(null);
-  const { exerciseTracking } = useAnalysisContext();
-
-  useEffect(() => {
-    if (exerciseTracking) {
-      // Get last performence of the specific exercise
-      setLastWorkoutData(() => {
-        return exerciseTracking
-          .filter((et) => Number(et.exercisetosplit_id) === exerciseToSplitId)
-          .pop();
-      });
-    }
-  }, [exerciseToSplitId, exerciseTracking]);
+  const { exerciseTrackingMaps } = useAnalysisContext();
+  const lastWorkoutData = useMemo(() => {
+    const allRecords = exerciseTrackingMaps?.byETSId?.[exerciseToSplitId];
+    if (!allRecords) return null;
+    return exerciseTrackingMaps?.byETSId?.[exerciseToSplitId][0];
+  }, [exerciseTrackingMaps, exerciseToSplitId]);
 
   return { lastWorkoutData };
 };

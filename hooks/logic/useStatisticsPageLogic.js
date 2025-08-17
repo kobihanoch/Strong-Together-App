@@ -7,7 +7,7 @@ import {
 } from "../../utils/statisticsUtils";
 
 const useStatisticsPageLogic = () => {
-  const { exerciseTracking } = useAnalysisContext();
+  const { exerciseTracking, exerciseTrackingMaps } = useAnalysisContext();
 
   // Map with date keys: Date, ETSId, splitName
   const {
@@ -15,9 +15,7 @@ const useStatisticsPageLogic = () => {
     byETSId: exerciseTrackingWithETSIdKey,
     bySplitName: exerciseTrackingWithSplitNameKey,
     splitDatesDesc,
-  } = useMemo(() => {
-    return getExerciseTrackingMapped(exerciseTracking);
-  }, [exerciseTracking]);
+  } = exerciseTrackingMaps;
 
   // Start as today's date
   const [selectedDate, setSelectedDate] = useState(
