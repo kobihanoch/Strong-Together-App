@@ -4,7 +4,6 @@ import React, { useMemo, useState, useCallback, useRef } from "react";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import {
-  Alert,
   Animated,
   Dimensions,
   Image,
@@ -19,20 +18,15 @@ import { RFValue } from "react-native-responsive-fontsize";
 import { useCreateWorkout } from "../../../context/CreateWorkoutContext";
 import images from "../../images";
 import StepperInput from "../../StepperInput";
+import { Dialog } from "react-native-alert-notification";
 
 const { width, height } = Dimensions.get("window");
 const HANDLE_W = Math.max(18, width * 0.1);
 const ACTION_BTN = Math.max(34, width * 0.09);
 
-const PickExerciseItem = ({ exercise, dragHandleProps, onDelete }) => {
-  /**
-   * {
-   *  id(exercise id), name, sets, order_index, targetmuscle, specifictargetmuscle
-   * }
-   */
-
-  // Context (kept minimal to preserve your current logic)
-  const { properties } = useCreateWorkout();
+const PickExerciseItem = ({ exercise, dragHandleProps }) => {
+  // Pull context pieces we need
+  const { editing, properties, actions } = useCreateWorkout();
 
   // Resolve muscle image once
   const imagePath = useMemo(
@@ -43,77 +37,74 @@ const PickExerciseItem = ({ exercise, dragHandleProps, onDelete }) => {
   // Modal visibility
   const [isModalVisible, setIsModalVisible] = useState(false);
 
-  // Edit button subtle animation (keeps button perfectly circular)
+  // Tiny press animations
   const editScale = useRef(new Animated.Value(1)).current;
-  const onEditIn = useCallback(() => {
-    Animated.spring(editScale, {
-      toValue: 0.96,
-      useNativeDriver: true,
-      speed: 30,
-    }).start();
-  }, [editScale]);
-  const onEditOut = useCallback(() => {
-    Animated.spring(editScale, {
-      toValue: 1,
-      useNativeDriver: true,
-      speed: 30,
-    }).start();
-  }, [editScale]);
-
-  // Delete button subtle animation
   const delScale = useRef(new Animated.Value(1)).current;
-  const onDelIn = useCallback(() => {
-    Animated.spring(delScale, {
-      toValue: 0.96,
-      useNativeDriver: true,
-      speed: 30,
-    }).start();
-  }, [delScale]);
-  const onDelOut = useCallback(() => {
-    Animated.spring(delScale, {
-      toValue: 1,
-      useNativeDriver: true,
-      speed: 30,
-    }).start();
-  }, [delScale]);
+  const onEditIn = useCallback(
+    () =>
+      Animated.spring(editScale, {
+        toValue: 0.96,
+        useNativeDriver: true,
+        speed: 30,
+      }).start(),
+    [editScale]
+  );
+  const onEditOut = useCallback(
+    () =>
+      Animated.spring(editScale, {
+        toValue: 1,
+        useNativeDriver: true,
+        speed: 30,
+      }).start(),
+    [editScale]
+  );
+  const onDelIn = useCallback(
+    () =>
+      Animated.spring(delScale, {
+        toValue: 0.96,
+        useNativeDriver: true,
+        speed: 30,
+      }).start(),
+    [delScale]
+  );
+  const onDelOut = useCallback(
+    () =>
+      Animated.spring(delScale, {
+        toValue: 1,
+        useNativeDriver: true,
+        speed: 30,
+      }).start(),
+    [delScale]
+  );
 
   // Open modal
-  const handleOpenEdit = useCallback(() => {
-    setIsModalVisible(true);
-  }, []);
+  const handleOpenEdit = useCallback(() => setIsModalVisible(true), []);
 
-  // Delete with confirmation
+  // Delete with confirmation (always use context action)
   const handleDelete = useCallback(() => {
-    Alert.alert(
-      "Remove exercise",
-      `Are you sure you want to remove "${exercise?.name}" from this split?`,
-      [
-        { text: "Cancel", style: "cancel" },
-        {
-          text: "Remove",
-          style: "destructive",
-          onPress: () => {
-            if (onDelete) {
-              onDelete(exercise);
-            } else {
-              // Fallback: try a contextual removal if you have one in your context
-              // properties.removeExerciseFromSplit?.(exercise);
-              console.warn(
-                "onDelete handler was not provided for PickExerciseItem."
-              );
-            }
-          },
-        },
-      ]
-    );
-  }, [exercise, onDelete]);
+    Dialog.show({
+      type: "WARNING",
+      title: "Remove exercise",
+      textBody: `Are you sure you want to remove "${exercise?.name}" from this split?`,
+      button: "Remove",
+      autoClose: false, // keep it open until we close manually
+      onPressButton: () => {
+        actions?.removeExercise?.(String(exercise?.id));
+        Dialog.hide();
+      },
+      // Some versions support this callback to handle outside taps:
+      onTouchOutside: () => {
+        Dialog.hide();
+      },
+    });
+  }, [exercise, actions]);
 
   return (
-    <View style={{ marginBottom: height * 0.0 }}>
+    <View style={{ marginBottom: 0 }}>
       <View style={{ position: "relative" }}>
         {/* Row with left drag handle + card */}
         <View style={{ flexDirection: "row", alignItems: "stretch" }}>
-          {/* Thin left drag handle (clean and unobtrusive) */}
+          {/* Left drag handle */}
           <Pressable {...(dragHandleProps || {})} style={styles.dragHandle}>
             <MaterialCommunityIcons
               name="drag-vertical"
@@ -149,7 +140,7 @@ const PickExerciseItem = ({ exercise, dragHandleProps, onDelete }) => {
                 </Text>
               </View>
 
-              {/* Top-right actions: Edit + Delete (stacked, floating, crisp) */}
+              {/* Actions */}
               <View style={styles.actionsContainer}>
                 {/* Edit */}
                 <Animated.View
@@ -274,7 +265,6 @@ const styles = StyleSheet.create({
     elevation: 2,
     overflow: "hidden",
   },
-
   // Thin left drag handle
   dragHandle: {
     width: HANDLE_W,
@@ -288,7 +278,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     backgroundColor: "rgba(230, 230, 230, 1)",
   },
-
   imageContainer: {
     flex: 1,
     borderRadius: 10,
@@ -319,7 +308,6 @@ const styles = StyleSheet.create({
     fontSize: RFValue(12),
     color: "#919191",
   },
-
   // Actions (floating, top-right)
   actionsContainer: {
     flex: 0.1,
@@ -350,7 +338,6 @@ const styles = StyleSheet.create({
   deleteBtn: {
     backgroundColor: "#FF3B30",
   },
-
   // Modal
   modalBackdrop: {
     flex: 1,

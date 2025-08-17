@@ -28,7 +28,7 @@ const SHEET_MAX_H = Math.min(height * 0.85, 720);
 
 const ExercisePickerModal = ({ visible, onClose }) => {
   // Pull DB from context
-  const { DB } = useCreateWorkout();
+  const { DB, actions } = useCreateWorkout();
 
   // Animated sheet + backdrop
   const translateY = useRef(new Animated.Value(SHEET_MAX_H)).current;
@@ -158,7 +158,15 @@ const ExercisePickerModal = ({ visible, onClose }) => {
 
   // Render one exercise card
   const renderItem = ({ item }) => (
-    <TouchableOpacity activeOpacity={0.9} style={styles.card}>
+    <TouchableOpacity
+      onPress={() => {
+        // Add to the current split as the last exercise.
+        actions?.addExercise?.(item);
+        handleCloseAnimated();
+      }}
+      style={styles.card}
+      activeOpacity={0.9}
+    >
       <View style={{ flexDirection: "row", alignItems: "center" }}>
         <View style={styles.dot} />
         <View style={{ flex: 1 }}>

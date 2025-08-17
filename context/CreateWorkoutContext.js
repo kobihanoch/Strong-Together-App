@@ -38,13 +38,25 @@ export const CreateWorkoutProvider = ({ children }) => {
     (ex) => {
       setSelectedExercises((prev) => {
         const current = prev?.[editedSplit] ?? [];
+
+        // Prevent duplicates (by id if present, else by name field fallback)
         const exists = ex.id
           ? current.some((e) => e.id === ex.id)
           : current.some((e) => e.exercise === ex.exercise);
         if (exists) return prev;
 
-        const next = [...current, { ...ex, order_index: current.length }]; // 0-based at append
-        return { ...prev, [editedSplit]: next };
+        // Append to end; order_index is 0-based -> next index is current.length
+        const appended = {
+          ...ex,
+          order_index: current.length, // last index after append (0-based)
+          // optional defaults if needed:
+          // sets: Array.isArray(ex.sets) ? ex.sets : [],
+        };
+
+        return {
+          ...prev,
+          [editedSplit]: [...current, appended],
+        };
       });
     },
     [editedSplit]
@@ -52,19 +64,38 @@ export const CreateWorkoutProvider = ({ children }) => {
 
   // Remove exercise from the current split
   const removeExercise = useCallback(
-    (ex) => {
+    (exOrId) => {
       setSelectedExercises((prev) => {
-        const current = prev?.[editedSplit] ?? [];
-        const next = ex.id
-          ? current.filter((e) => e.id !== ex.id)
-          : current.filter((e) => e.exercise !== ex.exercise);
+        const key = editedSplit;
+        const list = prev?.[key] ?? [];
 
-        if (next.length === current.length) return prev; // nothing removed
+        // 1) Prefer removing by id (coerce to string on both sides)
+        const idToRemove =
+          typeof exOrId === "object" && exOrId !== null ? exOrId.id : exOrId;
 
-        return {
-          ...prev,
-          [editedSplit]: next,
-        };
+        let next;
+
+        if (idToRemove != null) {
+          const idStr = String(idToRemove);
+          next = list.filter((it) => String(it?.id) !== idStr);
+        } else if (typeof exOrId === "object" && exOrId?.name) {
+          // 2) Fallback: remove by name if id is missing
+          next = list.filter((it) => it?.name !== exOrId.name);
+        } else if (
+          typeof exOrId === "object" &&
+          typeof exOrId?.order_index === "number"
+        ) {
+          // 3) Last resort: remove by order_index
+          next = list.filter((_, i) => i !== exOrId.order_index);
+        } else {
+          // Nothing to remove
+          return prev;
+        }
+
+        // Normalize order_index to 0-based after removal
+        const reindexed = next.map((it, i) => ({ ...it, order_index: i }));
+
+        return { ...prev, [key]: reindexed };
       });
     },
     [editedSplit]
