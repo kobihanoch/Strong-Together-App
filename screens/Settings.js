@@ -10,7 +10,8 @@ import {
 import { RFValue } from "react-native-responsive-fontsize";
 import { useAuth } from "../context/AuthContext";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
-import ToggleSetting from "../components/ToggleSetting";
+import ToggleSetting from "../components/NotificationsToggle";
+import NotificationsToggle from "../components/NotificationsToggle";
 
 const { width, height } = Dimensions.get("window");
 
@@ -55,7 +56,7 @@ const Settings = () => {
             </Text>
           </View>
 
-          <ToggleSetting></ToggleSetting>
+          <NotificationsToggle></NotificationsToggle>
         </View>
 
         <TouchableOpacity style={styles.box} onPress={() => logout()}>
