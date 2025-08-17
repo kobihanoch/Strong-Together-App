@@ -1,22 +1,27 @@
-import React from "react";
-import { Dimensions, StyleSheet, Text, TouchableOpacity } from "react-native";
+import React, { useCallback } from "react";
+import { TouchableOpacity, Text, Dimensions, StyleSheet } from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";
+import { useCreateWorkout } from "../../context/CreateWorkoutContext";
 
 const { width, height } = Dimensions.get("window");
+const EditableSplitTab = ({ splitObj, isSelected }) => {
+  const { editing } = useCreateWorkout();
+  const handleClick = useCallback(() => {
+    return editing.setEditedSplit(splitObj);
+  });
 
-const WorkoutSplitItem = ({ item, isSelected, onPress }) => {
   return (
     <TouchableOpacity
       style={[
         styles.splitContainer,
         isSelected && styles.selectedSplitContainer,
       ]}
-      onPress={onPress}
+      onPress={handleClick}
     >
       <Text
         style={[styles.splitName, { color: isSelected ? "white" : "black" }]}
       >
-        {item.name}
+        {splitObj}
       </Text>
     </TouchableOpacity>
   );
@@ -26,7 +31,7 @@ const styles = StyleSheet.create({
   splitContainer: {
     flex: 1,
     height: "85%",
-    width: width * 0.2,
+    width: width * 0.3,
     backgroundColor: "rgb(234, 240, 246)",
     justifyContent: "center",
     alignItems: "center",
@@ -50,5 +55,4 @@ const styles = StyleSheet.create({
     color: "#666",
   },
 });
-
-export default WorkoutSplitItem;
+export default EditableSplitTab;

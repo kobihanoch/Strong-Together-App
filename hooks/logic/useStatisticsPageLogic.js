@@ -1,15 +1,22 @@
 import moment from "moment";
 import { useMemo, useState } from "react";
-import { useAuth } from "../../context/AuthContext";
+import { useAnalysisContext } from "../../context/AnalysisContext";
 import {
-  getExerciseTrackingMappedByDate,
+  getExerciseTrackingMapped,
   getLastWorkoutForEachExercise,
 } from "../../utils/statisticsUtils";
 
 const useStatisticsPageLogic = () => {
-  const { exerciseTracking } = useAuth().workout;
-  const exerciseTrackingWithDateKey = useMemo(() => {
-    return getExerciseTrackingMappedByDate(exerciseTracking);
+  const { exerciseTracking } = useAnalysisContext();
+
+  // Map with date keys: Date, ETSId, splitName
+  const {
+    byDate: exerciseTrackingWithDateKey,
+    byETSId: exerciseTrackingWithETSIdKey,
+    bySplitName: exerciseTrackingWithSplitNameKey,
+    splitDatesDesc,
+  } = useMemo(() => {
+    return getExerciseTrackingMapped(exerciseTracking);
   }, [exerciseTracking]);
 
   // Start as today's date
@@ -20,7 +27,7 @@ const useStatisticsPageLogic = () => {
   // Calculate formatted date for each change of date
   const formattedDate = useMemo(() => {
     return moment(selectedDate).format("YYYY-MM-DD");
-  }, [selectedDate, exerciseTracking]);
+  }, [selectedDate]);
 
   // Change records when a date selection is aplied
   const exerciseTrackingByDate = useMemo(() => {
@@ -30,10 +37,18 @@ const useStatisticsPageLogic = () => {
   // Load prev workout data for each workout
   const exerciseTrackingByDatePrev = useMemo(() => {
     return getLastWorkoutForEachExercise(
-      exerciseTracking,
-      exerciseTrackingByDate
+      formattedDate,
+      exerciseTrackingWithDateKey,
+      exerciseTrackingWithSplitNameKey,
+      exerciseTrackingWithETSIdKey,
+      splitDatesDesc
     );
-  }, [exerciseTracking, exerciseTrackingByDate]);
+  }, [
+    formattedDate,
+    exerciseTrackingWithDateKey,
+    exerciseTrackingWithSplitNameKey,
+    exerciseTrackingWithETSIdKey,
+  ]);
 
   return {
     selectedDate,
@@ -41,6 +56,8 @@ const useStatisticsPageLogic = () => {
     exerciseTracking,
     exerciseTrackingByDate,
     exerciseTrackingByDatePrev,
+    exerciseTrackingWithETSIdKey,
+    splitDatesDesc,
   };
 };
 

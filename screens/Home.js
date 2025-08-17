@@ -4,17 +4,15 @@ import { RFValue } from "react-native-responsive-fontsize";
 import LastWorkoutSection from "../components/HomeComponents/LastWorkoutSection";
 import QuickLookSection from "../components/HomeComponents/QuickLookSection";
 import StartWorkoutButton from "../components/HomeComponents/StartWorkoutButton";
-import { useAuth } from "../context/AuthContext";
 import useHomePageLogic from "../hooks/logic/useHomePageLogic";
 
 const { width, height } = Dimensions.get("window");
 
 const Home = ({ navigation }) => {
-  const { user } = useAuth();
   // Hook handling
-  const { data: userData, loading } = useHomePageLogic(user);
+  const { data: userData, isLoading } = useHomePageLogic();
 
-  if (loading || !userData) {
+  if (isLoading) {
     return null;
   }
   return (

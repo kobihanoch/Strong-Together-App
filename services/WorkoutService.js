@@ -22,56 +22,20 @@ export const getUserExerciseTracking = async (userId) => {
 };
 
 // Removes a workout plan
-export const deleteWorkout = async (userId) => {
-  if (!userId) {
-    console.log("Error: user not found.");
-    return;
-  }
-  const { error } = await supabase
-    .from("workoutplans")
-    .delete()
-    .eq("user_id", userId);
-  if (error) {
-    console.log("Error occured deleting a workout: " + error);
+export const deleteWorkout = async () => {
+  try {
+    await api.delete("/api/workouts/delete");
+  } catch (error) {
     throw error;
   }
 };
 
 // Add a new workout plan
-export const addWorkout = async (userId, name, splitsNumber) => {
-  if (!userId) {
-    console.error("Error: userId is missing.");
-    throw new Error("User ID is required.");
-  }
-
-  console.log("Adding workout for user:", userId);
-
-  const { data, error } = await supabase
-    .from("workoutplans")
-    .insert([
-      {
-        user_id: userId,
-        trainer_id: userId,
-        name: name,
-        numberofsplits: splitsNumber,
-        //created_at: new Date().toISOString(),
-      },
-    ])
-    .select("id")
-    .single();
-
-  if (error) {
-    //console.error("Error inserting workout:", error.message);
-    throw error;
-  }
-
-  if (!data || data.length === 0) {
-    //console.error("Error: No data returned after inserting workout.");
-    throw new Error("Workout creation failed.");
-  }
-
-  //console.log("Workout created successfully:", data);
-  return { data };
+export const addWorkout = async (workoutData) => {
+  const { data } = await api.post("/api/workouts/add", {
+    workoutData: workoutData,
+  });
+  return data;
 };
 
 // Saves a workout after working out - startworkout.js

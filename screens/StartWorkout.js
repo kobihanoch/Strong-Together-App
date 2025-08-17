@@ -1,55 +1,46 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useCallback, useRef } from "react";
 import {
-  View,
-  Text,
-  StyleSheet,
   Dimensions,
   FlatList,
-  TextInput,
-  Alert,
+  StyleSheet,
+  Text,
   TouchableOpacity,
-  Animated,
+  View,
 } from "react-native";
-import Theme1 from "../components/Theme1";
-import useExercises from "../hooks/useExercises";
-import { RFValue } from "react-native-responsive-fontsize";
-import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
-import supabase from "../src/supabaseClient";
-import { LinearGradient } from "expo-linear-gradient";
-import PageIndicator from "../components/PageIndicator";
-import ExerciseItem from "../components/StartWorkoutComponents/ExerciseItem";
-import { useAuth } from "../context/AuthContext";
-import useStartWorkoutPageLogic from "../hooks/logic/useStartWorkoutPageLogic";
-import LoadingPage from "../components/LoadingPage";
-import ExerciseBox from "../components/StartWorkoutComponents/ExerciseBox";
-import { useFocusEffect } from "@react-navigation/native";
-import { BackHandler } from "react-native";
-import BottomModal from "../components/BottomModal";
 import { Dialog } from "react-native-alert-notification";
+import { RFValue } from "react-native-responsive-fontsize";
+import ExerciseBox from "../components/StartWorkoutComponents/ExerciseBox";
+import useStartWorkoutPageLogic from "../hooks/logic/useStartWorkoutPageLogic";
 
 const { width, height } = Dimensions.get("window");
 
 const StartWorkout = ({ navigation, route }) => {
-  const { user, setHasTrainedToday } = useAuth();
   const { data: workoutData, saving: workoutSaving } = useStartWorkoutPageLogic(
-    user,
-    route.params?.workoutSplit,
-    setHasTrainedToday
+    route.params?.workoutSplit
   );
 
   const flatListRef = useRef(null);
 
-  /*useEffect(() => {
-    console.log("Updated weights: " + JSON.stringify(workoutData.weightArrs));
-  }, [workoutData.weightArrs]);*/
+  const handlePressSave = useCallback(async () => {
+    let pressedYes = false;
 
-  /*useEffect(() => {
-    console.log("Updated reps: " + JSON.stringify(workoutData.repsArrs));
-  }, [workoutData.repsArrs]);*/
-
-  /*if (loading) {
-    return <LoadingPage message="Starting workout"></LoadingPage>;
-  }*/
+    Dialog.show({
+      type: "SUCCESS",
+      title: "Finish Workout?",
+      textBody: "Are you sure you’ve completed your workout?",
+      button: "Yes, Finish",
+      closeOnOverlayTap: true,
+      onPressButton: async () => {
+        pressedYes = true;
+        Dialog.hide();
+        await workoutSaving.saveData();
+      },
+      onHide: () => {
+        if (!pressedYes) {
+        }
+      },
+    });
+  }, [workoutSaving]);
 
   return (
     <View
@@ -98,26 +89,7 @@ const StartWorkout = ({ navigation, route }) => {
             height: "40%",
             gap: width * 0.03,
           }}
-          onPress={() => {
-            let pressedYes = false;
-
-            Dialog.show({
-              type: "SUCCESS",
-              title: "Finish Workout?",
-              textBody: "Are you sure you’ve completed your workout?",
-              button: "Yes, Finish",
-              closeOnOverlayTap: true,
-              onPressButton: () => {
-                pressedYes = true;
-                Dialog.hide();
-                workoutSaving.setSaveStarted(true);
-              },
-              onHide: () => {
-                if (!pressedYes) {
-                }
-              },
-            });
-          }}
+          onPress={handlePressSave}
         >
           <Text
             style={{

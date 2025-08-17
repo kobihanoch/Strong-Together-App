@@ -9,10 +9,9 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import useMediaUploads from "../../hooks/useMediaUploads";
-import supabase from "../../src/supabaseClient";
-import { useAuth } from "../../context/AuthContext";
 import api from "../../api/api";
+import { useAuth } from "../../context/AuthContext";
+import useMediaUploads from "../../hooks/useMediaUploads";
 
 const { width, height } = Dimensions.get("window");
 

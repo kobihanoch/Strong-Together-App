@@ -1,3 +1,125 @@
+// Mapping exercise tracking with keys:
+// {
+//   byDate: { [YYYY-MM-DD]: Record[] }, SORTED FROM NEW (FIRST) TO OLD(LAST)
+//   byETSId: { [exercisetosplit_id]: Record[] },
+//   bySplitName: { [splitname]: Record[] }.
+//   splitDatesDesc: { [splitName]: all dates DESC }
+// }
+export const getExerciseTrackingMapped = (exerciseTracking = []) => {
+  if (!exerciseTracking || !exerciseTracking.length) {
+    return { byDate: {}, byETSId: {}, bySplitName: {}, splitDatesDesc: {} };
+  }
+
+  // Helper: extract order_index from nested object with safe fallback
+  const getOrderIndex = (r) =>
+    r?.exercisetoworkoutsplit?.order_index ??
+    r?.order_index ??
+    Number.MAX_SAFE_INTEGER; // items without order_index go last
+
+  // First pass: bucket rows
+  const mapped = exerciseTracking.reduce(
+    (acc, r) => {
+      (acc.byDate[r.workoutdate] ??= []).push(r);
+      (acc.byETSId[r.exercisetosplit_id] ??= []).push(r);
+      (acc.bySplitName[r.splitname] ??= []).push(r);
+      return acc;
+    },
+    { byDate: {}, byETSId: {}, bySplitName: {} }
+  );
+
+  // byDate:
+  // - sort date keys DESC (newest first)
+  // - for each date's array, sort by order_index ASC (stable ties by ids)
+  const byDate = Object.fromEntries(
+    Object.keys(mapped.byDate)
+      .sort() // ascending
+      .reverse() // descending (newest first)
+      .map((d) => [
+        d,
+        [...mapped.byDate[d]].sort((a, b) => {
+          const ai = getOrderIndex(a);
+          const bi = getOrderIndex(b);
+          if (ai !== bi) return ai - bi; // primary: order_index asc
+          // tie-breakers to keep deterministic order
+          return (
+            (a.exercisetosplit_id ?? 0) - (b.exercisetosplit_id ?? 0) ||
+            (a.exercise_id ?? 0) - (b.exercise_id ?? 0) ||
+            (a.id ?? 0) - (b.id ?? 0)
+          );
+        }),
+      ])
+  );
+
+  // byETSId: keep your original sort (by workoutdate DESC)
+  const byETSId = {};
+  Object.entries(mapped.byETSId).forEach(([id, arr]) => {
+    byETSId[id] = [...arr].sort((a, b) =>
+      b.workoutdate.localeCompare(a.workoutdate)
+    );
+  });
+
+  // bySplitName: keep your original sort (by workoutdate DESC)
+  const bySplitName = {};
+  Object.entries(mapped.bySplitName).forEach(([sn, arr]) => {
+    bySplitName[sn] = [...arr].sort((a, b) =>
+      b.workoutdate.localeCompare(a.workoutdate)
+    );
+  });
+
+  // Distinct dates per split, newest first (derived from bySplitName already sorted)
+  const splitDatesDesc = {};
+  for (const [sn, arr] of Object.entries(bySplitName)) {
+    splitDatesDesc[sn] = [...new Set(arr.map((r) => r.workoutdate))];
+  }
+
+  return { byDate, byETSId, bySplitName, splitDatesDesc };
+};
+export const getLastWorkoutForEachExercise = (
+  date,
+  byDate,
+  bySplitName,
+  byETSId,
+  splitDatesDesc
+) => {
+  const etRecords = byDate[date];
+  if (!Array.isArray(etRecords) || etRecords.length === 0) return [];
+
+  // Iterate over each exercise record of selected date
+  return etRecords.reduce((acc, ex) => {
+    // Get all instances of specific exercise
+    const etsArr = byETSId[ex.exercisetosplit_id] ?? [];
+
+    // Find index of last log
+    const iNow = etsArr.findIndex((r) => r.workoutdate === date);
+    const lastLog =
+      iNow >= 0 ? etsArr[iNow + 1] : etsArr.find((r) => r.workoutdate < date);
+
+    // If no last log of exercise => Continue to next exercise
+    if (!lastLog) return acc;
+
+    // Get date of last workout same as this one
+    const dates = splitDatesDesc?.[ex.splitname] ?? [
+      ...new Set((bySplitName[ex.splitname] || []).map((r) => r.workoutdate)),
+    ];
+    const j = dates.indexOf(date);
+    const lastSplitDate = j >= 0 ? dates[j + 1] : dates.find((d) => d < date);
+
+    acc.push({
+      ...lastLog,
+      isLastWorkout: !!lastSplitDate && lastLog.workoutdate === lastSplitDate,
+    });
+    return acc;
+  }, []);
+};
+
+// PR for the same exercise
+export const isSetPR = (etsId, weight, byETSid) => {
+  const allWeightsRecordForExercise = byETSid[etsId].flatMap(
+    (record) => record.weight
+  );
+  return weight == Math.max(...allWeightsRecordForExercise);
+};
+
 export const formatDate = (dateToFormat) => {
   const monthNames = [
     "Jan",
@@ -20,104 +142,4 @@ export const formatDate = (dateToFormat) => {
   const year = dateObj.getFullYear();
 
   return `${monthName} ${day}, ${year}`;
-};
-
-const isExerciseInLastWorkoutWithSameType = (exerciseId, lastWorkout) => {
-  return lastWorkout.some((ex) => ex.exercise_id === exerciseId);
-};
-
-export const getLastWorkoutForEachExercise = (
-  exerciseTracking,
-  exerciseTrackingByDate
-) => {
-  if (exerciseTracking?.length > 0 && exerciseTrackingByDate?.length > 0) {
-    const sortedEtArr = [...exerciseTracking].sort(
-      (a, b) => new Date(b.workoutdate) - new Date(a.workoutdate)
-    );
-
-    const currentDate = exerciseTrackingByDate[0].workoutdate;
-    const lastWorkoutWithSameType = getLastWorkoutWithSameType(
-      exerciseTracking,
-      exerciseTrackingByDate
-    );
-
-    const previousWorkout = [];
-
-    exerciseTrackingByDate.forEach((exercise) => {
-      const lastLog = sortedEtArr.find(
-        (log) =>
-          log.exercise_id === exercise.exercise_id &&
-          new Date(log.workoutdate) < new Date(currentDate)
-      );
-
-      if (lastLog) {
-        const isLastWorkout = isExerciseInLastWorkoutWithSameType(
-          exercise.exercise_id,
-          lastWorkoutWithSameType
-        );
-        previousWorkout.push({ ...lastLog, isLastWorkout });
-      }
-    });
-
-    //console.log(
-    // "Found previous workout:",
-    // JSON.stringify(previousWorkout, null, 2)
-    // );
-
-    return previousWorkout;
-  }
-
-  return [];
-};
-
-export const getLastWorkoutWithSameType = (
-  exerciseTracking,
-  exerciseTrackingByDate
-) => {
-  if (exerciseTracking?.length > 0 && exerciseTrackingByDate?.length > 0) {
-    const sortedEtArr = [...exerciseTracking].sort(
-      (a, b) => new Date(a.workoutdate) - new Date(b.workoutdate)
-    );
-
-    const currentDate = exerciseTrackingByDate[0].workoutdate;
-    const splitName = exerciseTrackingByDate[0].splitname;
-
-    let lastWorkout = [];
-    let prevDate = "";
-
-    for (let j = sortedEtArr.length - 1; j >= 0; j--) {
-      const entry = sortedEtArr[j];
-      if (entry.splitname === splitName && entry.workoutdate < currentDate) {
-        if (!prevDate) {
-          prevDate = entry.workoutdate;
-        }
-
-        if (entry.workoutdate !== prevDate) {
-          break;
-        }
-
-        lastWorkout.push(entry);
-      }
-    }
-
-    //console.log("PREVIOUS WORKOUT FULL:", JSON.stringify(lastWorkout, null, 2));
-    return lastWorkout;
-  }
-
-  return [];
-};
-
-export const isSetPR = (exerciseTracking, weight) => {
-  let allWeightArr = exerciseTracking.flatMap((et) => et.weight);
-  return weight == Math.max(...allWeightArr);
-};
-
-// Mapping exercise tracking with key(date):value(all records)
-export const getExerciseTrackingMappedByDate = (exerciseTracking) => {
-  return exerciseTracking.reduce((acc, record) => {
-    acc[record.workoutdate]
-      ? acc[record.workoutdate].push(record)
-      : (acc[record.workoutdate] = [record]);
-    return acc;
-  }, {});
 };
