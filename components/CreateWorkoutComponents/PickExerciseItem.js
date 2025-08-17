@@ -22,10 +22,11 @@ import {
   Easing,
 } from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";
-import { useCreateWorkout } from "../../../context/CreateWorkoutContext";
-import images from "../../images";
-import StepperInput from "../../StepperInput";
+
+import images from "../images";
+import StepperInput from "../StepperInput";
 import { Dialog } from "react-native-alert-notification";
+import { useCreateWorkout } from "../../context/CreateWorkoutContext";
 
 const { width, height } = Dimensions.get("window");
 const HANDLE_W = Math.max(16, width * 0.06);

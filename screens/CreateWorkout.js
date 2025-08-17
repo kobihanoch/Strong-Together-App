@@ -1,15 +1,15 @@
 // English comments only inside code
 
 import React, { useCallback, useState } from "react";
-import { Dimensions, View, Text, TouchableOpacity } from "react-native";
+import { Dimensions, Text, TouchableOpacity, View } from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";
+import ExercisePickerModal from "../components/CreateWorkoutComponents/ExercisePickerModal";
+import SelectedExercisesList from "../components/CreateWorkoutComponents/SelectedExercisesList";
+import SplitTabsRow from "../components/CreateWorkoutComponents/SplitTabsRow";
 import {
   CreateWorkoutProvider,
   useCreateWorkout,
 } from "../context/CreateWorkoutContext";
-import SplitTabsRow from "../components/CreateWorkoutComponents/SplitTabsRow";
-import SelectedExercisesList from "../components/CreateWorkoutComponents/SelectedExercisesList";
-import ExercisePickerModal from "../components/CreateWorkoutComponents/ExercisePickerModal";
 
 const { width, height } = Dimensions.get("window");
 

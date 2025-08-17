@@ -1,12 +1,12 @@
 // English comments only inside code
 
 import React, { useCallback, useMemo } from "react";
-import { View, Text } from "react-native";
+import { Text, View } from "react-native";
 import DraggableFlatList, {
   ScaleDecorator,
 } from "react-native-draggable-flatlist";
+import PickExerciseItem from "../../components/CreateWorkoutComponents/PickExerciseItem";
 import { useCreateWorkout } from "../../context/CreateWorkoutContext";
-import PickExerciseItem from "../../components/CreateWorkoutComponents/AddExercisesScreenComponents/PickExerciseItem";
 
 const SelectedExercisesList = () => {
   // Pull what we need from context
