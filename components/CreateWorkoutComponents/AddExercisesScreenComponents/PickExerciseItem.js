@@ -19,6 +19,7 @@ import {
   Text,
   TouchableOpacity,
   View,
+  Easing,
 } from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";
 import { useCreateWorkout } from "../../../context/CreateWorkoutContext";
@@ -27,11 +28,12 @@ import StepperInput from "../../StepperInput";
 import { Dialog } from "react-native-alert-notification";
 
 const { width, height } = Dimensions.get("window");
-const HANDLE_W = Math.max(18, width * 0.1);
-const ACTION_BTN = Math.max(34, width * 0.09);
+const HANDLE_W = Math.max(16, width * 0.06);
+const CARD_H = height * 0.16;
+const MENU_BTN = Math.max(34, width * 0.09);
 
 const PickExerciseItem = ({ exercise, dragHandleProps }) => {
-  // Pull context pieces we need
+  // Context hooks
   const { editing, actions, utils } = useCreateWorkout();
 
   // Resolve muscle image once
@@ -40,64 +42,109 @@ const PickExerciseItem = ({ exercise, dragHandleProps }) => {
     [exercise?.targetmuscle, exercise?.specifictargetmuscle]
   );
 
-  // Local modal visibility
+  // Edit modal state
   const [isModalVisible, setIsModalVisible] = useState(false);
 
-  // Local editable sets (defaults to 3 slots)
-  const [localSets, setLocalSets] = useState([8, 8, 8]);
+  // Local editable sets (3 slots)
+  const [localSets, setLocalSets] = useState([10, 10, 10]);
 
-  // Sync local sets from exercise when opening/editing
   useEffect(() => {
+    const arr = Array.isArray(exercise?.sets) ? exercise.sets : [10, 10, 10];
     const base =
-      Array.isArray(exercise?.sets) && exercise.sets.length === 3
-        ? exercise.sets
-        : Array.isArray(exercise?.sets)
-        ? [
-            ...exercise.sets.slice(0, 3),
-            ...Array(Math.max(0, 3 - exercise.sets.length)).fill(8),
-          ]
-        : [8, 8, 8];
-    setLocalSets(base.map((n) => (Number.isFinite(n) ? n : 8)));
-  }, [exercise?.sets]);
+      arr.length === 3
+        ? arr
+        : [...arr.slice(0, 3), ...Array(Math.max(0, 3 - arr.length)).fill(10)];
+    setLocalSets(
+      base.map((n) => {
+        const v = Number.isFinite(n) ? n : 10;
+        return Math.max(utils.REPS_MIN, Math.min(utils.REPS_MAX, v));
+      })
+    );
+  }, [exercise?.sets, utils.REPS_MIN, utils.REPS_MAX]);
 
-  // Tiny press animations
-  const editScale = useRef(new Animated.Value(1)).current;
-  const delScale = useRef(new Animated.Value(1)).current;
-  const onEditIn = useCallback(() => {
-    Animated.spring(editScale, {
-      toValue: 0.96,
-      useNativeDriver: true,
-      speed: 30,
-    }).start();
-  }, [editScale]);
-  const onEditOut = useCallback(() => {
-    Animated.spring(editScale, {
-      toValue: 1,
-      useNativeDriver: true,
-      speed: 30,
-    }).start();
-  }, [editScale]);
-  const onDelIn = useCallback(() => {
-    Animated.spring(delScale, {
-      toValue: 0.96,
-      useNativeDriver: true,
-      speed: 30,
-    }).start();
-  }, [delScale]);
-  const onDelOut = useCallback(() => {
-    Animated.spring(delScale, {
-      toValue: 1,
-      useNativeDriver: true,
-      speed: 30,
-    }).start();
-  }, [delScale]);
+  // Bottom sheet state + animations
+  const [menuOpen, setMenuOpen] = useState(false);
+  const backdropOpacity = useRef(new Animated.Value(0)).current;
+  const sheetY = useRef(new Animated.Value(height)).current;
 
-  // Open modal
-  const handleOpenEdit = useCallback(() => setIsModalVisible(true), []);
+  // Simple guard to avoid double triggering actions
+  const actionBusyRef = useRef(false);
+  const withActionGuard = (fn) => () => {
+    if (actionBusyRef.current) return;
+    actionBusyRef.current = true;
+    try {
+      fn?.();
+    } finally {
+      // release on next tick so animations can start
+      setTimeout(() => (actionBusyRef.current = false), 0);
+    }
+  };
 
-  // Save updated sets back into the selected split list
+  const openMenu = useCallback(() => {
+    if (menuOpen) return;
+    setMenuOpen(true);
+    backdropOpacity.setValue(0);
+    sheetY.setValue(height);
+    Animated.parallel([
+      Animated.timing(backdropOpacity, {
+        toValue: 1,
+        duration: 200,
+        easing: Easing.out(Easing.quad),
+        useNativeDriver: true,
+      }),
+      Animated.spring(sheetY, {
+        toValue: 0,
+        tension: 220,
+        friction: 24,
+        useNativeDriver: true,
+      }),
+    ]).start();
+  }, [menuOpen, backdropOpacity, sheetY]);
+
+  // Close menu and run optional callback after fully closed
+  const closeMenu = useCallback(
+    (onClosed) => {
+      Animated.parallel([
+        Animated.timing(backdropOpacity, {
+          toValue: 0,
+          duration: 160,
+          easing: Easing.in(Easing.quad),
+          useNativeDriver: true,
+        }),
+        Animated.timing(sheetY, {
+          toValue: height,
+          duration: 200,
+          easing: Easing.in(Easing.cubic),
+          useNativeDriver: true,
+        }),
+      ]).start(({ finished }) => {
+        if (finished) {
+          setMenuOpen(false);
+          // Defer to next frame to avoid modal stacking conflicts
+          requestAnimationFrame(() => onClosed?.());
+        }
+      });
+    },
+    [backdropOpacity, sheetY]
+  );
+
+  // Open edit modal after the sheet fully closes
+  const handleOpenEdit = useCallback(
+    withActionGuard(() => {
+      if (!menuOpen) {
+        setIsModalVisible(true);
+      } else {
+        closeMenu(() => setIsModalVisible(true));
+      }
+    }),
+    [menuOpen, closeMenu]
+  );
+
+  // Save sets to context
   const handleSaveSets = useCallback(() => {
-    const safeSets = localSets.map((n) => (Number.isFinite(n) ? n : 0));
+    const safeSets = localSets.map((n) =>
+      Math.max(utils.REPS_MIN, Math.min(utils.REPS_MAX, Number(n) || 0))
+    );
     actions?.setSelectedExercises?.((prev) => {
       const key = editing?.editedSplit;
       const list = prev?.[key] ?? [];
@@ -111,46 +158,64 @@ const PickExerciseItem = ({ exercise, dragHandleProps }) => {
       return { ...prev, [key]: next };
     });
     setIsModalVisible(false);
-  }, [localSets, actions, editing?.editedSplit, exercise?.id]);
+  }, [
+    localSets,
+    actions,
+    editing?.editedSplit,
+    exercise?.id,
+    utils.REPS_MIN,
+    utils.REPS_MAX,
+  ]);
 
-  // Delete with confirmation (always use context action)
-  const handleDelete = useCallback(() => {
-    Dialog.show({
-      type: "WARNING",
-      title: "Remove exercise",
-      textBody: `Are you sure you want to remove "${exercise?.name}" from this split?`,
-      button: "Remove",
-      autoClose: false,
-      onPressButton: () => {
-        actions?.removeExercise?.(String(exercise?.id));
-        Dialog.hide();
-      },
-      onTouchOutside: () => {
-        Dialog.hide();
-      },
-    });
-  }, [exercise, actions]);
+  // Remove with confirmation — open dialog only after sheet fully closes
+  const handleRemove = useCallback(
+    withActionGuard(() => {
+      const showDialog = () =>
+        Dialog.show({
+          type: "WARNING",
+          title: "Remove exercise",
+          textBody: `Are you sure you want to remove "${exercise?.name}" from this split?`,
+          button: "Remove",
+          autoClose: false,
+          onPressButton: () => {
+            actions?.removeExercise?.(String(exercise?.id));
+            Dialog.hide();
+          },
+          onTouchOutside: () => {
+            Dialog.hide();
+          },
+        });
+
+      if (!menuOpen) {
+        showDialog();
+      } else {
+        closeMenu(showDialog);
+      }
+    }),
+    [exercise?.name, exercise?.id, actions, menuOpen, closeMenu]
+  );
 
   return (
     <View style={{ marginBottom: 0 }}>
       <View style={{ position: "relative" }}>
         {/* Row with left drag handle + card */}
         <View style={{ flexDirection: "row", alignItems: "stretch" }}>
-          {/* Left drag handle */}
+          {/* Left drag handle (grip dots) */}
           <Pressable {...(dragHandleProps || {})} style={styles.dragHandle}>
-            <MaterialCommunityIcons
-              name="drag-vertical"
-              size={RFValue(16)}
-              color="rgba(0,0,0,0.35)"
-            />
+            <View style={styles.gripColumn}>
+              {[...Array(3)].map((_, i) => (
+                <View key={`g1-${i}`} style={styles.gripDot} />
+              ))}
+            </View>
+            <View style={[styles.gripColumn, { marginLeft: 3 }]}>
+              {[...Array(3)].map((_, i) => (
+                <View key={`g2-${i}`} style={styles.gripDot} />
+              ))}
+            </View>
           </Pressable>
 
           {/* Main card */}
-          <TouchableOpacity
-            style={styles.exerciseContainer}
-            activeOpacity={0.9}
-            onPress={() => {}}
-          >
+          <View style={styles.exerciseContainer}>
             <View style={{ flex: 1, flexDirection: "row" }}>
               <View style={{ flex: 0.35, justifyContent: "center" }}>
                 <LinearGradient
@@ -172,64 +237,18 @@ const PickExerciseItem = ({ exercise, dragHandleProps }) => {
                 </Text>
               </View>
 
-              {/* Actions */}
-              <View style={styles.actionsContainer}>
-                {/* Edit */}
-                <Animated.View
-                  style={[
-                    styles.actionBtn,
-                    styles.editBtn,
-                    { transform: [{ scale: editScale }] },
-                  ]}
+              {/* Kebab menu */}
+              <View style={styles.menuContainer}>
+                <TouchableOpacity
+                  activeOpacity={0.9}
+                  onPress={openMenu}
+                  style={styles.menuBtn}
                 >
-                  <Pressable
-                    onPressIn={onEditIn}
-                    onPressOut={onEditOut}
-                    onPress={handleOpenEdit}
-                    android_ripple={{
-                      color: "rgba(255,255,255,0.18)",
-                      borderless: true,
-                    }}
-                    style={styles.actionPressable}
-                    hitSlop={{ top: 6, bottom: 6, left: 6, right: 6 }}
-                  >
-                    <MaterialCommunityIcons
-                      name="pencil"
-                      size={RFValue(15)}
-                      color="#fff"
-                    />
-                  </Pressable>
-                </Animated.View>
-
-                {/* Delete */}
-                <Animated.View
-                  style={[
-                    styles.actionBtn,
-                    styles.deleteBtn,
-                    { transform: [{ scale: delScale }] },
-                  ]}
-                >
-                  <Pressable
-                    onPressIn={onDelIn}
-                    onPressOut={onDelOut}
-                    onPress={handleDelete}
-                    android_ripple={{
-                      color: "rgba(255,255,255,0.18)",
-                      borderless: true,
-                    }}
-                    style={styles.actionPressable}
-                    hitSlop={{ top: 6, bottom: 6, left: 6, right: 6 }}
-                  >
-                    <MaterialCommunityIcons
-                      name="trash-can-outline"
-                      size={RFValue(15)}
-                      color="#fff"
-                    />
-                  </Pressable>
-                </Animated.View>
+                  <Text style={styles.menuIcon}>⋮</Text>
+                </TouchableOpacity>
               </View>
             </View>
-          </TouchableOpacity>
+          </View>
         </View>
 
         {/* Edit sets modal */}
@@ -246,7 +265,6 @@ const PickExerciseItem = ({ exercise, dragHandleProps }) => {
                   Edit sets for {exercise?.name}
                 </Text>
 
-                {/* Three steppers for 3 sets */}
                 {[0, 1, 2].map((i) => (
                   <View key={i} style={styles.modalRow}>
                     <Text style={styles.modalSetLabel}>{`Set ${i + 1}`}</Text>
@@ -278,6 +296,109 @@ const PickExerciseItem = ({ exercise, dragHandleProps }) => {
             </View>
           </Modal>
         )}
+
+        {/* Bottom sheet menu */}
+        <Modal
+          visible={menuOpen}
+          transparent
+          animationType="none"
+          onRequestClose={() => closeMenu()}
+        >
+          {/* Backdrop (fade only). pointerEvents ensures touches on the sheet are not blocked */}
+          <Animated.View
+            pointerEvents="auto"
+            style={[
+              StyleSheet.absoluteFillObject,
+              { backgroundColor: "rgba(0,0,0,0.35)", opacity: backdropOpacity },
+            ]}
+          >
+            <Pressable style={{ flex: 1 }} onPress={() => closeMenu()} />
+          </Animated.View>
+
+          {/* Sliding sheet */}
+          <Animated.View
+            pointerEvents="box-none"
+            style={{
+              position: "absolute",
+              left: 0,
+              right: 0,
+              bottom: 0,
+              transform: [{ translateY: sheetY }],
+            }}
+          >
+            <View
+              style={{
+                backgroundColor: "white",
+                borderTopLeftRadius: width * 0.05,
+                borderTopRightRadius: width * 0.05,
+                paddingHorizontal: width * 0.06,
+                paddingTop: height * 0.02,
+                paddingBottom: height * 0.03,
+                shadowColor: "#000",
+                shadowOpacity: 0.15,
+                shadowRadius: 6,
+                elevation: 8,
+              }}
+            >
+              <View
+                style={{
+                  alignSelf: "center",
+                  width: 44,
+                  height: 4,
+                  borderRadius: 2,
+                  backgroundColor: "rgba(0,0,0,0.12)",
+                  marginBottom: 8,
+                }}
+              />
+              <Text
+                style={{
+                  fontSize: RFValue(14),
+                  fontFamily: "Inter_700Bold",
+                  color: "#111",
+                  marginBottom: 6,
+                }}
+              >
+                {exercise?.name}
+              </Text>
+
+              <TouchableOpacity
+                activeOpacity={0.9}
+                onPress={handleOpenEdit}
+                style={styles.sheetItem}
+              >
+                <MaterialCommunityIcons
+                  name="pencil"
+                  size={RFValue(16)}
+                  color="#2979FF"
+                />
+                <Text style={styles.sheetItemText}>Edit sets</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                activeOpacity={0.9}
+                onPress={handleRemove}
+                style={[styles.sheetItem, { marginTop: 8 }]}
+              >
+                <MaterialCommunityIcons
+                  name="trash-can-outline"
+                  size={RFValue(16)}
+                  color="#FF3B30"
+                />
+                <Text style={[styles.sheetItemText, { color: "#FF3B30" }]}>
+                  Remove
+                </Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                activeOpacity={0.9}
+                onPress={() => closeMenu()}
+                style={styles.sheetCancel}
+              >
+                <Text style={styles.sheetCancelText}>Cancel</Text>
+              </TouchableOpacity>
+            </View>
+          </Animated.View>
+        </Modal>
       </View>
     </View>
   );
@@ -289,7 +410,7 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
     width: "86%",
     marginLeft: -15,
-    height: height * 0.16,
+    height: CARD_H,
     flex: 1,
     borderRadius: width * 0.03,
     marginVertical: height * 0.005,
@@ -302,19 +423,33 @@ const styles = StyleSheet.create({
     elevation: 2,
     overflow: "hidden",
   },
-  // Thin left drag handle
+
+  // Drag handle
   dragHandle: {
     width: HANDLE_W,
-    height: height * 0.165,
+    height: CARD_H + height * 0.005,
     alignSelf: "center",
-    zIndex: 99,
+    zIndex: 2,
     marginLeft: width * 0.04,
     marginRight: width * 0.02,
     borderRadius: width * 0.02,
+    backgroundColor: "rgba(0,0,0,0.04)",
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "rgba(230, 230, 230, 1)",
+    flexDirection: "row",
   },
+  gripColumn: {
+    alignItems: "center",
+    justifyContent: "space-between",
+    height: CARD_H * 0.38,
+  },
+  gripDot: {
+    width: 4,
+    height: 4,
+    borderRadius: 2,
+    backgroundColor: "rgba(0,0,0,0.35)",
+  },
+
   imageContainer: {
     flex: 1,
     borderRadius: 10,
@@ -326,7 +461,7 @@ const styles = StyleSheet.create({
     height: 50,
     width: 50,
     resizeMode: "contain",
-    opacity: 0.8,
+    opacity: 0.85,
   },
   exerciseInfoContainer: {
     flex: 0.55,
@@ -343,39 +478,36 @@ const styles = StyleSheet.create({
   muscleText: {
     fontFamily: "Inter_400Regular",
     fontSize: RFValue(12),
-    color: "#919191",
+    color: "#667085",
   },
-  // Actions (floating, top-right)
-  actionsContainer: {
+
+  // Kebab menu
+  menuContainer: {
     flex: 0.1,
     alignItems: "flex-end",
     justifyContent: "flex-start",
     marginTop: height * 0.008,
     marginRight: width * 0.01,
-    gap: height * 0.008,
   },
-  actionBtn: {
-    width: ACTION_BTN,
-    height: ACTION_BTN,
-    borderRadius: ACTION_BTN / 2,
-    shadowColor: "rgb(90, 90, 90)",
-    shadowOpacity: 0.12,
-    shadowRadius: 4,
-    elevation: 6,
-    overflow: "hidden",
-  },
-  actionPressable: {
-    flex: 1,
+  menuBtn: {
+    width: MENU_BTN,
+    height: MENU_BTN,
+    borderRadius: MENU_BTN / 2,
+    backgroundColor: "rgba(0,0,0,0.06)",
     alignItems: "center",
     justifyContent: "center",
+    shadowColor: "rgb(90, 90, 90)",
+    shadowOpacity: 0.08,
+    shadowRadius: 3,
+    elevation: 3,
   },
-  editBtn: {
-    backgroundColor: "#2979FF",
+  menuIcon: {
+    fontSize: RFValue(18),
+    color: "#2979FF",
+    lineHeight: RFValue(18),
   },
-  deleteBtn: {
-    backgroundColor: "#FF3B30",
-  },
-  // Modal styles
+
+  // Edit sets modal
   modalBackdrop: {
     flex: 1,
     backgroundColor: "rgba(0,0,0,0.6)",
@@ -424,6 +556,38 @@ const styles = StyleSheet.create({
     fontFamily: "Inter_700Bold",
     fontSize: RFValue(14),
     textAlign: "center",
+  },
+
+  // Bottom sheet items
+  sheetItem: {
+    height: Math.max(46, height * 0.056),
+    borderRadius: width * 0.03,
+    backgroundColor: "rgb(243, 246, 249)",
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 12,
+    marginTop: 8,
+  },
+  sheetItemText: {
+    marginLeft: 10,
+    fontSize: RFValue(13),
+    fontFamily: "Inter_700Bold",
+    color: "#111",
+  },
+  sheetCancel: {
+    height: Math.max(46, height * 0.054),
+    borderRadius: width * 0.03,
+    borderWidth: 2,
+    borderColor: "rgb(234, 240, 246)",
+    backgroundColor: "white",
+    alignItems: "center",
+    justifyContent: "center",
+    marginTop: 12,
+  },
+  sheetCancelText: {
+    fontSize: RFValue(13),
+    fontFamily: "Inter_700Bold",
+    color: "#111",
   },
 });
 

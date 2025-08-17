@@ -18,8 +18,8 @@ import { useCreateWorkout } from "../../context/CreateWorkoutContext";
 const { width, height } = Dimensions.get("window");
 
 // Slightly larger tabs for better touch targets and to de-bulk the menu button
-const TAB_H = Math.max(64, height * 0.082);
-const TAB_W = Math.max(92, width * 0.275);
+const TAB_H = Math.max(64, height * 0.12);
+const TAB_W = Math.max(92, width * 0.3);
 const GAP_W = Math.max(20, width * 0.055);
 
 // Bottom sheet constants
