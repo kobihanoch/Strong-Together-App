@@ -1,15 +1,15 @@
 // English comments only inside code
 
 import React, { useCallback, useState } from "react";
-import { Dimensions, Text, TouchableOpacity, View } from "react-native";
-import { RFValue } from "react-native-responsive-fontsize";
-import ExercisePickerModal from "../components/CreateWorkoutComponents/ExercisePickerModal";
-import SelectedExercisesList from "../components/CreateWorkoutComponents/SelectedExercisesList";
-import SplitTabsRow from "../components/CreateWorkoutComponents/SplitTabsRow";
+import { Dimensions, View } from "react-native";
 import {
   CreateWorkoutProvider,
   useCreateWorkout,
 } from "../context/CreateWorkoutContext";
+import SplitTabsRow from "../components/CreateWorkoutComponents/SplitTabsRow";
+import SelectedExercisesList from "../components/CreateWorkoutComponents/SelectedExercisesList";
+import ExercisePickerModal from "../components/CreateWorkoutComponents/ExercisePickerModal";
+import ActionButtons from "../components/CreateWorkoutComponents/ActionButtons";
 
 const { width, height } = Dimensions.get("window");
 
@@ -51,74 +51,12 @@ const InnerCreateWorkout = () => {
       <View style={{ flex: 1, alignItems: "stretch" }}>
         <SplitTabsRow />
 
-        {/* Action row: Add exercise + Save workout */}
-        <View
-          style={{
-            paddingHorizontal: width * 0.04,
-            marginBottom: height * 0.012,
-            flexDirection: "row",
-            gap: width * 0.03,
-          }}
-        >
-          {/* Primary button (filled) */}
-          <TouchableOpacity
-            onPress={handleOpenExercisesTable}
-            activeOpacity={0.9}
-            style={{
-              flex: 1,
-              height: Math.max(48, height * 0.058),
-              borderRadius: width * 0.035,
-              backgroundColor: "#2979FF",
-              alignItems: "center",
-              justifyContent: "center",
-              shadowColor: "#000",
-              shadowOpacity: 0.12,
-              shadowRadius: 6,
-              elevation: 4,
-            }}
-          >
-            <Text
-              style={{
-                fontSize: RFValue(14),
-                color: "white",
-                fontFamily: "Inter_700Bold",
-              }}
-            >
-              Add exercise
-            </Text>
-          </TouchableOpacity>
-
-          {/* Secondary button (outline -> becomes filled when saving) */}
-          <TouchableOpacity
-            onPress={handleSaveWorkout}
-            activeOpacity={0.9}
-            disabled={properties?.isSaving}
-            style={{
-              paddingHorizontal: width * 0.04,
-              height: Math.max(48, height * 0.058),
-              borderRadius: width * 0.035,
-              alignItems: "center",
-              justifyContent: "center",
-              shadowColor: "#000",
-              shadowOpacity: 0.08,
-              shadowRadius: 4,
-              elevation: 3,
-              borderWidth: 2,
-              borderColor: properties?.isSaving ? "#A8C5FF" : "#2979FF",
-              backgroundColor: properties?.isSaving ? "#EAF0F6" : "white",
-            }}
-          >
-            <Text
-              style={{
-                fontSize: RFValue(14),
-                color: properties?.isSaving ? "#6B7A90" : "#2979FF",
-                fontFamily: "Inter_700Bold",
-              }}
-            >
-              {properties?.isSaving ? "Saving..." : "Save workout"}
-            </Text>
-          </TouchableOpacity>
-        </View>
+        {/* New action bar */}
+        <ActionButtons
+          onAdd={handleOpenExercisesTable}
+          onSave={handleSaveWorkout}
+          saving={properties?.isSaving}
+        />
 
         <SelectedExercisesList />
 

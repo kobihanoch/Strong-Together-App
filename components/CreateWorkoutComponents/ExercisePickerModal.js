@@ -1,16 +1,17 @@
 // English comments only inside code
 
 import React, {
+  useCallback,
   useEffect,
   useMemo,
   useRef,
   useState,
-  useCallback,
 } from "react";
 import {
   Animated,
   Dimensions,
   Easing,
+  FlatList,
   Modal,
   Pressable,
   SectionList,
@@ -18,7 +19,6 @@ import {
   Text,
   TouchableOpacity,
   View,
-  FlatList,
 } from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";
 import { useCreateWorkout } from "../../context/CreateWorkoutContext";

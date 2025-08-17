@@ -411,6 +411,7 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
     width: "86%",
     marginLeft: -15,
+    paddingLeft: width * 0.05,
     height: CARD_H,
     flex: 1,
     borderRadius: width * 0.03,
