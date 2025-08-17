@@ -1,45 +1,54 @@
 import moment from "moment";
-import { useEffect, useState } from "react";
+import { useMemo, useState } from "react";
+import { useAnalysisContext } from "../../context/AnalysisContext";
 import {
-  filterExercisesByDate,
+  getExerciseTrackingMapped,
   getLastWorkoutForEachExercise,
 } from "../../utils/statisticsUtils";
-import { useAuth } from "../../context/AuthContext";
 
-const useStatisticsPageLogic = (user) => {
-  const { exerciseTracking } = useAuth().workout;
+const useStatisticsPageLogic = () => {
+  const { exerciseTracking } = useAnalysisContext();
+
+  // Map with date keys: Date, ETSId, splitName
+  const {
+    byDate: exerciseTrackingWithDateKey,
+    byETSId: exerciseTrackingWithETSIdKey,
+    bySplitName: exerciseTrackingWithSplitNameKey,
+    splitDatesDesc,
+  } = useMemo(() => {
+    return getExerciseTrackingMapped(exerciseTracking);
+  }, [exerciseTracking]);
+
+  // Start as today's date
   const [selectedDate, setSelectedDate] = useState(
     moment().format("YYYY-MM-DD")
   );
 
-  const [exerciseTrackingByDate, setExerciseTrackingByDate] = useState(null);
-  const [exerciseTrackingByDatePrev, setExerciseTrackingByDatePrev] =
-    useState(null);
+  // Calculate formatted date for each change of date
+  const formattedDate = useMemo(() => {
+    return moment(selectedDate).format("YYYY-MM-DD");
+  }, [selectedDate]);
+
+  // Change records when a date selection is aplied
+  const exerciseTrackingByDate = useMemo(() => {
+    return exerciseTrackingWithDateKey[formattedDate];
+  }, [formattedDate, exerciseTrackingWithDateKey]);
 
   // Load prev workout data for each workout
-  useEffect(() => {
-    setExerciseTrackingByDatePrev(
-      getLastWorkoutForEachExercise(exerciseTracking, exerciseTrackingByDate)
+  const exerciseTrackingByDatePrev = useMemo(() => {
+    return getLastWorkoutForEachExercise(
+      formattedDate,
+      exerciseTrackingWithDateKey,
+      exerciseTrackingWithSplitNameKey,
+      exerciseTrackingWithETSIdKey,
+      splitDatesDesc
     );
-  }, [exerciseTracking, exerciseTrackingByDate]);
-
-  // Load when changing dates
-  useEffect(() => {
-    if (exerciseTracking && exerciseTracking.length > 0) {
-      setExerciseTrackingByDate(
-        filterExercisesByDate(exerciseTracking, selectedDate)
-      );
-    }
-  }, [selectedDate, exerciseTracking]);
-
-  // Load selected workout on load up
-  useEffect(() => {
-    if (exerciseTracking && exerciseTracking.length > 0) {
-      const formattedDate = moment(selectedDate).format("YYYY-MM-DD");
-      const filtered = filterExercisesByDate(exerciseTracking, formattedDate);
-      setExerciseTrackingByDate(filtered);
-    }
-  }, []);
+  }, [
+    formattedDate,
+    exerciseTrackingWithDateKey,
+    exerciseTrackingWithSplitNameKey,
+    exerciseTrackingWithETSIdKey,
+  ]);
 
   return {
     selectedDate,
@@ -47,6 +56,8 @@ const useStatisticsPageLogic = (user) => {
     exerciseTracking,
     exerciseTrackingByDate,
     exerciseTrackingByDatePrev,
+    exerciseTrackingWithETSIdKey,
+    splitDatesDesc,
   };
 };
 

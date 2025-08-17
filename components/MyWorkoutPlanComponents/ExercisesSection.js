@@ -69,7 +69,7 @@ const ExercisesSection = ({ data }) => {
           width: "100%",
         }}
       >
-        {data?.selectedSplit?.muscle_group.replace(/\s*\([^)]*\)/g, "")}
+        {data?.selectedSplit?.muscleGroup.replace(/\s*\([^)]*\)/g, "")}
       </Text>
       <View style={{ flex: 1, marginTop: height * 0.02 }}>
         <View style={{ flex: 8.5 }}>

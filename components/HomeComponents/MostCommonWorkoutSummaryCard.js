@@ -1,8 +1,7 @@
 import React, { useEffect, useRef } from "react";
-import { Dimensions, Text, View } from "react-native";
+import { Animated, Dimensions, Text, View } from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";
 import Svg, { Circle } from "react-native-svg";
-import { Animated } from "react-native";
 const AnimatedCircle = Animated.createAnimatedComponent(Circle);
 
 const { width, height } = Dimensions.get("window");
@@ -17,7 +16,7 @@ const MostCommonWorkoutSummaryCard = ({
   const circumference = 2 * Math.PI * normalizedRadius;
 
   const progress = totalWorkoutNumber
-    ? Math.min(mostFrequentSplit.maxCount / totalWorkoutNumber, 1)
+    ? Math.min(mostFrequentSplit.times / totalWorkoutNumber, 1)
     : 0;
 
   //console.log(mostFrequentSplit);
@@ -62,7 +61,7 @@ const MostCommonWorkoutSummaryCard = ({
       >
         Common
       </Text>
-      {mostFrequentSplit.splitname ? (
+      {mostFrequentSplit?.splitName ? (
         <>
           <View
             style={{
@@ -115,7 +114,7 @@ const MostCommonWorkoutSummaryCard = ({
                   color: "black",
                 }}
               >
-                {mostFrequentSplit?.splitname}
+                {mostFrequentSplit?.splitName}
               </Text>
               <Text
                 style={{
@@ -123,7 +122,7 @@ const MostCommonWorkoutSummaryCard = ({
                   color: "#666",
                 }}
               >
-                {mostFrequentSplit?.maxCount} / {totalWorkoutNumber}
+                {mostFrequentSplit?.times} / {totalWorkoutNumber}
               </Text>
             </View>
           </View>

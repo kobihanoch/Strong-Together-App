@@ -1,7 +1,7 @@
 // components/MainLoadingScreen.js (בלי moti)
-import React, { useEffect, useRef, useState } from "react";
-import { View, Text, StyleSheet, Animated, Easing, Image } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
+import React, { useEffect, useRef, useState } from "react";
+import { Animated, Easing, StyleSheet, Text, View } from "react-native";
 
 const MESSAGES = [
   "Checking session…",
@@ -10,7 +10,7 @@ const MESSAGES = [
   "Almost ready…",
 ];
 
-export default function MainLoadingScreen() {
+const MainLoadingScreen = () => {
   const [idx, setIdx] = useState(0);
 
   // Pulse + slight rotate
@@ -102,7 +102,7 @@ export default function MainLoadingScreen() {
       </View>
     </View>
   );
-}
+};
 
 const styles = StyleSheet.create({
   container: { flex: 1, alignItems: "center", justifyContent: "center" },
@@ -122,3 +122,5 @@ const styles = StyleSheet.create({
   },
   fill: { height: "100%", backgroundColor: "white", borderRadius: 999 },
 });
+
+export default React.memo(MainLoadingScreen);

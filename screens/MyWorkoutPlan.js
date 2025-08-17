@@ -1,8 +1,7 @@
-import { useFocusEffect, useNavigation } from "@react-navigation/native";
-import React, { useCallback } from "react";
+import { useNavigation } from "@react-navigation/native";
+import React from "react";
 import { Dimensions, StyleSheet, Text, View } from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";
-import LoadingPage from "../components/LoadingPage";
 import ExercisesSection from "../components/MyWorkoutPlanComponents/ExercisesSection.js";
 import HeaderSection from "../components/MyWorkoutPlanComponents/HeaderSection.js";
 import WorkoutSplitsList from "../components/MyWorkoutPlanComponents/WorkoutSplitsList.js";
@@ -13,7 +12,7 @@ const { width, height } = Dimensions.get("window");
 
 const MyWorkoutPlan = () => {
   const navigation = useNavigation();
-  const { user, hasTrainedToday } = useAuth();
+  const { user } = useAuth();
   const { data: workoutData } = useMyWorkoutPlanPageLogic();
 
   return (
@@ -25,7 +24,7 @@ const MyWorkoutPlan = () => {
         gap: height * 0.02,
       }}
     >
-      {workoutData.workout ? (
+      {workoutData?.workout ? (
         <>
           <HeaderSection user={user}></HeaderSection>
           <WorkoutSplitsList data={workoutData}></WorkoutSplitsList>

@@ -55,7 +55,7 @@ const BottomModal = ({ isVisible, onClose, exerciseId, setIndex }) => {
       >
         <Text style={styles.title}>Last Performence</Text>
 
-        {lastWorkoutData.reps[setIndex] ? (
+        {lastWorkoutData?.reps[setIndex] ? (
           <View style={styles.contentContainer}>
             <Text style={styles.exerciseName}>{lastWorkoutData.exercise}</Text>
             <View style={styles.infoRow}>

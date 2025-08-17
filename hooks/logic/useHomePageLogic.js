@@ -1,103 +1,98 @@
-import { useEffect, useState } from "react";
+import { useMemo } from "react";
+import { useAnalysisContext } from "../../context/AnalysisContext";
 import { useAuth } from "../../context/AuthContext";
-import { getMostFrequentSplitNameByUserId } from "../../services/ExerciseTrackingService";
-import {
-  getUserGeneralPR,
-  getUserLastWorkoutDate,
-} from "../../utils/homePageUtils";
+import { useWorkoutContext } from "../../context/WorkoutContext";
+import { useGlobalAppLoadingContext } from "../../context/GlobalAppLoadingContext";
 
-const useHomePageLogic = (user) => {
-  // User data
-  const [username, setUsername] = useState(null);
-  const [userId, setUserId] = useState(null);
-  const [firstName, setFirstName] = useState(null);
+const useHomePageLogic = () => {
+  // Auth state (user + global session loading)
+  const { user, sessionLoading } = useAuth();
+  const { isLoading } = useGlobalAppLoadingContext();
 
-  // Workout from context and unpack
-  const { workout, workoutSplits, exerciseTracking } = useAuth().workout;
+  // Workout state (plan + derived maps + loading)
+  const {
+    workout,
+    workoutSplits, // [A,B,C...]
+    loading: workoutLoading,
+  } = useWorkoutContext();
 
-  // Inner states
-  const [hasAssignedWorkout, setHasAssignedWorkout] = useState(false);
-  const [mostFrequentSplit, setMostFrequentSplit] = useState(null);
-  const [profileImageUrl, setProfileImageUrl] = useState(null);
-  const [lastWorkoutDate, setLastWorkoutDate] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [totalWorkoutNumber, setTotalWorkoutNumber] = useState(0);
-  const [workoutSplitsNumber, setWorkoutSplitsNumber] = useState(0);
-  const [PR, setPR] = useState({});
+  // Analysis state (tracking + derived analytics + loading)
+  const {
+    exerciseTracking,
+    analyzedExerciseTrackingData,
+    loading: analysisLoading,
+  } = useAnalysisContext();
 
-  // Set username after user is loaded
-  useEffect(() => {
-    const loadData = async () => {
-      if (user && user.username && user.id) {
-        setLoading(true);
-        try {
-          const freSplit = await getMostFrequentSplitNameByUserId(user.id);
-          setMostFrequentSplit(freSplit);
-          setUsername(user.username);
-          setFirstName(user.name.split(" ")[0]);
-          setUserId(user.id);
-          setProfileImageUrl(user.profile_image_url);
-        } catch (err) {
-          console.error("Error fetching exercise tracking:", err);
-        } finally {
-          setLoading(false);
-        }
-      }
+  // Derive stable user fields
+  const { username, userId, firstName, profileImageUrl } = useMemo(() => {
+    const u = user ?? {};
+    // Safe split for first name
+    const fName =
+      typeof u.name === "string" && u.name.trim().length
+        ? u.name.trim().split(" ")[0]
+        : "";
+    return {
+      username: u.username ?? "",
+      userId: u.id ?? "",
+      firstName: fName,
+      profileImageUrl: u.profile_image_url ?? "",
     };
-
-    loadData();
   }, [user]);
 
-  // Sets PR
-  useEffect(() => {
-    if (exerciseTracking && exerciseTracking.length > 0) {
-      setPR(getUserGeneralPR(exerciseTracking));
-    }
-  }, [exerciseTracking]);
+  // Derived workout flags/counters
+  const { hasAssignedWorkout, workoutSplitsNumber } = useMemo(() => {
+    const hasWorkout = !!workout;
+    // workoutSplits is a map in the new context; count keys safely
+    const splitsCount = workoutSplits ? Object.keys(workoutSplits).length : 0;
+    return { hasAssignedWorkout: hasWorkout, workoutSplitsNumber: splitsCount };
+  }, [workout, workoutSplits]);
 
-  // Set user's assigned workout state after user is loaded
-  useEffect(() => {
-    setHasAssignedWorkout(!!workout);
-  }, [workout]);
+  // Derived analysis fields
+  const { PR, totalWorkoutNumber, mostFrequentSplit, lastWorkoutDate } =
+    useMemo(() => {
+      const a = analyzedExerciseTrackingData ?? {};
+      return {
+        PR: a.pr ?? null,
+        totalWorkoutNumber: a.workoutCount ?? 0,
+        mostFrequentSplit: a.mostFrequentSplit ?? null,
+        lastWorkoutDate: a.lastWorkoutDate ?? "none",
+      };
+    }, [analyzedExerciseTrackingData]);
 
-  // Get last workout date
-  useEffect(() => {
-    setLastWorkoutDate(getUserLastWorkoutDate(exerciseTracking));
-  }, [exerciseTracking]);
-
-  // Counter for workouts made
-  useEffect(() => {
-    const uniWorkouts = new Set();
-    if (exerciseTracking && exerciseTracking.length > 0) {
-      exerciseTracking.forEach((exerciseInTrackingData) => {
-        uniWorkouts.add(exerciseInTrackingData.workoutdate);
-      });
-      setTotalWorkoutNumber(uniWorkouts.size);
-    }
-  }, [exerciseTracking]);
-
-  // Set workout splits count
-  useEffect(() => {
-    if (workoutSplits) {
-      setWorkoutSplitsNumber(workoutSplits.length);
-    }
-  }, [workoutSplits]);
+  // Stable data object for easy consumption in components
+  const data = useMemo(
+    () => ({
+      username,
+      userId,
+      hasAssignedWorkout,
+      profileImageUrl,
+      firstName,
+      lastWorkoutDate,
+      totalWorkoutNumber,
+      workoutSplitsNumber,
+      mostFrequentSplit,
+      PR,
+      exerciseTracking: exerciseTracking ?? null,
+      isLoading,
+    }),
+    [
+      username,
+      userId,
+      hasAssignedWorkout,
+      profileImageUrl,
+      firstName,
+      lastWorkoutDate,
+      totalWorkoutNumber,
+      workoutSplitsNumber,
+      mostFrequentSplit,
+      PR,
+      exerciseTracking,
+      isLoading,
+    ]
+  );
 
   return {
-    data: {
-      username: username ?? "",
-      userId: userId ?? "",
-      hasAssignedWorkout: hasAssignedWorkout ?? false,
-      profileImageUrl: profileImageUrl ?? "",
-      firstName: firstName ?? "",
-      lastWorkoutDate: lastWorkoutDate ?? "none",
-      totalWorkoutNumber: totalWorkoutNumber ?? 0,
-      workoutSplitsNumber: workoutSplitsNumber ?? 0,
-      mostFrequentSplit: mostFrequentSplit ?? null,
-      PR: PR ?? null,
-      exerciseTracking: exerciseTracking ?? null,
-    },
-    loading,
+    data,
   };
 };
 

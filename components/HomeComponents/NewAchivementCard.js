@@ -52,8 +52,8 @@ function NewAchivementCard({ hasAssignedWorkout, PR }) {
             style={{ fontFamily: "Inter_600SemiBold", fontSize: RFValue(14) }}
           >
             {hasAssignedWorkout
-              ? PR.maxExercise
-                ? PR.maxExercise
+              ? PR?.maxExercise
+                ? PR?.maxExercise
                 : "N/A"
               : "No data"}
           </Text>
@@ -112,8 +112,8 @@ function NewAchivementCard({ hasAssignedWorkout, PR }) {
               }}
             >
               {hasAssignedWorkout
-                ? PR.maxWeight
-                  ? PR.maxWeight + " kg"
+                ? PR?.maxWeight
+                  ? PR?.maxWeight + " kg"
                   : "N/A"
                 : "N/A"}
             </Text>
@@ -135,7 +135,7 @@ function NewAchivementCard({ hasAssignedWorkout, PR }) {
                 fontSize: RFValue(14),
               }}
             >
-              {hasAssignedWorkout ? (PR.maxReps ? PR.maxReps : "N/A") : "N/A"}
+              {hasAssignedWorkout ? (PR?.maxReps ? PR?.maxReps : "N/A") : "N/A"}
             </Text>
             <Text
               style={{
@@ -191,7 +191,7 @@ function NewAchivementCard({ hasAssignedWorkout, PR }) {
                 fontSize: RFValue(14),
               }}
             >
-              🏋️ Exercise: {PR.maxExercise}
+              🏋️ Exercise: {PR?.maxExercise}
             </Text>
             <Text
               style={{
@@ -199,7 +199,7 @@ function NewAchivementCard({ hasAssignedWorkout, PR }) {
                 fontSize: RFValue(14),
               }}
             >
-              🔩 Weight: {PR.maxWeight} kg
+              🔩 Weight: {PR?.maxWeight} kg
             </Text>
             <Text
               style={{
@@ -207,7 +207,7 @@ function NewAchivementCard({ hasAssignedWorkout, PR }) {
                 fontSize: RFValue(14),
               }}
             >
-              🔁 Reps: {PR.maxReps}
+              🔁 Reps: {PR?.maxReps}
             </Text>
 
             <TouchableOpacity

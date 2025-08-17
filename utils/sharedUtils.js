@@ -1,38 +1,27 @@
-// Gets a full workout JSON and split it
-export const splitTheWorkout = (userWorkout) => {
-  if (userWorkout) {
-    const workoutObj = Object.fromEntries(
-      Object.entries(userWorkout).slice(0, 7)
-    );
-    //setWorkout(workoutObj);
+// Returns an obj
+// {
+//  workoutSplits = [{name: A, id: 1, muscle_group:...}, {name: B, id: 2. muscle_group:...},....]
+//  exercises = {A: [exercises...], B: [exercises...]}
+// }
+export const extractWorkoutSplits = (workout) => {
+  if (!workout) return { workoutSplits: [], exercises: [] };
 
-    const fullWorkoutSplits = userWorkout.workoutsplits || [];
-    const splits = fullWorkoutSplits
-      .map((split) => Object.fromEntries(Object.entries(split).slice(0, 5)))
-      .sort((a, b) => {
-        if (a.name < b.name) return -1;
-        if (a.name > b.name) return 1;
-        return 0;
+  const map = workout.workoutsplits.reduce((acc, split) => {
+    acc[split.name] = [...split.exercisetoworkoutsplit];
+    return acc;
+  }, {});
+
+  const arr = workout.workoutsplits.reduce(
+    (acc, split) => {
+      acc.arr.push({
+        name: split.name,
+        id: split.id,
+        muscleGroup: split.muscle_group,
       });
+      return acc;
+    },
+    { arr: [] }
+  );
 
-    //setWorkoutSplits(splits);
-
-    const allExercises = fullWorkoutSplits.flatMap((split) =>
-      (split.exercisetoworkoutsplit ?? []).map((item) => {
-        const { exercises, ...itemWithoutExercises } = item;
-        return {
-          ...itemWithoutExercises,
-          ...exercises,
-        };
-      })
-    );
-    //setExercises(allExercises);
-    return {
-      workout: workoutObj,
-      workoutSplits: splits,
-      exercises: allExercises,
-    };
-  } else {
-    return {};
-  }
+  return { workoutSplits: arr.arr, exercises: map };
 };

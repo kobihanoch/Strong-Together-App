@@ -1,18 +1,13 @@
 import React from "react";
-import { View, Text, Dimensions } from "react-native";
+import { Dimensions, Text, View } from "react-native";
 import { FlatList } from "react-native-gesture-handler";
-import MessageItem from "../components/InboxComponents/MessageItem";
-import LoadingPage from "../components/LoadingPage";
-import useInboxLogic from "../hooks/logic/useInboxLogic";
 import { RFValue } from "react-native-responsive-fontsize";
+import MessageItem from "../components/InboxComponents/MessageItem";
+import useInboxLogic from "../hooks/logic/useInboxLogic";
 const { width, height } = Dimensions.get("window");
 
 const Inbox = () => {
   const { messages, media } = useInboxLogic();
-
-  if (messages.loadingMessages) {
-    return <LoadingPage message="Loading messages"></LoadingPage>;
-  }
   return (
     <View style={{ flex: 1, flexDirection: "column" }}>
       <View style={{ flex: 1.5, justifyContent: "center" }}>
@@ -36,11 +31,10 @@ const Inbox = () => {
               <MessageItem
                 item={item}
                 profileImages={media.profileImagesCache}
-                sender={
-                  messages?.allSendersUsersArr?.filter(
-                    (usr) => usr.id === item.sender_id
-                  )[0]
-                }
+                sender={{
+                  id: item.sender_id,
+                  name: item.sender_full_name,
+                }}
                 deleteMessage={messages.confirmAndDeleteMessage}
               ></MessageItem>
             )}

@@ -2,7 +2,6 @@ import { LinearGradient } from "expo-linear-gradient";
 import React, { useState } from "react";
 import {
   ActivityIndicator,
-  Alert,
   Dimensions,
   Image,
   StyleSheet,
@@ -13,8 +12,8 @@ import {
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import Icon from "react-native-vector-icons/FontAwesome";
 import InputField from "../components/InputField";
-import Validators from "../components/Validators";
 import { useAuth } from "../context/AuthContext";
+import { showErrorAlert } from "../errors/errorAlerts";
 
 const { width, height } = Dimensions.get("window");
 
@@ -26,17 +25,11 @@ const Login = ({ navigation }) => {
   const handleLogin = async () => {
     // Validate inputs
     if (password.length == 0 || username.length == 0) {
-      Alert.alert("Error", "Please fill username and password");
+      showErrorAlert("Error", "Please fill username and password");
       return;
     }
 
-    try {
-      console.log("Calling login from useAuth");
-      await login(username, password);
-    } catch (err) {
-      // Show server or network errors
-      Alert.alert("Error", err.message);
-    }
+    await login(username, password);
   };
 
   return (

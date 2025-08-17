@@ -1,36 +1,172 @@
-import React, { createContext, useContext, useEffect, useState } from "react";
-import { Alert } from "react-native";
-import useExercises from "../hooks/useExercises";
-import { useUserWorkout } from "../hooks/useUserWorkout";
-import {
-  addExercisesToSplit,
-  updateExercisesToSplit,
-} from "../services/SplitExerciseService";
-import {
-  addWorkout,
-  deleteWorkout,
-  getUserWorkout,
-} from "../services/WorkoutService";
-import { addWorkoutSplits } from "../services/WorkoutSplitsService";
-import { useAuth } from "./AuthContext";
-import { useNavigation } from "@react-navigation/native";
-import MyWorkoutPlan from "../screens/MyWorkoutPlan";
-import { splitTheWorkout } from "../utils/sharedUtils";
+// English comments only inside code
 
-const CreateWorkoutContext = createContext();
+import { useNavigation } from "@react-navigation/native";
+import React, {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
+import useExercises from "../hooks/useExercises";
+import { addWorkout } from "../services/WorkoutService";
+import { useWorkoutContext } from "./WorkoutContext";
+
+const CreateWorkoutContext = createContext(null);
 
 export const useCreateWorkout = () => useContext(CreateWorkoutContext);
 
 export const CreateWorkoutProvider = ({ children }) => {
+  // ----------------------------Workout and Analysis contexes----------------------------
+  const { setWorkout, setWorkoutForEdit } = useWorkoutContext();
+
   // ----------------------------Navigation----------------------------
   const navigation = useNavigation();
 
   // ----------------------------Saving----------------------------
-  const [canSave, setCanSave] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
 
-  // ----------------------------User----------------------------
-  const { user, workout: workoutFromAuth } = useAuth();
+  // ----------------------------Editing----------------------------
+  const [editedSplit, setEditedSplit] = useState("A"); // Currently edited split
+
+  // Keep a map: { splitName: [...Exercises] }
+  const [selectedExercises, setSelectedExercises] = useState({ A: [] });
+
+  /*useEffect(() => {
+    console.log(JSON.stringify(selectedExercises, null, 2));
+  }, [selectedExercises]);*/
+
+  // ----------------------------Rules for sets----------------------------
+  // Reps constraints and defaults
+  const REPS_MIN = 1;
+  const REPS_MAX = 20;
+  const DEFAULT_SETS = [10, 10, 10];
+
+  // Clamp an array of sets to length=3 and values within [REPS_MIN, REPS_MAX]
+  const clampSetsToRules = useCallback(
+    (sets) => {
+      const base = Array.isArray(sets) ? sets.slice(0, 3) : [];
+      const padded =
+        base.length < 3
+          ? [...base, ...Array(3 - base.length).fill(DEFAULT_SETS[0])]
+          : base;
+      return padded.map((n) => {
+        const v = Number.isFinite(n) ? n : DEFAULT_SETS[0];
+        return Math.max(REPS_MIN, Math.min(REPS_MAX, v));
+      });
+    },
+    [REPS_MIN, REPS_MAX]
+  );
+
+  // ----------------------------Existing workout----------------------------
+  const { workoutForEdit: workout } = useWorkoutContext();
+
+  // Return the exercises for the currently edited split
+  const selectedExercisesForSplit = useMemo(() => {
+    return selectedExercises?.[editedSplit] ?? [];
+  }, [editedSplit, selectedExercises, workout]);
+
+  // Add exercise to the current split (no duplicates by id/name)
+  const addExercise = useCallback(
+    (ex) => {
+      setSelectedExercises((prev) => {
+        const current = prev?.[editedSplit] ?? [];
+
+        // Prevent duplicates (by id if present, else by name field fallback)
+        const exists = ex?.id
+          ? current.some((e) => String(e.id) === String(ex.id))
+          : current.some((e) => e?.exercise === ex?.exercise);
+        if (exists) return prev;
+
+        // Ensure sets follow rules (default to [10,10,10])
+        const safeSets = clampSetsToRules(ex?.sets ?? DEFAULT_SETS);
+
+        // Append to end; order_index is 0-based
+        const appended = {
+          ...ex,
+          order_index: current.length,
+          sets: safeSets,
+        };
+
+        return {
+          ...prev,
+          [editedSplit]: [...current, appended],
+        };
+      });
+    },
+    [editedSplit, clampSetsToRules]
+  );
+
+  // Remove exercise from the current split
+  const removeExercise = useCallback(
+    (exOrId) => {
+      setSelectedExercises((prev) => {
+        const key = editedSplit;
+        const list = prev?.[key] ?? [];
+
+        const idToRemove =
+          typeof exOrId === "object" && exOrId !== null ? exOrId.id : exOrId;
+
+        let next;
+
+        if (idToRemove != null) {
+          const idStr = String(idToRemove);
+          next = list.filter((it) => String(it?.id) !== idStr);
+        } else if (typeof exOrId === "object" && exOrId?.name) {
+          next = list.filter((it) => it?.name !== exOrId.name);
+        } else if (
+          typeof exOrId === "object" &&
+          typeof exOrId?.order_index === "number"
+        ) {
+          next = list.filter((_, i) => i !== exOrId.order_index);
+        } else {
+          return prev;
+        }
+
+        // Normalize order_index to 0-based after removal
+        const reindexed = next.map((it, i) => ({ ...it, order_index: i }));
+
+        return { ...prev, [key]: reindexed };
+      });
+    },
+    [editedSplit]
+  );
+
+  // Adjust user's assigned workout from DB to context
+  const hasWorkout = useMemo(() => workout != null, [workout]);
+
+  useEffect(() => {
+    if (hasWorkout) {
+      // Optionally ensure imported workout sets are clamped to rules
+      // If your DB is always valid, you can skip this normalization
+      setSelectedExercises((prev) => {
+        const incoming = workout || prev;
+        const next = {};
+        Object.keys(incoming || {}).forEach((splitKey) => {
+          next[splitKey] = (incoming[splitKey] || []).map((ex, idx) => ({
+            ...ex,
+            // Keep existing order_index if present; otherwise index
+            order_index:
+              typeof ex?.order_index === "number" ? ex.order_index : idx,
+            // Clamp sets from DB to rules
+            sets: clampSetsToRules(ex?.sets ?? DEFAULT_SETS),
+          }));
+        });
+        return next;
+      });
+    }
+  }, [workout, hasWorkout, clampSetsToRules]);
+
+  // Debug
+  // useEffect(() => {
+  //   console.log(JSON.stringify(selectedExercises, null, 2));
+  // }, [selectedExercises]);
+
+  // Extract all the splits from selected exercises
+  const workoutSplits = useMemo(() => {
+    return Object.keys(selectedExercises);
+  }, [selectedExercises]);
 
   // ----------------------------Exercises in DB----------------------------
   const {
@@ -39,317 +175,105 @@ export const CreateWorkoutProvider = ({ children }) => {
     loading: exLoading,
   } = useExercises();
 
-  // ----------------------------Fetched workout--------------------------------
-  const {
-    workout,
-    setWorkout,
-    workoutSplits,
-    setWorkoutSplits,
-    exercises,
-    setExercises,
-  } = workoutFromAuth;
-  // If user has a workout: NEED TO ADD A FUNCTION THAT ARRANGES THE GIVEN DATA OF USER AND TRANSLATES IT TO THIS DATA STRUCTURE
-  useEffect(() => {
-    //console.log("User has workout?", workout != null);
-    if (exercises) {
-      setIsNewWorkout(false);
-      const newSeletecExercises = [];
-      const exCopy = JSON.parse(JSON.stringify(exercises));
+  // ----------------------------Save workout----------------------------
+  const saveWorkout = useCallback(() => {
+    // Validate workout: must have splits and each split must contain at least one exercise
+    const map = selectedExercises || {};
+    const splitKeys = Object.keys(map);
 
-      workoutSplits.forEach((split) =>
-        newSeletecExercises.push({
-          name: split.name,
-          exercises: exCopy
-            .filter((ex) => ex.workoutsplit === split.name)
-            .map(({ id, exercise_id, sets, workoutsplit_id }) => ({
-              id,
-              exercise_id,
-              sets,
-              workoutsplit_id,
-            })),
-        })
-      );
-      //console.log(JSON.stringify(newSeletecExercises, null, 2));
-      setSelectedExercises(newSeletecExercises);
-      setCurrentStep(2);
-    } else {
-      setIsNewWorkout(true);
+    const hasNoSplits = splitKeys.length === 0;
+    const hasEmptySplit = splitKeys.some((k) => (map[k]?.length ?? 0) === 0);
+
+    if (hasNoSplits || hasEmptySplit) {
+      // Do not proceed; show a single-button warning dialog
+      Dialog.show({
+        type: "WARNING",
+        title: "Workout is incomplete",
+        textBody:
+          "Each split must include at least one exercise. Add exercises or remove empty splits before saving.",
+        button: "OK",
+        autoClose: true,
+        onPressButton: () => Dialog.hide(),
+        onTouchOutside: () => Dialog.hide(),
+      });
+      return;
     }
-  }, [workoutFromAuth]);
 
-  // ----------------------------Step----------------------------
-  const [currentStep, setCurrentStep] = useState(1);
-
-  useEffect(() => {
-    console.log("🟢 currentStep changed:", currentStep);
-  }, [currentStep]);
-
-  // ----------------------------Workout properties----------------------------
-  const [isNewWorkout, setIsNewWorkout] = useState(false);
-  const [splitsNumber, setSplitsNumber] = useState(1);
-  const [selectedExercises, setSelectedExercises] = useState([]);
-  const [focusedSplit, setFocusedSplit] = useState(null);
-  const [filteredExercises, setFilteredExercises] = useState(null);
-  const [muscles, setMuscles] = useState(null);
-  const [focusedExercise, setFocusedExercise] = useState(null);
-  const [focusedExerciseSets, setFocusedExerciseSets] = useState(null);
-
-  // When an exercise is being selected, autoomatifly update the focused exercise sets state
-  useEffect(() => {
-    if (focusedExercise) {
-      console.log("🎯 focusedExercise changed:", focusedExercise);
-      const sets = // Filter selected exercises array to set
-        selectedExercises
-          .find((split) => split.name === focusedSplit?.name)
-          ?.exercises.find(
-            (ex) => ex.exercise_id === focusedExercise?.id
-          )?.sets;
-
-      //console.log(sets);
-      setFocusedExerciseSets(sets);
-    }
-  }, [focusedExercise]);
-
-  // Update muscles
-  useEffect(() => {
-    setMuscles(getMuscles(dbExercises));
-  }, [dbExercises]);
-
-  // Set filtered exercises by muscle (first)
-  useEffect(() => {
-    if (dbExercises && muscles) {
-      //console.log(filterExercisesByMuscle(muscles[0], dbExercises));
-      setFilteredExercises(filterExercisesByMuscle(muscles[0], dbExercises));
-    }
-  }, [muscles, dbExercises]);
-
-  // Update the selected exercises array
-  useEffect(() => {
-    if (isNewWorkout) {
-      console.log("🟡 splitsNumber changed:", splitsNumber);
-      const newSelectedExercisesArr = createNamedLetterArray(splitsNumber);
-      setSelectedExercises(newSelectedExercisesArr);
-    }
-  }, [splitsNumber, isNewWorkout]);
-
-  useEffect(() => {
-    if (focusedSplit) {
-      console.log("🎯 focusedSplit changed:", focusedSplit?.name);
-    }
-  }, [focusedSplit]);
-
-  // Updates when all the splits are not empty
-  useEffect(() => {
-    const allSplitsHaveExercises = selectedExercises.every(
-      (split) => split.exercises.length > 0
-    );
-
-    setCanSave(allSplitsHaveExercises);
-    console.log(
-      "🔵 selectedExercises changed:",
-      JSON.stringify(selectedExercises, null, 2)
-    );
-  }, [selectedExercises]);
-
-  const createNamedLetterArray = (count) => {
-    return Array.from({ length: count }, (_, i) => {
-      const letter = String.fromCharCode(65 + i); // 65 = 'A'
-      return { name: letter, exercises: [] };
-    });
-  };
-
-  // ----------------------------Utils----------------------------
-
-  const filterExercisesByMuscle = (muscle, exercises) => {
-    const dup = exercises.filter((ex) => ex.targetmuscle === muscle);
-    //console.log(dup);
-    return dup;
-  };
-
-  const getMuscles = (exercises) => {
-    let musclesSet = new Set();
-    exercises.forEach((ex) => {
-      musclesSet.add(ex.targetmuscle);
-    });
-
-    const musclesArray = Array.from(musclesSet);
-    console.log(musclesArray);
-    return musclesArray;
-  };
-
-  const filterExercisesByFirstMuscle = () => {
-    setFilteredExercises(filterExercisesByMuscle(muscles[0], dbExercises));
-  };
-
-  // When toggling from not selected, default value for sets is [10, 10, 10]
-  const toggleExerciseInSplit = (exercise, isSelected) => {
-    const updated = selectedExercises.map((split) => {
-      if (split.name !== focusedSplit.name) return split;
-
-      const isExerciseAlreadyInSplit = split.exercises.some(
-        (ex) => ex.exercise_id === exercise.id
-      );
-
-      const newExercises = isSelected
-        ? split.exercises.filter((ex) => ex.exercise_id !== exercise.id)
-        : [
-            ...split.exercises,
-            {
-              id: null, // New exercise id is null
-              exercise_id: exercise.id,
-              workoutsplit_id: null,
-              sets: [10, 10, 10],
-            },
-          ];
-
-      return { ...split, exercises: newExercises };
-    });
-
-    setSelectedExercises(updated);
-  };
-
-  // Focused sets is updated after setting focused exercise - after entering the modal
-  const updateSetsForExercise = (exercise, inputSets) => {
-    const updated = selectedExercises.map((split) => {
-      if (split.name !== focusedSplit.name) return split;
-      const updatedExercises = split.exercises.map((ex) =>
-        ex.exercise_id === exercise.id ? { ...ex, sets: inputSets } : ex
-      );
-
-      return { ...split, exercises: updatedExercises };
-    });
-
-    setSelectedExercises(updated);
-  };
-
-  const saveWorkout = async () => {
+    // Passed validation -> proceed to save
     setIsSaving(true);
-    let hasError = false;
-    try {
-      // Create new
-      if (isNewWorkout) {
-        // If has already workout delete the first one
-        if (workout) {
-          console.log("Got here");
-          await deleteWorkout(user.id);
-          console.log("Got here 2");
-        }
-        // Create a new workout plan and get the id
-        try {
-          const { data: workoutPlan } = await addWorkout(
-            user.id,
-            "Power",
-            splitsNumber
-          );
+    console.log("Saving...");
 
-          //const newWorkoutId = workoutPlan?.id;
-          console.log("New workout plan created with id: ", workoutPlan.id);
-
-          // Create new workout splits and get IDs
-          const splitsArray = selectedExercises.map((split) => {
-            return { name: split.name, workout_id: workoutPlan.id };
-          });
-          const workoutSplitsIds = await addWorkoutSplits(splitsArray); // Returns all object, not only id
-          console.log("New workout splits ids: ", workoutSplitsIds);
-
-          // Add the exercises to it
-          const exercisesArray = selectedExercises.flatMap((split, index) => {
-            const splitId = workoutSplitsIds[index];
-
-            return split.exercises.map((exercise) => ({
-              exercise_id: exercise.exercise_id,
-              sets: exercise.sets,
-              workoutsplit_id: splitId,
-            }));
-          });
-          await addExercisesToSplit(exercisesArray);
-
-          //console.log("V!!!!!!!! :)");
-        } catch (e) {
-          hasError = true;
-          console.error(e);
-          Alert.alert(e);
-        }
-      }
-      // Update existing workout
-      else {
-        try {
-          await updateExercisesToSplit(selectedExercises, exercises, user.id); // Give new and old arrays to compare
-        } catch (e) {
-          console.error(e);
-        }
-      }
-
-      // Fetch all from DB and assign to cache
-      const fetchedWorkoutPlan = await getUserWorkout(user.id);
-      const {
-        workout: w,
-        workoutSplits: ws,
-        exercises: exs,
-      } = splitTheWorkout(fetchedWorkoutPlan);
-      // Add to cache (Auth context)
-      setWorkout(w);
-      setWorkoutSplits(ws);
-      setExercises(exs);
-    } catch (e) {
-      console.error(e);
-      Alert.alert(e);
-    } finally {
-      if (!hasError) {
+    (async () => {
+      try {
+        const data = await addWorkout(map);
+        setWorkout(data.workoutPlan);
+        setWorkoutForEdit(data.workoutPlanForEditWorkout);
         navigation.navigate("MyWorkoutPlan");
+      } catch (e) {
+        console.log(e);
+      } finally {
+        setIsSaving(false);
       }
-      setIsSaving(false);
-    }
-  };
+    })();
+  }, [navigation, selectedExercises, setIsSaving]);
 
-  //------------------------------------------------------------------------------------
+  // ----------------------------Memoized context value----------------------------
+  const contextValue = useMemo(
+    () => ({
+      properties: {
+        hasWorkout,
+        isSaving,
+      },
+      userWorkout: {
+        workout,
+        workoutSplits,
+      },
+      editing: {
+        editedSplit,
+        setEditedSplit,
+        selectedExercisesForSplit,
+        selectedExercises,
+      },
+      actions: {
+        addExercise,
+        removeExercise,
+        setSelectedExercises,
+        saveWorkout,
+      },
+      DB: {
+        dbExercises,
+        exError,
+        exLoading,
+      },
+      utils: {
+        REPS_MIN,
+        REPS_MAX,
+        DEFAULT_SETS,
+        clampSetsToRules,
+      },
+      saving: { setIsSaving },
+    }),
+    [
+      hasWorkout,
+      isSaving,
+      workout,
+      editedSplit,
+      selectedExercisesForSplit,
+      selectedExercises,
+      addExercise,
+      removeExercise,
+      dbExercises,
+      exError,
+      exLoading,
+      REPS_MIN,
+      REPS_MAX,
+      clampSetsToRules,
+      saveWorkout,
+    ]
+  );
 
   return (
-    <CreateWorkoutContext.Provider
-      value={{
-        properties: {
-          isNewWorkout,
-          currentStep,
-          setCurrentStep,
-          splitsNumber,
-          setSplitsNumber,
-          selectedExercises,
-          setSelectedExercises,
-          focusedSplit,
-          setFocusedSplit,
-          filteredExercises,
-          setFilteredExercises,
-          muscles,
-          focusedExercise,
-          setFocusedExercise,
-          focusedExerciseSets,
-          setFocusedExerciseSets,
-          setIsNewWorkout,
-        },
-        userWorkout: {
-          workout,
-          workoutSplits,
-          exercises,
-        },
-        DB: {
-          dbExercises,
-          exLoading,
-          exError,
-        },
-        utils: {
-          filterExercisesByMuscle,
-          getMuscles,
-          filterExercisesByFirstMuscle,
-          toggleExerciseInSplit,
-          updateSetsForExercise,
-        },
-        saving: {
-          canSave,
-          isSaving,
-          saveWorkout,
-        },
-      }}
-    >
+    <CreateWorkoutContext.Provider value={contextValue}>
       {children}
     </CreateWorkoutContext.Provider>
   );

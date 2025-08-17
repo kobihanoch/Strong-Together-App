@@ -1,5 +1,4 @@
 // services/AuthService.js
-import { SUPABASE_EDGE_URL } from "@env";
 import axios from "axios";
 import api from "../api/api";
 import { API_BASE_URL } from "../api/apiConfig";
@@ -14,17 +13,6 @@ export const refreshAndRotateTokens = async () => {
     headers: { "x-refresh-token": `Bearer ${rt}` },
   });
   return data;
-};
-
-// Fetch self data
-export const fetchSelfUserData = async () => {
-  try {
-    console.log("Calling fetch self");
-    const response = await api.get("/api/users/get");
-    return response;
-  } catch (error) {
-    throw error;
-  }
 };
 
 // Login

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { createStackNavigator } from "@react-navigation/stack";
 import Home from "../screens/Home";
 import Settings from "../screens/Settings";
@@ -8,10 +8,17 @@ import CreateWorkout from "../screens/CreateWorkout";
 import Profile from "../screens/Profile";
 import Statistics from "../screens/Statistics";
 import Inbox from "../screens/Inbox";
+import { useGlobalAppLoadingContext } from "../context/GlobalAppLoadingContext";
+import { useAuth } from "../context/AuthContext";
 
 const Stack = createStackNavigator();
 
 const AppStack = () => {
+  useEffect(() => {
+    console.log("App stack mounted");
+    return () => console.log("App stack unmounted");
+  }, []);
+
   return (
     <Stack.Navigator
       screenOptions={{

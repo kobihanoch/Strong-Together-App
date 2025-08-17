@@ -1,5 +1,5 @@
 import { useNavigation, useNavigationState } from "@react-navigation/native";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   Alert,
   Dimensions,
@@ -11,21 +11,20 @@ import {
 import { RFValue } from "react-native-responsive-fontsize";
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { Dialog } from "react-native-alert-notification";
 
 const { width, height } = Dimensions.get("window");
 
 const BottomTabBar = () => {
   const navigation = useNavigation();
   const routeName = useNavigationState((state) => {
-    const appRoute = state.routes[state.index];
-    const nestedState = appRoute.state;
-
-    if (nestedState && nestedState.routes && nestedState.routes.length > 0) {
-      const innerRoute = nestedState.routes[nestedState.index];
-      return innerRoute.name;
+    const appRoute = state?.routes?.[state.index];
+    const nested = appRoute?.state;
+    if (nested?.routes?.length) {
+      const inner = nested.routes[nested.index];
+      return inner?.name ?? appRoute?.name ?? "Home";
     }
-
-    return "Home";
+    return appRoute?.name ?? "Home";
   });
 
   //----------------- [ Workout mode ]-----------------
@@ -40,13 +39,13 @@ const BottomTabBar = () => {
   useEffect(() => {
     if (isWorkoutMode) {
       const now = Date.now();
-      setStartTime(now); // Save the moment workout started
+      setStartTime(now); // align start
+      setCurrentTime(now); // align current so diff starts at 0
+      setShowExitButton(false);
 
-      const timer = setInterval(() => {
+      timer = setInterval(() => {
         setCurrentTime(Date.now());
       }, 1000);
-
-      setShowExitButton(false);
 
       return () => clearInterval(timer);
     }
@@ -73,23 +72,34 @@ const BottomTabBar = () => {
     setTimeout(() => setShowExitButton(false), 3000);
   };
 
+  const pressedExitRef = useRef(false);
+
   const confirmExit = () => {
-    Alert.alert(
-      "Exit workout",
-      "Are you sure you want to quit? All of the progress will be terminated.",
-      [
-        {
-          text: "Continue workout",
-          style: "cancel",
-          onPress: () => setShowExitButton(false),
-        },
-        {
-          text: "Exit workout",
-          style: "destructive",
-          onPress: () => navigation.goBack(),
-        },
-      ]
-    );
+    pressedExitRef.current = false;
+
+    Dialog.show({
+      type: "WARNING",
+      title: "Exit workout",
+      titleStyle: {
+        fontSize: 22,
+      },
+      textBody: "Are you sure you want to quit?",
+      textBodyStyle: {
+        fontSize: 45,
+      },
+      button: "Exit workout",
+      closeOnOverlayTap: true,
+      onPressButton: () => {
+        pressedExitRef.current = true;
+        Dialog.hide();
+        navigation.goBack();
+      },
+      onHide: () => {
+        if (!pressedExitRef.current) {
+          setShowExitButton(false);
+        }
+      },
+    });
   };
 
   const tabs = [

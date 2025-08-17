@@ -1,9 +1,9 @@
 import React from "react";
 import { Text, View } from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";
-import { formatDate } from "../../utils/statisticsUtils";
-import { getDaysSince } from "../../utils/homePageUtils";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
+import { getDaysSince } from "../../utils/homePageUtils";
+import { formatDate } from "../../utils/statisticsUtils";
 
 const LastWorkoutSection = ({ data }) => {
   return (

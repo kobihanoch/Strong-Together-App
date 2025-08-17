@@ -1,8 +1,10 @@
+import { useNavigation } from "@react-navigation/native";
+import { Image } from "expo-image";
 import { LinearGradient } from "expo-linear-gradient";
 import React, { useEffect, useState } from "react";
 import {
+  Animated,
   Dimensions,
-  Image,
   Modal,
   StyleSheet,
   Text,
@@ -10,12 +12,9 @@ import {
   View,
 } from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";
+import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import { useAuth } from "../context/AuthContext";
 import { useNotifications } from "../context/NotificationsContext";
-import Icon from "react-native-vector-icons/Feather";
-import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
-import { useNavigation } from "@react-navigation/native";
-import { Animated } from "react-native";
 
 const { width, height } = Dimensions.get("window");
 
@@ -32,6 +31,15 @@ const TopComponent = () => {
   const [username, setUsername] = useState(null);
   const [fullname, setFullname] = useState(null);
   const [profileImageUrl, setProfileImageUrl] = useState(null);
+
+  // Image source
+  const imgSrc = profileImageUrl
+    ? {
+        uri: `${process.env.EXPO_PUBLIC_SUPABASE_URL}/storage/v1/object/public/${profileImageUrl}`,
+      }
+    : user?.gender == "Male"
+    ? require("../assets/man.png")
+    : require("../assets/woman.png");
 
   // Animations
   const scaleAnim = useState(new Animated.Value(1))[0];
@@ -89,12 +97,16 @@ const TopComponent = () => {
           <Image
             source={
               profileImageUrl
-                ? { uri: profileImageUrl }
+                ? {
+                    uri: `${process.env.EXPO_PUBLIC_SUPABASE_URL}/storage/v1/object/public/${profileImageUrl}`,
+                  }
                 : user?.gender == "Male"
                 ? require("../assets/man.png")
                 : require("../assets/woman.png")
             }
             style={styles.profileImage}
+            cachePolicy={profileImageUrl ? "disk" : "none"}
+            transition={150}
           />
         </TouchableOpacity>
         <View style={{ marginLeft: width * 0.04 }}>
@@ -171,7 +183,9 @@ const TopComponent = () => {
             <Image
               source={
                 profileImageUrl
-                  ? { uri: profileImageUrl }
+                  ? {
+                      uri: `${process.env.EXPO_PUBLIC_SUPABASE_URL}/storage/v1/object/public/${profileImageUrl}`,
+                    }
                   : user?.gender == "Male"
                   ? require("../assets/man.png")
                   : require("../assets/woman.png")
