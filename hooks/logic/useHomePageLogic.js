@@ -2,10 +2,12 @@ import { useMemo } from "react";
 import { useAnalysisContext } from "../../context/AnalysisContext";
 import { useAuth } from "../../context/AuthContext";
 import { useWorkoutContext } from "../../context/WorkoutContext";
+import { useGlobalAppLoadingContext } from "../../context/GlobalAppLoadingContext";
 
 const useHomePageLogic = () => {
   // Auth state (user + global session loading)
   const { user, sessionLoading } = useAuth();
+  const { isLoading } = useGlobalAppLoadingContext();
 
   // Workout state (plan + derived maps + loading)
   const {
@@ -71,6 +73,7 @@ const useHomePageLogic = () => {
       mostFrequentSplit,
       PR,
       exerciseTracking: exerciseTracking ?? null,
+      isLoading,
     }),
     [
       username,
@@ -84,6 +87,7 @@ const useHomePageLogic = () => {
       mostFrequentSplit,
       PR,
       exerciseTracking,
+      isLoading,
     ]
   );
 
