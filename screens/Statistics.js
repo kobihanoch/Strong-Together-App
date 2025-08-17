@@ -1,7 +1,5 @@
-import { LinearGradient } from "expo-linear-gradient";
 import React from "react";
 import { Dimensions, StyleSheet, View } from "react-native";
-import LoadingPage from "../components/LoadingPage";
 import CalendarCard from "../components/StatisticsComponents/CalendarCard";
 import ExercisesFlatList from "../components/StatisticsComponents/ExercisesFlatList";
 import { useAuth } from "../context/AuthContext";

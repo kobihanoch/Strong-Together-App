@@ -1,8 +1,7 @@
-import { useFocusEffect, useNavigation } from "@react-navigation/native";
-import React, { useCallback } from "react";
+import { useNavigation } from "@react-navigation/native";
+import React from "react";
 import { Dimensions, StyleSheet, Text, View } from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";
-import LoadingPage from "../components/LoadingPage";
 import ExercisesSection from "../components/MyWorkoutPlanComponents/ExercisesSection.js";
 import HeaderSection from "../components/MyWorkoutPlanComponents/HeaderSection.js";
 import WorkoutSplitsList from "../components/MyWorkoutPlanComponents/WorkoutSplitsList.js";

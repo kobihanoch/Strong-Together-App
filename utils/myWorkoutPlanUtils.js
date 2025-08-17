@@ -1,12 +1,3 @@
-// Filter exercises by workout split id
-export const filterExercises = (allExercises, selectedSplit) => {
-  return selectedSplit
-    ? allExercises.filter(
-        (exercise) => exercise.workoutsplit_id === selectedSplit.id
-      )
-    : [];
-};
-
 // Gets exercise count for split
 export const countExercisesForSplit = (allExercises, splitId) => {
   return allExercises.filter((exercise) => exercise.workoutsplit_id === splitId)

@@ -1,12 +1,10 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { useAuth } from "../../context/AuthContext";
+import { useAnalysisContext } from "../../context/AnalysisContext";
+import { useWorkoutContext } from "../../context/WorkoutContext";
 import {
   countExercisesForSplit,
-  filterExercises,
   getWorkoutSplitCounter,
 } from "../../utils/myWorkoutPlanUtils";
-import { useWorkoutContext } from "../../context/WorkoutContext";
-import { useAnalysisContext } from "../../context/AnalysisContext";
 
 export const useMyWorkoutPlanPageLogic = () => {
   const {
