@@ -1,6 +1,6 @@
 // English comments only inside code
 
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import { Dimensions, View } from "react-native";
 import {
   CreateWorkoutProvider,
@@ -33,12 +33,15 @@ const InnerCreateWorkout = () => {
 
   // Save handler (uses context action if available)
   const handleSaveWorkout = useCallback(() => {
-    if (actions?.saveWorkout) {
-      actions.saveWorkout(editing?.selectedExercises);
-      return;
-    }
-    console.warn("saveWorkout action is not implemented in context.");
+    actions.saveWorkout();
   }, [actions, editing?.selectedExercises]);
+
+  const invalidWorkout = useMemo(() => {
+    const map = editing?.selectedExercises || {};
+    const keys = Object.keys(map);
+    if (keys.length === 0) return true;
+    return keys.some((k) => (map[k]?.length ?? 0) === 0);
+  }, [editing?.selectedExercises]);
 
   return (
     <View
@@ -56,6 +59,8 @@ const InnerCreateWorkout = () => {
           onAdd={handleOpenExercisesTable}
           onSave={handleSaveWorkout}
           saving={properties?.isSaving}
+          // optional: disable the save button if invalid
+          disableSave={invalidWorkout}
         />
 
         <SelectedExercisesList />

@@ -10,6 +10,7 @@ import React, {
   useState,
 } from "react";
 import useExercises from "../hooks/useExercises";
+import { addWorkout } from "../services/WorkoutService";
 import { useWorkoutContext } from "./WorkoutContext";
 
 const CreateWorkoutContext = createContext(null);
@@ -17,6 +18,9 @@ const CreateWorkoutContext = createContext(null);
 export const useCreateWorkout = () => useContext(CreateWorkoutContext);
 
 export const CreateWorkoutProvider = ({ children }) => {
+  // ----------------------------Workout and Analysis contexes----------------------------
+  const { setWorkout, setWorkoutForEdit } = useWorkoutContext();
+
   // ----------------------------Navigation----------------------------
   const navigation = useNavigation();
 
@@ -171,6 +175,48 @@ export const CreateWorkoutProvider = ({ children }) => {
     loading: exLoading,
   } = useExercises();
 
+  // ----------------------------Save workout----------------------------
+  const saveWorkout = useCallback(() => {
+    // Validate workout: must have splits and each split must contain at least one exercise
+    const map = selectedExercises || {};
+    const splitKeys = Object.keys(map);
+
+    const hasNoSplits = splitKeys.length === 0;
+    const hasEmptySplit = splitKeys.some((k) => (map[k]?.length ?? 0) === 0);
+
+    if (hasNoSplits || hasEmptySplit) {
+      // Do not proceed; show a single-button warning dialog
+      Dialog.show({
+        type: "WARNING",
+        title: "Workout is incomplete",
+        textBody:
+          "Each split must include at least one exercise. Add exercises or remove empty splits before saving.",
+        button: "OK",
+        autoClose: true,
+        onPressButton: () => Dialog.hide(),
+        onTouchOutside: () => Dialog.hide(),
+      });
+      return;
+    }
+
+    // Passed validation -> proceed to save
+    setIsSaving(true);
+    console.log("Saving...");
+
+    (async () => {
+      try {
+        const data = await addWorkout(map);
+        setWorkout(data.workoutPlan);
+        setWorkoutForEdit(data.workoutPlanForEditWorkout);
+        navigation.navigate("MyWorkoutPlan");
+      } catch (e) {
+        console.log(e);
+      } finally {
+        setIsSaving(false);
+      }
+    })();
+  }, [navigation, selectedExercises, setIsSaving]);
+
   // ----------------------------Memoized context value----------------------------
   const contextValue = useMemo(
     () => ({
@@ -192,6 +238,7 @@ export const CreateWorkoutProvider = ({ children }) => {
         addExercise,
         removeExercise,
         setSelectedExercises,
+        saveWorkout,
       },
       DB: {
         dbExercises,
@@ -221,6 +268,7 @@ export const CreateWorkoutProvider = ({ children }) => {
       REPS_MIN,
       REPS_MAX,
       clampSetsToRules,
+      saveWorkout,
     ]
   );
 

@@ -44,10 +44,11 @@ const PrimaryButton = ({ title, onPress, disabled }) => {
 
 // Reusable secondary button (ghost/soft)
 const SecondaryButton = ({ title, onPress, disabled, loading }) => {
+  const isDisabled = !!disabled || !!loading;
   return (
     <Pressable
       onPress={onPress}
-      disabled={disabled}
+      disabled={isDisabled}
       android_ripple={{ color: "rgba(41,121,255,0.08)" }}
       style={({ pressed }) => ({
         paddingHorizontal: width * 0.04,
@@ -59,14 +60,13 @@ const SecondaryButton = ({ title, onPress, disabled, loading }) => {
         shadowOpacity: 0.06,
         shadowRadius: 4,
         elevation: 2,
-        // soft background + subtle border
-        backgroundColor: disabled
+        backgroundColor: isDisabled
           ? "#EEF3FF"
           : pressed
           ? "rgba(41,121,255,0.06)"
           : "rgba(41,121,255,0.04)",
         borderWidth: 2,
-        borderColor: disabled ? "#CFE0FF" : "#BFD3FF",
+        borderColor: isDisabled ? "#CFE0FF" : "#BFD3FF",
         transform: [{ scale: pressed ? 0.985 : 1 }],
         minWidth: Platform.OS === "ios" ? width * 0.36 : undefined,
       })}
@@ -74,7 +74,7 @@ const SecondaryButton = ({ title, onPress, disabled, loading }) => {
       <Text
         style={{
           fontSize: RFValue(14),
-          color: disabled ? "#6B7A90" : "#2979FF",
+          color: isDisabled ? "#6B7A90" : "#2979FF",
           fontFamily: "Inter_700Bold",
         }}
       >
@@ -85,7 +85,7 @@ const SecondaryButton = ({ title, onPress, disabled, loading }) => {
 };
 
 // Action bar with spacing and paddings
-const ActionButtons = ({ onAdd, onSave, saving }) => {
+const ActionButtons = ({ onAdd, onSave, saving, disableSave = false }) => {
   return (
     <View
       style={{
@@ -99,7 +99,7 @@ const ActionButtons = ({ onAdd, onSave, saving }) => {
       <SecondaryButton
         title="Save workout"
         onPress={onSave}
-        disabled={!!saving}
+        disabled={!!disableSave}
         loading={!!saving}
       />
     </View>
