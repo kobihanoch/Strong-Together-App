@@ -13,7 +13,11 @@ const useStartWorkoutPageLogic = (selectedSplit) => {
   // --------------------[ Context ]--------------------------------------
   const { user, setIsWorkoutMode } = useAuth();
   const { exercises } = useWorkoutContext();
-  const { setExerciseTracking, setHasTrainedToday } = useAnalysisContext();
+  const {
+    setExerciseTracking,
+    setHasTrainedToday,
+    setAnalyzedExerciseTrackingData,
+  } = useAnalysisContext();
 
   // --------------------[ Navigation ]--------------------------------------
   const navigation = useNavigation();

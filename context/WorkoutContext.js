@@ -51,6 +51,7 @@ export const WorkoutProvider = ({ children }) => {
 
   // Fetch on mount and whenever user changes
   useEffect(() => {
+    console.log("Workout Mounted");
     (async () => {
       if (user) {
         try {
@@ -77,6 +78,7 @@ export const WorkoutProvider = ({ children }) => {
     setWorkout(null);
     setWorkoutForEdit(null);
     setLoading(false);
+    console.log("Workout Unmounted");
   }, []);
 
   // Memoized context value

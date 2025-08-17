@@ -49,6 +49,7 @@ export const AnalysisProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    console.log("Analysis Mounted");
     (async () => {
       if (user) {
         try {
@@ -76,6 +77,7 @@ export const AnalysisProvider = ({ children }) => {
     setAnalyzedExerciseTrackingData(null);
     setHasTrainedToday(false);
     setLoading(false);
+    console.log("Analysis Unmounted");
   }, []);
 
   // Memoized context value
