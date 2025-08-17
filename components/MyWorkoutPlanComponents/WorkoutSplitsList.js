@@ -1,7 +1,6 @@
 import React from "react";
-import { Dimensions, Text, View } from "react-native";
+import { Dimensions, View } from "react-native";
 import { FlatList } from "react-native-gesture-handler";
-import { RFValue } from "react-native-responsive-fontsize";
 import WorkoutSplitItem from "./WorkoutSplitItem";
 
 const { width, height } = Dimensions.get("window");

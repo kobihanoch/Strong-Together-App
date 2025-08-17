@@ -17,5 +17,6 @@ export const unpackFromExerciseTrackingData = (exerciseTrackingData) => {
       id: exerciseTrackingData.most_frequent_split_id,
     },
     lastWorkoutDate: exerciseTrackingData.lastWorkoutDate,
+    splitDaysByName: exerciseTrackingData.splitDaysByName,
   };
 };

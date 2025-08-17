@@ -1,10 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useAnalysisContext } from "../../context/AnalysisContext";
 import { useWorkoutContext } from "../../context/WorkoutContext";
-import {
-  countExercisesForSplit,
-  getWorkoutSplitCounter,
-} from "../../utils/myWorkoutPlanUtils";
 
 export const useMyWorkoutPlanPageLogic = () => {
   const {
@@ -13,7 +9,8 @@ export const useMyWorkoutPlanPageLogic = () => {
     exercises: allExercises,
   } = useWorkoutContext();
 
-  const { exerciseTracking, hasTrainedToday } = useAnalysisContext();
+  const { exerciseTracking, analyzedExerciseTrackingData, hasTrainedToday } =
+    useAnalysisContext();
   const [selectedSplit, setSelectedSplit] = useState(null);
   const [buttonOpacity, setButtonOpacity] = useState(1);
 
@@ -32,7 +29,7 @@ export const useMyWorkoutPlanPageLogic = () => {
 
   // Gets preformed split count
   const splitTrainedCount = useMemo(() => {
-    return getWorkoutSplitCounter(selectedSplit?.name, exerciseTracking);
+    return analyzedExerciseTrackingData.splitDaysByName[selectedSplit?.name];
   }, [exerciseTracking, selectedSplit]);
 
   // Handling selection of split
@@ -49,7 +46,6 @@ export const useMyWorkoutPlanPageLogic = () => {
       setSelectedSplit,
       handleWorkoutSplitPress,
       filteredExercises,
-      countExercisesForSplit,
       buttonOpacity,
       splitTrainedCount,
       hasTrainedToday,
