@@ -6,8 +6,17 @@
 //   splitDatesDesc: { [splitName]: all dates DESC }
 // }
 export const getExerciseTrackingMapped = (exerciseTracking = []) => {
-  if (!exerciseTracking || !exerciseTracking.length)
+  if (!exerciseTracking || !exerciseTracking.length) {
     return { byDate: {}, byETSId: {}, bySplitName: {}, splitDatesDesc: {} };
+  }
+
+  // Helper: extract order_index from nested object with safe fallback
+  const getOrderIndex = (r) =>
+    r?.exercisetoworkoutsplit?.order_index ??
+    r?.order_index ??
+    Number.MAX_SAFE_INTEGER; // items without order_index go last
+
+  // First pass: bucket rows
   const mapped = exerciseTracking.reduce(
     (acc, r) => {
       (acc.byDate[r.workoutdate] ??= []).push(r);
@@ -18,13 +27,30 @@ export const getExerciseTrackingMapped = (exerciseTracking = []) => {
     { byDate: {}, byETSId: {}, bySplitName: {} }
   );
 
+  // byDate:
+  // - sort date keys DESC (newest first)
+  // - for each date's array, sort by order_index ASC (stable ties by ids)
   const byDate = Object.fromEntries(
     Object.keys(mapped.byDate)
-      .sort()
-      .reverse()
-      .map((d) => [d, [...mapped.byDate[d]]])
+      .sort() // ascending
+      .reverse() // descending (newest first)
+      .map((d) => [
+        d,
+        [...mapped.byDate[d]].sort((a, b) => {
+          const ai = getOrderIndex(a);
+          const bi = getOrderIndex(b);
+          if (ai !== bi) return ai - bi; // primary: order_index asc
+          // tie-breakers to keep deterministic order
+          return (
+            (a.exercisetosplit_id ?? 0) - (b.exercisetosplit_id ?? 0) ||
+            (a.exercise_id ?? 0) - (b.exercise_id ?? 0) ||
+            (a.id ?? 0) - (b.id ?? 0)
+          );
+        }),
+      ])
   );
 
+  // byETSId: keep your original sort (by workoutdate DESC)
   const byETSId = {};
   Object.entries(mapped.byETSId).forEach(([id, arr]) => {
     byETSId[id] = [...arr].sort((a, b) =>
@@ -32,6 +58,7 @@ export const getExerciseTrackingMapped = (exerciseTracking = []) => {
     );
   });
 
+  // bySplitName: keep your original sort (by workoutdate DESC)
   const bySplitName = {};
   Object.entries(mapped.bySplitName).forEach(([sn, arr]) => {
     bySplitName[sn] = [...arr].sort((a, b) =>
@@ -39,6 +66,7 @@ export const getExerciseTrackingMapped = (exerciseTracking = []) => {
     );
   });
 
+  // Distinct dates per split, newest first (derived from bySplitName already sorted)
   const splitDatesDesc = {};
   for (const [sn, arr] of Object.entries(bySplitName)) {
     splitDatesDesc[sn] = [...new Set(arr.map((r) => r.workoutdate))];
@@ -46,7 +74,6 @@ export const getExerciseTrackingMapped = (exerciseTracking = []) => {
 
   return { byDate, byETSId, bySplitName, splitDatesDesc };
 };
-
 export const getLastWorkoutForEachExercise = (
   date,
   byDate,

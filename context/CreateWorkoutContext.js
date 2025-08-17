@@ -33,9 +33,9 @@ export const CreateWorkoutProvider = ({ children }) => {
   // Keep a map: { splitName: [...Exercises] }
   const [selectedExercises, setSelectedExercises] = useState({ A: [] });
 
-  useEffect(() => {
+  /*useEffect(() => {
     console.log(JSON.stringify(selectedExercises, null, 2));
-  }, [selectedExercises]);
+  }, [selectedExercises]);*/
 
   // ----------------------------Rules for sets----------------------------
   // Reps constraints and defaults
