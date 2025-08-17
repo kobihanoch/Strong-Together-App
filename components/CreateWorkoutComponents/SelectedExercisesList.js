@@ -72,7 +72,7 @@ const SelectedExercisesList = () => {
     return (
       <View style={{ flex: 7, justifyContent: "center" }}>
         <Text style={{ opacity: 0.6, textAlign: "center", marginTop: 24 }}>
-          אין תרגילים בספליט הנוכחי
+          No selected exercises yet.
         </Text>
       </View>
     );

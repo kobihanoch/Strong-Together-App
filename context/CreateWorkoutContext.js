@@ -111,9 +111,9 @@ export const CreateWorkoutProvider = ({ children }) => {
     }
   }, [workout]);
 
-  /*useEffect(() => {
+  useEffect(() => {
     console.log(JSON.stringify(selectedExercises, null, 2));
-  }, [selectedExercises]);*/
+  }, [selectedExercises]);
 
   // Extract all the splits from selected exercises
   const workoutSplits = useMemo(() => {

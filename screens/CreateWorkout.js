@@ -1,3 +1,5 @@
+// English comments only inside code
+
 import React, { useCallback, useState } from "react";
 import { Dimensions, View, Text, TouchableOpacity } from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";
@@ -20,14 +22,23 @@ function CreateWorkout({ navigation }) {
 }
 
 const InnerCreateWorkout = () => {
-  // Flags from context
-  const { properties } = useCreateWorkout();
+  // Pull flags and actions from context
+  const { properties, editing, actions } = useCreateWorkout();
 
   // Local state to control modal visibility
   const [isPickerOpen, setIsPickerOpen] = useState(false);
 
   const handleOpenExercisesTable = useCallback(() => setIsPickerOpen(true), []);
   const handleClosePicker = useCallback(() => setIsPickerOpen(false), []);
+
+  // Save handler (uses context action if available)
+  const handleSaveWorkout = useCallback(() => {
+    if (actions?.saveWorkout) {
+      actions.saveWorkout(editing?.selectedExercises);
+      return;
+    }
+    console.warn("saveWorkout action is not implemented in context.");
+  }, [actions, editing?.selectedExercises]);
 
   return (
     <View
@@ -37,57 +48,86 @@ const InnerCreateWorkout = () => {
         backgroundColor: "transparent",
       }}
     >
-      {properties?.hasWorkout ? (
-        <View style={{ flex: 1, alignItems: "stretch" }}>
-          <SplitTabsRow />
+      <View style={{ flex: 1, alignItems: "stretch" }}>
+        <SplitTabsRow />
 
-          {/* Add exercise button */}
-          <View
+        {/* Action row: Add exercise + Save workout */}
+        <View
+          style={{
+            paddingHorizontal: width * 0.04,
+            marginBottom: height * 0.012,
+            flexDirection: "row",
+            gap: width * 0.03,
+          }}
+        >
+          {/* Primary button (filled) */}
+          <TouchableOpacity
+            onPress={handleOpenExercisesTable}
+            activeOpacity={0.9}
             style={{
-              paddingHorizontal: width * 0.04,
-              marginBottom: height * 0.012,
+              flex: 1,
+              height: Math.max(48, height * 0.058),
+              borderRadius: width * 0.035,
+              backgroundColor: "#2979FF",
+              alignItems: "center",
+              justifyContent: "center",
+              shadowColor: "#000",
+              shadowOpacity: 0.12,
+              shadowRadius: 6,
+              elevation: 4,
             }}
           >
-            <TouchableOpacity
-              onPress={handleOpenExercisesTable}
-              activeOpacity={0.9}
+            <Text
               style={{
-                height: Math.max(46, height * 0.055),
-                borderRadius: width * 0.03,
-                backgroundColor: "#2979FF",
-                alignItems: "center",
-                justifyContent: "center",
-                shadowColor: "#000",
-                shadowOpacity: 0.12,
-                shadowRadius: 6,
-                elevation: 4,
+                fontSize: RFValue(14),
+                color: "white",
+                fontFamily: "Inter_700Bold",
               }}
             >
-              <Text
-                style={{
-                  fontSize: RFValue(14),
-                  color: "white",
-                  fontFamily: "Inter_700Bold",
-                }}
-              >
-                Add exercise
-              </Text>
-            </TouchableOpacity>
-          </View>
+              Add exercise
+            </Text>
+          </TouchableOpacity>
 
-          <SelectedExercisesList />
+          {/* Secondary button (outline -> becomes filled when saving) */}
+          <TouchableOpacity
+            onPress={handleSaveWorkout}
+            activeOpacity={0.9}
+            disabled={properties?.isSaving}
+            style={{
+              paddingHorizontal: width * 0.04,
+              height: Math.max(48, height * 0.058),
+              borderRadius: width * 0.035,
+              alignItems: "center",
+              justifyContent: "center",
+              shadowColor: "#000",
+              shadowOpacity: 0.08,
+              shadowRadius: 4,
+              elevation: 3,
+              borderWidth: 2,
+              borderColor: properties?.isSaving ? "#A8C5FF" : "#2979FF",
+              backgroundColor: properties?.isSaving ? "#EAF0F6" : "white",
+            }}
+          >
+            <Text
+              style={{
+                fontSize: RFValue(14),
+                color: properties?.isSaving ? "#6B7A90" : "#2979FF",
+                fontFamily: "Inter_700Bold",
+              }}
+            >
+              {properties?.isSaving ? "Saving..." : "Save workout"}
+            </Text>
+          </TouchableOpacity>
+        </View>
 
-          {/* Sliding bottom-sheet modal */}
-          <ExercisePickerModal
-            visible={isPickerOpen}
-            onClose={handleClosePicker}
-          />
-        </View>
-      ) : (
-        <View>
-          <Text>Doesn't have workout</Text>
-        </View>
-      )}
+        <SelectedExercisesList />
+
+        {/* Sliding bottom-sheet modal */}
+        <ExercisePickerModal
+          visible={isPickerOpen}
+          onClose={handleClosePicker}
+        />
+      </View>
     </View>
   );
 };
