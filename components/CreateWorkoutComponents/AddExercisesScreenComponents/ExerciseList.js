@@ -1,33 +1,56 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useMemo, useCallback } from "react";
 import { View, FlatList } from "react-native";
 import PickExerciseItem from "./PickExerciseItem";
 import { useCreateWorkout } from "../../../context/CreateWorkoutContext";
 
 const ExerciseList = () => {
   const { properties, utils } = useCreateWorkout();
-  const selectedSplitIndexInArray = properties.selectedExercises.findIndex(
-    (split) => split.name === properties.focusedSplit.name
-  );
+  const { selectedExercises, focusedSplit, filteredExercises } = properties;
 
-  // Reset to first muscle every time loading flatlist
+  // Compute selected split index safely (avoid crashes when not set yet)
+  const selectedSplitIndexInArray = useMemo(() => {
+    if (!selectedExercises?.length || !focusedSplit?.name) return -1;
+    return selectedExercises.findIndex((s) => s.name === focusedSplit.name);
+  }, [selectedExercises, focusedSplit]);
+
+  // Reset to first muscle only on first mount (kept as in the original)
   useEffect(() => {
     utils.filterExercisesByFirstMuscle();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Stable key extractor (string)
+  const keyExtractor = useCallback((item) => String(item.id), []);
+
+  // Stable renderer — prevents re-renders of all rows when parent updates
+  const renderItem = useCallback(
+    ({ item }) => {
+      const exercisesInCurrentSplit =
+        selectedSplitIndexInArray >= 0
+          ? selectedExercises[selectedSplitIndexInArray]?.exercises || []
+          : [];
+
+      return (
+        <PickExerciseItem
+          exercise={item}
+          exercisesInCurrentSplit={exercisesInCurrentSplit}
+        />
+      );
+    },
+    [selectedSplitIndexInArray, selectedExercises]
+  );
 
   return (
     <View style={{ flex: 7 }}>
       <FlatList
-        data={properties.filteredExercises}
-        keyExtractor={(item) => item.id}
+        data={filteredExercises || []}
+        keyExtractor={keyExtractor}
         showsVerticalScrollIndicator={false}
-        renderItem={({ item }) => (
-          <PickExerciseItem
-            exercise={item}
-            exercisesInCurrentSplit={
-              properties.selectedExercises[selectedSplitIndexInArray].exercises
-            }
-          />
-        )}
+        renderItem={renderItem}
+        // Light, safe perf options (won't affect your styling)
+        initialNumToRender={10}
+        windowSize={7}
+        removeClippedSubviews
       />
     </View>
   );

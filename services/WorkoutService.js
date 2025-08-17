@@ -22,17 +22,10 @@ export const getUserExerciseTracking = async (userId) => {
 };
 
 // Removes a workout plan
-export const deleteWorkout = async (userId) => {
-  if (!userId) {
-    console.log("Error: user not found.");
-    return;
-  }
-  const { error } = await supabase
-    .from("workoutplans")
-    .delete()
-    .eq("user_id", userId);
-  if (error) {
-    console.log("Error occured deleting a workout: " + error);
+export const deleteWorkout = async () => {
+  try {
+    await api.delete("/api/workouts/delete");
+  } catch (error) {
     throw error;
   }
 };

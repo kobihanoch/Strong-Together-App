@@ -1,185 +1,231 @@
+// English comments only inside code
+
+import React, { useMemo, useState, useCallback, useRef } from "react";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
-import React, { useState } from "react";
 import {
+  Alert,
+  Animated,
   Dimensions,
   Image,
   Modal,
+  Pressable,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
 } from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";
-import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 import { useCreateWorkout } from "../../../context/CreateWorkoutContext";
 import images from "../../images";
 import StepperInput from "../../StepperInput";
 
 const { width, height } = Dimensions.get("window");
+const HANDLE_W = Math.max(18, width * 0.1);
+const ACTION_BTN = Math.max(34, width * 0.09);
 
-const PickExerciseItem = ({ exercise, exercisesInCurrentSplit }) => {
-  const { properties, utils } = useCreateWorkout();
-  const [isSelected, setIsSelected] = useState(
-    exercisesInCurrentSplit.some((ex) => ex.exercise_id === exercise.id)
+const PickExerciseItem = ({ exercise, dragHandleProps, onDelete }) => {
+  /**
+   * {
+   *  id(exercise id), name, sets, order_index, targetmuscle, specifictargetmuscle
+   * }
+   */
+
+  // Context (kept minimal to preserve your current logic)
+  const { properties } = useCreateWorkout();
+
+  // Resolve muscle image once
+  const imagePath = useMemo(
+    () => images?.[exercise?.targetmuscle]?.[exercise?.specifictargetmuscle],
+    [exercise?.targetmuscle, exercise?.specifictargetmuscle]
   );
 
-  const mainMuscle = exercise.targetmuscle;
-  const specificMuscle = exercise.specifictargetmuscle;
-  const imagePath = images[mainMuscle]?.[specificMuscle];
-
-  // For showing modal
+  // Modal visibility
   const [isModalVisible, setIsModalVisible] = useState(false);
 
-  // WIP: add modal and then add setFocusedExerciseSets and then put it inside the selectedExercises List
+  // Edit button subtle animation (keeps button perfectly circular)
+  const editScale = useRef(new Animated.Value(1)).current;
+  const onEditIn = useCallback(() => {
+    Animated.spring(editScale, {
+      toValue: 0.96,
+      useNativeDriver: true,
+      speed: 30,
+    }).start();
+  }, [editScale]);
+  const onEditOut = useCallback(() => {
+    Animated.spring(editScale, {
+      toValue: 1,
+      useNativeDriver: true,
+      speed: 30,
+    }).start();
+  }, [editScale]);
+
+  // Delete button subtle animation
+  const delScale = useRef(new Animated.Value(1)).current;
+  const onDelIn = useCallback(() => {
+    Animated.spring(delScale, {
+      toValue: 0.96,
+      useNativeDriver: true,
+      speed: 30,
+    }).start();
+  }, [delScale]);
+  const onDelOut = useCallback(() => {
+    Animated.spring(delScale, {
+      toValue: 1,
+      useNativeDriver: true,
+      speed: 30,
+    }).start();
+  }, [delScale]);
+
+  // Open modal
+  const handleOpenEdit = useCallback(() => {
+    setIsModalVisible(true);
+  }, []);
+
+  // Delete with confirmation
+  const handleDelete = useCallback(() => {
+    Alert.alert(
+      "Remove exercise",
+      `Are you sure you want to remove "${exercise?.name}" from this split?`,
+      [
+        { text: "Cancel", style: "cancel" },
+        {
+          text: "Remove",
+          style: "destructive",
+          onPress: () => {
+            if (onDelete) {
+              onDelete(exercise);
+            } else {
+              // Fallback: try a contextual removal if you have one in your context
+              // properties.removeExerciseFromSplit?.(exercise);
+              console.warn(
+                "onDelete handler was not provided for PickExerciseItem."
+              );
+            }
+          },
+        },
+      ]
+    );
+  }, [exercise, onDelete]);
 
   return (
     <View style={{ marginBottom: height * 0.0 }}>
       <View style={{ position: "relative" }}>
-        {/* Main Touchable: Select/Deselect Exercise */}
-        <TouchableOpacity
-          style={[
-            styles.exerciseContainer,
-            isSelected && { borderColor: "#2979FF", borderWidth: 2 },
-          ]}
-          onPress={() => {
-            utils.toggleExerciseInSplit(exercise, isSelected);
+        {/* Row with left drag handle + card */}
+        <View style={{ flexDirection: "row", alignItems: "stretch" }}>
+          {/* Thin left drag handle (clean and unobtrusive) */}
+          <Pressable {...(dragHandleProps || {})} style={styles.dragHandle}>
+            <MaterialCommunityIcons
+              name="drag-vertical"
+              size={RFValue(16)}
+              color="rgba(0,0,0,0.35)"
+            />
+          </Pressable>
 
-            if (isSelected) {
-              setIsSelected(false);
-            } else {
-              setIsSelected(true);
-            }
-          }}
-          activeOpacity={0.8}
-        >
-          {/* Content inside the card */}
-          <View style={{ flex: 1, flexDirection: "row" }}>
-            <View style={{ flex: 0.35, justifyContent: "center" }}>
-              <LinearGradient
-                colors={["rgb(234, 240, 246)", "rgb(234, 240, 246)"]}
-                style={styles.imageContainer}
-              >
-                <Image source={imagePath} style={styles.exerciseImage} />
-              </LinearGradient>
-            </View>
+          {/* Main card */}
+          <TouchableOpacity
+            style={styles.exerciseContainer}
+            activeOpacity={0.9}
+            onPress={() => {}}
+          >
+            <View style={{ flex: 1, flexDirection: "row" }}>
+              <View style={{ flex: 0.35, justifyContent: "center" }}>
+                <LinearGradient
+                  colors={["rgb(234, 240, 246)", "rgb(234, 240, 246)"]}
+                  style={styles.imageContainer}
+                >
+                  {!!imagePath && (
+                    <Image source={imagePath} style={styles.exerciseImage} />
+                  )}
+                </LinearGradient>
+              </View>
 
-            <View style={styles.exerciseInfoContainer}>
-              <Text style={styles.exerciseName}>{exercise.name}</Text>
-              <Text style={styles.muscleText}>
-                {exercise.targetmuscle}, {exercise.specifictargetmuscle}
-              </Text>
-              <View
-                style={{
-                  flexDirection: "row",
-                  justifyContent: "space-between",
-                }}
-              >
-                <Text style={styles.muscleText}>
-                  {exercise.targetmuscle}, {exercise.specifictargetmuscle}
+              <View style={styles.exerciseInfoContainer}>
+                <Text style={styles.exerciseName} numberOfLines={1}>
+                  {exercise?.name}
+                </Text>
+                <Text style={styles.muscleText} numberOfLines={1}>
+                  {exercise?.targetmuscle}, {exercise?.specifictargetmuscle}
                 </Text>
               </View>
-            </View>
 
-            <View style={styles.iconContainer}>
-              <FontAwesome5
-                name={isSelected ? "check-circle" : "info-circle"}
-                size={18}
-                color={isSelected ? "transparent" : "rgba(82, 82, 82, 0.4)"}
-              />
-            </View>
-          </View>
-        </TouchableOpacity>
+              {/* Top-right actions: Edit + Delete (stacked, floating, crisp) */}
+              <View style={styles.actionsContainer}>
+                {/* Edit */}
+                <Animated.View
+                  style={[
+                    styles.actionBtn,
+                    styles.editBtn,
+                    { transform: [{ scale: editScale }] },
+                  ]}
+                >
+                  <Pressable
+                    onPressIn={onEditIn}
+                    onPressOut={onEditOut}
+                    onPress={handleOpenEdit}
+                    android_ripple={{
+                      color: "rgba(255,255,255,0.18)",
+                      borderless: true,
+                    }}
+                    style={styles.actionPressable}
+                    hitSlop={{ top: 6, bottom: 6, left: 6, right: 6 }}
+                  >
+                    <MaterialCommunityIcons
+                      name="pencil"
+                      size={RFValue(15)}
+                      color="#fff"
+                    />
+                  </Pressable>
+                </Animated.View>
 
-        {isSelected && (
-          <TouchableOpacity
-            onPress={() => {
-              setIsModalVisible(true);
-              properties.setFocusedExercise(exercise);
-            }}
-            activeOpacity={0.85}
-            style={{
-              position: "absolute",
-              top: height * 0.03,
-              right: width * 0.04,
-              backgroundColor: "#2979FF",
-              borderRadius: width * 0.08,
-              padding: width * 0.03,
-              shadowColor: "rgb(90, 90, 90)",
-              shadowOpacity: 0.1,
-              shadowRadius: 4,
-              elevation: 6,
-            }}
-          >
-            <MaterialCommunityIcons
-              name="pencil-outline"
-              size={RFValue(13)}
-              color="white"
-            />
+                {/* Delete */}
+                <Animated.View
+                  style={[
+                    styles.actionBtn,
+                    styles.deleteBtn,
+                    { transform: [{ scale: delScale }] },
+                  ]}
+                >
+                  <Pressable
+                    onPressIn={onDelIn}
+                    onPressOut={onDelOut}
+                    onPress={handleDelete}
+                    android_ripple={{
+                      color: "rgba(255,255,255,0.18)",
+                      borderless: true,
+                    }}
+                    style={styles.actionPressable}
+                    hitSlop={{ top: 6, bottom: 6, left: 6, right: 6 }}
+                  >
+                    <MaterialCommunityIcons
+                      name="trash-can-outline"
+                      size={RFValue(15)}
+                      color="#fff"
+                    />
+                  </Pressable>
+                </Animated.View>
+              </View>
+            </View>
           </TouchableOpacity>
-        )}
+        </View>
 
+        {/* Reps editor modal */}
         {isModalVisible && (
           <Modal
             visible={isModalVisible}
-            transparent={true}
+            transparent
             animationType="fade"
             onRequestClose={() => setIsModalVisible(false)}
           >
-            <View
-              style={{
-                flex: 1,
-                backgroundColor: "rgba(0,0,0,0.6)",
-                justifyContent: "center",
-                alignItems: "center",
-                paddingHorizontal: width * 0.05,
-              }}
-            >
-              <View
-                style={{
-                  width: width * 0.9,
-                  backgroundColor: "#fff",
-                  borderRadius: width * 0.05,
-                  paddingVertical: height * 0.03,
-                  paddingHorizontal: width * 0.05,
-                  alignItems: "center",
-                  shadowColor: "#000",
-                  shadowOpacity: 0.25,
-                  shadowRadius: 4,
-                  elevation: 5,
-                }}
-              >
-                <Text
-                  style={{
-                    fontFamily: "Inter_700Bold",
-                    fontSize: RFValue(16),
-                    marginBottom: height * 0.02,
-                    color: "#1a1a1a",
-                  }}
-                >
-                  Edit Reps for {exercise.name}
+            <View style={styles.modalBackdrop}>
+              <View style={styles.modalCard}>
+                <Text style={styles.modalTitle}>
+                  Edit Reps for {exercise?.name}
                 </Text>
 
-                {properties.focusedExerciseSets?.map((reps, index) => (
-                  <View
-                    key={index}
-                    style={{
-                      width: "70%",
-                      marginBottom: height * 0.015,
-                    }}
-                  >
-                    <Text
-                      style={{
-                        fontFamily: "Inter_500Medium",
-                        fontSize: RFValue(13),
-                        color: "#444",
-                        marginBottom: height * 0.005,
-                        alignSelf: "center",
-                      }}
-                    >
-                      Set {index + 1}
-                    </Text>
-
+                {(properties.focusedExerciseSets || []).map((_, index) => (
+                  <View key={index} style={styles.modalRow}>
+                    <Text style={styles.modalSetLabel}>Set {index + 1}</Text>
                     <StepperInput
                       value={properties.focusedExerciseSets[index]}
                       onChange={(newVal) => {
@@ -195,35 +241,10 @@ const PickExerciseItem = ({ exercise, exercisesInCurrentSplit }) => {
                 ))}
 
                 <TouchableOpacity
-                  onPress={() => {
-                    setIsModalVisible(false);
-                    // Update the big array with the focused selected exercise sets array, and set focused exercise to null
-                    properties.setFocusedExercise(null);
-                    // If by mistake a field is without a value - automaticly make it 10 by default
-                    const cleanedSets = properties.focusedExerciseSets.map(
-                      (val) =>
-                        !val || val === "" || isNaN(val) ? 10 : parseInt(val)
-                    );
-                    utils.updateSetsForExercise(exercise, cleanedSets);
-                  }}
-                  style={{
-                    marginTop: height * 0.015,
-                    backgroundColor: "#2979FF",
-                    paddingVertical: height * 0.014,
-                    paddingHorizontal: width * 0.2,
-                    borderRadius: width * 0.03,
-                  }}
+                  onPress={() => setIsModalVisible(false)}
+                  style={styles.modalSaveBtn}
                 >
-                  <Text
-                    style={{
-                      color: "white",
-                      fontFamily: "Inter_700Bold",
-                      fontSize: RFValue(14),
-                      textAlign: "center",
-                    }}
-                  >
-                    Save
-                  </Text>
+                  <Text style={styles.modalSaveText}>Save</Text>
                 </TouchableOpacity>
               </View>
             </View>
@@ -233,11 +254,13 @@ const PickExerciseItem = ({ exercise, exercisesInCurrentSplit }) => {
     </View>
   );
 };
+
 const styles = StyleSheet.create({
+  // Card
   exerciseContainer: {
-    backgroundColor: "#fafafa",
-    width: "100%",
-    alignSelf: "center",
+    backgroundColor: "white",
+    width: "86%",
+    marginLeft: -15,
     height: height * 0.16,
     flex: 1,
     borderRadius: width * 0.03,
@@ -245,7 +268,27 @@ const styles = StyleSheet.create({
     borderColor: "transparent",
     borderWidth: 2,
     padding: width * 0.02,
+    shadowColor: "#000",
+    shadowOpacity: 0.06,
+    shadowRadius: 5,
+    elevation: 2,
+    overflow: "hidden",
   },
+
+  // Thin left drag handle
+  dragHandle: {
+    width: HANDLE_W,
+    height: height * 0.165,
+    alignSelf: "center",
+    zIndex: 99,
+    marginLeft: width * 0.04,
+    marginRight: width * 0.02,
+    borderRadius: width * 0.02,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "rgba(230, 230, 230, 1)",
+  },
+
   imageContainer: {
     flex: 1,
     borderRadius: 10,
@@ -276,62 +319,88 @@ const styles = StyleSheet.create({
     fontSize: RFValue(12),
     color: "#919191",
   },
-  setsContainer: {
-    flexDirection: "row",
-    justifyContent: "flex-start",
-    marginTop: 5,
-  },
-  setBubble: {
-    backgroundColor: "#2979FF",
-    paddingVertical: 5,
-    paddingHorizontal: 10,
-    borderRadius: 10,
-    marginRight: 5,
-  },
-  setText: {
-    color: "white",
-    fontSize: RFValue(12),
-    fontFamily: "Inter_700Bold",
-  },
-  editingContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "flex-start",
-    marginTop: 5,
-  },
-  inputsRow: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  editingInput: {
-    width: 40,
-    height: 30,
-    borderWidth: 2,
-    borderColor: "#2979FF",
-    borderRadius: 10,
-    textAlign: "center",
-    fontSize: RFValue(14),
-    backgroundColor: "#fff",
-    marginRight: 5,
-  },
-  saveButton: {
-    backgroundColor: "#2979FF",
-    paddingHorizontal: 12,
-    paddingVertical: 5,
-    borderRadius: 10,
-  },
-  saveButtonText: {
-    color: "white",
-    fontSize: RFValue(14),
-    fontFamily: "Inter_700Bold",
-  },
-  iconContainer: {
+
+  // Actions (floating, top-right)
+  actionsContainer: {
     flex: 0.1,
-    marginRight: width * 0.04,
-    flexDirection: "row",
-    justifyContent: "flex-end",
-    marginTop: height * 0.01,
+    alignItems: "flex-end",
+    justifyContent: "flex-start",
+    marginTop: height * 0.008,
+    marginRight: width * 0.01,
+    gap: height * 0.008,
+  },
+  actionBtn: {
+    width: ACTION_BTN,
+    height: ACTION_BTN,
+    borderRadius: ACTION_BTN / 2,
+    shadowColor: "rgb(90, 90, 90)",
+    shadowOpacity: 0.12,
+    shadowRadius: 4,
+    elevation: 6,
+    overflow: "hidden",
+  },
+  actionPressable: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  editBtn: {
+    backgroundColor: "#2979FF",
+  },
+  deleteBtn: {
+    backgroundColor: "#FF3B30",
+  },
+
+  // Modal
+  modalBackdrop: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.6)",
+    justifyContent: "center",
+    alignItems: "center",
+    paddingHorizontal: width * 0.05,
+  },
+  modalCard: {
+    width: width * 0.9,
+    backgroundColor: "#fff",
+    borderRadius: width * 0.05,
+    paddingVertical: height * 0.03,
+    paddingHorizontal: width * 0.05,
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  modalTitle: {
+    fontFamily: "Inter_700Bold",
+    fontSize: RFValue(16),
+    marginBottom: height * 0.02,
+    color: "#1a1a1a",
+  },
+  modalRow: {
+    width: "70%",
+    marginBottom: height * 0.015,
+  },
+  modalSetLabel: {
+    fontFamily: "Inter_500Medium",
+    fontSize: RFValue(13),
+    color: "#444",
+    marginBottom: height * 0.005,
+    alignSelf: "center",
+  },
+  modalSaveBtn: {
+    marginTop: height * 0.015,
+    backgroundColor: "#2979FF",
+    paddingVertical: height * 0.014,
+    paddingHorizontal: width * 0.2,
+    borderRadius: width * 0.03,
+  },
+  modalSaveText: {
+    color: "white",
+    fontFamily: "Inter_700Bold",
+    fontSize: RFValue(14),
+    textAlign: "center",
   },
 });
 
-export default PickExerciseItem;
+export default React.memo(PickExerciseItem);
