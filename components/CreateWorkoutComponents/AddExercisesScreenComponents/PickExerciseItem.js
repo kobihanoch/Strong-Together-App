@@ -1,6 +1,12 @@
 // English comments only inside code
 
-import React, { useMemo, useState, useCallback, useRef } from "react";
+import React, {
+  useMemo,
+  useState,
+  useCallback,
+  useRef,
+  useEffect,
+} from "react";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import {
@@ -26,7 +32,7 @@ const ACTION_BTN = Math.max(34, width * 0.09);
 
 const PickExerciseItem = ({ exercise, dragHandleProps }) => {
   // Pull context pieces we need
-  const { editing, properties, actions } = useCreateWorkout();
+  const { editing, actions, utils } = useCreateWorkout();
 
   // Resolve muscle image once
   const imagePath = useMemo(
@@ -34,51 +40,78 @@ const PickExerciseItem = ({ exercise, dragHandleProps }) => {
     [exercise?.targetmuscle, exercise?.specifictargetmuscle]
   );
 
-  // Modal visibility
+  // Local modal visibility
   const [isModalVisible, setIsModalVisible] = useState(false);
+
+  // Local editable sets (defaults to 3 slots)
+  const [localSets, setLocalSets] = useState([8, 8, 8]);
+
+  // Sync local sets from exercise when opening/editing
+  useEffect(() => {
+    const base =
+      Array.isArray(exercise?.sets) && exercise.sets.length === 3
+        ? exercise.sets
+        : Array.isArray(exercise?.sets)
+        ? [
+            ...exercise.sets.slice(0, 3),
+            ...Array(Math.max(0, 3 - exercise.sets.length)).fill(8),
+          ]
+        : [8, 8, 8];
+    setLocalSets(base.map((n) => (Number.isFinite(n) ? n : 8)));
+  }, [exercise?.sets]);
 
   // Tiny press animations
   const editScale = useRef(new Animated.Value(1)).current;
   const delScale = useRef(new Animated.Value(1)).current;
-  const onEditIn = useCallback(
-    () =>
-      Animated.spring(editScale, {
-        toValue: 0.96,
-        useNativeDriver: true,
-        speed: 30,
-      }).start(),
-    [editScale]
-  );
-  const onEditOut = useCallback(
-    () =>
-      Animated.spring(editScale, {
-        toValue: 1,
-        useNativeDriver: true,
-        speed: 30,
-      }).start(),
-    [editScale]
-  );
-  const onDelIn = useCallback(
-    () =>
-      Animated.spring(delScale, {
-        toValue: 0.96,
-        useNativeDriver: true,
-        speed: 30,
-      }).start(),
-    [delScale]
-  );
-  const onDelOut = useCallback(
-    () =>
-      Animated.spring(delScale, {
-        toValue: 1,
-        useNativeDriver: true,
-        speed: 30,
-      }).start(),
-    [delScale]
-  );
+  const onEditIn = useCallback(() => {
+    Animated.spring(editScale, {
+      toValue: 0.96,
+      useNativeDriver: true,
+      speed: 30,
+    }).start();
+  }, [editScale]);
+  const onEditOut = useCallback(() => {
+    Animated.spring(editScale, {
+      toValue: 1,
+      useNativeDriver: true,
+      speed: 30,
+    }).start();
+  }, [editScale]);
+  const onDelIn = useCallback(() => {
+    Animated.spring(delScale, {
+      toValue: 0.96,
+      useNativeDriver: true,
+      speed: 30,
+    }).start();
+  }, [delScale]);
+  const onDelOut = useCallback(() => {
+    Animated.spring(delScale, {
+      toValue: 1,
+      useNativeDriver: true,
+      speed: 30,
+    }).start();
+  }, [delScale]);
 
   // Open modal
   const handleOpenEdit = useCallback(() => setIsModalVisible(true), []);
+
+  // Save updated sets back into the selected split list
+  const handleSaveSets = useCallback(() => {
+    const safeSets = localSets.map((n) => (Number.isFinite(n) ? n : 0));
+    actions?.setSelectedExercises?.((prev) => {
+      const key = editing?.editedSplit;
+      const list = prev?.[key] ?? [];
+      const idx = list.findIndex(
+        (it) => String(it?.id) === String(exercise?.id)
+      );
+      if (idx === -1) return prev;
+      const updatedItem = { ...list[idx], sets: safeSets };
+      const next = [...list];
+      next[idx] = updatedItem;
+      return { ...prev, [key]: next };
+    });
+    setIsModalVisible(false);
+  }, [localSets, actions, editing?.editedSplit, exercise?.id]);
 
   // Delete with confirmation (always use context action)
   const handleDelete = useCallback(() => {
@@ -87,12 +120,11 @@ const PickExerciseItem = ({ exercise, dragHandleProps }) => {
       title: "Remove exercise",
       textBody: `Are you sure you want to remove "${exercise?.name}" from this split?`,
       button: "Remove",
-      autoClose: false, // keep it open until we close manually
+      autoClose: false,
       onPressButton: () => {
         actions?.removeExercise?.(String(exercise?.id));
         Dialog.hide();
       },
-      // Some versions support this callback to handle outside taps:
       onTouchOutside: () => {
         Dialog.hide();
       },
@@ -200,7 +232,7 @@ const PickExerciseItem = ({ exercise, dragHandleProps }) => {
           </TouchableOpacity>
         </View>
 
-        {/* Reps editor modal */}
+        {/* Edit sets modal */}
         {isModalVisible && (
           <Modal
             visible={isModalVisible}
@@ -211,28 +243,33 @@ const PickExerciseItem = ({ exercise, dragHandleProps }) => {
             <View style={styles.modalBackdrop}>
               <View style={styles.modalCard}>
                 <Text style={styles.modalTitle}>
-                  Edit Reps for {exercise?.name}
+                  Edit sets for {exercise?.name}
                 </Text>
 
-                {(properties.focusedExerciseSets || []).map((_, index) => (
-                  <View key={index} style={styles.modalRow}>
-                    <Text style={styles.modalSetLabel}>Set {index + 1}</Text>
+                {/* Three steppers for 3 sets */}
+                {[0, 1, 2].map((i) => (
+                  <View key={i} style={styles.modalRow}>
+                    <Text style={styles.modalSetLabel}>{`Set ${i + 1}`}</Text>
                     <StepperInput
-                      value={properties.focusedExerciseSets[index]}
-                      onChange={(newVal) => {
-                        const updated = [...properties.focusedExerciseSets];
-                        updated[index] = newVal;
-                        properties.setFocusedExerciseSets(updated);
+                      value={localSets[i] ?? 10}
+                      onChange={(val) => {
+                        const safe = Math.max(
+                          utils.REPS_MIN,
+                          Math.min(utils.REPS_MAX, val)
+                        );
+                        const next = [...localSets];
+                        next[i] = safe;
+                        setLocalSets(next);
                       }}
-                      min={1}
-                      max={20}
+                      min={utils.REPS_MIN}
+                      max={utils.REPS_MAX}
                       step={1}
                     />
                   </View>
                 ))}
 
                 <TouchableOpacity
-                  onPress={() => setIsModalVisible(false)}
+                  onPress={handleSaveSets}
                   style={styles.modalSaveBtn}
                 >
                   <Text style={styles.modalSaveText}>Save</Text>
@@ -338,7 +375,7 @@ const styles = StyleSheet.create({
   deleteBtn: {
     backgroundColor: "#FF3B30",
   },
-  // Modal
+  // Modal styles
   modalBackdrop: {
     flex: 1,
     backgroundColor: "rgba(0,0,0,0.6)",

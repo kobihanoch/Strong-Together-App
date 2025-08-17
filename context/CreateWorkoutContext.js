@@ -1,3 +1,5 @@
+// English comments only inside code
+
 import { useNavigation } from "@react-navigation/native";
 import React, {
   createContext,
@@ -27,9 +29,37 @@ export const CreateWorkoutProvider = ({ children }) => {
   // Keep a map: { splitName: [...Exercises] }
   const [selectedExercises, setSelectedExercises] = useState({ A: [] });
 
+  useEffect(() => {
+    console.log(JSON.stringify(selectedExercises, null, 2));
+  }, [selectedExercises]);
+
+  // ----------------------------Rules for sets----------------------------
+  // Reps constraints and defaults
+  const REPS_MIN = 1;
+  const REPS_MAX = 20;
+  const DEFAULT_SETS = [10, 10, 10];
+
+  // Clamp an array of sets to length=3 and values within [REPS_MIN, REPS_MAX]
+  const clampSetsToRules = useCallback(
+    (sets) => {
+      const base = Array.isArray(sets) ? sets.slice(0, 3) : [];
+      const padded =
+        base.length < 3
+          ? [...base, ...Array(3 - base.length).fill(DEFAULT_SETS[0])]
+          : base;
+      return padded.map((n) => {
+        const v = Number.isFinite(n) ? n : DEFAULT_SETS[0];
+        return Math.max(REPS_MIN, Math.min(REPS_MAX, v));
+      });
+    },
+    [REPS_MIN, REPS_MAX]
+  );
+
+  // ----------------------------Existing workout----------------------------
+  const { workoutForEdit: workout } = useWorkoutContext();
+
   // Return the exercises for the currently edited split
   const selectedExercisesForSplit = useMemo(() => {
-    // Always return an array
     return selectedExercises?.[editedSplit] ?? [];
   }, [editedSplit, selectedExercises, workout]);
 
@@ -40,17 +70,19 @@ export const CreateWorkoutProvider = ({ children }) => {
         const current = prev?.[editedSplit] ?? [];
 
         // Prevent duplicates (by id if present, else by name field fallback)
-        const exists = ex.id
-          ? current.some((e) => e.id === ex.id)
-          : current.some((e) => e.exercise === ex.exercise);
+        const exists = ex?.id
+          ? current.some((e) => String(e.id) === String(ex.id))
+          : current.some((e) => e?.exercise === ex?.exercise);
         if (exists) return prev;
 
-        // Append to end; order_index is 0-based -> next index is current.length
+        // Ensure sets follow rules (default to [10,10,10])
+        const safeSets = clampSetsToRules(ex?.sets ?? DEFAULT_SETS);
+
+        // Append to end; order_index is 0-based
         const appended = {
           ...ex,
-          order_index: current.length, // last index after append (0-based)
-          // optional defaults if needed:
-          // sets: Array.isArray(ex.sets) ? ex.sets : [],
+          order_index: current.length,
+          sets: safeSets,
         };
 
         return {
@@ -59,7 +91,7 @@ export const CreateWorkoutProvider = ({ children }) => {
         };
       });
     },
-    [editedSplit]
+    [editedSplit, clampSetsToRules]
   );
 
   // Remove exercise from the current split
@@ -69,7 +101,6 @@ export const CreateWorkoutProvider = ({ children }) => {
         const key = editedSplit;
         const list = prev?.[key] ?? [];
 
-        // 1) Prefer removing by id (coerce to string on both sides)
         const idToRemove =
           typeof exOrId === "object" && exOrId !== null ? exOrId.id : exOrId;
 
@@ -79,16 +110,13 @@ export const CreateWorkoutProvider = ({ children }) => {
           const idStr = String(idToRemove);
           next = list.filter((it) => String(it?.id) !== idStr);
         } else if (typeof exOrId === "object" && exOrId?.name) {
-          // 2) Fallback: remove by name if id is missing
           next = list.filter((it) => it?.name !== exOrId.name);
         } else if (
           typeof exOrId === "object" &&
           typeof exOrId?.order_index === "number"
         ) {
-          // 3) Last resort: remove by order_index
           next = list.filter((_, i) => i !== exOrId.order_index);
         } else {
-          // Nothing to remove
           return prev;
         }
 
@@ -101,27 +129,40 @@ export const CreateWorkoutProvider = ({ children }) => {
     [editedSplit]
   );
 
-  // ----------------------------Existing workout----------------------------
-  const { workoutForEdit: workout } = useWorkoutContext();
-
   // Adjust user's assigned workout from DB to context
+  const hasWorkout = useMemo(() => workout != null, [workout]);
+
   useEffect(() => {
     if (hasWorkout) {
-      setSelectedExercises(workout);
+      // Optionally ensure imported workout sets are clamped to rules
+      // If your DB is always valid, you can skip this normalization
+      setSelectedExercises((prev) => {
+        const incoming = workout || prev;
+        const next = {};
+        Object.keys(incoming || {}).forEach((splitKey) => {
+          next[splitKey] = (incoming[splitKey] || []).map((ex, idx) => ({
+            ...ex,
+            // Keep existing order_index if present; otherwise index
+            order_index:
+              typeof ex?.order_index === "number" ? ex.order_index : idx,
+            // Clamp sets from DB to rules
+            sets: clampSetsToRules(ex?.sets ?? DEFAULT_SETS),
+          }));
+        });
+        return next;
+      });
     }
-  }, [workout]);
+  }, [workout, hasWorkout, clampSetsToRules]);
 
-  useEffect(() => {
-    console.log(JSON.stringify(selectedExercises, null, 2));
-  }, [selectedExercises]);
+  // Debug
+  // useEffect(() => {
+  //   console.log(JSON.stringify(selectedExercises, null, 2));
+  // }, [selectedExercises]);
 
   // Extract all the splits from selected exercises
   const workoutSplits = useMemo(() => {
     return Object.keys(selectedExercises);
   }, [selectedExercises]);
-
-  // State for deciding has workout or not
-  const hasWorkout = useMemo(() => workout != null, [workout]);
 
   // ----------------------------Exercises in DB----------------------------
   const {
@@ -157,7 +198,12 @@ export const CreateWorkoutProvider = ({ children }) => {
         exError,
         exLoading,
       },
-      utils: {},
+      utils: {
+        REPS_MIN,
+        REPS_MAX,
+        DEFAULT_SETS,
+        clampSetsToRules,
+      },
       saving: { setIsSaving },
     }),
     [
@@ -166,12 +212,15 @@ export const CreateWorkoutProvider = ({ children }) => {
       workout,
       editedSplit,
       selectedExercisesForSplit,
-      selectedExercises, // Workout to show to UI
+      selectedExercises,
       addExercise,
       removeExercise,
       dbExercises,
       exError,
       exLoading,
+      REPS_MIN,
+      REPS_MAX,
+      clampSetsToRules,
     ]
   );
 
