@@ -12,7 +12,6 @@ export const useMyWorkoutPlanPageLogic = () => {
   const { exerciseTracking, analyzedExerciseTrackingData, hasTrainedToday } =
     useAnalysisContext();
   const [selectedSplit, setSelectedSplit] = useState(null);
-  const [buttonOpacity, setButtonOpacity] = useState(1);
 
   // Set selected split at startup
   useEffect(() => {
@@ -46,7 +45,6 @@ export const useMyWorkoutPlanPageLogic = () => {
       setSelectedSplit,
       handleWorkoutSplitPress,
       filteredExercises,
-      buttonOpacity,
       splitTrainedCount,
       hasTrainedToday,
     },

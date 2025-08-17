@@ -1,8 +1,7 @@
+import { Dialog } from "react-native-alert-notification";
 import { useAuth } from "../../context/AuthContext";
 import { useNotifications } from "../../context/NotificationsContext";
-import { Alert } from "react-native";
 import { deleteMessage } from "../../services/MessagesService";
-import { Dialog } from "react-native-alert-notification";
 
 const useInboxLogic = () => {
   const { user } = useAuth();
