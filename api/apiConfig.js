@@ -7,7 +7,7 @@
 // Uncomment by production or dev environment
 
 // ------{PRODUCTION}-------
-//export const API_BASE_URL = process.env.REACT_NATIVE_APP_API_BASE_URL;
+export const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL;
 
 // ------{DEVELOPMENT}-------
-export const API_BASE_URL = `http://10.0.0.41:5000`;
+//export const API_BASE_URL = `http://10.0.0.41:5000`;
