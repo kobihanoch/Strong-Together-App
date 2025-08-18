@@ -17,11 +17,8 @@ const useHomePageLogic = () => {
   } = useWorkoutContext();
 
   // Analysis state (tracking + derived analytics + loading)
-  const {
-    exerciseTracking,
-    analyzedExerciseTrackingData,
-    loading: analysisLoading,
-  } = useAnalysisContext();
+  const { analyzedExerciseTrackingData, loading: analysisLoading } =
+    useAnalysisContext();
 
   // Derive stable user fields
   const { username, userId, firstName, profileImageUrl } = useMemo(() => {
@@ -72,7 +69,6 @@ const useHomePageLogic = () => {
       workoutSplitsNumber,
       mostFrequentSplit,
       PR,
-      exerciseTracking: exerciseTracking ?? null,
       isLoading,
     }),
     [
@@ -86,7 +82,6 @@ const useHomePageLogic = () => {
       workoutSplitsNumber,
       mostFrequentSplit,
       PR,
-      exerciseTracking,
       isLoading,
     ]
   );

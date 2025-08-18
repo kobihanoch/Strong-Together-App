@@ -113,13 +113,12 @@ const CalendarStripCustom = ({
 
       const dateKey = item.format("YYYY-MM-DD");
       let workoutLogForDate = null;
-      if (Array.isArray(userExerciseLogs)) {
-        // If performance here ever becomes an issue, convert to a map outside.
-        workoutLogForDate = userExerciseLogs.find(
-          (log) => log.workoutdate === dateKey
-        );
-      }
-      const splitName = workoutLogForDate?.splitname;
+
+      // If performance here ever becomes an issue, convert to a map outside.
+
+      workoutLogForDate = userExerciseLogs[dateKey];
+
+      const splitName = workoutLogForDate?.[0].splitname;
 
       return (
         <TouchableOpacity

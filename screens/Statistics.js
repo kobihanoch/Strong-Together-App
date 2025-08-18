@@ -12,10 +12,10 @@ const StatisticsPage = () => {
   const {
     selectedDate,
     setSelectedDate,
-    exerciseTracking,
     exerciseTrackingByDate,
     exerciseTrackingByDatePrev,
     exerciseTrackingWithETSIdKey,
+    exerciseTrackingWithDateKey,
   } = useStatisticsPageLogic(user);
 
   return (
@@ -41,14 +41,13 @@ const StatisticsPage = () => {
         <CalendarCard
           selectedDate={selectedDate}
           setSelectedDate={setSelectedDate}
-          userExerciseLogs={exerciseTracking || []}
+          userExerciseLogs={exerciseTrackingWithDateKey || []}
         />
       </View>
       <View style={{ flex: 7.5 }}>
         <ExercisesFlatList
           data={exerciseTrackingByDate}
           dataToCompare={exerciseTrackingByDatePrev || []}
-          exerciseTracking={exerciseTracking ?? []}
           byETSId={exerciseTrackingWithETSIdKey}
         ></ExercisesFlatList>
       </View>

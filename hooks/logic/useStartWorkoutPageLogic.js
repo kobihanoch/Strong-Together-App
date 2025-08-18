@@ -14,7 +14,7 @@ const useStartWorkoutPageLogic = (selectedSplit) => {
   const { user, setIsWorkoutMode } = useAuth();
   const { exercises } = useWorkoutContext();
   const {
-    setExerciseTracking,
+    setExerciseTrackingMaps,
     setHasTrainedToday,
     setAnalyzedExerciseTrackingData,
   } = useAnalysisContext();
@@ -66,9 +66,10 @@ const useStartWorkoutPageLogic = (selectedSplit) => {
         rDup,
         exercisesForSelectedSplit
       );
-      // Need to get exercise trackigg back for cache
-      const { exerciseTracking, analysis } = await saveWorkoutProcess(obj);
-      setExerciseTracking(exerciseTracking);
+
+      const { exerciseTrackingMaps, analysis } = await saveWorkoutProcess(obj);
+
+      setExerciseTrackingMaps(exerciseTrackingMaps);
       setAnalyzedExerciseTrackingData(analysis);
       setHasTrainedToday(true);
       setIsWorkoutMode(false);

@@ -5,7 +5,7 @@
 //   bySplitName: { [splitname]: Record[] }.
 //   splitDatesDesc: { [splitName]: all dates DESC }
 // }
-export const getExerciseTrackingMapped = (exerciseTracking = []) => {
+/*export const getExerciseTrackingMapped = (exerciseTracking = []) => {
   if (!exerciseTracking || !exerciseTracking.length) {
     return { byDate: {}, byETSId: {}, bySplitName: {}, splitDatesDesc: {} };
   }
@@ -72,8 +72,9 @@ export const getExerciseTrackingMapped = (exerciseTracking = []) => {
     splitDatesDesc[sn] = [...new Set(arr.map((r) => r.workoutdate))];
   }
 
-  return { byDate, byETSId, bySplitName, splitDatesDesc };
-};
+  return { byDate, byETSId, bySplitName };
+};*/
+
 export const getLastWorkoutForEachExercise = (
   date,
   byDate,
@@ -120,6 +121,7 @@ export const isSetPR = (etsId, weight, byETSid) => {
   return weight == Math.max(...allWeightsRecordForExercise);
 };
 
+// Format a date string (YYYY-MM-DD) into "Mon DD, YYYY"
 export const formatDate = (dateToFormat) => {
   const monthNames = [
     "Jan",
@@ -136,10 +138,26 @@ export const formatDate = (dateToFormat) => {
     "Dec",
   ];
 
-  const dateObj = new Date(dateToFormat);
-  const monthName = monthNames[dateObj.getMonth()];
-  const day = dateObj.getDate();
-  const year = dateObj.getFullYear();
+  let year, month, day;
 
+  // Handle both "YYYY-MM-DD" strings and Date objects
+  if (
+    typeof dateToFormat === "string" &&
+    /^\d{4}-\d{2}-\d{2}$/.test(dateToFormat)
+  ) {
+    // Parse manually to avoid timezone issues
+    [year, month, day] = dateToFormat
+      .split("-")
+      .map((part) => parseInt(part, 10));
+    // month is 1-based, convert to 0-based
+    month = month - 1;
+  } else {
+    const dateObj = new Date(dateToFormat);
+    year = dateObj.getFullYear();
+    month = dateObj.getMonth();
+    day = dateObj.getDate();
+  }
+
+  const monthName = monthNames[month];
   return `${monthName} ${day}, ${year}`;
 };
