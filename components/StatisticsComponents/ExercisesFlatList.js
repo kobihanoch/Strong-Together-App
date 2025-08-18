@@ -18,12 +18,13 @@ const ExercisesFlatList = ({ data, dataToCompare, byETSId }) => {
               item={item}
               dataToCompare={dataToCompare}
               byETSId={byETSId}
-            ></ExerciseCard>
+            />
           )}
           contentContainerStyle={{ padding: 10 }}
           initialNumToRender={4}
           windowSize={5}
           removeClippedSubviews
+          showsHorizontalScrollIndicator={false}
         />
       ) : (
         <Text
