@@ -28,7 +28,9 @@ export const useMyWorkoutPlanPageLogic = () => {
 
   // Gets preformed split count
   const splitTrainedCount = useMemo(() => {
-    return analyzedExerciseTrackingData.splitDaysByName[selectedSplit?.name];
+    return (
+      analyzedExerciseTrackingData.splitDaysByName[selectedSplit?.name] ?? 0
+    );
   }, [exerciseTracking, selectedSplit]);
 
   // Handling selection of split
