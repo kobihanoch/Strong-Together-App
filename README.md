@@ -22,23 +22,26 @@
 
 ---
 
-# Strong Together App – Frontend (v3.0.0)
+# Strong Together App – Frontend (v3.0.0)
 
-Welcome to the **Strong Together App** — a cross‑platform mobile
+Welcome to the **Strong Together App** — a cross-platform mobile
 application for planning, scheduling and tracking your workouts. The
 app lets athletes and trainers collaborate on custom workout plans,
-log exercise data, send messages and stay accountable. Version 3
+log exercise data, send messages and stay accountable. Version 3
 represents a major update: the monolithic Deno/Supabase setup has
 been split into two repositories (frontend and backend) and the
 backend has been rewritten in **pure Node.js + Express**. This
 transition allowed us to streamline API calls, implement database
-indexes and views, and achieve ~50 % faster UI flow through smart
+indexes and views, and achieve ~50 % faster UI flow through smart
 memoization (`useMemo`/`useCallback`) and context state management.
+
+👉 The Backend codebase is maintained in a dedicated repository here:  
+[`Strong-Together-Backend`](https://github.com/kobihanoch/Strong-Together-Backend)
 
 ## Table of Contents
 
 1. [Project Overview](#project-overview)
-2. [Screenshots](#screenshots)
+2. [Sreenshots](#screenshots)
 3. [Main Features](#main-features)
 4. [Architecture Overview](#architecture-overview)
 5. [Tech Stack](#tech-stack)
@@ -71,7 +74,7 @@ PostgreSQL database and synchronized with a backend API.
 
 Version 3 separated the client and server into two distinct
 repositories. While previous versions relied on Supabase client
-libraries and server‑side functions written in Deno, we I use a
+libraries and server‑side functions written in Deno, I now use a
 dedicated Node.js/Express API for authentication, CRUD operations, WebSockets connection for realtime features (messages). This change enables more flexible deployment
 options and made it easier to optimise queries with **indexes and
 SQL views**.
@@ -167,7 +170,7 @@ The project follows a **two‑tier architecture**:
   and tracking. It uses PostgreSQL as its primary datastore and
   defines indexes and views to speed up complex queries. Please
   refer to the backend repository for route documentation.
-  **`{BackendLink} for Backend API documentation.`**
+  **[`Backend repository`](https://github.com/kobihanoch/Strong-Together-Backend) for Backend API documentation.**
 
 > **Note:** When upgrading from version 2.x, be aware that all
 > Supabase client calls have been removed from the frontend. Instead,
@@ -195,7 +198,7 @@ The main technologies and libraries used in the frontend and backend include:
 
 - **Node.js** ≥ 16.x and **npm** ≥ 7.x
 - **Expo CLI** (`npm install -g expo-cli`) or React Native CLI
-- A local copy of the **backend repository** running on your
+- A local copy of the [`Backend repository`](https://github.com/kobihanoch/Strong-Together-Backend) running on your
   machine or accessible via network
 
 ### Steps
@@ -362,8 +365,8 @@ Important points about the schema:
   users can share progress and compete.
 - **Internationalisation** – expand language support beyond the
   current default and allow dynamic language switching.
-- **Scheduling** - schdueled workouts in next update.
-- **AI Integration** - for building workouts and analyze performence.
+- **Scheduling** - scheduled workouts in next update.
+- **AI Integration** - for building workouts and analyze performance.
 
 ## Contributing
 
