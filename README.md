@@ -26,13 +26,12 @@
 
 Welcome to the **Strong Together App** — a cross-platform mobile
 application for planning, scheduling and tracking your workouts. The
-app lets athletes and trainers collaborate on custom workout plans,
+app lets athletes custom their workout plans,
 log exercise data, send messages and stay accountable. Version 3
-represents a major update: the monolithic Deno/Supabase setup has
-been split into two repositories (frontend and backend) and the
+represents a major update: the monolithic Deno/Supabase setup has removed, and transformed to two repositories (frontend and backend) and the
 backend has been rewritten in **pure Node.js + Express**. This
-transition allowed us to streamline API calls, implement database
-indexes and views, and achieve ~50 % faster UI flow through smart
+transition allowed me to streamline API calls, implement database
+indexes and views, and achieve **~50 % faster** UI flow through smart
 memoization (`useMemo`/`useCallback`) and context state management.
 
 👉 The Backend codebase is maintained in a dedicated repository here:  
