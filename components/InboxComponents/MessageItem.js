@@ -1,13 +1,11 @@
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { Image } from "expo-image";
 import { useState } from "react";
 import { Dimensions, Modal, Text, TouchableOpacity, View } from "react-native";
-import { Image } from "expo-image";
 import { Swipeable } from "react-native-gesture-handler";
 import { RFValue } from "react-native-responsive-fontsize";
-import useInboxLogic from "../../hooks/logic/useInboxLogic";
-import { updateMsgReadStatus } from "../../services/MessagesService";
-import { formatDate } from "../../utils/statisticsUtils";
 import { useNotifications } from "../../context/NotificationsContext";
+import { formatDate } from "../../utils/statisticsUtils";
 
 const { width, height } = Dimensions.get("window");
 
