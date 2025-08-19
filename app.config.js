@@ -34,7 +34,7 @@ export default {
     web: {
       favicon: "./assets/favicon.png",
     },
-    plugins: ["expo-font"],
+    plugins: [["expo-notifications", { mode: "production" }], "expo-font"],
     extra: {
       eas: {
         projectId: "c2039946-58ec-44b1-beb0-cb0a69f01873",
