@@ -38,25 +38,24 @@ memoization (`useMemo`/`useCallback`) and context state management.
 ## Table of Contents
 
 1. [Project Overview](#project-overview)
-2. [Sreenshots](#screenshots)
+2. [Screenshots](#screenshots)
 3. [Main Features](#main-features)
 4. [Architecture Overview](#architecture-overview)
 5. [Tech Stack](#tech-stack)
 6. [Installation & Setup](#installation--setup)
 7. [Environment Variables](#environment-variables)
 8. [Running the App Locally](#running-the-app-locally)
-9. [Available Scripts](#available-scripts)
-10. [Database Schema](#database-schema)
-11. [Application Flows](#application-flows)
+9. [Database Schema](#database-schema)
+10. [Application Flows](#application-flows)
     - [Workout Flow](#workout-flow)
     - [Tracking Flow](#tracking-flow)
     - [Messages Flow](#messages-flow)
     - [Auth Flow](#auth-flow)
-12. [Testing](#testing)
-13. [Deployment](#deployment)
-14. [Roadmap & Future Improvements](#roadmap--future-improvements)
-15. [Contributing](#contributing)
-16. [License](#license)
+11. [Testing](#testing)
+12. [Deployment](#deployment)
+13. [Roadmap & Future Improvements](#roadmap--future-improvements)
+14. [Contributing](#contributing)
+15. [License](#license)
 
 ---
 
@@ -82,7 +81,7 @@ SQL views**.
 ### App Previews
 
 <div align="center">
-  <img src="assets/sshome.png" alt="Home Screen" width="200" style="margin-right: 20px;"/>
+  <img src="https://github.com/user-attachments/assets/b51b3dff-1732-4c59-9d1a-7ffbe5fd6362" alt="Home Screen" width="200" style="margin-right: 20px;"/>
   <img src="assets/ssintroduction.png" alt="Intro Screen" width="200"/>
 </div>
 <p align="center">
@@ -91,18 +90,25 @@ SQL views**.
   <strong>Intro Screen</strong>: Onboarding walkthrough.
 </p>
 
+<div align="center">
+  <img src="https://github.com/user-attachments/assets/8ccbbf43-3544-4738-8a20-7dbb989b1e89" alt="Edit reps" width="200"/>
+  <img src="https://github.com/user-attachments/assets/387ec46b-7976-46aa-b420-07ad2a88abdc" alt="Change exercise order" width="200"/>
+  <img src="https://github.com/user-attachments/assets/83d38cf0-f289-4bf6-a63f-438bed8bcaf2" alt="Add split" width="200"/>
+</div>
+<p align="center">
+  <strong>Create/Modify</strong>: Edit your workout plan as how much you want.
+</p>
 
 <div align="center">
-  <img src="assets/ssmyplan.png" alt="Watch the Program Plan" width="200"/>
+  <img src="https://github.com/user-attachments/assets/67f394e9-aea6-4a9e-b286-aab83230de6b" alt="Watch the Program Plan" width="200"/>
 </div>
 <p align="center">
   <strong>Watch the Program Plan</strong>: View and manage workout plans.
 </p>
 
-
 <div align="center">
-  <img src="assets/sss.PNG" alt="After Workout Statistics" width="200" style="margin-right: 20px;"/>
-  <img src="assets/sssw.PNG" alt="Active Workout" width="200"/>
+  <img src="https://github.com/user-attachments/assets/6248cf62-7ed0-439a-a6fb-d77d305ca0db" alt="After Workout Statistics" width="200" style="margin-right: 20px;"/>
+  <img src="https://github.com/user-attachments/assets/a03f4a65-4db6-4f96-b465-9526573ddcbd" alt="Active Workout" width="200"/>
 </div>
 <p align="center">
   <strong>After Workout Statistics</strong>: Summarized session results.  
@@ -110,17 +116,12 @@ SQL views**.
   <strong>Active Workout</strong>: Real-time tracking of sets, reps, and weights.
 </p>
 
-
 <div align="center">
-  <img src="assets/ssinbox.png" alt="Inbox" width="200" style="margin-right: 20px;"/>
-  <img src="assets/ssmessagemodal.png" alt="Message Modal" width="200"/>
+  <img src="https://github.com/user-attachments/assets/b8364732-6a74-49b3-a881-6fbff174ce91" alt="Message Modal" width="200"/>
 </div>
 <p align="center">
-  <strong>Inbox</strong>: View and manage messages.  
-  <br>
   <strong>Message Modal</strong>: Compose or view messages.
 </p>
-
 
 ## Main Features
 
@@ -149,8 +150,8 @@ The project follows a **two‑tier architecture**:
 
 ```
 ┌───────────────────────────┐     HTTPS        ┌─────────────────────────┐
-│    React Native Client    │ ───────────────> │ Node.js/Express Server  │
-│  (Strong Together App v3) │   API Requests   │    (Backend Repo)       │
+│    React Native Client    │ ───────────────> │  Node.js/Express Server │
+│ (Strong Together App v3)  │   API Requests   │      (Backend Repo)     │
 └───────────────────────────┘                  └─────────────────────────┘
 ```
 
@@ -177,17 +178,16 @@ The project follows a **two‑tier architecture**:
 
 The main technologies and libraries used in the frontend and backend include:
 
-| Layer                | Technology                                          |
-| -------------------- | --------------------------------------------------- |
+| Layer                | Technology                                            |
+| -------------------- | ----------------------------------------------------- |
 | **Framework**        | [`React Native`](https://reactnative.dev/) (Expo/CLI) |
-| **State management** | React Context + hooks (`useState`, `useReducer`)    |
+| **State management** | React Context + hooks (`useState`, `useReducer`)      |
 | **Navigation**       | [`React Navigation`](https://reactnavigation.org/)    |
-| **HTTP client**      | [`axios`](https://axios-http.com/)                  |
-| **Backend API**      | Node.js + Express (separate repository)             |
-| **Cache**            | Redis cache                                         |
-| **Deploying**        | Docker + Render                                     |
-| **Database**         | Supabase PostgreSQL with indexes & views            |
-
+| **HTTP client**      | [`axios`](https://axios-http.com/)                    |
+| **Backend API**      | Node.js + Express (separate repository)               |
+| **Cache**            | Redis cache                                           |
+| **Deploying**        | Docker + Render                                       |
+| **Database**         | Supabase PostgreSQL with indexes & views              |
 
 ## Installation & Setup
 
@@ -240,9 +240,10 @@ The application uses environment variables (loaded via
 behaviour. Create a `.env` file in the project root with the
 following keys:
 
-| Variable  | Description                                                    |
-| --------- | -------------------------------------------------------------- |
-| `API_URL` | Base URL of the Express backend (e.g. `http://localhost:5000`) |
+| Variable                   | Description                                                    |
+| -------------------------- | -------------------------------------------------------------- |
+| `EXPO_PUBLIC_API_URL`      | Base URL of the Express backend (e.g. `http://localhost:5000`) |
+| `EXPO_PUBLIC_SUPABASE_URL` | Supabase bucket url for media                                  |
 
 You can add additional variables as needed by your backend (such
 as analytics keys, feature flags, etc.). See `.env.example` for
@@ -266,7 +267,7 @@ defines tables for users, messages, workout plans, splits, exercises
 and tracking logs. The simplified ER diagram below shows how the
 entities relate to each other:
 
-![Database schema overview](assets/DB.png)
+![Database schema overview](https://github.com/user-attachments/assets/797d6621-b5b2-4959-87e8-40319b720c1a)
 
 Important points about the schema:
 
@@ -295,7 +296,7 @@ Important points about the schema:
 
 ### Workout Flow
 
-![Database workout flow](assets/workout.png)
+![Database workout flow](https://github.com/user-attachments/assets/e61c060e-222e-43b8-9819-aedf67963e15)
 
 1. **Create a Plan** – A user (or trainer) starts by creating a
    `WorkoutPlan` with a name and difficulty level. This inserts a
@@ -312,7 +313,7 @@ Important points about the schema:
 
 ### Tracking Flow
 
-![Database workout tracking flow](assets/tracking.png)
+![Database workout tracking flow](https://github.com/user-attachments/assets/9ffa26e2-d762-465e-bbbd-28460373e0a7)
 
 1. **Select a split** – On the day of training, the user
    opens a split and sees the list of exercises in order.
@@ -328,7 +329,7 @@ Important points about the schema:
 
 ### Messages Flow
 
-![Database workout tracking flow](assets/messages.png)
+![Database workout tracking flow](https://github.com/user-attachments/assets/d0e6754a-9123-4443-9fe5-eaecca6885a8)
 
 1. **Compose Message** – System messages after a workout.
    Each message includes a `subject` and `msg` body. When a message
@@ -343,12 +344,12 @@ Important points about the schema:
 
 ### Auth Flow
 
-![Database authentication flow](assets/auth.png)
+![Database authentication flow](https://github.com/user-attachments/assets/1516ac04-941f-4792-a4c9-31036a1d9de2)
 
-1. **Login & Token Issuance** – On successful login, the server issues an `access_token` (short-lived) and a `refresh_token` (long-lived).  
-2. **Access Control** – Each API request requires a valid `access_token`. If the token is missing, expired, or invalid, the request is denied.  
-3. **Token Refresh** – When the `access_token` expires, the client uses the `refresh_token` to obtain a new pair of tokens without re-logging in.  
-4. **Blacklisting** – On logout or suspected compromise, the `refresh_token` (and optionally the `access_token`) is stored in the `blacklistedtokens` table. Any attempt to reuse blacklisted tokens is rejected.  
+1. **Login & Token Issuance** – On successful login, the server issues an `access_token` (short-lived) and a `refresh_token` (long-lived).
+2. **Access Control** – Each API request requires a valid `access_token`. If the token is missing, expired, or invalid, the request is denied.
+3. **Token Refresh** – When the `access_token` expires, the client uses the `refresh_token` to obtain a new pair of tokens without re-logging in.
+4. **Blacklisting** – On logout or suspected compromise, the `refresh_token` (and optionally the `access_token`) is stored in the `blacklistedtokens` table. Any attempt to reuse blacklisted tokens is rejected.
 
 ## Roadmap & Future Improvements
 
@@ -382,4 +383,3 @@ Thank you for checking out the Strong Together App! We hope this
 updated README helps you get started quickly, understand the
 underlying architecture and contribute effectively. Feel free to
 open an issue if something is unclear or missing.
-
