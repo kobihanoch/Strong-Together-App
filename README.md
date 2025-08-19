@@ -1,6 +1,4 @@
-# 🌟 Strong Together 🌟
-
-**Your Ultimate Gym Tracking Companion**
+# Strong Together App – Frontend (v3.0.0)
 
 ---
 
@@ -12,17 +10,11 @@
   <img src="https://img.shields.io/badge/Status-In%20Progress-yellow" alt="Status In Progress" />
   <img src="https://img.shields.io/badge/Type-Side%20Project-lightgrey" alt="Side Project" />
 
-## </div>
+</div>
 
 <p align="center">
   <img src="assets/icon.png" alt="Strong-Together-App Icon" width="150" />
 </p>
-
-**Strong-Together-App** is the ultimate fitness companion designed to help users achieve their health and fitness goals. From personalized workout plans to real-time progress tracking, this app makes fitness accessible, engaging, and rewarding.
-
----
-
-# Strong Together App – Frontend (v3.0.0)
 
 Welcome to the **Strong Together App** — a cross-platform mobile
 application for planning, scheduling and tracking your workouts. The
