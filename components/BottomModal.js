@@ -1,22 +1,20 @@
 import React, { useEffect, useState } from "react";
 import {
-  View,
-  Text,
-  Modal,
-  TouchableOpacity,
   Animated,
   Dimensions,
+  Modal,
   StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
-import useLastWorkoutExerciseTrackingData from "../hooks/useLastWorkoutExerciseTrackingData";
 import { RFValue } from "react-native-responsive-fontsize";
 
 const { height } = Dimensions.get("window");
 
-const BottomModal = ({ isVisible, onClose, exerciseId, setIndex }) => {
+const BottomModal = ({ isVisible, onClose, lastWorkoutData, setIndex }) => {
   const [visible, setVisible] = useState(false);
   const [slideAnim] = useState(new Animated.Value(height));
-  const { lastWorkoutData } = useLastWorkoutExerciseTrackingData(exerciseId);
 
   useEffect(() => {
     if (isVisible) {
@@ -61,19 +59,19 @@ const BottomModal = ({ isVisible, onClose, exerciseId, setIndex }) => {
             <View style={styles.infoRow}>
               <Text style={styles.label}>Weight</Text>
               <Text style={styles.value}>
-                {displayValue(lastWorkoutData.weight?.[setIndex])} kg
+                {displayValue(lastWorkoutData?.weight?.[setIndex])} kg
               </Text>
             </View>
             <View style={styles.infoRow}>
               <Text style={styles.label}>Reps</Text>
               <Text style={styles.value}>
-                {displayValue(lastWorkoutData.reps?.[setIndex])}
+                {displayValue(lastWorkoutData?.reps?.[setIndex])}
               </Text>
             </View>
             <View style={styles.infoRow}>
               <Text style={styles.label}>Date</Text>
               <Text style={styles.value}>
-                {new Date(lastWorkoutData.workoutdate).toLocaleDateString()}
+                {new Date(lastWorkoutData?.workoutdate).toLocaleDateString()}
               </Text>
             </View>
           </View>

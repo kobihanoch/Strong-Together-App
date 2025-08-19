@@ -10,6 +10,7 @@ import { useAuth } from "./AuthContext";
 import { getUserExerciseTracking } from "../services/WorkoutService";
 import { unpackFromExerciseTrackingData } from "../utils/authUtils";
 import { useGlobalAppLoadingContext } from "./GlobalAppLoadingContext";
+import { getExerciseTrackingMapped } from "../utils/statisticsUtils";
 
 const AnalysisContext = createContext(null);
 export const useAnalysisContext = () => {
@@ -40,7 +41,8 @@ export const AnalysisProvider = ({ children }) => {
   const { user, sessionLoading } = useAuth();
 
   // Raw and derived analysis state
-  const [exerciseTracking, setExerciseTracking] = useState(null);
+  const [exerciseTrackingMaps, setExerciseTrackingMaps] = useState(null);
+
   const [analyzedExerciseTrackingData, setAnalyzedExerciseTrackingData] =
     useState(null);
   const [hasTrainedToday, setHasTrainedToday] = useState(false);
@@ -54,9 +56,13 @@ export const AnalysisProvider = ({ children }) => {
       if (user) {
         try {
           setLoading(true);
-          const res = await getUserExerciseTracking();
-          setExerciseTracking(res?.exercisetracking ?? []);
-          setAnalyzedExerciseTrackingData(unpackFromExerciseTrackingData(res));
+          const { exerciseTrackingAnalysis, exerciseTrackingMaps } =
+            await getUserExerciseTracking();
+
+          setExerciseTrackingMaps(exerciseTrackingMaps ?? []);
+          setAnalyzedExerciseTrackingData(
+            unpackFromExerciseTrackingData(exerciseTrackingAnalysis)
+          );
           setHasTrainedToday(!!res?.hasTrainedToday);
         } finally {
           setLoading(false);
@@ -73,7 +79,6 @@ export const AnalysisProvider = ({ children }) => {
   }, [loading, setGlobalLoading]);
 
   const logoutCleanup = useCallback(() => {
-    setExerciseTracking(null);
     setAnalyzedExerciseTrackingData(null);
     setHasTrainedToday(false);
     setLoading(false);
@@ -83,15 +88,20 @@ export const AnalysisProvider = ({ children }) => {
   // Memoized context value
   const value = useMemo(
     () => ({
-      exerciseTracking,
-      setExerciseTracking,
+      exerciseTrackingMaps,
+      setExerciseTrackingMaps,
       analyzedExerciseTrackingData,
       setAnalyzedExerciseTrackingData,
       hasTrainedToday,
       setHasTrainedToday,
       loading,
     }),
-    [exerciseTracking, analyzedExerciseTrackingData, hasTrainedToday, loading]
+    [
+      exerciseTrackingMaps,
+      analyzedExerciseTrackingData,
+      hasTrainedToday,
+      loading,
+    ]
   );
 
   return (

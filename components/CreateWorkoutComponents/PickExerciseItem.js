@@ -1,5 +1,3 @@
-// English comments only inside code
-
 import React, {
   useMemo,
   useState,
@@ -30,7 +28,7 @@ import { useCreateWorkout } from "../../context/CreateWorkoutContext";
 
 const { width, height } = Dimensions.get("window");
 const HANDLE_W = Math.max(16, width * 0.06);
-const CARD_H = height * 0.16;
+const CARD_H = height * 0.12;
 const MENU_BTN = Math.max(34, width * 0.09);
 
 const PickExerciseItem = ({ exercise, dragHandleProps }) => {
@@ -435,7 +433,8 @@ const styles = StyleSheet.create({
     marginLeft: width * 0.04,
     marginRight: width * 0.02,
     borderRadius: width * 0.02,
-    backgroundColor: "rgba(0,0,0,0.04)",
+    backgroundColor: "#ecececff",
+    opacity: 0.8,
     alignItems: "center",
     justifyContent: "center",
     flexDirection: "row",
@@ -449,7 +448,7 @@ const styles = StyleSheet.create({
     width: 4,
     height: 4,
     borderRadius: 2,
-    backgroundColor: "rgba(0,0,0,0.35)",
+    backgroundColor: "#afafafff",
   },
 
   imageContainer: {

@@ -1,5 +1,3 @@
-// English comments only inside code
-
 import React, { useCallback, useMemo } from "react";
 import { Text, View } from "react-native";
 import DraggableFlatList, {

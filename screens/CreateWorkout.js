@@ -1,5 +1,3 @@
-// English comments only inside code
-
 import React, { useCallback, useMemo, useState } from "react";
 import { Dimensions, View } from "react-native";
 import {

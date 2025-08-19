@@ -1,23 +1,19 @@
 import moment from "moment";
 import { useMemo, useState } from "react";
 import { useAnalysisContext } from "../../context/AnalysisContext";
-import {
-  getExerciseTrackingMapped,
-  getLastWorkoutForEachExercise,
-} from "../../utils/statisticsUtils";
+import { getLastWorkoutForEachExercise } from "../../utils/statisticsUtils";
 
 const useStatisticsPageLogic = () => {
-  const { exerciseTracking } = useAnalysisContext();
+  const { exerciseTrackingMaps } = useAnalysisContext();
 
   // Map with date keys: Date, ETSId, splitName
   const {
     byDate: exerciseTrackingWithDateKey,
     byETSId: exerciseTrackingWithETSIdKey,
     bySplitName: exerciseTrackingWithSplitNameKey,
-    splitDatesDesc,
-  } = useMemo(() => {
-    return getExerciseTrackingMapped(exerciseTracking);
-  }, [exerciseTracking]);
+  } = exerciseTrackingMaps;
+
+  console.log(selectedDate);
 
   // Start as today's date
   const [selectedDate, setSelectedDate] = useState(
@@ -40,8 +36,7 @@ const useStatisticsPageLogic = () => {
       formattedDate,
       exerciseTrackingWithDateKey,
       exerciseTrackingWithSplitNameKey,
-      exerciseTrackingWithETSIdKey,
-      splitDatesDesc
+      exerciseTrackingWithETSIdKey
     );
   }, [
     formattedDate,
@@ -53,11 +48,10 @@ const useStatisticsPageLogic = () => {
   return {
     selectedDate,
     setSelectedDate,
-    exerciseTracking,
     exerciseTrackingByDate,
     exerciseTrackingByDatePrev,
+    exerciseTrackingWithDateKey,
     exerciseTrackingWithETSIdKey,
-    splitDatesDesc,
   };
 };
 

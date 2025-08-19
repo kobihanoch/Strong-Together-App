@@ -10,8 +10,8 @@ export const useUserWorkout = () => {
     try {
       const data = await saveWorkoutData(workoutData);
       return {
-        exerciseTracking: data.exercisetracking,
-        analysis: unpackFromExerciseTrackingData(data),
+        exerciseTrackingMaps: data.exerciseTrackingMaps,
+        analysis: unpackFromExerciseTrackingData(data.exerciseTrackingAnalysis),
       };
     } catch (err) {
       console.error(err);

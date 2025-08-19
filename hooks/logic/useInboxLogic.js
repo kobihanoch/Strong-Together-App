@@ -1,8 +1,7 @@
+import { Dialog } from "react-native-alert-notification";
 import { useAuth } from "../../context/AuthContext";
 import { useNotifications } from "../../context/NotificationsContext";
-import { Alert } from "react-native";
 import { deleteMessage } from "../../services/MessagesService";
-import { Dialog } from "react-native-alert-notification";
 
 const useInboxLogic = () => {
   const { user } = useAuth();
@@ -10,7 +9,6 @@ const useInboxLogic = () => {
     allReceivedMessages,
     setAllReceivedMessages,
     unreadMessages,
-    setUnreadMessages,
     loadingMessages,
     profileImagesCache,
     allSendersUsersArr,
@@ -31,7 +29,6 @@ const useInboxLogic = () => {
         try {
           await deleteMessage(msgId);
           setAllReceivedMessages((prev) => prev.filter((m) => m.id !== msgId));
-          setUnreadMessages((prev) => prev.filter((m) => m.id !== msgId));
         } catch (err) {
           console.log("Delete failed:", err);
         }
@@ -47,7 +44,6 @@ const useInboxLogic = () => {
     messages: {
       allReceivedMessages,
       unreadMessages,
-      setUnreadMessages,
       loadingMessages,
       allSendersUsersArr,
       confirmAndDeleteMessage,

@@ -1,6 +1,4 @@
 // App.js
-// English comments only inside code
-
 import {
   NavigationContainer,
   useNavigationContainerRef,

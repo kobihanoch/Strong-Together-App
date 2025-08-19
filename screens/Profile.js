@@ -9,7 +9,7 @@ const { width, height } = Dimensions.get("window");
 
 function Profile({ navigation }) {
   const { user } = useAuth();
-  const { data, mediaLoading, setMediaLoading } = useProfilePageLogic(user);
+  const { data, mediaLoading, setMediaLoading } = useProfilePageLogic();
 
   return (
     <View
