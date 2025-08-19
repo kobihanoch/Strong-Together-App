@@ -89,6 +89,7 @@ export const AnalysisProvider = ({ children }) => {
   const value = useMemo(
     () => ({
       exerciseTrackingMaps,
+      setExerciseTrackingMaps,
       analyzedExerciseTrackingData,
       setAnalyzedExerciseTrackingData,
       hasTrainedToday,
