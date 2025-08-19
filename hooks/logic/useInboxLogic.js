@@ -9,7 +9,6 @@ const useInboxLogic = () => {
     allReceivedMessages,
     setAllReceivedMessages,
     unreadMessages,
-    setUnreadMessages,
     loadingMessages,
     profileImagesCache,
     allSendersUsersArr,
@@ -30,7 +29,6 @@ const useInboxLogic = () => {
         try {
           await deleteMessage(msgId);
           setAllReceivedMessages((prev) => prev.filter((m) => m.id !== msgId));
-          setUnreadMessages((prev) => prev.filter((m) => m.id !== msgId));
         } catch (err) {
           console.log("Delete failed:", err);
         }
@@ -46,7 +44,6 @@ const useInboxLogic = () => {
     messages: {
       allReceivedMessages,
       unreadMessages,
-      setUnreadMessages,
       loadingMessages,
       allSendersUsersArr,
       confirmAndDeleteMessage,
