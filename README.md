@@ -6,8 +6,8 @@
 
 <div align="center">
 
-  <img src="https://img.shields.io/badge/Version-2.12.0-blue" alt="Version 2.12.0" />
-  <img src="https://img.shields.io/badge/Technologies-React%20Native%2C%20JavaScript%2C%20Expo%20Go%2C%20Supabase-green" alt="Technologies" />
+  <img src="https://img.shields.io/badge/Version-3.0.0-blue" alt="Version 3.0.0" />
+  <img src="https://img.shields.io/badge/Technologies-React%20Native%2C%20JavaScript%2C%20Expo%20Go-green" alt="Technologies" />
   <img src="https://img.shields.io/badge/License-Personal%20Use-orange" alt="Personal Use License" />
   <img src="https://img.shields.io/badge/Status-In%20Progress-yellow" alt="Status In Progress" />
   <img src="https://img.shields.io/badge/Type-Side%20Project-lightgrey" alt="Side Project" />
@@ -22,57 +22,64 @@
 
 ---
 
-## 🏋️ About Strong-Together-App
+# Strong Together App – Frontend (v3.0.0)
 
-The aim of **Strong-Together-App** is to create a seamless fitness platform that combines innovative technology and fitness best practices to:
+Welcome to the **Strong Together App** — a cross‑platform mobile
+application for planning, scheduling and tracking your workouts. The
+app lets athletes and trainers collaborate on custom workout plans,
+log exercise data, send messages and stay accountable. Version 3
+represents a major update: the monolithic Deno/Supabase setup has
+been split into two repositories (frontend and backend) and the
+backend has been rewritten in **pure Node.js + Express**. This
+transition allowed us to streamline API calls, implement database
+indexes and views, and achieve ~50 % faster UI flow through smart
+memoization (`useMemo`/`useCallback`) and context state management.
 
-- **Simplify Workouts**: Provide users with personalized and manageable workout plans.
-- **Track Progress**: Monitor user achievements to keep them motivated.
-- **Foster Engagement**: Offer in-app tools like notifications and future community options to maintain consistent engagement.
-- **Leverage Technology**: Utilize tools like Supabase for real-time data management and React Native for a seamless cross-platform experience.
+## Table of Contents
 
----
-
-## 🎯 Key Highlights
-
-### 🚀 Core Features
-
-- **Personalized Fitness Plans**: Tailor-made workout plans for every fitness level.
-- **Progress Tracking**: Track your exercises, weights, and reps in real time.
-- **Push Notifications**: Get reminders and alerts to stay consistent.
-- **User-Friendly Interface**: Intuitive and simple design for seamless navigation.
-
-### 💡 Planned Features
-
-- **Community Support**: Create groups, share progress, and participate in challenges.
-- **Trainer Mode**: Enable trainers to manage clients with ease.
-- **Advanced Analytics**: Gain insights into your fitness journey with detailed reports.
-
----
-
-## 🛠️ Tech Stack
-
-#### Frontend
-
-- ⚛️ **React Native**: Cross-platform mobile app development.  
-  <img src="https://img.icons8.com/color/48/react-native.png" alt="React Icon" width="50"/>
-
-- 📦 **Expo**: Simplified development and testing.  
-  <img src="https://img.icons8.com/ios-filled/50/000000/expo.png" alt="Expo Icon" width="50"/>
-
-#### Backend
-
-- 🧱 **Supabase**: Real-time database, authentication, and hosting.
-- **PostgreSQL**: Relational database for structured data storage.  
-  <img src="https://img.icons8.com/color/48/javascript.png" alt="JavaScript Icon" width="50"/>
+1. [Project Overview](#project-overview)
+2. [Sreenshots](#screenshots)
+3. [Main Features](#main-features)
+4. [Architecture Overview](#architecture-overview)
+5. [Tech Stack](#tech-stack)
+6. [Installation & Setup](#installation--setup)
+7. [Environment Variables](#environment-variables)
+8. [Running the App Locally](#running-the-app-locally)
+9. [Available Scripts](#available-scripts)
+10. [Database Schema](#database-schema)
+11. [Application Flows](#application-flows)
+    - [Workout Flow](#workout-flow)
+    - [Tracking Flow](#tracking-flow)
+    - [Messages Flow](#messages-flow)
+    - [Auth Flow](#auth-flow)
+12. [Testing](#testing)
+13. [Deployment](#deployment)
+14. [Roadmap & Future Improvements](#roadmap--future-improvements)
+15. [Contributing](#contributing)
+16. [License](#license)
 
 ---
 
-## 📸 Screenshots
+## Project Overview
+
+The Strong Together App helps users build healthier habits by
+combining **workout planning**, **exercise tracking** and **social
+accountability**. Users can create custom workout plans with splits
+and exercises, schedule workouts on specific days of the week,
+receive notifications before a session and log each set’s weight and
+repetitions. All data is stored in a
+PostgreSQL database and synchronized with a backend API.
+
+Version 3 separated the client and server into two distinct
+repositories. While previous versions relied on Supabase client
+libraries and server‑side functions written in Deno, we I use a
+dedicated Node.js/Express API for authentication, CRUD operations, WebSockets connection for realtime features (messages). This change enables more flexible deployment
+options and made it easier to optimise queries with **indexes and
+SQL views**.
+
+## Screenshots
 
 ### App Previews
-
----
 
 <div align="center">
   <img src="assets/sshome.png" alt="Home Screen" width="200" style="margin-right: 20px;"/>
@@ -84,7 +91,6 @@ The aim of **Strong-Together-App** is to create a seamless fitness platform that
   <strong>Intro Screen</strong>: Onboarding walkthrough.
 </p>
 
----
 
 <div align="center">
   <img src="assets/ssmyplan.png" alt="Watch the Program Plan" width="200"/>
@@ -93,7 +99,6 @@ The aim of **Strong-Together-App** is to create a seamless fitness platform that
   <strong>Watch the Program Plan</strong>: View and manage workout plans.
 </p>
 
----
 
 <div align="center">
   <img src="assets/sss.PNG" alt="After Workout Statistics" width="200" style="margin-right: 20px;"/>
@@ -105,7 +110,6 @@ The aim of **Strong-Together-App** is to create a seamless fitness platform that
   <strong>Active Workout</strong>: Real-time tracking of sets, reps, and weights.
 </p>
 
----
 
 <div align="center">
   <img src="assets/ssinbox.png" alt="Inbox" width="200" style="margin-right: 20px;"/>
@@ -117,240 +121,265 @@ The aim of **Strong-Together-App** is to create a seamless fitness platform that
   <strong>Message Modal</strong>: Compose or view messages.
 </p>
 
----
 
-## 🗄️ Database Schema
+## Main Features
 
-The database has been divided into three main flows for clarity: **Workout Flow**, **Messages Flow**, and **Tracking Flow**. Each section provides an explanation and visual representation of the database relationships for its respective flow.
+- **Custom workout plans** – Create workout plans containing
+  configurable splits (e.g. push/pull/legs) and assign exercises to
+  each split. Each user can design their own routines. (AI integration in next update).
+- **Notifications** – Get a daily push notification
+- **Exercise tracking** – Log sets, repetitions and weight for each
+  exercise. Tracking records are stored with a reference to the
+  underlying split so you can review progress over time.
+- **In‑app messaging** – Receive system messages at first login and after each successful workout.
+- **Authentication & roles** – Sign up and log in securely, used access and refresh tokens. User
+  accounts include profile information and optional push tokens for notifications.
+- **Smart performance** – Heavy screens use `useMemo`,
+  `useCallback` and context providers to avoid unnecessary re‑renders.
+  Combined with batched API calls, these optimisations cut perceived
+  navigation latency by **roughly 50 % compared with previous versions.**
+- **Modular backend** – All network communication goes through a
+  RESTful API implemented in a separate repository using Node.js and
+  Express. This decoupling simplifies versioning and makes it easy to
+  swap backend implementations without touching the client.
 
----
+## Architecture Overview
 
-## 🧠 Edge Functions, Security, and Deno
+The project follows a **two‑tier architecture**:
 
-To ensure sensitive operations are handled securely and efficiently, **Strong-Together** leverages **Supabase Edge Functions**, powered by **Deno**, a modern runtime for JavaScript and TypeScript. This combination enhances both **security**, **scalability**, and **developer productivity**. Additionally, all database tables are protected using **Row Level Security (RLS)**, **Edge Functions**, or **RPC Functions**, ensuring end-to-end security and controlled data access.
+```
+┌───────────────────────────┐     HTTPS        ┌─────────────────────────┐
+│    React Native Client    │ ───────────────> │ Node.js/Express Server  │
+│  (Strong Together App v3) │   API Requests   │    (Backend Repo)       │
+└───────────────────────────┘                  └─────────────────────────┘
+```
 
----
+- **Frontend** (this repository) – built with React Native and
+  supporting both iOS and Android. (Currently shared at TestFlight, soon at AppStore and Google Play). State is managed via React
+  context and hooks, screens are organised under a specific folder
+  and navigation is handled by React Navigation. The app interacts
+  with the backend through a thin API client (e.g. using
+  `axios`).
 
-### 🔐 **Why Use Edge Functions with Deno?**
+- **Backend** – a separate Node.js/Express server that exposes
+  authenticated endpoints for users, workouts, exercises, messages
+  and tracking. It uses PostgreSQL as its primary datastore and
+  defines indexes and views to speed up complex queries. Please
+  refer to the backend repository for route documentation.
+  **`{BackendLink} for Backend API documentation.`**
 
-- **Prevent Data Leaks**: Sensitive logic, like authentication or user profile operations, is moved to the backend, away from the client.
-- **Secure by Default**: Deno's secure runtime provides built-in protections, such as strict permissions for file access, network calls, and environment variables.
-- **Elevated Privileges**: Supabase Edge Functions use `SUPABASE_SERVICE_ROLE_KEY` to perform privileged operations that regular users cannot.
-- **Seamless TypeScript Support**: Deno natively supports TypeScript, making development faster and easier for modern JavaScript developers.
-- **Enhanced Table Protection**: Every database table is safeguarded with RLS policies or accessed through controlled Edge or RPC Functions.
+> **Note:** When upgrading from version 2.x, be aware that all
+> Supabase client calls have been removed from the frontend. Instead,
+> configure the `API_URL` environment variable to point at your
+> running Express server.
 
----
+## Tech Stack
 
-### 🛠️ **How Deno and Edge Functions Add Value**
+The main technologies and libraries used in the frontend and backend include:
 
-| **Feature**                     | **Benefit**                                                                   |
-| ------------------------------- | ----------------------------------------------------------------------------- |
-| 🔒 **Secure Authentication**    | Handles login, token management, and sensitive data retrieval securely.       |
-| 🚀 **Deno-Powered Performance** | Fast and lightweight execution of backend logic with modern tooling.          |
-| 🌐 **Expandable Architecture**  | Prepares the app for future integrations like AI-driven workouts or trainers. |
-| 🛡️ **Strong Data Protection**   | Combines RLS, Edge Functions, and RPC Functions to enforce strict access.     |
+| Layer                | Technology                                          |
+| -------------------- | --------------------------------------------------- |
+| **Framework**        | [`React Native`](https://reactnative.dev/) (Expo/CLI) |
+| **State management** | React Context + hooks (`useState`, `useReducer`)    |
+| **Navigation**       | [`React Navigation`](https://reactnavigation.org/)    |
+| **HTTP client**      | [`axios`](https://axios-http.com/)                  |
+| **Backend API**      | Node.js + Express (separate repository)             |
+| **Cache**            | Redis cache                                         |
+| **Deploying**        | Docker + Render                                     |
+| **Database**         | Supabase PostgreSQL with indexes & views            |
 
----
 
-### 🧩 **Examples of Edge Function Use Cases**
+## Installation & Setup
 
-While exact implementations aren’t disclosed for security reasons, here are some examples of what **Deno-powered Edge Functions** enable:
+### Prerequisites
 
-- **User Management**: Securely manage authentication, registration, and session persistence.
-- **Workout Operations**: Handle workout tracking and plan updates without exposing the logic to the client.
-- **Sensitive Data Retrieval**: Fetch information (e.g., user statistics, workout history) safely via server-side logic.
-- **Controlled Access**: Ensure that all database interactions respect RLS policies or are routed through secure RPC Functions.
-- **Advanced Features**: Enable real-time syncing and AI-assisted workflows with server-side logic.
+- **Node.js** ≥ 16.x and **npm** ≥ 7.x
+- **Expo CLI** (`npm install -g expo-cli`) or React Native CLI
+- A local copy of the **backend repository** running on your
+  machine or accessible via network
 
----
+### Steps
 
-### ✅ **Benefits of Backend Delegation**
+1. **Clone the repository**:
 
-- **Cleaner Code**: Client-side logic is simpler and safer, focusing only on UI and basic workflows.
-- **Stronger Security**: Sensitive operations are isolated on the backend, minimizing attack vectors.
-- **Future-Proof**: Adding more advanced features becomes easier without compromising security.
-
-> With the combination of RLS, Edge Functions, and RPC Functions, **Strong-Together** ensures a robust and secure backend that scales with your needs.
-
-> As the project evolves, more edge functions will be added to support new features and improve existing workflows.
-
----
-
-### 1️⃣ **Workout Flow**
-
-The **Workout Flow** is responsible for managing users, workout plans, workout splits, and exercises. It outlines how workout plans are created, divided into splits, and associated with specific exercises.
-
-<p align="center">
-  <img src="assets/workout.png" alt="Workout Flow Diagram" width="800" />
-</p>
-
-#### Key Tables:
-
-- **Users**:
-  - Stores user information such as ID, name, email, and profile image.
-- **Workout Plans**:
-  - Created by users or trainers and includes attributes like workout level, number of splits, and name.
-- **Workout Splits**:
-  - Represents divisions of a workout plan, targeting specific muscle groups.
-- **Exercises**:
-  - Contains information about individual exercises, including target muscles and descriptions.
-- **Exercise to Workout Splits**:
-  - Links exercises to specific workout splits, specifying the number of sets.
-
----
-
-### 2️⃣ **Tracking Flow**
-
-The **Tracking Flow** manages the tracking of exercises completed by users during specific workouts. It also handles scheduling workouts with notifications.
-
-<p align="center">
-  <img src="assets/tracking.png" alt="Tracking Flow Diagram" width="800" />
-</p>
-
-#### Key Tables:
-
-- **Users**:
-  - Tracks the progress of each user.
-- **Exercise Tracking**:
-  - Logs the completion of exercises, including weights, reps, and the date of the workout.
-- **Workout Splits**:
-  - Connects tracked exercises to the respective workout split.
-- **Scheduled Workouts**:
-  - Allows users to schedule workout activities with notifications and reminders.
-
-#### Flow Details:
-
-1. Users log their progress for specific exercises in **Exercise Tracking**.
-2. **Scheduled Workouts** is used to set up notifications for upcoming workout splits.
-
----
-
-### 3️⃣ **Messages Flow**
-
-The **Messages Flow** handles the communication between users. It allows users to send and receive messages, with data about senders, receivers, and the content of the messages.
-
-<p align="center">
-  <img src="assets/messages.png" alt="Messages Flow Diagram" width="800" />
-</p>
-
-#### Key Tables:
-
-- **Users**:
-  - Acts as both the sender and receiver of messages.
-- **Messages**:
-  - Stores the content of the message, the subject, and metadata like whether the message has been read.
-
-#### Flow Details:
-
-1. A **sender** (user) initiates a message.
-2. The **receiver** (user) gets the message.
-3. The `is_read` field tracks whether the message has been opened.
-
----
-
-## 🖥️ Installation Guide
-
-### ⚡ Quick Start
-
-1. **Clone the Repository**:
    ```bash
    git clone https://github.com/kobihanoch/Strong-Together-App.git
-   ```
-2. **Navigate to the Project Directory**:
-   ```bash
    cd Strong-Together-App
    ```
-3. **Install Dependencies**:
+
+2. **Install dependencies**:
+
    ```bash
    npm install
    ```
-4. **Run the Application**:
+
+3. **Set up environment variables**. Copy the provided `.env.example`
+   to `.env` and adjust the values as needed (see the
+   [Environment Variables](#environment-variables) section for
+   descriptions).
+
+4. **Start your backend**. Follow the instructions in the backend
+   repository to run the Express server locally. The frontend
+   expects the API to be reachable at the `API_URL` you define in
+   your `.env` file.
+
+5. **Run the app**. For development with Expo, execute:
+
    ```bash
-   npm start
+   npm run start
    ```
 
+   This will launch the Expo Dev Tools where you can choose to run
+   the app on an iOS simulator, Android emulator or a physical
+   device via QR code.
+
+## Environment Variables
+
+The application uses environment variables (loaded via
+`react-native-dotenv` or a similar library) to configure runtime
+behaviour. Create a `.env` file in the project root with the
+following keys:
+
+| Variable  | Description                                                    |
+| --------- | -------------------------------------------------------------- |
+| `API_URL` | Base URL of the Express backend (e.g. `http://localhost:5000`) |
+
+You can add additional variables as needed by your backend (such
+as analytics keys, feature flags, etc.). See `.env.example` for
+defaults.
+
+## Running the App Locally
+
+Start the app:
+
+| Command          | Description                                          |
+| ---------------- | ---------------------------------------------------- |
+| `npx expo start` | Launch Expo Dev Tools and run the app in development |
+
+The first run may take a few minutes as Expo bundles your assets and
+installs native modules.
+
+## Database Schema
+
+The backend uses PostgreSQL as its primary datastore. The schema
+defines tables for users, messages, workout plans, splits, exercises
+and tracking logs. The simplified ER diagram below shows how the
+entities relate to each other:
+
+![Database schema overview](assets/DB.png)
+
+Important points about the schema:
+
+- **Users** table stores authentication credentials and profile
+  metadata (`username`, `email`, `role`, `push_token`, etc.).
+- **WorkoutPlans** contain high‑level programmes created by a user or
+  trainer. Each plan has multiple **WorkoutSplits** (e.g. chest day,
+  legs day).
+- **Exercises** catalog the available movements along with
+  descriptions and targeted muscle groups.
+- **ExerciseToWorkoutSplit** is a join table mapping exercises to
+  splits with an order index and number of sets.
+- **ExerciseTracking** records actual performance data — weight and
+  repetitions — for each workout date and split mapping.
+- **ScheduledWorkouts** allows users to attach a split to a day of the
+  week and optionally specify a notification time.
+- **Messages** stores subject/body along with sender and receiver
+  identifiers.
+- **BlacklistedTokens** are used by the backend to invalidate JWTs
+  after logout or password reset.
+
+> **Optimisations:** In version 3, indexes were added on the
+> foreign‑key columns (e.g. `workout_id`, `user_id`) and SQL views were
+> introduced for common joins. These changes reduce query latency and
+> improve performance when fetching nested data.
+
+### Workout Flow
+
+![Database workout flow](assets/workout.png)
+
+1. **Create a Plan** – A user (or trainer) starts by creating a
+   `WorkoutPlan` with a name and difficulty level. This inserts a
+   record into the `workoutplans` table with a `user_id` pointing to
+   the owner.
+2. **Add Splits** – For each plan, the user defines one or more
+   `WorkoutSplits`. Each split represents a training session (e.g.
+   “Upper Body”) and is stored in the `workoutsplits` table with a
+   foreign key back to its plan.
+3. **Assign Exercises** – Using the exercise catalogue, the user
+   selects movements for each split. These associations are stored
+   in the `exercisetoworkoutsplit` table along with an order index
+   (position in the workout) and planned number of sets.
+
+### Tracking Flow
+
+![Database workout tracking flow](assets/tracking.png)
+
+1. **Select a split** – On the day of training, the user
+   opens a split and sees the list of exercises in order.
+2. **Record Sets** – For each exercise, the user logs weight and
+   repetitions. Each entry is persisted as a row in the
+   `exercisetracking` table with a reference to the
+   `exercisetoworkoutsplit` identifier, the performing `user_id` and
+   the date of the workout.
+3. **Review Progress** – The app aggregates tracking data to show
+   charts of personal records, trends over time and progress against
+   planned sets. These analytics are built on SQL views in the
+   backend for efficiency.
+
+### Messages Flow
+
+![Database workout tracking flow](assets/messages.png)
+
+1. **Compose Message** – System messages after a workout.
+   Each message includes a `subject` and `msg` body. When a message
+   is sent, a record is inserted into the `messages` table with
+   `sender_id` and `receiver_id` foreign keys.
+2. **Receive & Read** – Recipients fetch their inbox via the API.
+   When a message is opened, the `is_read` flag is updated to `true`.
+   The app may also use push notifications to alert users of new
+   messages.
+3. **Delete** – Messages can be removed from the inbox by issuing a delete request, which marks the record as
+   deleted in the database.
+
+### Auth Flow
+
+![Database authentication flow](assets/auth.png)
+
+1. **Login & Token Issuance** – On successful login, the server issues an `access_token` (short-lived) and a `refresh_token` (long-lived).  
+2. **Access Control** – Each API request requires a valid `access_token`. If the token is missing, expired, or invalid, the request is denied.  
+3. **Token Refresh** – When the `access_token` expires, the client uses the `refresh_token` to obtain a new pair of tokens without re-logging in.  
+4. **Blacklisting** – On logout or suspected compromise, the `refresh_token` (and optionally the `access_token`) is stored in the `blacklistedtokens` table. Any attempt to reuse blacklisted tokens is rejected.  
+
+## Roadmap & Future Improvements
+
+- **Better offline support** – cache workout plans and tracking data
+  locally when the device is offline and sync with the server once
+  connectivity is restored.
+- **Analytics & Insights** – provide deeper insights such as
+  one‑rep max estimations, volume trends and periodisation tools.
+- **Group training features** – enable group plans where multiple
+  users can share progress and compete.
+- **Internationalisation** – expand language support beyond the
+  current default and allow dynamic language switching.
+- **Scheduling** - schdueled workouts in next update.
+- **AI Integration** - for building workouts and analyze performence.
+
+## Contributing
+
+Currently a personal project. Contributions are not open.  
+(Will consider in future versions).
+
 ---
 
-## 🗂️ Folder Structure
+## License
 
-Below is the complete folder structure for **Strong-Together-App**, organized and modular. Click the arrow to expand and view all details.
-
-| **Folder**            | **Description**                                                                |
-| --------------------- | ------------------------------------------------------------------------------ |
-| 📁 **components/**    | Contains reusable UI components used across the app.                           |
-| 📁 **context/**       | React Context for managing global state like authentication and notifications. |
-| 📁 **hooks/**         | Custom reusable hooks for logic and API calls.                                 |
-| 📁 **navigation/**    | Contains navigation stacks for authenticated and unauthenticated users.        |
-| 📁 **notifications/** | Handles push notifications and notification logic.                             |
-| 📁 **screens/**       | Individual screens for the application.                                        |
-| 📁 **services/**      | Backend service logic for interacting with APIs and databases.                 |
-| 📁 **utils/**         | Utility functions for common logic and helpers.                                |
-| 📁 **src/**           | Core configuration files for the app.                                          |
+This project is licensed under the **MIT License**.  
+See the `LICENSE` file for details.
 
 ---
 
-## ⚖️ Copyright Notice
+Thank you for checking out the Strong Together App! We hope this
+updated README helps you get started quickly, understand the
+underlying architecture and contribute effectively. Feel free to
+open an issue if something is unclear or missing.
 
-© 2025 Kobi Hanoch. All rights reserved.
-
-This repository and its code are the intellectual property of **Kobi Hanoch**. The following terms apply to this project:
-
-1. **Strict Prohibition**:  
-   Unauthorized use, copying, modification, or distribution of any part of this repository is **strictly prohibited**.
-
-2. **Purpose of the Code**:  
-   This code is provided **only for observation and learning purposes**. It cannot be used for any commercial or non-commercial purposes without explicit written permission from the author.
-
-3. **Intellectual Property Rights**:  
-   All ideas, implementations, and designs in this repository are the intellectual property of the author. Any violations of these rights may lead to legal action.
-
-4. **License**:  
-   This project is not open source. Any usage, even partial, must be authorized by **Kobi Hanoch**.
-
----
-
-## 🙌 Credits
-
-This project was made possible with the help of the following tools, technologies, and resources:
-
-### **Technologies**
-
-- [**React Native**](https://reactnative.dev/)  
-   A framework for building cross-platform mobile applications.  
-   <img src="https://img.icons8.com/color/48/react-native.png" alt="React Icon" width="25"/>
-
-- [**Expo**](https://expo.dev/)  
-   A powerful toolchain for React Native that simplifies development and testing.  
-   <img src="https://img.icons8.com/ios-filled/50/000000/expo.png" alt="Expo Icon" width="25"/>
-
-- [**Supabase**](https://supabase.com/)  
-   An open-source backend as a service for real-time database management and authentication.
-
-- [**PostgreSQL**](https://www.postgresql.org/)  
-   A robust, open-source relational database system.
-
-### **Additional Resources**
-
-- Icons provided by [**Icons8**](https://icons8.com/):  
-   React Native, JavaScript, Expo, and other icons.
-- Shields.io for generating the badges used in this README.
-- Markdown formatting references from [**CommonMark**](https://commonmark.org/).
-
-### **Database Schema Design**
-
-- Database schema designed and visualized using [**dbdiagram.io**](https://dbdiagram.io/).
-
-### Inspiration & Learning
-
-- Tutorials and guides from the [React Native Documentation](https://reactnative.dev/docs/getting-started).
-- Community insights and discussions on [Stack Overflow](https://stackoverflow.com/).
-- Database schema concepts from [dbdiagram.io](https://dbdiagram.io/).
-
----
-
-⭐ If you like this project, don’t forget to give it a star! ⭐
-
-For any questions or support, feel free to reach out:
-
-- **GitHub**: [@kobihanoch](https://github.com/kobihanoch)
-- **Email**: [kobikobi622@gmail.com](mailto:kobikobi622@gmail.com)
