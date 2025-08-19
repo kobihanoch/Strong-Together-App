@@ -91,7 +91,7 @@ SQL views**.
   <br>
   <strong>Intro Screen</strong>: Onboarding walkthrough.
 </p>
-
+<br><br>
 <div align="center">
   <img src="https://github.com/user-attachments/assets/8ccbbf43-3544-4738-8a20-7dbb989b1e89" alt="Edit reps" width="200"/>
   <img src="https://github.com/user-attachments/assets/387ec46b-7976-46aa-b420-07ad2a88abdc" alt="Change exercise order" width="200"/>
@@ -100,24 +100,28 @@ SQL views**.
 <p align="center">
   <strong>Create/Modify</strong>: Edit your workout plan as how much you want.
 </p>
-
+<br><br>
 <div align="center">
   <img src="https://github.com/user-attachments/assets/67f394e9-aea6-4a9e-b286-aab83230de6b" alt="Watch the Program Plan" width="200"/>
 </div>
 <p align="center">
   <strong>Watch the Program Plan</strong>: View and manage workout plans.
 </p>
-
+<br><br>
 <div align="center">
   <img src="https://github.com/user-attachments/assets/6248cf62-7ed0-439a-a6fb-d77d305ca0db" alt="After Workout Statistics" width="200" style="margin-right: 20px;"/>
   <img src="https://github.com/user-attachments/assets/a03f4a65-4db6-4f96-b465-9526573ddcbd" alt="Active Workout" width="200"/>
+  <img src="https://github.com/user-attachments/assets/225515c3-a266-4cfd-989f-839aae8291bc" alt="Compare to last workout" width="200"/>
+  
 </div>
 <p align="center">
   <strong>After Workout Statistics</strong>: Summarized session results.  
   <br>
   <strong>Active Workout</strong>: Real-time tracking of sets, reps, and weights.
+  <br>
+  <strong>Compare Progress</strong>: Check your last performance.
 </p>
-
+<br><br>
 <div align="center">
   <img src="https://github.com/user-attachments/assets/b8364732-6a74-49b3-a881-6fbff174ce91" alt="Message Modal" width="200"/>
 </div>
