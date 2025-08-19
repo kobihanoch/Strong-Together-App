@@ -1,7 +1,5 @@
-import { LinearGradient } from "expo-linear-gradient";
 import React from "react";
 import { Dimensions, StyleSheet, View } from "react-native";
-import LoadingPage from "../components/LoadingPage";
 import CalendarCard from "../components/StatisticsComponents/CalendarCard";
 import ExercisesFlatList from "../components/StatisticsComponents/ExercisesFlatList";
 import { useAuth } from "../context/AuthContext";
@@ -14,9 +12,10 @@ const StatisticsPage = () => {
   const {
     selectedDate,
     setSelectedDate,
-    exerciseTracking,
     exerciseTrackingByDate,
     exerciseTrackingByDatePrev,
+    exerciseTrackingWithETSIdKey,
+    exerciseTrackingWithDateKey,
   } = useStatisticsPageLogic(user);
 
   return (
@@ -42,14 +41,14 @@ const StatisticsPage = () => {
         <CalendarCard
           selectedDate={selectedDate}
           setSelectedDate={setSelectedDate}
-          userExerciseLogs={exerciseTracking || []}
+          userExerciseLogs={exerciseTrackingWithDateKey || []}
         />
       </View>
       <View style={{ flex: 7.5 }}>
         <ExercisesFlatList
           data={exerciseTrackingByDate}
           dataToCompare={exerciseTrackingByDatePrev || []}
-          exerciseTracking={exerciseTracking}
+          byETSId={exerciseTrackingWithETSIdKey}
         ></ExercisesFlatList>
       </View>
     </View>

@@ -1,49 +1,57 @@
 import moment from "moment";
-import { useEffect, useState } from "react";
-import {
-  filterExercisesByDate,
-  getLastWorkoutForEachExercise,
-} from "../../utils/statisticsUtils";
-import { useAuth } from "../../context/AuthContext";
+import { useMemo, useState } from "react";
+import { useAnalysisContext } from "../../context/AnalysisContext";
+import { getLastWorkoutForEachExercise } from "../../utils/statisticsUtils";
 
-const useStatisticsPageLogic = (user) => {
-  const { exerciseTracking } = useAuth().workout;
-  const [selectedDate, setSelectedDate] = useState(moment());
-  const [exerciseTrackingByDate, setExerciseTrackingByDate] = useState(null);
-  const [exerciseTrackingByDatePrev, setExerciseTrackingByDatePrev] =
-    useState(null);
+const useStatisticsPageLogic = () => {
+  const { exerciseTrackingMaps } = useAnalysisContext();
 
-  // Load prev workout data for each workout
-  useEffect(() => {
-    setExerciseTrackingByDatePrev(
-      getLastWorkoutForEachExercise(exerciseTracking, exerciseTrackingByDate)
-    );
-  }, [exerciseTracking, exerciseTrackingByDate]);
+  // Map with date keys: Date, ETSId, splitName
+  const {
+    byDate: exerciseTrackingWithDateKey,
+    byETSId: exerciseTrackingWithETSIdKey,
+    bySplitName: exerciseTrackingWithSplitNameKey,
+  } = exerciseTrackingMaps;
 
-  // Load when changing dates
-  useEffect(() => {
-    if (exerciseTracking && exerciseTracking.length > 0) {
-      setExerciseTrackingByDate(
-        filterExercisesByDate(exerciseTracking, selectedDate)
-      );
-    }
+  console.log(selectedDate);
+
+  // Start as today's date
+  const [selectedDate, setSelectedDate] = useState(
+    moment().format("YYYY-MM-DD")
+  );
+
+  // Calculate formatted date for each change of date
+  const formattedDate = useMemo(() => {
+    return moment(selectedDate).format("YYYY-MM-DD");
   }, [selectedDate]);
 
-  // Load selected workout on load up
-  useEffect(() => {
-    if (exerciseTracking && exerciseTracking.length > 0) {
-      const formattedDate = moment(selectedDate).format("YYYY-MM-DD");
-      const filtered = filterExercisesByDate(exerciseTracking, formattedDate);
-      setExerciseTrackingByDate(filtered);
-    }
-  }, []);
+  // Change records when a date selection is aplied
+  const exerciseTrackingByDate = useMemo(() => {
+    return exerciseTrackingWithDateKey[formattedDate];
+  }, [formattedDate, exerciseTrackingWithDateKey]);
+
+  // Load prev workout data for each workout
+  const exerciseTrackingByDatePrev = useMemo(() => {
+    return getLastWorkoutForEachExercise(
+      formattedDate,
+      exerciseTrackingWithDateKey,
+      exerciseTrackingWithSplitNameKey,
+      exerciseTrackingWithETSIdKey
+    );
+  }, [
+    formattedDate,
+    exerciseTrackingWithDateKey,
+    exerciseTrackingWithSplitNameKey,
+    exerciseTrackingWithETSIdKey,
+  ]);
 
   return {
     selectedDate,
     setSelectedDate,
-    exerciseTracking,
     exerciseTrackingByDate,
     exerciseTrackingByDatePrev,
+    exerciseTrackingWithDateKey,
+    exerciseTrackingWithETSIdKey,
   };
 };
 

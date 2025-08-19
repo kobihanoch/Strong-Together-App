@@ -4,7 +4,7 @@ export default {
   expo: {
     name: "Strong Together",
     slug: "strong-together",
-    version: "2.12.0",
+    version: "3.0.0",
     orientation: "portrait",
     icon: "./assets/icon.png",
     userInterfaceStyle: "light",
@@ -12,6 +12,10 @@ export default {
       image: "./assets/logo.png",
       resizeMode: "contain",
       backgroundColor: "#2979ff",
+    },
+    notification: {
+      icon: "./assets/icon.png",
+      color: "#FFFFFF",
     },
     ios: {
       supportsTablet: true,

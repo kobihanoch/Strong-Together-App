@@ -1,135 +1,93 @@
-import { useEffect, useState } from "react";
-import { useFocusEffect } from "@react-navigation/native";
-import { useUserWorkout } from "../useUserWorkout";
-import React from "react";
-import {
-  getUserGeneralPR,
-  getUserLastWorkoutDate,
-  getWelcomeMessageString,
-} from "../../utils/homePageUtils";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import useSystemMessages from "../automations/useSystemMessages";
+import { useMemo } from "react";
+import { useAnalysisContext } from "../../context/AnalysisContext";
 import { useAuth } from "../../context/AuthContext";
-import { getMostFrequentSplitNameByUserId } from "../../services/ExerciseTrackingService";
+import { useWorkoutContext } from "../../context/WorkoutContext";
+import { useGlobalAppLoadingContext } from "../../context/GlobalAppLoadingContext";
 
-const useHomePageLogic = (user) => {
-  // Send welcome message for the first time
-  const { sendSystemMessage, isSending } = useSystemMessages(user?.id);
-  const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+const useHomePageLogic = () => {
+  // Auth state (user + global session loading)
+  const { user, sessionLoading } = useAuth();
+  const { isLoading } = useGlobalAppLoadingContext();
 
-  useEffect(() => {
-    (async () => {
-      if (user) {
-        if (await AsyncStorage.getItem("firstLogin")) {
-          console.log(
-            "First login detected for ",
-            user.username,
-            ", 2 seconds to message."
-          );
-          await sleep(3000);
-          const welcomeMsg = getWelcomeMessageString(user?.name);
-          await sendSystemMessage(welcomeMsg.header, welcomeMsg.text);
+  // Workout state (plan + derived maps + loading)
+  const {
+    workout,
+    workoutSplits, // [A,B,C...]
+    loading: workoutLoading,
+  } = useWorkoutContext();
 
-          await AsyncStorage.removeItem("firstLogin");
-          console.log("Message sent and asyncstorage item deleted!");
-        } else {
-          console.log("Not first login - not sending message.");
-        }
-      }
-    })();
-  }, [user]);
+  // Analysis state (tracking + derived analytics + loading)
+  const { analyzedExerciseTrackingData, loading: analysisLoading } =
+    useAnalysisContext();
 
-  // User data
-  const [username, setUsername] = useState(null);
-  const [userId, setUserId] = useState(null);
-  const [firstName, setFirstName] = useState(null);
-
-  // Workout from context and unpack
-  const { workout, workoutSplits, exerciseTracking } = useAuth().workout;
-
-  // Inner states
-  const [hasAssignedWorkout, setHasAssignedWorkout] = useState(false);
-  const [mostFrequentSplit, setMostFrequentSplit] = useState(null);
-  const [profileImageUrl, setProfileImageUrl] = useState(null);
-  const [lastWorkoutDate, setLastWorkoutDate] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [totalWorkoutNumber, setTotalWorkoutNumber] = useState(0);
-  const [workoutSplitsNumber, setWorkoutSplitsNumber] = useState(0);
-  const [PR, setPR] = useState({});
-
-  // Set username after user is loaded
-  useEffect(() => {
-    const loadData = async () => {
-      if (user && user.username && user.id) {
-        setLoading(true);
-        try {
-          const freSplit = await getMostFrequentSplitNameByUserId(user.id);
-          setMostFrequentSplit(freSplit);
-          setUsername(user.username);
-          setFirstName(user.name.split(" ")[0]);
-          setUserId(user.id);
-          setProfileImageUrl(user.profile_image_url);
-        } catch (err) {
-          console.error("Error fetching exercise tracking:", err);
-        } finally {
-          setLoading(false);
-        }
-      }
+  // Derive stable user fields
+  const { username, userId, firstName, profileImageUrl } = useMemo(() => {
+    const u = user ?? {};
+    // Safe split for first name
+    const fName =
+      typeof u.name === "string" && u.name.trim().length
+        ? u.name.trim().split(" ")[0]
+        : "";
+    return {
+      username: u.username ?? "",
+      userId: u.id ?? "",
+      firstName: fName,
+      profileImageUrl: u.profile_image_url ?? "",
     };
-
-    loadData();
   }, [user]);
 
-  // Sets PR
-  useEffect(() => {
-    if (exerciseTracking && exerciseTracking.length > 0) {
-      setPR(getUserGeneralPR(exerciseTracking));
-    }
-  }, [exerciseTracking]);
+  // Derived workout flags/counters
+  const { hasAssignedWorkout, workoutSplitsNumber } = useMemo(() => {
+    const hasWorkout = !!workout;
+    // workoutSplits is a map in the new context; count keys safely
+    const splitsCount = workoutSplits ? Object.keys(workoutSplits).length : 0;
+    return { hasAssignedWorkout: hasWorkout, workoutSplitsNumber: splitsCount };
+  }, [workout, workoutSplits]);
 
-  // Set user's assigned workout state after user is loaded
-  useEffect(() => {
-    setHasAssignedWorkout(!!workout);
-  }, [workout]);
+  // Derived analysis fields
+  const { PR, totalWorkoutNumber, mostFrequentSplit, lastWorkoutDate } =
+    useMemo(() => {
+      const a = analyzedExerciseTrackingData ?? {};
+      return {
+        PR: a.pr ?? null,
+        totalWorkoutNumber: a.workoutCount ?? 0,
+        mostFrequentSplit: a.mostFrequentSplit ?? null,
+        lastWorkoutDate: a.lastWorkoutDate ?? "none",
+      };
+    }, [analyzedExerciseTrackingData]);
 
-  // Get last workout date
-  useEffect(() => {
-    setLastWorkoutDate(getUserLastWorkoutDate(exerciseTracking));
-  }, [exerciseTracking]);
-
-  // Counter for workouts made
-  useEffect(() => {
-    const uniWorkouts = new Set();
-    if (exerciseTracking && exerciseTracking.length > 0) {
-      exerciseTracking.forEach((exerciseInTrackingData) => {
-        uniWorkouts.add(exerciseInTrackingData.workoutdate);
-      });
-      setTotalWorkoutNumber(uniWorkouts.size);
-    }
-  }, [exerciseTracking]);
-
-  // Set workout splits count
-  useEffect(() => {
-    if (workoutSplits) {
-      setWorkoutSplitsNumber(workoutSplits.length);
-    }
-  }, [workoutSplits]);
+  // Stable data object for easy consumption in components
+  const data = useMemo(
+    () => ({
+      username,
+      userId,
+      hasAssignedWorkout,
+      profileImageUrl,
+      firstName,
+      lastWorkoutDate,
+      totalWorkoutNumber,
+      workoutSplitsNumber,
+      mostFrequentSplit,
+      PR,
+      isLoading,
+    }),
+    [
+      username,
+      userId,
+      hasAssignedWorkout,
+      profileImageUrl,
+      firstName,
+      lastWorkoutDate,
+      totalWorkoutNumber,
+      workoutSplitsNumber,
+      mostFrequentSplit,
+      PR,
+      isLoading,
+    ]
+  );
 
   return {
-    data: {
-      username: username ?? "",
-      userId: userId ?? "",
-      hasAssignedWorkout: hasAssignedWorkout ?? false,
-      profileImageUrl: profileImageUrl ?? "",
-      firstName: firstName ?? "",
-      lastWorkoutDate: lastWorkoutDate ?? "none",
-      totalWorkoutNumber: totalWorkoutNumber ?? 0,
-      workoutSplitsNumber: workoutSplitsNumber ?? 0,
-      mostFrequentSplit: mostFrequentSplit ?? null,
-      PR: PR ?? null,
-      exerciseTracking: exerciseTracking ?? null,
-    },
-    loading,
+    data,
   };
 };
 

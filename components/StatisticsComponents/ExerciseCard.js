@@ -1,23 +1,31 @@
 import { FontAwesome5 } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
-import React from "react";
+import React, { useMemo } from "react";
 import { Dimensions, Image, StyleSheet, Text, View } from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";
 import images from "../../components/images";
 import { formatDate, isSetPR } from "../../utils/statisticsUtils";
+import useStatisticsPageLogic from "../../hooks/logic/useStatisticsPageLogic";
 
 const { width, height } = Dimensions.get("window");
 
-const ExerciseCard = ({ item, dataToCompare, exerciseTracking }) => {
-  const previousExercise = Array.isArray(dataToCompare)
-    ? dataToCompare.find((prev) => prev.exercise_id == item.exercise_id)
-    : null;
-  //console.log(JSON.stringify(previousExercise));
-  const mainMuscle = item.exercisetoworkoutsplit.exercises.targetmuscle;
-  const specificMuscle =
-    item.exercisetoworkoutsplit.exercises.specifictargetmuscle;
+const ExerciseCard = ({ item, dataToCompare, byETSId }) => {
+  // Same exercise in last workout
+  const previousExercise = useMemo(() => {
+    return Array.isArray(dataToCompare)
+      ? dataToCompare.find((prev) => prev.exercise_id == item.exercise_id)
+      : null;
+  }, [dataToCompare, item]);
+  const mainMuscle = useMemo(() => {
+    return item.exercisetoworkoutsplit.exercises.targetmuscle;
+  }, [item]);
+  const specificMuscle = useMemo(() => {
+    return item.exercisetoworkoutsplit.exercises.specifictargetmuscle;
+  }, [item]);
 
-  const imagePath = images[mainMuscle]?.[specificMuscle];
+  const imagePath = useMemo(() => {
+    return images[mainMuscle]?.[specificMuscle];
+  }, [mainMuscle, specificMuscle]);
 
   return (
     <View style={styles.item}>
@@ -101,18 +109,24 @@ const ExerciseCard = ({ item, dataToCompare, exerciseTracking }) => {
           >
             {item.weight.map((w, index) => {
               const prevWeight = previousExercise?.weight?.[index];
-              const isImproved = prevWeight !== undefined && w > prevWeight;
-              const isPr = isSetPR(exerciseTracking, w);
+              const isImproved =
+                (prevWeight !== undefined && w > prevWeight) ||
+                (prevWeight == w &&
+                  previousExercise?.reps?.[index] < item.reps[index]);
+              const isSame =
+                w == prevWeight &&
+                previousExercise?.reps?.[index] == item.reps[index];
+              const isPr = isSetPR(item.exercisetosplit_id, w, byETSId);
               const color = isPr
                 ? "rgb(170, 122, 2)"
-                : prevWeight === undefined
+                : isSame || prevWeight === undefined
                 ? "black"
                 : isImproved
                 ? "rgb(13, 177, 54)"
                 : "rgb(177, 13, 13)";
               const backgroundColor = isPr
                 ? "rgba(255, 183, 0, 0.07)"
-                : prevWeight === undefined
+                : isSame || prevWeight === undefined
                 ? "rgba(219, 219, 219, 0.1)"
                 : isImproved
                 ? "rgba(13, 177, 54, 0.07)"
@@ -172,6 +186,8 @@ const ExerciseCard = ({ item, dataToCompare, exerciseTracking }) => {
                       <Text style={{ fontFamily: "Inter_700Bold", color }}>
                         PR
                       </Text>
+                    ) : isSame ? (
+                      <></>
                     ) : prevWeight ? (
                       isImproved ? (
                         <FontAwesome5

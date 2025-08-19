@@ -1,9 +1,9 @@
 import React from "react";
 import { Text, View } from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";
-import { formatDate } from "../../utils/statisticsUtils";
-import { getDaysSince } from "../../utils/homePageUtils";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
+import { getDaysSince } from "../../utils/homePageUtils";
+import { formatDate } from "../../utils/statisticsUtils";
 
 const LastWorkoutSection = ({ data }) => {
   return (
@@ -29,12 +29,9 @@ const LastWorkoutSection = ({ data }) => {
           color="#1A1A1A"
           opacity={0.7}
         ></MaterialCommunityIcons>{" "}
-        {data.exerciseTracking && data.exerciseTracking.length > 0
-          ? "Last workout at: " +
-            formatDate(data.lastWorkoutDate).split(",")[0] +
-            "\n" +
-            formatDate(data.lastWorkoutDate).split(",")[1].trim()
-          : data.lastWorkoutDate}
+        {data.lastWorkoutDate != "none"
+          ? "Last workout at: " + formatDate(data.lastWorkoutDate)
+          : "No workout performed yet."}
       </Text>
       <Text
         style={{

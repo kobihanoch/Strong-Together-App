@@ -1,11 +1,13 @@
 import js from "@eslint/js";
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useMemo } from "react";
 import { View, Text, Dimensions, TouchableOpacity } from "react-native";
 import { TextInput } from "react-native-gesture-handler";
 import { RFValue } from "react-native-responsive-fontsize";
 import ProgressBar from "./ProgressBar";
 import { MaterialCommunityIcons, Feather } from "@expo/vector-icons";
 import BottomModal from "../BottomModal";
+import useLastWorkoutExerciseTrackingData from "../../hooks/useLastWorkoutExerciseTrackingData";
+import { computeProgressByVolume } from "../../utils/startWorkoutUtils";
 
 const { width, height } = Dimensions.get("window");
 
@@ -28,9 +30,59 @@ const ExerciseBox = ({
     Array(item.sets.length).fill(0)
   );
   const [progress, setProgress] = useState(0);
+
+  const { lastWorkoutData } = useLastWorkoutExerciseTrackingData(item?.id); // Record for exercise in last appearence
+  const lastWorkoutSetsCount = useMemo(() => {
+    return Number(lastWorkoutData?.weight?.length ?? 0);
+  }, [lastWorkoutData]);
+
+  const lastWorkoutRepsForCurrentSet = useMemo(() => {
+    const arr = lastWorkoutData?.reps;
+    return Array.isArray(arr) && visibleSetIndex < arr.length
+      ? Number(arr?.[visibleSetIndex])
+      : null;
+  }, [lastWorkoutData, visibleSetIndex, item?.id]);
+
+  const lastWorkoutWeightsForCurrentSet = useMemo(() => {
+    const arr = lastWorkoutData?.weight;
+    return Array.isArray(arr) && visibleSetIndex < arr.length
+      ? Number(arr?.[visibleSetIndex])
+      : null;
+  }, [lastWorkoutData, visibleSetIndex, item?.id]);
+
+  // Compute progress vs last workout by volume (weight * reps) with fallback to target reps
   useEffect(() => {
-    setProgress((repsArray[visibleSetIndex] / item.sets[visibleSetIndex]) * 10);
-  }, [repsArray, visibleSetIndex]);
+    const setIdx = visibleSetIndex;
+
+    const currReps = Number(repsArray?.[setIdx] ?? 0);
+    const currWeight = Number(weightsArray?.[setIdx] ?? 0);
+
+    const prevReps = lastWorkoutRepsForCurrentSet; // null if no history
+    const prevWeight = lastWorkoutWeightsForCurrentSet; // null if no history
+
+    const targetReps = Number(item?.sets?.[setIdx] ?? 0);
+
+    //Explicit flag whether there is a previous set entry
+    const hasLastWorkout = setIdx >= 0 && setIdx < lastWorkoutSetsCount;
+
+    const next = computeProgressByVolume({
+      currReps,
+      currWeight,
+      prevReps: hasLastWorkout ? prevReps : null,
+      prevWeight: hasLastWorkout ? prevWeight : null,
+      targetReps,
+    });
+
+    setProgress(next);
+  }, [
+    visibleSetIndex,
+    repsArray,
+    weightsArray,
+    lastWorkoutRepsForCurrentSet,
+    lastWorkoutWeightsForCurrentSet,
+    lastWorkoutSetsCount,
+    item,
+  ]);
 
   useEffect(() => {
     const weightDup = [...weightArrs];
@@ -151,7 +203,7 @@ const ExerciseBox = ({
                 <BottomModal
                   isVisible={isModalVisible}
                   onClose={() => setIsModalVisible(false)}
-                  exerciseId={item.id}
+                  lastWorkoutData={lastWorkoutData}
                   setIndex={visibleSetIndex}
                 />
               </View>

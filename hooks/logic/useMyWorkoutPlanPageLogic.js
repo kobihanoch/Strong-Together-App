@@ -1,30 +1,17 @@
-import { useEffect, useState } from "react";
-import {
-  countExercisesForSplit,
-  filterExercises,
-  getWorkoutSplitCounter,
-} from "../../utils/myWorkoutPlanUtils";
-import { useUserWorkout } from "../useUserWorkout";
-import { useAuth } from "../../context/AuthContext";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { useAnalysisContext } from "../../context/AnalysisContext";
+import { useWorkoutContext } from "../../context/WorkoutContext";
 
 export const useMyWorkoutPlanPageLogic = () => {
   const {
     workout,
     workoutSplits,
-    exerciseTracking,
     exercises: allExercises,
-  } = useAuth().workout;
-  const { hasTrainedToday: authHasTrainedToday } = useAuth();
-  const [selectedSplit, setSelectedSplit] = useState(null);
-  const [buttonOpacity, setButtonOpacity] = useState(1);
-  const [filteredExercises, setFilteredExercises] = useState(null);
-  const [splitTrainedCount, setSplitTrainedCount] = useState(0);
-  const [hasTrainedToday, setHasTrainedToday] = useState(false);
+  } = useWorkoutContext();
 
-  // Updating has trained today state
-  useEffect(() => {
-    setHasTrainedToday(authHasTrainedToday);
-  }, [authHasTrainedToday]);
+  const { exerciseTracking, analyzedExerciseTrackingData, hasTrainedToday } =
+    useAnalysisContext();
+  const [selectedSplit, setSelectedSplit] = useState(null);
 
   // Set selected split at startup
   useEffect(() => {
@@ -33,26 +20,23 @@ export const useMyWorkoutPlanPageLogic = () => {
     }
   }, [workoutSplits]);
 
-  // Gets preformed split count
-  useEffect(() => {
-    if (exerciseTracking && selectedSplit) {
-      setSplitTrainedCount(
-        getWorkoutSplitCounter(selectedSplit?.name, exerciseTracking)
-      );
-    }
-  }, [exerciseTracking, selectedSplit]);
-
   // Filter exercises by selected split
-  useEffect(() => {
-    if (allExercises && allExercises.length > 0) {
-      setFilteredExercises(filterExercises(allExercises, selectedSplit));
-    }
+  const filteredExercises = useMemo(() => {
+    if (!selectedSplit) return;
+    return allExercises[selectedSplit.name];
   }, [allExercises, selectedSplit]);
 
-  // Setting selected split when button is pressed
-  const handleWorkoutSplitPress = (split) => {
+  // Gets preformed split count
+  const splitTrainedCount = useMemo(() => {
+    return (
+      analyzedExerciseTrackingData.splitDaysByName[selectedSplit?.name] ?? 0
+    );
+  }, [exerciseTracking, selectedSplit]);
+
+  // Handling selection of split
+  const handleWorkoutSplitPress = useCallback((split) => {
     setSelectedSplit(split);
-  };
+  }, []);
 
   return {
     data: {
@@ -63,8 +47,6 @@ export const useMyWorkoutPlanPageLogic = () => {
       setSelectedSplit,
       handleWorkoutSplitPress,
       filteredExercises,
-      countExercisesForSplit,
-      buttonOpacity,
       splitTrainedCount,
       hasTrainedToday,
     },

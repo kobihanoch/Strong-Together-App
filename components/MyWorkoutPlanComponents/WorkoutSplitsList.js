@@ -1,7 +1,6 @@
 import React from "react";
-import { Dimensions, Text, View } from "react-native";
+import { Dimensions, View } from "react-native";
 import { FlatList } from "react-native-gesture-handler";
-import { RFValue } from "react-native-responsive-fontsize";
 import WorkoutSplitItem from "./WorkoutSplitItem";
 
 const { width, height } = Dimensions.get("window");
@@ -25,10 +24,6 @@ const WorkoutSplitsList = ({ data }) => {
         renderItem={({ item }) => (
           <WorkoutSplitItem
             item={item}
-            exercise_count={data.countExercisesForSplit(
-              data.allExercises,
-              item.id
-            )}
             isSelected={item.id === data.selectedSplit?.id}
             onPress={() => data.handleWorkoutSplitPress(item)}
           />

@@ -65,9 +65,54 @@ export const filterZeroesInArr = (reps, weights) => {
   return { reps: filteredReps, weights: filteredWeights };
 };
 
-export const getWorkoutCompleteMessageString = () => {
-  return {
-    header: "Workout Done!",
-    text: "Great work today!\nPlease note that you can't start a new training session until tomorrow, so take a good rest.\n\nIn the meantime, feel free to check your progress on the Statistics page.\n\nKeep pushing forward!",
-  };
-};
+/*
+ * Compute progress normalized to 0..10.
+ * Primary metric: volume ratio (weight * reps) vs previous workout for the same set.
+ * Fallback: if no previous data -> ratio of current reps to target reps.
+ */
+export function computeProgressByVolume({
+  currReps,
+  currWeight,
+  prevReps,
+  prevWeight,
+  targetReps,
+  hasLastWorkout,
+}) {
+  // Normalize inputs once (do this BEFORE any branch)
+  const CR = Number(currReps ?? 0);
+  const CW = Number(currWeight ?? 0);
+  const PR = prevReps == null ? null : Number(prevReps);
+  const PW = prevWeight == null ? null : Number(prevWeight);
+  const TR = Number(targetReps ?? 0);
+
+  // Determine if we actually have previous data for THIS set
+  const hasPrev = PR != null && PW != null && (hasLastWorkout ?? true);
+
+  if (hasPrev) {
+    const currVol = CR > 0 && CW > 0 ? CR * CW : 0;
+    const prevVol = PR > 0 && PW > 0 ? PR * PW : 0;
+
+    if (prevVol > 0) {
+      const ratio = currVol / prevVol; // 1.0 = matched last time
+      const normalized = clamp(ratio, 0, 1) * 10;
+      return Number.isFinite(normalized) ? normalized : 0;
+    }
+    // If previous exists but has zero volume, treat as 0 progress (or fall back to target)
+    if (TR > 0) {
+      const ratio = CR / TR; // optional fallback to target
+      const normalized = clamp(ratio, 0, 1) * 10;
+      return Number.isFinite(normalized) ? normalized : 0;
+    }
+    return 0;
+  }
+
+  // No previous data -> fallback to target reps
+  if (TR > 0) {
+    const ratio = CR / TR; // 1.0 = met target reps
+    const normalized = clamp(ratio, 0, 1) * 10;
+    return Number.isFinite(normalized) ? normalized : 0;
+  }
+
+  return 0;
+}
+export const clamp = (v, min, max) => Math.max(min, Math.min(max, v));

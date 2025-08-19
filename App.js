@@ -1,124 +1,143 @@
+// App.js
 import {
-  Inter_400Regular,
-  Inter_700Bold,
-  Inter_500Medium,
-  Inter_600SemiBold,
-} from "@expo-google-fonts/inter";
-import {
-  CommonActions,
   NavigationContainer,
   useNavigationContainerRef,
 } from "@react-navigation/native";
+import { createStackNavigator } from "@react-navigation/stack";
 import * as Font from "expo-font";
 import React, { useEffect, useState } from "react";
-import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
-import BottomTabBar from "./components/BottomTabBar";
-import Theme1 from "./components/Theme1";
+import {
+  ActivityIndicator,
+  StatusBar,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
+import { AlertNotificationRoot } from "react-native-alert-notification";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
+
+import {
+  Inter_400Regular,
+  Inter_500Medium,
+  Inter_600SemiBold,
+  Inter_700Bold,
+} from "@expo-google-fonts/inter";
+
+import { AnalysisProvider } from "./context/AnalysisContext";
 import { AuthProvider, useAuth } from "./context/AuthContext";
+import { NotificationsProvider } from "./context/NotificationsContext";
+import { WorkoutProvider } from "./context/WorkoutContext";
+
+import BottomTabBar from "./components/BottomTabBar";
+import MainLoadingScreen from "./components/MainLoadingScreen";
+import Theme1 from "./components/Theme1";
+import {
+  GlobalAppLoadingProvider,
+  useGlobalAppLoadingContext,
+} from "./context/GlobalAppLoadingContext";
 import AppStack from "./navigation/AppStack";
 import AuthStack from "./navigation/AuthStack";
-import { StatusBar } from "react-native";
-import { createStackNavigator } from "@react-navigation/stack";
-import { NotificationsProvider } from "./context/NotificationsContext";
 import NotificationsSetup from "./notifications/NotificationsSetup";
-import * as Notifications from "expo-notifications";
-import LoadingPage from "./components/LoadingPage";
+import { NotifierRoot } from "react-native-notifier";
+
+// ---------- Fonts Loader Hook ----------
+function useFontsReady() {
+  const [ready, setReady] = useState(false);
+  useEffect(() => {
+    (async () => {
+      await Font.loadAsync({
+        PoppinsLight: require("./assets/fonts/Poppins-Light.ttf"),
+        Inter_400Regular,
+        Inter_700Bold,
+        Inter_500Medium,
+        Inter_600SemiBold,
+      });
+      setReady(true);
+    })();
+  }, []);
+  return ready;
+}
 
 const RootStack = createStackNavigator();
 
+// ---------- App Root ----------
 export default function App() {
-  const [fontsLoaded, setFontsLoaded] = useState(false);
+  const fontsReady = useFontsReady();
   const navigationRef = useNavigationContainerRef();
 
-  // This tells Expo to show the notification even when app is in foreground
-  Notifications.setNotificationHandler({
-    handleNotification: async () => ({
-      shouldShowAlert: false,
-      shouldPlaySound: false,
-      shouldSetBadge: false, // CHANGE ALL TO TRUE ON BUILD
-    }),
-  });
-
-  const loadFonts = async () => {
-    await Font.loadAsync({
-      PoppinsLight: require("./assets/fonts/Poppins-Light.ttf"),
-      Inter_400Regular,
-      Inter_700Bold,
-      Inter_500Medium,
-      Inter_600SemiBold,
-    });
-    setFontsLoaded(true);
-  };
-
-  useEffect(() => {
-    loadFonts();
-  }, []);
-
-  if (!fontsLoaded) {
+  if (!fontsReady) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#0000ff" />
+        <ActivityIndicator size="large" />
         <Text>Loading...</Text>
       </View>
     );
   }
 
   return (
-    <AuthProvider>
-      <WrappedWithNotifications />
-    </AuthProvider>
+    <AlertNotificationRoot>
+      <GestureHandlerRootView style={{ flex: 1 }}>
+        <GlobalAppLoadingProvider>
+          <AuthProvider>
+            <NavigationContainer ref={navigationRef}>
+              <RootNavigator />
+              <NotifierRoot />
+            </NavigationContainer>
+          </AuthProvider>
+        </GlobalAppLoadingProvider>
+      </GestureHandlerRootView>
+    </AlertNotificationRoot>
   );
 }
 
-const WrappedWithNotifications = () => {
-  const { user } = useAuth();
-  const navigationRef = useNavigationContainerRef();
+// ---------- Navigation Logic (auth-only here) ----------
+function RootNavigator() {
+  const { isLoggedIn, user } = useAuth();
+  const { isLoading } = useGlobalAppLoadingContext();
 
   return (
-    <NotificationsProvider user={user}>
-      <NavigationContainer ref={navigationRef}>
-        <MainNavigator />
-      </NavigationContainer>
+    <>
+      {/* Always render the tree so providers can mount */}
+      {isLoggedIn ? <AppWithProviders key={user?.id} /> : <AuthStack />}
+
+      {/* Full-screen overlay while restoring session */}
+      {isLoading && (
+        <View style={[StyleSheet.absoluteFill, { zIndex: 9999 }]}>
+          <MainLoadingScreen />
+        </View>
+      )}
+    </>
+  );
+}
+
+// ---------- App branch wrapped with app-scoped providers ----------
+function AppWithProviders() {
+  return (
+    <NotificationsProvider>
+      <WorkoutProvider>
+        <AnalysisProvider>
+          <MainApp />
+        </AnalysisProvider>
+      </WorkoutProvider>
     </NotificationsProvider>
   );
-};
-
-function MainNavigator() {
-  const { isLoggedIn, initial, sessionLoading } = useAuth();
-  useEffect(() => {
-    (async () => {
-      await initial.checkIfUserSession();
-    })();
-  }, []);
-  console.log("🧠 isLoggedIn value:", isLoggedIn);
-
-  // If session is initialized - don't show auth screen but loading screen instead - can be customized in future
-  if (sessionLoading) {
-    return <LoadingPage message="Logging in..."></LoadingPage>;
-  }
-  return (
-    <RootStack.Navigator screenOptions={{ headerShown: false }}>
-      {isLoggedIn ? (
-        <RootStack.Screen name="App" component={AppWrapper} />
-      ) : (
-        <RootStack.Screen name="Auth" component={AuthStack} />
-      )}
-    </RootStack.Navigator>
-  );
-  function AppWrapper() {
-    return (
-      <>
-        <StatusBar barStyle="dark-content" />
-        <Theme1>
-          <AppStack />
-          <NotificationsSetup />
-        </Theme1>
-        <BottomTabBar />
-      </>
-    );
-  }
 }
 
+// ---------- Logged-in shell UI ----------
+function MainApp() {
+  return (
+    <>
+      <StatusBar barStyle="dark-content" />
+      <Theme1>
+        <AppStack />
+        <NotificationsSetup />
+      </Theme1>
+      <BottomTabBar />
+    </>
+  );
+}
+
+// ---------- Styles ----------
 const styles = StyleSheet.create({
   loadingContainer: {
     flex: 1,

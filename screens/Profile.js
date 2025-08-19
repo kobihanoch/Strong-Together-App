@@ -1,7 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { Alert, Dimensions, Text, TouchableOpacity, View } from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";
-import LoadingPage from "../components/LoadingPage";
 import ImagePickerComponent from "../components/ProfileComponents/ImagePickerComponent";
 import { useAuth } from "../context/AuthContext";
 import useProfilePageLogic from "../hooks/logic/useProfilePageLogic";
@@ -10,12 +9,9 @@ const { width, height } = Dimensions.get("window");
 
 function Profile({ navigation }) {
   const { user } = useAuth();
-  const { data, loading, mediaLoading, updateProfilePic, setMediaLoading } =
-    useProfilePageLogic(user);
+  const { data, mediaLoading, setMediaLoading } = useProfilePageLogic();
 
-  return mediaLoading ? (
-    <LoadingPage message="Loading user data..." />
-  ) : (
+  return (
     <View
       style={{
         flex: 1,
@@ -35,7 +31,6 @@ function Profile({ navigation }) {
       >
         <ImagePickerComponent
           user={user}
-          updateProfilePic={updateProfilePic}
           setMediaLoading={setMediaLoading}
         ></ImagePickerComponent>
       </View>

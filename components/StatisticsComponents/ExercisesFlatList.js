@@ -5,7 +5,7 @@ import ExerciseCard from "./ExerciseCard";
 
 const { width, height } = Dimensions.get("window");
 
-const ExercisesFlatList = ({ data, dataToCompare, exerciseTracking }) => {
+const ExercisesFlatList = ({ data, dataToCompare, byETSId }) => {
   return (
     <View style={{ flex: 7, justifyContent: "center", alignItems: "center" }}>
       {data && data.length > 0 ? (
@@ -17,10 +17,14 @@ const ExercisesFlatList = ({ data, dataToCompare, exerciseTracking }) => {
             <ExerciseCard
               item={item}
               dataToCompare={dataToCompare}
-              exerciseTracking={exerciseTracking}
-            ></ExerciseCard>
+              byETSId={byETSId}
+            />
           )}
           contentContainerStyle={{ padding: 10 }}
+          initialNumToRender={4}
+          windowSize={5}
+          removeClippedSubviews
+          showsHorizontalScrollIndicator={false}
         />
       ) : (
         <Text
