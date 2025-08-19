@@ -53,11 +53,9 @@ memoization (`useMemo`/`useCallback`) and context state management.
     - [Tracking Flow](#tracking-flow)
     - [Messages Flow](#messages-flow)
     - [Auth Flow](#auth-flow)
-11. [Testing](#testing)
-12. [Deployment](#deployment)
-13. [Roadmap & Future Improvements](#roadmap--future-improvements)
-14. [Contributing](#contributing)
-15. [License](#license)
+11. [Roadmap & Future Improvements](#roadmap--future-improvements)
+12. [Contributing](#contributing)
+13. [License](#license)
 
 ---
 
