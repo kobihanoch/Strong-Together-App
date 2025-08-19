@@ -65,8 +65,7 @@ memoization (`useMemo`/`useCallback`) and context state management.
 ## Project Overview
 
 The Strong Together App helps users build healthier habits by
-combining **workout planning**, **exercise tracking** and **social
-accountability**. Users can create custom workout plans with splits
+combining **workout planning** and**exercise tracking**. Users can create custom workout plans with splits
 and exercises, schedule workouts on specific days of the week,
 receive notifications before a session and log each set’s weight and
 repetitions. All data is stored in a
