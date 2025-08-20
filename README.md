@@ -1,20 +1,17 @@
 # Strong Together App – Frontend (v3.0.0)
 
----
-
 <div align="center">
 
-  <img src="https://img.shields.io/badge/Version-3.0.0-blue" alt="Version 3.0.0" />
-  <img src="https://img.shields.io/badge/Technologies-React%20Native%2C%20JavaScript%2C%20Expo%20Go-green" alt="Technologies" />
-  <img src="https://img.shields.io/badge/License-Personal%20Use-orange" alt="Personal Use License" />
-  <img src="https://img.shields.io/badge/Status-In%20Progress-yellow" alt="Status In Progress" />
-  <img src="https://img.shields.io/badge/Type-Side%20Project-lightgrey" alt="Side Project" />
+  
 
 </div>
 
 <p align="center">
   <img src="assets/icon.png" alt="Strong-Together-App Icon" width="150" />
 </p>
+
+ <img src="https://img.shields.io/badge/Technologies-React%20Native%2C%20JavaScript%2C%20Expo%20Go-green" alt="Technologies" />
+ 
 
 Welcome to the **Strong Together App** — a cross-platform mobile
 application for planning, scheduling and tracking your workouts. The
