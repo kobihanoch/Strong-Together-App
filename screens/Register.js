@@ -15,6 +15,7 @@ import Icon from "react-native-vector-icons/FontAwesome";
 import InputField from "../components/InputField";
 import { useAuth } from "../context/AuthContext";
 import { showErrorAlert } from "../errors/errorAlerts";
+import SelectField from "../components/SelectField";
 
 const { width, height } = Dimensions.get("window");
 
@@ -94,11 +95,10 @@ const Register = ({ navigation }) => {
                 value={fullName}
                 onChangeText={setFullName}
               />
-              <InputField
-                placeholder="Gender"
+              <SelectField
                 iconName="venus-mars"
                 value={gender}
-                onChangeText={setGender}
+                onChange={setGender}
               />
               <InputField
                 placeholder="Password"

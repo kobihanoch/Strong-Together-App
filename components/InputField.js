@@ -2,7 +2,7 @@ import React from "react";
 import { Dimensions, StyleSheet, TextInput, View } from "react-native";
 import Icon from "react-native-vector-icons/FontAwesome";
 
-const { width, height } = Dimensions.get("window"); // לקבלת רוחב וגובה המסך
+const { width, height } = Dimensions.get("window");
 
 const InputField = ({
   placeholder,
