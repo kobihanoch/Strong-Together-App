@@ -50,11 +50,13 @@
     "react-native-draggable-flatlist": "^4.0.3",
     "react-native-gesture-handler": "~2.24.0",
     "react-native-get-random-values": "^1.11.0",
+    "react-native-gifted-charts": "^1.4.63",
     "react-native-image-filter-kit": "^0.8.0",
     "react-native-keyboard-aware-scroll-view": "^0.9.5",
     "react-native-linear-gradient": "^2.8.3",
     "react-native-network-info": "^5.2.1",
     "react-native-notifier": "^2.0.0",
+    "react-native-pie": "^1.1.2",
     "react-native-reanimated": "~3.17.4",
     "react-native-responsive-fontsize": "^0.5.1",
     "react-native-safe-area-context": "5.4.0",
@@ -68,6 +70,7 @@
     "stream-http": "^3.2.0",
     "tls-browserify": "^0.2.2",
     "use-latest-callback": "^0.2.1",
+    "victory-native": "^41.19.3",
     "which": "5.0.0"
   },
   "devDependencies": {

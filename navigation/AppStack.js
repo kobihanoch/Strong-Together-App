@@ -1,15 +1,14 @@
-import React, { useEffect } from "react";
 import { createStackNavigator } from "@react-navigation/stack";
-import Home from "../screens/Home";
-import Settings from "../screens/Settings";
-import MyWorkoutPlan from "../screens/MyWorkoutPlan";
-import StartWorkout from "../screens/StartWorkout";
+import React, { useEffect } from "react";
+import Analytics from "../screens/Analytics";
 import CreateWorkout from "../screens/CreateWorkout";
-import Profile from "../screens/Profile";
-import Statistics from "../screens/Statistics";
+import Home from "../screens/Home";
 import Inbox from "../screens/Inbox";
-import { useGlobalAppLoadingContext } from "../context/GlobalAppLoadingContext";
-import { useAuth } from "../context/AuthContext";
+import MyWorkoutPlan from "../screens/MyWorkoutPlan";
+import Profile from "../screens/Profile";
+import Settings from "../screens/Settings";
+import StartWorkout from "../screens/StartWorkout";
+import Statistics from "../screens/Statistics";
 
 const Stack = createStackNavigator();
 
@@ -27,7 +26,7 @@ const AppStack = () => {
 
         cardStyle: { backgroundColor: "#F9F9F9", flex: 1 },
       }}
-      initialRouteName="Home"
+      initialRouteName="Analytics"
     >
       <Stack.Screen name="Home" component={Home} />
       <Stack.Screen name="Settings" component={Settings} />
@@ -37,6 +36,7 @@ const AppStack = () => {
       <Stack.Screen name="CreateWorkout" component={CreateWorkout} />
       <Stack.Screen name="Statistics" component={Statistics} />
       <Stack.Screen name="Inbox" component={Inbox} />
+      <Stack.Screen name="Analytics" component={Analytics} />
     </Stack.Navigator>
   );
 };
