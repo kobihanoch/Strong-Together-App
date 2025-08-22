@@ -1,10 +1,9 @@
-import React, { useEffect, useMemo } from "react";
+import React, { useMemo } from "react";
 import { Dimensions, Text, View } from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";
-import Card from "./Card";
-import { PieChart } from "react-native-gifted-charts";
-import PieDiagramSplitsCounter from "./PieDiagramSplitsCounter";
 import { splitsCounterToPieData } from "../../utils/analyticsUtils";
+import Card from "./Card";
+import PieDiagramSplitsCounter from "./PieDiagramSplitsCounter";
 
 const { width, height } = Dimensions.get("window");
 
