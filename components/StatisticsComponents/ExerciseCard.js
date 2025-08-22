@@ -221,8 +221,10 @@ const ExerciseCard = ({ item, dataToCompare }) => {
             flex: 5,
             flexDirection: "column",
             gap: height * 0.02,
-            backgroundColor: "rgba(3, 95, 255, 0.13)",
+            backgroundColor: "rgba(255, 255, 255, 1)",
             borderRadius: height * 0.02,
+            borderColor: "rgba(169, 169, 169, 0.25)",
+            borderWidth: 0.5,
             padding: height * 0.02,
           }}
         >
