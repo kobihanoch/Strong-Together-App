@@ -114,11 +114,19 @@ export const getLastWorkoutForEachExercise = (
 };
 
 // PR for the same exercise
-export const isSetPR = (etsId, weight, byETSid) => {
-  const allWeightsRecordForExercise = byETSid[etsId].flatMap(
-    (record) => record.weight
-  );
-  return weight == Math.max(...allWeightsRecordForExercise);
+export const isSetPR = (exId, weight, reps, prsByExId, workoutDate) => {
+  const prForExercise = prsByExId[exId];
+  if (!prForExercise) return true;
+
+  const { weight: prW, reps: prR } = prForExercise;
+  if (weight >= prW && reps >= prR) {
+    if (prForExercise.workoutdate == workoutDate) {
+      return true;
+    } else if (weight > prW && reps > prR) {
+      return true;
+    }
+  }
+  return false;
 };
 
 // Format a date string (YYYY-MM-DD) into "Mon DD, YYYY"

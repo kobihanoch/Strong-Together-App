@@ -6,11 +6,10 @@ import React, {
   useMemo,
   useState,
 } from "react";
-import { useAuth } from "./AuthContext";
 import { getUserExerciseTracking } from "../services/WorkoutService";
 import { unpackFromExerciseTrackingData } from "../utils/authUtils";
+import { useAuth } from "./AuthContext";
 import { useGlobalAppLoadingContext } from "./GlobalAppLoadingContext";
-import { getExerciseTrackingMapped } from "../utils/statisticsUtils";
 
 const AnalysisContext = createContext(null);
 export const useAnalysisContext = () => {

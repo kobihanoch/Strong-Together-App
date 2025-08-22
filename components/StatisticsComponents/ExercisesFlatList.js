@@ -5,7 +5,7 @@ import ExerciseCard from "./ExerciseCard";
 
 const { width, height } = Dimensions.get("window");
 
-const ExercisesFlatList = ({ data, dataToCompare, byETSId }) => {
+const ExercisesFlatList = ({ data, dataToCompare }) => {
   return (
     <View style={{ flex: 7, justifyContent: "center", alignItems: "center" }}>
       {data && data.length > 0 ? (
@@ -14,11 +14,7 @@ const ExercisesFlatList = ({ data, dataToCompare, byETSId }) => {
           horizontal
           keyExtractor={(item) => item.id.toString()}
           renderItem={({ item }) => (
-            <ExerciseCard
-              item={item}
-              dataToCompare={dataToCompare}
-              byETSId={byETSId}
-            />
+            <ExerciseCard item={item} dataToCompare={dataToCompare} />
           )}
           contentContainerStyle={{ padding: 10 }}
           initialNumToRender={4}

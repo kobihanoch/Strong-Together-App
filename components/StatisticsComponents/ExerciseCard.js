@@ -1,15 +1,15 @@
 import { FontAwesome5 } from "@expo/vector-icons";
-import { LinearGradient } from "expo-linear-gradient";
 import React, { useMemo } from "react";
 import { Dimensions, Image, StyleSheet, Text, View } from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";
 import images from "../../components/images";
 import { formatDate, isSetPR } from "../../utils/statisticsUtils";
-import useStatisticsPageLogic from "../../hooks/logic/useStatisticsPageLogic";
+import { useAnalysisContext } from "../../context/AnalysisContext";
 
 const { width, height } = Dimensions.get("window");
 
-const ExerciseCard = ({ item, dataToCompare, byETSId }) => {
+const ExerciseCard = ({ item, dataToCompare }) => {
+  const { prMapExId } = useAnalysisContext().analyzedExerciseTrackingData;
   // Same exercise in last workout
   const previousExercise = useMemo(() => {
     return Array.isArray(dataToCompare)
@@ -116,7 +116,13 @@ const ExerciseCard = ({ item, dataToCompare, byETSId }) => {
               const isSame =
                 w == prevWeight &&
                 previousExercise?.reps?.[index] == item.reps[index];
-              const isPr = isSetPR(item.exercisetosplit_id, w, byETSId);
+              const isPr = isSetPR(
+                item.exercise_id,
+                w,
+                item.reps[index],
+                prMapExId,
+                item.workoutdate
+              );
               const color = isPr
                 ? "rgb(170, 122, 2)"
                 : isSame || prevWeight === undefined
