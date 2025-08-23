@@ -114,41 +114,14 @@ const Overview = ({ overViewData }) => {
                 fontFamily: "Inter_400Regular",
                 color: "white",
                 fontSize: RFValue(12),
-                opacity: 0.8,
+                opacity: 0.7,
                 marginTop: height * 0.01,
               }}
             >
-              Workout name
+              Workout Name
             </Text>
           </View>
-          <View
-            style={{
-              flexDirection: "column",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            <Text
-              style={{
-                fontFamily: "Inter_600SemiBold",
-                color: "white",
-                fontSize: RFValue(14),
-              }}
-            >
-              {workoutPlan.created_at.split("T")[0]}
-            </Text>
-            <Text
-              style={{
-                fontFamily: "Inter_400Regular",
-                color: "white",
-                fontSize: RFValue(12),
-                opacity: 0.8,
-                marginTop: height * 0.01,
-              }}
-            >
-              Last updated
-            </Text>
-          </View>
+
           <View
             style={{
               flexDirection: "column",
@@ -170,11 +143,43 @@ const Overview = ({ overViewData }) => {
                 fontFamily: "Inter_400Regular",
                 color: "white",
                 fontSize: RFValue(12),
-                opacity: 0.8,
+                opacity: 0.7,
                 marginTop: height * 0.01,
               }}
             >
-              Splits
+              Splits Count
+            </Text>
+          </View>
+          <View
+            style={{
+              flexDirection: "column",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <Text
+              style={{
+                fontFamily: "Inter_600SemiBold",
+                color: "white",
+                fontSize: RFValue(14),
+              }}
+            >
+              {workoutPlan.created_at
+                .split("T")[0]
+                .split("-")
+                .reverse()
+                .join("/")}
+            </Text>
+            <Text
+              style={{
+                fontFamily: "Inter_400Regular",
+                color: "white",
+                fontSize: RFValue(12),
+                opacity: 0.7,
+                marginTop: height * 0.01,
+              }}
+            >
+              Last Updated
             </Text>
           </View>
         </View>
