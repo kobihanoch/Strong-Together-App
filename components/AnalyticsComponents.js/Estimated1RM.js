@@ -73,6 +73,8 @@ const Estimated1RM = ({ exercises, onSeeAll }) => {
       subtitleColor="#797979ff"
       iconColor="black"
       iconName={"medal"}
+      useBorder={true}
+      borderWidth={0}
     >
       {/* Rows list */}
       <View
@@ -91,7 +93,7 @@ const Estimated1RM = ({ exercises, onSeeAll }) => {
                 flexDirection: "row",
                 alignItems: "center",
                 borderColor: "rgba(233, 233, 233, 1)",
-                borderWidth: 1,
+                borderWidth: 0.5,
                 borderRadius: width * 0.02,
                 height: height * 0.068,
               }}
@@ -130,6 +132,8 @@ const Estimated1RM = ({ exercises, onSeeAll }) => {
                     fontFamily: "Inter_400Regular",
                     color: "black",
                     fontSize: RFValue(10),
+                    opacity: 0.5,
+                    marginTop: 3,
                   }}
                 >
                   {recordData.weight} x {recordData.reps}
