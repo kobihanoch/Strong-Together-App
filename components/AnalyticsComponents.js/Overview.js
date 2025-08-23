@@ -8,7 +8,7 @@ import PieDiagramSplitsCounter from "./PieDiagramSplitsCounter";
 const { width, height } = Dimensions.get("window");
 
 const Overview = ({ overViewData }) => {
-  const { workoutCount, splitsCounter } = overViewData;
+  const { workoutCount, splitsCounter, workoutPlan } = overViewData;
   const splitsCounterWithColors = useMemo(
     () => splitsCounterToPieData(splitsCounter),
     [splitsCounter]
@@ -69,24 +69,114 @@ const Overview = ({ overViewData }) => {
       titleColor="#E5E7EB"
       subtitleColor="#E5E7EB"
     >
-      <View
-        style={{
-          height: height * 0.3,
-          flexDirection: "row",
-        }}
-      >
+      <View style={{ flexDirection: "column" }}>
         <View
-          style={{ flex: 6, justifyContent: "center", alignItems: "center" }}
+          style={{
+            height: height * 0.3,
+            flexDirection: "row",
+          }}
         >
-          <PieDiagramSplitsCounter
-            splitsCounterWithColors={splitsCounterWithColors}
-            workoutCount={workoutCount}
-          ></PieDiagramSplitsCounter>
+          <View
+            style={{ flex: 6, justifyContent: "center", alignItems: "center" }}
+          >
+            <PieDiagramSplitsCounter
+              splitsCounterWithColors={splitsCounterWithColors}
+              workoutCount={workoutCount}
+            ></PieDiagramSplitsCounter>
+          </View>
+          <View
+            style={{ flex: 4, justifyContent: "center", alignItems: "center" }}
+          >
+            <View style={{ gap: height * 0.02 }}>
+              {renderLegendComponent()}
+            </View>
+          </View>
         </View>
-        <View
-          style={{ flex: 4, justifyContent: "center", alignItems: "center" }}
-        >
-          <View style={{ gap: height * 0.02 }}>{renderLegendComponent()}</View>
+        <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
+          <View
+            style={{
+              flexDirection: "column",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <Text
+              style={{
+                fontFamily: "Inter_600SemiBold",
+                color: "white",
+                fontSize: RFValue(14),
+              }}
+            >
+              {workoutPlan.name}
+            </Text>
+            <Text
+              style={{
+                fontFamily: "Inter_400Regular",
+                color: "white",
+                fontSize: RFValue(12),
+                opacity: 0.8,
+                marginTop: height * 0.01,
+              }}
+            >
+              Workout name
+            </Text>
+          </View>
+          <View
+            style={{
+              flexDirection: "column",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <Text
+              style={{
+                fontFamily: "Inter_600SemiBold",
+                color: "white",
+                fontSize: RFValue(14),
+              }}
+            >
+              {workoutPlan.created_at.split("T")[0]}
+            </Text>
+            <Text
+              style={{
+                fontFamily: "Inter_400Regular",
+                color: "white",
+                fontSize: RFValue(12),
+                opacity: 0.8,
+                marginTop: height * 0.01,
+              }}
+            >
+              Last updated
+            </Text>
+          </View>
+          <View
+            style={{
+              flexDirection: "column",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <Text
+              style={{
+                fontFamily: "Inter_600SemiBold",
+                color: "white",
+                fontSize: RFValue(14),
+              }}
+            >
+              {workoutPlan.numberofsplits}
+            </Text>
+            <Text
+              style={{
+                fontFamily: "Inter_400Regular",
+                color: "white",
+                fontSize: RFValue(12),
+                opacity: 0.8,
+                marginTop: height * 0.01,
+              }}
+            >
+              Splits
+            </Text>
+          </View>
         </View>
       </View>
     </Card>

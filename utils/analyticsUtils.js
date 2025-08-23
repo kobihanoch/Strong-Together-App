@@ -2,9 +2,9 @@
 
 // Palette: first 3 are exactly as requested, followed by more accents
 export const PIE_COLORS = [
-  "#F59E0B", // warm: amber
-  "#22C55E", // cool: emerald
-  "#F97316", // warm: orange
+  "#29ffaf", // warm: amber
+  "#ff2979", // cool: emerald
+  "#ffaf29", // warm: orange
   "#0D9488", // cool: teal
   "#EF4444", // warm: red
   "#84CC16", // cool: lime
