@@ -6,13 +6,14 @@ import useAnalysticsLogic from "../hooks/logic/useAnalysticsLogic";
 import { RFValue } from "react-native-responsive-fontsize";
 import Overview from "../components/AnalyticsComponents.js/Overview";
 import Estimated1RM from "../components/AnalyticsComponents.js/Estimated1RM";
+import VolumeAttendence from "../components/AnalyticsComponents.js/VolumeAttendence";
 
 const { width, height } = Dimensions.get("window");
 
 const Analytics = () => {
   const { data, loading, globalLoading } = useAnalysticsLogic();
   // Need to plug estimated PRs
-  const { overview, _1rms } = data;
+  const { overview, _1rms, adherence } = data;
 
   return (
     !loading &&
@@ -26,6 +27,7 @@ const Analytics = () => {
       >
         <Overview overViewData={overview}></Overview>
         <Estimated1RM rmData={_1rms}></Estimated1RM>
+        <VolumeAttendence adherenceData={adherence}></VolumeAttendence>
       </ScrollView>
     )
   );

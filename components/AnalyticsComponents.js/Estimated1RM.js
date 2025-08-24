@@ -1,5 +1,3 @@
-// English comments only inside the code
-
 import { FontAwesome5 } from "@expo/vector-icons";
 import React from "react";
 import { Dimensions, TouchableOpacity, View, Text } from "react-native";

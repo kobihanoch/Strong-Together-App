@@ -11,6 +11,7 @@ const useAnalysticsLogic = () => {
     analyzedExerciseTrackingData ?? {};
   const { workout } = useWorkoutContext();
   const [_1RM, set1RM] = useState({});
+  const [adherence, setAdherence] = useState({});
   const [loading, setLoading] = useState(true);
 
   // Fetch analytics data
@@ -20,6 +21,7 @@ const useAnalysticsLogic = () => {
         setLoading(true);
         const { _1RM, goals } = await getTrackingAnalytics();
         set1RM(_1RM);
+        setAdherence(goals);
       } catch (e) {
       } finally {
         setLoading(false);
@@ -36,6 +38,9 @@ const useAnalysticsLogic = () => {
       },
       _1rms: {
         rm: _1RM,
+      },
+      adherence: {
+        adh: adherence,
       },
     },
     loading: loading,
