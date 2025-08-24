@@ -10,23 +10,24 @@ import Estimated1RM from "../components/AnalyticsComponents.js/Estimated1RM";
 const { width, height } = Dimensions.get("window");
 
 const Analytics = () => {
-  const { data, loading } = useAnalysticsLogic();
+  const { data, loading, globalLoading } = useAnalysticsLogic();
   // Need to plug estimated PRs
-  const { overview } = data;
-
-  if (loading) return null;
+  const { overview, _1rms } = data;
 
   return (
-    <ScrollView
-      style={{
-        width: "100%",
-        flex: 1,
-      }}
-      showsVerticalScrollIndicator={false}
-    >
-      <Overview overViewData={overview}></Overview>
-      <Estimated1RM></Estimated1RM>
-    </ScrollView>
+    !loading &&
+    !globalLoading && (
+      <ScrollView
+        style={{
+          width: "100%",
+          flex: 1,
+        }}
+        showsVerticalScrollIndicator={false}
+      >
+        <Overview overViewData={overview}></Overview>
+        <Estimated1RM rmData={_1rms}></Estimated1RM>
+      </ScrollView>
+    )
   );
 };
 

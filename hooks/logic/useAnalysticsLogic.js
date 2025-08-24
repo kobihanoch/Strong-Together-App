@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo } from "react";
 import { useGlobalAppLoadingContext } from "../../context/GlobalAppLoadingContext";
 import { useAnalysisContext } from "../../context/AnalysisContext";
 import { useWorkoutContext } from "../../context/WorkoutContext";
+import { getTrackingAnalytics } from "../../services/AnalyticsService";
 
 const useAnalysticsLogic = () => {
   const { isLoading: globalLoading } = useGlobalAppLoadingContext();
@@ -9,7 +10,22 @@ const useAnalysticsLogic = () => {
   const { workoutCount = 0, splitDaysByName: splitsCounter = new Map() } =
     analyzedExerciseTrackingData ?? {};
   const { workout } = useWorkoutContext();
-  const loading = globalLoading || !analyzedExerciseTrackingData || !workout;
+  const [_1RM, set1RM] = useState({});
+  const [loading, setLoading] = useState(true);
+
+  // Fetch analytics data
+  useEffect(() => {
+    (async () => {
+      try {
+        setLoading(true);
+        const { _1RM, goals } = await getTrackingAnalytics();
+        set1RM(_1RM);
+      } catch (e) {
+      } finally {
+        setLoading(false);
+      }
+    })();
+  }, []);
 
   return {
     data: {
@@ -18,8 +34,12 @@ const useAnalysticsLogic = () => {
         splitsCounter: splitsCounter,
         workoutPlan: workout,
       },
+      _1rms: {
+        rm: _1RM,
+      },
     },
     loading: loading,
+    globalLoading: globalLoading,
   };
 };
 

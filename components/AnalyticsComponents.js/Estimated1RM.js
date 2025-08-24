@@ -8,61 +8,8 @@ import Card from "./Card";
 
 const { width, height } = Dimensions.get("window");
 
-const Estimated1RM = ({ exercises, onSeeAll }) => {
-  // Demo data (remove when wiring real props)
-  exercises = exercises ?? {
-    1: {
-      id: 371,
-      reps: 5,
-      weight: 160,
-      exercise: "Squat",
-      exercise_id: 1,
-      workoutdate: "2025-07-11",
-      exercisetosplit_id: 775,
-      est1RM: 180,
-    },
-    2: {
-      id: 537,
-      reps: 12,
-      weight: 109,
-      exercise: "Leg Extensions",
-      exercise_id: 2,
-      workoutdate: "2025-08-20",
-      exercisetosplit_id: 1270,
-      est1RM: 200,
-    },
-    5: {
-      id: 370,
-      reps: 12,
-      weight: 55,
-      exercise: "Leg Curl",
-      exercise_id: 5,
-      workoutdate: "2025-07-11",
-      exercisetosplit_id: 774,
-      est1RM: 110,
-    },
-    6: {
-      id: 541,
-      reps: 8,
-      weight: 40,
-      exercise: "Walking Lunges",
-      exercise_id: 6,
-      workoutdate: "2025-08-20",
-      exercisetosplit_id: 1274,
-      est1RM: 80,
-    },
-    7: {
-      id: 394,
-      reps: 2,
-      weight: 220,
-      exercise: "Leg Press",
-      exercise_id: 7,
-      workoutdate: "2025-07-17",
-      exercisetosplit_id: 776,
-      est1RM: 350,
-    },
-  };
-
+const Estimated1RM = ({ rmData, onSeeAll }) => {
+  const { rm } = rmData;
   return (
     <Card
       style={{ width: "90%", alignSelf: "center", marginTop: height * 0.02 }}
@@ -80,7 +27,7 @@ const Estimated1RM = ({ exercises, onSeeAll }) => {
       <View
         style={{ height: height * 0.3, flexDirection: "column", marginTop: 10 }}
       >
-        {Object.entries(exercises)
+        {Object.entries(rm)
           .slice(0, 4)
           .map(([exId, recordData]) => (
             <View
@@ -116,7 +63,7 @@ const Estimated1RM = ({ exercises, onSeeAll }) => {
               </View>
 
               <View
-                style={{ flexDirection: "column", paddingLeft: 15, flex: 7 }}
+                style={{ flexDirection: "column", paddingLeft: 15, flex: 6 }}
               >
                 <Text
                   style={{
@@ -136,11 +83,11 @@ const Estimated1RM = ({ exercises, onSeeAll }) => {
                     marginTop: 3,
                   }}
                 >
-                  {recordData.weight} x {recordData.reps}
+                  {recordData.pr_weight} x {recordData.pr_reps}
                 </Text>
               </View>
 
-              <View style={{ flexDirection: "column", flex: 2 }}>
+              <View style={{ flexDirection: "column", flex: 3 }}>
                 <Text
                   style={{
                     fontFamily: "Inter_700Bold",
@@ -149,7 +96,7 @@ const Estimated1RM = ({ exercises, onSeeAll }) => {
                     textAlign: "right",
                   }}
                 >
-                  {recordData.est1RM} kg
+                  {recordData.max_1rm} kg
                 </Text>
                 <Text
                   style={{
