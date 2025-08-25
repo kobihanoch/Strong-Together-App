@@ -21,7 +21,7 @@ import { RFValue } from "react-native-responsive-fontsize";
 
 const { width, height } = Dimensions.get("window");
 
-const BottomModalFlatlist = forwardRef(function BottomModalFlatlist(
+const SlidingBottomModal = forwardRef(function SlidingBottomModal(
   {
     data = [],
     renderItem,
@@ -157,4 +157,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default BottomModalFlatlist;
+export default SlidingBottomModal;

@@ -6,10 +6,10 @@ import { ScrollView } from "react-native-gesture-handler";
 import Estimated1RM from "../components/AnalyticsComponents.js/Estimated1RM";
 import GoalAdherence from "../components/AnalyticsComponents.js/GoalAdherence";
 import Overview from "../components/AnalyticsComponents.js/Overview";
-import useAnalysticsLogic from "../hooks/logic/useAnalysticsLogic";
-import BottomModalFlatlist from "../components/BottomModalFlatlist";
 import RenderEst1RMItem from "../components/AnalyticsComponents.js/RenderEst1RMItem";
 import RenderGoalAdherenceItem from "../components/AnalyticsComponents.js/RenderGoalAdherenceItem";
+import SlidingBottomModal from "../components/SlidingBottomModal";
+import useAnalysticsLogic from "../hooks/logic/useAnalysticsLogic";
 
 const { height } = Dimensions.get("window");
 
@@ -55,7 +55,7 @@ const Analytics = () => {
       </ScrollView>
 
       {/* RMS modal (unchanged) */}
-      <BottomModalFlatlist
+      <SlidingBottomModal
         title="All Estimated 1RMs"
         ref={RMSModalRef}
         data={Object.entries(_1rms.rm)}
@@ -68,7 +68,7 @@ const Analytics = () => {
       />
 
       {/* Goal Adherence modal: show ONLY the selected name */}
-      <BottomModalFlatlist
+      <SlidingBottomModal
         title={"Goal Adherence"}
         ref={goalAdherenceModalRef}
         data={selectedAdh ? [[selectedAdh.name, selectedAdh.v]] : []} // only one entry
