@@ -39,10 +39,7 @@ const Home = ({ navigation }) => {
           <StartWorkoutButton></StartWorkoutButton>
         </View>
 
-        {/*flex 1*/}
-        <LastWorkoutSection data={userData}></LastWorkoutSection>
-
-        {/*flex 6*/}
+        {/*flex 7*/}
         <QuickLookSection data={userData}></QuickLookSection>
       </View>
     </View>

@@ -26,7 +26,7 @@ const AppStack = () => {
 
         cardStyle: { backgroundColor: "#F9F9F9", flex: 1 },
       }}
-      initialRouteName="Analytics"
+      initialRouteName="Home"
     >
       <Stack.Screen name="Home" component={Home} />
       <Stack.Screen name="Settings" component={Settings} />
