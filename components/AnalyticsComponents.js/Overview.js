@@ -7,7 +7,7 @@ import PieDiagramSplitsCounter from "./PieDiagramSplitsCounter";
 
 const { width, height } = Dimensions.get("window");
 
-const Overview = ({ overViewData }) => {
+const Overview = ({ overViewData, hasData }) => {
   const { workoutCount, splitsCounter, workoutPlan } = overViewData;
   const splitsCounterWithColors = useMemo(
     () => splitsCounterToPieData(splitsCounter),
@@ -70,119 +70,139 @@ const Overview = ({ overViewData }) => {
       subtitleColor="#E5E7EB"
     >
       <View style={{ flexDirection: "column" }}>
-        <View
-          style={{
-            height: height * 0.3,
-            flexDirection: "row",
-          }}
-        >
-          <View
-            style={{ flex: 6, justifyContent: "center", alignItems: "center" }}
-          >
-            <PieDiagramSplitsCounter
-              splitsCounterWithColors={splitsCounterWithColors}
-              workoutCount={workoutCount}
-            ></PieDiagramSplitsCounter>
-          </View>
-          <View
-            style={{ flex: 4, justifyContent: "center", alignItems: "center" }}
-          >
-            <View style={{ gap: height * 0.02 }}>
-              {renderLegendComponent()}
+        {hasData ? (
+          <>
+            <View
+              style={{
+                height: height * 0.3,
+                flexDirection: "row",
+              }}
+            >
+              <View
+                style={{
+                  flex: 6,
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+              >
+                <PieDiagramSplitsCounter
+                  splitsCounterWithColors={splitsCounterWithColors}
+                  workoutCount={workoutCount}
+                ></PieDiagramSplitsCounter>
+              </View>
+              <View
+                style={{
+                  flex: 4,
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+              >
+                <View style={{ gap: height * 0.02 }}>
+                  {renderLegendComponent()}
+                </View>
+              </View>
             </View>
-          </View>
-        </View>
-        <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
-          <View
-            style={{
-              flexDirection: "column",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            <Text
-              style={{
-                fontFamily: "Inter_600SemiBold",
-                color: "white",
-                fontSize: RFValue(14),
-              }}
+            <View
+              style={{ flexDirection: "row", justifyContent: "space-between" }}
             >
-              {workoutPlan.name}
-            </Text>
-            <Text
-              style={{
-                fontFamily: "Inter_400Regular",
-                color: "white",
-                fontSize: RFValue(12),
-                opacity: 0.7,
-                marginTop: height * 0.01,
-              }}
-            >
-              Workout Name
-            </Text>
-          </View>
+              <View
+                style={{
+                  flexDirection: "column",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <Text
+                  style={{
+                    fontFamily: "Inter_600SemiBold",
+                    color: "white",
+                    fontSize: RFValue(14),
+                  }}
+                >
+                  {workoutPlan.name}
+                </Text>
+                <Text
+                  style={{
+                    fontFamily: "Inter_400Regular",
+                    color: "white",
+                    fontSize: RFValue(12),
+                    opacity: 0.7,
+                    marginTop: height * 0.01,
+                  }}
+                >
+                  Workout Name
+                </Text>
+              </View>
 
-          <View
-            style={{
-              flexDirection: "column",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            <Text
-              style={{
-                fontFamily: "Inter_600SemiBold",
-                color: "white",
-                fontSize: RFValue(14),
-              }}
-            >
-              {workoutPlan.numberofsplits}
-            </Text>
-            <Text
-              style={{
-                fontFamily: "Inter_400Regular",
-                color: "white",
-                fontSize: RFValue(12),
-                opacity: 0.7,
-                marginTop: height * 0.01,
-              }}
-            >
-              Splits Count
-            </Text>
-          </View>
-          <View
-            style={{
-              flexDirection: "column",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            <Text
-              style={{
-                fontFamily: "Inter_600SemiBold",
-                color: "white",
-                fontSize: RFValue(14),
-              }}
-            >
-              {workoutPlan.created_at
-                .split("T")[0]
-                .split("-")
-                .reverse()
-                .join("/")}
-            </Text>
-            <Text
-              style={{
-                fontFamily: "Inter_400Regular",
-                color: "white",
-                fontSize: RFValue(12),
-                opacity: 0.7,
-                marginTop: height * 0.01,
-              }}
-            >
-              Last Updated
-            </Text>
-          </View>
-        </View>
+              <View
+                style={{
+                  flexDirection: "column",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <Text
+                  style={{
+                    fontFamily: "Inter_600SemiBold",
+                    color: "white",
+                    fontSize: RFValue(14),
+                  }}
+                >
+                  {workoutPlan.numberofsplits}
+                </Text>
+                <Text
+                  style={{
+                    fontFamily: "Inter_400Regular",
+                    color: "white",
+                    fontSize: RFValue(12),
+                    opacity: 0.7,
+                    marginTop: height * 0.01,
+                  }}
+                >
+                  Splits Count
+                </Text>
+              </View>
+              <View
+                style={{
+                  flexDirection: "column",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <Text
+                  style={{
+                    fontFamily: "Inter_600SemiBold",
+                    color: "white",
+                    fontSize: RFValue(14),
+                  }}
+                >
+                  {workoutPlan.created_at
+                    .split("T")[0]
+                    .split("-")
+                    .reverse()
+                    .join("/")}
+                </Text>
+                <Text
+                  style={{
+                    fontFamily: "Inter_400Regular",
+                    color: "white",
+                    fontSize: RFValue(12),
+                    opacity: 0.7,
+                    marginTop: height * 0.01,
+                  }}
+                >
+                  Last Updated
+                </Text>
+              </View>
+            </View>
+          </>
+        ) : (
+          <>
+            <View>
+              <Text>No data</Text>
+            </View>
+          </>
+        )}
       </View>
     </Card>
   );

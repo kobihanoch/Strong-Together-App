@@ -13,6 +13,10 @@ const useAnalysticsLogic = () => {
   const [_1RM, set1RM] = useState({});
   const [adherence, setAdherence] = useState({});
   const [loading, setLoading] = useState(true);
+  const hasData = useMemo(
+    () => !!analyzedExerciseTrackingData,
+    [analyzedExerciseTrackingData]
+  );
 
   // Fetch analytics data
   useEffect(() => {
@@ -45,6 +49,7 @@ const useAnalysticsLogic = () => {
     },
     loading: loading,
     globalLoading: globalLoading,
+    hasData,
   };
 };
 

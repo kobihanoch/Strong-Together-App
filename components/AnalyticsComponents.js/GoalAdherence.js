@@ -14,9 +14,11 @@ import Card from "./Card";
 
 const { width, height } = Dimensions.get("window");
 
-const adhumeAttendence = ({ adherenceData, onSeeAll }) => {
+const GoalAdherence = ({ adherenceData, onSeeAll, hasData }) => {
   const { adh } = adherenceData;
-  const data = useMemo(() => Object.entries(adh), [adh]);
+  const data = useMemo(() => {
+    return Object.entries(adh);
+  }, [adh]);
   const [pageWidth, setPageWidth] = useState(0);
   const [index, setIndex] = useState(0);
 
@@ -113,38 +115,51 @@ const adhumeAttendence = ({ adherenceData, onSeeAll }) => {
   );
 
   return (
-    Object.entries(adh).length && (
-      <Card
-        style={{ width: "90%", alignSelf: "center", marginTop: height * 0.02 }}
-        height={120}
-        title={"Goal Adherence"}
-        subtitle={"Actual / Planned reps per exercise "}
-        titleColor="#000000ff"
-        subtitleColor="#797979ff"
-        iconColor="black"
-        iconName={"target"}
-        useBorder={true}
-        borderWidth={0}
+    <Card
+      style={{ width: "90%", alignSelf: "center", marginTop: height * 0.02 }}
+      height={120}
+      title={"Goal Adherence"}
+      subtitle={"Actual / Planned reps per exercise "}
+      titleColor="#000000ff"
+      subtitleColor="#797979ff"
+      iconColor="black"
+      iconName={"target"}
+      useBorder={true}
+      borderWidth={0}
+    >
+      <View
+        style={{
+          flexDirection: "column",
+          marginTop: 10,
+        }}
       >
-        <View style={{ flexDirection: "column", marginTop: 10 }}>
-          <FlatList
-            data={data}
-            onLayout={onLayout}
-            renderItem={({ item: [name, v] }) =>
-              renderItem({ item: [name, v] })
-            }
-            keyExtractor={([name, v]) => name}
-            horizontal
-            pagingEnabled
-            style={{ flex: 1 }}
-            showsHorizontalScrollIndicator={false}
-            onMomentumScrollEnd={onMomentumScrollEnd}
-          ></FlatList>
-          <PageDots index={index} length={data.length} />
-        </View>
-      </Card>
-    )
+        {hasData && data.length > 0 ? (
+          <>
+            <PageDots index={index} length={data.length} />
+            <FlatList
+              data={data}
+              onLayout={onLayout}
+              renderItem={({ item: [name, v] }) =>
+                renderItem({ item: [name, v] })
+              }
+              keyExtractor={([name, v]) => name}
+              horizontal
+              pagingEnabled
+              style={{ flex: 1, marginTop: 25 }}
+              showsHorizontalScrollIndicator={false}
+              onMomentumScrollEnd={onMomentumScrollEnd}
+            ></FlatList>
+          </>
+        ) : (
+          <>
+            <View>
+              <Text>No data</Text>
+            </View>
+          </>
+        )}
+      </View>
+    </Card>
   );
 };
 
-export default adhumeAttendence;
+export default GoalAdherence;
