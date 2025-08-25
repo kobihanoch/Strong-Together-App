@@ -1,20 +1,23 @@
+import BottomSheet, {
+  BottomSheetBackdrop,
+  BottomSheetFlatList,
+} from "@gorhom/bottom-sheet";
 import React, {
   forwardRef,
-  useRef,
+  useCallback,
   useImperativeHandle,
   useMemo,
-  useCallback,
+  useRef,
 } from "react";
 import {
+  Dimensions,
   StyleSheet,
-  View,
   Text,
   TouchableOpacity,
-  Dimensions,
+  View,
 } from "react-native";
-import BottomSheet, { BottomSheetFlatList } from "@gorhom/bottom-sheet";
-import { RFValue } from "react-native-responsive-fontsize";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { RFValue } from "react-native-responsive-fontsize";
 
 const { width, height } = Dimensions.get("window");
 
@@ -26,6 +29,7 @@ const BottomModalFlatlist = forwardRef(function BottomModalFlatlist(
     snapPoints: snapPointsProp = ["25%", "50%", "90%"],
     initialIndex = -1,
     contentContainerStyle,
+    flatListUsage = false,
   },
   ref
 ) {
@@ -38,11 +42,23 @@ const BottomModalFlatlist = forwardRef(function BottomModalFlatlist(
     snapToIndex: (i) => sheetRef.current?.snapToIndex?.(i),
   }));
 
+  const renderBackdrop = useCallback(
+    (props) => (
+      <BottomSheetBackdrop
+        {...props}
+        disappearsOnIndex={-1}
+        appearsOnIndex={0}
+        opacity={0.7}
+      />
+    ),
+    []
+  );
+
   const snapPoints = useMemo(() => snapPointsProp, [snapPointsProp]);
 
   const Handle = useCallback(() => {
     return (
-      <View style={styles.header}>
+      <View>
         <View style={{ flexDirection: "column" }}>
           <View
             style={{
@@ -52,18 +68,11 @@ const BottomModalFlatlist = forwardRef(function BottomModalFlatlist(
               backgroundColor: "#C4C4C4",
               alignSelf: "center",
               marginBottom: 10,
-              marginTop: 10,
+              marginTop: 20,
             }}
           ></View>
-          <View style={{ flexDirection: "row" }}>
+          <View style={styles.header}>
             <Text style={styles.headerTitle}>{title}</Text>
-            <TouchableOpacity
-              onPress={() => sheetRef.current?.close?.()}
-              style={styles.closeBtn}
-              activeOpacity={0.7}
-            >
-              <Text style={styles.closeX}>×</Text>
-            </TouchableOpacity>
           </View>
         </View>
       </View>
@@ -86,25 +95,36 @@ const BottomModalFlatlist = forwardRef(function BottomModalFlatlist(
         index={initialIndex} // start closed
         snapPoints={snapPoints}
         enableDynamicSizing={false}
+        backdropComponent={renderBackdrop}
         enablePanDownToClose
         handleComponent={Handle}
         backgroundStyle={styles.sheetBg} // optional, just to see it while testing
       >
-        <BottomSheetFlatList
-          data={data}
-          keyExtractor={keyExtractor}
-          renderItem={renderItem}
-          contentContainerStyle={[
-            styles.contentContainer,
-            contentContainerStyle,
-          ]}
-        />
+        {flatListUsage ? (
+          <BottomSheetFlatList
+            data={data}
+            keyExtractor={keyExtractor}
+            renderItem={renderItem}
+            contentContainerStyle={[
+              styles.contentContainer,
+              contentContainerStyle,
+            ]}
+            showsVerticalScrollIndicator={false}
+          />
+        ) : (
+          <View></View>
+        )}
       </BottomSheet>
     </GestureHandlerRootView>
   );
 });
 
 const styles = StyleSheet.create({
+  sheetBg: {
+    backgroundColor: "white",
+    borderTopLeftRadius: 30,
+    borderTopRightRadius: 30,
+  },
   header: {
     flexDirection: "row",
     alignItems: "center",
@@ -116,6 +136,7 @@ const styles = StyleSheet.create({
     fontFamily: "Inter_600SemiBold",
     fontSize: RFValue(15),
     color: "black",
+    marginTop: 10,
   },
   closeBtn: {
     position: "absolute",
