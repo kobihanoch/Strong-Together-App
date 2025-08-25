@@ -30,6 +30,7 @@ const SlidingBottomModal = forwardRef(function SlidingBottomModal(
     initialIndex = -1,
     contentContainerStyle,
     flatListUsage = false,
+    children,
   },
   ref
 ) {
@@ -112,7 +113,7 @@ const SlidingBottomModal = forwardRef(function SlidingBottomModal(
             showsVerticalScrollIndicator={false}
           />
         ) : (
-          <View></View>
+          <View>{children}</View>
         )}
       </BottomSheet>
     </GestureHandlerRootView>

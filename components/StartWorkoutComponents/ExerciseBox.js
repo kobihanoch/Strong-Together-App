@@ -1,13 +1,11 @@
-import js from "@eslint/js";
-import React, { useState, useRef, useEffect, useMemo } from "react";
-import { View, Text, Dimensions, TouchableOpacity } from "react-native";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { Dimensions, Text, TouchableOpacity, View } from "react-native";
 import { TextInput } from "react-native-gesture-handler";
 import { RFValue } from "react-native-responsive-fontsize";
-import ProgressBar from "./ProgressBar";
-import { MaterialCommunityIcons, Feather } from "@expo/vector-icons";
-import BottomModal from "../BottomModal";
 import useLastWorkoutExerciseTrackingData from "../../hooks/useLastWorkoutExerciseTrackingData";
 import { computeProgressByVolume } from "../../utils/startWorkoutUtils";
+import ProgressBar from "./ProgressBar";
 
 const { width, height } = Dimensions.get("window");
 
@@ -20,9 +18,15 @@ const ExerciseBox = ({
   repsArrs,
   updateWeightArrs,
   updateRepsArrs,
+  setLastWorkoutDataForModal,
+  setVisibleSetIndexForModal,
+  openModal,
 }) => {
-  const [isModalVisible, setIsModalVisible] = useState(false);
   const [visibleSetIndex, setVisibleSetIndex] = useState(0);
+  useEffect(() => {
+    setVisibleSetIndexForModal(visibleSetIndex);
+  }, [visibleSetIndex]);
+
   const [repsArray, setRepsArray] = useState(() =>
     Array(item.sets.length).fill(0)
   );
@@ -32,6 +36,16 @@ const ExerciseBox = ({
   const [progress, setProgress] = useState(0);
 
   const { lastWorkoutData } = useLastWorkoutExerciseTrackingData(item?.id); // Record for exercise in last appearence
+
+  const handleClickOnOpenModal = useCallback(() => {
+    setLastWorkoutDataForModal(lastWorkoutData);
+    openModal();
+  }, [lastWorkoutData]);
+
+  useEffect(() => {
+    setLastWorkoutDataForModal(lastWorkoutData);
+  }, [lastWorkoutData]);
+
   const lastWorkoutSetsCount = useMemo(() => {
     return Number(lastWorkoutData?.weight?.length ?? 0);
   }, [lastWorkoutData]);
@@ -193,19 +207,13 @@ const ExerciseBox = ({
                     Target: {item.sets[visibleSetIndex]} reps
                   </Text>
                 </View>
-                <TouchableOpacity onPress={() => setIsModalVisible(true)}>
+                <TouchableOpacity onPress={() => handleClickOnOpenModal()}>
                   <MaterialCommunityIcons
                     name="history"
                     size={RFValue(25)}
                     color="#2563eb"
                   />
                 </TouchableOpacity>
-                <BottomModal
-                  isVisible={isModalVisible}
-                  onClose={() => setIsModalVisible(false)}
-                  lastWorkoutData={lastWorkoutData}
-                  setIndex={visibleSetIndex}
-                />
               </View>
 
               <View

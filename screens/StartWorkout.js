@@ -1,4 +1,4 @@
-import React, { useCallback, useRef } from "react";
+import React, { useCallback, useRef, useState } from "react";
 import {
   Dimensions,
   FlatList,
@@ -11,6 +11,8 @@ import { Dialog } from "react-native-alert-notification";
 import { RFValue } from "react-native-responsive-fontsize";
 import ExerciseBox from "../components/StartWorkoutComponents/ExerciseBox";
 import useStartWorkoutPageLogic from "../hooks/logic/useStartWorkoutPageLogic";
+import LastWorkoutData from "../components/StartWorkoutComponents/LastWorkoutData";
+import SlidingBottomModal from "../components/SlidingBottomModal";
 
 const { width, height } = Dimensions.get("window");
 
@@ -18,8 +20,15 @@ const StartWorkout = ({ navigation, route }) => {
   const { data: workoutData, saving: workoutSaving } = useStartWorkoutPageLogic(
     route.params?.workoutSplit
   );
+  const [lastWorkoutDataForModal, setLastWorkoutDataForModal] = useState(null);
+  const [visibleSetIndexForModal, setVisibleSetIndexForModal] = useState(0);
 
   const flatListRef = useRef(null);
+
+  const modalRef = useRef(null);
+  const openModal = useCallback(() => {
+    modalRef?.current?.open?.(1);
+  }, []);
 
   const handlePressSave = useCallback(async () => {
     let pressedYes = false;
@@ -73,6 +82,9 @@ const StartWorkout = ({ navigation, route }) => {
               updateRepsArrs={workoutData.setRepsArrs}
               weightArrs={workoutData.weightArrs}
               repsArrs={workoutData.repsArrs}
+              setLastWorkoutDataForModal={setLastWorkoutDataForModal}
+              setVisibleSetIndexForModal={setVisibleSetIndexForModal}
+              openModal={openModal}
             ></ExerciseBox>
           )}
         ></FlatList>
@@ -102,6 +114,17 @@ const StartWorkout = ({ navigation, route }) => {
           </Text>
         </TouchableOpacity>
       </View>
+      <SlidingBottomModal
+        title="Last Performance"
+        ref={modalRef}
+        snapPoints={["50%", "50%", "80%"]}
+        flatListUsage={false}
+      >
+        <LastWorkoutData
+          lastWorkoutData={lastWorkoutDataForModal}
+          setIndex={visibleSetIndexForModal}
+        ></LastWorkoutData>
+      </SlidingBottomModal>
     </View>
   );
 };
