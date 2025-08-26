@@ -85,8 +85,7 @@ export const WorkoutProvider = ({ children }) => {
           setWorkout(workoutPlan ?? null);
           setWorkoutForEdit(workoutPlanForEditWorkout ?? null);
 
-          // Store in cache
-          await cacheSetJSON(workoutPlanKey, data, TTL_48H);
+          // Store in cache - (auto)
         } finally {
           setLoading(false);
         }

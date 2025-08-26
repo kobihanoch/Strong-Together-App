@@ -93,8 +93,7 @@ export const AnalysisProvider = ({ children }) => {
           );
           setHasTrainedToday(exerciseTrackingAnalysis.hasTrainedToday);
 
-          // Store in cache
-          await cacheSetJSON(trackingKey, res, TTL_48H);
+          // Store in cache (auto)
         } finally {
           setLoading(false);
         }

@@ -6,6 +6,8 @@ import {
   useMemo,
   useState,
 } from "react";
+import { cacheGetJSON, keyInbox, TTL_48H } from "../cache/cacheUtils.js";
+import useUpdateCache from "../hooks/useUpdateCache.js";
 import {
   getUserMessages,
   updateMsgReadStatus,
@@ -15,13 +17,6 @@ import { cacheProfileImagesAndGetMap } from "../utils/notificationsUtils.js";
 import { registerToMessagesListener } from "../webSockets/socketListeners";
 import { useAuth } from "./AuthContext.js";
 import { useGlobalAppLoadingContext } from "./GlobalAppLoadingContext.js";
-import {
-  cacheDeleteKey,
-  cacheGetJSON,
-  cacheSetJSON,
-  keyInbox,
-  TTL_48H,
-} from "../cache/cacheUtils.js";
 
 /**
  * Notifications Flow:
@@ -43,6 +38,9 @@ export const NotificationsProvider = ({ children }) => {
   const { setLoading: setGlobalLoading } = useGlobalAppLoadingContext();
 
   const { user, sessionLoading } = useAuth();
+
+  // Stable cache key (unify 45 days usage)
+  const msgKey = useMemo(() => (user ? keyInbox(user.id) : null), [user?.id]);
 
   // All user's received messages
   const [allReceivedMessages, setAllReceivedMessages] = useState([]);
@@ -94,8 +92,7 @@ export const NotificationsProvider = ({ children }) => {
           setAllReceivedMessages(messages.messages);
           setAllSendersUsersArr(messages.senders);
 
-          // Store in cache
-          await cacheSetJSON(inboxKey, messages, TTL_48H);
+          // Storage in cache happens alone with dependencies (below)
         } finally {
           setLoadingMessages(false);
         }
@@ -133,26 +130,16 @@ export const NotificationsProvider = ({ children }) => {
     );
   };
 
-  // Write-through cache any time messages/senders change
-  useEffect(() => {
-    if (!user?.id) return;
+  // Already unpacked (the analysis) - ready for later user
+  const cachedPayload = useMemo(() => {
+    return {
+      messages: allReceivedMessages,
+      senders: allSendersUsersArr,
+    };
+  }, [allReceivedMessages, allSendersUsersArr]);
 
-    (async () => {
-      try {
-        const msgKey = keyInbox(user.id);
-        await cacheDeleteKey(msgKey);
-        await cacheSetJSON(
-          msgKey,
-          {
-            messages: allReceivedMessages,
-            senders: allSendersUsersArr,
-          },
-          TTL_48H
-        );
-        console.log("[Inbox]: Cache updated!");
-      } catch (e) {}
-    })();
-  }, [allReceivedMessages, allSendersUsersArr, user?.id]);
+  const enabled = !!user?.id && !loadingMessages;
+  useUpdateCache(msgKey, cachedPayload, TTL_48H, enabled);
 
   return (
     <NotificationsContext.Provider
