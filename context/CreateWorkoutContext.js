@@ -9,14 +9,8 @@ import React, {
 } from "react";
 import useExercises from "../hooks/useExercises";
 import { addWorkout } from "../services/WorkoutService";
-import { useWorkoutContext } from "./WorkoutContext";
-import {
-  cacheDeleteKey,
-  cacheSetJSON,
-  keyWorkoutPlan,
-  TTL_48H,
-} from "../cache/cacheUtils";
 import { useAuth } from "./AuthContext";
+import { useWorkoutContext } from "./WorkoutContext";
 
 const CreateWorkoutContext = createContext(null);
 
@@ -212,10 +206,6 @@ export const CreateWorkoutProvider = ({ children }) => {
     (async () => {
       try {
         const data = await addWorkout(map);
-        // Save in cache
-        const planKey = keyWorkoutPlan(user.id);
-        await cacheDeleteKey(planKey);
-        await cacheSetJSON(planKey, data, TTL_48H);
 
         setWorkout(data.workoutPlan);
         setWorkoutForEdit(data.workoutPlanForEditWorkout);

@@ -16,6 +16,7 @@ import { getUserWorkout } from "../services/WorkoutService";
 import { extractWorkoutSplits } from "../utils/sharedUtils";
 import { useAuth } from "./AuthContext";
 import { useGlobalAppLoadingContext } from "./GlobalAppLoadingContext";
+import useUpdateCache from "../hooks/useUpdateCache";
 
 const WorkoutContext = createContext(null);
 export const useWorkoutContext = () => {
@@ -40,6 +41,12 @@ export const WorkoutProvider = ({ children }) => {
   const { setLoading: setGlobalLoading } = useGlobalAppLoadingContext();
 
   const { user, sessionLoading } = useAuth();
+
+  // Stable cache key (unify 45 days usage)
+  const planKey = useMemo(
+    () => (user ? keyWorkoutPlan(user.id) : null),
+    [user?.id]
+  );
 
   // Raw workout plan from API
   const [workout, setWorkout] = useState(null);
@@ -100,6 +107,17 @@ export const WorkoutProvider = ({ children }) => {
     setLoading(false);
     console.log("Workout Unmounted");
   }, []);
+
+  // Cache payload
+  const cachedPayload = useMemo(() => {
+    return {
+      workoutPlan: workout,
+      workoutPlanForEditWorkout: workoutForEdit,
+    };
+  }, [workout, workoutForEdit]);
+
+  const enabled = !!user?.id && !loading;
+  useUpdateCache(planKey, cachedPayload, TTL_48H, enabled);
 
   // Memoized context value
   const value = useMemo(

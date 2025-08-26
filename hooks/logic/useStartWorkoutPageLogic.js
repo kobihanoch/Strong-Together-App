@@ -77,11 +77,7 @@ const useStartWorkoutPageLogic = (selectedSplit) => {
       const res = await saveWorkoutProcess(obj);
       const { exerciseTrackingMaps, exerciseTrackingAnalysis } = res;
 
-      // Store in cache
-      const trackingKey = keyTracking(user.id, 45);
-      await cacheDeleteKey(trackingKey);
-      await cacheSetJSON(trackingKey, res, TTL_48H);
-
+      // Update context
       setExerciseTrackingMaps(exerciseTrackingMaps);
       setAnalyzedExerciseTrackingData(
         unpackFromExerciseTrackingData(exerciseTrackingAnalysis)
