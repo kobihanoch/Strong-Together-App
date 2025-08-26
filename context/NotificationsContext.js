@@ -6,6 +6,8 @@ import {
   useMemo,
   useState,
 } from "react";
+import { cacheGetJSON, keyInbox, TTL_48H } from "../cache/cacheUtils.js";
+import useUpdateCache from "../hooks/useUpdateCache.js";
 import {
   getUserMessages,
   updateMsgReadStatus,
@@ -37,6 +39,9 @@ export const NotificationsProvider = ({ children }) => {
 
   const { user, sessionLoading } = useAuth();
 
+  // Stable cache key (unify 45 days usage)
+  const msgKey = useMemo(() => (user ? keyInbox(user.id) : null), [user?.id]);
+
   // All user's received messages
   const [allReceivedMessages, setAllReceivedMessages] = useState([]);
 
@@ -53,6 +58,9 @@ export const NotificationsProvider = ({ children }) => {
 
   // Loading
   const [loadingMessages, setLoadingMessages] = useState(true);
+
+  // Flag for non-duplicate caching at startup
+  const [APICall, setAPICall] = useState(false);
 
   // Load listener
   useEffect(() => {
@@ -72,11 +80,27 @@ export const NotificationsProvider = ({ children }) => {
       if (user) {
         setLoadingMessages(true);
         try {
+          setAPICall(false);
+          // Check if cached at front
+          const inboxKey = keyInbox(user.id);
+          const cached = await cacheGetJSON(inboxKey);
+          if (cached) {
+            setAllReceivedMessages(cached.messages);
+            setAllSendersUsersArr(cached.senders);
+            console.log("Inbox cached!");
+          }
+          setLoadingMessages(false);
+
+          setAPICall(true);
+          // If not cached fetch from API
           const messages = await getUserMessages();
           setAllReceivedMessages(messages.messages);
           setAllSendersUsersArr(messages.senders);
+
+          // Storage in cache happens alone with dependencies (below)
         } finally {
           setLoadingMessages(false);
+          setAPICall(false);
         }
       }
     })();
@@ -93,6 +117,7 @@ export const NotificationsProvider = ({ children }) => {
     setAllReceivedMessages([]);
     setAllSendersUsersArr([]);
     setProfileImagesCache({});
+    setAPICall(false);
     setLoadingMessages(false);
   }, []);
 
@@ -111,6 +136,17 @@ export const NotificationsProvider = ({ children }) => {
       prev.map((m) => (m.id === msgId ? { ...m, is_read: true } : m))
     );
   };
+
+  // Cache payload
+  const cachedPayload = useMemo(() => {
+    return {
+      messages: allReceivedMessages,
+      senders: allSendersUsersArr,
+    };
+  }, [allReceivedMessages, allSendersUsersArr]);
+
+  const enabled = !!user?.id && !loadingMessages && !APICall;
+  useUpdateCache(msgKey, cachedPayload, TTL_48H, enabled);
 
   return (
     <NotificationsContext.Provider
