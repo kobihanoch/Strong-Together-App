@@ -126,6 +126,15 @@ export const AuthProvider = ({ children }) => {
 
       // Initialize side effects
       await initializeUserSession(u.data.id);
+    } catch (e) {
+      // If caught an error => failed for initial refresh => probably multi device connection
+      await clearRefreshToken();
+      await cacheDeleteAllCache();
+      _accessToken = null;
+      setIsLoggedIn(false);
+      setLoading(false);
+      setUser(null);
+      setIsWorkoutMode(false);
     } finally {
       setSessionLoading(false);
     }
