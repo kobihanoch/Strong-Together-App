@@ -59,6 +59,9 @@ export const NotificationsProvider = ({ children }) => {
   // Loading
   const [loadingMessages, setLoadingMessages] = useState(true);
 
+  // Flag for non-duplicate caching at startup
+  const [APICall, setAPICall] = useState(false);
+
   // Load listener
   useEffect(() => {
     if (user) {
@@ -77,6 +80,7 @@ export const NotificationsProvider = ({ children }) => {
       if (user) {
         setLoadingMessages(true);
         try {
+          setAPICall(false);
           // Check if cached at front
           const inboxKey = keyInbox(user.id);
           const cached = await cacheGetJSON(inboxKey);
@@ -87,6 +91,7 @@ export const NotificationsProvider = ({ children }) => {
           }
           setLoadingMessages(false);
 
+          setAPICall(true);
           // If not cached fetch from API
           const messages = await getUserMessages();
           setAllReceivedMessages(messages.messages);
@@ -95,6 +100,7 @@ export const NotificationsProvider = ({ children }) => {
           // Storage in cache happens alone with dependencies (below)
         } finally {
           setLoadingMessages(false);
+          setAPICall(false);
         }
       }
     })();
@@ -111,6 +117,7 @@ export const NotificationsProvider = ({ children }) => {
     setAllReceivedMessages([]);
     setAllSendersUsersArr([]);
     setProfileImagesCache({});
+    setAPICall(false);
     setLoadingMessages(false);
   }, []);
 
@@ -130,7 +137,7 @@ export const NotificationsProvider = ({ children }) => {
     );
   };
 
-  // Already unpacked (the analysis) - ready for later user
+  // Cache payload
   const cachedPayload = useMemo(() => {
     return {
       messages: allReceivedMessages,
@@ -138,7 +145,7 @@ export const NotificationsProvider = ({ children }) => {
     };
   }, [allReceivedMessages, allSendersUsersArr]);
 
-  const enabled = !!user?.id && !loadingMessages;
+  const enabled = !!user?.id && !loadingMessages && !APICall;
   useUpdateCache(msgKey, cachedPayload, TTL_48H, enabled);
 
   return (
