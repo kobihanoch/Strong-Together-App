@@ -1,17 +1,15 @@
+// English comments only inside the code
+
 import React, {
+  forwardRef,
   useCallback,
-  useEffect,
   useMemo,
   useRef,
   useState,
 } from "react";
 import {
-  Animated,
   Dimensions,
-  Easing,
   FlatList,
-  Modal,
-  Pressable,
   SectionList,
   StyleSheet,
   Text,
@@ -20,23 +18,24 @@ import {
 } from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";
 import { useCreateWorkout } from "../../context/CreateWorkoutContext";
+// Adjust this import path to where your SlidingBottomModal lives
+import SlidingBottomModal from "../../components/SlidingBottomModal";
 
 const { width, height } = Dimensions.get("window");
-const SHEET_MAX_H = Math.min(height * 0.85, 720);
 
-const ExercisePickerModal = ({ visible, onClose }) => {
+const ExercisePickerModal = forwardRef(function ExercisePickerModal(_, ref) {
   // Pull DB from context
   const { DB, actions } = useCreateWorkout();
 
-  // Animated sheet + backdrop
-  const translateY = useRef(new Animated.Value(SHEET_MAX_H)).current;
-  const backdropOpacity = useRef(new Animated.Value(0)).current;
-
-  // Refs for programmatic scrolling
+  // Refs for programmatic scrolling inside the sheet
   const sectionListRef = useRef(null);
   const tabsRef = useRef(null);
 
-  // Sections are grouped by targetmuscle; titles are targetmuscle
+  // Forward the ref control to the inner bottom sheet (open/close/snapToIndex)
+  // SlidingBottomModal already implements the imperative API, so we just pass the ref through.
+  const sheetRef = ref;
+
+  // Build sections grouped by targetmuscle
   const sections = useMemo(() => {
     const all = DB?.dbExercises ?? [];
     const map = {};
@@ -64,49 +63,7 @@ const ExercisePickerModal = ({ visible, onClose }) => {
   // Selected tab (synced with visible section)
   const [selectedTab, setSelectedTab] = useState(tabItems[0] || null);
 
-  // Animate in/out
-  useEffect(() => {
-    if (visible) {
-      Animated.parallel([
-        Animated.timing(backdropOpacity, {
-          toValue: 1,
-          duration: 160,
-          useNativeDriver: true,
-          easing: Easing.out(Easing.quad),
-        }),
-        Animated.timing(translateY, {
-          toValue: 0,
-          duration: 220,
-          useNativeDriver: true,
-          easing: Easing.out(Easing.cubic),
-        }),
-      ]).start();
-    } else {
-      translateY.setValue(SHEET_MAX_H);
-      backdropOpacity.setValue(0);
-    }
-  }, [visible, translateY, backdropOpacity]);
-
-  const handleCloseAnimated = useCallback(() => {
-    Animated.parallel([
-      Animated.timing(backdropOpacity, {
-        toValue: 0,
-        duration: 160,
-        useNativeDriver: true,
-        easing: Easing.in(Easing.quad),
-      }),
-      Animated.timing(translateY, {
-        toValue: SHEET_MAX_H,
-        duration: 200,
-        useNativeDriver: true,
-        easing: Easing.in(Easing.cubic),
-      }),
-    ]).start(({ finished }) => {
-      if (finished) onClose();
-    });
-  }, [onClose, backdropOpacity, translateY]);
-
-  // Scroll to section by tab press
+  // Jump to a section when tapping a tab
   const handlePressTab = useCallback(
     (title) => {
       const sectionIndex = sections.findIndex((s) => s.title === title);
@@ -118,7 +75,6 @@ const ExercisePickerModal = ({ visible, onClose }) => {
           viewPosition: 0,
           animated: true,
         });
-        // Also center the pressed tab in the tabs FlatList
         const tabIndex = tabItems.findIndex((t) => t === title);
         if (tabIndex >= 0 && tabsRef.current?.scrollToIndex) {
           tabsRef.current.scrollToIndex({
@@ -132,9 +88,8 @@ const ExercisePickerModal = ({ visible, onClose }) => {
     [sections, tabItems]
   );
 
-  // Sync selected tab while user scrolls the SectionList
+  // Keep tab selection in sync while scrolling the SectionList
   const onViewableItemsChanged = useRef(({ viewableItems }) => {
-    // Find first visible section header
     const firstHeader = viewableItems.find(
       (vi) => vi.section && vi.index === null
     );
@@ -156,43 +111,50 @@ const ExercisePickerModal = ({ visible, onClose }) => {
 
   // Render one exercise card
   const renderItem = ({ item }) => (
-    <TouchableOpacity
-      onPress={() => {
-        // Add to the current split as the last exercise.
-        actions?.addExercise?.(item);
-        handleCloseAnimated();
-      }}
-      style={styles.card}
-      activeOpacity={0.9}
-    >
-      <View style={{ flexDirection: "row", alignItems: "center" }}>
-        <View style={styles.dot} />
-        <View style={{ flex: 1 }}>
-          <Text style={styles.cardTitle} numberOfLines={1}>
-            {item?.name}
-          </Text>
-          <Text style={styles.cardSub} numberOfLines={1}>
-            {item?.targetmuscle}
-            {item?.specifictargetmuscle
-              ? ` • ${item.specifictargetmuscle}`
-              : ""}
-          </Text>
+    <View style={{ paddingHorizontal: width * 0.02 }}>
+      <TouchableOpacity
+        onPress={() => {
+          // Add to the current split as the last exercise. No closing logic here.
+          actions?.addExercise?.(item);
+        }}
+        style={styles.card}
+        activeOpacity={0.9}
+      >
+        <View style={{ flexDirection: "row", alignItems: "center" }}>
+          <View style={styles.dot} />
+          <View style={{ flex: 1 }}>
+            <Text style={styles.cardTitle} numberOfLines={1}>
+              {item?.name}
+            </Text>
+            <Text style={styles.cardSub} numberOfLines={1}>
+              {item?.targetmuscle}
+              {item?.specifictargetmuscle
+                ? ` • ${item.specifictargetmuscle}`
+                : ""}
+            </Text>
+          </View>
+          <View style={styles.choosePill}>
+            <Text style={styles.chooseText}>Choose</Text>
+          </View>
         </View>
-        <View style={styles.choosePill}>
-          <Text style={styles.chooseText}>Choose</Text>
-        </View>
-      </View>
-    </TouchableOpacity>
+      </TouchableOpacity>
+    </View>
   );
 
   // Section header = targetmuscle
   const renderSectionHeader = ({ section }) => (
-    <View style={{ marginTop: height * 0.01, marginBottom: height * 0.006 }}>
+    <View
+      style={{
+        marginTop: height * 0.03,
+        marginBottom: height * 0.03,
+        paddingHorizontal: width * 0.02,
+      }}
+    >
       <Text style={styles.sectionTitle}>{section.title}</Text>
     </View>
   );
 
-  // Tabs row (FlatList horizontal) for targetmuscle jump
+  // Tab chip
   const renderTab = ({ item }) => {
     const selected = item === selectedTab;
     return (
@@ -215,124 +177,57 @@ const ExercisePickerModal = ({ visible, onClose }) => {
   };
 
   return (
-    <Modal
-      visible={visible}
-      transparent
-      animationType="none"
-      onRequestClose={handleCloseAnimated}
+    <SlidingBottomModal
+      ref={sheetRef}
+      title="Pick an exercise"
+      // Open from parent with: ref.current.open(1)
+      snapPoints={["90%", "90%", "100%"]}
+      flatListUsage={false}
     >
-      <Pressable
-        onPress={handleCloseAnimated}
-        style={{ flex: 1, justifyContent: "flex-end" }}
-      >
-        <Animated.View
-          pointerEvents="none"
-          style={[
-            StyleSheet.absoluteFillObject,
-            { backgroundColor: "rgba(0,0,0,0.55)", opacity: backdropOpacity },
-          ]}
-        />
-        <Animated.View
-          style={[styles.sheet, { transform: [{ translateY }] }]}
-          onStartShouldSetResponder={() => true}
-          onResponderStart={(e) => e.stopPropagation()}
-        >
-          {/* Header */}
-          <View style={styles.headerRow}>
-            <Text style={styles.headerTitle}>Pick an exercise</Text>
-            <TouchableOpacity
-              onPress={handleCloseAnimated}
-              activeOpacity={0.8}
-              style={styles.closeBtn}
-            >
-              <Text style={styles.closeText}>Close</Text>
-            </TouchableOpacity>
-          </View>
+      {/* Tabs strip (jump between target muscles) */}
+      <FlatList
+        ref={tabsRef}
+        data={tabItems}
+        keyExtractor={(it) => it}
+        renderItem={renderTab}
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={{
+          paddingHorizontal: width * 0.02,
+          paddingBottom: height * 0.012,
+        }}
+        getItemLayout={(data, index) => ({
+          length: Math.max(38, height * 0.046) + 12,
+          offset: (Math.max(38, height * 0.046) + 12) * index,
+          index,
+        })}
+      />
 
-          {/* Tabs strip (jump between target muscles) */}
-          <FlatList
-            ref={tabsRef}
-            data={tabItems}
-            keyExtractor={(it) => it}
-            renderItem={renderTab}
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={{
-              paddingHorizontal: width * 0.02,
-              paddingBottom: height * 0.012,
-            }}
-            getItemLayout={(data, index) => ({
-              length: Math.max(38, height * 0.046) + 12, // approximate for smooth scrollToIndex
-              offset: (Math.max(38, height * 0.046) + 12) * index,
-              index,
-            })}
-          />
-
-          {/* Sectioned list (section header = targetmuscle) */}
-          <SectionList
-            ref={sectionListRef}
-            sections={sections}
-            keyExtractor={(item) => String(item.id)}
-            renderItem={renderItem}
-            renderSectionHeader={renderSectionHeader}
-            stickySectionHeadersEnabled={false}
-            showsVerticalScrollIndicator={false}
-            contentContainerStyle={{ paddingBottom: height * 0.02 }}
-            onViewableItemsChanged={onViewableItemsChanged}
-            viewabilityConfig={viewConfigRef.current}
-            getItemLayout={(sectionData, index) => {
-              // Optional: implement more precise layout if lists are very large
-              return { length: 64, offset: 64 * index, index };
-            }}
-          />
-        </Animated.View>
-      </Pressable>
-    </Modal>
+      {/* Sectioned list (section header = targetmuscle) */}
+      <SectionList
+        ref={sectionListRef}
+        sections={sections}
+        keyExtractor={(item) => String(item.id)}
+        renderItem={renderItem}
+        renderSectionHeader={renderSectionHeader}
+        stickySectionHeadersEnabled={false}
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{ paddingBottom: height * 0.02 }}
+        onViewableItemsChanged={onViewableItemsChanged}
+        viewabilityConfig={viewConfigRef.current}
+        getItemLayout={(sectionData, index) => {
+          // Approximate layout for smoother scrollToLocation on large lists
+          return { length: 64, offset: 64 * index, index };
+        }}
+      />
+    </SlidingBottomModal>
   );
-};
+});
 
 const styles = StyleSheet.create({
-  sheet: {
-    width: "100%",
-    height: SHEET_MAX_H,
-    backgroundColor: "#fff",
-    borderTopLeftRadius: width * 0.06,
-    borderTopRightRadius: width * 0.06,
-    paddingTop: height * 0.018,
-    paddingHorizontal: width * 0.045,
-    shadowColor: "#000",
-    shadowOpacity: 0.2,
-    shadowRadius: 8,
-    elevation: 12,
-  },
-  headerRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: height * 0.012,
-  },
-  headerTitle: {
-    flex: 1,
-    fontFamily: "Inter_700Bold",
-    fontSize: RFValue(16),
-    color: "#111",
-  },
-  closeBtn: {
-    height: 36,
-    minWidth: 36,
-    borderRadius: 18,
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: "rgba(0,0,0,0.06)",
-    paddingHorizontal: 12,
-  },
-  closeText: {
-    fontSize: RFValue(12),
-    color: "#111",
-    fontFamily: "Inter_600SemiBold",
-  },
   sectionTitle: {
     fontFamily: "Inter_700Bold",
-    fontSize: RFValue(12),
+    fontSize: RFValue(15),
     color: "#1A1A1A",
     opacity: 0.9,
   },
