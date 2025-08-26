@@ -1,9 +1,5 @@
 import { useEffect } from "react";
-import {
-  cacheDeleteKey,
-  cacheGetJSON,
-  cacheSetJSON,
-} from "../cache/cacheUtils";
+import { cacheSetJSON } from "../cache/cacheUtils";
 
 const useUpdateCache = (key, value, TTL, enabled = true) => {
   useEffect(() => {
