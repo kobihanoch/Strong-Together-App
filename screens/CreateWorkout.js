@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from "react";
+import React, { useCallback, useMemo, useState, useRef } from "react";
 import { Dimensions, View } from "react-native";
 import {
   CreateWorkoutProvider,
@@ -23,11 +23,10 @@ const InnerCreateWorkout = () => {
   // Pull flags and actions from context
   const { properties, editing, actions } = useCreateWorkout();
 
-  // Local state to control modal visibility
-  const [isPickerOpen, setIsPickerOpen] = useState(false);
-
-  const handleOpenExercisesTable = useCallback(() => setIsPickerOpen(true), []);
-  const handleClosePicker = useCallback(() => setIsPickerOpen(false), []);
+  const pickerRef = useRef(null);
+  const openPicker = useCallback(() => {
+    pickerRef.current?.open?.(1);
+  }, [pickerRef]);
 
   // Save handler (uses context action if available)
   const handleSaveWorkout = useCallback(() => {
@@ -54,7 +53,7 @@ const InnerCreateWorkout = () => {
 
         {/* New action bar */}
         <ActionButtons
-          onAdd={handleOpenExercisesTable}
+          onAdd={openPicker}
           onSave={handleSaveWorkout}
           saving={properties?.isSaving}
           // optional: disable the save button if invalid
@@ -64,10 +63,7 @@ const InnerCreateWorkout = () => {
         <SelectedExercisesList />
 
         {/* Sliding bottom-sheet modal */}
-        <ExercisePickerModal
-          visible={isPickerOpen}
-          onClose={handleClosePicker}
-        />
+        <ExercisePickerModal ref={pickerRef} />
       </View>
     </View>
   );

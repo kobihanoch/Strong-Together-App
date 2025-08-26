@@ -1,7 +1,6 @@
 import React from "react";
 import { Dimensions, StyleSheet, Text, View } from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";
-import LastWorkoutSection from "../components/HomeComponents/LastWorkoutSection";
 import QuickLookSection from "../components/HomeComponents/QuickLookSection";
 import StartWorkoutButton from "../components/HomeComponents/StartWorkoutButton";
 import useHomePageLogic from "../hooks/logic/useHomePageLogic";
@@ -39,10 +38,7 @@ const Home = ({ navigation }) => {
           <StartWorkoutButton></StartWorkoutButton>
         </View>
 
-        {/*flex 1*/}
-        <LastWorkoutSection data={userData}></LastWorkoutSection>
-
-        {/*flex 6*/}
+        {/*flex 7*/}
         <QuickLookSection data={userData}></QuickLookSection>
       </View>
     </View>

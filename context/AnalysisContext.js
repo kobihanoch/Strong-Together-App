@@ -10,6 +10,13 @@ import { getUserExerciseTracking } from "../services/WorkoutService";
 import { unpackFromExerciseTrackingData } from "../utils/authUtils";
 import { useAuth } from "./AuthContext";
 import { useGlobalAppLoadingContext } from "./GlobalAppLoadingContext";
+import {
+  cacheGetJSON,
+  cacheSetJSON,
+  keyTracking,
+  TTL_48H,
+} from "../cache/cacheUtils";
+import useUpdateCache from "../hooks/useUpdateCache";
 
 const AnalysisContext = createContext(null);
 export const useAnalysisContext = () => {
@@ -49,20 +56,44 @@ export const AnalysisProvider = ({ children }) => {
   // Loading flag for this context
   const [loading, setLoading] = useState(true);
 
+  // Stable cache key (unify 45 days usage)
+  const trackingKey = useMemo(
+    () => (user ? keyTracking(user.id, 45) : null),
+    [user?.id]
+  );
+
   useEffect(() => {
     console.log("Analysis Mounted");
     (async () => {
       if (user) {
         try {
           setLoading(true);
-          const { exerciseTrackingAnalysis, exerciseTrackingMaps } =
-            await getUserExerciseTracking();
+          // Check if cached
+          const trackingKey = keyTracking(user.id, 45);
+          const cached = await cacheGetJSON(trackingKey);
+          if (cached) {
+            console.log("Analysis is cached!");
+            setExerciseTrackingMaps(cached.exerciseTrackingMaps ?? []);
+            // If cached - already unpacked
+            setAnalyzedExerciseTrackingData(
+              cached.analyzedExerciseTrackingData
+            );
+            setHasTrainedToday(cached.hasTrainedToday);
+            return;
+          }
+
+          // If not cached call API
+          const res = await getUserExerciseTracking();
+          const { exerciseTrackingAnalysis, exerciseTrackingMaps } = res;
 
           setExerciseTrackingMaps(exerciseTrackingMaps ?? []);
+          // If raw data from server - unpack
           setAnalyzedExerciseTrackingData(
             unpackFromExerciseTrackingData(exerciseTrackingAnalysis)
           );
-          setHasTrainedToday(!!res?.hasTrainedToday);
+          setHasTrainedToday(exerciseTrackingAnalysis.hasTrainedToday);
+
+          // Store in cache (auto)
         } finally {
           setLoading(false);
         }
@@ -83,6 +114,18 @@ export const AnalysisProvider = ({ children }) => {
     setLoading(false);
     console.log("Analysis Unmounted");
   }, []);
+
+  // Already unpacked (the analysis) - ready for later user
+  const cachedPayload = useMemo(() => {
+    return {
+      exerciseTrackingMaps: exerciseTrackingMaps,
+      analyzedExerciseTrackingData: analyzedExerciseTrackingData,
+      hasTrainedToday: hasTrainedToday,
+    };
+  }, [exerciseTrackingMaps, analyzedExerciseTrackingData, hasTrainedToday]);
+
+  const enabled = !!user?.id && !loading;
+  useUpdateCache(trackingKey, cachedPayload, TTL_48H, enabled);
 
   // Memoized context value
   const value = useMemo(

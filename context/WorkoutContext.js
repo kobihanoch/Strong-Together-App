@@ -1,15 +1,22 @@
 import React, {
   createContext,
+  useCallback,
   useContext,
+  useEffect,
   useMemo,
   useState,
-  useEffect,
-  useCallback,
 } from "react";
+import {
+  cacheGetJSON,
+  cacheSetJSON,
+  keyWorkoutPlan,
+  TTL_48H,
+} from "../cache/cacheUtils";
 import { getUserWorkout } from "../services/WorkoutService";
 import { extractWorkoutSplits } from "../utils/sharedUtils";
 import { useAuth } from "./AuthContext";
 import { useGlobalAppLoadingContext } from "./GlobalAppLoadingContext";
+import useUpdateCache from "../hooks/useUpdateCache";
 
 const WorkoutContext = createContext(null);
 export const useWorkoutContext = () => {
@@ -35,6 +42,12 @@ export const WorkoutProvider = ({ children }) => {
 
   const { user, sessionLoading } = useAuth();
 
+  // Stable cache key
+  const planKey = useMemo(
+    () => (user ? keyWorkoutPlan(user.id) : null),
+    [user?.id]
+  );
+
   // Raw workout plan from API
   const [workout, setWorkout] = useState(null);
 
@@ -56,10 +69,23 @@ export const WorkoutProvider = ({ children }) => {
       if (user) {
         try {
           setLoading(true);
+          // Check if cached
+          const workoutPlanKey = keyWorkoutPlan(user.id);
+          const cached = await cacheGetJSON(workoutPlanKey);
+          if (cached) {
+            console.log("Workout plan is cached!");
+            setWorkout(cached.workoutPlan ?? null);
+            setWorkoutForEdit(cached.workoutPlanForEditWorkout ?? null);
+            return;
+          }
+
+          // If not cached fetch by API call
           const { data } = await getUserWorkout();
           const { workoutPlan, workoutPlanForEditWorkout } = data || {};
           setWorkout(workoutPlan ?? null);
           setWorkoutForEdit(workoutPlanForEditWorkout ?? null);
+
+          // Store in cache - (auto)
         } finally {
           setLoading(false);
         }
@@ -80,6 +106,17 @@ export const WorkoutProvider = ({ children }) => {
     setLoading(false);
     console.log("Workout Unmounted");
   }, []);
+
+  // Cache payload
+  const cachedPayload = useMemo(() => {
+    return {
+      workoutPlan: workout,
+      workoutPlanForEditWorkout: workoutForEdit,
+    };
+  }, [workout, workoutForEdit]);
+
+  const enabled = !!user?.id && !loading;
+  useUpdateCache(planKey, cachedPayload, TTL_48H, enabled);
 
   // Memoized context value
   const value = useMemo(

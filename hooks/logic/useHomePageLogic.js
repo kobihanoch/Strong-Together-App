@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import { useAnalysisContext } from "../../context/AnalysisContext";
 import { useAuth } from "../../context/AuthContext";
 import { useWorkoutContext } from "../../context/WorkoutContext";
@@ -88,6 +88,7 @@ const useHomePageLogic = () => {
 
   return {
     data,
+    isLoading,
   };
 };
 

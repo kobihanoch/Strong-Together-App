@@ -21,7 +21,7 @@ import { RFValue } from "react-native-responsive-fontsize";
 
 const { width, height } = Dimensions.get("window");
 
-const BottomModalFlatlist = forwardRef(function BottomModalFlatlist(
+const SlidingBottomModal = forwardRef(function SlidingBottomModal(
   {
     data = [],
     renderItem,
@@ -30,6 +30,7 @@ const BottomModalFlatlist = forwardRef(function BottomModalFlatlist(
     initialIndex = -1,
     contentContainerStyle,
     flatListUsage = false,
+    children,
   },
   ref
 ) {
@@ -112,7 +113,7 @@ const BottomModalFlatlist = forwardRef(function BottomModalFlatlist(
             showsVerticalScrollIndicator={false}
           />
         ) : (
-          <View></View>
+          <View>{children}</View>
         )}
       </BottomSheet>
     </GestureHandlerRootView>
@@ -157,4 +158,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default BottomModalFlatlist;
+export default SlidingBottomModal;

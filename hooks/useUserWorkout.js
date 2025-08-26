@@ -1,6 +1,5 @@
 import { useCallback, useState } from "react";
 import { saveWorkoutData } from "../services/WorkoutService";
-import { unpackFromExerciseTrackingData } from "../utils/authUtils";
 
 export const useUserWorkout = () => {
   const [saving, setSaving] = useState(false);
@@ -11,7 +10,7 @@ export const useUserWorkout = () => {
       const data = await saveWorkoutData(workoutData);
       return {
         exerciseTrackingMaps: data.exerciseTrackingMaps,
-        analysis: unpackFromExerciseTrackingData(data.exerciseTrackingAnalysis),
+        exerciseTrackingAnalysis: data.exerciseTrackingAnalysis,
       };
     } catch (err) {
       console.error(err);

@@ -5,22 +5,24 @@ import MostCommonWorkoutSummaryCard from "./MostCommonWorkoutSummaryCard";
 import NewAchivementCard from "./NewAchivementCard";
 import CreateOrEditWorkoutCard from "./CreateOrEditWorkoutCard";
 import WorkoutCountCard from "./WorkoutCountCard";
+import AnalyticsSection from "./AnalyticsSection";
 
 const { width, height } = Dimensions.get("window");
 const QuickLookSection = ({ data, navigation }) => {
   return (
     <View
       style={{
-        flex: 6,
+        flex: 7,
         width: "85%",
         justifyContent: "flex-start",
         flexDirection: "column",
         gap: height * 0.01,
+        marginTop: -20,
       }}
     >
       <Text
         style={{
-          fontFamily: "Inter_700Bold",
+          fontFamily: "Inter_600SemiBold",
           fontSize: RFValue(20),
           flex: 1,
         }}
@@ -48,6 +50,7 @@ const QuickLookSection = ({ data, navigation }) => {
           hasAssignedWorkout={data.hasAssignedWorkout}
         ></CreateOrEditWorkoutCard>
       </View>
+
       <View
         style={{
           flexDirection: "row",
@@ -62,6 +65,7 @@ const QuickLookSection = ({ data, navigation }) => {
           hasAssignedWorkout={data.hasAssignedWorkout}
         ></NewAchivementCard>
       </View>
+      <AnalyticsSection style={{ flex: 1 }}></AnalyticsSection>
     </View>
   );
 };

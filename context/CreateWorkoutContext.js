@@ -9,7 +9,9 @@ import React, {
 } from "react";
 import useExercises from "../hooks/useExercises";
 import { addWorkout } from "../services/WorkoutService";
+import { useAuth } from "./AuthContext";
 import { useWorkoutContext } from "./WorkoutContext";
+import { cacheDeleteKey, keyAnalytics } from "../cache/cacheUtils";
 
 const CreateWorkoutContext = createContext(null);
 
@@ -18,6 +20,7 @@ export const useCreateWorkout = () => useContext(CreateWorkoutContext);
 export const CreateWorkoutProvider = ({ children }) => {
   // ----------------------------Workout and Analysis contexes----------------------------
   const { setWorkout, setWorkoutForEdit } = useWorkoutContext();
+  const { user } = useAuth();
 
   // ----------------------------Navigation----------------------------
   const navigation = useNavigation();
@@ -206,6 +209,9 @@ export const CreateWorkoutProvider = ({ children }) => {
         const data = await addWorkout(map);
         setWorkout(data.workoutPlan);
         setWorkoutForEdit(data.workoutPlanForEditWorkout);
+
+        // Delete analytics cache
+        await cacheDeleteKey(keyAnalytics(user.id));
         navigation.navigate("MyWorkoutPlan");
       } catch (e) {
         console.log(e);
