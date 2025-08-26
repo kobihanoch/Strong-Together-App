@@ -15,6 +15,12 @@ import { cacheProfileImagesAndGetMap } from "../utils/notificationsUtils.js";
 import { registerToMessagesListener } from "../webSockets/socketListeners";
 import { useAuth } from "./AuthContext.js";
 import { useGlobalAppLoadingContext } from "./GlobalAppLoadingContext.js";
+import {
+  cacheGetJSON,
+  cacheSetJSON,
+  keyInbox,
+  TTL_48H,
+} from "../cache/cacheUtils.js";
 
 /**
  * Notifications Flow:
@@ -72,9 +78,22 @@ export const NotificationsProvider = ({ children }) => {
       if (user) {
         setLoadingMessages(true);
         try {
+          // Check if cached at front
+          const inboxKey = keyInbox(user.id);
+          const cached = await cacheGetJSON(inboxKey);
+          if (cached) {
+            setAllReceivedMessages(cached.messages);
+            setAllSendersUsersArr(cached.senders);
+            console.log("Inbox cached!");
+          }
+
+          // If not cached fetch from API
           const messages = await getUserMessages();
           setAllReceivedMessages(messages.messages);
           setAllSendersUsersArr(messages.senders);
+
+          // Store in cache
+          await cacheSetJSON(inboxKey, messages, TTL_48H);
         } finally {
           setLoadingMessages(false);
         }

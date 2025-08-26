@@ -8,6 +8,13 @@ import React, {
 } from "react";
 import api from "../api/api";
 import {
+  cacheDeleteAllCache,
+  cacheGetJSON,
+  cacheSetJSON,
+  keyAuth,
+  TTL_48H,
+} from "../cache/cacheUtils";
+import {
   loginUser,
   logoutUser,
   refreshAndRotateTokens,
@@ -90,18 +97,38 @@ export const AuthProvider = ({ children }) => {
       }
 
       // Rotate tokens
-      const { accessToken: at, refreshToken: rt } =
-        await refreshAndRotateTokens();
+      const {
+        accessToken: at,
+        refreshToken: rt,
+        userId,
+      } = await refreshAndRotateTokens();
       await saveRefreshToken(rt);
       GlobalAuth.setAccessToken(at);
 
-      // Fetch self user
+      // Check for front cache
+      const authKey = keyAuth(userId);
+      const cached = await cacheGetJSON(authKey);
+      if (cached) {
+        setIsLoggedIn(true);
+        setUser(cached);
+        console.log("User cached!");
+      }
+
+      // Fetch self user - API call
       const u = await fetchSelfUserData();
       setIsLoggedIn(true);
       setUser(u.data);
 
+      // Store in cache
+      await cacheSetJSON(authKey, u.data, TTL_48H);
+
       // Initialize side effects
       await initializeUserSession(u.data.id);
+    } catch (e) {
+      await clearRefreshToken();
+      GlobalAuth.setAccessToken(null);
+      setIsLoggedIn(false);
+      setUser(null);
     } finally {
       setSessionLoading(false);
     }
@@ -135,6 +162,10 @@ export const AuthProvider = ({ children }) => {
 
         setIsLoggedIn(true);
         setUser(u);
+
+        // Store in cache
+        const authKey = keyAuth(u.id);
+        await cacheSetJSON(authKey, u, TTL_48H);
 
         await initializeUserSession(u.id);
       } finally {
@@ -179,6 +210,7 @@ export const AuthProvider = ({ children }) => {
       } catch {}
       GlobalAuth.logout;
       await clearRefreshToken();
+      await cacheDeleteAllCache();
       setIsLoggedIn(false);
       setLoading(false);
       setUser(null);

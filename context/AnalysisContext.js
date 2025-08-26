@@ -10,6 +10,12 @@ import { getUserExerciseTracking } from "../services/WorkoutService";
 import { unpackFromExerciseTrackingData } from "../utils/authUtils";
 import { useAuth } from "./AuthContext";
 import { useGlobalAppLoadingContext } from "./GlobalAppLoadingContext";
+import {
+  cacheGetJSON,
+  cacheSetJSON,
+  keyTracking,
+  TTL_48H,
+} from "../cache/cacheUtils";
 
 const AnalysisContext = createContext(null);
 export const useAnalysisContext = () => {
@@ -55,14 +61,30 @@ export const AnalysisProvider = ({ children }) => {
       if (user) {
         try {
           setLoading(true);
-          const { exerciseTrackingAnalysis, exerciseTrackingMaps } =
-            await getUserExerciseTracking();
+          // Check if cached
+          const trackingKey = keyTracking(user.id, 45);
+          const cached = await cacheGetJSON(trackingKey);
+          if (cached) {
+            console.log("ET is cached!");
+            setExerciseTrackingMaps(cached.exerciseTrackingMaps ?? []);
+            setAnalyzedExerciseTrackingData(
+              unpackFromExerciseTrackingData(cached.exerciseTrackingAnalysis)
+            );
+            setHasTrainedToday(cached.exerciseTrackingAnalysis.hasTrainedToday);
+          }
+
+          // If not cached call API
+          const res = await getUserExerciseTracking();
+          const { exerciseTrackingAnalysis, exerciseTrackingMaps } = res;
 
           setExerciseTrackingMaps(exerciseTrackingMaps ?? []);
           setAnalyzedExerciseTrackingData(
             unpackFromExerciseTrackingData(exerciseTrackingAnalysis)
           );
-          setHasTrainedToday(!!res?.hasTrainedToday);
+          setHasTrainedToday(exerciseTrackingAnalysis.hasTrainedToday);
+
+          // Store in cache
+          await cacheSetJSON(trackingKey, res, TTL_48H);
         } finally {
           setLoading(false);
         }

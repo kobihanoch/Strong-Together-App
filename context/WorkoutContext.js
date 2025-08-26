@@ -5,11 +5,18 @@ import React, {
   useState,
   useEffect,
   useCallback,
+  cache,
 } from "react";
 import { getUserWorkout } from "../services/WorkoutService";
 import { extractWorkoutSplits } from "../utils/sharedUtils";
 import { useAuth } from "./AuthContext";
 import { useGlobalAppLoadingContext } from "./GlobalAppLoadingContext";
+import {
+  cacheGetJSON,
+  cacheSetJSON,
+  keyWorkoutPlan,
+  TTL_48H,
+} from "../cache/cacheUtils";
 
 const WorkoutContext = createContext(null);
 export const useWorkoutContext = () => {
@@ -56,10 +63,23 @@ export const WorkoutProvider = ({ children }) => {
       if (user) {
         try {
           setLoading(true);
+          // Check if cached
+          const workoutPlanKey = keyWorkoutPlan(user.id);
+          const cached = await cacheGetJSON(workoutPlanKey);
+          if (cached) {
+            console.log("Workout plan is cached!");
+            setWorkout(cached.workoutPlan ?? null);
+            setWorkoutForEdit(cached.workoutPlanForEditWorkout ?? null);
+          }
+
+          // If not cached fetch by API call
           const { data } = await getUserWorkout();
           const { workoutPlan, workoutPlanForEditWorkout } = data || {};
           setWorkout(workoutPlan ?? null);
           setWorkoutForEdit(workoutPlanForEditWorkout ?? null);
+
+          // Store in cache
+          await cacheSetJSON(workoutPlanKey, data, TTL_48H);
         } finally {
           setLoading(false);
         }
