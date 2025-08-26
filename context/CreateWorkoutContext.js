@@ -11,6 +11,7 @@ import useExercises from "../hooks/useExercises";
 import { addWorkout } from "../services/WorkoutService";
 import { useAuth } from "./AuthContext";
 import { useWorkoutContext } from "./WorkoutContext";
+import { cacheDeleteKey, keyAnalytics } from "../cache/cacheUtils";
 
 const CreateWorkoutContext = createContext(null);
 
@@ -206,9 +207,11 @@ export const CreateWorkoutProvider = ({ children }) => {
     (async () => {
       try {
         const data = await addWorkout(map);
-
         setWorkout(data.workoutPlan);
         setWorkoutForEdit(data.workoutPlanForEditWorkout);
+
+        // Delete analytics cache
+        await cacheDeleteKey(keyAnalytics(user.id));
         navigation.navigate("MyWorkoutPlan");
       } catch (e) {
         console.log(e);

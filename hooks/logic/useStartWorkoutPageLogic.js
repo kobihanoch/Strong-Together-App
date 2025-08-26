@@ -1,20 +1,15 @@
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import { useCallback, useMemo, useState } from "react";
+import { cacheDeleteKey, keyAnalytics } from "../../cache/cacheUtils";
+import { useAnalysisContext } from "../../context/AnalysisContext";
 import { useAuth } from "../../context/AuthContext";
+import { useWorkoutContext } from "../../context/WorkoutContext";
+import { unpackFromExerciseTrackingData } from "../../utils/authUtils";
 import {
   createObjectForDataBase,
   filterZeroesInArr,
 } from "../../utils/startWorkoutUtils";
 import { useUserWorkout } from "../useUserWorkout";
-import { useWorkoutContext } from "../../context/WorkoutContext";
-import { useAnalysisContext } from "../../context/AnalysisContext";
-import {
-  cacheDeleteKey,
-  cacheSetJSON,
-  keyTracking,
-  TTL_48H,
-} from "../../cache/cacheUtils";
-import { unpackFromExerciseTrackingData } from "../../utils/authUtils";
 
 const useStartWorkoutPageLogic = (selectedSplit) => {
   // --------------------[ Context ]--------------------------------------
@@ -84,6 +79,10 @@ const useStartWorkoutPageLogic = (selectedSplit) => {
       );
       setHasTrainedToday(true);
       setIsWorkoutMode(false);
+
+      // Delete analytics cache
+      await cacheDeleteKey(keyAnalytics(user.id));
+      console.log("Analytics deleted");
     } catch (err) {
       console.error(err);
       throw err;
