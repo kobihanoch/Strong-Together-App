@@ -16,6 +16,7 @@ import { registerToMessagesListener } from "../webSockets/socketListeners";
 import { useAuth } from "./AuthContext.js";
 import { useGlobalAppLoadingContext } from "./GlobalAppLoadingContext.js";
 import {
+  cacheDeleteKey,
   cacheGetJSON,
   cacheSetJSON,
   keyInbox,
@@ -131,6 +132,27 @@ export const NotificationsProvider = ({ children }) => {
       prev.map((m) => (m.id === msgId ? { ...m, is_read: true } : m))
     );
   };
+
+  // Write-through cache any time messages/senders change
+  useEffect(() => {
+    if (!user?.id) return;
+
+    (async () => {
+      try {
+        const msgKey = keyInbox(user.id);
+        await cacheDeleteKey(msgKey);
+        await cacheSetJSON(
+          msgKey,
+          {
+            messages: allReceivedMessages,
+            senders: allSendersUsersArr,
+          },
+          TTL_48H
+        );
+        console.log("[Inbox]: Cache updated!");
+      } catch (e) {}
+    })();
+  }, [allReceivedMessages, allSendersUsersArr, user?.id]);
 
   return (
     <NotificationsContext.Provider
