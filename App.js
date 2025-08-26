@@ -39,6 +39,7 @@ import AppStack from "./navigation/AppStack";
 import AuthStack from "./navigation/AuthStack";
 import NotificationsSetup from "./notifications/NotificationsSetup";
 import { NotifierRoot } from "react-native-notifier";
+import { cacheHousekeepingOnBoot } from "./cache/cacheUtils";
 
 // ---------- Fonts Loader Hook ----------
 function useFontsReady() {
@@ -64,6 +65,13 @@ const RootStack = createStackNavigator();
 export default function App() {
   const fontsReady = useFontsReady();
   const navigationRef = useNavigationContainerRef();
+
+  // Delete cache for outdated app versions (against different data structures)
+  useEffect(() => {
+    (async () => {
+      cacheHousekeepingOnBoot();
+    })();
+  }, []);
 
   if (!fontsReady) {
     return (
