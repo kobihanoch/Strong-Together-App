@@ -8,6 +8,13 @@ import {
 import { useUserWorkout } from "../useUserWorkout";
 import { useWorkoutContext } from "../../context/WorkoutContext";
 import { useAnalysisContext } from "../../context/AnalysisContext";
+import {
+  cacheDeleteKey,
+  cacheSetJSON,
+  keyTracking,
+  TTL_48H,
+} from "../../cache/cacheUtils";
+import { unpackFromExerciseTrackingData } from "../../utils/authUtils";
 
 const useStartWorkoutPageLogic = (selectedSplit) => {
   // --------------------[ Context ]--------------------------------------
@@ -67,10 +74,18 @@ const useStartWorkoutPageLogic = (selectedSplit) => {
         exercisesForSelectedSplit
       );
 
-      const { exerciseTrackingMaps, analysis } = await saveWorkoutProcess(obj);
+      const res = await saveWorkoutProcess(obj);
+      const { exerciseTrackingMaps, exerciseTrackingAnalysis } = res;
+
+      // Store in cache
+      const trackingKey = keyTracking(user.id, 45);
+      await cacheDeleteKey(trackingKey);
+      await cacheSetJSON(trackingKey, res, TTL_48H);
 
       setExerciseTrackingMaps(exerciseTrackingMaps);
-      setAnalyzedExerciseTrackingData(analysis);
+      setAnalyzedExerciseTrackingData(
+        unpackFromExerciseTrackingData(exerciseTrackingAnalysis)
+      );
       setHasTrainedToday(true);
       setIsWorkoutMode(false);
     } catch (err) {

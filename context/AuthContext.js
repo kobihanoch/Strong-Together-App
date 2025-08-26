@@ -112,6 +112,8 @@ export const AuthProvider = ({ children }) => {
         setIsLoggedIn(true);
         setUser(cached);
         console.log("User cached!");
+        await initializeUserSession(u.data.id);
+        return;
       }
 
       // Fetch self user - API call
@@ -124,11 +126,6 @@ export const AuthProvider = ({ children }) => {
 
       // Initialize side effects
       await initializeUserSession(u.data.id);
-    } catch (e) {
-      await clearRefreshToken();
-      GlobalAuth.setAccessToken(null);
-      setIsLoggedIn(false);
-      setUser(null);
     } finally {
       setSessionLoading(false);
     }

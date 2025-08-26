@@ -70,6 +70,7 @@ export const WorkoutProvider = ({ children }) => {
             console.log("Workout plan is cached!");
             setWorkout(cached.workoutPlan ?? null);
             setWorkoutForEdit(cached.workoutPlanForEditWorkout ?? null);
+            return;
           }
 
           // If not cached fetch by API call

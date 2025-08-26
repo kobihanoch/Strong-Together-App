@@ -65,12 +65,12 @@ export const AnalysisProvider = ({ children }) => {
           const trackingKey = keyTracking(user.id, 45);
           const cached = await cacheGetJSON(trackingKey);
           if (cached) {
-            console.log("ET is cached!");
             setExerciseTrackingMaps(cached.exerciseTrackingMaps ?? []);
             setAnalyzedExerciseTrackingData(
               unpackFromExerciseTrackingData(cached.exerciseTrackingAnalysis)
             );
             setHasTrainedToday(cached.exerciseTrackingAnalysis.hasTrainedToday);
+            return;
           }
 
           // If not cached call API

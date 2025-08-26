@@ -86,6 +86,7 @@ export const NotificationsProvider = ({ children }) => {
             setAllSendersUsersArr(cached.senders);
             console.log("Inbox cached!");
           }
+          setLoadingMessages(false);
 
           // If not cached fetch from API
           const messages = await getUserMessages();
