@@ -42,7 +42,7 @@ export const WorkoutProvider = ({ children }) => {
 
   const { user, sessionLoading } = useAuth();
 
-  // Stable cache key (unify 45 days usage)
+  // Stable cache key
   const planKey = useMemo(
     () => (user ? keyWorkoutPlan(user.id) : null),
     [user?.id]
