@@ -1,22 +1,21 @@
 import React, {
   createContext,
+  useCallback,
   useContext,
+  useEffect,
   useMemo,
   useState,
-  useEffect,
-  useCallback,
-  cache,
 } from "react";
-import { getUserWorkout } from "../services/WorkoutService";
-import { extractWorkoutSplits } from "../utils/sharedUtils";
-import { useAuth } from "./AuthContext";
-import { useGlobalAppLoadingContext } from "./GlobalAppLoadingContext";
 import {
   cacheGetJSON,
   cacheSetJSON,
   keyWorkoutPlan,
   TTL_48H,
 } from "../cache/cacheUtils";
+import { getUserWorkout } from "../services/WorkoutService";
+import { extractWorkoutSplits } from "../utils/sharedUtils";
+import { useAuth } from "./AuthContext";
+import { useGlobalAppLoadingContext } from "./GlobalAppLoadingContext";
 
 const WorkoutContext = createContext(null);
 export const useWorkoutContext = () => {
