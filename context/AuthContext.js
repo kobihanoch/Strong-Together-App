@@ -112,7 +112,7 @@ export const AuthProvider = ({ children }) => {
         setIsLoggedIn(true);
         setUser(cached);
         console.log("User cached!");
-        await initializeUserSession(u.data.id);
+        await initializeUserSession(userId);
         return;
       }
 
@@ -208,6 +208,7 @@ export const AuthProvider = ({ children }) => {
       GlobalAuth.logout;
       await clearRefreshToken();
       await cacheDeleteAllCache();
+      _accessToken = null;
       setIsLoggedIn(false);
       setLoading(false);
       setUser(null);
