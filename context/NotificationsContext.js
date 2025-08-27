@@ -12,8 +12,8 @@ import {
   getUserMessages,
   updateMsgReadStatus,
 } from "../services/MessagesService.js";
-import { filterMessagesByUnread } from "../utils/authUtils";
-import { cacheProfileImagesAndGetMap } from "../utils/notificationsUtils.js";
+import { filterMessagesByUnread } from "../utils/notificationsContextUtils.js";
+import { cacheProfileImagesAndGetMap } from "../utils/notificationsContextUtils.js";
 import { registerToMessagesListener } from "../webSockets/socketListeners";
 import { useAuth } from "./AuthContext.js";
 import { useGlobalAppLoadingContext } from "./GlobalAppLoadingContext.js";
