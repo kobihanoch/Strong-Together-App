@@ -10,9 +10,9 @@ export const getDaysSince = (lastDateString) => {
 
   switch (diffDays) {
     case 0:
-      return "today";
+      return "Today";
     case 1:
-      return "yesterday";
+      return "Yesterday";
     default:
       if (diffDays < 30) {
         return `${diffDays} days ago`;
