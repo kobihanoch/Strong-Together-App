@@ -3,12 +3,12 @@ import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Dimensions,
-  Image,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
 } from "react-native";
+import { Image } from "expo-image";
 import api from "../../api/api";
 import { useAuth } from "../../context/AuthContext";
 import useMediaUploads from "../../hooks/useMediaUploads";
@@ -49,6 +49,7 @@ function ImagePickerComponent({ user, setMediaLoading }) {
           type: "image/jpeg",
         };
 
+        console.log("Older path:", profileimagePath);
         const { path } = await uploadToStorageAndReturnPath(file);
 
         // Update in auth context
@@ -58,6 +59,7 @@ function ImagePickerComponent({ user, setMediaLoading }) {
         }));
 
         setProfileimagePath(path);
+        console.log("Newer path:", profileimagePath);
       }
     } catch (err) {
       console.log("Error handling profile image upload:", err);
@@ -109,6 +111,7 @@ function ImagePickerComponent({ user, setMediaLoading }) {
                 ? require("../../assets/man.png")
                 : require("../../assets/woman.png")
             }
+            cachePolicy={profileimagePath ? "disk" : "none"}
             style={styles.image}
           />
         )}

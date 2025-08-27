@@ -13,7 +13,9 @@ const useProfilePageLogic = () => {
     return getDaysSince(dataOfCreation);
   }, [user]);
   const workoutCount = useMemo(() => {
-    return analyzedExerciseTrackingData.workoutCount;
+    return analyzedExerciseTrackingData
+      ? analyzedExerciseTrackingData.workoutCount
+      : 0;
   }, [analyzedExerciseTrackingData]);
 
   const [mediaLoading, setMediaLoading] = useState(false);

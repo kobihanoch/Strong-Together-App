@@ -69,6 +69,10 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [isWorkoutMode, setIsWorkoutMode] = useState(false); // For start workout
 
+  useEffect(() => {
+    if (user) console.log("Auth context image path:", user?.profile_image_url);
+  }, [user?.profile_image_url]);
+
   /**
    * initializeUserSession
    * - Called after we have a valid user + tokens.
@@ -239,6 +243,7 @@ export const AuthProvider = ({ children }) => {
       // state
       isLoggedIn,
       user,
+      setUser,
       loading,
       sessionLoading,
       // actions
@@ -256,6 +261,7 @@ export const AuthProvider = ({ children }) => {
     [
       isLoggedIn,
       user,
+      setUser,
       loading,
       sessionLoading,
       register,
