@@ -9,7 +9,7 @@ export const useMyWorkoutPlanPageLogic = () => {
     exercises: allExercises,
   } = useWorkoutContext();
 
-  const { exerciseTracking, analyzedExerciseTrackingData, hasTrainedToday } =
+  const { analyzedExerciseTrackingData, hasTrainedToday } =
     useAnalysisContext();
   const [selectedSplit, setSelectedSplit] = useState(null);
 
@@ -29,9 +29,9 @@ export const useMyWorkoutPlanPageLogic = () => {
   // Gets preformed split count
   const splitTrainedCount = useMemo(() => {
     return (
-      analyzedExerciseTrackingData.splitDaysByName[selectedSplit?.name] ?? 0
+      analyzedExerciseTrackingData?.splitDaysByName[selectedSplit?.name] ?? 0
     );
-  }, [exerciseTracking, selectedSplit]);
+  }, [analyzedExerciseTrackingData, selectedSplit]);
 
   // Handling selection of split
   const handleWorkoutSplitPress = useCallback((split) => {
