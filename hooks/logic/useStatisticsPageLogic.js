@@ -1,5 +1,5 @@
 import moment from "moment";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useAnalysisContext } from "../../context/AnalysisContext";
 import { getLastWorkoutForEachExercise } from "../../utils/statisticsUtils";
 
@@ -12,8 +12,6 @@ const useStatisticsPageLogic = () => {
     byETSId: exerciseTrackingWithETSIdKey,
     bySplitName: exerciseTrackingWithSplitNameKey,
   } = exerciseTrackingMaps;
-
-  console.log(selectedDate);
 
   // Start as today's date
   const [selectedDate, setSelectedDate] = useState(

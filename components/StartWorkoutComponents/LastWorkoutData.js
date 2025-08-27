@@ -6,8 +6,6 @@ const LastWorkoutData = ({ lastWorkoutData, setIndex }) => {
   const displayValue = (value) =>
     value === undefined || value === null ? "Not recorded" : value;
 
-  console.log(lastWorkoutData);
-
   return (
     <View>
       {lastWorkoutData?.reps[setIndex] ? (

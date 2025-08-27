@@ -6,17 +6,12 @@ import React, {
   useMemo,
   useState,
 } from "react";
+import { cacheGetJSON, keyTracking, TTL_48H } from "../cache/cacheUtils";
+import useUpdateCache from "../hooks/useUpdateCache";
 import { getUserExerciseTracking } from "../services/WorkoutService";
-import { unpackFromExerciseTrackingData } from "../utils/authUtils";
+import { unpackFromExerciseTrackingData } from "../utils/analysisContexUtils";
 import { useAuth } from "./AuthContext";
 import { useGlobalAppLoadingContext } from "./GlobalAppLoadingContext";
-import {
-  cacheGetJSON,
-  cacheSetJSON,
-  keyTracking,
-  TTL_48H,
-} from "../cache/cacheUtils";
-import useUpdateCache from "../hooks/useUpdateCache";
 
 const AnalysisContext = createContext(null);
 export const useAnalysisContext = () => {
