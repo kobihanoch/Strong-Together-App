@@ -66,7 +66,11 @@ export const AnalysisProvider = ({ children }) => {
   );
 
   // Loading flag for this context
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
+
+  // Flag for API data hydration to enable cache writing
+  // Flag stays true until context is unmounting on logout (guard against initial refrence building)
+  const [APIDataHydrated, setAPIDataHydrated] = useState(false);
 
   // Update cache on change of payload
   // Already unpacked (the analysis) - ready for later user
@@ -77,12 +81,11 @@ export const AnalysisProvider = ({ children }) => {
     };
   }, [exerciseTrackingMaps, analyzedExerciseTrackingData]);
 
-  const enabled = !!user?.id && !loading;
-  useUpdateCache(trackingKey, cachedPayload, TTL_48H, enabled);
+  useUpdateCache(trackingKey, cachedPayload, TTL_48H, APIDataHydrated);
 
-  useEffect(() => {
+  /*useEffect(() => {
     console.log("Analysis Mounted");
-  }, []);
+  }, []);*/
 
   // Load from cache and from server
   useEffect(() => {
@@ -91,7 +94,7 @@ export const AnalysisProvider = ({ children }) => {
         try {
           // Check if cached
           if (cached) {
-            console.log("Analysis is cached!");
+            console.log("[Analysis Context]: Cached");
             setExerciseTrackingMaps(cached.exerciseTrackingMaps ?? []);
             // If cached - already unpacked
             setAnalyzedExerciseTrackingData(
@@ -102,26 +105,18 @@ export const AnalysisProvider = ({ children }) => {
             setLoading(true);
           }
 
-          // If not cached call API
+          // Call API
           const res = await getUserExerciseTracking();
           const { exerciseTrackingAnalysis, exerciseTrackingMaps } = res;
 
-          // If raw data from server - unpack
+          // Raw data from server - unpack
           const unpackedAnalysis = unpackFromExerciseTrackingData(
             exerciseTrackingAnalysis
           );
 
-          // Comapre cache to raw unpacked from server - if same dont cause re render for states
-          if (
-            unpackedAnalysis.workoutCount ===
-              cached?.analyzedExerciseTrackingData?.workoutCount &&
-            unpackedAnalysis.lastWorkoutDate ===
-              cached?.analyzedExerciseTrackingData?.lastWorkoutDate
-          )
-            return;
-
           setExerciseTrackingMaps(exerciseTrackingMaps ?? []);
           setAnalyzedExerciseTrackingData(unpackedAnalysis);
+          setAPIDataHydrated(true);
 
           // Store in cache (auto)
         } finally {
@@ -131,7 +126,7 @@ export const AnalysisProvider = ({ children }) => {
     })();
 
     return logoutCleanup;
-  }, [cacheHydrated, cached, user, trackingKey]);
+  }, [cacheHydrated, user, trackingKey]);
 
   // Update global loading
   useEffect(() => {
@@ -144,7 +139,8 @@ export const AnalysisProvider = ({ children }) => {
     setAnalyzedExerciseTrackingData(null);
     setExerciseTrackingMaps(null);
     setLoading(false);
-    console.log("Analysis Unmounted");
+    setAPIDataHydrated(false);
+    //console.log("Analysis Unmounted");
   }, []);
 
   // Memoized context value

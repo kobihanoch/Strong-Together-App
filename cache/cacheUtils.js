@@ -95,7 +95,12 @@ export async function cacheHousekeepingOnBoot() {
       }
     }
     await AsyncStorage.setItem(META_VERSION_KEY, CACHE_VERSION);
-    console.log("[Cache]: Housekeeping suscceeded");
+    console.log(
+      "[Cache]: Housekeeping suscceeded. App version:",
+      CACHE_VERSION,
+      "prev version:",
+      prev
+    );
   } catch (e) {
     console.warn("[Cache] Housekeeping failed:", e?.message);
   }
