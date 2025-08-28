@@ -40,7 +40,7 @@ export const NotificationsProvider = ({ children }) => {
 
   const { user, isValidatedWithServer } = useAuth();
 
-  // Stable cache key (unify 45 days usage)
+  // Stable cache key
   const msgKey = useMemo(() => (user ? keyInbox(user.id) : null), [user?.id]);
 
   // Get cache
@@ -92,7 +92,7 @@ export const NotificationsProvider = ({ children }) => {
   // Load senders on start (same API call)
   useEffect(() => {
     (async () => {
-      if (cacheHydrated && user && msgKey) {
+      if (cacheHydrated && msgKey) {
         try {
           if (cached) {
             console.log("[Notifications Context]: Cached");
@@ -108,7 +108,7 @@ export const NotificationsProvider = ({ children }) => {
     })();
 
     return logoutCleanup;
-  }, [cacheHydrated, user, msgKey]);
+  }, [cacheHydrated, msgKey]);
 
   // Run only after validating tokens at auth context
   useEffect(() => {

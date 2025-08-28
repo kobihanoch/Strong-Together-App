@@ -90,7 +90,7 @@ export const AnalysisProvider = ({ children }) => {
   // Load from cache and from server
   useEffect(() => {
     (async () => {
-      if (cacheHydrated && user && trackingKey) {
+      if (cacheHydrated && trackingKey) {
         try {
           // Check if cached
           if (cached) {
@@ -110,7 +110,7 @@ export const AnalysisProvider = ({ children }) => {
     })();
 
     return logoutCleanup;
-  }, [cacheHydrated, user, trackingKey]);
+  }, [cacheHydrated, trackingKey]);
 
   // Run only after validating tokens at auth context
   useEffect(() => {

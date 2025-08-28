@@ -152,8 +152,11 @@ export const AuthProvider = ({ children }) => {
           } = await refreshAndRotateTokens();
           await saveRefreshToken(rt);
           GlobalAuth.setAccessToken(at);
+          // For other contexes to start fetching from API after cache
           setIsValidatedWithServer(true);
-          console.log("Validation with server completed");
+          console.log(
+            "[Auth Context]: Validation with server completed => Fetching data from API"
+          );
 
           // Save for later use
           await cacheSetJSON("CACHE:USER_ID", userId, TTL_48H);
@@ -205,7 +208,10 @@ export const AuthProvider = ({ children }) => {
 
         await saveRefreshToken(rt);
         GlobalAuth.setAccessToken(at);
+
+        // Save for later entrance
         await cacheSetJSON("CACHE:USER_ID", u.id, TTL_48H);
+        // For other contexes to start fetching from API after cache
         setIsValidatedWithServer(true);
 
         setIsLoggedIn(true);

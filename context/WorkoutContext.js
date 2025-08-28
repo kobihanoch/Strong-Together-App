@@ -82,7 +82,7 @@ export const WorkoutProvider = ({ children }) => {
   // Load from cache and from server
   useEffect(() => {
     (async () => {
-      if (cacheHydrated && user && planKey) {
+      if (cacheHydrated && planKey) {
         try {
           // Check if cached
           if (cached) {
@@ -99,7 +99,7 @@ export const WorkoutProvider = ({ children }) => {
     })();
 
     return logoutCleanup;
-  }, [cacheHydrated, user, planKey]);
+  }, [cacheHydrated, planKey]);
 
   // Run only after validating tokens at auth context
   useEffect(() => {
