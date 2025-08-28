@@ -38,7 +38,7 @@ export const NotificationsProvider = ({ children }) => {
   // Global loading
   const { setLoading: setGlobalLoading } = useGlobalAppLoadingContext();
 
-  const { user, sessionLoading } = useAuth();
+  const { user, isValidatedWithServer } = useAuth();
 
   // Stable cache key (unify 45 days usage)
   const msgKey = useMemo(() => (user ? keyInbox(user.id) : null), [user?.id]);
@@ -102,7 +102,19 @@ export const NotificationsProvider = ({ children }) => {
           } else {
             setLoadingMessages(true);
           }
+        } finally {
+        }
+      }
+    })();
 
+    return logoutCleanup;
+  }, [cacheHydrated, user, msgKey]);
+
+  // Run only after validating tokens at auth context
+  useEffect(() => {
+    (async () => {
+      if (isValidatedWithServer) {
+        try {
           // Call API
           const messages = await getUserMessages();
           const { messages: msgs, senders } = messages;
@@ -115,9 +127,7 @@ export const NotificationsProvider = ({ children }) => {
         }
       }
     })();
-
-    return logoutCleanup;
-  }, [cacheHydrated, user, msgKey]);
+  }, [isValidatedWithServer]);
 
   useEffect(() => {
     setGlobalLoading("notifications", loadingMessages);

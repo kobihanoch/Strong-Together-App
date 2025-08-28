@@ -13,6 +13,8 @@ const useUpdateCache = (key, value, TTL, enabled = false) => {
         console.log("[Analysis Context]: Cache updated");
       else if (key.includes("WORKOUTPLAN"))
         console.log("[Workout Context]: Cache updated");
+      else if (key.includes("AUTH"))
+        console.log("[Auth Context]: Cache updated");
       else if (key.includes("INBOX"))
         console.log("[Notifactions Context]: Cache updated");
       else if (key.includes("ANALYTICS"))

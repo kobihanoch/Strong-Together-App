@@ -36,7 +36,7 @@ export const WorkoutProvider = ({ children }) => {
   // Global loading
   const { setLoading: setGlobalLoading } = useGlobalAppLoadingContext();
 
-  const { user } = useAuth();
+  const { user, isValidatedWithServer } = useAuth();
 
   // Stable cache key
   const planKey = useMemo(
@@ -93,7 +93,19 @@ export const WorkoutProvider = ({ children }) => {
           } else {
             setLoading(true);
           }
+        } finally {
+        }
+      }
+    })();
 
+    return logoutCleanup;
+  }, [cacheHydrated, user, planKey]);
+
+  // Run only after validating tokens at auth context
+  useEffect(() => {
+    (async () => {
+      if (isValidatedWithServer) {
+        try {
           // Call API
           const { data } = await getUserWorkout();
           const { workoutPlan, workoutPlanForEditWorkout } = data || {};
@@ -108,9 +120,7 @@ export const WorkoutProvider = ({ children }) => {
         }
       }
     })();
-
-    return logoutCleanup;
-  }, [cacheHydrated, user, planKey]);
+  }, [isValidatedWithServer]);
 
   useEffect(() => {
     setGlobalLoading("workout", loading);

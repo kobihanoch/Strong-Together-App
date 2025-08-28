@@ -2,7 +2,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import Constants from "expo-constants";
 
 // Versions for cache
-const META_VERSION_KEY = "CACHE:__VERSION__";
+const META_VERSION_KEY = "__VERSION__";
 export const CACHE_VERSION = Constants.expoConfig.version;
 
 // ----- TTL helpers -----
@@ -80,9 +80,6 @@ export async function cacheDeleteAllCache() {
 
 export async function cacheHousekeepingOnBoot() {
   try {
-    const prev = await AsyncStorage.getItem(META_VERSION_KEY);
-    if (prev === CACHE_VERSION) return; // already cleaned for this version
-
     const keys = await AsyncStorage.getAllKeys();
     const stale = keys.filter(
       (k) => k.startsWith("CACHE:") && !k.endsWith(`:${CACHE_VERSION}`)
@@ -95,12 +92,7 @@ export async function cacheHousekeepingOnBoot() {
       }
     }
     await AsyncStorage.setItem(META_VERSION_KEY, CACHE_VERSION);
-    console.log(
-      "[Cache]: Housekeeping suscceeded. App version:",
-      CACHE_VERSION,
-      "prev version:",
-      prev
-    );
+    console.log("[Cache]: Housekeeping suscceeded.");
   } catch (e) {
     console.warn("[Cache] Housekeeping failed:", e?.message);
   }

@@ -43,7 +43,7 @@ export const AnalysisProvider = ({ children }) => {
   // Global loading
   const { setLoading: setGlobalLoading } = useGlobalAppLoadingContext();
 
-  const { user } = useAuth();
+  const { user, isValidatedWithServer } = useAuth();
 
   // Stable cache key (unify 45 days usage)
   const trackingKey = useMemo(
@@ -96,7 +96,6 @@ export const AnalysisProvider = ({ children }) => {
           if (cached) {
             console.log("[Analysis Context]: Cached");
             setExerciseTrackingMaps(cached.exerciseTrackingMaps ?? []);
-            // If cached - already unpacked
             setAnalyzedExerciseTrackingData(
               cached.analyzedExerciseTrackingData
             );
@@ -104,21 +103,6 @@ export const AnalysisProvider = ({ children }) => {
           } else {
             setLoading(true);
           }
-
-          // Call API
-          const res = await getUserExerciseTracking();
-          const { exerciseTrackingAnalysis, exerciseTrackingMaps } = res;
-
-          // Raw data from server - unpack
-          const unpackedAnalysis = unpackFromExerciseTrackingData(
-            exerciseTrackingAnalysis
-          );
-
-          setExerciseTrackingMaps(exerciseTrackingMaps ?? []);
-          setAnalyzedExerciseTrackingData(unpackedAnalysis);
-          setAPIDataHydrated(true);
-
-          // Store in cache (auto)
         } finally {
           setLoading(false);
         }
@@ -127,6 +111,32 @@ export const AnalysisProvider = ({ children }) => {
 
     return logoutCleanup;
   }, [cacheHydrated, user, trackingKey]);
+
+  // Run only after validating tokens at auth context
+  useEffect(() => {
+    (async () => {
+      if (isValidatedWithServer) {
+        try {
+          // Call API
+          const res = await getUserExerciseTracking();
+          const {
+            exerciseTrackingAnalysis: resAnalysis,
+            exerciseTrackingMaps: resETMaps,
+          } = res;
+
+          // Raw data from server - unpack
+          const unpackedAnalysis = unpackFromExerciseTrackingData(resAnalysis);
+
+          setExerciseTrackingMaps(resETMaps ?? []);
+          setAnalyzedExerciseTrackingData(unpackedAnalysis);
+          setAPIDataHydrated(true);
+          // Store in cache (auto)
+        } finally {
+          setLoading(false);
+        }
+      }
+    })();
+  }, [isValidatedWithServer]);
 
   // Update global loading
   useEffect(() => {
