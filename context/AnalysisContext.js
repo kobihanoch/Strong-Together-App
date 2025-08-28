@@ -6,10 +6,14 @@ import React, {
   useMemo,
   useState,
 } from "react";
-import { cacheGetJSON, keyTracking, TTL_48H } from "../cache/cacheUtils";
+import { keyTracking, TTL_48H } from "../cache/cacheUtils";
+import useGetCache from "../hooks/useGetCache";
 import useUpdateCache from "../hooks/useUpdateCache";
 import { getUserExerciseTracking } from "../services/WorkoutService";
-import { unpackFromExerciseTrackingData } from "../utils/analysisContexUtils";
+import {
+  checkHasTrainedToday,
+  unpackFromExerciseTrackingData,
+} from "../utils/analysisContexUtils";
 import { useAuth } from "./AuthContext";
 import { useGlobalAppLoadingContext } from "./GlobalAppLoadingContext";
 
@@ -39,17 +43,7 @@ export const AnalysisProvider = ({ children }) => {
   // Global loading
   const { setLoading: setGlobalLoading } = useGlobalAppLoadingContext();
 
-  const { user, sessionLoading } = useAuth();
-
-  // Raw and derived analysis state
-  const [exerciseTrackingMaps, setExerciseTrackingMaps] = useState(null);
-
-  const [analyzedExerciseTrackingData, setAnalyzedExerciseTrackingData] =
-    useState(null);
-  const [hasTrainedToday, setHasTrainedToday] = useState(false);
-
-  // Loading flag for this context
-  const [loading, setLoading] = useState(true);
+  const { user } = useAuth();
 
   // Stable cache key (unify 45 days usage)
   const trackingKey = useMemo(
@@ -57,15 +51,45 @@ export const AnalysisProvider = ({ children }) => {
     [user?.id]
   );
 
+  // Get cache
+  const { cached, hydrated: cacheHydrated } = useGetCache(trackingKey);
+
+  // Raw and derived analysis state
+  const [exerciseTrackingMaps, setExerciseTrackingMaps] = useState(null);
+
+  const [analyzedExerciseTrackingData, setAnalyzedExerciseTrackingData] =
+    useState(null);
+
+  const hasTrainedToday = useMemo(
+    () => checkHasTrainedToday(analyzedExerciseTrackingData?.lastWorkoutDate),
+    [analyzedExerciseTrackingData?.lastWorkoutDate]
+  );
+
+  // Loading flag for this context
+  const [loading, setLoading] = useState(true);
+
+  // Update cache on change of payload
+  // Already unpacked (the analysis) - ready for later user
+  const cachedPayload = useMemo(() => {
+    return {
+      exerciseTrackingMaps: exerciseTrackingMaps,
+      analyzedExerciseTrackingData: analyzedExerciseTrackingData,
+    };
+  }, [exerciseTrackingMaps, analyzedExerciseTrackingData]);
+
+  const enabled = !!user?.id && !loading;
+  useUpdateCache(trackingKey, cachedPayload, TTL_48H, enabled);
+
   useEffect(() => {
     console.log("Analysis Mounted");
+  }, []);
+
+  // Load from cache and from server
+  useEffect(() => {
     (async () => {
-      if (user) {
+      if (cacheHydrated && user && trackingKey) {
         try {
-          setLoading(true);
           // Check if cached
-          const trackingKey = keyTracking(user.id, 45);
-          const cached = await cacheGetJSON(trackingKey);
           if (cached) {
             console.log("Analysis is cached!");
             setExerciseTrackingMaps(cached.exerciseTrackingMaps ?? []);
@@ -73,20 +97,31 @@ export const AnalysisProvider = ({ children }) => {
             setAnalyzedExerciseTrackingData(
               cached.analyzedExerciseTrackingData
             );
-            setHasTrainedToday(cached.hasTrainedToday);
-            return;
+            setLoading(false);
+          } else {
+            setLoading(true);
           }
 
           // If not cached call API
           const res = await getUserExerciseTracking();
           const { exerciseTrackingAnalysis, exerciseTrackingMaps } = res;
 
-          setExerciseTrackingMaps(exerciseTrackingMaps ?? []);
           // If raw data from server - unpack
-          setAnalyzedExerciseTrackingData(
-            unpackFromExerciseTrackingData(exerciseTrackingAnalysis)
+          const unpackedAnalysis = unpackFromExerciseTrackingData(
+            exerciseTrackingAnalysis
           );
-          setHasTrainedToday(exerciseTrackingAnalysis.hasTrainedToday);
+
+          // Comapre cache to raw unpacked from server - if same dont cause re render for states
+          if (
+            unpackedAnalysis.workoutCount ===
+              cached?.analyzedExerciseTrackingData?.workoutCount &&
+            unpackedAnalysis.lastWorkoutDate ===
+              cached?.analyzedExerciseTrackingData?.lastWorkoutDate
+          )
+            return;
+
+          setExerciseTrackingMaps(exerciseTrackingMaps ?? []);
+          setAnalyzedExerciseTrackingData(unpackedAnalysis);
 
           // Store in cache (auto)
         } finally {
@@ -96,31 +131,21 @@ export const AnalysisProvider = ({ children }) => {
     })();
 
     return logoutCleanup;
-  }, [user]);
+  }, [cacheHydrated, cached, user, trackingKey]);
 
+  // Update global loading
   useEffect(() => {
     setGlobalLoading("analysis", loading);
     return () => setGlobalLoading("analysis", false);
   }, [loading, setGlobalLoading]);
 
+  // Unmount cleanup
   const logoutCleanup = useCallback(() => {
     setAnalyzedExerciseTrackingData(null);
-    setHasTrainedToday(false);
+    setExerciseTrackingMaps(null);
     setLoading(false);
     console.log("Analysis Unmounted");
   }, []);
-
-  // Already unpacked (the analysis) - ready for later user
-  const cachedPayload = useMemo(() => {
-    return {
-      exerciseTrackingMaps: exerciseTrackingMaps,
-      analyzedExerciseTrackingData: analyzedExerciseTrackingData,
-      hasTrainedToday: hasTrainedToday,
-    };
-  }, [exerciseTrackingMaps, analyzedExerciseTrackingData, hasTrainedToday]);
-
-  const enabled = !!user?.id && !loading;
-  useUpdateCache(trackingKey, cachedPayload, TTL_48H, enabled);
 
   // Memoized context value
   const value = useMemo(
@@ -130,7 +155,6 @@ export const AnalysisProvider = ({ children }) => {
       analyzedExerciseTrackingData,
       setAnalyzedExerciseTrackingData,
       hasTrainedToday,
-      setHasTrainedToday,
       loading,
     }),
     [
