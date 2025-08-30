@@ -105,7 +105,9 @@ export default function App() {
 
 // ---------- Navigation Logic (auth-only here) ----------
 function RootNavigator() {
-  const { isLoggedIn, user } = useAuth();
+  const { isLoggedIn, user, authPhase } = useAuth();
+
+  if (authPhase === "checking") return null;
 
   return (
     <>

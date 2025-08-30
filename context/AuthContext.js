@@ -68,6 +68,8 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [isWorkoutMode, setIsWorkoutMode] = useState(false); // For start workout
 
+  const [authPhase, setAuthPhase] = useState("checking");
+
   // Flag for below contexes for fetching with API
   const [isValidatedWithServer, setIsValidatedWithServer] = useState(false);
 
@@ -111,6 +113,7 @@ export const AuthProvider = ({ children }) => {
       // If a prev session => get user id and store it in state
       // At this point an auth key is building and automatically trying to fetch user data from cache
       // Auto start belows useEffect
+      setAuthPhase("checking");
       const cacheUserId = await cacheGetJSON("CACHE:USER_ID");
       const existingRt = await getRefreshToken();
       if (!existingRt || !cacheUserId) {
@@ -122,9 +125,12 @@ export const AuthProvider = ({ children }) => {
         setUser(null);
         setUserIdCache(null);
         GlobalAuth.setAccessToken(null);
+        setAuthPhase("guest");
         return;
       }
+      setIsLoggedIn(true);
       setUserIdCache(cacheUserId);
+      setAuthPhase("authed");
 
       // Try to validate with server
       try {
@@ -159,6 +165,7 @@ export const AuthProvider = ({ children }) => {
         setIsWorkoutMode(false);
         setUserIdCache(null);
         setIsValidatedWithServer(false);
+        setAuthPhase("guest");
       }
     })();
   }, []);
@@ -190,6 +197,7 @@ export const AuthProvider = ({ children }) => {
       // User is fetched from server by cache hook
       setUserIdCache(u.id);
       setIsValidatedWithServer(true);
+      setAuthPhase("authed");
 
       // Save for later entrance
       await cacheSetJSON("CACHE:USER_ID", u.id, TTL_48H);
@@ -246,6 +254,7 @@ export const AuthProvider = ({ children }) => {
       setIsWorkoutMode(false);
       setUserIdCache(null);
       setIsValidatedWithServer(false);
+      setAuthPhase("guest");
     }
   }, []);
 
@@ -261,6 +270,7 @@ export const AuthProvider = ({ children }) => {
   const value = useMemo(
     () => ({
       // state
+      authPhase,
       isLoggedIn,
       user,
       setUser,
@@ -291,6 +301,7 @@ export const AuthProvider = ({ children }) => {
       isWorkoutMode,
       setIsWorkoutMode,
       isValidatedWithServer,
+      authPhase,
     ]
   );
 
