@@ -14,6 +14,7 @@ import {
   keyAuth,
   TTL_48H,
 } from "../cache/cacheUtils";
+import useCacheAndFetch from "../hooks/useCacheAndFetch";
 import {
   loginUser,
   logoutUser,
@@ -28,9 +29,6 @@ import {
 } from "../utils/tokenStore.js";
 import { connectSocket, disconnectSocket } from "../webSockets/socketConfig";
 import { useGlobalAppLoadingContext } from "./GlobalAppLoadingContext";
-import useUpdateCache from "../hooks/useUpdateCache";
-import useGetCache from "../hooks/useGetCache";
-import useCacheAndFetch from "../hooks/useCacheAndFetch";
 
 const AuthContext = createContext(null);
 export const useAuth = () => useContext(AuthContext);
@@ -88,7 +86,7 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   // Hook usage
-  const { loading: sessionLoading } = useCacheAndFetch(
+  const { loading: userDataLoading } = useCacheAndFetch(
     { id: userIdCache }, // user prop
     keyAuth, // key builder
     isValidatedWithServer, // flag from server
@@ -174,9 +172,9 @@ export const AuthProvider = ({ children }) => {
 
   // Report auth session loading to global loading
   useEffect(() => {
-    setGlobalLoading("auth", loading);
+    setGlobalLoading("auth", userDataLoading);
     return () => setGlobalLoading("auth", false); // ensure cleanup on unmount
-  }, [loading]);
+  }, [userDataLoading]);
 
   /**
    * login
@@ -273,7 +271,7 @@ export const AuthProvider = ({ children }) => {
       user,
       setUser,
       loading,
-      sessionLoading,
+      userDataLoading,
       // actions
       register,
       login,
@@ -291,7 +289,7 @@ export const AuthProvider = ({ children }) => {
       user,
       setUser,
       loading,
-      sessionLoading,
+      userDataLoading,
       register,
       login,
       logout,

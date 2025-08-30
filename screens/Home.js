@@ -4,6 +4,7 @@ import { RFValue } from "react-native-responsive-fontsize";
 import QuickLookSection from "../components/HomeComponents/QuickLookSection";
 import StartWorkoutButton from "../components/HomeComponents/StartWorkoutButton";
 import useHomePageLogic from "../hooks/logic/useHomePageLogic";
+import { Skeleton } from "moti/skeleton";
 
 const { width, height } = Dimensions.get("window");
 
@@ -11,37 +12,50 @@ const Home = ({ navigation }) => {
   // Hook handling
   const { data: userData, isLoading } = useHomePageLogic();
 
-  if (isLoading) {
-    return null;
-  }
   return (
-    <View style={{ flex: 1, paddingVertical: height * 0.02 }}>
-      <View style={styles.midContainer}>
-        {/*flex 2*/}
-        <View
-          style={{
-            flex: 3,
-            flexDirection: "column",
-            gap: height * 0.03,
-            justifyContent: "center",
-            width: "100%",
-            padding: height * 0.03,
-            borderRadius: height * 0.04,
-            shadowColor: "#000",
-            shadowOffset: { width: 0, height: 0 },
-            shadowOpacity: 0.05,
-            shadowRadius: 5,
-            elevation: 1,
-          }}
-        >
-          <Text style={styles.headerText}>Hello, {userData?.firstName}!</Text>
-          <StartWorkoutButton></StartWorkoutButton>
-        </View>
+    <Skeleton.Group show={isLoading}>
+      <View style={{ flex: 1, paddingVertical: height * 0.02 }}>
+        <View style={styles.midContainer}>
+          {/*flex 2*/}
+          <View
+            style={{
+              flex: 3,
+              flexDirection: "column",
+              gap: height * 0.03,
+              justifyContent: "center",
+              width: "100%",
+              padding: height * 0.03,
+              borderRadius: height * 0.04,
+              shadowColor: "#000",
+              shadowOffset: { width: 0, height: 0 },
+              shadowOpacity: 0.05,
+              shadowRadius: 5,
+              elevation: 1,
+            }}
+          >
+            <Skeleton
+              width={width * 0.5}
+              height={height * 0.06}
+              radius={10}
+              colorMode="light"
+            >
+              <Text style={styles.headerText}>
+                {isLoading ? "" : `Hello, ${userData?.firstName}!`}
+              </Text>
+            </Skeleton>
+            <Skeleton colorMode="light" height={height * 0.1} width={"100%"}>
+              <StartWorkoutButton></StartWorkoutButton>
+            </Skeleton>
+          </View>
 
-        {/*flex 7*/}
-        <QuickLookSection data={userData}></QuickLookSection>
+          {/*flex 7*/}
+          <QuickLookSection
+            data={userData}
+            isLoading={isLoading}
+          ></QuickLookSection>
+        </View>
       </View>
-    </View>
+    </Skeleton.Group>
   );
 };
 

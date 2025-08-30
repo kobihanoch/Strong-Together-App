@@ -15,6 +15,8 @@ import { RFValue } from "react-native-responsive-fontsize";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import { useAuth } from "../context/AuthContext";
 import { useNotifications } from "../context/NotificationsContext";
+import { useGlobalAppLoadingContext } from "../context/GlobalAppLoadingContext";
+import { Skeleton } from "moti/skeleton";
 
 const { width, height } = Dimensions.get("window");
 
@@ -22,6 +24,7 @@ const TopComponent = () => {
   // Context
   const { user, isWorkoutMode } = useAuth();
   const { unreadMessages } = useNotifications();
+  const { isLoading } = useGlobalAppLoadingContext();
 
   // Navigation
   const navigation = useNavigation();
@@ -81,121 +84,137 @@ const TopComponent = () => {
   };
 
   return (
-    <LinearGradient
-      colors={["transparent", "transparent"]}
-      style={styles.topContainer}
-    >
-      <View
-        style={{
-          flexDirection: "row",
-          justifyContent: "flex-start",
-          alignItems: "center",
-          flex: 0.5,
-        }}
+    <Skeleton.Group show={isLoading}>
+      <LinearGradient
+        colors={["transparent", "transparent"]}
+        style={styles.topContainer}
       >
-        <TouchableOpacity onPress={handleImagePress}>
-          <Image
-            source={
-              profileImageUrl
-                ? {
-                    uri: `${process.env.EXPO_PUBLIC_SUPABASE_URL}/storage/v1/object/public/${profileImageUrl}`,
-                  }
-                : user?.gender == "Male"
-                ? require("../assets/man.png")
-                : require("../assets/woman.png")
-            }
-            style={styles.profileImage}
-            cachePolicy={profileImageUrl ? "disk" : "none"}
-            transition={150}
-          />
-        </TouchableOpacity>
-        <View style={{ marginLeft: width * 0.04 }}>
-          <Text
-            style={{
-              fontFamily: "Inter_600SemiBold",
-              fontSize: RFValue(18),
-              color: "black",
-            }}
-          >
-            {fullname}
-          </Text>
-          <Text
-            style={{
-              fontFamily: "Inter_400Regular",
-              fontSize: RFValue(13),
-              color: "black",
-              opacity: 0.7,
-            }}
-          >
-            @{username}
-          </Text>
-        </View>
-      </View>
-      <View style={{ flexDirection: "row", gap: width * 0.02 }}>
-        <TouchableOpacity
-          style={{ marginBottom: height * 0.02 }}
-          onPress={() => navigation.navigate("Inbox")}
-          disabled={isWorkoutMode ? true : false}
+        <View
+          style={{
+            flexDirection: "row",
+            justifyContent: "flex-start",
+            alignItems: "center",
+            flex: 0.5,
+          }}
         >
-          <MaterialCommunityIcons
-            name={"bell"}
-            size={RFValue(20)}
-            color={"#1A1A1A"}
-            opacity={isWorkoutMode ? 0 : 0.8}
-          ></MaterialCommunityIcons>
-          <Animated.View
-            style={{
-              transform: [{ scale: scaleAnim }],
-              backgroundColor: "#EF4444",
-              height: height * 0.015,
-              borderRadius: height * 0.05,
-              aspectRatio: 1,
-              position: "absolute",
-              bottom: 0,
-              right: 0,
-              justifyContent: "center",
-              alignItems: "center",
-              opacity: isWorkoutMode ? 0 : msgCount == 0 ? 0 : 1,
-            }}
+          <Skeleton
+            height={height * 0.06}
+            width={height * 0.06}
+            radius="round"
+            colorMode="light"
           >
-            <Text
+            <TouchableOpacity onPress={handleImagePress}>
+              <Image
+                source={
+                  profileImageUrl
+                    ? {
+                        uri: `${process.env.EXPO_PUBLIC_SUPABASE_URL}/storage/v1/object/public/${profileImageUrl}`,
+                      }
+                    : user?.gender == "Male"
+                    ? require("../assets/man.png")
+                    : require("../assets/woman.png")
+                }
+                style={styles.profileImage}
+                cachePolicy={profileImageUrl ? "disk" : "none"}
+                transition={150}
+              />
+            </TouchableOpacity>
+          </Skeleton>
+          <View style={{ marginLeft: width * 0.04 }}>
+            <Skeleton colorMode="light" height={20} width={100}>
+              <Text
+                style={{
+                  fontFamily: "Inter_600SemiBold",
+                  fontSize: RFValue(18),
+                  color: "black",
+                }}
+              >
+                {isLoading ? "" : fullname}
+              </Text>
+            </Skeleton>
+            <Skeleton colorMode="light" width={150}>
+              <Text
+                style={{
+                  fontFamily: "Inter_400Regular",
+                  fontSize: RFValue(13),
+                  color: "black",
+                  opacity: 0.7,
+                }}
+              >
+                {isLoading ? "" : `@${username}`}
+              </Text>
+            </Skeleton>
+          </View>
+        </View>
+        <View style={{ flexDirection: "row", gap: width * 0.02 }}>
+          <TouchableOpacity
+            style={{ marginBottom: height * 0.02 }}
+            onPress={() => navigation.navigate("Inbox")}
+            disabled={isWorkoutMode ? true : false}
+          >
+            <MaterialCommunityIcons
+              name={"bell"}
+              size={RFValue(20)}
+              color={"#1A1A1A"}
+              opacity={isWorkoutMode ? 0 : 0.8}
+            ></MaterialCommunityIcons>
+            <Animated.View
               style={{
-                color: "white",
-                fontSize: RFValue(6),
-                fontFamily: "Inter_600SemiBold",
+                transform: [{ scale: scaleAnim }],
+                backgroundColor: "#EF4444",
+                height: height * 0.015,
+                borderRadius: height * 0.05,
+                aspectRatio: 1,
+                position: "absolute",
+                bottom: 0,
+                right: 0,
+                justifyContent: "center",
+                alignItems: "center",
+                opacity: isWorkoutMode ? 0 : msgCount == 0 ? 0 : 1,
               }}
             >
-              {msgCount > 99 ? "!" : msgCount}
-            </Text>
-          </Animated.View>
-        </TouchableOpacity>
-      </View>
-
-      {/* Modal */}
-      <Modal
-        visible={isModalVisible}
-        transparent={true}
-        animationType="fade"
-        onRequestClose={closeModal}
-      >
-        <View style={styles.modalContainer}>
-          <TouchableOpacity style={styles.modalBackground} onPress={closeModal}>
-            <Image
-              source={
-                profileImageUrl
-                  ? {
-                      uri: `${process.env.EXPO_PUBLIC_SUPABASE_URL}/storage/v1/object/public/${profileImageUrl}`,
-                    }
-                  : user?.gender == "Male"
-                  ? require("../assets/man.png")
-                  : require("../assets/woman.png")
-              }
-              style={styles.enlargedImage}
-            />
+              <Text
+                style={{
+                  color: "white",
+                  fontSize: RFValue(6),
+                  fontFamily: "Inter_600SemiBold",
+                }}
+              >
+                {msgCount > 99 ? "!" : msgCount}
+              </Text>
+            </Animated.View>
           </TouchableOpacity>
         </View>
-      </Modal>
-    </LinearGradient>
+
+        {/* Modal */}
+        <Modal
+          visible={isModalVisible}
+          transparent={true}
+          animationType="fade"
+          onRequestClose={closeModal}
+        >
+          <View style={styles.modalContainer}>
+            <TouchableOpacity
+              style={styles.modalBackground}
+              onPress={closeModal}
+            >
+              <Image
+                source={
+                  profileImageUrl
+                    ? {
+                        uri: `${process.env.EXPO_PUBLIC_SUPABASE_URL}/storage/v1/object/public/${profileImageUrl}`,
+                      }
+                    : user?.gender == "Male"
+                    ? require("../assets/man.png")
+                    : require("../assets/woman.png")
+                }
+                style={styles.enlargedImage}
+              />
+            </TouchableOpacity>
+          </View>
+        </Modal>
+      </LinearGradient>
+    </Skeleton.Group>
   );
 };
 
