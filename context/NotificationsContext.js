@@ -66,6 +66,12 @@ export const NotificationsProvider = ({ children }) => {
     setAllSendersUsersArr(data?.senders);
   }, []);
 
+  // Cache payload
+  const cachePayload = useMemo(
+    () => ({ messages: allReceivedMessages, senders: allSendersUsersArr }),
+    [allReceivedMessages, allSendersUsersArr]
+  );
+
   // Hook usage
   const { loading: loadingMessages } = useCacheAndFetch(
     user, // user prop
@@ -73,7 +79,7 @@ export const NotificationsProvider = ({ children }) => {
     isValidatedWithServer, // flag from server
     fetchFn, // fetch cb
     onDataFn, // on data cb
-    { messages: allReceivedMessages, senders: allSendersUsersArr }, // cache payload
+    cachePayload, // cache payload
     "Notifications Context" // log
   );
 

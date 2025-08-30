@@ -4,7 +4,7 @@ import api from "../api/api";
 export const fetchSelfUserData = async () => {
   try {
     const response = await api.get("/api/users/get");
-    return response;
+    return response.data;
   } catch (error) {
     throw error;
   }

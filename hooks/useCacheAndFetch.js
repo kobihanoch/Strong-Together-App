@@ -14,7 +14,7 @@ const useCacheAndFetch = (
 ) => {
   // Stable cache key
   const cacheKey = useMemo(
-    () => (user ? keyBuilderFn(user.id) : null),
+    () => (user?.id ? keyBuilderFn(user.id) : null),
     [user?.id]
   );
 

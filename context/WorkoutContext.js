@@ -58,6 +58,12 @@ export const WorkoutProvider = ({ children }) => {
     setWorkoutForEdit(data?.workoutPlanForEditWorkout ?? null);
   }, []);
 
+  // Cache payload
+  const cachePayload = useMemo(
+    () => ({ workoutPlan: workout, workoutPlanForEditWorkout: workoutForEdit }),
+    [workout, workoutForEdit]
+  );
+
   // Hook usage
   const { loading } = useCacheAndFetch(
     user, // user prop
@@ -65,7 +71,7 @@ export const WorkoutProvider = ({ children }) => {
     isValidatedWithServer, // flag from server
     fetchFn, // fetch cb
     onDataFn, // on data cb
-    { workoutPlan: workout, workoutPlanForEditWorkout: workoutForEdit }, // cache payload
+    cachePayload, // cache payload
     "Workout Context" // log
   );
 

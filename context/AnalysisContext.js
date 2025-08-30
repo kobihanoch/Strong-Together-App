@@ -73,6 +73,15 @@ export const AnalysisProvider = ({ children }) => {
     );
   }, []);
 
+  // Cache payload
+  const cachePayload = useMemo(
+    () => ({
+      exerciseTrackingMaps: exerciseTrackingMaps,
+      analyzedExerciseTrackingData: analyzedExerciseTrackingData,
+    }),
+    [exerciseTrackingMaps, analyzedExerciseTrackingData]
+  );
+
   // Hook usage
   const { loading } = useCacheAndFetch(
     user, // user prop
@@ -80,10 +89,7 @@ export const AnalysisProvider = ({ children }) => {
     isValidatedWithServer, // flag from server
     fetchFn, // fetch cb
     onDataFn, // on data cb
-    {
-      exerciseTrackingMaps: exerciseTrackingMaps,
-      analyzedExerciseTrackingData: analyzedExerciseTrackingData,
-    }, // cache payload
+    cachePayload, // cache payload
     "Analysis Context" // log
   );
 
