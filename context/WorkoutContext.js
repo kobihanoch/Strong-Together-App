@@ -2,17 +2,15 @@ import React, {
   createContext,
   useCallback,
   useContext,
-  useEffect,
   useMemo,
   useState,
 } from "react";
 import { keyWorkoutPlan } from "../cache/cacheUtils";
 import useCacheAndFetch from "../hooks/useCacheAndFetch";
+import useUpdateGlobalLoading from "../hooks/useUpdateGlobalLoading";
 import { getUserWorkout } from "../services/WorkoutService";
 import { extractWorkoutSplits } from "../utils/workoutContextUtils";
 import { useAuth } from "./AuthContext";
-import { useGlobalAppLoadingContext } from "./GlobalAppLoadingContext";
-import useUpdateGlobalLoading from "../hooks/useUpdateGlobalLoading";
 
 const WorkoutContext = createContext(null);
 export const useWorkoutContext = () => {

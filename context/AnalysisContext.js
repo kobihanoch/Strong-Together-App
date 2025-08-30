@@ -14,7 +14,6 @@ import {
   unpackFromExerciseTrackingData,
 } from "../utils/analysisContexUtils";
 import { useAuth } from "./AuthContext";
-import { useGlobalAppLoadingContext } from "./GlobalAppLoadingContext";
 
 const AnalysisContext = createContext(null);
 export const useAnalysisContext = () => {

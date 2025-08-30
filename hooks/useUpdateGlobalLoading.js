@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import { useGlobalAppLoadingContext } from "../context/GlobalAppLoadingContext";
 
 const useUpdateGlobalLoading = (key, loadingState) => {
