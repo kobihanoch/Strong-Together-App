@@ -66,11 +66,13 @@ export const AnalysisProvider = ({ children }) => {
     // Data from cache - already unpacked
     setExerciseTrackingMaps(data?.exerciseTrackingMaps ?? []);
     // Determines if data retreived from API or cache
-    setAnalyzedExerciseTrackingData(
-      data?.exerciseTrackingAnalysis
-        ? unpackFromExerciseTrackingData(data?.exerciseTrackingAnalysis)
-        : data?.analyzedExerciseTrackingData
-    );
+    try {
+      setAnalyzedExerciseTrackingData(
+        unpackFromExerciseTrackingData(data?.exerciseTrackingAnalysis)
+      );
+    } catch (error) {
+      setAnalyzedExerciseTrackingData(data?.analyzedExerciseTrackingData);
+    }
   }, []);
 
   // Cache payload
