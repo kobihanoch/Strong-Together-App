@@ -28,20 +28,16 @@ import { AuthProvider, useAuth } from "./context/AuthContext";
 import { NotificationsProvider } from "./context/NotificationsContext";
 import { WorkoutProvider } from "./context/WorkoutContext";
 
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import Constants from "expo-constants";
 import { NotifierRoot } from "react-native-notifier";
 import { cacheHousekeepingOnBoot } from "./cache/cacheUtils";
 import BottomTabBar from "./components/BottomTabBar";
-import MainLoadingScreen from "./components/MainLoadingScreen";
 import Theme1 from "./components/Theme1";
-import {
-  GlobalAppLoadingProvider,
-  useGlobalAppLoadingContext,
-} from "./context/GlobalAppLoadingContext";
+import { GlobalAppLoadingProvider } from "./context/GlobalAppLoadingContext";
 import AppStack from "./navigation/AppStack";
 import AuthStack from "./navigation/AuthStack";
 import NotificationsSetup from "./notifications/NotificationsSetup";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 
 // ---------- Fonts Loader Hook ----------
 function useFontsReady() {
