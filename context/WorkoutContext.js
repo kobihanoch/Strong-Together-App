@@ -12,6 +12,7 @@ import { getUserWorkout } from "../services/WorkoutService";
 import { extractWorkoutSplits } from "../utils/workoutContextUtils";
 import { useAuth } from "./AuthContext";
 import { useGlobalAppLoadingContext } from "./GlobalAppLoadingContext";
+import useUpdateGlobalLoading from "../hooks/useUpdateGlobalLoading";
 
 const WorkoutContext = createContext(null);
 export const useWorkoutContext = () => {
@@ -31,9 +32,6 @@ export const useWorkoutContext = () => {
  */
 
 export const WorkoutProvider = ({ children }) => {
-  // Global loading
-  const { setLoading: setGlobalLoading } = useGlobalAppLoadingContext();
-
   const { user, isValidatedWithServer } = useAuth();
 
   // Raw workout plan from API
@@ -75,10 +73,8 @@ export const WorkoutProvider = ({ children }) => {
     "Workout Context" // log
   );
 
-  useEffect(() => {
-    setGlobalLoading("workout", loading);
-    return () => setGlobalLoading("workout", false);
-  }, [loading]);
+  // Report workout plan loading to global loading
+  useUpdateGlobalLoading("WorkoutPlan", loading);
 
   // Memoized context value
   const value = useMemo(

@@ -15,6 +15,7 @@ import {
   TTL_48H,
 } from "../cache/cacheUtils";
 import useCacheAndFetch from "../hooks/useCacheAndFetch";
+import useUpdateGlobalLoading from "../hooks/useUpdateGlobalLoading";
 import {
   loginUser,
   logoutUser,
@@ -28,7 +29,6 @@ import {
   saveRefreshToken,
 } from "../utils/tokenStore.js";
 import { connectSocket, disconnectSocket } from "../webSockets/socketConfig";
-import { useGlobalAppLoadingContext } from "./GlobalAppLoadingContext";
 
 const AuthContext = createContext(null);
 export const useAuth = () => useContext(AuthContext);
@@ -60,9 +60,6 @@ export const GlobalAuth = {
 };
 
 export const AuthProvider = ({ children }) => {
-  // Global loading
-  const { setLoading: setGlobalLoading } = useGlobalAppLoadingContext();
-
   const [userIdCache, setUserIdCache] = useState(null);
 
   // --- Auth & session state ---
@@ -95,6 +92,9 @@ export const AuthProvider = ({ children }) => {
     user, // cache payload
     "Auth Context" // log
   );
+
+  // Report auth session loading to global loading
+  useUpdateGlobalLoading("Auth", userDataLoading);
 
   /**
    * initializeUserSession
@@ -169,12 +169,6 @@ export const AuthProvider = ({ children }) => {
       initializeUserSession(user.id);
     }
   }, [isValidatedWithServer, user?.id, initializeUserSession]);
-
-  // Report auth session loading to global loading
-  useEffect(() => {
-    setGlobalLoading("auth", userDataLoading);
-    return () => setGlobalLoading("auth", false); // ensure cleanup on unmount
-  }, [userDataLoading]);
 
   /**
    * login

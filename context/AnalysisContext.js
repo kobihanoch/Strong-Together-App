@@ -2,12 +2,12 @@ import React, {
   createContext,
   useCallback,
   useContext,
-  useEffect,
   useMemo,
   useState,
 } from "react";
 import { keyTracking } from "../cache/cacheUtils";
 import useCacheAndFetch from "../hooks/useCacheAndFetch";
+import useUpdateGlobalLoading from "../hooks/useUpdateGlobalLoading";
 import { getUserExerciseTracking } from "../services/WorkoutService";
 import {
   checkHasTrainedToday,
@@ -39,9 +39,6 @@ export const useAnalysisContext = () => {
  */
 
 export const AnalysisProvider = ({ children }) => {
-  // Global loading
-  const { setLoading: setGlobalLoading } = useGlobalAppLoadingContext();
-
   const { user, isValidatedWithServer } = useAuth();
 
   // Raw and derived analysis state
@@ -95,11 +92,8 @@ export const AnalysisProvider = ({ children }) => {
     "Analysis Context" // log
   );
 
-  // Update global loading
-  useEffect(() => {
-    setGlobalLoading("analysis", loading);
-    return () => setGlobalLoading("analysis", false);
-  }, [loading, setGlobalLoading]);
+  // Report analysis loading to global loading
+  useUpdateGlobalLoading("Analysis", loading);
 
   // Memoized context value
   const value = useMemo(

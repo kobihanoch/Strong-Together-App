@@ -19,6 +19,7 @@ import {
 import { registerToMessagesListener } from "../webSockets/socketListeners";
 import { useAuth } from "./AuthContext.js";
 import { useGlobalAppLoadingContext } from "./GlobalAppLoadingContext.js";
+import useUpdateGlobalLoading from "../hooks/useUpdateGlobalLoading.js";
 
 /**
  * Notifications Flow:
@@ -36,9 +37,6 @@ export const NotificationsContext = createContext();
 export const useNotifications = () => useContext(NotificationsContext);
 
 export const NotificationsProvider = ({ children }) => {
-  // Global loading
-  const { setLoading: setGlobalLoading } = useGlobalAppLoadingContext();
-
   const { user, isValidatedWithServer } = useAuth();
 
   // All user's received messages
@@ -83,6 +81,9 @@ export const NotificationsProvider = ({ children }) => {
     "Notifications Context" // log
   );
 
+  // Report inbox loading to global loading
+  useUpdateGlobalLoading("Notifications", loadingMessages);
+
   // Load listener
   useEffect(() => {
     if (user) {
@@ -93,11 +94,6 @@ export const NotificationsProvider = ({ children }) => {
       return cleanup;
     }
   }, [user]);
-
-  useEffect(() => {
-    setGlobalLoading("notifications", loadingMessages);
-    return () => setGlobalLoading("notifications", false);
-  }, [loadingMessages]);
 
   // Prefetch images and return mapping of profile images when senders updated
   useEffect(() => {
