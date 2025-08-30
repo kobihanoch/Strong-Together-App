@@ -215,7 +215,7 @@ const styles = StyleSheet.create({
   profileImage: {
     height: height * 0.06,
     aspectRatio: 1,
-    resizeMode: "stretch",
+    contentFit: "stretch",
     borderWidth: 0.5,
     borderRadius: 40,
     borderColor: "white",
