@@ -125,7 +125,7 @@ const TopComponent = () => {
               <Text
                 style={{
                   fontFamily: "Inter_600SemiBold",
-                  fontSize: RFValue(18),
+                  fontSize: RFValue(17),
                   color: "black",
                 }}
               >
@@ -136,7 +136,7 @@ const TopComponent = () => {
               <Text
                 style={{
                   fontFamily: "Inter_400Regular",
-                  fontSize: RFValue(13),
+                  fontSize: RFValue(12),
                   color: "black",
                   opacity: 0.7,
                 }}
