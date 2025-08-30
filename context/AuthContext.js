@@ -81,7 +81,6 @@ export const AuthProvider = ({ children }) => {
   // On data function
   const onDataFn = useCallback((u) => {
     setUser(u);
-    setIsLoggedIn(!!u);
   }, []);
 
   // Hook usage
@@ -195,6 +194,9 @@ export const AuthProvider = ({ children }) => {
 
       // Start cache hook logic
       // User is fetched from server by cache hook
+      console.log("Still loading in context => is logged in true");
+
+      setIsLoggedIn(true);
       setUserIdCache(u.id);
       setIsValidatedWithServer(true);
       setAuthPhase("authed");
