@@ -1,67 +1,55 @@
-import { useState, useEffect, useMemo } from "react";
-import { useGlobalAppLoadingContext } from "../../context/GlobalAppLoadingContext";
+import { useCallback, useMemo, useState } from "react";
+import { keyAnalytics } from "../../cache/cacheUtils";
 import { useAnalysisContext } from "../../context/AnalysisContext";
+import { useAuth } from "../../context/AuthContext";
 import { useWorkoutContext } from "../../context/WorkoutContext";
 import { getTrackingAnalytics } from "../../services/AnalyticsService";
-import { cacheGetJSON, keyAnalytics, TTL_48H } from "../../cache/cacheUtils";
-import { useAuth } from "../../context/AuthContext";
-import useUpdateCache from "../useUpdateCache";
+import useCacheAndFetch from "../useCacheAndFetch";
 
 const useAnalysticsLogic = () => {
-  const { isLoading: globalLoading } = useGlobalAppLoadingContext();
-  const { user } = useAuth();
+  const { user, isValidatedWithServer } = useAuth();
   const { analyzedExerciseTrackingData } = useAnalysisContext();
   const { workoutCount = 0, splitDaysByName: splitsCounter = new Map() } =
     analyzedExerciseTrackingData ?? {};
   const { workout } = useWorkoutContext();
   const [_1RM, set1RM] = useState({});
   const [adherence, setAdherence] = useState({});
-  const [loading, setLoading] = useState(true);
   const hasData = useMemo(
     () => !!analyzedExerciseTrackingData,
     [analyzedExerciseTrackingData]
   );
 
-  const analyticsKey = useMemo(
-    () => (user ? keyAnalytics(user.id) : null),
-    [user?.id]
-  );
+  // -------------------------- useCacheHandler props ------------------------------
 
-  // Fetch analytics data
-  useEffect(() => {
-    (async () => {
-      try {
-        setLoading(true);
-        // Check cache
-        const analyticsKey = keyAnalytics(user.id);
-        const cached = await cacheGetJSON(analyticsKey);
-        if (cached) {
-          set1RM(cached._1RM);
-          setAdherence(cached.goals);
-          return;
-        }
+  // Fetch function
+  const fetchFn = useCallback(async () => await getTrackingAnalytics(), []);
 
-        // API
-        const { _1RM, goals } = await getTrackingAnalytics();
-        set1RM(_1RM);
-        setAdherence(goals);
-      } catch (e) {
-      } finally {
-        setLoading(false);
-      }
-    })();
+  // On data function
+  const onDataFn = useCallback((data) => {
+    set1RM(data._1RM);
+    setAdherence(data.goals);
   }, []);
 
   // Cache payload
-  const cachedPayload = useMemo(() => {
-    return {
-      _1RM: _1RM,
-      goals: adherence,
-    };
-  }, [_1RM, adherence]);
+  const cachePayload = useMemo(
+    () => ({ _1RM: _1RM, goals: adherence }),
+    [_1RM, adherence]
+  );
 
-  const enabled = !!user?.id && !loading;
-  useUpdateCache(analyticsKey, cachedPayload, TTL_48H, enabled);
+  const validateFlag = useMemo(() => {
+    return isValidatedWithServer && hasData;
+  }, [isValidatedWithServer, hasData]);
+
+  // Hook usage
+  const { loading } = useCacheAndFetch(
+    user, // user prop
+    keyAnalytics, // key builder
+    validateFlag, // flag from server
+    fetchFn, // fetch cb
+    onDataFn, // on data cb
+    cachePayload, // cache payload
+    "Analytics" // log
+  );
 
   return {
     data: {
@@ -78,7 +66,6 @@ const useAnalysticsLogic = () => {
       },
     },
     loading: loading,
-    globalLoading: globalLoading,
     hasData,
   };
 };

@@ -33,8 +33,6 @@ const Analytics = () => {
     goalAdherenceModalRef.current?.open?.(1);
   }, []);
 
-  if (loading || globalLoading) return null;
-
   return (
     <View style={{ flex: 1 }}>
       <ScrollView
