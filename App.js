@@ -106,19 +106,11 @@ export default function App() {
 // ---------- Navigation Logic (auth-only here) ----------
 function RootNavigator() {
   const { isLoggedIn, user } = useAuth();
-  const { isLoading } = useGlobalAppLoadingContext();
 
   return (
     <>
       {/* Always render the tree so providers can mount */}
       {isLoggedIn ? <AppWithProviders key={user?.id} /> : <AuthStack />}
-
-      {/* Full-screen overlay while restoring session */}
-      {isLoading && (
-        <View style={[StyleSheet.absoluteFill, { zIndex: 9999 }]}>
-          <MainLoadingScreen />
-        </View>
-      )}
     </>
   );
 }

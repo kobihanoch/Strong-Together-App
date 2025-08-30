@@ -75,7 +75,7 @@ export async function cacheDeleteAllCache() {
   for (let i = 0; i < toDelete.length; i += CHUNK) {
     await AsyncStorage.multiRemove(toDelete.slice(i, i + CHUNK));
   }
-  console.log("Cache delted!");
+  console.log("\x1b[96m[Cache]: All user cache deleted\x1b[0m");
 }
 
 export async function cacheHousekeepingOnBoot() {

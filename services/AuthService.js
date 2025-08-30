@@ -18,8 +18,8 @@ export const refreshAndRotateTokens = async () => {
 // Login
 export const loginUser = async (username, password) => {
   try {
-    const response = await api.post("/api/auth/login", { username, password });
-    return response;
+    const { data } = await api.post("/api/auth/login", { username, password });
+    return data;
   } catch (error) {
     throw error;
   }

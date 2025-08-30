@@ -117,6 +117,9 @@ export const AuthProvider = ({ children }) => {
       const existingRt = await getRefreshToken();
       if (!existingRt || !cacheUserId) {
         // No refresh token -> no session => stay logged out and auto renavifate to auth stack
+        console.log(
+          "\x1b[31m[Auth Context]: No latest user => Login is required\x1b[0m"
+        );
         setIsLoggedIn(false);
         setUser(null);
         setUserIdCache(null);
@@ -139,13 +142,16 @@ export const AuthProvider = ({ children }) => {
         // For other contexes to start fetching from API after cache
         setIsValidatedWithServer(true);
         console.log(
-          "[Auth Context]: Validation with server completed => Fetching data from API"
+          "\x1b[32m[Auth Context]: Validation with server completed => Fetching data from API\x1b[0m"
         );
 
         // Save for later use
         await cacheSetJSON("CACHE:USER_ID", userId, TTL_48H);
         // Store in cache (auto)
       } catch (e) {
+        console.log(
+          "\x1b[31m[Auth Context]: Validation with server failed => Logging out\x1b[0m"
+        );
         await clearRefreshToken();
         await cacheDeleteAllCache();
         _accessToken = null;
@@ -153,7 +159,7 @@ export const AuthProvider = ({ children }) => {
         setLoading(false);
         setUser(null);
         setIsWorkoutMode(false);
-        setUserIdCache(false);
+        setUserIdCache(null);
         setIsValidatedWithServer(false);
       }
     })();
@@ -168,9 +174,9 @@ export const AuthProvider = ({ children }) => {
 
   // Report auth session loading to global loading
   useEffect(() => {
-    setGlobalLoading("auth", sessionLoading);
+    setGlobalLoading("auth", loading);
     return () => setGlobalLoading("auth", false); // ensure cleanup on unmount
-  }, [sessionLoading]);
+  }, [loading]);
 
   /**
    * login
@@ -180,19 +186,23 @@ export const AuthProvider = ({ children }) => {
   const login = useCallback(async (username, password) => {
     setLoading(true);
     try {
-      const res = await loginUser(username, password);
-      const { accessToken: at, refreshToken: rt, user: u } = res.data;
-
+      const {
+        accessToken: at,
+        refreshToken: rt,
+        user: u,
+      } = await loginUser(username, password);
       await saveRefreshToken(rt);
       GlobalAuth.setAccessToken(at);
+
+      // Start cache hook logic
+      // User is fetched from server by cache hook
+      setUserIdCache(u.id);
+      setIsValidatedWithServer(true);
 
       // Save for later entrance
       await cacheSetJSON("CACHE:USER_ID", u.id, TTL_48H);
       // For other contexes to start fetching from API after cache
-      setIsValidatedWithServer(true);
-
-      setIsLoggedIn(true);
-      setUser(u);
+      console.log("\x1b[32m[Auth Context]: Login succeeded!\x1b[0m");
 
       // Cache stores auto
     } finally {
@@ -225,6 +235,8 @@ export const AuthProvider = ({ children }) => {
    */
   const logout = useCallback(async () => {
     try {
+      setIsLoggedIn(false);
+      setUser(null);
       await logoutUser(); // best-effort
     } catch (err) {
       // Log but do not block local cleanup
@@ -233,7 +245,6 @@ export const AuthProvider = ({ children }) => {
       try {
         disconnectSocket();
       } catch {}
-      GlobalAuth.logout;
       await clearRefreshToken();
       await cacheDeleteAllCache();
       _accessToken = null;
@@ -241,8 +252,7 @@ export const AuthProvider = ({ children }) => {
       setLoading(false);
       setUser(null);
       setIsWorkoutMode(false);
-      setUserIdCache(false);
-      setAPIDataHydrated(false);
+      setUserIdCache(null);
       setIsValidatedWithServer(false);
     }
   }, []);
