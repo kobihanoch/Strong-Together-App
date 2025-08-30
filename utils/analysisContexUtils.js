@@ -1,3 +1,5 @@
+import { DateTime } from "luxon";
+
 export const unpackFromExerciseTrackingData = (exerciseTrackingData) => {
   return {
     prMapExId: exerciseTrackingData.prs.pr_map_exercise_id,
@@ -16,4 +18,12 @@ export const unpackFromExerciseTrackingData = (exerciseTrackingData) => {
     lastWorkoutDate: exerciseTrackingData.lastWorkoutDate,
     splitDaysByName: exerciseTrackingData.splitDaysByName,
   };
+};
+
+export const checkHasTrainedToday = (
+  lastWorkoutDate,
+  tz = "Asia/Jerusalem"
+) => {
+  if (!lastWorkoutDate) return false;
+  return lastWorkoutDate === DateTime.now().setZone(tz).toISODate(); // '2025-08-28'
 };

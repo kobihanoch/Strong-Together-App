@@ -14,6 +14,8 @@ import {
   keyAuth,
   TTL_48H,
 } from "../cache/cacheUtils";
+import useCacheAndFetch from "../hooks/useCacheAndFetch";
+import useUpdateGlobalLoading from "../hooks/useUpdateGlobalLoading";
 import {
   loginUser,
   logoutUser,
@@ -27,7 +29,6 @@ import {
   saveRefreshToken,
 } from "../utils/tokenStore.js";
 import { connectSocket, disconnectSocket } from "../webSockets/socketConfig";
-import { useGlobalAppLoadingContext } from "./GlobalAppLoadingContext";
 
 const AuthContext = createContext(null);
 export const useAuth = () => useContext(AuthContext);
@@ -59,19 +60,42 @@ export const GlobalAuth = {
 };
 
 export const AuthProvider = ({ children }) => {
-  // Global loading
-  const { setLoading: setGlobalLoading } = useGlobalAppLoadingContext();
+  const [userIdCache, setUserIdCache] = useState(null);
 
   // --- Auth & session state ---
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [loading, setLoading] = useState(false); // UI loading for login/register
-  const [sessionLoading, setSessionLoading] = useState(true); // App boot/silent refresh
   const [user, setUser] = useState(null);
   const [isWorkoutMode, setIsWorkoutMode] = useState(false); // For start workout
 
-  useEffect(() => {
-    if (user) console.log("Auth context image path:", user?.profile_image_url);
-  }, [user?.profile_image_url]);
+  const [authPhase, setAuthPhase] = useState("checking");
+
+  // Flag for below contexes for fetching with API
+  const [isValidatedWithServer, setIsValidatedWithServer] = useState(false);
+
+  // -------------------------- useCacheHandler props ------------------------------
+
+  // Fetch function
+  const fetchFn = useCallback(async () => await fetchSelfUserData(), []);
+
+  // On data function
+  const onDataFn = useCallback((u) => {
+    setUser(u);
+  }, []);
+
+  // Hook usage
+  const { loading: userDataLoading } = useCacheAndFetch(
+    { id: userIdCache }, // user prop
+    keyAuth, // key builder
+    isValidatedWithServer, // flag from server
+    fetchFn, // fetch cb
+    onDataFn, // on data cb
+    user, // cache payload
+    "Auth Context" // log
+  );
+
+  // Report auth session loading to global loading
+  useUpdateGlobalLoading("Auth", userDataLoading);
 
   /**
    * initializeUserSession
@@ -82,108 +106,111 @@ export const AuthProvider = ({ children }) => {
     await connectSocket(userId);
   }, []);
 
-  /**
-   * checkIfUserSession
-   * - Called on mount.
-   * - Tries to silently restore session using a refresh token.
-   * - On success: sets user, tokens, and runs initializeUserSession.
-   */
-  const checkIfUserSession = useCallback(async () => {
-    setSessionLoading(true);
-    try {
+  // Inital check
+  useEffect(() => {
+    (async () => {
+      // If a prev session => get user id and store it in state
+      // At this point an auth key is building and automatically trying to fetch user data from cache
+      // Auto start belows useEffect
+      setAuthPhase("checking");
+      const cacheUserId = await cacheGetJSON("CACHE:USER_ID");
       const existingRt = await getRefreshToken();
-      if (!existingRt) {
-        // No refresh token -> no session
+      if (!existingRt || !cacheUserId) {
+        // No refresh token -> no session => stay logged out and auto renavifate to auth stack
+        console.log(
+          "\x1b[31m[Auth Context]: No latest user => Login is required\x1b[0m"
+        );
         setIsLoggedIn(false);
         setUser(null);
+        setUserIdCache(null);
         GlobalAuth.setAccessToken(null);
+        setAuthPhase("guest");
         return;
       }
-
-      // Rotate tokens
-      const {
-        accessToken: at,
-        refreshToken: rt,
-        userId,
-      } = await refreshAndRotateTokens();
-      await saveRefreshToken(rt);
-      GlobalAuth.setAccessToken(at);
-
-      // Check for front cache
-      const authKey = keyAuth(userId);
-      const cached = await cacheGetJSON(authKey);
-      if (cached) {
-        setIsLoggedIn(true);
-        setUser(cached);
-        console.log("User cached!");
-        await initializeUserSession(userId);
-        return;
-      }
-
-      // Fetch self user - API call
-      const u = await fetchSelfUserData();
       setIsLoggedIn(true);
-      setUser(u.data);
+      setUserIdCache(cacheUserId);
+      setAuthPhase("authed");
 
-      // Store in cache
-      await cacheSetJSON(authKey, u.data, TTL_48H);
+      // Try to validate with server
+      try {
+        // Check if user is cached
+        // Initialize session tokens
+        const {
+          accessToken: at,
+          refreshToken: rt,
+          userId,
+        } = await refreshAndRotateTokens();
+        await saveRefreshToken(rt);
+        GlobalAuth.setAccessToken(at);
+        // For other contexes to start fetching from API after cache
+        setIsValidatedWithServer(true);
+        console.log(
+          "\x1b[32m[Auth Context]: Validation with server completed => Fetching data from API\x1b[0m"
+        );
 
-      // Initialize side effects
-      await initializeUserSession(u.data.id);
-    } catch (e) {
-      // If caught an error => failed for initial refresh => probably multi device connection
-      await clearRefreshToken();
-      await cacheDeleteAllCache();
-      _accessToken = null;
-      setIsLoggedIn(false);
-      setLoading(false);
-      setUser(null);
-      setIsWorkoutMode(false);
-    } finally {
-      setSessionLoading(false);
+        // Save for later use
+        await cacheSetJSON("CACHE:USER_ID", userId, TTL_48H);
+        // Store in cache (auto)
+      } catch (e) {
+        console.log(
+          "\x1b[31m[Auth Context]: Validation with server failed => Logging out\x1b[0m"
+        );
+        await clearRefreshToken();
+        await cacheDeleteAllCache();
+        _accessToken = null;
+        setIsLoggedIn(false);
+        setLoading(false);
+        setUser(null);
+        setIsWorkoutMode(false);
+        setUserIdCache(null);
+        setIsValidatedWithServer(false);
+        setAuthPhase("guest");
+      }
+    })();
+  }, []);
+
+  // Connect socket only after server validates
+  useEffect(() => {
+    if (isValidatedWithServer && user?.id) {
+      initializeUserSession(user.id);
     }
-  }, [initializeUserSession]);
-
-  // Report auth session loading to global loading
-  useEffect(() => {
-    setGlobalLoading("auth", sessionLoading);
-    return () => setGlobalLoading("auth", false); // ensure cleanup on unmount
-  }, [sessionLoading]);
-
-  // Run the silent session check at app start
-  useEffect(() => {
-    checkIfUserSession().catch(() => setSessionLoading(false));
-  }, [checkIfUserSession]);
+  }, [isValidatedWithServer, user?.id, initializeUserSession]);
 
   /**
    * login
    * - Logs in with username/password.
    * - Saves refresh token, sets access token, sets user, runs initializeUserSession.
    */
-  const login = useCallback(
-    async (username, password) => {
-      setLoading(true);
-      try {
-        const res = await loginUser(username, password);
-        const { accessToken: at, refreshToken: rt, user: u } = res.data;
+  const login = useCallback(async (username, password) => {
+    setLoading(true);
+    try {
+      const {
+        accessToken: at,
+        refreshToken: rt,
+        user: u,
+      } = await loginUser(username, password);
+      await saveRefreshToken(rt);
+      GlobalAuth.setAccessToken(at);
 
-        await saveRefreshToken(rt);
-        GlobalAuth.setAccessToken(at);
+      // Start cache hook logic
+      // User is fetched from server by cache hook
+      console.log("Still loading in context => is logged in true");
 
-        setIsLoggedIn(true);
-        setUser(u);
+      setIsLoggedIn(true);
+      setUserIdCache(u.id);
+      setIsValidatedWithServer(true);
+      setAuthPhase("authed");
 
-        // Store in cache
-        const authKey = keyAuth(u.id);
-        await cacheSetJSON(authKey, u, TTL_48H);
+      // Save for later entrance
+      await cacheSetJSON("CACHE:USER_ID", u.id, TTL_48H);
+      // For other contexes to start fetching from API after cache
+      console.log("\x1b[32m[Auth Context]: Login succeeded!\x1b[0m");
 
-        await initializeUserSession(u.id);
-      } finally {
-        setLoading(false);
-      }
-    },
-    [initializeUserSession]
-  );
+      // Cache stores auto
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
   /**
    * register
@@ -210,6 +237,8 @@ export const AuthProvider = ({ children }) => {
    */
   const logout = useCallback(async () => {
     try {
+      setIsLoggedIn(false);
+      setUser(null);
       await logoutUser(); // best-effort
     } catch (err) {
       // Log but do not block local cleanup
@@ -218,7 +247,6 @@ export const AuthProvider = ({ children }) => {
       try {
         disconnectSocket();
       } catch {}
-      GlobalAuth.logout;
       await clearRefreshToken();
       await cacheDeleteAllCache();
       _accessToken = null;
@@ -226,6 +254,9 @@ export const AuthProvider = ({ children }) => {
       setLoading(false);
       setUser(null);
       setIsWorkoutMode(false);
+      setUserIdCache(null);
+      setIsValidatedWithServer(false);
+      setAuthPhase("guest");
     }
   }, []);
 
@@ -241,36 +272,38 @@ export const AuthProvider = ({ children }) => {
   const value = useMemo(
     () => ({
       // state
+      authPhase,
       isLoggedIn,
       user,
       setUser,
       loading,
-      sessionLoading,
+      userDataLoading,
       // actions
       register,
       login,
       logout,
       // init fns (exposed for bootstrappers if needed)
       initial: {
-        checkIfUserSession,
         initializeUserSession,
       },
       isWorkoutMode,
       setIsWorkoutMode,
+      isValidatedWithServer,
     }),
     [
       isLoggedIn,
       user,
       setUser,
       loading,
-      sessionLoading,
+      userDataLoading,
       register,
       login,
       logout,
-      checkIfUserSession,
       initializeUserSession,
       isWorkoutMode,
       setIsWorkoutMode,
+      isValidatedWithServer,
+      authPhase,
     ]
   );
 

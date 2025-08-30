@@ -13,10 +13,10 @@ import Statistics from "../screens/Statistics";
 const Stack = createStackNavigator();
 
 const AppStack = () => {
-  useEffect(() => {
+  /*useEffect(() => {
     console.log("App stack mounted");
     return () => console.log("App stack unmounted");
-  }, []);
+  }, []);*/
 
   return (
     <Stack.Navigator

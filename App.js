@@ -28,18 +28,16 @@ import { AuthProvider, useAuth } from "./context/AuthContext";
 import { NotificationsProvider } from "./context/NotificationsContext";
 import { WorkoutProvider } from "./context/WorkoutContext";
 
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import Constants from "expo-constants";
+import { NotifierRoot } from "react-native-notifier";
+import { cacheHousekeepingOnBoot } from "./cache/cacheUtils";
 import BottomTabBar from "./components/BottomTabBar";
-import MainLoadingScreen from "./components/MainLoadingScreen";
 import Theme1 from "./components/Theme1";
-import {
-  GlobalAppLoadingProvider,
-  useGlobalAppLoadingContext,
-} from "./context/GlobalAppLoadingContext";
+import { GlobalAppLoadingProvider } from "./context/GlobalAppLoadingContext";
 import AppStack from "./navigation/AppStack";
 import AuthStack from "./navigation/AuthStack";
 import NotificationsSetup from "./notifications/NotificationsSetup";
-import { NotifierRoot } from "react-native-notifier";
-import { cacheHousekeepingOnBoot } from "./cache/cacheUtils";
 
 // ---------- Fonts Loader Hook ----------
 function useFontsReady() {
@@ -69,7 +67,10 @@ export default function App() {
   // Delete cache for outdated app versions (against different data structures)
   useEffect(() => {
     (async () => {
-      cacheHousekeepingOnBoot();
+      const cacheVer = await AsyncStorage.getItem("__VERSION__");
+      const appVer = Constants.expoConfig.version;
+      if (cacheVer === appVer) return; // already cleaned for this version
+      await cacheHousekeepingOnBoot();
     })();
   }, []);
 
@@ -100,20 +101,14 @@ export default function App() {
 
 // ---------- Navigation Logic (auth-only here) ----------
 function RootNavigator() {
-  const { isLoggedIn, user } = useAuth();
-  const { isLoading } = useGlobalAppLoadingContext();
+  const { isLoggedIn, user, authPhase } = useAuth();
+
+  if (authPhase === "checking") return null;
 
   return (
     <>
       {/* Always render the tree so providers can mount */}
       {isLoggedIn ? <AppWithProviders key={user?.id} /> : <AuthStack />}
-
-      {/* Full-screen overlay while restoring session */}
-      {isLoading && (
-        <View style={[StyleSheet.absoluteFill, { zIndex: 9999 }]}>
-          <MainLoadingScreen />
-        </View>
-      )}
     </>
   );
 }

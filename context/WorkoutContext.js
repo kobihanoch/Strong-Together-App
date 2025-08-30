@@ -2,16 +2,15 @@ import React, {
   createContext,
   useCallback,
   useContext,
-  useEffect,
   useMemo,
   useState,
 } from "react";
-import { cacheGetJSON, keyWorkoutPlan, TTL_48H } from "../cache/cacheUtils";
-import useUpdateCache from "../hooks/useUpdateCache";
+import { keyWorkoutPlan } from "../cache/cacheUtils";
+import useCacheAndFetch from "../hooks/useCacheAndFetch";
+import useUpdateGlobalLoading from "../hooks/useUpdateGlobalLoading";
 import { getUserWorkout } from "../services/WorkoutService";
 import { extractWorkoutSplits } from "../utils/workoutContextUtils";
 import { useAuth } from "./AuthContext";
-import { useGlobalAppLoadingContext } from "./GlobalAppLoadingContext";
 
 const WorkoutContext = createContext(null);
 export const useWorkoutContext = () => {
@@ -28,20 +27,10 @@ export const useWorkoutContext = () => {
  * - Fetch and hold the user's active workout plan
  * - Derive mapped splits + flat exercises
  * - Provide an editable copy (workoutForEdit)
- * - Reset state when user logs out (user becomes null)
  */
 
 export const WorkoutProvider = ({ children }) => {
-  // Global loading
-  const { setLoading: setGlobalLoading } = useGlobalAppLoadingContext();
-
-  const { user, sessionLoading } = useAuth();
-
-  // Stable cache key
-  const planKey = useMemo(
-    () => (user ? keyWorkoutPlan(user.id) : null),
-    [user?.id]
-  );
+  const { user, isValidatedWithServer } = useAuth();
 
   // Raw workout plan from API
   const [workout, setWorkout] = useState(null);
@@ -54,64 +43,36 @@ export const WorkoutProvider = ({ children }) => {
   // Editable version for edit workout
   const [workoutForEdit, setWorkoutForEdit] = useState(null);
 
-  // Loading flag for this context
-  const [loading, setLoading] = useState(true);
+  // -------------------------- useCacheHandler props ------------------------------
 
-  // Fetch on mount and whenever user changes
-  useEffect(() => {
-    console.log("Workout Mounted");
-    (async () => {
-      if (user) {
-        try {
-          setLoading(true);
-          // Check if cached
-          const workoutPlanKey = keyWorkoutPlan(user.id);
-          const cached = await cacheGetJSON(workoutPlanKey);
-          if (cached) {
-            console.log("Workout plan is cached!");
-            setWorkout(cached.workoutPlan ?? null);
-            setWorkoutForEdit(cached.workoutPlanForEditWorkout ?? null);
-            return;
-          }
+  // Fetch function
+  const fetchFn = useCallback(async () => await getUserWorkout(), []);
 
-          // If not cached fetch by API call
-          const { data } = await getUserWorkout();
-          const { workoutPlan, workoutPlanForEditWorkout } = data || {};
-          setWorkout(workoutPlan ?? null);
-          setWorkoutForEdit(workoutPlanForEditWorkout ?? null);
-
-          // Store in cache - (auto)
-        } finally {
-          setLoading(false);
-        }
-      }
-    })();
-
-    return logoutCleanup;
-  }, [user, sessionLoading]);
-
-  useEffect(() => {
-    setGlobalLoading("workout", loading);
-    return () => setGlobalLoading("workout", false);
-  }, [loading]);
-
-  const logoutCleanup = useCallback(() => {
-    setWorkout(null);
-    setWorkoutForEdit(null);
-    setLoading(false);
-    console.log("Workout Unmounted");
+  // On data function
+  const onDataFn = useCallback((data) => {
+    setWorkout(data?.workoutPlan ?? null);
+    setWorkoutForEdit(data?.workoutPlanForEditWorkout ?? null);
   }, []);
 
   // Cache payload
-  const cachedPayload = useMemo(() => {
-    return {
-      workoutPlan: workout,
-      workoutPlanForEditWorkout: workoutForEdit,
-    };
-  }, [workout, workoutForEdit]);
+  const cachePayload = useMemo(
+    () => ({ workoutPlan: workout, workoutPlanForEditWorkout: workoutForEdit }),
+    [workout, workoutForEdit]
+  );
 
-  const enabled = !!user?.id && !loading;
-  useUpdateCache(planKey, cachedPayload, TTL_48H, enabled);
+  // Hook usage
+  const { loading } = useCacheAndFetch(
+    user, // user prop
+    keyWorkoutPlan, // key builder
+    isValidatedWithServer, // flag from server
+    fetchFn, // fetch cb
+    onDataFn, // on data cb
+    cachePayload, // cache payload
+    "Workout Context" // log
+  );
+
+  // Report workout plan loading to global loading
+  useUpdateGlobalLoading("WorkoutPlan", loading);
 
   // Memoized context value
   const value = useMemo(

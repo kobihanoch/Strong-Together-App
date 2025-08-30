@@ -15,11 +15,8 @@ const useStartWorkoutPageLogic = (selectedSplit) => {
   // --------------------[ Context ]--------------------------------------
   const { user, setIsWorkoutMode } = useAuth();
   const { exercises } = useWorkoutContext();
-  const {
-    setExerciseTrackingMaps,
-    setHasTrainedToday,
-    setAnalyzedExerciseTrackingData,
-  } = useAnalysisContext();
+  const { setExerciseTrackingMaps, setAnalyzedExerciseTrackingData } =
+    useAnalysisContext();
 
   // --------------------[ Navigation ]--------------------------------------
   const navigation = useNavigation();
@@ -77,7 +74,6 @@ const useStartWorkoutPageLogic = (selectedSplit) => {
       setAnalyzedExerciseTrackingData(
         unpackFromExerciseTrackingData(exerciseTrackingAnalysis)
       );
-      setHasTrainedToday(true);
       setIsWorkoutMode(false);
 
       // Delete analytics cache

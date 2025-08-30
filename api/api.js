@@ -44,14 +44,14 @@ api.interceptors.response.use(
     const status = error.response?.status;
     const data = error.response?.data;
 
-    /*if (status === 401) {
+    if (status === 401) {
       console.log("401 from API:", {
         url: original.url,
         method: original.method,
         resp: data,
         authHeader: original.headers?.Authorization?.slice(0, 32) + "...",
       });
-    }*/
+    }
 
     // Detect if network error - no response
     if (!error.response) {

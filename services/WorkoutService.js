@@ -4,7 +4,7 @@ import api from "../api/api";
 export const getUserWorkout = async () => {
   try {
     const response = await api.get("/api/workouts/getworkout");
-    return response;
+    return response.data;
   } catch (error) {
     throw error;
   }

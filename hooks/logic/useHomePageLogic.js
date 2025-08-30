@@ -1,12 +1,12 @@
-import { useEffect, useMemo } from "react";
+import { useMemo } from "react";
 import { useAnalysisContext } from "../../context/AnalysisContext";
 import { useAuth } from "../../context/AuthContext";
-import { useWorkoutContext } from "../../context/WorkoutContext";
 import { useGlobalAppLoadingContext } from "../../context/GlobalAppLoadingContext";
+import { useWorkoutContext } from "../../context/WorkoutContext";
 
 const useHomePageLogic = () => {
   // Auth state (user + global session loading)
-  const { user, sessionLoading } = useAuth();
+  const { user } = useAuth();
   const { isLoading } = useGlobalAppLoadingContext();
 
   // Workout state (plan + derived maps + loading)
