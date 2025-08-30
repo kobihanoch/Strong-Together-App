@@ -6,9 +6,8 @@ import React, {
   useMemo,
   useState,
 } from "react";
-import { keyTracking, TTL_48H } from "../cache/cacheUtils";
-import useGetCache from "../hooks/useGetCache";
-import useUpdateCache from "../hooks/useUpdateCache";
+import { keyTracking } from "../cache/cacheUtils";
+import useCacheAndFetch from "../hooks/useCacheAndFetch";
 import { getUserExerciseTracking } from "../services/WorkoutService";
 import {
   checkHasTrainedToday,
@@ -45,15 +44,6 @@ export const AnalysisProvider = ({ children }) => {
 
   const { user, isValidatedWithServer } = useAuth();
 
-  // Stable cache key (unify 45 days usage)
-  const trackingKey = useMemo(
-    () => (user ? keyTracking(user.id, 45) : null),
-    [user?.id]
-  );
-
-  // Get cache
-  const { cached, hydrated: cacheHydrated } = useGetCache(trackingKey);
-
   // Raw and derived analysis state
   const [exerciseTrackingMaps, setExerciseTrackingMaps] = useState(null);
 
@@ -65,93 +55,43 @@ export const AnalysisProvider = ({ children }) => {
     [analyzedExerciseTrackingData?.lastWorkoutDate]
   );
 
-  // Loading flag for this context
-  const [loading, setLoading] = useState(false);
+  // -------------------------- useCacheHandler props ------------------------------
 
-  // Flag for API data hydration to enable cache writing
-  // Flag stays true until context is unmounting on logout (guard against initial refrence building)
-  const [APIDataHydrated, setAPIDataHydrated] = useState(false);
+  // Fetch function
+  const fetchFn = useCallback(async () => await getUserExerciseTracking(), []);
 
-  // Update cache on change of payload
-  // Already unpacked (the analysis) - ready for later user
-  const cachedPayload = useMemo(() => {
-    return {
+  // On data function
+  const onDataFn = useCallback((data) => {
+    // Raw data from server - unpack
+    // Data from cache - already unpacked
+    setExerciseTrackingMaps(data?.exerciseTrackingMaps ?? []);
+    // Determines if data retreived from API or cache
+    setAnalyzedExerciseTrackingData(
+      data?.exerciseTrackingAnalysis
+        ? unpackFromExerciseTrackingData(data?.exerciseTrackingAnalysis)
+        : data?.analyzedExerciseTrackingData
+    );
+  }, []);
+
+  // Hook usage
+  const { loading } = useCacheAndFetch(
+    user, // user prop
+    keyTracking, // key builder
+    isValidatedWithServer, // flag from server
+    fetchFn, // fetch cb
+    onDataFn, // on data cb
+    {
       exerciseTrackingMaps: exerciseTrackingMaps,
       analyzedExerciseTrackingData: analyzedExerciseTrackingData,
-    };
-  }, [exerciseTrackingMaps, analyzedExerciseTrackingData]);
-
-  useUpdateCache(trackingKey, cachedPayload, TTL_48H, APIDataHydrated);
-
-  /*useEffect(() => {
-    console.log("Analysis Mounted");
-  }, []);*/
-
-  // Load from cache and from server
-  useEffect(() => {
-    (async () => {
-      if (cacheHydrated && trackingKey) {
-        try {
-          // Check if cached
-          if (cached) {
-            console.log("[Analysis Context]: Cached");
-            setExerciseTrackingMaps(cached.exerciseTrackingMaps ?? []);
-            setAnalyzedExerciseTrackingData(
-              cached.analyzedExerciseTrackingData
-            );
-            setLoading(false);
-          } else {
-            setLoading(true);
-          }
-        } finally {
-          setLoading(false);
-        }
-      }
-    })();
-
-    return logoutCleanup;
-  }, [cacheHydrated, trackingKey]);
-
-  // Run only after validating tokens at auth context
-  useEffect(() => {
-    (async () => {
-      if (isValidatedWithServer) {
-        try {
-          // Call API
-          const res = await getUserExerciseTracking();
-          const {
-            exerciseTrackingAnalysis: resAnalysis,
-            exerciseTrackingMaps: resETMaps,
-          } = res;
-
-          // Raw data from server - unpack
-          const unpackedAnalysis = unpackFromExerciseTrackingData(resAnalysis);
-
-          setExerciseTrackingMaps(resETMaps ?? []);
-          setAnalyzedExerciseTrackingData(unpackedAnalysis);
-          setAPIDataHydrated(true);
-          // Store in cache (auto)
-        } finally {
-          setLoading(false);
-        }
-      }
-    })();
-  }, [isValidatedWithServer]);
+    }, // cache payload
+    "Analysis Context" // log
+  );
 
   // Update global loading
   useEffect(() => {
     setGlobalLoading("analysis", loading);
     return () => setGlobalLoading("analysis", false);
   }, [loading, setGlobalLoading]);
-
-  // Unmount cleanup
-  const logoutCleanup = useCallback(() => {
-    setAnalyzedExerciseTrackingData(null);
-    setExerciseTrackingMaps(null);
-    setLoading(false);
-    setAPIDataHydrated(false);
-    //console.log("Analysis Unmounted");
-  }, []);
 
   // Memoized context value
   const value = useMemo(

@@ -6,18 +6,19 @@ import {
   useMemo,
   useState,
 } from "react";
-import { cacheGetJSON, keyInbox, TTL_48H } from "../cache/cacheUtils.js";
-import useUpdateCache from "../hooks/useUpdateCache.js";
+import { keyInbox } from "../cache/cacheUtils.js";
+import useCacheAndFetch from "../hooks/useCacheAndFetch.js";
 import {
   getUserMessages,
   updateMsgReadStatus,
 } from "../services/MessagesService.js";
-import { filterMessagesByUnread } from "../utils/notificationsContextUtils.js";
-import { cacheProfileImagesAndGetMap } from "../utils/notificationsContextUtils.js";
+import {
+  cacheProfileImagesAndGetMap,
+  filterMessagesByUnread,
+} from "../utils/notificationsContextUtils.js";
 import { registerToMessagesListener } from "../webSockets/socketListeners";
 import { useAuth } from "./AuthContext.js";
 import { useGlobalAppLoadingContext } from "./GlobalAppLoadingContext.js";
-import useGetCache from "../hooks/useGetCache.js";
 
 /**
  * Notifications Flow:
@@ -40,13 +41,6 @@ export const NotificationsProvider = ({ children }) => {
 
   const { user, isValidatedWithServer } = useAuth();
 
-  // Stable cache key
-  const msgKey = useMemo(() => (user ? keyInbox(user.id) : null), [user?.id]);
-
-  // Get cache
-  // Triggers on plan key builded
-  const { cached, hydrated: cacheHydrated } = useGetCache(msgKey);
-
   // All user's received messages
   const [allReceivedMessages, setAllReceivedMessages] = useState([]);
 
@@ -61,21 +55,27 @@ export const NotificationsProvider = ({ children }) => {
   // ALl profile images
   const [profileImagesCache, setProfileImagesCache] = useState({});
 
-  // Loading
-  const [loadingMessages, setLoadingMessages] = useState(false);
+  // -------------------------- useCacheHandler props ------------------------------
 
-  // Flag for API data hydration to enable cache writing
-  // Flag stays true until context is unmounting on logout (guard against initial refrence building)
-  const [APIDataHydrated, setAPIDataHydrated] = useState(false);
+  // Fetch function
+  const fetchFn = useCallback(async () => await getUserMessages(), []);
 
-  // Cache payload
-  const cachedPayload = useMemo(() => {
-    return {
-      messages: allReceivedMessages,
-      senders: allSendersUsersArr,
-    };
-  }, [allReceivedMessages, allSendersUsersArr]);
-  useUpdateCache(msgKey, cachedPayload, TTL_48H, APIDataHydrated);
+  // On data function
+  const onDataFn = useCallback((data) => {
+    setAllReceivedMessages(data?.messages);
+    setAllSendersUsersArr(data?.senders);
+  }, []);
+
+  // Hook usage
+  const { loading: loadingMessages } = useCacheAndFetch(
+    user, // user prop
+    keyInbox, // key builder
+    isValidatedWithServer, // flag from server
+    fetchFn, // fetch cb
+    onDataFn, // on data cb
+    { messages: allReceivedMessages, senders: allSendersUsersArr }, // cache payload
+    "Notifications Context" // log
+  );
 
   // Load listener
   useEffect(() => {
@@ -88,59 +88,10 @@ export const NotificationsProvider = ({ children }) => {
     }
   }, [user]);
 
-  // Load messages on start
-  // Load senders on start (same API call)
-  useEffect(() => {
-    (async () => {
-      if (cacheHydrated && msgKey) {
-        try {
-          if (cached) {
-            console.log("[Notifications Context]: Cached");
-            setAllReceivedMessages(cached.messages);
-            setAllSendersUsersArr(cached.senders);
-            setLoadingMessages(false);
-          } else {
-            setLoadingMessages(true);
-          }
-        } finally {
-        }
-      }
-    })();
-
-    return logoutCleanup;
-  }, [cacheHydrated, msgKey]);
-
-  // Run only after validating tokens at auth context
-  useEffect(() => {
-    (async () => {
-      if (isValidatedWithServer) {
-        try {
-          // Call API
-          const messages = await getUserMessages();
-          const { messages: msgs, senders } = messages;
-          setAllReceivedMessages(msgs);
-          setAllSendersUsersArr(senders);
-          setAPIDataHydrated(true);
-          // Storage in cache happens alone with dependencies
-        } finally {
-          setLoadingMessages(false);
-        }
-      }
-    })();
-  }, [isValidatedWithServer]);
-
   useEffect(() => {
     setGlobalLoading("notifications", loadingMessages);
     return () => setGlobalLoading("notifications", false);
   }, [loadingMessages]);
-
-  const logoutCleanup = useCallback(() => {
-    setAllReceivedMessages([]);
-    setAllSendersUsersArr([]);
-    setProfileImagesCache({});
-    setLoadingMessages(false);
-    setAPIDataHydrated(false);
-  }, []);
 
   // Prefetch images and return mapping of profile images when senders updated
   useEffect(() => {
@@ -150,13 +101,13 @@ export const NotificationsProvider = ({ children }) => {
     })();
   }, [allSendersUsersArr]);
 
-  const markAsRead = async (msgId) => {
+  const markAsRead = useCallback(async (msgId) => {
     await updateMsgReadStatus(msgId);
     // Update state
     setAllReceivedMessages((prev) =>
       prev.map((m) => (m.id === msgId ? { ...m, is_read: true } : m))
     );
-  };
+  }, []);
 
   return (
     <NotificationsContext.Provider

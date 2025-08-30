@@ -1,7 +1,7 @@
-import { useState, useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { TTL_48H } from "../cache/cacheUtils";
-import useUpdateCache from "./useUpdateCache";
 import useGetCache from "./useGetCache";
+import useUpdateCache from "./useUpdateCache";
 
 const useCacheAndFetch = (
   user,
