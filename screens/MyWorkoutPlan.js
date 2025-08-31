@@ -7,6 +7,7 @@ import HeaderSection from "../components/MyWorkoutPlanComponents/HeaderSection.j
 import WorkoutSplitsList from "../components/MyWorkoutPlanComponents/WorkoutSplitsList.js";
 import { useAuth } from "../context/AuthContext";
 import { useMyWorkoutPlanPageLogic } from "../hooks/logic/useMyWorkoutPlanPageLogic.js";
+import { useTranslation } from "react-i18next";
 
 const { width, height } = Dimensions.get("window");
 
@@ -14,6 +15,10 @@ const MyWorkoutPlan = () => {
   const navigation = useNavigation();
   const { user } = useAuth();
   const { data: workoutData } = useMyWorkoutPlanPageLogic();
+  const { t } = useTranslation();
+
+  // Prefer first token of the user's name
+  const firstName = (user?.name || "").split(" ")[0] || "";
 
   return (
     <View
@@ -26,36 +31,32 @@ const MyWorkoutPlan = () => {
     >
       {workoutData?.workout ? (
         <>
-          <HeaderSection user={user}></HeaderSection>
-          <WorkoutSplitsList data={workoutData}></WorkoutSplitsList>
-          <ExercisesSection data={workoutData}></ExercisesSection>
+          <HeaderSection user={user} />
+          <WorkoutSplitsList data={workoutData} />
+          <ExercisesSection data={workoutData} />
         </>
       ) : (
-        <>
-          <View
+        <View
+          style={{
+            flex: 1,
+            justifyContent: "center",
+            alignItems: "center",
+            flexDirection: "column",
+          }}
+        >
+          <Text style={{ fontSize: RFValue(23), fontFamily: "Inter_700Bold" }}>
+            {t("home.noPlan")}
+          </Text>
+          <Text
             style={{
-              flex: 1,
-              justifyContent: "center",
-              alignItems: "center",
-              flexDirection: "column",
+              fontSize: RFValue(18),
+              fontFamily: "Inter_400Regular",
+              color: "gray",
             }}
           >
-            <Text
-              style={{ fontSize: RFValue(23), fontFamily: "Inter_700Bold" }}
-            >
-              No workout available
-            </Text>
-            <Text
-              style={{
-                fontSize: RFValue(18),
-                fontFamily: "Inter_400Regular",
-                color: "gray",
-              }}
-            >
-              Create one to start your journy
-            </Text>
-          </View>
-        </>
+            {t("home.createPlanCta")}
+          </Text>
+        </View>
       )}
     </View>
   );

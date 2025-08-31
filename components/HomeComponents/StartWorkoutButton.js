@@ -17,7 +17,7 @@ const StartWorkoutButton = () => {
     <View style={{ flex: 1, width: "85%", alignSelf: "center" }}>
       <TouchableOpacity
         style={{
-          flexDirection: isRTL ? "row-reverse" : "row",
+          flexDirection: "row",
           justifyContent: "center",
           alignItems: "center",
           backgroundColor: "#2979FF",

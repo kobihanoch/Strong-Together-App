@@ -1,16 +1,25 @@
-import { LinearGradient } from "expo-linear-gradient";
 import React from "react";
 import { Dimensions, Image, StyleSheet, Text, View } from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";
-import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 import images from "../../components/images";
+import { useTranslation } from "react-i18next";
+import { slug, tExercise, tMuscle } from "../../utils/translationUtils";
 
 const { width, height } = Dimensions.get("window");
 
 const ExerciseItem = ({ exercise }) => {
+  const { t } = useTranslation();
+
+  // Use the correct DB fields
   const mainMuscle = exercise.targetmuscle;
   const specificMuscle = exercise.specifictargetmuscle;
 
+  // Translate names with safe fallback to DB text
+  const exName = tExercise(t, exercise.exercise);
+  const mainName = tMuscle(t, mainMuscle);
+  const specName = tMuscle(t, specificMuscle);
+
+  // Keep image lookup based on original DB keys
   const imagePath = images[mainMuscle]?.[specificMuscle];
 
   return (
@@ -18,12 +27,7 @@ const ExerciseItem = ({ exercise }) => {
       <View style={{ flex: 1, flexDirection: "row" }}>
         <View style={{ flex: 0.3, justifyContent: "center" }}>
           <View
-            /*colors={["#00142a", "#0d2540"]}*/
-            style={{
-              flex: 1,
-              alignItems: "center",
-              justifyContent: "center",
-            }}
+            style={{ flex: 1, alignItems: "center", justifyContent: "center" }}
           >
             <View
               style={{
@@ -47,6 +51,7 @@ const ExerciseItem = ({ exercise }) => {
             </View>
           </View>
         </View>
+
         <View
           style={{
             flex: 0.7,
@@ -61,18 +66,21 @@ const ExerciseItem = ({ exercise }) => {
                 fontFamily: "Inter_600SemiBold",
                 fontSize: RFValue(15),
                 color: "black",
+                alignSelf: "flex-start",
               }}
             >
-              {exercise.exercise}
+              {exName}
             </Text>
+
             <Text
               style={{
                 fontFamily: "Inter_400Regular",
                 fontSize: RFValue(10),
                 color: "#919191",
+                alignSelf: "flex-start",
               }}
             >
-              {exercise.targetmuscle}, {exercise.specifictargetmuscle}
+              {mainName}, {specName}
             </Text>
 
             <Text
@@ -81,13 +89,14 @@ const ExerciseItem = ({ exercise }) => {
                 fontSize: RFValue(10),
                 color: "black",
                 opacity: 0.7,
+                alignSelf: "flex-start",
               }}
             >
               {Array.isArray(exercise.sets)
                 ? exercise.sets.join(" / ")
                 : exercise.sets
                 ? exercise.sets.split(",").join(" ")
-                : "N/A"}
+                : t("common.na")}
             </Text>
           </View>
         </View>

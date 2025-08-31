@@ -1,21 +1,25 @@
 import React from "react";
-import {
-  Dimensions,
-  Text,
-  Touchable,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { Dimensions, Text, TouchableOpacity, View } from "react-native";
 import { FlatList } from "react-native-gesture-handler";
 import { RFValue } from "react-native-responsive-fontsize";
 import ExerciseItem from "./ExerciseItem";
 import { useNavigation } from "@react-navigation/native";
-import { MaterialCommunityIcons, Feather } from "@expo/vector-icons";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { useTranslation } from "react-i18next";
+import { localizeMuscleList } from "../../utils/translationUtils";
 
 const { width, height } = Dimensions.get("window");
 
 const ExercisesSection = ({ data }) => {
   const navigation = useNavigation();
+  const { t } = useTranslation();
+
+  const splitName = data?.selectedSplit?.name || "";
+  const muscleGroupRaw = data?.selectedSplit?.muscleGroup || "";
+
+  // Use utils to translate only main muscles (ignore anything in parentheses)
+  const muscleGroupLocalized = localizeMuscleList(t, muscleGroupRaw);
+
   return (
     <View
       style={{
@@ -43,7 +47,7 @@ const ExercisesSection = ({ data }) => {
             marginLeft: width * 0.04,
           }}
         >
-          Workout {data?.selectedSplit?.name}
+          {t("workout.splitTitle", { name: splitName })}
         </Text>
         <Text
           style={{
@@ -57,20 +61,22 @@ const ExercisesSection = ({ data }) => {
             color: "#2563eb",
           }}
         >
-          Completed x{data?.splitTrainedCount}
+          {t("workout.completedTimes", { count: data?.splitTrainedCount || 0 })}
         </Text>
       </View>
+
       <Text
         style={{
           fontFamily: "Inter_400Regular",
           fontSize: RFValue(15),
           marginLeft: width * 0.04,
           marginTop: height * 0.005,
-          width: "100%",
+          alignSelf: "flex-start",
         }}
       >
-        {data?.selectedSplit?.muscleGroup.replace(/\s*\([^)]*\)/g, "")}
+        {muscleGroupLocalized}
       </Text>
+
       <View style={{ flex: 1, marginTop: height * 0.02 }}>
         <View style={{ flex: 8.5 }}>
           <FlatList
@@ -81,6 +87,7 @@ const ExercisesSection = ({ data }) => {
             renderItem={({ item }) => <ExerciseItem exercise={item} />}
           />
         </View>
+
         <TouchableOpacity
           style={{
             width: "95%",
@@ -95,7 +102,7 @@ const ExercisesSection = ({ data }) => {
             borderRadius: height * 0.02,
             opacity: data.hasTrainedToday ? 0.7 : 1,
           }}
-          disabled={data.hasTrainedToday ? true : false}
+          disabled={!!data.hasTrainedToday}
           onPress={() =>
             navigation.navigate("StartWorkout", {
               workoutSplit: data.selectedSplit,
@@ -107,7 +114,7 @@ const ExercisesSection = ({ data }) => {
             color="white"
             size={RFValue(15)}
             style={{ display: data.hasTrainedToday ? "flex" : "none" }}
-          ></MaterialCommunityIcons>
+          />
           <Text
             style={{
               fontFamily: "Inter_600SemiBold",
@@ -115,7 +122,7 @@ const ExercisesSection = ({ data }) => {
               color: "white",
             }}
           >
-            Start workout
+            {t("home.startWorkout")}
           </Text>
         </TouchableOpacity>
       </View>

@@ -9,12 +9,18 @@ import {
 } from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";
 import { useTranslation } from "react-i18next";
+import { tExercise } from "../../utils/translationUtils";
 
 const { width, height } = Dimensions.get("window");
 
 function NewAchivementCard({ hasAssignedWorkout, PR }) {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const { t } = useTranslation();
+
+  // Translate PR exercise if it exists
+  const prExerciseName = PR?.maxExercise
+    ? tExercise(t, PR.maxExercise)
+    : t("common.na");
 
   return (
     <View
@@ -53,11 +59,7 @@ function NewAchivementCard({ hasAssignedWorkout, PR }) {
           <Text
             style={{ fontFamily: "Inter_600SemiBold", fontSize: RFValue(14) }}
           >
-            {hasAssignedWorkout
-              ? PR?.maxExercise
-                ? PR?.maxExercise
-                : t("common.na")
-              : t("common.noData")}
+            {hasAssignedWorkout ? prExerciseName : t("common.noData")}
           </Text>
         </View>
 
@@ -114,9 +116,7 @@ function NewAchivementCard({ hasAssignedWorkout, PR }) {
               }}
             >
               {hasAssignedWorkout
-                ? PR?.maxReps
-                  ? PR?.maxReps
-                  : t("common.na")
+                ? PR?.maxReps ?? t("common.na")
                 : t("common.na")}
             </Text>
             <Text
@@ -135,7 +135,7 @@ function NewAchivementCard({ hasAssignedWorkout, PR }) {
       <Modal
         visible={isModalVisible}
         animationType="fade"
-        transparent={true}
+        transparent
         onRequestClose={() => setIsModalVisible(false)}
       >
         <View
@@ -166,29 +166,21 @@ function NewAchivementCard({ hasAssignedWorkout, PR }) {
             >
               {t("pr.detailsTitle")}
             </Text>
+
             <Text
-              style={{
-                fontFamily: "Inter_500Medium",
-                fontSize: RFValue(14),
-              }}
+              style={{ fontFamily: "Inter_500Medium", fontSize: RFValue(14) }}
             >
-              {t("labels.exercise")}: {PR?.maxExercise}
+              {t("labels.exercise")}: {prExerciseName}
             </Text>
             <Text
-              style={{
-                fontFamily: "Inter_500Medium",
-                fontSize: RFValue(14),
-              }}
+              style={{ fontFamily: "Inter_500Medium", fontSize: RFValue(14) }}
             >
               {t("labels.weight")}: {t("units.kg", { value: PR?.maxWeight })}
             </Text>
             <Text
-              style={{
-                fontFamily: "Inter_500Medium",
-                fontSize: RFValue(14),
-              }}
+              style={{ fontFamily: "Inter_500Medium", fontSize: RFValue(14) }}
             >
-              {t("labels.reps")}: {PR?.maxReps}
+              {t("labels.reps")}: {PR?.maxReps ?? t("common.na")}
             </Text>
 
             <TouchableOpacity
