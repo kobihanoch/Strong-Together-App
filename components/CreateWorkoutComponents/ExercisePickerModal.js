@@ -20,6 +20,7 @@ import { RFValue } from "react-native-responsive-fontsize";
 import { useCreateWorkout } from "../../context/CreateWorkoutContext";
 // Adjust this import path to where your SlidingBottomModal lives
 import SlidingBottomModal from "../../components/SlidingBottomModal";
+import ExerciseSearchBar from "./ExerciseSearchBar";
 
 const { width, height } = Dimensions.get("window");
 
@@ -56,6 +57,18 @@ const ExercisePickerModal = forwardRef(function ExercisePickerModal(_, ref) {
       }),
     }));
   }, [DB?.dbExercises]);
+
+  // Search bar
+  const [query, setQuery] = useState("");
+  const searchExercises = useCallback((text) => setQuery(text));
+  const filteredExercises = useMemo(() => {
+    return sections
+      .map((section) => ({
+        ...section,
+        data: section.data.filter((ex) => ex.name.includes(query)),
+      }))
+      .filter((section) => section.data.length);
+  }, [query, sections]);
 
   // Tabs data = section titles (targetmuscle)
   const tabItems = useMemo(() => sections.map((s) => s.title), [sections]);
@@ -203,16 +216,21 @@ const ExercisePickerModal = forwardRef(function ExercisePickerModal(_, ref) {
         })}
       />
 
+      <ExerciseSearchBar
+        search={searchExercises}
+        query={query}
+      ></ExerciseSearchBar>
+
       {/* Sectioned list (section header = targetmuscle) */}
       <SectionList
         ref={sectionListRef}
-        sections={sections}
+        sections={filteredExercises}
         keyExtractor={(item) => String(item.id)}
         renderItem={renderItem}
         renderSectionHeader={renderSectionHeader}
         stickySectionHeadersEnabled={false}
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingBottom: height * 0.02 }}
+        contentContainerStyle={{ paddingBottom: height * 0.3 }}
         onViewableItemsChanged={onViewableItemsChanged}
         viewabilityConfig={viewConfigRef.current}
         getItemLayout={(sectionData, index) => {
