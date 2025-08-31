@@ -116,13 +116,31 @@ const BottomTabBar = () => {
         isWorkoutMode && tab.name === "MyWorkoutPlan" ? (
           <TouchableOpacity
             key={index}
-            style={[styles.tabButton, styles.specialTabButton]}
+            style={{
+              padding: 15,
+              paddingHorizontal: 30,
+              borderRadius: 15,
+            }}
             onPress={showExitButton ? confirmExit : handleTimerPress}
           >
             {showExitButton ? (
-              <FontAwesome5 name="times" size={RFValue(20)} color="red" />
+              <Text style={styles.exitButton}>Quit workout</Text>
             ) : (
-              <Text style={styles.timerText}>{formatTime()}</Text>
+              <View
+                style={{
+                  flexDirection: "column",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  gap: 5,
+                }}
+              >
+                <Text style={styles.timerText}>{formatTime()}</Text>
+                <Text
+                  style={{ color: "#2979FF", fontFamily: "Inter_400Regular" }}
+                >
+                  Press to quit
+                </Text>
+              </View>
             )}
           </TouchableOpacity>
         ) : (
@@ -189,13 +207,14 @@ const styles = StyleSheet.create({
     color: "white",
   },
   timerText: {
-    color: "white",
+    color: "#2979FF",
     fontSize: RFValue(12),
     fontFamily: "Inter_700Bold",
   },
   exitButton: {
-    justifyContent: "center",
-    alignItems: "center",
+    color: "#2979FF",
+    fontSize: RFValue(12),
+    fontFamily: "Inter_700Bold",
   },
 });
 
