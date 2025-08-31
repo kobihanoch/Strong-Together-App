@@ -1,13 +1,16 @@
+// English comments only inside the code
 import { useNavigation } from "@react-navigation/native";
 import React from "react";
 import { Dimensions, Text, TouchableOpacity, View } from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
+import { useTranslation } from "react-i18next";
 
 const { width, height } = Dimensions.get("window");
 
 function CreateOrEditWorkoutCard({ hasAssignedWorkout }) {
   const navigation = useNavigation();
+  const { t } = useTranslation();
 
   return (
     <View
@@ -51,7 +54,7 @@ function CreateOrEditWorkoutCard({ hasAssignedWorkout }) {
                   marginBottom: height * 0.015,
                 }}
               >
-                Edit workout
+                {t("workout.editWorkout")}
               </Text>
 
               <View
@@ -100,7 +103,7 @@ function CreateOrEditWorkoutCard({ hasAssignedWorkout }) {
                   marginBottom: height * 0.015,
                 }}
               >
-                New Workout
+                {t("workout.newWorkout")}
               </Text>
 
               <View

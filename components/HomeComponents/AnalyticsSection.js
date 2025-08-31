@@ -3,11 +3,16 @@ import React from "react";
 import { View, Text, Dimensions, TouchableOpacity } from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
+import { useTranslation } from "react-i18next";
+import { useLang } from "../../src/i18n/LangProvider";
 
 const { width, height } = Dimensions.get("window");
 
 const AnalyticsSection = () => {
   const navigate = useNavigation();
+  const { t } = useTranslation();
+  const { isRTL } = useLang();
+
   return (
     <View
       style={{
@@ -30,9 +35,10 @@ const AnalyticsSection = () => {
           fontFamily: "Inter_600SemiBold",
           fontSize: RFValue(12),
           color: "black",
+          textAlign: isRTL ? "right" : "left",
         }}
       >
-        Check out your workout analytics
+        {t("analytics.cta")}
       </Text>
       <TouchableOpacity
         style={{
@@ -45,7 +51,7 @@ const AnalyticsSection = () => {
         onPress={() => navigate.navigate("Analytics")}
       >
         <MaterialCommunityIcons
-          name="chevron-right"
+          name={isRTL ? "chevron-left" : "chevron-right"}
           color="white"
           size={RFValue(15)}
         />

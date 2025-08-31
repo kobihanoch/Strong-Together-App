@@ -34,11 +34,13 @@
     "expo-image": "~2.4.0",
     "expo-image-picker": "~16.1.4",
     "expo-linear-gradient": "^14.1.5",
+    "expo-localization": "~16.1.6",
     "expo-notifications": "0.31.4",
     "expo-secure-store": "^14.2.3",
     "expo-status-bar": "~2.2.3",
     "expo-updates": "0.28.17",
     "https-browserify": "^1.0.0",
+    "i18next": "^25.4.2",
     "isomorphic-ws": "^5.0.0",
     "lottie-react-native": "7.2.2",
     "luxon": "^3.7.1",
@@ -46,6 +48,7 @@
     "moti": "^0.30.0",
     "node-libs-react-native": "^1.2.1",
     "react": "19.0.0",
+    "react-i18next": "^15.7.3",
     "react-native": "0.79.5",
     "react-native-alert-notification": "^0.4.2",
     "react-native-auto-skeleton": "^0.1.26",
@@ -76,7 +79,8 @@
     "tls-browserify": "^0.2.2",
     "use-latest-callback": "^0.2.1",
     "victory-native": "^41.19.3",
-    "which": "5.0.0"
+    "which": "5.0.0",
+    "@shopify/react-native-skia": "v2.0.0-next.4"
   },
   "devDependencies": {
     "@babel/core": "^7.26.0",

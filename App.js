@@ -38,6 +38,7 @@ import { GlobalAppLoadingProvider } from "./context/GlobalAppLoadingContext";
 import AppStack from "./navigation/AppStack";
 import AuthStack from "./navigation/AuthStack";
 import NotificationsSetup from "./notifications/NotificationsSetup";
+import LangProvider from "./src/i18n/LangProvider";
 
 // ---------- Fonts Loader Hook ----------
 function useFontsReady() {
@@ -84,18 +85,20 @@ export default function App() {
   }
 
   return (
-    <AlertNotificationRoot>
-      <GestureHandlerRootView style={{ flex: 1 }}>
-        <GlobalAppLoadingProvider>
-          <AuthProvider>
-            <NavigationContainer ref={navigationRef}>
-              <RootNavigator />
-              <NotifierRoot />
-            </NavigationContainer>
-          </AuthProvider>
-        </GlobalAppLoadingProvider>
-      </GestureHandlerRootView>
-    </AlertNotificationRoot>
+    <LangProvider>
+      <AlertNotificationRoot>
+        <GestureHandlerRootView style={{ flex: 1 }}>
+          <GlobalAppLoadingProvider>
+            <AuthProvider>
+              <NavigationContainer ref={navigationRef}>
+                <RootNavigator />
+                <NotifierRoot />
+              </NavigationContainer>
+            </AuthProvider>
+          </GlobalAppLoadingProvider>
+        </GestureHandlerRootView>
+      </AlertNotificationRoot>
+    </LangProvider>
   );
 }
 

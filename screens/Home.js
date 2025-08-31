@@ -1,3 +1,4 @@
+// English comments only inside the code
 import React from "react";
 import { Dimensions, StyleSheet, Text, View } from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";
@@ -5,18 +6,26 @@ import QuickLookSection from "../components/HomeComponents/QuickLookSection";
 import StartWorkoutButton from "../components/HomeComponents/StartWorkoutButton";
 import useHomePageLogic from "../hooks/logic/useHomePageLogic";
 import { Skeleton } from "moti/skeleton";
+import { useTranslation } from "react-i18next";
+import { useLang } from "../src/i18n/LangProvider";
 
 const { width, height } = Dimensions.get("window");
 
 const Home = ({ navigation }) => {
-  // Hook handling
   const { data: userData, isLoading } = useHomePageLogic();
+  const { t } = useTranslation();
+  const { isRTL } = useLang();
 
   return (
     <Skeleton.Group show={isLoading}>
-      <View style={{ flex: 1, paddingVertical: height * 0.02 }}>
+      <View
+        style={{
+          flex: 1,
+          paddingVertical: height * 0.02,
+          writingDirection: isRTL ? "rtl" : "ltr",
+        }}
+      >
         <View style={styles.midContainer}>
-          {/*flex 2*/}
           <View
             style={{
               flex: 3,
@@ -39,20 +48,19 @@ const Home = ({ navigation }) => {
               radius={10}
               colorMode="light"
             >
-              <Text style={styles.headerText}>
-                {isLoading ? "" : `Hello, ${userData?.firstName}!`}
+              <Text style={[styles.headerText]}>
+                {isLoading
+                  ? ""
+                  : t("home.greeting", { name: userData?.firstName || "" })}
               </Text>
             </Skeleton>
+
             <Skeleton colorMode="light" height={height * 0.1} width={"100%"}>
-              <StartWorkoutButton></StartWorkoutButton>
+              <StartWorkoutButton />
             </Skeleton>
           </View>
 
-          {/*flex 7*/}
-          <QuickLookSection
-            data={userData}
-            isLoading={isLoading}
-          ></QuickLookSection>
+          <QuickLookSection data={userData} isLoading={isLoading} />
         </View>
       </View>
     </Skeleton.Group>
@@ -60,53 +68,19 @@ const Home = ({ navigation }) => {
 };
 
 const styles = StyleSheet.create({
-  headerContainer: {
-    paddingHorizontal: width * 0.06,
-    flex: 1.5,
-    flexDirection: "row",
-    gap: width * 0.05,
-    alignItems: "center",
-  },
   headerText: {
     fontFamily: "Inter_600SemiBold",
     color: "black",
     fontSize: RFValue(35),
     alignItems: "flex-start",
+    alignSelf: "flex-start",
   },
-  semiHeaderText: {
-    fontFamily: "Inter_400Regular",
-    fontSize: RFValue(13),
-    marginTop: height * 0.01,
-  },
-
   midContainer: {
     flex: 1,
     flexDirection: "column",
     justifyContent: "flex-start",
     alignItems: "center",
     gap: height * 0.005,
-  },
-
-  bottomContainer: {
-    flex: 0,
-    flexDirection: "column",
-    justifyContent: "space-around",
-    alignItems: "center",
-  },
-
-  logoutButton: {
-    marginTop: height * 0.1,
-    backgroundColor: "#ff4d4d",
-    paddingVertical: height * 0.015,
-    paddingHorizontal: width * 0.2,
-    borderRadius: 25,
-    alignSelf: "center",
-  },
-  logoutButtonText: {
-    color: "white",
-    fontFamily: "Inter_700Bold",
-    fontSize: width * 0.04,
-    textAlign: "center",
   },
 });
 

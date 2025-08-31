@@ -221,6 +221,7 @@ const TopComponent = () => {
 const styles = StyleSheet.create({
   topContainer: {
     flex: 1,
+    direction: "ltr",
     width: "100%",
     flexDirection: "row",
     justifyContent: "space-between",

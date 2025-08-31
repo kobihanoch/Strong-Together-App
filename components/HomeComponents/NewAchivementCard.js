@@ -8,11 +8,13 @@ import {
   View,
 } from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";
+import { useTranslation } from "react-i18next";
 
 const { width, height } = Dimensions.get("window");
 
 function NewAchivementCard({ hasAssignedWorkout, PR }) {
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const { t } = useTranslation();
 
   return (
     <View
@@ -42,7 +44,7 @@ function NewAchivementCard({ hasAssignedWorkout, PR }) {
           <Text
             style={{ fontFamily: "Inter_600SemiBold", fontSize: RFValue(12) }}
           >
-            Personal Record
+            {t("pr.title")}
           </Text>
           <Image
             source={require("../../assets/gold-medal.png")}
@@ -54,33 +56,9 @@ function NewAchivementCard({ hasAssignedWorkout, PR }) {
             {hasAssignedWorkout
               ? PR?.maxExercise
                 ? PR?.maxExercise
-                : "N/A"
-              : "No data"}
+                : t("common.na")
+              : t("common.noData")}
           </Text>
-
-          {/* Here will be the button fo the modal */}
-          {/*hasAssignedWorkout && (
-            <TouchableOpacity
-              style={{
-                marginTop: height * 0.01,
-                paddingHorizontal: width * 0.04,
-                paddingVertical: height * 0.008,
-                backgroundColor: "#2979FF",
-                borderRadius: height * 0.01,
-              }}
-              onPress={() => setIsModalVisible(true)}
-            >
-              <Text
-                style={{
-                  color: "white",
-                  fontSize: RFValue(12),
-                  fontFamily: "Inter_600SemiBold",
-                }}
-              >
-                View Details
-              </Text>
-            </TouchableOpacity>
-          )*/}
         </View>
 
         <View
@@ -113,9 +91,9 @@ function NewAchivementCard({ hasAssignedWorkout, PR }) {
             >
               {hasAssignedWorkout
                 ? PR?.maxWeight
-                  ? PR?.maxWeight + " kg"
-                  : "N/A"
-                : "N/A"}
+                  ? t("units.kg", { value: PR?.maxWeight })
+                  : t("common.na")
+                : t("common.na")}
             </Text>
             <Text
               style={{
@@ -124,7 +102,7 @@ function NewAchivementCard({ hasAssignedWorkout, PR }) {
                 color: "rgb(137, 137, 137)",
               }}
             >
-              Weight
+              {t("labels.weight")}
             </Text>
           </View>
 
@@ -135,7 +113,11 @@ function NewAchivementCard({ hasAssignedWorkout, PR }) {
                 fontSize: RFValue(14),
               }}
             >
-              {hasAssignedWorkout ? (PR?.maxReps ? PR?.maxReps : "N/A") : "N/A"}
+              {hasAssignedWorkout
+                ? PR?.maxReps
+                  ? PR?.maxReps
+                  : t("common.na")
+                : t("common.na")}
             </Text>
             <Text
               style={{
@@ -144,13 +126,12 @@ function NewAchivementCard({ hasAssignedWorkout, PR }) {
                 color: "rgb(137, 137, 137)",
               }}
             >
-              Reps
+              {t("labels.reps")}
             </Text>
           </View>
         </View>
       </View>
 
-      {/* MODAL */}
       <Modal
         visible={isModalVisible}
         animationType="fade"
@@ -183,7 +164,7 @@ function NewAchivementCard({ hasAssignedWorkout, PR }) {
                 marginBottom: height * 0.01,
               }}
             >
-              Personal Record Details
+              {t("pr.detailsTitle")}
             </Text>
             <Text
               style={{
@@ -191,7 +172,7 @@ function NewAchivementCard({ hasAssignedWorkout, PR }) {
                 fontSize: RFValue(14),
               }}
             >
-              🏋️ Exercise: {PR?.maxExercise}
+              {t("labels.exercise")}: {PR?.maxExercise}
             </Text>
             <Text
               style={{
@@ -199,7 +180,7 @@ function NewAchivementCard({ hasAssignedWorkout, PR }) {
                 fontSize: RFValue(14),
               }}
             >
-              🔩 Weight: {PR?.maxWeight} kg
+              {t("labels.weight")}: {t("units.kg", { value: PR?.maxWeight })}
             </Text>
             <Text
               style={{
@@ -207,7 +188,7 @@ function NewAchivementCard({ hasAssignedWorkout, PR }) {
                 fontSize: RFValue(14),
               }}
             >
-              🔁 Reps: {PR?.maxReps}
+              {t("labels.reps")}: {PR?.maxReps}
             </Text>
 
             <TouchableOpacity
@@ -227,7 +208,7 @@ function NewAchivementCard({ hasAssignedWorkout, PR }) {
                   fontSize: RFValue(13),
                 }}
               >
-                Close
+                {t("common.close")}
               </Text>
             </TouchableOpacity>
           </View>

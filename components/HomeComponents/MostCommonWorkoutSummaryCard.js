@@ -2,6 +2,7 @@ import React, { useEffect, useRef } from "react";
 import { Animated, Dimensions, Text, View } from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";
 import Svg, { Circle } from "react-native-svg";
+import { useTranslation } from "react-i18next";
 const AnimatedCircle = Animated.createAnimatedComponent(Circle);
 
 const { width, height } = Dimensions.get("window");
@@ -10,6 +11,7 @@ const MostCommonWorkoutSummaryCard = ({
   totalWorkoutNumber,
   mostFrequentSplit,
 }) => {
+  const { t } = useTranslation();
   const radius = width * 0.1;
   const strokeWidth = width * 0.02;
   const normalizedRadius = radius - strokeWidth / 2;
@@ -19,7 +21,6 @@ const MostCommonWorkoutSummaryCard = ({
     ? Math.min(mostFrequentSplit.times / totalWorkoutNumber, 1)
     : 0;
 
-  //console.log(mostFrequentSplit);
   const animatedValue = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
@@ -59,7 +60,7 @@ const MostCommonWorkoutSummaryCard = ({
           marginBottom: height * 0.015,
         }}
       >
-        Common
+        {t("analytics.common")}
       </Text>
       {mostFrequentSplit?.splitName ? (
         <>
@@ -128,7 +129,7 @@ const MostCommonWorkoutSummaryCard = ({
           </View>
         </>
       ) : (
-        <Text>No records</Text>
+        <Text>{t("common.noRecords")}</Text>
       )}
     </View>
   );

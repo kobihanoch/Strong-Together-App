@@ -3,17 +3,21 @@ import React from "react";
 import { Text, TouchableOpacity, View, Dimensions } from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";
 import { useNavigation } from "@react-navigation/native";
+import { useTranslation } from "react-i18next";
+import { useLang } from "../../src/i18n/LangProvider";
 
 const { width, height } = Dimensions.get("window");
 
 const StartWorkoutButton = () => {
   const navigation = useNavigation();
+  const { t } = useTranslation();
+  const { isRTL } = useLang();
+
   return (
     <View style={{ flex: 1, width: "85%", alignSelf: "center" }}>
-      {/*<WorkoutCountCard userId={userId} height={height} width={width} />*/}
       <TouchableOpacity
         style={{
-          flexDirection: "row",
+          flexDirection: isRTL ? "row-reverse" : "row",
           justifyContent: "center",
           alignItems: "center",
           backgroundColor: "#2979FF",
@@ -38,7 +42,7 @@ const StartWorkoutButton = () => {
             fontSize: RFValue(18),
           }}
         >
-          Start Workout
+          {t("home.startWorkout")}
         </Text>
       </TouchableOpacity>
     </View>

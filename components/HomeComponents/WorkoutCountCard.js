@@ -1,12 +1,15 @@
 import React, { useEffect, useState, useRef } from "react";
 import { StyleSheet, Text, View, Dimensions, Animated } from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";
+import { useTranslation } from "react-i18next";
 
 const { width, height } = Dimensions.get("window");
 function WorkoutCountCard({ totalWorkoutNumber }) {
+  const { t } = useTranslation();
   const animatedValue = useRef(new Animated.Value(0)).current;
   const [displayValue, setDisplayValue] = useState(0);
   const scaleAnim = useRef(new Animated.Value(1)).current;
+
   useEffect(() => {
     Animated.timing(animatedValue, {
       toValue: totalWorkoutNumber,
@@ -30,7 +33,6 @@ function WorkoutCountCard({ totalWorkoutNumber }) {
     const listener = animatedValue.addListener(({ value }) => {
       setDisplayValue(Math.floor(value));
     });
-
     return () => {
       animatedValue.removeListener(listener);
     };
@@ -74,7 +76,7 @@ function WorkoutCountCard({ totalWorkoutNumber }) {
               alignSelf: "center",
             }}
           >
-            Workouts
+            {t("workout.workouts")}
           </Text>
         </View>
 
@@ -100,7 +102,7 @@ function WorkoutCountCard({ totalWorkoutNumber }) {
             marginTop: height * 0.01,
           }}
         >
-          Total workouts
+          {t("workout.totalWorkouts")}
         </Text>
       </View>
     </View>

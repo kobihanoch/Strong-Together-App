@@ -7,9 +7,14 @@ import CreateOrEditWorkoutCard from "./CreateOrEditWorkoutCard";
 import WorkoutCountCard from "./WorkoutCountCard";
 import AnalyticsSection from "./AnalyticsSection";
 import { Skeleton } from "moti/skeleton";
+import { useTranslation } from "react-i18next";
+import { useLang } from "../../src/i18n/LangProvider";
 
 const { width, height } = Dimensions.get("window");
 const QuickLookSection = ({ data, isLoading }) => {
+  const { t } = useTranslation();
+  const { isRTL } = useLang();
+
   return (
     <Skeleton.Group show={isLoading}>
       <View
@@ -27,9 +32,10 @@ const QuickLookSection = ({ data, isLoading }) => {
             fontFamily: "Inter_600SemiBold",
             fontSize: RFValue(20),
             flex: 1,
+            alignSelf: "flex-start",
           }}
         >
-          Insights
+          {t("home.insights")}
         </Text>
 
         <Skeleton colorMode="light" height={140}>
