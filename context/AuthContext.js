@@ -128,10 +128,12 @@ export const AuthProvider = ({ children }) => {
         return;
       }
       setIsLoggedIn(true);
+      // Triggers SWR hook logic chain
       setUserIdCache(cacheUserId);
       setAuthPhase("authed");
 
       // Try to validate with server
+      // Silent background validation with server (if there was a previuos session)
       try {
         // Check if user is cached
         // Initialize session tokens
