@@ -2,7 +2,7 @@ import React from "react";
 import { Text, View, Dimensions } from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";
 import MostCommonWorkoutSummaryCard from "./MostCommonWorkoutSummaryCard";
-import NewAchivementCard from "./NewAchivementCard";
+import NewAchivementCard from "./PRCard";
 import CreateOrEditWorkoutCard from "./CreateOrEditWorkoutCard";
 import WorkoutCountCard from "./WorkoutCountCard";
 import AnalyticsSection from "./AnalyticsSection";

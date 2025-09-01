@@ -1,14 +1,13 @@
-import React from "react";
-import { Dimensions, StyleSheet, Text, View } from "react-native";
-import { RFValue } from "react-native-responsive-fontsize";
-import QuickLookSection from "../components/HomeComponents/QuickLookSection";
-import StartWorkoutButton from "../components/HomeComponents/StartWorkoutButton";
-import useHomePageLogic from "../hooks/logic/useHomePageLogic";
 import { Skeleton } from "moti/skeleton";
-import TopComponent from "../components/TopComponent";
+import React from "react";
+import { Dimensions, StyleSheet, View } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
+import { RFValue } from "react-native-responsive-fontsize";
+import PRCard from "../components/HomeComponents/PRCard";
+import QuickActions from "../components/HomeComponents/QuickActions";
 import StartWorkoutCard from "../components/HomeComponents/StartWorkoutCard";
-import NewAchivementCard from "../components/HomeComponents/NewAchivementCard";
+import TopComponent from "../components/TopComponent";
+import useHomePageLogic from "../hooks/logic/useHomePageLogic";
 
 const { width, height } = Dimensions.get("window");
 
@@ -23,13 +22,16 @@ const Home = ({ navigation }) => {
           <TopComponent />
         </View>
         <View style={{ flex: 8 }}>
-          <ScrollView style={{ flex: 1 }}>
+          <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false}>
             <View style={styles.midContainer}>
               <StartWorkoutCard data={userData}></StartWorkoutCard>
-              <NewAchivementCard
+              <PRCard
                 PR={userData.PR}
                 hasAssignedWorkout={userData.hasAssignedWorkout}
-              ></NewAchivementCard>
+              ></PRCard>
+              <QuickActions
+                hasAssignedWorkout={userData.hasAssignedWorkout}
+              ></QuickActions>
             </View>
           </ScrollView>
         </View>
@@ -62,7 +64,7 @@ const styles = StyleSheet.create({
     flexDirection: "column",
     justifyContent: "flex-start",
     alignItems: "center",
-    gap: height * 0.005,
+    gap: height * 0.03,
   },
 
   bottomContainer: {

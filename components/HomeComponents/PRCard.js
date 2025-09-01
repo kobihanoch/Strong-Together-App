@@ -15,7 +15,7 @@ import { formatDate } from "../../utils/statisticsUtils";
 
 const { width, height } = Dimensions.get("window");
 
-function NewAchivementCard({ hasAssignedWorkout, PR }) {
+function PRCard({ hasAssignedWorkout, PR }) {
   return (
     <View style={styles.container}>
       <View style={{ flex: 1, flexDirection: "column", gap: 10 }}>
@@ -168,7 +168,6 @@ const styles = StyleSheet.create({
     width: "90%",
     alignSelf: "center",
     borderRadius: 15,
-    marginTop: height * 0.05,
   },
   container: {
     alignSelf: "center",
@@ -180,7 +179,6 @@ const styles = StyleSheet.create({
     flexDirection: "column",
     backgroundColor: "#f4f8ffff",
     gap: 10,
-    marginTop: 20,
   },
   insideContainer: {
     flexDirection: "row",
@@ -216,4 +214,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default NewAchivementCard;
+export default PRCard;
