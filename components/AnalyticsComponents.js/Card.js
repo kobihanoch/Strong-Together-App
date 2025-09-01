@@ -8,9 +8,14 @@ const { width, height } = Dimensions.get("window");
 
 const Card = ({
   title,
+  titleSize,
+  titleFont,
   subtitle,
   children,
   iconName,
+  iconBgColor,
+  iconW,
+  iconH,
   headerRight,
   height,
   style,
@@ -49,7 +54,18 @@ const Card = ({
         {/* Header */}
         <View style={styles.header}>
           <View style={{ flex: 1 }}>
-            <Text style={[styles.title, { color: titleColor }]}>{title}</Text>
+            <Text
+              style={[
+                styles.title,
+                {
+                  color: titleColor,
+                  fontSize: titleSize ? titleSize : RFValue(17),
+                  fontFamily: titleFont ? titleFont : "Inter_700Bold",
+                },
+              ]}
+            >
+              {title}
+            </Text>
             {subtitle ? (
               <Text style={[styles.subtitle, { color: subtitleColor }]}>
                 {subtitle}
@@ -61,7 +77,18 @@ const Card = ({
           {headerRight ? (
             <View style={styles.icon}>{headerRight}</View>
           ) : iconName ? (
-            <View style={styles.icon}>
+            <View
+              style={[
+                styles.icon,
+                {
+                  backgroundColor: iconBgColor
+                    ? iconBgColor
+                    : "rgba(0,0,0,0.04)",
+                  width: iconW ?? 32,
+                  height: iconH ?? 32,
+                },
+              ]}
+            >
               <MaterialCommunityIcons
                 name={iconName}
                 size={18}

@@ -29,7 +29,7 @@ const StartWorkoutCard = ({ data }) => {
 
   const exCountForMostFrqSplit = useMemo(() => {
     if (!workoutForEdit || !data) return;
-    return workoutForEdit[data.mostFrequentSplit.splitName].length;
+    return workoutForEdit[data?.mostFrequentSplit?.splitName]?.length;
   }, [workoutForEdit, data]);
 
   const radius = width * 0.1;

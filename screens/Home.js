@@ -8,6 +8,7 @@ import { Skeleton } from "moti/skeleton";
 import TopComponent from "../components/TopComponent";
 import { ScrollView } from "react-native-gesture-handler";
 import StartWorkoutCard from "../components/HomeComponents/StartWorkoutCard";
+import NewAchivementCard from "../components/HomeComponents/NewAchivementCard";
 
 const { width, height } = Dimensions.get("window");
 
@@ -25,6 +26,10 @@ const Home = ({ navigation }) => {
           <ScrollView style={{ flex: 1 }}>
             <View style={styles.midContainer}>
               <StartWorkoutCard data={userData}></StartWorkoutCard>
+              <NewAchivementCard
+                PR={userData.PR}
+                hasAssignedWorkout={userData.hasAssignedWorkout}
+              ></NewAchivementCard>
             </View>
           </ScrollView>
         </View>
