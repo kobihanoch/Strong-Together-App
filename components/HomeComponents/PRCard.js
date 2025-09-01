@@ -167,7 +167,7 @@ function PRCard({ hasAssignedWorkout, PR, hasTracking }) {
                       }}
                     >
                       {" "}
-                      {hasTracking ? "Times" : "No data yet"}
+                      {hasTracking ? "reps" : "No data yet"}
                     </Text>
                   </Text>
                 </View>
