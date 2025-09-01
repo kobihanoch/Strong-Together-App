@@ -97,6 +97,78 @@ const TopComponent = () => {
             flex: 0.5,
           }}
         >
+          <View style={{}}>
+            <Skeleton colorMode="light" width={150}>
+              <Text
+                style={{
+                  fontFamily: "Inter_400Regular",
+                  fontSize: RFValue(15),
+                  color: "black",
+                  opacity: 1,
+                }}
+              >
+                Hello,
+              </Text>
+            </Skeleton>
+            <Skeleton colorMode="light" height={20} width={100}>
+              <Text
+                style={{
+                  fontFamily: "Inter_600SemiBold",
+                  fontSize: RFValue(17),
+                  color: "black",
+                }}
+              >
+                {isLoading ? "" : fullname}
+              </Text>
+            </Skeleton>
+          </View>
+        </View>
+        <View
+          style={{
+            flexDirection: "row",
+            gap: width * 0.02,
+            alignItems: "flex-end",
+          }}
+        >
+          <View style={{ marginBottom: 15, marginRight: 10 }}>
+            <TouchableOpacity
+              style={{}}
+              onPress={() => navigation.navigate("Inbox")}
+              disabled={isWorkoutMode ? true : false}
+            >
+              <MaterialCommunityIcons
+                name={"bell"}
+                size={RFValue(20)}
+                color={"#1A1A1A"}
+                opacity={isWorkoutMode ? 0 : 0.8}
+              ></MaterialCommunityIcons>
+              <Animated.View
+                style={{
+                  transform: [{ scale: scaleAnim }],
+                  backgroundColor: "#EF4444",
+                  height: height * 0.015,
+                  borderRadius: height * 0.05,
+                  aspectRatio: 1,
+                  position: "absolute",
+                  bottom: 0,
+                  right: 0,
+                  justifyContent: "center",
+                  alignItems: "center",
+                  opacity: isWorkoutMode ? 0 : msgCount == 0 ? 0 : 1,
+                }}
+              >
+                <Text
+                  style={{
+                    color: "white",
+                    fontSize: RFValue(6),
+                    fontFamily: "Inter_600SemiBold",
+                  }}
+                >
+                  {msgCount > 99 ? "!" : msgCount}
+                </Text>
+              </Animated.View>
+            </TouchableOpacity>
+          </View>
           <Skeleton
             height={height * 0.06}
             width={height * 0.06}
@@ -120,70 +192,6 @@ const TopComponent = () => {
               />
             </TouchableOpacity>
           </Skeleton>
-          <View style={{ marginLeft: width * 0.04 }}>
-            <Skeleton colorMode="light" height={20} width={100}>
-              <Text
-                style={{
-                  fontFamily: "Inter_600SemiBold",
-                  fontSize: RFValue(17),
-                  color: "black",
-                }}
-              >
-                {isLoading ? "" : fullname}
-              </Text>
-            </Skeleton>
-            <Skeleton colorMode="light" width={150}>
-              <Text
-                style={{
-                  fontFamily: "Inter_400Regular",
-                  fontSize: RFValue(12),
-                  color: "black",
-                  opacity: 0.7,
-                }}
-              >
-                {isLoading ? "" : `@${username}`}
-              </Text>
-            </Skeleton>
-          </View>
-        </View>
-        <View style={{ flexDirection: "row", gap: width * 0.02 }}>
-          <TouchableOpacity
-            style={{ marginBottom: height * 0.02 }}
-            onPress={() => navigation.navigate("Inbox")}
-            disabled={isWorkoutMode ? true : false}
-          >
-            <MaterialCommunityIcons
-              name={"bell"}
-              size={RFValue(20)}
-              color={"#1A1A1A"}
-              opacity={isWorkoutMode ? 0 : 0.8}
-            ></MaterialCommunityIcons>
-            <Animated.View
-              style={{
-                transform: [{ scale: scaleAnim }],
-                backgroundColor: "#EF4444",
-                height: height * 0.015,
-                borderRadius: height * 0.05,
-                aspectRatio: 1,
-                position: "absolute",
-                bottom: 0,
-                right: 0,
-                justifyContent: "center",
-                alignItems: "center",
-                opacity: isWorkoutMode ? 0 : msgCount == 0 ? 0 : 1,
-              }}
-            >
-              <Text
-                style={{
-                  color: "white",
-                  fontSize: RFValue(6),
-                  fontFamily: "Inter_600SemiBold",
-                }}
-              >
-                {msgCount > 99 ? "!" : msgCount}
-              </Text>
-            </Animated.View>
-          </TouchableOpacity>
         </View>
 
         {/* Modal */}
@@ -227,8 +235,8 @@ const styles = StyleSheet.create({
     alignItems: "flex-end",
     paddingHorizontal: width * 0.06,
     paddingVertical: height * 0.01,
-    backgroundColor: "#F9F9F9",
-    borderBottomWidth: 0.5,
+    backgroundColor: "rgba(255, 255, 255, 1)",
+    borderBottomWidth: 0,
     borderBottomColor: "rgba(219, 219, 219, 0.8)",
   },
   profileImage: {

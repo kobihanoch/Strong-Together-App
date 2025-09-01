@@ -6,6 +6,8 @@ import StartWorkoutButton from "../components/HomeComponents/StartWorkoutButton"
 import useHomePageLogic from "../hooks/logic/useHomePageLogic";
 import { Skeleton } from "moti/skeleton";
 import TopComponent from "../components/TopComponent";
+import { ScrollView } from "react-native-gesture-handler";
+import StartWorkoutCard from "../components/HomeComponents/StartWorkoutCard";
 
 const { width, height } = Dimensions.get("window");
 
@@ -15,48 +17,16 @@ const Home = ({ navigation }) => {
 
   return (
     <Skeleton.Group show={isLoading}>
-      <View style={{ flex: 1, paddingVertical: height * 0.02 }}>
-        <View style={{ flex: 1.7 }}>
+      <View style={{ flex: 1, flexDirection: "column" }}>
+        <View style={{ flex: 2 }}>
           <TopComponent />
         </View>
-        <View style={styles.midContainer}>
-          {/*flex 2*/}
-          <View
-            style={{
-              flex: 3,
-              flexDirection: "column",
-              gap: height * 0.03,
-              justifyContent: "center",
-              width: "100%",
-              padding: height * 0.03,
-              borderRadius: height * 0.04,
-              shadowColor: "#000",
-              shadowOffset: { width: 0, height: 0 },
-              shadowOpacity: 0.05,
-              shadowRadius: 5,
-              elevation: 1,
-            }}
-          >
-            <Skeleton
-              width={width * 0.5}
-              height={height * 0.06}
-              radius={10}
-              colorMode="light"
-            >
-              <Text style={styles.headerText}>
-                {isLoading ? "" : `Hello, ${userData?.firstName}!`}
-              </Text>
-            </Skeleton>
-            <Skeleton colorMode="light" height={height * 0.1} width={"100%"}>
-              <StartWorkoutButton></StartWorkoutButton>
-            </Skeleton>
-          </View>
-
-          {/*flex 7*/}
-          <QuickLookSection
-            data={userData}
-            isLoading={isLoading}
-          ></QuickLookSection>
+        <View style={{ flex: 8 }}>
+          <ScrollView style={{ flex: 1 }}>
+            <View style={styles.midContainer}>
+              <StartWorkoutCard data={userData}></StartWorkoutCard>
+            </View>
+          </ScrollView>
         </View>
       </View>
     </Skeleton.Group>
@@ -84,7 +54,6 @@ const styles = StyleSheet.create({
   },
 
   midContainer: {
-    flex: 7.3,
     flexDirection: "column",
     justifyContent: "flex-start",
     alignItems: "center",

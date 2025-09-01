@@ -22,9 +22,8 @@ const AppStack = () => {
     <Stack.Navigator
       screenOptions={{
         headerShown: false,
-        gestureEnabled: false,
-
-        cardStyle: { backgroundColor: "#F9F9F9", flex: 1 },
+        gestureEnabled: true,
+        cardStyle: { backgroundColor: "rgba(255, 255, 255, 1)", flex: 1 },
       }}
       initialRouteName="Home"
     >
