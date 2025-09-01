@@ -22,6 +22,7 @@ const MyWorkoutPlan = () => {
         alignItems: "center",
         flexDirection: "column",
         gap: height * 0.02,
+        paddingTop: height * 0.07,
       }}
     >
       {workoutData?.workout ? (

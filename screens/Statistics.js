@@ -56,7 +56,7 @@ const StatisticsPage = () => {
 const styles = StyleSheet.create({
   pageContainer: {
     flex: 1,
-    paddingVertical: height * 0.03,
+    paddingVertical: height * 0.1,
     flexDirection: "column",
   },
   contentContainer: {

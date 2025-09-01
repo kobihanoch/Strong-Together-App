@@ -57,6 +57,7 @@ const StartWorkout = ({ navigation, route }) => {
         flex: 1,
         backgroundColor: "transparent",
         flexDirection: "column",
+        paddingTop: height * 0.07,
       }}
     >
       <View style={styles.container}>

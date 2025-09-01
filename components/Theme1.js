@@ -7,11 +7,7 @@ const { width, height } = Dimensions.get("window");
 const Theme1 = ({ children, header, lowerPartColor = "white" }) => {
   return (
     <View style={styles.container}>
-      <View style={{ flex: 1.7 }}>
-        <TopComponent header={header} />
-      </View>
-
-      <View style={{ flex: 7.3, backgroundColor: "blue" }}>{children}</View>
+      <View style={{ flex: 1, backgroundColor: "blue" }}>{children}</View>
     </View>
   );
 };

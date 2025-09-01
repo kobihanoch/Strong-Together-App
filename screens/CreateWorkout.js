@@ -44,7 +44,8 @@ const InnerCreateWorkout = () => {
     <View
       style={{
         flex: 1,
-        paddingVertical: height * 0.02,
+        paddingTop: height * 0.1,
+        paddingBottom: height * 0.0,
         backgroundColor: "transparent",
       }}
     >

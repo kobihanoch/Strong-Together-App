@@ -5,6 +5,7 @@ import QuickLookSection from "../components/HomeComponents/QuickLookSection";
 import StartWorkoutButton from "../components/HomeComponents/StartWorkoutButton";
 import useHomePageLogic from "../hooks/logic/useHomePageLogic";
 import { Skeleton } from "moti/skeleton";
+import TopComponent from "../components/TopComponent";
 
 const { width, height } = Dimensions.get("window");
 
@@ -15,6 +16,9 @@ const Home = ({ navigation }) => {
   return (
     <Skeleton.Group show={isLoading}>
       <View style={{ flex: 1, paddingVertical: height * 0.02 }}>
+        <View style={{ flex: 1.7 }}>
+          <TopComponent />
+        </View>
         <View style={styles.midContainer}>
           {/*flex 2*/}
           <View
@@ -80,7 +84,7 @@ const styles = StyleSheet.create({
   },
 
   midContainer: {
-    flex: 1,
+    flex: 7.3,
     flexDirection: "column",
     justifyContent: "flex-start",
     alignItems: "center",

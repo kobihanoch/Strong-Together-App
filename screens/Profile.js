@@ -16,7 +16,7 @@ function Profile({ navigation }) {
       style={{
         flex: 1,
         alignItems: "center",
-        paddingVertical: height * 0.02,
+        paddingVertical: height * 0.07,
       }}
     >
       <View

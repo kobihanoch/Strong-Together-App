@@ -34,7 +34,7 @@ const Analytics = () => {
   }, []);
 
   return (
-    <View style={{ flex: 1 }}>
+    <View style={{ flex: 1, paddingTop: height * 0.07 }}>
       <ScrollView
         style={{ width: "100%", flex: 1 }}
         showsVerticalScrollIndicator={false}
