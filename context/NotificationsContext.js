@@ -71,7 +71,7 @@ export const NotificationsProvider = ({ children }) => {
   );
 
   // Hook usage
-  const { loading: loadingMessages } = useCacheAndFetch(
+  const { loading: loadingMessages, cacheKnown } = useCacheAndFetch(
     user, // user prop
     keyInbox, // key builder
     isValidatedWithServer, // flag from server
@@ -82,7 +82,7 @@ export const NotificationsProvider = ({ children }) => {
   );
 
   // Report inbox loading to global loading
-  useUpdateGlobalLoading("Notifications", loadingMessages);
+  useUpdateGlobalLoading("Notifications", cacheKnown ? loadingMessages : true);
 
   // Load listener
   useEffect(() => {

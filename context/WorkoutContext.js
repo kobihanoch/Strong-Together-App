@@ -61,7 +61,7 @@ export const WorkoutProvider = ({ children }) => {
   );
 
   // Hook usage
-  const { loading } = useCacheAndFetch(
+  const { loading, cacheKnown } = useCacheAndFetch(
     user, // user prop
     keyWorkoutPlan, // key builder
     isValidatedWithServer, // flag from server
@@ -72,7 +72,7 @@ export const WorkoutProvider = ({ children }) => {
   );
 
   // Report workout plan loading to global loading
-  useUpdateGlobalLoading("WorkoutPlan", loading);
+  useUpdateGlobalLoading("WorkoutPlan", cacheKnown ? loading : true);
 
   // Memoized context value
   const value = useMemo(

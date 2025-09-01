@@ -81,7 +81,7 @@ export const AnalysisProvider = ({ children }) => {
   );
 
   // Hook usage
-  const { loading } = useCacheAndFetch(
+  const { loading, cacheKnown } = useCacheAndFetch(
     user, // user prop
     keyTracking, // key builder
     isValidatedWithServer, // flag from server
@@ -92,7 +92,7 @@ export const AnalysisProvider = ({ children }) => {
   );
 
   // Report analysis loading to global loading
-  useUpdateGlobalLoading("Analysis", loading);
+  useUpdateGlobalLoading("Analysis", cacheKnown ? loading : true);
 
   // Memoized context value
   const value = useMemo(

@@ -4,6 +4,7 @@ import {
   useMemo,
   useState,
   useCallback,
+  useEffect,
 } from "react";
 
 const GlobalAppLoadingContext = createContext();
@@ -25,6 +26,10 @@ export const GlobalAppLoadingProvider = ({ children }) => {
     () => Object.values(sources).some(Boolean),
     [sources]
   );
+
+  useEffect(() => {
+    console.log(sources);
+  }, [sources]);
 
   // Stable value object except when isLoading changes
   const value = useMemo(

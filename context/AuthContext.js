@@ -84,7 +84,7 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   // Hook usage
-  const { loading: userDataLoading } = useCacheAndFetch(
+  const { loading: userDataLoading, cacheKnown } = useCacheAndFetch(
     { id: userIdCache }, // user prop
     keyAuth, // key builder
     isValidatedWithServer, // flag from server
@@ -95,7 +95,7 @@ export const AuthProvider = ({ children }) => {
   );
 
   // Report auth session loading to global loading
-  useUpdateGlobalLoading("Auth", userDataLoading);
+  useUpdateGlobalLoading("Auth", cacheKnown ? userDataLoading : true);
 
   /**
    * initializeUserSession

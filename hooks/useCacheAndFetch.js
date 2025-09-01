@@ -32,6 +32,8 @@ const useCacheAndFetch = (
   // Loading state
   const [loading, setLoading] = useState(false);
 
+  const [cacheKnown, setCacheKnown] = useState(false);
+
   // Updates cache auto when cached payload refrence is builded again (on data change)
   useUpdateCache(cacheKey, cachedPayload, TTL_48H, dataHydrated);
 
@@ -58,6 +60,7 @@ const useCacheAndFetch = (
             setLoading(true);
           }
         } finally {
+          setCacheKnown(true);
         }
       }
     })();
@@ -83,7 +86,7 @@ const useCacheAndFetch = (
     })();
   }, [isValidatedByServerFlag]);
 
-  return { data, loading };
+  return { data, loading, cacheKnown };
 };
 
 export default useCacheAndFetch;
