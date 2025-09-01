@@ -17,6 +17,10 @@ const useHomePageLogic = () => {
 
   // Analysis state (tracking + derived analytics + loading)
   const { analyzedExerciseTrackingData } = useAnalysisContext();
+  const hasTracking = useMemo(
+    () => !!analyzedExerciseTrackingData,
+    [analyzedExerciseTrackingData]
+  );
 
   // Derive stable user fields
   const { username, userId, firstName, profileImageUrl } = useMemo(() => {
@@ -60,6 +64,7 @@ const useHomePageLogic = () => {
       username,
       userId,
       hasAssignedWorkout,
+      hasTracking,
       profileImageUrl,
       firstName,
       lastWorkoutDate,

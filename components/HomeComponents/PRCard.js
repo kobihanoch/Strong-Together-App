@@ -12,154 +12,171 @@ import { RFValue } from "react-native-responsive-fontsize";
 import Card from "../AnalyticsComponents.js/Card";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import { formatDate } from "../../utils/statisticsUtils";
+import { Skeleton } from "moti/skeleton";
+import { useGlobalAppLoadingContext } from "../../context/GlobalAppLoadingContext";
 
 const { width, height } = Dimensions.get("window");
 
-function PRCard({ hasAssignedWorkout, PR }) {
-  return (
-    <View style={styles.container}>
-      <View style={{ flex: 1, flexDirection: "column", gap: 10 }}>
-        <Text style={styles.header}>Personal Record</Text>
-        <View style={styles.insideContainer}>
-          <View style={{ flexDirection: "column", gap: 10, flex: 5 }}>
-            <View style={styles.card}>
-              <View
-                style={{
-                  flexDirection: "row",
-                  alignItems: "center",
-                  gap: 10,
-                }}
-              >
-                <MaterialCommunityIcons
-                  name={"dumbbell"}
-                  size={RFValue(12)}
-                  backgroundColor={"#12c282ff"}
-                  paddingHorizontal={7}
-                  paddingVertical={7}
-                  borderRadius={10}
-                  color={"white"}
-                ></MaterialCommunityIcons>
-                <Text style={styles.cardHeader}>Exercise</Text>
-              </View>
-              <Text
-                style={[
-                  styles.maxEntity,
-                  { fontSize: RFValue(12), marginTop: 15 },
-                ]}
-              >
-                {PR?.maxExercise}
-              </Text>
-            </View>
-            <View style={styles.card}>
-              <View
-                style={{
-                  flexDirection: "row",
-                  alignItems: "center",
-                  gap: 10,
-                }}
-              >
-                <MaterialCommunityIcons
-                  name={"calendar"}
-                  size={RFValue(12)}
-                  backgroundColor={"#06B6D4"}
-                  paddingHorizontal={7}
-                  paddingVertical={7}
-                  borderRadius={10}
-                  color={"white"}
-                ></MaterialCommunityIcons>
-                <Text style={styles.cardHeader}>Date</Text>
-              </View>
-              <Text
-                style={[
-                  styles.maxEntity,
-                  { fontSize: RFValue(12), marginTop: 15 },
-                ]}
-              >
-                {formatDate(PR?.maxDate)}
-              </Text>
-            </View>
-          </View>
+function PRCard({ hasAssignedWorkout, PR, hasTracking }) {
+  const { isLoading } = useGlobalAppLoadingContext();
 
-          <View style={{ flexDirection: "column", gap: 10, flex: 5 }}>
-            <View style={styles.card}>
-              <View
-                style={{
-                  flexDirection: "row",
-                  alignItems: "center",
-                  gap: 10,
-                }}
-              >
-                <MaterialCommunityIcons
-                  name={"weight"}
-                  size={RFValue(12)}
-                  backgroundColor={"#ff2979"}
-                  paddingHorizontal={7}
-                  paddingVertical={7}
-                  borderRadius={10}
-                  color={"white"}
-                ></MaterialCommunityIcons>
-                <Text style={styles.cardHeader}>Weight</Text>
-              </View>
-              <Text
-                style={[
-                  styles.maxEntity,
-                  { fontSize: RFValue(16), marginTop: 15 },
-                ]}
-              >
-                {PR?.maxWeight}{" "}
-                <Text
-                  style={{
-                    fontFamily: "Inter_400Regular",
-                    fontSize: RFValue(12),
-                    opacity: 0.5,
-                  }}
-                >
-                  Kg
-                </Text>
-              </Text>
+  return (
+    <Skeleton.Group show={isLoading}>
+      <View style={styles.container}>
+        <View style={{ flex: 1, flexDirection: "column", gap: 10 }}>
+          <Text style={styles.header}>Personal Record</Text>
+          <View style={styles.insideContainer}>
+            <View style={{ flexDirection: "column", gap: 10, flex: 5 }}>
+              <Skeleton colorMode="light">
+                <View style={styles.card}>
+                  <View
+                    style={{
+                      flexDirection: "row",
+                      alignItems: "center",
+                      gap: 10,
+                    }}
+                  >
+                    <MaterialCommunityIcons
+                      name={"dumbbell"}
+                      size={RFValue(12)}
+                      backgroundColor={"#12c282ff"}
+                      paddingHorizontal={7}
+                      paddingVertical={7}
+                      borderRadius={10}
+                      color={"white"}
+                    ></MaterialCommunityIcons>
+                    <Text style={styles.cardHeader}>Exercise</Text>
+                  </View>
+
+                  <Text
+                    style={[
+                      styles.maxEntity,
+                      { fontSize: RFValue(12), marginTop: 15 },
+                    ]}
+                  >
+                    {hasTracking ? PR?.maxExercise : "No data yet"}
+                  </Text>
+                </View>
+              </Skeleton>
+
+              <Skeleton colorMode="light">
+                <View style={styles.card}>
+                  <View
+                    style={{
+                      flexDirection: "row",
+                      alignItems: "center",
+                      gap: 10,
+                    }}
+                  >
+                    <MaterialCommunityIcons
+                      name={"calendar"}
+                      size={RFValue(12)}
+                      backgroundColor={"#06B6D4"}
+                      paddingHorizontal={7}
+                      paddingVertical={7}
+                      borderRadius={10}
+                      color={"white"}
+                    ></MaterialCommunityIcons>
+                    <Text style={styles.cardHeader}>Date</Text>
+                  </View>
+                  <Text
+                    style={[
+                      styles.maxEntity,
+                      { fontSize: RFValue(12), marginTop: 15 },
+                    ]}
+                  >
+                    {hasTracking ? formatDate(PR?.maxDate) : "No data yet"}
+                  </Text>
+                </View>
+              </Skeleton>
             </View>
-            <View style={styles.card}>
-              <View
-                style={{
-                  flexDirection: "row",
-                  alignItems: "center",
-                  gap: 10,
-                }}
-              >
-                <MaterialCommunityIcons
-                  name={"fire"}
-                  size={RFValue(12)}
-                  backgroundColor={"#ffaf29"}
-                  paddingHorizontal={7}
-                  paddingVertical={7}
-                  borderRadius={10}
-                  color={"white"}
-                ></MaterialCommunityIcons>
-                <Text style={styles.cardHeader}>Reps</Text>
-              </View>
-              <Text
-                style={[
-                  styles.maxEntity,
-                  { fontSize: RFValue(16), marginTop: 15 },
-                ]}
-              >
-                {PR?.maxReps}
-                <Text
-                  style={{
-                    fontFamily: "Inter_400Regular",
-                    fontSize: RFValue(12),
-                    opacity: 0.5,
-                  }}
-                >
-                  {" "}
-                  Times
-                </Text>
-              </Text>
+
+            <View style={{ flexDirection: "column", gap: 10, flex: 5 }}>
+              <Skeleton colorMode="light">
+                <View style={styles.card}>
+                  <View
+                    style={{
+                      flexDirection: "row",
+                      alignItems: "center",
+                      gap: 10,
+                    }}
+                  >
+                    <MaterialCommunityIcons
+                      name={"weight"}
+                      size={RFValue(12)}
+                      backgroundColor={"#ff2979"}
+                      paddingHorizontal={7}
+                      paddingVertical={7}
+                      borderRadius={10}
+                      color={"white"}
+                    ></MaterialCommunityIcons>
+                    <Text style={styles.cardHeader}>Weight</Text>
+                  </View>
+                  <Text
+                    style={[
+                      styles.maxEntity,
+                      { fontSize: RFValue(16), marginTop: 15 },
+                    ]}
+                  >
+                    {hasTracking ? PR?.maxWeight : ""}
+                    <Text
+                      style={{
+                        fontFamily: "Inter_400Regular",
+                        fontSize: RFValue(12),
+                        opacity: 0.5,
+                      }}
+                    >
+                      {hasTracking ? " kg" : "No data yet"}
+                    </Text>
+                  </Text>
+                </View>
+              </Skeleton>
+
+              <Skeleton colorMode="light">
+                <View style={styles.card}>
+                  <View
+                    style={{
+                      flexDirection: "row",
+                      alignItems: "center",
+                      gap: 10,
+                    }}
+                  >
+                    <MaterialCommunityIcons
+                      name={"fire"}
+                      size={RFValue(12)}
+                      backgroundColor={"#ffaf29"}
+                      paddingHorizontal={7}
+                      paddingVertical={7}
+                      borderRadius={10}
+                      color={"white"}
+                    ></MaterialCommunityIcons>
+                    <Text style={styles.cardHeader}>Reps</Text>
+                  </View>
+                  <Text
+                    style={[
+                      styles.maxEntity,
+                      { fontSize: RFValue(16), marginTop: 15 },
+                    ]}
+                  >
+                    {hasTracking ? PR?.maxReps : ""}
+                    <Text
+                      style={{
+                        fontFamily: "Inter_400Regular",
+                        fontSize: RFValue(12),
+                        opacity: 0.5,
+                      }}
+                    >
+                      {" "}
+                      {hasTracking ? "Times" : "No data yet"}
+                    </Text>
+                  </Text>
+                </View>
+              </Skeleton>
             </View>
           </View>
         </View>
       </View>
-    </View>
+    </Skeleton.Group>
   );
 }
 

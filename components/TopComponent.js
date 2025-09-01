@@ -130,7 +130,13 @@ const TopComponent = () => {
             alignItems: "flex-end",
           }}
         >
-          <View style={{ marginBottom: 15, marginRight: 10 }}>
+          <View
+            style={{
+              marginBottom: 15,
+              marginRight: 10,
+              opacity: isLoading ? 0 : 1,
+            }}
+          >
             <TouchableOpacity
               style={{}}
               onPress={() => navigation.navigate("Inbox")}

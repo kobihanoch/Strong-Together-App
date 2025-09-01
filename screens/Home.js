@@ -16,27 +16,26 @@ const Home = ({ navigation }) => {
   const { data: userData, isLoading } = useHomePageLogic();
 
   return (
-    <Skeleton.Group show={isLoading}>
-      <View style={{ flex: 1, flexDirection: "column" }}>
-        <View style={{ flex: 2 }}>
-          <TopComponent />
-        </View>
-        <View style={{ flex: 8 }}>
-          <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false}>
-            <View style={styles.midContainer}>
-              <StartWorkoutCard data={userData}></StartWorkoutCard>
-              <PRCard
-                PR={userData.PR}
-                hasAssignedWorkout={userData.hasAssignedWorkout}
-              ></PRCard>
-              <QuickActions
-                hasAssignedWorkout={userData.hasAssignedWorkout}
-              ></QuickActions>
-            </View>
-          </ScrollView>
-        </View>
+    <View style={{ flex: 1, flexDirection: "column" }}>
+      <View style={{ flex: 2 }}>
+        <TopComponent />
       </View>
-    </Skeleton.Group>
+      <View style={{ flex: 8 }}>
+        <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false}>
+          <View style={styles.midContainer}>
+            <StartWorkoutCard data={userData}></StartWorkoutCard>
+            <PRCard
+              PR={userData.PR}
+              hasAssignedWorkout={userData.hasAssignedWorkout}
+              hasTracking={userData.hasTracking}
+            ></PRCard>
+            <QuickActions
+              hasAssignedWorkout={userData.hasAssignedWorkout}
+            ></QuickActions>
+          </View>
+        </ScrollView>
+      </View>
+    </View>
   );
 };
 
