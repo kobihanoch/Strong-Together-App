@@ -1,10 +1,12 @@
-import React, { useRef } from "react";
-import { Dimensions, StyleSheet, View } from "react-native";
+import React, { useCallback, useRef } from "react";
+import { Dimensions, StyleSheet, View, StatusBar } from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";
 import RenderItemExercise from "../components/MyWorkoutPlanComponents/RenderItemExercise.js";
 import SplitFlatList from "../components/MyWorkoutPlanComponents/SplitFlatList.js";
 import SlidingBottomModal from "../components/SlidingBottomModal.js";
 import { useMyWorkoutPlanPageLogic } from "../hooks/logic/useMyWorkoutPlanPageLogic.js";
+import { useFocusEffect } from "@react-navigation/native";
+import useLightStatusBar from "../hooks/useLightStatusBar.js";
 
 const { width, height } = Dimensions.get("window");
 
@@ -14,6 +16,8 @@ const MyWorkoutPlan = () => {
 
   // Modal
   const exRef = useRef(null);
+
+  useLightStatusBar();
 
   return hasWorkout ? (
     <View style={styles.container}>
