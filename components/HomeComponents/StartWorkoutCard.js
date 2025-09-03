@@ -7,7 +7,7 @@ import { useWorkoutContext } from "../../context/WorkoutContext";
 import { getBodyPartsForSplit } from "../../utils/homePageUtils";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
-import { ImageBackground } from "expo-image";
+import { Image, ImageBackground } from "expo-image";
 import SlideToStart from "./SlideToStart";
 import { useNavigation } from "@react-navigation/native";
 import { Skeleton } from "moti/skeleton";
@@ -66,11 +66,15 @@ const StartWorkoutCard = ({ data }) => {
   });
   return (
     <Skeleton.Group show={isLoading}>
-      <ImageBackground
-        source={require("../../assets/gymbg.png")}
-        style={styles.imageBackground}
-        imageStyle={{ borderRadius: 15 }}
-      >
+      <View style={styles.bgWrapper}>
+        {/* Cached background image (behind content) */}
+        <Image
+          source={require("../../assets/gymbg.png")}
+          style={styles.bgImage}
+          contentFit="cover"
+          transition={300}
+          cachePolicy="disk"
+        />
         <LinearGradient
           colors={["#00000092", "#000000b6"]}
           style={styles.container}
@@ -231,17 +235,22 @@ const StartWorkoutCard = ({ data }) => {
             )}
           </View>
         </LinearGradient>
-      </ImageBackground>
+      </View>
     </Skeleton.Group>
   );
 };
 
 const styles = StyleSheet.create({
-  imageBackground: {
+  bgWrapper: {
     width: "90%",
     alignSelf: "center",
-    borderRadius: 15,
     marginTop: height * 0.05,
+    borderRadius: 15,
+    overflow: "hidden", // critical for rounded corners on the image behind
+  },
+  bgImage: {
+    ...StyleSheet.absoluteFillObject, // fill the wrapper
+    zIndex: -1, // stay behind content
   },
   container: {
     alignSelf: "center",

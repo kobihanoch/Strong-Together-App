@@ -27,10 +27,6 @@ export const GlobalAppLoadingProvider = ({ children }) => {
     [sources]
   );
 
-  useEffect(() => {
-    console.log(sources);
-  }, [sources]);
-
   // Stable value object except when isLoading changes
   const value = useMemo(
     () => ({ isLoading, setLoading }),

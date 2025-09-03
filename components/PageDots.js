@@ -1,11 +1,20 @@
-// English comments only inside the code
-
 import React from "react";
 import { View, Animated } from "react-native";
 
-const PageDots = ({ index, length }) => {
+const PageDots = ({
+  index,
+  length,
+  activeColor = "#111",
+  inactiveColor = "#111",
+  style,
+}) => {
   return (
-    <View style={{ flexDirection: "row", alignSelf: "center", marginTop: 8 }}>
+    <View
+      style={[
+        { flexDirection: "row", alignSelf: "center", marginTop: 8 },
+        style,
+      ]}
+    >
       {Array.from({ length }).map((_, i) => {
         const active = i === index;
         return (
@@ -15,7 +24,7 @@ const PageDots = ({ index, length }) => {
               width: active ? 10 : 8,
               height: active ? 10 : 8,
               borderRadius: 999,
-              backgroundColor: "#111",
+              backgroundColor: active ? activeColor : inactiveColor,
               opacity: active ? 1 : 0.4,
               marginHorizontal: 4,
             }}

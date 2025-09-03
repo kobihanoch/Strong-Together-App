@@ -1,68 +1,61 @@
-import { useNavigation } from "@react-navigation/native";
-import React from "react";
-import { Dimensions, StyleSheet, Text, View } from "react-native";
+import React, { useRef } from "react";
+import { Dimensions, StyleSheet, View } from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";
-import ExercisesSection from "../components/MyWorkoutPlanComponents/ExercisesSection.js";
-import HeaderSection from "../components/MyWorkoutPlanComponents/HeaderSection.js";
-import WorkoutSplitsList from "../components/MyWorkoutPlanComponents/WorkoutSplitsList.js";
-import { useAuth } from "../context/AuthContext";
+import RenderItemExercise from "../components/MyWorkoutPlanComponents/RenderItemExercise.js";
+import SplitFlatList from "../components/MyWorkoutPlanComponents/SplitFlatList.js";
+import SlidingBottomModal from "../components/SlidingBottomModal.js";
 import { useMyWorkoutPlanPageLogic } from "../hooks/logic/useMyWorkoutPlanPageLogic.js";
 
 const { width, height } = Dimensions.get("window");
 
 const MyWorkoutPlan = () => {
-  const navigation = useNavigation();
-  const { user } = useAuth();
-  const { data: workoutData } = useMyWorkoutPlanPageLogic();
+  const { hasWorkout, filteredExercises, setSelectedSplit, selectedSplit } =
+    useMyWorkoutPlanPageLogic();
 
-  return (
-    <View
-      style={{
-        flex: 1,
-        alignItems: "center",
-        flexDirection: "column",
-        gap: height * 0.02,
-        paddingTop: height * 0.07,
-      }}
-    >
-      {workoutData?.workout ? (
-        <>
-          <HeaderSection user={user}></HeaderSection>
-          <WorkoutSplitsList data={workoutData}></WorkoutSplitsList>
-          <ExercisesSection data={workoutData}></ExercisesSection>
-        </>
-      ) : (
-        <>
-          <View
-            style={{
-              flex: 1,
-              justifyContent: "center",
-              alignItems: "center",
-              flexDirection: "column",
-            }}
-          >
-            <Text
-              style={{ fontSize: RFValue(23), fontFamily: "Inter_700Bold" }}
-            >
-              No workout available
-            </Text>
-            <Text
-              style={{
-                fontSize: RFValue(18),
-                fontFamily: "Inter_400Regular",
-                color: "gray",
-              }}
-            >
-              Create one to start your journy
-            </Text>
-          </View>
-        </>
-      )}
+  // Modal
+  const exRef = useRef(null);
+
+  return hasWorkout ? (
+    <View style={styles.container}>
+      <View style={{}}>
+        {/* Passing setSelectedSplit as a prop for re-rendering the logic hook */}
+        <SplitFlatList
+          setSelectedSplit={setSelectedSplit}
+          selectedSplit={selectedSplit}
+          filteredExercises={filteredExercises}
+        ></SplitFlatList>
+        {/* Sliding Modal For Exercises */}
+        <SlidingBottomModal
+          title="Exercises"
+          ref={exRef}
+          data={filteredExercises}
+          renderItem={({ item }) => {
+            return <RenderItemExercise item={item}></RenderItemExercise>;
+          }}
+          enableBackDrop={false}
+          enablePanDownClose={false}
+          snapPoints={["32%", "50%", "85%"]}
+          flatListUsage={true}
+          initialIndex={0}
+        />
+      </View>
     </View>
+  ) : (
+    <View></View>
   );
 };
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+
+    flexDirection: "column",
+  },
+  header: {
+    fontFamily: "Inter_700Bold",
+    fontSize: RFValue(20),
+    marginLeft: width * 0.05,
+  },
   loadingContainer: {
     flex: 1,
     justifyContent: "center",
