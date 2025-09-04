@@ -11,10 +11,12 @@
     "release": "standard-version"
   },
   "dependencies": {
+    "@animatereactnative/accordion": "^0.1.5",
     "@expo-google-fonts/inter": "^0.3.0",
     "@expo/config-plugins": "10.1.2",
     "@expo/prebuild-config": "~9.0.0",
     "@gorhom/bottom-sheet": "^5.2.3",
+    "@react-native-aria/utils": "^0.2.12",
     "@react-native-async-storage/async-storage": "2.1.2",
     "@react-native-community/netinfo": "^11.4.1",
     "@react-native-picker/picker": "2.11.1",
@@ -27,6 +29,7 @@
     "base-64": "^1.0.0",
     "cross-spawn": "7.0.6",
     "crypto-js": "^4.2.0",
+    "crypto-random-string": "^4.0.0",
     "expo": "53.0.20",
     "expo-application": "~6.1.5",
     "expo-device": "~7.1.4",
@@ -61,11 +64,13 @@
     "react-native-linear-gradient": "^2.8.3",
     "react-native-network-info": "^5.2.1",
     "react-native-notifier": "^2.0.0",
+    "react-native-paper": "^5.14.5",
     "react-native-pie": "^1.1.2",
     "react-native-reanimated": "~3.17.4",
     "react-native-responsive-fontsize": "^0.5.1",
     "react-native-safe-area-context": "5.4.0",
     "react-native-screens": "4.11.1",
+    "react-native-segmented-control-2": "^2.1.0",
     "react-native-slide-to-unlock": "^0.1.8",
     "react-native-svg": "15.11.2",
     "react-native-url-polyfill": "^2.0.0",
@@ -89,6 +94,9 @@
     "isexe": "^3.1.1",
     "standard-version": "^9.5.0",
     "typescript": "~5.8.3"
+  },
+  "overrides": {
+    "@shopify/react-native-skia": "2.2.7"
   },
   "expo": {
     "doctor": {

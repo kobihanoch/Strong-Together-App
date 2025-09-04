@@ -4,7 +4,7 @@ import { cacheDeleteKey, keyAnalytics } from "../../cache/cacheUtils";
 import { useAnalysisContext } from "../../context/AnalysisContext";
 import { useAuth } from "../../context/AuthContext";
 import { useWorkoutContext } from "../../context/WorkoutContext";
-import { unpackFromExerciseTrackingData } from "../../utils/authUtils";
+import { unpackFromExerciseTrackingData } from "../../utils/analysisContexUtils";
 import {
   createObjectForDataBase,
   filterZeroesInArr,
