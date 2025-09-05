@@ -9,6 +9,8 @@ import { colors } from "../../constants/colors";
 import { formatDate } from "../../utils/statisticsUtils";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import StatsTable from "./StatsTable";
+import RestDayCard from "./RestDayCard";
+import { useNavigation } from "@react-navigation/native";
 
 const { width, height } = Dimensions.get("window");
 
@@ -75,6 +77,7 @@ const ExerciseItem = ({ index, exData, lastPerformanceData }) => {
 };
 
 const ExercisesFlatList = ({ data, dataToCompare }) => {
+  const nav = useNavigation();
   const renderItem = useCallback(
     ({ item, index }) => {
       return (
@@ -104,17 +107,11 @@ const ExercisesFlatList = ({ data, dataToCompare }) => {
       />
     </Column>
   ) : (
-    <Column>
-      <Text
-        style={{
-          fontFamily: "Inter_700Bold",
-          color: "black",
-          fontSize: RFValue(18),
-        }}
-      >
-        REST DAY
-      </Text>
-    </Column>
+    <RestDayCard
+      onPlanPress={() => {
+        nav.navigate("MyWorkoutPlan");
+      }}
+    />
   );
 };
 

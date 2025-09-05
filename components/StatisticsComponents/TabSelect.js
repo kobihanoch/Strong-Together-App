@@ -61,7 +61,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.lightCardBg,
     paddingVertical: 2,
     marginHorizontal: 10,
-    marginTop: 20,
+    marginTop: 10,
     borderRadius: 16,
     justifyContent: "center",
     height: height * 0.06,

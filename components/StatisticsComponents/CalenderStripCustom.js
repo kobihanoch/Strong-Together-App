@@ -137,11 +137,11 @@ const CalendarStripCustom = ({
             <Text
               style={{
                 fontSize: RFValue(13),
-                color: "black",
+                color: isSelected ? "white" : "black",
                 fontFamily: "Inter_400Regular",
                 padding: height * 0.01,
                 textAlign: "center",
-                opacity: 0.2,
+                opacity: isSelected ? 1 : 0.2,
               }}
               numberOfLines={1}
             >
@@ -212,7 +212,6 @@ const styles = StyleSheet.create({
     backgroundColor: colors.lightCardBg,
     paddingTop: height * 0.1,
     height: height * 0.3,
-    borderRadius: 16,
     paddingHorizontal: width * 0.04,
   },
   monthHeader: {
