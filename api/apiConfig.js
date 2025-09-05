@@ -10,4 +10,4 @@
 //export const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL;
 
 // ------{DEVELOPMENT}-------
-export const API_BASE_URL = `http://10.0.0.32:5000`;
+export const API_BASE_URL = `http://10.0.0.17:5000`;

@@ -60,6 +60,7 @@ const styles = StyleSheet.create({
   sectionListContainer: {
     backgroundColor: colors.lightCardBg,
     paddingVertical: 2,
+    marginHorizontal: 10,
     marginTop: 20,
     borderRadius: 16,
     justifyContent: "center",

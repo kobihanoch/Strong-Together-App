@@ -90,17 +90,6 @@ const ExercisesFlatList = ({ data, dataToCompare }) => {
 
   return data && data.length ? (
     <Column>
-      <Row
-        style={{ alignItems: "center", marginTop: 20, marginHorizontal: 10 }}
-      >
-        <View style={styles.capitalContainer}>
-          <Text style={styles.capitalText}>{data[0].splitname}</Text>
-        </View>
-        <Column>
-          <Text style={styles.workoutTitle}>Workout {data[0].splitname}</Text>
-          <Text style={styles.dateText}>{formatDate(data[0].workoutdate)}</Text>
-        </Column>
-      </Row>
       <FlatList
         data={data}
         keyExtractor={(item) => item.id.toString()}
@@ -130,33 +119,9 @@ const ExercisesFlatList = ({ data, dataToCompare }) => {
 };
 
 const styles = StyleSheet.create({
-  workoutTitle: {
-    fontFamily: "Inter_600SemiBold",
-    fontSize: RFValue(15),
-    color: "black",
-    marginHorizontal: 10,
-  },
-  dateText: {
-    fontFamily: "Inter_400Regular",
-    fontSize: RFValue(11),
-    color: colors.textSecondary,
-    marginHorizontal: 10,
-  },
-  capitalContainer: {
-    backgroundColor: colors.primary,
-    height: height * 0.05,
-    justifyContent: "center",
-    alignItems: "center",
-    borderRadius: 10,
-    aspectRatio: 1,
-  },
-  capitalText: {
-    color: "white",
-    fontFamily: "Inter_700Bold",
-    fontSize: RFValue(17),
-  },
   itemContainer: {
-    width: "100%",
+    width: "95%",
+    alignSelf: "center",
     borderRadius: 15,
     borderWidth: 1,
     borderColor: "rgba(17,24,39,0.06)",

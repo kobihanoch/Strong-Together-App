@@ -185,19 +185,19 @@ const CalendarStripCustom = ({
 
 const styles = StyleSheet.create({
   container: {
-    marginTop: 20,
+    marginTop: 0,
     justifyContent: "center",
     flexDirection: "column",
     backgroundColor: colors.lightCardBg,
-    paddingTop: height * 0.04,
-    paddingHorizontal: width * 0.04,
-    height: height * 0.23,
+    paddingTop: height * 0.1,
+    height: height * 0.3,
     borderRadius: 16,
   },
   monthHeader: {
     color: "rgba(0, 0, 0, 1)",
     fontFamily: "Inter_500Medium",
     fontSize: RFValue(14),
+    marginHorizontal: width * 0.04,
   },
   dateItem: {
     width: ITEM_W,
