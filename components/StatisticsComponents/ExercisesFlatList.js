@@ -11,10 +11,18 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import StatsTable from "./StatsTable";
 import RestDayCard from "./RestDayCard";
 import { useNavigation } from "@react-navigation/native";
+import { Image } from "expo-image";
+import images from "../images";
+import { LinearGradient } from "expo-linear-gradient";
 
 const { width, height } = Dimensions.get("window");
 
 const ExerciseItem = ({ index, exData, lastPerformanceData }) => {
+  const mainMuscle = exData?.exercisetoworkoutsplit?.exercises?.targetmuscle;
+  const specificMuscle =
+    exData?.exercisetoworkoutsplit?.exercises?.specifictargetmuscle;
+  const imagePath = images[mainMuscle]?.[specificMuscle];
+
   const lastLogOfEx = useMemo(() => {
     if (lastPerformanceData) {
       const [last] = lastPerformanceData.filter(
@@ -48,20 +56,40 @@ const ExerciseItem = ({ index, exData, lastPerformanceData }) => {
   return (
     <Accordion.Accordion style={styles.itemContainer}>
       <Accordion.Header>
-        {/* This is your “tab” header */}
-        <Row style={{ justifyContent: "space-between", width: "100%" }}>
-          <Column style={{ gap: 10 }}>
-            <Text style={styles.exerciseTitle}>{exData.exercise}</Text>
-            <Text style={styles.pressableText}>Tap to toggle information</Text>
-          </Column>
+        {/* Header */}
+        <Row style={{ width: "100%", alignItems: "center" }}>
+          {/* Left group: image + text */}
+          <Row style={{ flex: 1, alignItems: "center", gap: 12 }}>
+            <LinearGradient
+              colors={["#fafafaff", "#f1f8ffff"]}
+              start={[0, 0]}
+              end={[1, 1]}
+              style={styles.imageContainer}
+            >
+              <Image
+                source={imagePath}
+                cachePolicy="disk"
+                contentFit="contain" // keep proportions, no stretching
+                style={{ width: "100%", height: "100%" }} // let the container size it
+              />
+            </LinearGradient>
+
+            <Column style={{ flex: 1, gap: 6 }}>
+              <Text style={styles.exerciseTitle} numberOfLines={1}>
+                {exData.exercise}
+              </Text>
+              <Text style={styles.pressableText}>
+                Tap to toggle information
+              </Text>
+            </Column>
+          </Row>
+
+          {/* Right: chevron */}
           <Accordion.HeaderIcon>
             <MaterialCommunityIcons
-              name={"chevron-down"}
+              name="chevron-down"
               size={RFValue(20)}
-              color={"black"}
-              paddingHorizontal={4}
-              paddingVertical={4}
-              borderRadius={10}
+              color="black"
             />
           </Accordion.HeaderIcon>
         </Row>
@@ -76,8 +104,9 @@ const ExerciseItem = ({ index, exData, lastPerformanceData }) => {
   );
 };
 
-const ExercisesFlatList = ({ data, dataToCompare }) => {
+const ExercisesFlatList = ({ data, dataToCompare, setIndex }) => {
   const nav = useNavigation();
+
   const renderItem = useCallback(
     ({ item, index }) => {
       return (
@@ -124,10 +153,21 @@ const styles = StyleSheet.create({
     borderColor: "rgba(17,24,39,0.06)",
     paddingVertical: height * 0.02,
     paddingHorizontal: width * 0.04,
+    backgroundColor: "#fff",
+  },
+  imageContainer: {
+    height: height * 0.1, // square
+    aspectRatio: 1,
+    backgroundColor: colors.lightCardBg,
+    padding: 12, // was 20; gives the image room
+    borderRadius: 16,
+    overflow: "hidden", // ensure rounded corners actually clip the image
   },
   exerciseTitle: {
     fontFamily: "Inter_500Medium",
-    fontSize: RFValue(15),
+    fontSize: RFValue(14),
+    // optional: improve vertical rhythm
+    lineHeight: RFValue(17),
   },
   pressableText: {
     fontFamily: "Inter_500Medium",
