@@ -17,8 +17,9 @@ export const keyAnalytics = (userId) =>
   `CACHE:ANALYTICS:${userId}:${CACHE_VERSION}`;
 export const keyTracking = (userId, days) =>
   `CACHE:TRACKING:${userId}:${days}:${CACHE_VERSION}`;
-export const keyAuth = (userId) => `CACHE:AUTH:${userId}:${CACHE_VERSION}`; // optional
-export const keyInbox = (userId) => `CACHE:INBOX:${userId}:${CACHE_VERSION}`; // optional
+export const keyAuth = (userId) => `CACHE:AUTH:${userId}:${CACHE_VERSION}`;
+export const keyInbox = (userId) => `CACHE:INBOX:${userId}:${CACHE_VERSION}`;
+export const keyCardio = (userId) => `CACHE:CARDIO:${userId}:${CACHE_VERSION}`;
 
 /**
  * Save JSON value under a key with TTL (in seconds).

@@ -38,6 +38,7 @@ import { GlobalAppLoadingProvider } from "./context/GlobalAppLoadingContext";
 import AppStack from "./navigation/AppStack";
 import AuthStack from "./navigation/AuthStack";
 import NotificationsSetup from "./notifications/NotificationsSetup";
+import { CardioProvider } from "./context/CardioContext";
 
 // ---------- Fonts Loader Hook ----------
 function useFontsReady() {
@@ -119,7 +120,9 @@ function AppWithProviders() {
     <NotificationsProvider>
       <WorkoutProvider>
         <AnalysisProvider>
-          <MainApp />
+          <CardioProvider>
+            <MainApp />
+          </CardioProvider>
         </AnalysisProvider>
       </WorkoutProvider>
     </NotificationsProvider>
