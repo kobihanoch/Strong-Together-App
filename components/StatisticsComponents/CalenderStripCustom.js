@@ -19,6 +19,7 @@ import {
 import { RFValue } from "react-native-responsive-fontsize";
 import { colors } from "../../constants/colors";
 import useGenerateDays from "../../hooks/useGenerateDays";
+import Row from "../Row";
 
 const { width, height } = Dimensions.get("window");
 // Use fixed item math so FlatList can jump directly to the right index
@@ -60,6 +61,15 @@ const CalendarStripCustom = ({
       setCurrentMonth(firstMoment.format("MMMM YYYY"));
     }
   }).current;
+
+  // Emable scrolling for today by pressing a button
+  const flatListRef = useRef(null);
+  const scrollToToday = useCallback(() => {
+    if (!flatListRef) return;
+    const todayIndex = datesList.findIndex((d) => d.isSame(today, "day"));
+    flatListRef.current.scrollToIndex({ index: todayIndex, animated: true });
+    onDateSelect(today.format("YYYY-MM-DD"));
+  }, [initialScrollIndex, flatListRef]);
 
   const renderItem = useCallback(
     ({ item }) => {
@@ -146,7 +156,17 @@ const CalendarStripCustom = ({
 
   return (
     <View style={styles.container}>
-      <Text style={styles.monthHeader}>{currentMonth}</Text>
+      <Row
+        style={{
+          width: "100%",
+          justifyContent: "space-between",
+        }}
+      >
+        <Text style={styles.monthHeader}>{currentMonth}</Text>
+        <TouchableOpacity onPress={scrollToToday}>
+          <Text style={styles.todayButton}>Today</Text>
+        </TouchableOpacity>
+      </Row>
 
       <View
         style={{
@@ -160,6 +180,7 @@ const CalendarStripCustom = ({
           data={datesList}
           keyExtractor={(item) => item.format("YYYY-MM-DD")}
           horizontal
+          ref={flatListRef}
           renderItem={renderItem}
           showsHorizontalScrollIndicator={false}
           contentContainerStyle={{
@@ -192,12 +213,17 @@ const styles = StyleSheet.create({
     paddingTop: height * 0.1,
     height: height * 0.3,
     borderRadius: 16,
+    paddingHorizontal: width * 0.04,
   },
   monthHeader: {
     color: "rgba(0, 0, 0, 1)",
     fontFamily: "Inter_500Medium",
     fontSize: RFValue(14),
-    marginHorizontal: width * 0.04,
+  },
+  todayButton: {
+    fontFamily: "Inter_400Regular",
+    color: colors.primary,
+    fontSize: RFValue(13),
   },
   dateItem: {
     width: ITEM_W,
