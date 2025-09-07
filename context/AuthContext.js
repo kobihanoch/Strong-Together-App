@@ -134,6 +134,7 @@ export const AuthProvider = ({ children }) => {
 
       // Try to validate with server
       // Silent background validation with server (if there was a previuos session)
+
       try {
         // Check if user is cached
         // Initialize session tokens
@@ -154,6 +155,13 @@ export const AuthProvider = ({ children }) => {
         await cacheSetJSON("CACHE:USER_ID", userId, TTL_48H);
         // Store in cache (auto)
       } catch (e) {
+        if (e.isNetworkError) {
+          console.log(
+            "\x1b[33m[Auth Context]: Server validation skipped (offline). Staying logged-in with cached data.\x1b[0m"
+          );
+          setIsValidatedWithServer(false);
+          return;
+        }
         console.log(
           "\x1b[31m[Auth Context]: Validation with server failed => Logging out\x1b[0m"
         );

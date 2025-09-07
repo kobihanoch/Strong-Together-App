@@ -75,7 +75,9 @@ const Card = ({
 
           {/* Right-top icon or custom element */}
           {headerRight ? (
-            <View style={styles.icon}>{headerRight}</View>
+            <View style={styles.icon}>
+              <Text>{headerRight}</Text>
+            </View>
           ) : iconName ? (
             <View
               style={[
