@@ -29,7 +29,6 @@ import {
   saveRefreshToken,
 } from "../utils/tokenStore.js";
 import { connectSocket, disconnectSocket } from "../webSockets/socketConfig";
-import { useNetworkStatus } from "../hooks/useNetworkStatus";
 
 const AuthContext = createContext(null);
 export const useAuth = () => useContext(AuthContext);
@@ -106,7 +105,7 @@ export const AuthProvider = ({ children }) => {
   const initializeUserSession = useCallback(async (userId) => {
     await connectSocket(userId);
   }, []);
-  useNetworkStatus();
+
   // Inital check
   useEffect(() => {
     (async () => {

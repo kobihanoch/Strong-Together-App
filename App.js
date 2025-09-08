@@ -39,6 +39,7 @@ import AppStack from "./navigation/AppStack";
 import AuthStack from "./navigation/AuthStack";
 import NotificationsSetup from "./notifications/NotificationsSetup";
 import { CardioProvider } from "./context/CardioContext";
+import { useNetworkStatus } from "./hooks/useNetworkStatus";
 
 // ---------- Fonts Loader Hook ----------
 function useFontsReady() {
@@ -64,6 +65,7 @@ const RootStack = createStackNavigator();
 export default function App() {
   const fontsReady = useFontsReady();
   const navigationRef = useNavigationContainerRef();
+  useNetworkStatus();
 
   // Delete cache for outdated app versions (against different data structures)
   useEffect(() => {
