@@ -174,6 +174,7 @@ export const AuthProvider = ({ children }) => {
           "\x1b[31m[Auth Context]: No latest user => Login is required\x1b[0m"
         );
         await clearContext();
+        return;
       }
       setIsLoggedIn(true);
       // Triggers SWR hook logic chain
@@ -285,6 +286,7 @@ export const AuthProvider = ({ children }) => {
     await clearRefreshToken();
     await cacheDeleteAllCache();
     _accessToken = null;
+    GlobalAuth.setAccessToken(null);
     setIsLoggedIn(false);
     setLoading(false);
     setUser(null);
