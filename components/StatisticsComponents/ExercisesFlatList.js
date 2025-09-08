@@ -1,19 +1,17 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { Dimensions, FlatList, Text, View, StyleSheet } from "react-native";
-import { RFValue } from "react-native-responsive-fontsize";
-import ExerciseCard from "./ExerciseCard";
-import Column from "../Column";
-import Row from "../Row";
 import { Accordion } from "@animatereactnative/accordion";
-import { colors } from "../../constants/colors";
-import { formatDate } from "../../utils/statisticsUtils";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import StatsTable from "./StatsTable";
-import RestDayCard from "./RestDayCard";
 import { useNavigation } from "@react-navigation/native";
 import { Image } from "expo-image";
-import images from "../images";
 import { LinearGradient } from "expo-linear-gradient";
+import React, { useCallback, useMemo } from "react";
+import { Dimensions, FlatList, StyleSheet, Text } from "react-native";
+import { RFValue } from "react-native-responsive-fontsize";
+import { colors } from "../../constants/colors";
+import Column from "../Column";
+import images from "../images";
+import Row from "../Row";
+import RestDayCard from "./RestDayCard";
+import StatsTable from "./StatsTable";
 
 const { width, height } = Dimensions.get("window");
 

@@ -9,7 +9,7 @@ export const refreshAndRotateTokens = async () => {
   const rt = await getRefreshToken();
   if (!rt) throw new Error("No stored refresh token");
 
-  const { data } = await axios.post(`${API_BASE_URL}/api/auth/refresh`, null, {
+  const { data } = await api.post(`/api/auth/refresh`, null, {
     headers: { "x-refresh-token": `Bearer ${rt}` },
   });
   return data;

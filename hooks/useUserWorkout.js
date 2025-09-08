@@ -13,7 +13,6 @@ export const useUserWorkout = () => {
         exerciseTrackingAnalysis: data.exerciseTrackingAnalysis,
       };
     } catch (err) {
-      console.error(err);
       throw err;
     } finally {
       setSaving(false);

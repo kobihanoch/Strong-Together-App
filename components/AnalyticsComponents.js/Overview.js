@@ -31,7 +31,7 @@ const Overview = ({ overViewData, hasData }) => {
   const renderLegendComponent = () => {
     return (
       <>
-        {Object.entries(splitsCounter).length &&
+        {Object.entries(splitsCounter).length > 0 &&
           splitsCounterWithColors.map((s) => {
             return (
               <View

@@ -22,7 +22,9 @@ api.interceptors.request.use(
     }
     return config;
   },
-  (error) => Promise.reject(error)
+  (error) => {
+    return Promise.reject(error);
+  }
 );
 
 // Flow:
@@ -54,13 +56,17 @@ api.interceptors.response.use(
     }
 
     // Detect if network error - no response
-    if (!error.response) {
-      const online = await isDeviceOnline();
-      if (!online) {
-        notifyOffline();
-      } else {
-        notifyServerDown();
-      }
+    const online = await isDeviceOnline();
+
+    if (!online) {
+      notifyOffline();
+      error.isNetworkError = true;
+      console.log("Offline");
+      return Promise.reject(error);
+    } else if (!error.response) {
+      // Some other fetch/network problem (e.g., DNS, TLS fail)
+      notifyServerDown();
+      console.log("Server down");
       return Promise.reject(error);
     }
 
@@ -98,7 +104,7 @@ api.interceptors.response.use(
         // Some toast to show error
         showErrorAlert("Error", data?.message);
         // Block
-        Promise.reject(refreshErr);
+        return Promise.reject(refreshErr);
       }
     }
 
