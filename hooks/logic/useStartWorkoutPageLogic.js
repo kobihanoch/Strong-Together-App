@@ -77,13 +77,12 @@ const useStartWorkoutPageLogic = (selectedSplit) => {
       setIsWorkoutMode(false);
 
       // Delete analytics cache
-      await cacheDeleteKey(keyAnalytics(user.id));
-      console.log("Analytics deleted");
+      //await cacheDeleteKey(keyAnalytics(user.id));
+      //console.log("Analytics deleted");
+      navigation.navigate("Statistics");
     } catch (err) {
-      console.error(err);
       throw err;
     } finally {
-      navigation.navigate("Statistics");
       setSaveStarted(false);
     }
   });

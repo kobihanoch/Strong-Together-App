@@ -34,11 +34,11 @@ import { NotifierRoot } from "react-native-notifier";
 import { cacheHousekeepingOnBoot } from "./cache/cacheUtils";
 import BottomTabBar from "./components/BottomTabBar";
 import Theme1 from "./components/Theme1";
+import { CardioProvider } from "./context/CardioContext";
 import { GlobalAppLoadingProvider } from "./context/GlobalAppLoadingContext";
 import AppStack from "./navigation/AppStack";
 import AuthStack from "./navigation/AuthStack";
 import NotificationsSetup from "./notifications/NotificationsSetup";
-import { CardioProvider } from "./context/CardioContext";
 
 // ---------- Fonts Loader Hook ----------
 function useFontsReady() {

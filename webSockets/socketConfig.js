@@ -21,16 +21,16 @@ export const connectSocket = (userId) => {
   });
 
   socket.on("connect", () => {
-    console.log("SOCKET connected");
+    console.log("[WebSocket]: Socket connected");
     socket.emit("user_loggedin", userId); // emit only after connect
   });
 
   socket.on("disconnect", (reason) => {
-    console.log("SOCKET disconnected:", reason);
+    console.log("[WebSocket]: Socket disconnected:", reason);
   });
 
   socket.on("connect_error", (err) => {
-    console.log("SOCKET connect_error:", err?.message || err);
+    console.error("[WebSocket]: Socket connect_error:", err?.message || err);
   });
 
   socket.connect();
