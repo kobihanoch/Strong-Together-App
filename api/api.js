@@ -67,7 +67,6 @@ api.interceptors.response.use(
       // Some other fetch/network problem (e.g., DNS, TLS fail)
       notifyServerDown();
       console.log("Server down");
-      error.isNetworkError = true;
       return Promise.reject(error);
     }
 
