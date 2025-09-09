@@ -75,6 +75,8 @@
   return { byDate, byETSId, bySplitName };
 };*/
 
+import { colors } from "../constants/colors";
+
 export const getLastWorkoutForEachExercise = (
   date,
   byDate,
@@ -168,4 +170,56 @@ export const formatDate = (dateToFormat) => {
 
   const monthName = monthNames[month];
   return `${monthName} ${day}, ${year}`;
+};
+
+export const formatTime = (min, sec) => {
+  const hrs = Math.floor(min / 60);
+  const mins = min - hrs * 60;
+  const hrsText = hrs > 0 ? (hrs == 1 ? hrs + " hr" : hrs + " hrs") : null;
+  const minText =
+    mins > 0 ? (mins == 1 ? mins + " min" : mins + " mins") : null;
+  const secText =
+    hrs < 1
+      ? sec > 0
+        ? sec == 1
+          ? sec + " sec"
+          : sec + " secs"
+        : null
+      : null;
+  return [hrsText, minText, secText].filter(Boolean).join(" ");
+};
+
+export const getDayAbbreviation = (dateStr) => {
+  const date = new Date(dateStr);
+  return date.toLocaleDateString("en-US", { weekday: "short" }); // e.g., "Sun"
+};
+
+export const normalizeDataToWeeklyCardioGraph = (data) => {
+  if (!Array.isArray(data)) return [];
+
+  // Step 1: Initialize empty week map
+  const dayMap = {
+    Sun: 0,
+    Mon: 0,
+    Tue: 0,
+    Wed: 0,
+    Thu: 0,
+    Fri: 0,
+    Sat: 0,
+  };
+
+  // Step 2: Fill values from actual data
+  data.forEach((rec) => {
+    const label = getDayAbbreviation(rec.workout_date); // e.g., "Tue"
+    if (label in dayMap) {
+      dayMap[label] += rec.duration_mins ?? 0;
+    }
+  });
+
+  // Step 3: Return as array in correct order
+  return ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((label) => ({
+    label,
+    value: dayMap[label],
+    frontColor: colors.primary,
+  }));
 };
