@@ -58,8 +58,7 @@ const CardioWeeklyGraph = ({ data, cardWidth }) => {
         isAnimated
         spacing={spacingW}
         barWidth={BAR_WIDTH}
-        barBorderTopRightRadius={height * 0.01}
-        barBorderTopLeftRadius={height * 0.01}
+        barBorderRadius={height * 0.01}
         noOfSections={1}
       />
     </View>

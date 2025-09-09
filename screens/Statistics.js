@@ -51,7 +51,10 @@ const StatisticsPage = () => {
   if (isLoading) return null;
 
   return (
-    <ScrollView style={styles.pageContainer}>
+    <ScrollView
+      style={styles.pageContainer}
+      showsVerticalScrollIndicator={false}
+    >
       <CalendarStripCustom
         onDateSelect={setSelectedDate}
         selectedDate={selectedDate}
