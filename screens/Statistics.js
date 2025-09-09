@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Dimensions, StyleSheet } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
 import { RFValue } from "react-native-responsive-fontsize";
@@ -8,12 +8,8 @@ import ExercisesFlatList from "../components/StatisticsComponents/ExercisesFlatL
 import TabSelect from "../components/StatisticsComponents/TabSelect";
 import WorkoutHeader from "../components/StatisticsComponents/workoutHeader";
 import { useAuth } from "../context/AuthContext";
+import { useGlobalAppLoadingContext } from "../context/GlobalAppLoadingContext";
 import useStatisticsPageLogic from "../hooks/logic/useStatisticsPageLogic";
-import Row from "../components/Row";
-import {
-  GlobalAppLoadingProvider,
-  useGlobalAppLoadingContext,
-} from "../context/GlobalAppLoadingContext";
 
 const { width, height } = Dimensions.get("window");
 
@@ -26,11 +22,21 @@ const StatisticsPage = () => {
     exerciseTrackingByDatePrev, // Array of all last performences of all exercises
     exerciseTrackingWithDateKey, // Map of [date] => [...exercisetracking logs]
     cardioByDate, // Cardio for date X
+    cardioForWeek, // Cardio for week starting at sunday date Y
   } = useStatisticsPageLogic(user);
 
   const { isLoading } = useGlobalAppLoadingContext();
 
   const [index, setIndex] = useState(0);
+
+  const cardioDotRef = useRef(null);
+
+  useEffect(() => {
+    if (cardioByDate) cardioDotRef.current.showCardioDot();
+    else {
+      cardioDotRef.current.hideCardioDot();
+    }
+  }, [cardioByDate]);
 
   useEffect(() => {
     setIndex(
@@ -51,11 +57,17 @@ const StatisticsPage = () => {
         selectedDate={selectedDate}
         userExerciseLogs={exerciseTrackingWithDateKey}
       />
-      <TabSelect index={index} setIndex={setIndex}></TabSelect>
-      <WorkoutHeader
-        data={exerciseTrackingByDate}
-        selectedDate={selectedDate}
-      ></WorkoutHeader>
+      <TabSelect
+        index={index}
+        setIndex={setIndex}
+        ref={cardioDotRef}
+      ></TabSelect>
+      {index == 0 ? (
+        <WorkoutHeader
+          data={exerciseTrackingByDate}
+          selectedDate={selectedDate}
+        ></WorkoutHeader>
+      ) : null}
       {index === 0 ? (
         <ExercisesFlatList
           data={exerciseTrackingByDate}
@@ -63,7 +75,10 @@ const StatisticsPage = () => {
           setIndex={setIndex}
         ></ExercisesFlatList>
       ) : (
-        <CardioSection></CardioSection>
+        <CardioSection
+          daily={cardioByDate}
+          weekly={cardioForWeek}
+        ></CardioSection>
       )}
     </ScrollView>
   );

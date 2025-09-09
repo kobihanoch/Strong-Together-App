@@ -27,8 +27,21 @@ const useStatisticsPageLogic = () => {
     return moment(selectedDate).format("YYYY-MM-DD");
   }, [selectedDate]);
 
+  // For weekly map
+  const startOfWeekDay = useMemo(() => {
+    return moment(selectedDate).startOf("week").format("YYYY-MM-DD");
+  }, [formattedDate]);
+
+  const cardioForWeek = useMemo(
+    () => weeklyCardioMap?.[startOfWeekDay],
+    [startOfWeekDay]
+  );
+
   // Cardio by date
-  const cardioByDate = useMemo(() => dailyCardioMap?.[formattedDate]);
+  const cardioByDate = useMemo(
+    () => dailyCardioMap?.[formattedDate],
+    [formattedDate]
+  );
 
   // Change records when a date selection is aplied
   const exerciseTrackingByDate = useMemo(() => {
@@ -63,6 +76,7 @@ const useStatisticsPageLogic = () => {
     exerciseTrackingWithDateKey,
     exerciseTrackingWithETSIdKey,
     cardioByDate,
+    cardioForWeek,
   };
 };
 

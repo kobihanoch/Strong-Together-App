@@ -1,5 +1,5 @@
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import React from "react";
+import React, { forwardRef, useImperativeHandle, useState } from "react";
 import { Dimensions, StyleSheet, Text, View } from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";
 import SegmentedControl from "react-native-segmented-control-2";
@@ -8,7 +8,14 @@ import Row from "../Row";
 
 const { width, height } = Dimensions.get("window");
 
-const TabSelect = ({ index, setIndex }) => {
+const TabSelect = forwardRef(({ index, setIndex }, ref) => {
+  const [cardioDotVisible, setCardioDotVisible] = useState(false);
+
+  useImperativeHandle(ref, () => ({
+    showCardioDot: () => setCardioDotVisible(true),
+    hideCardioDot: () => setCardioDotVisible(false),
+  }));
+
   return (
     <View style={styles.sectionListContainer}>
       <SegmentedControl
@@ -41,6 +48,7 @@ const TabSelect = ({ index, setIndex }) => {
               paddingVertical={5}
             />
             <Text style={styles.textStyle}>Cardio</Text>
+            {cardioDotVisible && <View style={styles.dot}></View>}
           </Row>,
         ]}
         onChange={setIndex}
@@ -54,7 +62,7 @@ const TabSelect = ({ index, setIndex }) => {
       />
     </View>
   );
-};
+});
 
 const styles = StyleSheet.create({
   sectionListContainer: {
@@ -77,6 +85,13 @@ const styles = StyleSheet.create({
     fontFamily: "Inter_400Regular",
     color: "black",
     fontSize: RFValue(13),
+  },
+  dot: {
+    height: 8,
+    aspectRatio: 1,
+    borderRadius: 20,
+    backgroundColor: "#ff2979",
+    marginLeft: "auto",
   },
 });
 
