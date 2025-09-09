@@ -38,7 +38,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 10,
   },
   capitalContainer: {
-    backgroundColor: colors.primary,
+    backgroundColor: colors.lightCardBg,
     height: height * 0.05,
     justifyContent: "center",
     alignItems: "center",
@@ -47,7 +47,7 @@ const styles = StyleSheet.create({
     marginLeft: 10,
   },
   capitalText: {
-    color: "white",
+    color: "black",
     fontFamily: "Inter_700Bold",
     fontSize: RFValue(17),
   },
