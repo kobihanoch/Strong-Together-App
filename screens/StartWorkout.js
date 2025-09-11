@@ -13,6 +13,9 @@ import ExerciseBox from "../components/StartWorkoutComponents/ExerciseBox";
 import useStartWorkoutPageLogic from "../hooks/logic/useStartWorkoutPageLogic";
 import LastWorkoutData from "../components/StartWorkoutComponents/LastWorkoutData";
 import SlidingBottomModal from "../components/SlidingBottomModal";
+import TimerComponent from "../components/Timer";
+import Timer from "../components/Timer";
+import BottomTabBarStartWorkout from "../components/StartWorkoutComponents/BottomTabBarStartWorkout";
 
 const { width, height } = Dimensions.get("window");
 
@@ -22,8 +25,6 @@ const StartWorkout = ({ navigation, route }) => {
   );
   const [lastWorkoutDataForModal, setLastWorkoutDataForModal] = useState(null);
   const [visibleSetIndexForModal, setVisibleSetIndexForModal] = useState(0);
-
-  const flatListRef = useRef(null);
 
   const modalRef = useRef(null);
   const openModal = useCallback(() => {
@@ -52,69 +53,19 @@ const StartWorkout = ({ navigation, route }) => {
   }, [workoutSaving]);
 
   return (
-    <View
-      style={{
-        flex: 1,
-        backgroundColor: "transparent",
-        flexDirection: "column",
-        paddingTop: height * 0.07,
-      }}
-    >
+    <View style={{ flex: 1 }}>
       <View style={styles.container}>
-        <FlatList
-          data={workoutData.exercisesForSelectedSplit}
-          horizontal
-          ref={flatListRef}
-          showsHorizontalScrollIndicator={false}
-          centerContent
-          pagingEnabled
-          style={{ flex: 1 }}
-          contentContainerStyle={{ flexGrow: 1 }}
-          keyExtractor={(item) => item.id.toString()}
-          renderItem={({ item, index }) => (
-            <ExerciseBox
-              item={item}
-              index={index}
-              exerciseCount={workoutData.exercisesForSelectedSplit.length}
-              onScrollNext={() => {
-                flatListRef.current?.scrollToIndex({ index: index + 1 });
-              }}
-              updateWeightArrs={workoutData.setWeightArrs}
-              updateRepsArrs={workoutData.setRepsArrs}
-              weightArrs={workoutData.weightArrs}
-              repsArrs={workoutData.repsArrs}
-              setLastWorkoutDataForModal={setLastWorkoutDataForModal}
-              setVisibleSetIndexForModal={setVisibleSetIndexForModal}
-              openModal={openModal}
-            ></ExerciseBox>
-          )}
-        ></FlatList>
-      </View>
-      <View style={{ flex: 2, justifyContent: "center", alignItems: "center" }}>
         <TouchableOpacity
-          style={{
-            flexDirection: "row",
-            justifyContent: "center",
-            alignItems: "center",
-            backgroundColor: "#2979FF",
-            borderRadius: height * 0.02,
-            width: "50%",
-            height: "40%",
-            gap: width * 0.03,
-          }}
-          onPress={handlePressSave}
+          onPress={workoutSaving.saveData}
+          style={{ marginTop: 200 }}
         >
-          <Text
-            style={{
-              fontFamily: "Inter_600SemiBold",
-              color: "white",
-              fontSize: RFValue(15),
-            }}
-          >
-            Finish Workout
-          </Text>
+          <Text>Save workout</Text>
         </TouchableOpacity>
+        <BottomTabBarStartWorkout
+          exercises={workoutData?.exercisesForSelectedSplit}
+        />
       </View>
+
       <SlidingBottomModal
         title="Last Performance"
         ref={modalRef}
@@ -131,7 +82,7 @@ const StartWorkout = ({ navigation, route }) => {
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 8 },
+  container: { flex: 1 },
   countdownContainer: {
     position: "absolute",
     top: 0,
