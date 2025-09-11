@@ -104,6 +104,7 @@ export default function App() {
 function RootNavigator() {
   const { isLoggedIn, user, authPhase } = useAuth();
 
+  // Ensures no UI is rendered if auth is not loaded yet
   if (authPhase === "checking") return null;
 
   return (
