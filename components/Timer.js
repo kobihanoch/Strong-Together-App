@@ -7,8 +7,8 @@ import React, {
 } from "react";
 import { Text } from "react-native";
 
-const Timer = forwardRef(({ style }, ref) => {
-  const startAtRef = useRef(Date.now());
+const Timer = forwardRef(({ style, startTime = null }, ref) => {
+  const startAtRef = useRef(startTime || Date.now());
   const intervalRef = useRef(null);
   const [elapsed, setElapsed] = useState(0);
   const pausedRef = useRef(false);

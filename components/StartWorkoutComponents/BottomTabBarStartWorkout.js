@@ -15,14 +15,14 @@ import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityI
 
 const { width, height } = Dimensions.get("window");
 
-const BottomTabBarStartWorkout = ({ exercises }) => {
-  const workoutName = exercises?.[0].workoutsplit;
+const BottomTabBarStartWorkout = ({ exercises, startTime }) => {
+  const workoutName = exercises?.[0]?.workoutsplit;
   const exerciseCount = exercises.length;
 
   return (
     <Row style={styles.container}>
       <Column style={styles.section}>
-        <Timer style={styles.timerContainer} />
+        <Timer style={styles.timerContainer} startTime={startTime} />
         <Text style={styles.sectionHeader}>Time Elapsed</Text>
       </Column>
     </Row>

@@ -1,27 +1,22 @@
 import React, { useCallback, useRef, useState } from "react";
-import {
-  Dimensions,
-  FlatList,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { Dimensions, StyleSheet, View } from "react-native";
 import { Dialog } from "react-native-alert-notification";
 import { RFValue } from "react-native-responsive-fontsize";
-import ExerciseBox from "../components/StartWorkoutComponents/ExerciseBox";
-import useStartWorkoutPageLogic from "../hooks/logic/useStartWorkoutPageLogic";
-import LastWorkoutData from "../components/StartWorkoutComponents/LastWorkoutData";
 import SlidingBottomModal from "../components/SlidingBottomModal";
-import TimerComponent from "../components/Timer";
-import Timer from "../components/Timer";
 import BottomTabBarStartWorkout from "../components/StartWorkoutComponents/BottomTabBarStartWorkout";
+import LastWorkoutData from "../components/StartWorkoutComponents/LastWorkoutData";
+import useStartWorkoutPageLogic from "../hooks/logic/useStartWorkoutPageLogic";
 
 const { width, height } = Dimensions.get("window");
 
 const StartWorkout = ({ navigation, route }) => {
-  const { data: workoutData, saving: workoutSaving } = useStartWorkoutPageLogic(
-    route.params?.workoutSplit
+  const {
+    data: workoutData,
+    saving: workoutSaving,
+    controls,
+  } = useStartWorkoutPageLogic(
+    route.params?.workoutSplit,
+    route.params?.resumedWorkout
   );
   const [lastWorkoutDataForModal, setLastWorkoutDataForModal] = useState(null);
   const [visibleSetIndexForModal, setVisibleSetIndexForModal] = useState(0);
@@ -55,14 +50,9 @@ const StartWorkout = ({ navigation, route }) => {
   return (
     <View style={{ flex: 1 }}>
       <View style={styles.container}>
-        <TouchableOpacity
-          onPress={workoutSaving.saveData}
-          style={{ marginTop: 200 }}
-        >
-          <Text>Save workout</Text>
-        </TouchableOpacity>
         <BottomTabBarStartWorkout
           exercises={workoutData?.exercisesForSelectedSplit}
+          startTime={workoutData?.startTime}
         />
       </View>
 
