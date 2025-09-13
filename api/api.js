@@ -1,5 +1,4 @@
 import axios from "axios";
-import { GlobalAuth } from "../context/AuthContext.js";
 import { showErrorAlert } from "../errors/errorAlerts";
 import { refreshAndRotateTokens } from "../services/AuthService";
 import { saveRefreshToken } from "../utils/tokenStore";
@@ -9,19 +8,13 @@ import {
   notifyOffline,
   notifyServerDown,
 } from "./networkCheck";
+import GlobalAuth from "../utils/authUtils";
 
 const api = axios.create({ baseURL: API_BASE_URL, timeout: 12000 });
 
 // Attach access token to every outgoing request (if present)
 api.interceptors.request.use(
-  async (config) => {
-    const at = GlobalAuth.getAccessToken && GlobalAuth.getAccessToken();
-    if (at) {
-      config.headers = config.headers || {};
-      config.headers.Authorization = `Bearer ${at}`;
-    }
-    return config;
-  },
+  async (config) => config,
   (error) => {
     return Promise.reject(error);
   }
