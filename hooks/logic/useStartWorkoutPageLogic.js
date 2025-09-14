@@ -17,6 +17,7 @@ import {
 const useStartWorkoutPageLogic = (selectedSplit, resumedWorkout = null) => {
   // --------------------[ Context ]--------------------------------------
   const { user, setIsWorkoutMode } = useAuth();
+  const cacheKey = keyStartWorkout(user.id);
   const { exercises = {} } = useWorkoutContext() || {};
   const {
     setExerciseTrackingMaps = null,
@@ -39,10 +40,22 @@ const useStartWorkoutPageLogic = (selectedSplit, resumedWorkout = null) => {
   // --------------------[ Weight and Reps arrays + Start time ]-----------------------------------------
 
   // Start time cacluated once at mounting, clears on unmounting
-  const startTime = useMemo(() => {
-    if (resumedWorkout) {
-      return resumedWorkout.startTime;
-    } else return Date.now();
+  const [pausedTotal, setPausedTotal] = useState(
+    resumedWorkout ? resumedWorkout.pausedTotal : 0
+  );
+  const startTime = useMemo(
+    () => (resumedWorkout ? resumedWorkout.startTime : Date.now()),
+    [resumedWorkout]
+  );
+
+  // Total pause time
+  useEffect(() => {
+    const lp = resumedWorkout?.lastPause;
+    if (typeof lp === "number" && Number.isFinite(lp)) {
+      const delta = Math.max(0, Date.now() - lp); // clamp against negatives
+      setPausedTotal((prev) => prev + delta);
+    }
+    // run once on mount; do not re-run on prop identity changes
   }, []);
 
   // Key value obj with ex name key and weights and reps arrays, etsid, notes
@@ -55,7 +68,7 @@ const useStartWorkoutPageLogic = (selectedSplit, resumedWorkout = null) => {
   });
 
   useEffect(
-    () => console.log(JSON.stringify(workoutProgressObj, null, 2)),
+    () => console.log(/*JSON.stringify(workoutProgressObj, null, 2)*/),
     [workoutProgressObj]
   );
 
@@ -71,7 +84,20 @@ const useStartWorkoutPageLogic = (selectedSplit, resumedWorkout = null) => {
   );
 
   // --------------------[ Add progress + Caching]-----------------------------------------
-  const cacheKey = keyStartWorkout(user.id);
+
+  const saveToCache = useCallback(async () => {
+    await cacheSetJSON(
+      cacheKey,
+      {
+        selectedSplit,
+        workout: workoutProgressObj,
+        startTime,
+        lastPause: Date.now(),
+        pausedTotal,
+      },
+      TTL_36H
+    );
+  }, [cacheKey, selectedSplit, workoutProgressObj, startTime, pausedTotal]);
 
   const timeoutRef = useRef(null);
   // Debounce caching 5 secs
@@ -79,20 +105,12 @@ const useStartWorkoutPageLogic = (selectedSplit, resumedWorkout = null) => {
     (async () => {
       if (timeoutRef.current) clearTimeout(timeoutRef.current);
       timeoutRef.current = setTimeout(async () => {
-        await cacheSetJSON(
-          cacheKey,
-          {
-            selectedSplit: selectedSplit,
-            workout: workoutProgressObj,
-            startTime: startTime,
-          },
-          TTL_36H
-        );
+        saveToCache();
       }, 5000);
     })();
 
     return () => clearTimeout(timeoutRef.current);
-  }, [workoutProgressObj, cacheKey]);
+  }, [workoutProgressObj, pausedTotal, saveToCache]);
 
   const addWeightRecord = useCallback((exerciseName, setIndex, weight) => {
     setWorkoutProgressObj((prev) => {
@@ -195,6 +213,7 @@ const useStartWorkoutPageLogic = (selectedSplit, resumedWorkout = null) => {
     data: {
       exercisesForSelectedSplit,
       startTime,
+      pausedTotal,
     },
     controls: {
       addNotes,

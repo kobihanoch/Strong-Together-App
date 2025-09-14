@@ -52,7 +52,10 @@ const StartWorkout = ({ navigation, route }) => {
       <View style={styles.container}>
         <BottomTabBarStartWorkout
           exercises={workoutData?.exercisesForSelectedSplit}
-          startTime={workoutData?.startTime}
+          timerProps={{
+            startTime: workoutData?.startTime,
+            pausedTotal: workoutData?.pausedTotal,
+          }}
         />
       </View>
 

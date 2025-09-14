@@ -35,6 +35,8 @@ const AppStack = () => {
           resumedWorkout: {
             workout: payload.workout,
             startTime: payload.startTime,
+            pausedTotal: payload.pausedTotal,
+            lastPause: payload.lastPause,
           },
         });
         setInitialRoute("StartWorkout");
