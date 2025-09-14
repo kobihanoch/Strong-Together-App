@@ -11,8 +11,14 @@ import Profile from "../screens/Profile";
 import Settings from "../screens/Settings";
 import StartWorkout from "../screens/StartWorkout";
 import Statistics from "../screens/Statistics";
-import { cacheGetJSON, keyStartWorkout } from "../cache/cacheUtils";
+import {
+  cacheDeleteKey,
+  cacheGetJSON,
+  keyStartWorkout,
+} from "../cache/cacheUtils";
 import { useAuth } from "../context/AuthContext";
+import { Dialog } from "react-native-alert-notification";
+import { useNavigation } from "@react-navigation/native";
 
 const Stack = createStackNavigator();
 
@@ -22,32 +28,49 @@ const AppStack = () => {
   // Decide initial route once we know if there is a cached workout
   const [initialRoute, setInitialRoute] = useState(null);
   const [resumeParams, setResumeParams] = useState(null);
-
+  const nav = useNavigation();
   // Resume workout if interuptted
   useEffect(() => {
     (async () => {
       const payload = await cacheGetJSON(keyStartWorkout(user.id));
 
-      if (payload?.workout && payload?.startTime) {
-        // Prepare params for StartWorkout
-        setResumeParams({
-          workoutSplit: payload.selectedSplit,
-          resumedWorkout: {
-            workout: payload.workout,
-            startTime: payload.startTime,
-            pausedTotal: payload.pausedTotal,
-            lastPause: payload.lastPause,
+      if (payload?.workout && payload?.startTime && nav) {
+        let pressedYes = false;
+        Dialog.show({
+          type: "DANGER",
+          title: "Resume Workout",
+          titleStyle: {
+            fontSize: 22,
+          },
+          textBody:
+            "Last workout was paused in the middle. Would you like to resume it?",
+          textBodyStyle: {
+            fontSize: 45,
+          },
+          button: "Resume",
+          closeOnOverlayTap: true,
+          onPressButton: () => {
+            pressedYes = true;
+            Dialog.hide();
+            nav.navigate("StartWorkout", {
+              workoutSplit: payload.selectedSplit,
+              resumedWorkout: {
+                workout: payload.workout,
+                startTime: payload.startTime,
+                pausedTotal: payload.pausedTotal,
+                lastPause: payload.lastPause,
+              },
+            });
+          },
+          onHide: async () => {
+            if (pressedYes) return;
+            const startWorkoutCacheKey = keyStartWorkout(user.id);
+            await cacheDeleteKey(startWorkoutCacheKey);
           },
         });
-        setInitialRoute("StartWorkout");
-      } else {
-        setInitialRoute("Home");
       }
     })();
-  }, [user?.id]);
-
-  // Render nothing (or a tiny loader) until the decision is made
-  if (!initialRoute) return null;
+  }, [user?.id, nav]);
 
   return (
     <Stack.Navigator
@@ -56,17 +79,13 @@ const AppStack = () => {
         gestureEnabled: true,
         cardStyle: { backgroundColor: "rgba(255, 255, 255, 1)", flex: 1 },
       }}
-      initialRouteName={initialRoute}
+      initialRouteName={"Home"}
     >
       <Stack.Screen name="Home" component={Home} />
       <Stack.Screen name="Settings" component={Settings} />
       <Stack.Screen name="Profile" component={Profile} />
       <Stack.Screen name="MyWorkoutPlan" component={MyWorkoutPlan} />
-      <Stack.Screen
-        name="StartWorkout"
-        component={StartWorkout}
-        initialParams={resumeParams || undefined} // <-- inject resume params if any
-      />
+      <Stack.Screen name="StartWorkout" component={StartWorkout} />
       <Stack.Screen name="CreateWorkout" component={CreateWorkout} />
       <Stack.Screen name="Statistics" component={Statistics} />
       <Stack.Screen name="Inbox" component={Inbox} />
