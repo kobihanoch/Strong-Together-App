@@ -76,11 +76,6 @@ const useStartWorkoutPageLogic = (selectedSplit, resumedWorkout = null) => {
     [workoutProgressObj, exercisesForSelectedSplit]
   );
 
-  useEffect(
-    () => console.log(/*JSON.stringify(workoutProgressObj, null, 2)*/),
-    [workoutProgressObj]
-  );
-
   // --------------------[ Add progress ]-----------------------------------------
   const addWeightRecord = useCallback((exerciseName, setIndex, weight) => {
     setWorkoutProgressObj((prev) =>

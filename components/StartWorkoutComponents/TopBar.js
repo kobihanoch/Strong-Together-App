@@ -47,7 +47,7 @@ const TopBar = ({ workoutName, totalSets, setsDone, timerProps }) => {
               <MaterialCommunityIcons
                 name={"chart-timeline-variant-shimmer"}
                 size={RFValue(15)}
-                color={"#12c282ff"}
+                color={"black"}
               />
               <Text style={styles.progressHeader}>
                 {Math.round((setsDone / totalSets) * 100) + "%"}
@@ -55,9 +55,9 @@ const TopBar = ({ workoutName, totalSets, setsDone, timerProps }) => {
             </Row>
             <Row style={{ gap: 4 }}>
               <MaterialCommunityIcons
-                name={"clock"}
-                size={RFValue(15)}
-                color={"#06B6D4"}
+                name={"timer"}
+                size={RFValue(14)}
+                color={"black"}
               />
               <Timer
                 style={styles.timerContainer}

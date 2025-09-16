@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { cacheSetJSON, keyStartWorkout, TTL_36H } from "../cache/cacheUtils";
+import { AppState } from "react-native";
 
 // Encapsulates: startTime, pausedTotal, and debounced cache writes (kept exactly as-is)
 export const useStartWorkoutCache = (
@@ -46,6 +47,8 @@ export const useStartWorkoutCache = (
   }, [cacheKey, selectedSplit, workoutProgressObj, startTime, pausedTotal]);
 
   const timeoutRef = useRef(null);
+
+  // Debounce caching each workout progress change
   useEffect(() => {
     (async () => {
       if (timeoutRef.current) clearTimeout(timeoutRef.current);
@@ -56,6 +59,17 @@ export const useStartWorkoutCache = (
 
     return () => clearTimeout(timeoutRef.current);
   }, [workoutProgressObj, pausedTotal, saveToCache]);
+
+  // App state listener
+  useEffect(() => {
+    const sub = AppState.addEventListener("change", (state) => {
+      if (state === "inactive" || state === "background") {
+        // Flush immediately
+        saveToCache();
+      }
+    });
+    return () => sub.remove();
+  }, [saveToCache]);
 
   return {
     cacheKey,
