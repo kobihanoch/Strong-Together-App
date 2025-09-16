@@ -71,10 +71,11 @@ const useStartWorkoutPageLogic = (selectedSplit, resumedWorkout = null) => {
 
   // Count only after both fields has updated and count
   // Count only until planned sets by original workout plan
-  const setsDone = useMemo(
-    () => countSetsDone(workoutProgressObj, exercisesForSelectedSplit),
-    [workoutProgressObj, exercisesForSelectedSplit]
-  );
+  const { sum: setsDone = 0, byExercise: setsDoneWithExerciseNameKey = {} } =
+    useMemo(
+      () => countSetsDone(workoutProgressObj, exercisesForSelectedSplit),
+      [workoutProgressObj, exercisesForSelectedSplit]
+    );
 
   // --------------------[ Add progress ]-----------------------------------------
   const addWeightRecord = useCallback((exerciseName, setIndex, weight) => {
@@ -153,6 +154,7 @@ const useStartWorkoutPageLogic = (selectedSplit, resumedWorkout = null) => {
       totalSets,
       workoutName,
       setsDone,
+      setsDoneWithExerciseNameKey,
     },
     controls: {
       addNotes,

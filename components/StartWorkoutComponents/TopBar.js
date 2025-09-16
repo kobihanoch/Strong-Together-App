@@ -81,7 +81,9 @@ const TopBar = ({ workoutName, totalSets, setsDone, timerProps }) => {
         planned={totalSets}
         showPct={false}
       ></AdherenceBar>
-      <Text style={styles.workoutCompletionText}>Workout Completion %</Text>
+      <Text style={styles.workoutCompletionText}>
+        {Math.round((setsDone / totalSets) * 100) + "%"} Completed
+      </Text>
     </Column>
   );
 };
@@ -142,7 +144,7 @@ const styles = StyleSheet.create({
   workoutCompletionText: {
     fontSize: RFValue(11),
     fontFamily: "Inter_400Regular",
-    color: colors.textSecondary,
+    color: colors.primary,
     marginTop: 7,
   },
 });

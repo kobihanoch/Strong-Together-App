@@ -61,7 +61,10 @@ const StartWorkout = ({ navigation, route }) => {
             pausedTotal: workoutData?.pausedTotal,
           }}
         />
-        <ExercisesSection exercises={workoutData?.exercisesForSelectedSplit} />
+        <ExercisesSection
+          exercises={workoutData?.exercisesForSelectedSplit}
+          exercisesSetsDoneMap={workoutData?.setsDoneWithExerciseNameKey}
+        />
       </View>
 
       <SlidingBottomModal

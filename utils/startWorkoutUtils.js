@@ -104,7 +104,9 @@ export const countSetsDone = (
   workoutProgressObj,
   exercisesForSelectedSplit
 ) => {
-  let total = 0;
+  if (!workoutProgressObj || !exercisesForSelectedSplit) return {};
+  let sum = 0;
+  const byExercise = {};
 
   for (const [name, rec] of Object.entries(workoutProgressObj)) {
     const planned =
@@ -114,20 +116,21 @@ export const countSetsDone = (
     const wArr = rec?.weight ?? [];
     const rArr = rec?.reps ?? [];
 
-    // Count a set only when both fields were updated for the same index
+    // Count only indices within planned range where both fields were updated
+    let done = 0;
     for (let i = 0; i < planned; i++) {
       const bothUpdated = i in wArr && i in rArr;
-      if (bothUpdated) total++;
+      if (bothUpdated) done++;
     }
+
+    byExercise[name] = { done, planned };
+    sum += done;
   }
 
-  return total;
+  return { sum, byExercise };
 };
 
-// utils/workoutAdders.js
-
 // Shape: state[exerciseName] = { etsid, weight: [], reps: [], notes }
-
 export const applyWeight = (state, exerciseName, setIndex, weight) => {
   // Guard: valid state/exercise and non-negative integer index
   if (
