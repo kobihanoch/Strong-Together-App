@@ -7,6 +7,7 @@ import BottomTabBarStartWorkout from "../components/StartWorkoutComponents/Botto
 import LastWorkoutData from "../components/StartWorkoutComponents/LastWorkoutData";
 import TopBar from "../components/StartWorkoutComponents/TopBar";
 import useStartWorkoutPageLogic from "../hooks/logic/useStartWorkoutPageLogic";
+import ExercisesSection from "../components/StartWorkoutComponents/ExercisesSection";
 
 const { width, height } = Dimensions.get("window");
 
@@ -55,7 +56,12 @@ const StartWorkout = ({ navigation, route }) => {
           workoutName={workoutData?.workoutName}
           totalSets={workoutData?.totalSets}
           setsDone={workoutData?.setsDone}
+          timerProps={{
+            startTime: workoutData?.startTime,
+            pausedTotal: workoutData?.pausedTotal,
+          }}
         />
+        <ExercisesSection exercises={workoutData?.exercisesForSelectedSplit} />
       </View>
 
       <SlidingBottomModal

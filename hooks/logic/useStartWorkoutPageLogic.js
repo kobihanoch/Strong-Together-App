@@ -5,30 +5,39 @@ import { useAuth } from "../../context/AuthContext";
 import { useWorkoutContext } from "../../context/WorkoutContext";
 import { unpackFromExerciseTrackingData } from "../../utils/analysisContexUtils";
 import {
+  applyNotes,
+  applyReps,
+  applyWeight,
   countSetsDone,
   createArrayForDataBase,
 } from "../../utils/startWorkoutUtils";
 import { useUserWorkout } from "../useUserWorkout";
 import { showErrorAlert } from "../../errors/errorAlerts";
-import {
-  cacheDeleteKey,
-  cacheSetJSON,
-  keyStartWorkout,
-  TTL_36H,
-} from "../../cache/cacheUtils";
+import { cacheDeleteKey } from "../../cache/cacheUtils";
+import { useStartWorkoutCache } from "../useStartWorkoutCache";
 
 const useStartWorkoutPageLogic = (selectedSplit, resumedWorkout = null) => {
+  // --------------------[ Navigation ]--------------------------------------
+  const navigation = useNavigation();
   // --------------------[ Context ]--------------------------------------
   const { user, setIsWorkoutMode } = useAuth();
-  const cacheKey = keyStartWorkout(user.id);
   const { exercises = {} } = useWorkoutContext() || {};
   const {
     setExerciseTrackingMaps = null,
     setAnalyzedExerciseTrackingData = null,
   } = useAnalysisContext() || {};
 
-  // --------------------[ Exercises ]------------------------------------------
+  // --------------------[ Set workout mode ]--------------------------------------
+  useFocusEffect(
+    useCallback(() => {
+      setIsWorkoutMode(true);
+      return () => {
+        setIsWorkoutMode(false);
+      };
+    }, [])
+  );
 
+  // --------------------[ Exercises and Workout Name ]------------------------------------------
   // Set exercises array for selected split
   const exercisesForSelectedSplit = useMemo(() => {
     return exercises[selectedSplit.name] || [];
@@ -42,33 +51,7 @@ const useStartWorkoutPageLogic = (selectedSplit, resumedWorkout = null) => {
 
   const workoutName = selectedSplit?.name;
 
-  // --------------------[ Navigation ]--------------------------------------
-  const navigation = useNavigation();
-
-  // --------------------[ Outside hooks ]--------------------------------------
-  const { saveWorkoutProcess } = useUserWorkout();
-
-  // --------------------[ Weight and Reps arrays + Start time ]-----------------------------------------
-
-  // Start time cacluated once at mounting, clears on unmounting
-  const [pausedTotal, setPausedTotal] = useState(
-    resumedWorkout ? resumedWorkout.pausedTotal : 0
-  );
-  const startTime = useMemo(
-    () => (resumedWorkout ? resumedWorkout.startTime : Date.now()),
-    [resumedWorkout]
-  );
-
-  // Total pause time
-  useEffect(() => {
-    const lp = resumedWorkout?.lastPause;
-    if (typeof lp === "number" && Number.isFinite(lp)) {
-      const delta = Math.max(0, Date.now() - lp); // clamp against negatives
-      setPausedTotal((prev) => prev + delta);
-    }
-    // run once on mount; do not re-run on prop identity changes
-  }, []);
-
+  // --------------------[ Progress object ]--------------------------------------
   // Key value obj with ex name key and weights and reps arrays, etsid, notes
   const [workoutProgressObj, setWorkoutProgressObj] = useState(() => {
     if (resumedWorkout) return resumedWorkout.workout;
@@ -77,6 +60,15 @@ const useStartWorkoutPageLogic = (selectedSplit, resumedWorkout = null) => {
       return acc;
     }, {});
   });
+
+  // --------------------[ Timer + Caching ]----------------------
+  const { cacheKey, startTime, pausedTotal } = useStartWorkoutCache(
+    user.id,
+    selectedSplit,
+    resumedWorkout,
+    workoutProgressObj
+  );
+
   // Count only after both fields has updated and count
   // Count only until planned sets by original workout plan
   const setsDone = useMemo(
@@ -89,92 +81,25 @@ const useStartWorkoutPageLogic = (selectedSplit, resumedWorkout = null) => {
     [workoutProgressObj]
   );
 
-  // --------------------[ Set workout mode ]--------------------------------------
-  useFocusEffect(
-    useCallback(() => {
-      setIsWorkoutMode(true);
-
-      return () => {
-        setIsWorkoutMode(false);
-      };
-    }, [])
-  );
-
-  // --------------------[ Add progress + Caching]-----------------------------------------
-
-  const saveToCache = useCallback(async () => {
-    await cacheSetJSON(
-      cacheKey,
-      {
-        selectedSplit,
-        workout: workoutProgressObj,
-        startTime,
-        lastPause: Date.now(),
-        pausedTotal,
-      },
-      TTL_36H
-    );
-  }, [cacheKey, selectedSplit, workoutProgressObj, startTime, pausedTotal]);
-
-  const timeoutRef = useRef(null);
-  // Debounce caching 5 secs
-  useEffect(() => {
-    (async () => {
-      if (timeoutRef.current) clearTimeout(timeoutRef.current);
-      timeoutRef.current = setTimeout(async () => {
-        //saveToCache();
-      }, 5000);
-    })();
-
-    return () => clearTimeout(timeoutRef.current);
-  }, [workoutProgressObj, pausedTotal, saveToCache]);
-
+  // --------------------[ Add progress ]-----------------------------------------
   const addWeightRecord = useCallback((exerciseName, setIndex, weight) => {
-    setWorkoutProgressObj((prev) => {
-      const exerciseInObj = prev[exerciseName];
-      const currentExerciseWeightArray = [...exerciseInObj.weight] || [];
-      currentExerciseWeightArray[setIndex] = weight;
-      return {
-        ...prev,
-        [exerciseName]: {
-          ...exerciseInObj,
-          weight: currentExerciseWeightArray,
-        },
-      };
-    });
+    setWorkoutProgressObj((prev) =>
+      applyWeight(prev, exerciseName, setIndex, weight)
+    );
   }, []);
 
   const addRepsRecord = useCallback((exerciseName, setIndex, reps) => {
-    setWorkoutProgressObj((prev) => {
-      const exerciseInObj = prev[exerciseName];
-      const currentExerciseRepsArray = [...exerciseInObj.reps] || [];
-      currentExerciseRepsArray[setIndex] = reps;
-      return {
-        ...prev,
-        [exerciseName]: {
-          ...exerciseInObj,
-          reps: currentExerciseRepsArray,
-        },
-      };
-    });
+    setWorkoutProgressObj((prev) =>
+      applyReps(prev, exerciseName, setIndex, reps)
+    );
   }, []);
 
   const addNotes = useCallback((exerciseName, notes) => {
-    setWorkoutProgressObj((prev) => {
-      const exerciseInObj = prev[exerciseName];
-      return {
-        ...prev,
-        [exerciseName]: {
-          ...exerciseInObj,
-          notes: notes,
-        },
-      };
-    });
+    setWorkoutProgressObj((prev) => applyNotes(prev, exerciseName, notes));
   }, []);
 
-  // Testing
+  // --------------------[ Testing ]---------------------------------------------
   useEffect(() => {
-    //cacheDeleteKey(cacheKey);
     if (exercisesForSelectedSplit && exercisesForSelectedSplit.length) {
       addWeightRecord("Incline Bench Press", 0, 10);
       addWeightRecord("Incline Bench Press", 2, 30);
@@ -192,7 +117,7 @@ const useStartWorkoutPageLogic = (selectedSplit, resumedWorkout = null) => {
   }, [exercisesForSelectedSplit]);
 
   // --------------------[ Save Workout ]-----------------------------------------
-
+  const { saveWorkoutProcess } = useUserWorkout();
   const [saveStarted, setSaveStarted] = useState(false);
 
   const saveData = useCallback(async () => {
@@ -216,9 +141,6 @@ const useStartWorkoutPageLogic = (selectedSplit, resumedWorkout = null) => {
       );
       setIsWorkoutMode(false);
 
-      // Delete analytics cache
-      //await cacheDeleteKey(keyAnalytics(user.id));
-      //console.log("Analytics deleted");
       navigation.navigate("Statistics");
       await cacheDeleteKey(cacheKey);
     } catch (err) {

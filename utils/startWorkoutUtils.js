@@ -123,3 +123,72 @@ export const countSetsDone = (
 
   return total;
 };
+
+// utils/workoutAdders.js
+
+// Shape: state[exerciseName] = { etsid, weight: [], reps: [], notes }
+
+export const applyWeight = (state, exerciseName, setIndex, weight) => {
+  // Guard: valid state/exercise and non-negative integer index
+  if (
+    !state ||
+    !state[exerciseName] ||
+    !Number.isInteger(setIndex) ||
+    setIndex < 0
+  )
+    return state;
+
+  const ex = state[exerciseName];
+  const current = Array.isArray(ex.weight) ? ex.weight : [];
+
+  // No-op if value did not change
+  if (current[setIndex] === weight) return state;
+
+  // Immutable update
+  const nextWeight = current.slice();
+  nextWeight[setIndex] = weight;
+
+  return {
+    ...state,
+    [exerciseName]: { ...ex, weight: nextWeight },
+  };
+};
+
+export const applyReps = (state, exerciseName, setIndex, reps) => {
+  // Guard: valid state/exercise and non-negative integer index
+  if (
+    !state ||
+    !state[exerciseName] ||
+    !Number.isInteger(setIndex) ||
+    setIndex < 0
+  )
+    return state;
+
+  const ex = state[exerciseName];
+  const current = Array.isArray(ex.reps) ? ex.reps : [];
+
+  // No-op if value did not change
+  if (current[setIndex] === reps) return state;
+
+  // Immutable update
+  const nextReps = current.slice();
+  nextReps[setIndex] = reps;
+
+  return {
+    ...state,
+    [exerciseName]: { ...ex, reps: nextReps },
+  };
+};
+
+export const applyNotes = (state, exerciseName, notes) => {
+  // Guard: valid state/exercise
+  if (!state || !state[exerciseName]) return state;
+
+  const ex = state[exerciseName];
+  if (ex.notes === notes) return state; // No-op
+
+  return {
+    ...state,
+    [exerciseName]: { ...ex, notes },
+  };
+};
