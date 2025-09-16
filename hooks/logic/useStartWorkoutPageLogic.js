@@ -4,7 +4,10 @@ import { useAnalysisContext } from "../../context/AnalysisContext";
 import { useAuth } from "../../context/AuthContext";
 import { useWorkoutContext } from "../../context/WorkoutContext";
 import { unpackFromExerciseTrackingData } from "../../utils/analysisContexUtils";
-import { createArrayForDataBase } from "../../utils/startWorkoutUtils";
+import {
+  countSetsDone,
+  createArrayForDataBase,
+} from "../../utils/startWorkoutUtils";
 import { useUserWorkout } from "../useUserWorkout";
 import { showErrorAlert } from "../../errors/errorAlerts";
 import {
@@ -30,6 +33,14 @@ const useStartWorkoutPageLogic = (selectedSplit, resumedWorkout = null) => {
   const exercisesForSelectedSplit = useMemo(() => {
     return exercises[selectedSplit.name] || [];
   }, [exercises, selectedSplit]);
+
+  // Always an array
+  const totalSets = exercisesForSelectedSplit.reduce((sum, ex) => {
+    sum += ex.sets.length;
+    return sum;
+  }, 0);
+
+  const workoutName = selectedSplit?.name;
 
   // --------------------[ Navigation ]--------------------------------------
   const navigation = useNavigation();
@@ -66,6 +77,12 @@ const useStartWorkoutPageLogic = (selectedSplit, resumedWorkout = null) => {
       return acc;
     }, {});
   });
+  // Count only after both fields has updated and count
+  // Count only until planned sets by original workout plan
+  const setsDone = useMemo(
+    () => countSetsDone(workoutProgressObj, exercisesForSelectedSplit),
+    [workoutProgressObj, exercisesForSelectedSplit]
+  );
 
   useEffect(
     () => console.log(/*JSON.stringify(workoutProgressObj, null, 2)*/),
@@ -105,7 +122,7 @@ const useStartWorkoutPageLogic = (selectedSplit, resumedWorkout = null) => {
     (async () => {
       if (timeoutRef.current) clearTimeout(timeoutRef.current);
       timeoutRef.current = setTimeout(async () => {
-        saveToCache();
+        //saveToCache();
       }, 5000);
     })();
 
@@ -162,6 +179,8 @@ const useStartWorkoutPageLogic = (selectedSplit, resumedWorkout = null) => {
       addWeightRecord("Incline Bench Press", 0, 10);
       addWeightRecord("Incline Bench Press", 2, 30);
       addWeightRecord("Incline Bench Press", 1, 20.5);
+      addRepsRecord("Incline Bench Press", 0, 12);
+      addRepsRecord("Incline Bench Press", 2, 12);
       addRepsRecord("Incline Bench Press", 1, 12);
       addWeightRecord("Chest Fly", 0, 15.5);
       addWeightRecord("Chest Fly", 1, 17.5);
@@ -214,6 +233,9 @@ const useStartWorkoutPageLogic = (selectedSplit, resumedWorkout = null) => {
       exercisesForSelectedSplit,
       startTime,
       pausedTotal,
+      totalSets,
+      workoutName,
+      setsDone,
     },
     controls: {
       addNotes,

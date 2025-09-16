@@ -5,6 +5,7 @@ import { RFValue } from "react-native-responsive-fontsize";
 import SlidingBottomModal from "../components/SlidingBottomModal";
 import BottomTabBarStartWorkout from "../components/StartWorkoutComponents/BottomTabBarStartWorkout";
 import LastWorkoutData from "../components/StartWorkoutComponents/LastWorkoutData";
+import TopBar from "../components/StartWorkoutComponents/TopBar";
 import useStartWorkoutPageLogic from "../hooks/logic/useStartWorkoutPageLogic";
 
 const { width, height } = Dimensions.get("window");
@@ -50,12 +51,10 @@ const StartWorkout = ({ navigation, route }) => {
   return (
     <View style={{ flex: 1 }}>
       <View style={styles.container}>
-        <BottomTabBarStartWorkout
-          exercises={workoutData?.exercisesForSelectedSplit}
-          timerProps={{
-            startTime: workoutData?.startTime,
-            pausedTotal: workoutData?.pausedTotal,
-          }}
+        <TopBar
+          workoutName={workoutData?.workoutName}
+          totalSets={workoutData?.totalSets}
+          setsDone={workoutData?.setsDone}
         />
       </View>
 

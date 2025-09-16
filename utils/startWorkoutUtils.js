@@ -99,3 +99,27 @@ export function computeProgressByVolume({
   return 0;
 }
 export const clamp = (v, min, max) => Math.max(min, Math.min(max, v));
+
+export const countSetsDone = (
+  workoutProgressObj,
+  exercisesForSelectedSplit
+) => {
+  let total = 0;
+
+  for (const [name, rec] of Object.entries(workoutProgressObj)) {
+    const planned =
+      exercisesForSelectedSplit.find((e) => e.exercise === name)?.sets
+        ?.length ?? 0;
+
+    const wArr = rec?.weight ?? [];
+    const rArr = rec?.reps ?? [];
+
+    // Count a set only when both fields were updated for the same index
+    for (let i = 0; i < planned; i++) {
+      const bothUpdated = i in wArr && i in rArr;
+      if (bothUpdated) total++;
+    }
+  }
+
+  return total;
+};

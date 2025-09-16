@@ -43,7 +43,7 @@ const AppStack = () => {
             fontSize: 22,
           },
           textBody:
-            "Last workout was paused in the middle. Would you like to resume it?",
+            "We found a paused workout. Do you want to pick up where you left off?",
           textBodyStyle: {
             fontSize: 45,
           },
