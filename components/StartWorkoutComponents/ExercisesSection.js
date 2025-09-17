@@ -149,6 +149,7 @@ const RenderItem = ({
                 addWeightRecord(exName, setIndex, val);
               }}
               style={styles.weightInput}
+              keyboardType={"numeric"}
             />
           </Column>
           <Column style={{ width: "50%", gap: 5 }}>
@@ -161,6 +162,7 @@ const RenderItem = ({
                 addRepsRecord(exName, setIndex, val);
               }}
               style={styles.weightInput}
+              keyboardType={"number-pad"}
             />
           </Column>
         </Row>
