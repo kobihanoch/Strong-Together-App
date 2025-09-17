@@ -26,8 +26,6 @@ const AppStack = () => {
   const { user } = useAuth();
 
   // Decide initial route once we know if there is a cached workout
-  const [initialRoute, setInitialRoute] = useState(null);
-  const [resumeParams, setResumeParams] = useState(null);
   const nav = useNavigation();
   // Resume workout if interuptted
   useEffect(() => {
@@ -76,7 +74,7 @@ const AppStack = () => {
     <Stack.Navigator
       screenOptions={{
         headerShown: false,
-        gestureEnabled: true,
+        gestureEnabled: false,
         cardStyle: { backgroundColor: "rgba(255, 255, 255, 1)", flex: 1 },
       }}
       initialRouteName={"Home"}

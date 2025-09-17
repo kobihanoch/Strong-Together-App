@@ -23,10 +23,11 @@ const TopBar = ({
   setsDone,
   timerProps,
   saveWorkout,
+  onExit,
 }) => {
   return (
     <Column style={styles.container}>
-      <Row style={{ gap: 25 }}>
+      <Row style={{ gap: 25, alignItems: "center" }}>
         <View>
           <LinearGradient
             colors={["#2979FF", "#2979FF"]}
@@ -38,13 +39,6 @@ const TopBar = ({
               color={"white"}
             />
           </LinearGradient>
-          <View style={styles.flameContainer}>
-            <MaterialCommunityIcons
-              name={"fire"}
-              size={RFValue(12)}
-              color={"#533807ff"}
-            />
-          </View>
         </View>
         <Column style={{ gap: 3 }}>
           <Text style={styles.workoutHeader}>Workout {workoutName}</Text>
@@ -73,14 +67,24 @@ const TopBar = ({
             </Row>
           </Row>
         </Column>
-        <TouchableOpacity style={styles.finishBtn} onPress={saveWorkout}>
-          <Text style={styles.finishBtnText}>Finish</Text>
-          <MaterialCommunityIcons
-            name={"check"}
-            size={RFValue(12)}
-            color={"white"}
-          />
-        </TouchableOpacity>
+        <Column style={{ marginLeft: "auto", gap: 10 }}>
+          <TouchableOpacity style={styles.finishBtn} onPress={saveWorkout}>
+            <Text style={styles.finishBtnText}>Finish</Text>
+            <MaterialCommunityIcons
+              name={"check"}
+              size={RFValue(12)}
+              color={"white"}
+            />
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.exitBtn} onPress={onExit}>
+            <Text style={styles.exitBtnText}>Exit</Text>
+            <MaterialCommunityIcons
+              name={"exit-to-app"}
+              size={RFValue(12)}
+              color={colors.primary}
+            />
+          </TouchableOpacity>
+        </Column>
       </Row>
       <AdherenceBar
         actual={setsDone}
@@ -98,7 +102,7 @@ const TopBar = ({
 
 const styles = StyleSheet.create({
   container: {
-    height: height * 0.25,
+    height: height * 0.28,
     justifyContent: "flex-end",
     backgroundColor: colors.lightCardBg,
     paddingBlock: 20,
@@ -140,7 +144,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     borderRadius: 16,
     backgroundColor: "#2979FF",
-    marginLeft: "auto",
     flexDirection: "row",
     gap: 7,
   },
@@ -148,6 +151,23 @@ const styles = StyleSheet.create({
     fontSize: RFValue(12),
     fontFamily: "Inter_600SemiBold",
     color: "white",
+  },
+  exitBtn: {
+    paddingVertical: 12,
+    paddingHorizontal: 30,
+    justifyContent: "center",
+    alignItems: "center",
+    borderRadius: 16,
+    backgroundColor: "transparent",
+    borderWidth: 1,
+    borderColor: colors.primary,
+    flexDirection: "row",
+    gap: 7,
+  },
+  exitBtnText: {
+    fontSize: RFValue(12),
+    fontFamily: "Inter_600SemiBold",
+    color: colors.primary,
   },
   workoutCompletionText: {
     fontSize: RFValue(11),

@@ -61,9 +61,9 @@ const useStartWorkoutPageLogic = (selectedSplit, resumedWorkout = null) => {
     }, {});
   });
 
-  useEffect(() => {
+  /*useEffect(() => {
     console.log(JSON.stringify(workoutProgressObj, null, 2));
-  }, [workoutProgressObj]);
+  }, [workoutProgressObj]);*/
 
   // --------------------[ Timer + Caching ]----------------------
   const { cacheKey, startTime, pausedTotal } = useStartWorkoutCache(
@@ -98,25 +98,16 @@ const useStartWorkoutPageLogic = (selectedSplit, resumedWorkout = null) => {
     setWorkoutProgressObj((prev) => applyNotes(prev, exerciseName, notes));
   }, []);
 
-  // --------------------[ Testing ]---------------------------------------------
-  /*useEffect(() => {
-    if (exercisesForSelectedSplit && exercisesForSelectedSplit.length) {
-      addWeightRecord("Incline Bench Press", 0, 10);
-      addWeightRecord("Incline Bench Press", 2, 30);
-      addWeightRecord("Incline Bench Press", 1, 20.5);
-      addRepsRecord("Incline Bench Press", 0, 12);
-      addRepsRecord("Incline Bench Press", 2, 12);
-      addRepsRecord("Incline Bench Press", 1, 12);
-      addWeightRecord("Chest Fly", 0, 15.5);
-      addWeightRecord("Chest Fly", 1, 17.5);
-      addRepsRecord("Chest Fly", 0, 12);
-      addRepsRecord("Chest Fly", 1, 15);
-      addNotes("Incline Bench Press", "Was easy!");
-    }
-    //console.log(workoutProgressObj);
-  }, [exercisesForSelectedSplit]);*/
-
   // --------------------[ Save Workout ]-----------------------------------------
+  const clearCache = async () => {
+    await cacheDeleteKey(cacheKey);
+  };
+
+  const onExit = useCallback(async () => {
+    navigation.navigate("MyWorkoutPlan");
+    await clearCache();
+  }, [cacheKey]);
+
   const { saveWorkoutProcess } = useUserWorkout();
   const [saveStarted, setSaveStarted] = useState(false);
 
@@ -140,9 +131,8 @@ const useStartWorkoutPageLogic = (selectedSplit, resumedWorkout = null) => {
         unpackFromExerciseTrackingData(exerciseTrackingAnalysis)
       );
       setIsWorkoutMode(false);
-
+      await clearCache();
       navigation.navigate("Statistics");
-      await cacheDeleteKey(cacheKey);
     } catch (err) {
       throw err;
     } finally {
@@ -169,6 +159,7 @@ const useStartWorkoutPageLogic = (selectedSplit, resumedWorkout = null) => {
       saveStarted,
       saveData,
     },
+    onExit,
     workoutProgressObj,
   };
 };

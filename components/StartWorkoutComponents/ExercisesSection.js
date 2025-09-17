@@ -34,7 +34,7 @@ const RenderItem = ({
     weight: recW,
     reps: recR,
     notes: recNotes,
-  } = workoutProgressObj[item.exercise];
+  } = workoutProgressObj[item?.exercise];
   const exName = item.exercise;
 
   // Controls
@@ -258,8 +258,8 @@ const ExercisesSection = ({
       )}
       keyExtractor={(it) => it.exercise}
       enableOnAndroid // turn on automatic handling on Android
-      extraScrollHeight={260} // how much to scroll above the focused input
-      keyboardShouldPersistTaps="handled" // taps on inputs won't dismiss keyboard unexpectedly
+      extraScrollHeight={200} // how much to scroll above the focused input
+      keyboardShouldPersistTaps="never" // taps on inputs won't dismiss keyboard unexpectedly
       showsVerticalScrollIndicator={false}
       nestedScrollEnabled
     />

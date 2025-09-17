@@ -17,6 +17,7 @@ const StartWorkout = ({ navigation, route }) => {
     saving: workoutSaving,
     controls,
     workoutProgressObj,
+    onExit,
   } = useStartWorkoutPageLogic(
     route.params?.workoutSplit,
     route.params?.resumedWorkout
@@ -50,6 +51,28 @@ const StartWorkout = ({ navigation, route }) => {
     });
   }, [workoutSaving]);
 
+  const handlePresExit = useCallback(async () => {
+    let pressedYes = false;
+
+    Dialog.show({
+      type: "WARNING",
+      title: "Exit Workout?",
+      textBody:
+        "Are you sure you want to quit the workout? All progress will be lost.",
+      button: "Yes, Exit",
+      closeOnOverlayTap: true,
+      onPressButton: async () => {
+        pressedYes = true;
+        Dialog.hide();
+        await onExit();
+      },
+      onHide: () => {
+        if (!pressedYes) {
+        }
+      },
+    });
+  }, [workoutSaving]);
+
   return (
     <View style={{ flex: 1 }}>
       <View style={styles.container}>
@@ -61,7 +84,8 @@ const StartWorkout = ({ navigation, route }) => {
             startTime: workoutData?.startTime,
             pausedTotal: workoutData?.pausedTotal,
           }}
-          saveWorkout={workoutSaving?.saveData}
+          saveWorkout={handlePressSave}
+          onExit={handlePresExit}
         />
         <ExercisesSection
           exercises={workoutData?.exercisesForSelectedSplit}
