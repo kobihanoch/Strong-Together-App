@@ -61,6 +61,7 @@ const StartWorkout = ({ navigation, route }) => {
             startTime: workoutData?.startTime,
             pausedTotal: workoutData?.pausedTotal,
           }}
+          saveWorkout={workoutSaving?.saveData}
         />
         <ExercisesSection
           exercises={workoutData?.exercisesForSelectedSplit}

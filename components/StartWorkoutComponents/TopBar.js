@@ -17,7 +17,13 @@ import { colors } from "../../constants/colors";
 
 const { height, width } = Dimensions.get("window");
 
-const TopBar = ({ workoutName, totalSets, setsDone, timerProps }) => {
+const TopBar = ({
+  workoutName,
+  totalSets,
+  setsDone,
+  timerProps,
+  saveWorkout,
+}) => {
   return (
     <Column style={styles.container}>
       <Row style={{ gap: 25 }}>
@@ -67,7 +73,7 @@ const TopBar = ({ workoutName, totalSets, setsDone, timerProps }) => {
             </Row>
           </Row>
         </Column>
-        <TouchableOpacity style={styles.finishBtn}>
+        <TouchableOpacity style={styles.finishBtn} onPress={saveWorkout}>
           <Text style={styles.finishBtnText}>Finish</Text>
           <MaterialCommunityIcons
             name={"check"}
