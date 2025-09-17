@@ -92,6 +92,9 @@ const StartWorkout = ({ navigation, route }) => {
           exercisesSetsDoneMap={workoutData?.setsDoneWithExerciseNameKey}
           controls={controls}
           workoutProgressObj={workoutProgressObj}
+          setLastWorkoutDataForModal={setLastWorkoutDataForModal}
+          setVisibleSetIndexForModal={setVisibleSetIndexForModal}
+          openModal={openModal}
         />
       </View>
 

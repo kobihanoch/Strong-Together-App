@@ -1,12 +1,13 @@
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { debounce } from "lodash";
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   Dimensions,
   FlatList,
   StyleSheet,
   Text,
   TextInput,
+  TouchableOpacity,
   View,
 } from "react-native";
 import {
@@ -20,6 +21,7 @@ import PageDots from "../PageDots";
 import PercantageCircle from "../PercentageCircle";
 import Row from "../Row";
 import NumericInputWithRules from "./NumericInputWithRules";
+import useLastWorkoutExerciseTrackingData from "../../hooks/useLastWorkoutExerciseTrackingData";
 
 const { width, height } = Dimensions.get("window");
 
@@ -28,6 +30,9 @@ const RenderItem = ({
   exercisesSetsDoneMap,
   controls,
   workoutProgressObj,
+  setLastWorkoutDataForModal,
+  setVisibleSetIndexForModal,
+  openModal,
 }) => {
   // Recorded stats
   const {
@@ -36,6 +41,7 @@ const RenderItem = ({
     notes: recNotes,
   } = workoutProgressObj[item?.exercise];
   const exName = item.exercise;
+  const { lastWorkoutData } = useLastWorkoutExerciseTrackingData(item?.id);
 
   // Controls
   const { addNotes, addWeightRecord, addRepsRecord } = controls || {};
@@ -91,7 +97,7 @@ const RenderItem = ({
           },
         ]}
       >
-        <Row style={{ gap: 5 }}>
+        <Row style={{ gap: 10 }}>
           <View
             style={[
               styles.itemCurrentSetNumberContainer,
@@ -113,6 +119,17 @@ const RenderItem = ({
             </Text>
           </View>
           <Text style={styles.itemCurrentSetText}>Set {setNumber}</Text>
+          <TouchableOpacity
+            style={{ marginLeft: "auto" }}
+            disabled={isSetLocked}
+            onPress={() => {
+              setLastWorkoutDataForModal(lastWorkoutData);
+              setVisibleSetIndexForModal(setIndex);
+              openModal();
+            }}
+          >
+            <MaterialCommunityIcons name="history" size={RFValue(15)} />
+          </TouchableOpacity>
         </Row>
         <Row
           style={{
@@ -244,6 +261,9 @@ const ExercisesSection = ({
   exercisesSetsDoneMap,
   controls,
   workoutProgressObj,
+  setLastWorkoutDataForModal,
+  setVisibleSetIndexForModal,
+  openModal,
 }) => {
   return (
     <KeyboardAwareFlatList
@@ -254,6 +274,9 @@ const ExercisesSection = ({
           exercisesSetsDoneMap={exercisesSetsDoneMap}
           controls={controls}
           workoutProgressObj={workoutProgressObj}
+          setLastWorkoutDataForModal={setLastWorkoutDataForModal}
+          setVisibleSetIndexForModal={setVisibleSetIndexForModal}
+          openModal={openModal}
         />
       )}
       keyExtractor={(it) => it.exercise}
@@ -315,7 +338,8 @@ const styles = StyleSheet.create({
     borderColor: colors.primaryDark,
     borderRadius: 16,
     marginTop: 10,
-    padding: 10,
+    paddingVertical: 15,
+    paddingHorizontal: 15,
   },
   itemCurrentSetNumberContainer: {
     backgroundColor: colors.primary,
