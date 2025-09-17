@@ -16,6 +16,7 @@ const StartWorkout = ({ navigation, route }) => {
     data: workoutData,
     saving: workoutSaving,
     controls,
+    workoutProgressObj,
   } = useStartWorkoutPageLogic(
     route.params?.workoutSplit,
     route.params?.resumedWorkout
@@ -64,6 +65,8 @@ const StartWorkout = ({ navigation, route }) => {
         <ExercisesSection
           exercises={workoutData?.exercisesForSelectedSplit}
           exercisesSetsDoneMap={workoutData?.setsDoneWithExerciseNameKey}
+          controls={controls}
+          workoutProgressObj={workoutProgressObj}
         />
       </View>
 

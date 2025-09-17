@@ -80,6 +80,8 @@ const TopBar = ({ workoutName, totalSets, setsDone, timerProps }) => {
         actual={setsDone}
         planned={totalSets}
         showPct={false}
+        colorStatic={colors.primary}
+        changeColors={false}
       ></AdherenceBar>
       <Text style={styles.workoutCompletionText}>
         {Math.round((setsDone / totalSets) * 100) + "%"} Completed

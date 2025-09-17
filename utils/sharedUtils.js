@@ -25,3 +25,10 @@ export const getDaysSince = (lastDateString) => {
       }
   }
 };
+
+export const safeParseFloat = (val) => {
+  if (!val) return undefined;
+  const cleaned = val.replace(",", ".");
+  const num = parseFloat(cleaned);
+  return Number.isFinite(num) ? num : undefined;
+};

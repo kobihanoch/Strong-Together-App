@@ -4,10 +4,13 @@ import { View, Animated } from "react-native";
 const PageDots = ({
   index = 0,
   length = 0,
-  activeColor = "#111",
-  inactiveColor = "#111",
-  fillColor, // optional: custom color for filled dots before the index
-  fillToIndex = false,
+  // Page indexing
+  activeColor = "#111", // Active index color
+  inactiveColor = "#111", // Inactive color
+  // Progress
+  fillColor, // Custom color for filled dots before the index
+  fillToIndex = false, // Fill colors until index (true/false)
+  fillAll = false, // Fill all dots (if completed)
   style,
 }) => {
   // Clamp index to valid range
@@ -21,16 +24,23 @@ const PageDots = ({
       ]}
     >
       {Array.from({ length }).map((_, i) => {
-        // Is the current dot considered "active" (highlighted)?
-        const active = fillToIndex ? i <= clampedIndex : i === clampedIndex;
+        // All dots active if fillAll is true
+        const active = fillAll
+          ? true
+          : fillToIndex
+          ? i <= clampedIndex
+          : i === clampedIndex;
 
         // Determine which color to use
         let color = inactiveColor;
+
         if (active) {
-          if (fillToIndex && fillColor && i < clampedIndex) {
-            color = fillColor; // filled before current index
+          if (fillAll && fillColor) {
+            color = fillColor; // all dots same color
+          } else if (fillToIndex && fillColor && i < clampedIndex) {
+            color = fillColor; // dots before index
           } else {
-            color = activeColor; // current index or fallback
+            color = activeColor; // current index
           }
         }
 

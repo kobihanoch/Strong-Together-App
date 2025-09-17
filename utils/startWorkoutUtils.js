@@ -119,7 +119,8 @@ export const countSetsDone = (
     // Count only indices within planned range where both fields were updated
     let done = 0;
     for (let i = 0; i < planned; i++) {
-      const bothUpdated = i in wArr && i in rArr;
+      const bothUpdated =
+        i in wArr && i in rArr && wArr[i] !== 0 && rArr[i] !== 0;
       if (bothUpdated) done++;
     }
 

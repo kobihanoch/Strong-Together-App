@@ -61,6 +61,10 @@ const useStartWorkoutPageLogic = (selectedSplit, resumedWorkout = null) => {
     }, {});
   });
 
+  useEffect(() => {
+    console.log(JSON.stringify(workoutProgressObj, null, 2));
+  }, [workoutProgressObj]);
+
   // --------------------[ Timer + Caching ]----------------------
   const { cacheKey, startTime, pausedTotal } = useStartWorkoutCache(
     user.id,
@@ -95,7 +99,7 @@ const useStartWorkoutPageLogic = (selectedSplit, resumedWorkout = null) => {
   }, []);
 
   // --------------------[ Testing ]---------------------------------------------
-  useEffect(() => {
+  /*useEffect(() => {
     if (exercisesForSelectedSplit && exercisesForSelectedSplit.length) {
       addWeightRecord("Incline Bench Press", 0, 10);
       addWeightRecord("Incline Bench Press", 2, 30);
@@ -110,7 +114,7 @@ const useStartWorkoutPageLogic = (selectedSplit, resumedWorkout = null) => {
       addNotes("Incline Bench Press", "Was easy!");
     }
     //console.log(workoutProgressObj);
-  }, [exercisesForSelectedSplit]);
+  }, [exercisesForSelectedSplit]);*/
 
   // --------------------[ Save Workout ]-----------------------------------------
   const { saveWorkoutProcess } = useUserWorkout();
@@ -165,6 +169,7 @@ const useStartWorkoutPageLogic = (selectedSplit, resumedWorkout = null) => {
       saveStarted,
       saveData,
     },
+    workoutProgressObj,
   };
 };
 
