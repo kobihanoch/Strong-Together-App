@@ -13,7 +13,7 @@ import {
 } from "../../utils/startWorkoutUtils";
 import { useUserWorkout } from "../useUserWorkout";
 import { showErrorAlert } from "../../errors/errorAlerts";
-import { cacheDeleteKey } from "../../cache/cacheUtils";
+import { cacheDeleteKey, cacheGetJSON } from "../../cache/cacheUtils";
 import { useStartWorkoutCache } from "../useStartWorkoutCache";
 
 const useStartWorkoutPageLogic = (selectedSplit, resumedWorkout = null) => {
@@ -99,13 +99,14 @@ const useStartWorkoutPageLogic = (selectedSplit, resumedWorkout = null) => {
   }, []);
 
   // --------------------[ Save Workout ]-----------------------------------------
-  const clearCache = async () => {
-    await cacheDeleteKey(cacheKey);
+  const clearCache = () => {
+    cacheDeleteKey(cacheKey);
   };
 
-  const onExit = useCallback(async () => {
-    navigation.navigate("MyWorkoutPlan");
-    await clearCache();
+  const onExit = useCallback(() => {
+    clearCache();
+    // Force unmounting
+    navigation.replace("MyWorkoutPlan");
   }, [cacheKey]);
 
   const { saveWorkoutProcess } = useUserWorkout();
@@ -131,7 +132,7 @@ const useStartWorkoutPageLogic = (selectedSplit, resumedWorkout = null) => {
         unpackFromExerciseTrackingData(exerciseTrackingAnalysis)
       );
       setIsWorkoutMode(false);
-      await clearCache();
+      clearCache();
       navigation.navigate("Statistics");
     } catch (err) {
       throw err;
