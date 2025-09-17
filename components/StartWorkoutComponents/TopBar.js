@@ -27,7 +27,7 @@ const TopBar = ({
 }) => {
   return (
     <Column style={styles.container}>
-      <Row style={{ gap: 25, alignItems: "center" }}>
+      <Row style={{ gap: 15, alignItems: "center" }}>
         <View>
           <LinearGradient
             colors={["#2979FF", "#2979FF"]}
@@ -67,24 +67,18 @@ const TopBar = ({
             </Row>
           </Row>
         </Column>
-        <Column style={{ marginLeft: "auto", gap: 10 }}>
+        <Row style={{ marginLeft: "auto", gap: 10 }}>
           <TouchableOpacity style={styles.finishBtn} onPress={saveWorkout}>
             <Text style={styles.finishBtnText}>Finish</Text>
-            <MaterialCommunityIcons
-              name={"check"}
-              size={RFValue(12)}
-              color={"white"}
-            />
           </TouchableOpacity>
           <TouchableOpacity style={styles.exitBtn} onPress={onExit}>
-            <Text style={styles.exitBtnText}>Exit</Text>
             <MaterialCommunityIcons
               name={"exit-to-app"}
               size={RFValue(12)}
               color={colors.primary}
             />
           </TouchableOpacity>
-        </Column>
+        </Row>
       </Row>
       <AdherenceBar
         actual={setsDone}
@@ -102,7 +96,7 @@ const TopBar = ({
 
 const styles = StyleSheet.create({
   container: {
-    height: height * 0.28,
+    height: height * 0.25,
     justifyContent: "flex-end",
     backgroundColor: colors.lightCardBg,
     paddingBlock: 20,
@@ -139,7 +133,7 @@ const styles = StyleSheet.create({
   },
   finishBtn: {
     paddingVertical: 12,
-    paddingHorizontal: 30,
+    paddingHorizontal: 20,
     justifyContent: "center",
     alignItems: "center",
     borderRadius: 16,
@@ -154,15 +148,13 @@ const styles = StyleSheet.create({
   },
   exitBtn: {
     paddingVertical: 12,
-    paddingHorizontal: 30,
+    paddingHorizontal: 10,
     justifyContent: "center",
     alignItems: "center",
     borderRadius: 16,
     backgroundColor: "transparent",
     borderWidth: 1,
     borderColor: colors.primary,
-    flexDirection: "row",
-    gap: 7,
   },
   exitBtnText: {
     fontSize: RFValue(12),
