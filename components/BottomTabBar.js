@@ -12,6 +12,7 @@ import { RFValue } from "react-native-responsive-fontsize";
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Dialog } from "react-native-alert-notification";
+import { useAuth } from "../context/AuthContext";
 
 const { width, height } = Dimensions.get("window");
 
@@ -26,53 +27,13 @@ const BottomTabBar = () => {
     }
     return appRoute?.name ?? "Home";
   });
+  const { isWorkoutMode } = useAuth();
 
-  //----------------- [ Workout mode ]-----------------
-  const isWorkoutMode = routeName === "StartWorkout";
-
-  // Start time as timestamp
-  const [startTime, setStartTime] = useState(null);
-  // Current time refreshed each second
-  const [currentTime, setCurrentTime] = useState(Date.now());
-  const [showExitButton, setShowExitButton] = useState(false);
-
-  useEffect(() => {
-    if (isWorkoutMode) {
-      const now = Date.now();
-      setStartTime(now); // align start
-      setCurrentTime(now); // align current so diff starts at 0
-      setShowExitButton(false);
-
-      timer = setInterval(() => {
-        setCurrentTime(Date.now());
-      }, 1000);
-
-      return () => clearInterval(timer);
-    }
-  }, [isWorkoutMode]);
-
-  // Calculate how many seconds have passed
-  const elapsedSeconds = startTime
-    ? Math.floor((currentTime - startTime) / 1000)
-    : 0;
-
-  const formatTime = () => {
-    const minutes = String(Math.floor(elapsedSeconds / 60)).padStart(2, "0");
-    const remainingSeconds = String(elapsedSeconds % 60).padStart(2, "0");
-    return `${minutes}:${remainingSeconds}`;
-  };
-
-  //-----------------[ Regular tab bar ]-----------------
   const handleTabPress = (tabName) => {
     navigation.navigate(tabName);
   };
 
-  const handleTimerPress = () => {
-    setShowExitButton(true);
-    setTimeout(() => setShowExitButton(false), 3000);
-  };
-
-  const pressedExitRef = useRef(false);
+  //----------------- [ Workout mode ]-----------------
 
   const confirmExit = () => {
     pressedExitRef.current = false;
@@ -111,62 +72,28 @@ const BottomTabBar = () => {
   ];
 
   return (
-    <View style={styles.tabBarContainer}>
-      {tabs.map((tab, index) =>
-        isWorkoutMode && tab.name === "MyWorkoutPlan" ? (
+    !isWorkoutMode && (
+      <View style={styles.tabBarContainer}>
+        {tabs.map((tab, index) => (
           <TouchableOpacity
             key={index}
-            style={{
-              padding: 15,
-              paddingHorizontal: 30,
-              borderRadius: 15,
-            }}
-            onPress={showExitButton ? confirmExit : handleTimerPress}
+            style={[
+              styles.tabButton,
+              index !== tabs.length - 1 && styles.tabSeparator,
+              tab.name === "MyWorkoutPlan" && styles.specialTabButton,
+            ]}
+            onPress={() => handleTabPress(tab.name)}
           >
-            {showExitButton ? (
-              <Text style={styles.exitButton}>Quit workout</Text>
-            ) : (
-              <View
-                style={{
-                  flexDirection: "column",
-                  justifyContent: "center",
-                  alignItems: "center",
-                  gap: 5,
-                }}
-              >
-                <Text style={styles.timerText}>{formatTime()}</Text>
-                <Text
-                  style={{ color: "#2979FF", fontFamily: "Inter_400Regular" }}
-                >
-                  Press to quit
-                </Text>
-              </View>
-            )}
+            <MaterialCommunityIcons
+              name={tab.icon}
+              size={RFValue(20)}
+              color={routeName === tab.name ? "#2979FF" : "rgb(184, 184, 184)"}
+              style={tab.name === "MyWorkoutPlan" && styles.specialIcon}
+            />
           </TouchableOpacity>
-        ) : (
-          !isWorkoutMode && (
-            <TouchableOpacity
-              key={index}
-              style={[
-                styles.tabButton,
-                index !== tabs.length - 1 && styles.tabSeparator,
-                tab.name === "MyWorkoutPlan" && styles.specialTabButton,
-              ]}
-              onPress={() => handleTabPress(tab.name)}
-            >
-              <MaterialCommunityIcons
-                name={tab.icon}
-                size={RFValue(20)}
-                color={
-                  routeName === tab.name ? "#2979FF" : "rgb(184, 184, 184)"
-                }
-                style={tab.name === "MyWorkoutPlan" && styles.specialIcon}
-              />
-            </TouchableOpacity>
-          )
-        )
-      )}
-    </View>
+        ))}
+      </View>
+    )
   );
 };
 

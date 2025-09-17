@@ -1,68 +1,51 @@
-export const createObjectForDataBase = (
-  userId,
-  weights,
-  reps,
-  workoutDetails
-) => {
-  if (!workoutDetails) return;
-  let objs = [];
-  //console.log("Workut details: " + JSON.stringify(workoutDetails, null, 2));
-  for (let i = 0; i < workoutDetails.length; i++) {
-    if (
-      weights[i] &&
-      reps[i] &&
-      weights[i].length != 0 &&
-      reps[i].length != 0
-    ) {
-      const now = new Date();
-      const yyyy = now.getFullYear();
-      const mm = String(now.getMonth() + 1).padStart(2, "0");
-      const dd = String(now.getDate()).padStart(2, "0");
-
-      const formattedDate = `${yyyy}-${mm}-${dd}`;
-      objs.push({
-        user_id: userId,
-        exercisetosplit_id: workoutDetails[i].id,
-        workoutdate: formattedDate,
-        weight: weights[i],
-        reps: reps[i],
-      });
+/* 
+[
+  {"exercisetosplit_id": 1251, "notes": "Was easy!", "reps": [12], "user_id": NULL, "weight": [20.5]},
+  ...
+]
+Passing null to server to avoid injections
+*/
+export const createArrayForDataBase = (workoutObj) => {
+  if (!Object.keys(workoutObj).length) return [];
+  const arr = Object.entries(workoutObj).map(([exName, records]) => {
+    // Iterating for each exercise
+    const wArr = records.weight;
+    const rArr = records.reps;
+    const { weight, reps } = dropInvalidPairs(wArr, rArr);
+    const etsid = records.etsid;
+    const notes = records.notes;
+    if (weight.length && reps.length && etsid) {
+      return {
+        exercisetosplit_id: etsid,
+        weight: weight,
+        reps: reps,
+        notes: notes,
+      };
     }
-  }
-  //console.log(JSON.stringify(objs, null, 2));
-  return objs;
+  });
+  const filteredArr = arr.filter((ex) => ex != null && ex != undefined);
+  //console.log(filteredArr);
+  return filteredArr;
 };
 
-export const filterZeroesInArr = (reps, weights) => {
-  const filteredReps = [];
-  const filteredWeights = [];
+const dropInvalidPairs = (weights = [], reps = []) => {
+  const isValid = (v) => Number.isFinite(+v) && +v !== 0;
 
-  for (let i = 0; i < reps.length; i++) {
-    const repSet = reps[i];
-    const weightSet = weights[i];
+  // Take the shortest length to avoid out-of-bounds
+  const maxLen = Math.min(weights.length, reps.length);
 
-    if (Array.isArray(repSet) && Array.isArray(weightSet)) {
-      const newRepSet = [];
-      const newWeightSet = [];
+  const filteredWeights = weights
+    .slice(0, maxLen)
+    .filter((_, i) => isValid(weights[i]) && isValid(reps[i]));
 
-      for (let j = 0; j < repSet.length; j++) {
-        const rep = repSet[j];
-        const weight = weightSet[j];
+  const filteredReps = reps
+    .slice(0, maxLen)
+    .filter((_, i) => isValid(weights[i]) && isValid(reps[i]));
 
-        if (rep !== 0 && weight !== 0 && rep != null && weight != null) {
-          newRepSet.push(rep);
-          newWeightSet.push(weight);
-        }
-      }
-
-      filteredReps.push(newRepSet);
-      filteredWeights.push(newWeightSet);
-    } else {
-      filteredReps.push(repSet);
-      filteredWeights.push(weightSet);
-    }
-  }
-  return { reps: filteredReps, weights: filteredWeights };
+  return {
+    weight: filteredWeights,
+    reps: filteredReps,
+  };
 };
 
 /*
@@ -116,3 +99,100 @@ export function computeProgressByVolume({
   return 0;
 }
 export const clamp = (v, min, max) => Math.max(min, Math.min(max, v));
+
+export const countSetsDone = (
+  workoutProgressObj,
+  exercisesForSelectedSplit
+) => {
+  if (!workoutProgressObj || !exercisesForSelectedSplit) return {};
+  let sum = 0;
+  const byExercise = {};
+
+  for (const [name, rec] of Object.entries(workoutProgressObj)) {
+    const planned =
+      exercisesForSelectedSplit.find((e) => e.exercise === name)?.sets
+        ?.length ?? 0;
+
+    const wArr = rec?.weight ?? [];
+    const rArr = rec?.reps ?? [];
+
+    // Count only indices within planned range where both fields were updated
+    let done = 0;
+    for (let i = 0; i < planned; i++) {
+      const bothUpdated =
+        i in wArr && i in rArr && wArr[i] !== 0 && rArr[i] !== 0;
+      if (bothUpdated) done++;
+    }
+
+    byExercise[name] = { done, planned };
+    sum += done;
+  }
+
+  return { sum, byExercise };
+};
+
+// Shape: state[exerciseName] = { etsid, weight: [], reps: [], notes }
+export const applyWeight = (state, exerciseName, setIndex, weight) => {
+  // Guard: valid state/exercise and non-negative integer index
+  if (
+    !state ||
+    !state[exerciseName] ||
+    !Number.isInteger(setIndex) ||
+    setIndex < 0
+  )
+    return state;
+
+  const ex = state[exerciseName];
+  const current = Array.isArray(ex.weight) ? ex.weight : [];
+
+  // No-op if value did not change
+  if (current[setIndex] === weight) return state;
+
+  // Immutable update
+  const nextWeight = current.slice();
+  nextWeight[setIndex] = weight;
+
+  return {
+    ...state,
+    [exerciseName]: { ...ex, weight: nextWeight },
+  };
+};
+
+export const applyReps = (state, exerciseName, setIndex, reps) => {
+  // Guard: valid state/exercise and non-negative integer index
+  if (
+    !state ||
+    !state[exerciseName] ||
+    !Number.isInteger(setIndex) ||
+    setIndex < 0
+  )
+    return state;
+
+  const ex = state[exerciseName];
+  const current = Array.isArray(ex.reps) ? ex.reps : [];
+
+  // No-op if value did not change
+  if (current[setIndex] === reps) return state;
+
+  // Immutable update
+  const nextReps = current.slice();
+  nextReps[setIndex] = reps;
+
+  return {
+    ...state,
+    [exerciseName]: { ...ex, reps: nextReps },
+  };
+};
+
+export const applyNotes = (state, exerciseName, notes) => {
+  // Guard: valid state/exercise
+  if (!state || !state[exerciseName]) return state;
+
+  const ex = state[exerciseName];
+  if (ex.notes === notes) return state; // No-op
+
+  return {
+    ...state,
+    [exerciseName]: { ...ex, notes },
+  };
+};

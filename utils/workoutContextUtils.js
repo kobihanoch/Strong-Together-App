@@ -8,7 +8,9 @@ export const extractWorkoutSplits = (workout) => {
     return { workoutSplits: [], exercises: [] };
 
   const map = workout.workoutsplits.reduce((acc, split) => {
-    acc[split.name] = [...split.exercisetoworkoutsplit];
+    const splitName = split.name;
+    const splitExFields = split.exercisetoworkoutsplit;
+    acc[splitName] = [...splitExFields];
     return acc;
   }, {});
 

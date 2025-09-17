@@ -4,9 +4,9 @@ import React, {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
 } from "react";
-import api from "../api/api";
 import {
   cacheDeleteAllCache,
   cacheGetJSON,
@@ -15,6 +15,7 @@ import {
   TTL_48H,
 } from "../cache/cacheUtils";
 import useCacheAndFetch from "../hooks/useCacheAndFetch";
+import { useNetworkStatus } from "../hooks/useNetworkStatus";
 import useUpdateGlobalLoading from "../hooks/useUpdateGlobalLoading";
 import {
   loginUser,
@@ -23,6 +24,7 @@ import {
   registerUser,
 } from "../services/AuthService";
 import { fetchSelfUserData } from "../services/UserService";
+import GlobalAuth from "../utils/authUtils";
 import {
   clearRefreshToken,
   getRefreshToken,
@@ -43,23 +45,8 @@ export const useAuth = () => useContext(AuthContext);
  * - DO NOT hold workout/analysis state here (separate contexts handle them)
  */
 
-// Single, app-wide in-memory access token (used by Axios interceptors)
-let _accessToken = null;
-
-export const GlobalAuth = {
-  getAccessToken: () => _accessToken,
-  setAccessToken: (t) => {
-    _accessToken = t;
-    if (t) {
-      api.defaults.headers.common.Authorization = `Bearer ${t}`;
-    } else {
-      delete api.defaults.headers.common.Authorization;
-    }
-  },
-  logout: null,
-};
-
 export const AuthProvider = ({ children }) => {
+  // --- Caching state - if stored so start load cached user data ---
   const [userIdCache, setUserIdCache] = useState(null);
 
   // --- Auth & session state ---
@@ -68,9 +55,15 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [isWorkoutMode, setIsWorkoutMode] = useState(false); // For start workout
 
+  // --- For fluint loading at startup with no blinks ---
   const [authPhase, setAuthPhase] = useState("checking");
 
-  // Flag for below contexes for fetching with API
+  // --- Offline mode supportings ---
+  const isOnline = useNetworkStatus();
+  const attemptedServerValidationRef = useRef(false);
+  const serverValidatingLockRef = useRef(false);
+
+  // --- Flag for below contexes for fetching with API ---
   const [isValidatedWithServer, setIsValidatedWithServer] = useState(false);
 
   // -------------------------- useCacheHandler props ------------------------------
@@ -106,6 +99,50 @@ export const AuthProvider = ({ children }) => {
     await connectSocket(userId);
   }, []);
 
+  // Attempting server validation fuction
+  const attemptServerValidation = useCallback(async () => {
+    try {
+      // Check if user is cached
+      // Initialize session tokens
+      // Avoid multiple calls on unstable network
+      if (serverValidatingLockRef.current) return;
+      serverValidatingLockRef.current = true;
+      //await new Promise((res) => setTimeout(res, 3000)); // wait 3 seconds
+      const {
+        accessToken: at,
+        refreshToken: rt,
+        userId,
+      } = await refreshAndRotateTokens();
+      await saveRefreshToken(rt);
+      GlobalAuth.setAccessToken(at);
+      // For other contexes to start fetching from API after cache
+      setIsValidatedWithServer(true);
+      console.log(
+        "\x1b[32m[Auth Context]: Validation with server completed => Fetching data from API\x1b[0m"
+      );
+
+      // Save for later use
+      await cacheSetJSON("CACHE:USER_ID", userId, TTL_48H);
+      //Alert.alert("Validation completed!");
+      // Store in cache (auto)
+    } catch (e) {
+      if (e.isNetworkError) {
+        console.log(
+          "\x1b[33m[Auth Context]: Server validation skipped (offline). Staying logged-in with cached data.\x1b[0m"
+        );
+        setIsValidatedWithServer(false);
+        return;
+      }
+      console.log(
+        "\x1b[31m[Auth Context]: Validation with server failed => Logging out\x1b[0m"
+      );
+      await clearContext();
+    } finally {
+      attemptedServerValidationRef.current = true;
+      serverValidatingLockRef.current = false;
+    }
+  }, [clearContext]);
+
   // Inital check
   useEffect(() => {
     (async () => {
@@ -120,11 +157,7 @@ export const AuthProvider = ({ children }) => {
         console.log(
           "\x1b[31m[Auth Context]: No latest user => Login is required\x1b[0m"
         );
-        setIsLoggedIn(false);
-        setUser(null);
-        setUserIdCache(null);
-        GlobalAuth.setAccessToken(null);
-        setAuthPhase("guest");
+        await clearContext();
         return;
       }
       setIsLoggedIn(true);
@@ -134,42 +167,22 @@ export const AuthProvider = ({ children }) => {
 
       // Try to validate with server
       // Silent background validation with server (if there was a previuos session)
-      try {
-        // Check if user is cached
-        // Initialize session tokens
-        const {
-          accessToken: at,
-          refreshToken: rt,
-          userId,
-        } = await refreshAndRotateTokens();
-        await saveRefreshToken(rt);
-        GlobalAuth.setAccessToken(at);
-        // For other contexes to start fetching from API after cache
-        setIsValidatedWithServer(true);
-        console.log(
-          "\x1b[32m[Auth Context]: Validation with server completed => Fetching data from API\x1b[0m"
-        );
+      await attemptServerValidation();
+    })();
+  }, [clearContext]);
 
-        // Save for later use
-        await cacheSetJSON("CACHE:USER_ID", userId, TTL_48H);
-        // Store in cache (auto)
-      } catch (e) {
-        console.log(
-          "\x1b[31m[Auth Context]: Validation with server failed => Logging out\x1b[0m"
-        );
-        await clearRefreshToken();
-        await cacheDeleteAllCache();
-        _accessToken = null;
-        setIsLoggedIn(false);
-        setLoading(false);
-        setUser(null);
-        setIsWorkoutMode(false);
-        setUserIdCache(null);
-        setIsValidatedWithServer(false);
-        setAuthPhase("guest");
+  // If starting in offline mode - fetch later
+  useEffect(() => {
+    (async () => {
+      if (
+        !isValidatedWithServer &&
+        attemptedServerValidationRef.current &&
+        isOnline
+      ) {
+        await attemptServerValidation();
       }
     })();
-  }, []);
+  }, [isValidatedWithServer, isOnline]);
 
   // Connect socket only after server validates
   useEffect(() => {
@@ -249,17 +262,23 @@ export const AuthProvider = ({ children }) => {
       try {
         disconnectSocket();
       } catch {}
-      await clearRefreshToken();
-      await cacheDeleteAllCache();
-      _accessToken = null;
-      setIsLoggedIn(false);
-      setLoading(false);
-      setUser(null);
-      setIsWorkoutMode(false);
-      setUserIdCache(null);
-      setIsValidatedWithServer(false);
-      setAuthPhase("guest");
+      await clearContext();
     }
+  }, []);
+
+  const clearContext = useCallback(async () => {
+    await clearRefreshToken();
+    await cacheDeleteAllCache();
+    GlobalAuth.setAccessToken(null);
+    setIsLoggedIn(false);
+    setLoading(false);
+    setUser(null);
+    setIsWorkoutMode(false);
+    setUserIdCache(null);
+    setIsValidatedWithServer(false);
+    setAuthPhase("guest");
+    attemptedServerValidationRef.current = false;
+    serverValidatingLockRef.current = false;
   }, []);
 
   // Expose the real logout to axios interceptors via GlobalAuth.logout

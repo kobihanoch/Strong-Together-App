@@ -35,7 +35,7 @@ const useCacheAndFetch = (
   const [cacheKnown, setCacheKnown] = useState(false);
 
   // Updates cache auto when cached payload refrence is builded again (on data change)
-  useUpdateCache(cacheKey, cachedPayload, TTL_48H, dataHydrated);
+  useUpdateCache(logLabel, cacheKey, cachedPayload, TTL_48H, dataHydrated);
 
   // Load from cache
   // Functional only when there is a cache key and cache is hydrated (skip mounting phase)

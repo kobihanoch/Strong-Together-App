@@ -7,7 +7,7 @@ export const unpackFromExerciseTrackingData = (exerciseTrackingData) => {
       maxReps: exerciseTrackingData.prs.pr_max.reps,
       maxWeight: exerciseTrackingData.prs.pr_max.weight,
       maxExercise: exerciseTrackingData.prs.pr_max.exercise,
-      maxDate: exerciseTrackingData.prs.pr_max.workoutDate,
+      maxDate: exerciseTrackingData.prs.pr_max.workoutdate,
     },
     workoutCount: exerciseTrackingData.unique_days,
     mostFrequentSplit: {

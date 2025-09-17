@@ -1,28 +1,23 @@
 import axios from "axios";
-import { API_BASE_URL } from "./apiConfig";
-import { GlobalAuth } from "../context/AuthContext.js";
-import { getRefreshToken, saveRefreshToken } from "../utils/tokenStore";
-import { refreshAndRotateTokens } from "../services/AuthService";
 import { showErrorAlert } from "../errors/errorAlerts";
+import { refreshAndRotateTokens } from "../services/AuthService";
+import { saveRefreshToken } from "../utils/tokenStore";
+import { API_BASE_URL } from "./apiConfig";
 import {
   isDeviceOnline,
   notifyOffline,
   notifyServerDown,
 } from "./networkCheck";
+import GlobalAuth from "../utils/authUtils";
 
 const api = axios.create({ baseURL: API_BASE_URL, timeout: 12000 });
 
 // Attach access token to every outgoing request (if present)
 api.interceptors.request.use(
-  async (config) => {
-    const at = GlobalAuth.getAccessToken && GlobalAuth.getAccessToken();
-    if (at) {
-      config.headers = config.headers || {};
-      config.headers.Authorization = `Bearer ${at}`;
-    }
-    return config;
-  },
-  (error) => Promise.reject(error)
+  async (config) => config,
+  (error) => {
+    return Promise.reject(error);
+  }
 );
 
 // Flow:
@@ -54,13 +49,17 @@ api.interceptors.response.use(
     }
 
     // Detect if network error - no response
-    if (!error.response) {
-      const online = await isDeviceOnline();
-      if (!online) {
-        notifyOffline();
-      } else {
-        notifyServerDown();
-      }
+    const online = await isDeviceOnline();
+
+    if (!online) {
+      notifyOffline();
+      error.isNetworkError = true;
+      console.log("Offline");
+      return Promise.reject(error);
+    } else if (!error.response) {
+      // Some other fetch/network problem (e.g., DNS, TLS fail)
+      notifyServerDown();
+      console.log("Server down");
       return Promise.reject(error);
     }
 
@@ -98,7 +97,7 @@ api.interceptors.response.use(
         // Some toast to show error
         showErrorAlert("Error", data?.message);
         // Block
-        Promise.reject(refreshErr);
+        return Promise.reject(refreshErr);
       }
     }
 

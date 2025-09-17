@@ -17,6 +17,9 @@ import {
   View,
 } from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";
+import { colors } from "../../constants/colors";
+import useGenerateDays from "../../hooks/useGenerateDays";
+import Row from "../Row";
 
 const { width, height } = Dimensions.get("window");
 // Use fixed item math so FlatList can jump directly to the right index
@@ -29,82 +32,44 @@ const CalendarStripCustom = ({
   selectedDate,
   userExerciseLogs,
 }) => {
-  const [datesList, setDatesList] = useState([]);
-  const [currentMonth, setCurrentMonth] = useState(
-    moment().format("MMMM YYYY")
-  );
-  const flatListRef = useRef(null);
-
-  // Prevent double-scrolling on mount (initialScrollIndex + manual scroll)
-  const didInitScroll = useRef(false);
-
-  useEffect(() => {
-    generateDates();
-  }, []);
-
-  // Keep your function name; remove setTimeout and run only once
-  useEffect(() => {
-    scrollToSelectedDate();
-  }, [datesList, selectedDate]); // include selectedDate so it repositions if external selection changes
-
-  const generateDates = () => {
-    const days = [];
-    const start = moment().clone().subtract(45, "days");
-    const end = moment().clone().add(45, "days");
-
-    let current = start.clone();
-    while (current.isSameOrBefore(end)) {
-      days.push(current.clone());
-      current.add(1, "day");
-    }
-    setDatesList(days);
-  };
+  const { datesList } = useGenerateDays();
 
   const handleDatePress = (date) => {
     onDateSelect && onDateSelect(date.format("YYYY-MM-DD"));
   };
 
-  const scrollToSelectedDate = () => {
-    if (!datesList.length || !flatListRef.current || didInitScroll.current)
-      return;
-
-    const index = datesList.findIndex((d) => d.isSame(selectedDate, "day"));
-    if (index === -1) return;
-
-    const offset = index * ITEM_LEN - width / 2 + ITEM_LEN / 2;
-    flatListRef.current.scrollToOffset({
-      offset: offset > 0 ? offset : 0,
-      animated: false,
-    });
-    didInitScroll.current = true; // avoid a second jump
-  };
-
-  const onViewRef = useRef(({ viewableItems }) => {
-    if (viewableItems.length > 0) {
-      const centerItem = viewableItems[Math.floor(viewableItems.length / 2)];
-      if (centerItem) {
-        const date = centerItem.item;
-        setCurrentMonth(date.format("MMMM YYYY"));
-      }
-    }
-  });
-
-  const viewConfigRef = useRef({ itemVisiblePercentThreshold: 50 });
-
   // Compute initialScrollIndex so the list renders at the selected day without a visible jump
   const initialScrollIndex = useMemo(() => {
-    if (!datesList.length) return undefined;
+    if (!datesList || !selectedDate) return undefined;
     const idx = datesList.findIndex((d) => d.isSame(selectedDate, "day"));
-    return idx !== -1 ? idx : undefined;
+    return idx;
   }, [datesList, selectedDate]);
-
-  // Stable layout math for FlatList virtualization
-  const getItemLayout = useCallback((_, index) => {
-    return { length: ITEM_LEN, offset: ITEM_LEN * index, index };
-  }, []);
 
   // Small memo to avoid moment() per-item for "today"
   const today = useMemo(() => moment(), []);
+
+  // Initae with current month of today's date
+  const [currentMonth, setCurrentMonth] = useState(
+    moment().format("MMMM YYYY")
+  );
+
+  const onViewableItemsChanged = useRef(({ viewableItems }) => {
+    if (!viewableItems?.length) return;
+    // Use the first (or center) visible item to derive current month
+    const firstMoment = viewableItems[0]?.item;
+    if (firstMoment) {
+      setCurrentMonth(firstMoment.format("MMMM YYYY"));
+    }
+  }).current;
+
+  // Emable scrolling for today by pressing a button
+  const flatListRef = useRef(null);
+  const scrollToToday = useCallback(() => {
+    if (!flatListRef) return;
+    const todayIndex = datesList.findIndex((d) => d.isSame(today, "day"));
+    flatListRef.current.scrollToIndex({ index: todayIndex, animated: true });
+    onDateSelect(today.format("YYYY-MM-DD"));
+  }, [initialScrollIndex, flatListRef]);
 
   const renderItem = useCallback(
     ({ item }) => {
@@ -155,10 +120,10 @@ const CalendarStripCustom = ({
             <Text
               style={{
                 fontSize: RFValue(13),
-                color: isSelected ? "white" : "#2563eb",
+                color: isSelected ? "white" : "black",
                 backgroundColor: isSelected
                   ? "transparent"
-                  : "rgb(234, 240, 246)",
+                  : "rgba(234, 240, 246, 0)",
                 padding: height * 0.01,
                 borderRadius: height * 0.04,
                 fontFamily: "Inter_400Regular",
@@ -172,11 +137,11 @@ const CalendarStripCustom = ({
             <Text
               style={{
                 fontSize: RFValue(13),
-                color: "black",
+                color: isSelected ? "white" : "black",
                 fontFamily: "Inter_400Regular",
                 padding: height * 0.01,
                 textAlign: "center",
-                opacity: 0.2,
+                opacity: isSelected ? 1 : 0.2,
               }}
               numberOfLines={1}
             >
@@ -191,14 +156,31 @@ const CalendarStripCustom = ({
 
   return (
     <View style={styles.container}>
-      <Text style={styles.monthHeader}>{currentMonth}</Text>
+      <Row
+        style={{
+          width: "100%",
+          justifyContent: "space-between",
+        }}
+      >
+        <Text style={styles.monthHeader}>{currentMonth}</Text>
+        <TouchableOpacity onPress={scrollToToday}>
+          <Text style={styles.todayButton}>Today</Text>
+        </TouchableOpacity>
+      </Row>
 
-      <View style={{ width: "100%", alignItems: "center", height: "90%" }}>
+      <View
+        style={{
+          width: "100%",
+          alignItems: "center",
+          justifyContent: "center",
+          height: "100%",
+        }}
+      >
         <FlatList
-          ref={flatListRef}
           data={datesList}
           keyExtractor={(item) => item.format("YYYY-MM-DD")}
           horizontal
+          ref={flatListRef}
           renderItem={renderItem}
           showsHorizontalScrollIndicator={false}
           contentContainerStyle={{
@@ -208,11 +190,13 @@ const CalendarStripCustom = ({
           }}
           initialNumToRender={10}
           maxToRenderPerBatch={20}
-          getItemLayout={getItemLayout}
+          onViewableItemsChanged={onViewableItemsChanged}
+          getItemLayout={(_, index) => ({
+            length: ITEM_W,
+            offset: ITEM_W * index,
+            index,
+          })}
           initialScrollIndex={initialScrollIndex} // render at the right index up-front
-          onViewableItemsChanged={onViewRef.current}
-          viewabilityConfig={viewConfigRef.current}
-          removeClippedSubviews // minor perf win on long lists
           windowSize={7}
         />
       </View>
@@ -222,27 +206,29 @@ const CalendarStripCustom = ({
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    marginTop: 0,
     justifyContent: "center",
-    alignItems: "center",
     flexDirection: "column",
+    backgroundColor: colors.lightCardBg,
+    paddingTop: height * 0.1,
+    height: height * 0.3,
+    paddingHorizontal: width * 0.04,
   },
   monthHeader: {
-    textAlign: "center",
-    backgroundColor: "rgb(234, 240, 246)",
-    paddingVertical: height * 0.01,
-    paddingHorizontal: width * 0.04,
-    borderRadius: height * 0.04,
-    color: "rgb(0, 0, 0)",
-    fontFamily: "Inter_600SemiBold",
+    color: "rgba(0, 0, 0, 1)",
+    fontFamily: "Inter_500Medium",
     fontSize: RFValue(14),
+  },
+  todayButton: {
+    fontFamily: "Inter_400Regular",
+    color: colors.primary,
+    fontSize: RFValue(13),
   },
   dateItem: {
     width: ITEM_W,
     flexDirection: "column",
     gap: height * 0.005,
     borderRadius: width * 0.07,
-    marginHorizontal: width * 0.01,
     alignItems: "center",
     justifyContent: "center",
     paddingVertical: height * 0.01,
@@ -257,7 +243,7 @@ const styles = StyleSheet.create({
   dayNumber: {
     fontSize: RFValue(20),
     color: "black",
-    fontFamily: "Inter_700Bold",
+    fontFamily: "Inter_400Regular",
   },
   todayText: { color: "#2563eb" },
   selectedText: { color: "white", opacity: 1 },

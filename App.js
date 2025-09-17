@@ -34,6 +34,7 @@ import { NotifierRoot } from "react-native-notifier";
 import { cacheHousekeepingOnBoot } from "./cache/cacheUtils";
 import BottomTabBar from "./components/BottomTabBar";
 import Theme1 from "./components/Theme1";
+import { CardioProvider } from "./context/CardioContext";
 import { GlobalAppLoadingProvider } from "./context/GlobalAppLoadingContext";
 import AppStack from "./navigation/AppStack";
 import AuthStack from "./navigation/AuthStack";
@@ -103,6 +104,7 @@ export default function App() {
 function RootNavigator() {
   const { isLoggedIn, user, authPhase } = useAuth();
 
+  // Ensures no UI is rendered if auth is not loaded yet
   if (authPhase === "checking") return null;
 
   return (
@@ -119,7 +121,9 @@ function AppWithProviders() {
     <NotificationsProvider>
       <WorkoutProvider>
         <AnalysisProvider>
-          <MainApp />
+          <CardioProvider>
+            <MainApp />
+          </CardioProvider>
         </AnalysisProvider>
       </WorkoutProvider>
     </NotificationsProvider>

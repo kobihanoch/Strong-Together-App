@@ -9,13 +9,7 @@ import React, {
   useMemo,
   useRef,
 } from "react";
-import {
-  Dimensions,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { Dimensions, StyleSheet, Text, View } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { RFValue } from "react-native-responsive-fontsize";
 
@@ -31,6 +25,8 @@ const SlidingBottomModal = forwardRef(function SlidingBottomModal(
     contentContainerStyle,
     flatListUsage = false,
     children,
+    enableBackDrop = true,
+    enablePanDownClose = true,
   },
   ref
 ) {
@@ -96,8 +92,8 @@ const SlidingBottomModal = forwardRef(function SlidingBottomModal(
         index={initialIndex} // start closed
         snapPoints={snapPoints}
         enableDynamicSizing={false}
-        backdropComponent={renderBackdrop}
-        enablePanDownToClose
+        backdropComponent={enableBackDrop ? renderBackdrop : undefined}
+        enablePanDownToClose={enablePanDownClose}
         handleComponent={Handle}
         backgroundStyle={styles.sheetBg} // optional, just to see it while testing
       >

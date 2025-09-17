@@ -18,7 +18,7 @@ export const notifyOffline = () =>
   once(() =>
     Notifier.showNotification({
       title: "No Internet",
-      description: "You're offline. Check your connection.",
+      description: "You are currently offline.",
       duration: 2500,
       showAnimationDuration: 250,
       hideOnPress: true,

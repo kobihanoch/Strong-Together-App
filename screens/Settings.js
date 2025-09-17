@@ -23,12 +23,16 @@ const Settings = () => {
       style={{
         flex: 1,
         paddingHorizontal: width * 0.04,
-        paddingVertical: height * 0.04,
+        paddingTop: height * 0.07,
       }}
     >
-      <Text style={{ fontFamily: "Inter_600SemiBold", fontSize: RFValue(25) }}>
-        Settings
-      </Text>
+      <View style={{ flex: 1.5, justifyContent: "center" }}>
+        <Text
+          style={{ fontFamily: "Inter_600SemiBold", fontSize: RFValue(25) }}
+        >
+          Settings
+        </Text>
+      </View>
       <View
         style={{
           flexDirection: "column",
@@ -36,6 +40,7 @@ const Settings = () => {
           alignSelf: "center",
           marginTop: height * 0.04,
           gap: height * 0.02,
+          flex: 8.5,
         }}
       >
         <View style={[styles.box, { height: height * 0.1 }]}>

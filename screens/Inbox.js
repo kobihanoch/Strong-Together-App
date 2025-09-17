@@ -9,7 +9,9 @@ const { width, height } = Dimensions.get("window");
 const Inbox = () => {
   const { messages, media } = useInboxLogic();
   return (
-    <View style={{ flex: 1, flexDirection: "column" }}>
+    <View
+      style={{ flex: 1, flexDirection: "column", paddingTop: height * 0.07 }}
+    >
       <View style={{ flex: 1.5, justifyContent: "center" }}>
         <Text
           style={{
