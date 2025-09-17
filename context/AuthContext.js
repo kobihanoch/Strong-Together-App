@@ -7,7 +7,6 @@ import React, {
   useRef,
   useState,
 } from "react";
-import api from "../api/api";
 import {
   cacheDeleteAllCache,
   cacheGetJSON,
@@ -25,6 +24,7 @@ import {
   registerUser,
 } from "../services/AuthService";
 import { fetchSelfUserData } from "../services/UserService";
+import GlobalAuth from "../utils/authUtils";
 import {
   clearRefreshToken,
   getRefreshToken,
@@ -44,22 +44,6 @@ export const useAuth = () => useContext(AuthContext);
  * - Handle session bootstrap (checkIfUserSession, initializeUserSession)
  * - DO NOT hold workout/analysis state here (separate contexts handle them)
  */
-
-// Single, app-wide in-memory access token (used by Axios interceptors)
-let _accessToken = null;
-
-export const GlobalAuth = {
-  getAccessToken: () => _accessToken,
-  setAccessToken: (t) => {
-    _accessToken = t;
-    if (t) {
-      api.defaults.headers.common.Authorization = `Bearer ${t}`;
-    } else {
-      delete api.defaults.headers.common.Authorization;
-    }
-  },
-  logout: null,
-};
 
 export const AuthProvider = ({ children }) => {
   // --- Caching state - if stored so start load cached user data ---
@@ -285,7 +269,6 @@ export const AuthProvider = ({ children }) => {
   const clearContext = useCallback(async () => {
     await clearRefreshToken();
     await cacheDeleteAllCache();
-    _accessToken = null;
     GlobalAuth.setAccessToken(null);
     setIsLoggedIn(false);
     setLoading(false);

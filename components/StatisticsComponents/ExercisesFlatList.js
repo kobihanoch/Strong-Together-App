@@ -122,7 +122,7 @@ const ExercisesFlatList = ({ data, dataToCompare, setIndex }) => {
     <Column>
       <FlatList
         data={data}
-        keyExtractor={(item) => item.id.toString()}
+        keyExtractor={(item) => item.exercisetosplit_id.toString()}
         renderItem={renderItem}
         contentContainerStyle={{ padding: 10 }}
         initialNumToRender={4}

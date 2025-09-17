@@ -13,6 +13,10 @@ export const colors = {
   textSecondary: "#6B7280",
   border: "rgba(17, 24, 39, 0.06)",
 
+  completed: "#12c282ff",
+  completedDark: "#166347ff",
+  completedLight: "#46e9adff",
+  completedLightTransparent: "#46e9ad0d",
   success: "#15803D",
   error: "#DC2626",
   warning: "#F59E0B",
