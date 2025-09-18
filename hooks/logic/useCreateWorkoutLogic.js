@@ -69,11 +69,19 @@ const useCreateWorkoutLogic = () => {
   );
 
   const removeSplit = useCallback((splitName) => {
-    setSelectedExercises((prev) => removeSplitLogic(prev, splitName));
+    setSelectedExercises((prev) => {
+      const { next, nextSelected } = removeSplitLogic(prev, splitName);
+      setSelectedSplit(nextSelected);
+      return next;
+    });
   }, []);
 
   const addSplit = useCallback(() => {
-    setSelectedExercises((prev) => addSplitLogic(prev));
+    setSelectedExercises((prev) => {
+      const { next, lastAdded, didAdd } = addSplitLogic(prev);
+      if (didAdd) setSelectedSplit(lastAdded); // Only when we actually added
+      return next; // Always return a valid state object
+    });
   }, []);
 
   const saveLock = useRef(false);

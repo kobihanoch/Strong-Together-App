@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
   View,
   StyleSheet,
@@ -24,6 +24,30 @@ const TopSection = ({
   addSplit,
   removeSplit,
 }) => {
+  const scrollViewRef = useRef(null);
+  const [splitCardW, setSplitCardW] = useState(0);
+  // Calculate an x-offset for a given index (includes card width + horizontal margins)
+  const getOffsetX = useCallback((index) => index * splitCardW, [splitCardW]);
+
+  // Scroll to a specific index safely
+  const scrollToIndex = useCallback(
+    (index) => {
+      if (!scrollViewRef.current || !splitCardW) return;
+      scrollViewRef.current.scrollTo({
+        x: getOffsetX(index),
+        animated: true,
+      });
+    },
+    [getOffsetX, splitCardW]
+  );
+
+  // When selection changes (including after adding a split), scroll it into view
+  useEffect(() => {
+    if (!selectedSplit) return;
+    const idx = splitsList.indexOf(selectedSplit);
+    if (idx >= 0) scrollToIndex(idx);
+  }, [selectedSplit, splitsList.length, scrollToIndex]);
+
   return (
     <Column style={styles.container}>
       <Row style={{ justifyContent: "space-between" }}>
@@ -68,13 +92,17 @@ const TopSection = ({
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}
-          style={{ paddingTop: 30, width: 20 }}
+          style={{ paddingTop: 30 }}
+          ref={scrollViewRef}
         >
-          {splitsList.map((split) => {
+          {splitsList.map((split, i) => {
             const isSelectedSplit = selectedSplit === split;
             const exCount = exerciseCountMap[split] ?? 0;
             return (
-              <View style={{ overflow: "visible" }}>
+              <View
+                key={split}
+                onLayout={(e) => setSplitCardW(e.nativeEvent.layout.width)}
+              >
                 <TouchableOpacity
                   style={styles.splitsRemoveBtn}
                   onPress={() => removeSplit(split)}
@@ -127,6 +155,7 @@ const TopSection = ({
             );
           })}
         </ScrollView>
+
         <TouchableOpacity style={styles.addSplitBtn} onPress={addSplit}>
           <MaterialCommunityIcons
             name={"plus"}
@@ -226,7 +255,7 @@ const styles = StyleSheet.create({
   },
   addSplitBtn: {
     height: height * 0.09,
-    aspectRatio: 1,
+    width: height * 0.09,
     justifyContent: "center",
     alignItems: "center",
     backgroundColor: colors.primaryLight,
@@ -236,6 +265,7 @@ const styles = StyleSheet.create({
     borderColor: colors.primaryDark,
     borderRadius: 16,
     marginTop: 30,
+    marginLeft: "auto",
   },
 });
 

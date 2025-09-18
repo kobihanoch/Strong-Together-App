@@ -47,13 +47,22 @@ export const updateSetsLogic = (prev, splitName, exercise, updatedSetsArr) => {
 
 export const addSplitLogic = (prev) => {
   const splitsList = Object.keys(prev);
+
   if (splitsList.length >= 6) {
     showErrorAlert("Error", "Max splits allowed is 6");
-    return prev;
+    return { next: prev, lastAdded: null, didAdd: false };
   }
+
   const splitName = getNextSplitNameFromObj(prev);
-  if (prev[splitName]) return prev;
-  return { ...prev, [splitName]: [] };
+
+  if (prev[splitName]) {
+    return { next: prev, lastAdded: null, didAdd: false };
+  }
+  return {
+    next: { ...prev, [splitName]: [] },
+    lastAdded: splitName,
+    didAdd: true,
+  };
 };
 
 // Next name based on existing object keys (A..Z). Assumes keys are single uppercase letters.
@@ -79,15 +88,37 @@ export const onDragEndLogic = (prev, splitName, data) => {
 
 export const removeSplitLogic = (prev, splitName) => {
   const copy = { ...prev };
+  const splitNames = Object.keys(copy);
+  const indexToRemove = splitNames.indexOf(splitName);
+
   delete copy[splitName];
 
-  // If nothing left, initialize default "A"
+  // If nothing left → reset to default
   if (Object.keys(copy).length === 0) {
-    return { A: [] };
+    return {
+      next: { A: [] },
+      nextSelected: "A",
+    };
   }
 
-  // Re-key to A,B,C,... so e.g. A, C  -> A, B
-  return normalizeSplitKeys(copy);
+  // Normalize keys to A, B, C...
+  const normalized = normalizeSplitKeys(copy);
+  const newKeys = Object.keys(normalized);
+
+  let nextSelected;
+
+  if (indexToRemove < newKeys.length) {
+    // There is a right neighbor at the same index (after deletion)
+    nextSelected = newKeys[indexToRemove];
+  } else {
+    // Removed the last → fallback to last available
+    nextSelected = newKeys[newKeys.length - 1];
+  }
+
+  return {
+    next: normalized,
+    nextSelected,
+  };
 };
 
 export const moveItem = (arr, from, to) => {
