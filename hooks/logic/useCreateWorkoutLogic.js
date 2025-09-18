@@ -6,6 +6,7 @@ import { addWorkout } from "../../services/WorkoutService";
 import {
   addExerciseLogic,
   addSplitLogic,
+  getExercisesCountMap,
   onDragEndLogic,
   removeExerciseLogic,
   removeSplitLogic,
@@ -39,6 +40,10 @@ const useCreateWorkoutLogic = () => {
   const { exercises: availableExercises, loading: exLoading } = useExercises();
 
   // ---------------------------- Controls ----------------------------------
+  const [selectedSplit, setSelectedSplit] = useState("A");
+  const { map: exerciseCountMap, totalExercises } =
+    getExercisesCountMap(selectedExercises);
+
   const addExercise = useCallback((splitName, exercise) => {
     setSelectedExercises((prev) => addExerciseLogic(prev, splitName, exercise));
   }, []);
@@ -144,6 +149,11 @@ const useCreateWorkoutLogic = () => {
     saveWorkout,
     controls,
     loadings,
+    hasWorkout,
+    setSelectedSplit,
+    exerciseCountMap,
+    totalExercises,
+    selectedSplit,
   };
 };
 

@@ -106,3 +106,16 @@ const normalizeSplitKeys = (obj) => {
   });
   return out;
 };
+
+export const getExercisesCountMap = (selectedExercises) => {
+  let sum = 0;
+  const map = Object.entries(selectedExercises).reduce(
+    (acc, [split, exercises]) => {
+      sum += exercises.length;
+      acc[split] = exercises.length;
+      return acc;
+    },
+    {}
+  );
+  return { totalExercises: sum, map };
+};

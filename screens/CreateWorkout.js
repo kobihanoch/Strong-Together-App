@@ -1,58 +1,47 @@
-import React, { useCallback, useMemo, useState, useRef } from "react";
-import { Dimensions, View } from "react-native";
-import {
-  CreateWorkoutProvider,
-  useCreateWorkout,
-} from "../context/CreateWorkoutContext";
-import SplitTabsRow from "../components/CreateWorkoutComponents/SplitTabsRow";
-import SelectedExercisesList from "../components/CreateWorkoutComponents/SelectedExercisesList";
+import React, { useCallback, useMemo, useRef } from "react";
+import { Dimensions, View, Text, StyleSheet } from "react-native";
 import ExercisePickerModal from "../components/CreateWorkoutComponents/ExercisePickerModal";
-import ActionButtons from "../components/CreateWorkoutComponents/ActionButtons";
+import useCreateWorkoutLogic from "../hooks/logic/useCreateWorkoutLogic";
+import TopSection from "../components/CreateWorkoutComponents/TopSection";
 
 const { width, height } = Dimensions.get("window");
 
-function CreateWorkout({ navigation }) {
-  return (
-    <CreateWorkoutProvider>
-      <InnerCreateWorkout />
-    </CreateWorkoutProvider>
-  );
-}
-
-const InnerCreateWorkout = () => {
+const CreateWorkout = () => {
   // Pull flags and actions from context
-  const { properties, editing, actions } = useCreateWorkout();
+  const {
+    selectedExercises = { A: [] },
+    splitsList = [],
+    availableExercises = [],
+    saveWorkout,
+    controls = {},
+    loadings = {},
+    hasWorkout = false,
+    setSelectedSplit,
+    selectedSplit = "A",
+    exerciseCountMap = { A: 0 },
+    totalExercises = 0,
+  } = useCreateWorkoutLogic() || {};
 
   const pickerRef = useRef(null);
   const openPicker = useCallback(() => {
     pickerRef.current?.open?.(1);
   }, [pickerRef]);
 
-  // Save handler (uses context action if available)
-  const handleSaveWorkout = useCallback(() => {
-    actions.saveWorkout();
-  }, [actions, editing?.selectedExercises]);
-
-  const invalidWorkout = useMemo(() => {
-    const map = editing?.selectedExercises || {};
-    const keys = Object.keys(map);
-    if (keys.length === 0) return true;
-    return keys.some((k) => (map[k]?.length ?? 0) === 0);
-  }, [editing?.selectedExercises]);
-
   return (
-    <View
-      style={{
-        flex: 1,
-        paddingTop: height * 0.1,
-        paddingBottom: height * 0.0,
-        backgroundColor: "transparent",
-      }}
-    >
-      <View style={{ flex: 1, alignItems: "stretch" }}>
-        <SplitTabsRow />
+    <View style={styles.container}>
+      <TopSection
+        hasWorkout={hasWorkout}
+        splitsList={splitsList}
+        setSelectedSplit={setSelectedSplit}
+        selectedSplit={selectedSplit}
+        exerciseCountMap={exerciseCountMap}
+        totalExercises={totalExercises}
+        addSplit={controls.addSplit}
+        removeSplit={controls.removeSplit}
+      />
+      {/*<SplitTabsRow />
 
-        {/* New action bar */}
+        {/* New action bar
         <ActionButtons
           onAdd={openPicker}
           onSave={handleSaveWorkout}
@@ -61,13 +50,18 @@ const InnerCreateWorkout = () => {
           disableSave={invalidWorkout}
         />
 
-        <SelectedExercisesList />
+        <SelectedExercisesList />*/}
 
-        {/* Sliding bottom-sheet modal */}
-        <ExercisePickerModal ref={pickerRef} />
-      </View>
+      {/* Sliding bottom-sheet modal */}
+      <ExercisePickerModal ref={pickerRef} />
     </View>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+});
 
 export default CreateWorkout;
