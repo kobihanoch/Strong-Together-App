@@ -1,8 +1,16 @@
 import React, { useCallback, useMemo, useRef } from "react";
-import { Dimensions, View, Text, StyleSheet } from "react-native";
+import {
+  Dimensions,
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+} from "react-native";
 import ExercisePickerModal from "../components/CreateWorkoutComponents/ExercisePickerModal";
 import useCreateWorkoutLogic from "../hooks/logic/useCreateWorkoutLogic";
 import TopSection from "../components/CreateWorkoutComponents/TopSection";
+import { colors } from "../constants/colors";
+import { RFValue } from "react-native-responsive-fontsize";
 
 const { width, height } = Dimensions.get("window");
 
@@ -53,7 +61,17 @@ const CreateWorkout = () => {
         <SelectedExercisesList />*/}
 
       {/* Sliding bottom-sheet modal */}
-      <ExercisePickerModal ref={pickerRef} />
+      <TouchableOpacity
+        style={styles.openExercisesModalBtn}
+        onPress={openPicker}
+      >
+        <Text style={styles.plusText}>+</Text>
+      </TouchableOpacity>
+      <ExercisePickerModal
+        ref={pickerRef}
+        selectedSplit={selectedSplit}
+        controls={controls}
+      />
     </View>
   );
 };
@@ -61,6 +79,27 @@ const CreateWorkout = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  openExercisesModalBtn: {
+    backgroundColor: colors.primary,
+    height: 60,
+    aspectRatio: 1,
+    borderRadius: 80,
+    justifyContent: "center",
+    alignItems: "center",
+    shadowColor: colors.primary,
+    shadowOpacity: 0.4,
+    shadowRadius: 5,
+    shadowOffset: { width: 0, height: 0 },
+    // Android shadow
+    elevation: 6,
+    position: "absolute",
+    bottom: 20,
+    right: 20,
+  },
+  plusText: {
+    color: "white",
+    fontSize: RFValue(25),
   },
 });
 

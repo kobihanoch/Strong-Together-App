@@ -5,7 +5,10 @@ import { RFValue } from "react-native-responsive-fontsize";
 
 const { width, height } = Dimensions.get("window");
 
-const ExercisePickerModal = forwardRef(function ExercisePickerModal(_, ref) {
+const ExercisePickerModal = forwardRef(function ExercisePickerModal(
+  { selectedSplit, controls },
+  ref
+) {
   return <View></View>;
 });
 

@@ -103,7 +103,7 @@ const styles = StyleSheet.create({
     alignSelf: "center",
     justifyContent: "center",
     alignItems: "center",
-    height: height * 0.095,
+    height: height * 0.12,
     backgroundColor: "white",
     elevation: 5,
     shadowColor: "#000",
