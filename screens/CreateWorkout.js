@@ -11,6 +11,7 @@ import useCreateWorkoutLogic from "../hooks/logic/useCreateWorkoutLogic";
 import TopSection from "../components/CreateWorkoutComponents/TopSection";
 import { colors } from "../constants/colors";
 import { RFValue } from "react-native-responsive-fontsize";
+import SelectedExercisesList from "../components/CreateWorkoutComponents/SelectedExercisesList";
 
 const { width, height } = Dimensions.get("window");
 
@@ -28,6 +29,7 @@ const CreateWorkout = () => {
     selectedSplit = "A",
     exerciseCountMap = { A: 0 },
     totalExercises = 0,
+    exForSplit,
   } = useCreateWorkoutLogic() || {};
 
   const pickerRef = useRef(null);
@@ -59,6 +61,7 @@ const CreateWorkout = () => {
         />
 
         <SelectedExercisesList />*/}
+      <SelectedExercisesList exForSplit={exForSplit} controls={controls} />
 
       {/* Sliding bottom-sheet modal */}
       <TouchableOpacity

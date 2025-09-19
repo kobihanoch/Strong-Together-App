@@ -27,8 +27,11 @@ const useCreateWorkoutLogic = () => {
   const [isSaving, setIsSaving] = useState(false);
 
   // ----------------------------Editing----------------------------
+  const [selectedSplit, setSelectedSplit] = useState("A");
   // Keep a map: { splitName: [...Exercises] }
   const [selectedExercises, setSelectedExercises] = useState({ A: [] });
+  const exForSplit = selectedExercises[selectedSplit] || [];
+
   // Update dynamiclly if there is a workout
   useEffect(() => {
     if (hasWorkout)
@@ -40,32 +43,42 @@ const useCreateWorkoutLogic = () => {
   const { exercises: availableExercises, loading: exLoading } = useExercises();
 
   // ---------------------------- Controls ----------------------------------
-  const [selectedSplit, setSelectedSplit] = useState("A");
+
   const { map: exerciseCountMap, totalExercises } =
     getExercisesCountMap(selectedExercises);
 
-  const addExercise = useCallback((splitName, exercise) => {
-    setSelectedExercises((prev) => addExerciseLogic(prev, splitName, exercise));
-  }, []);
+  const addExercise = useCallback(
+    (selectedSplit, exercise) => {
+      setSelectedExercises((prev) =>
+        addExerciseLogic(prev, selectedSplit, exercise)
+      );
+    },
+    [selectedSplit]
+  );
 
-  const removeExercise = useCallback((splitName, exercise) => {
-    setSelectedExercises((prev) =>
-      removeExerciseLogic(prev, splitName, exercise)
-    );
-  }, []);
+  const removeExercise = useCallback(
+    (exercise) => {
+      setSelectedExercises((prev) =>
+        removeExerciseLogic(prev, selectedSplit, exercise)
+      );
+    },
+    [selectedSplit]
+  );
 
-  const updateSets = useCallback((splitName, exercise, updatedSetsArr) => {
-    setSelectedExercises((prev) =>
-      updateSetsLogic(prev, splitName, exercise, updatedSetsArr)
-    );
-  }, []);
+  const updateSets = useCallback(
+    (exercise, updatedSetsArr) => {
+      setSelectedExercises((prev) =>
+        updateSetsLogic(prev, selectedSplit, exercise, updatedSetsArr)
+      );
+    },
+    [selectedSplit]
+  );
 
   const onDragEnd = useCallback(
-    (splitName) =>
-      ({ data }) => {
-        setSelectedExercises((prev) => onDragEndLogic(prev, splitName, data));
-      },
-    []
+    ({ data }) => {
+      setSelectedExercises((prev) => onDragEndLogic(prev, selectedSplit, data));
+    },
+    [selectedSplit]
   );
 
   const removeSplit = useCallback((splitName) => {
@@ -162,6 +175,7 @@ const useCreateWorkoutLogic = () => {
     exerciseCountMap,
     totalExercises,
     selectedSplit,
+    exForSplit,
   };
 };
 
