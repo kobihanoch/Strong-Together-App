@@ -21,6 +21,8 @@ const CreateWorkout = () => {
     selectedExercises = { A: [] },
     splitsList = [],
     availableExercises = [],
+    allExercises = [],
+    muscles = [],
     saveWorkout,
     controls = {},
     loadings = {},
@@ -74,7 +76,9 @@ const CreateWorkout = () => {
         ref={pickerRef}
         selectedSplit={selectedSplit}
         controls={controls}
-        availableExercises={availableExercises}
+        availableExercises={availableExercises} // Mao
+        allExercises={allExercises} // Flat
+        muscles={muscles}
       />
     </View>
   );

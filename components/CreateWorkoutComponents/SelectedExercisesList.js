@@ -86,7 +86,19 @@ const RenderItem = ({ item, drag, removeExercise, updateSets }) => {
             ></MaterialCommunityIcons>
           </Pressable>
           <Column style={{ gap: 2 }}>
-            <Text style={styles.exerciseHeader}>{item.name}</Text>
+            <Text style={styles.exerciseHeader}>
+              {item.name},{" "}
+              <Text
+                style={{
+                  fontFamily: "Inter_400Regular",
+                  color: colors.textSecondary,
+                  fontSize: RFValue(12),
+                  opacity: 0.7,
+                }}
+              >
+                {item?.targetmuscle}
+              </Text>
+            </Text>
             <Text style={styles.exerciseCount}>Exercise {exNumber}</Text>
           </Column>
           <TouchableOpacity
@@ -186,6 +198,7 @@ const SelectedExercisesList = ({ exForSplit, controls }) => {
         alwaysBounceVertical={false}
         // Important so taps on TextInputs are not swallowed by the list
         keyboardShouldPersistTaps="handled"
+        showsVerticalScrollIndicator={false}
       />
     </View>
   );

@@ -1,4 +1,4 @@
-import React, { forwardRef, useState } from "react";
+import React, { forwardRef, useCallback, useEffect, useState } from "react";
 import {
   Dimensions,
   FlatList,
@@ -6,23 +6,52 @@ import {
   View,
   Text,
   TouchableOpacity,
+  ScrollView,
+  TextInput,
+  Keyboard,
+  Pressable,
 } from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";
 import SlidingBottomModal from "../SlidingBottomModal";
 import { colors } from "../../constants/colors";
 import Column from "../Column";
 import Row from "../Row";
-import { ScrollView } from "react-native-gesture-handler";
+import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
+import { BottomSheetFlatList } from "@gorhom/bottom-sheet";
 // Adjust this import path to where your SlidingBottomModal lives
 
 const { width, height } = Dimensions.get("window");
 
 const ExercisePickerModal = forwardRef(function ExercisePickerModal(
-  { selectedSplit, controls, availableExercises },
+  { selectedSplit, controls, availableExercises, allExercises, muscles },
   ref
 ) {
-  const muscles = ["All", ...Object.keys(availableExercises)];
-  const [selectedMuscle, setSelectedMuscle] = useState("Legs");
+  const [selectedMuscle, setSelectedMuscle] = useState("All");
+  const exToShow =
+    selectedMuscle === "All"
+      ? allExercises
+      : availableExercises[selectedMuscle];
+  const [filteredExToShow, setFilteredExToShow] = useState(exToShow ?? []);
+  const [query, setQuery] = useState("");
+  useEffect(() => {
+    setFilteredExToShow(() =>
+      exToShow.filter((ex) =>
+        ex.name.toLowerCase().includes(query.toLowerCase())
+      )
+    );
+  }, [query, exToShow]);
+
+  const renderItem = useCallback(({ item }) => {
+    return (
+      <Column style={styles.exContainer}>
+        <Text style={styles.exName}>{item?.name}</Text>
+        <Text style={styles.exMuscles}>
+          {selectedMuscle === "All" ? item?.targetmuscle : selectedMuscle},{" "}
+          {item?.specificTargetMuscle}
+        </Text>
+      </Column>
+    );
+  });
 
   return (
     <SlidingBottomModal
@@ -31,60 +60,74 @@ const ExercisePickerModal = forwardRef(function ExercisePickerModal(
       flatListUsage={false}
       title={null}
     >
-      <Column style={{ paddingHorizontal: 15, gap: 20 }}>
-        {/* Header */}
-        <Column style={{ marginTop: 15, gap: 5 }}>
-          <Text style={styles.header}>Add Exercise</Text>
-          <Text style={styles.semiHeader}>
-            Choose from our exercise library
-          </Text>
-        </Column>
+      <Pressable onPress={Keyboard.dismiss} accessible={false}>
+        <Column style={{ paddingHorizontal: 15, gap: 20 }}>
+          {/* Header */}
+          <Column style={{ marginTop: 15, gap: 5 }}>
+            <Text style={styles.header}>Add Exercise</Text>
+            <Text style={styles.semiHeader}>
+              Choose from our exercise library
+            </Text>
+          </Column>
 
-        {/* Search Bar */}
-
-        {/* Muscle Tabs */}
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          style={{ overflow: "visible" }}
-        >
-          {muscles?.map((muscle) => {
-            const isMuscleSelected = selectedMuscle === muscle;
-            return (
-              <TouchableOpacity
-                style={[
-                  styles.muscleTab,
-                  isMuscleSelected ? { backgroundColor: colors.primary } : {},
-                ]}
-                key={muscle}
-                onPress={() => setSelectedMuscle(muscle)}
-              >
-                <Text
+          {/* Search Bar */}
+          <Row style={styles.searchBarContainer}>
+            <MaterialCommunityIcons
+              name={"magnify"}
+              color={"#aaaaaaff"}
+              size={RFValue(17)}
+            />
+            <TextInput
+              style={styles.searchBarText}
+              placeholder="Search Exercises..."
+              onBlur={Keyboard.dismiss}
+              onChangeText={(val) => setQuery(val)}
+              keyboardType="default"
+            />
+          </Row>
+          {/* Muscle Tabs */}
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            style={{ overflow: "visible" }}
+          >
+            {muscles?.map((muscle) => {
+              const isMuscleSelected = selectedMuscle === muscle;
+              return (
+                <TouchableOpacity
                   style={[
-                    styles.muscleTabText,
-                    isMuscleSelected
-                      ? { color: "white", fontFamily: "Inter_600SemiBold" }
-                      : {},
+                    styles.muscleTab,
+                    isMuscleSelected ? { backgroundColor: colors.primary } : {},
                   ]}
+                  key={muscle}
+                  onPress={() => setSelectedMuscle(muscle)}
                 >
-                  {muscle}
-                </Text>
-              </TouchableOpacity>
-            );
-          })}
-        </ScrollView>
-        <FlatList
-          data={
-            selectedMuscle === "All"
-              ? Object.values(availableExercises).flat()
-              : availableExercises[selectedMuscle]
-          }
-          renderItem={({ item }) => {
-            return <Text>{item.name}</Text>;
-          }}
-          showsVerticalScrollIndicator={false}
-        />
-      </Column>
+                  <Text
+                    style={[
+                      styles.muscleTabText,
+                      isMuscleSelected
+                        ? { color: "white", fontFamily: "Inter_600SemiBold" }
+                        : {},
+                    ]}
+                  >
+                    {muscle}
+                  </Text>
+                </TouchableOpacity>
+              );
+            })}
+          </ScrollView>
+          <BottomSheetFlatList
+            data={filteredExToShow}
+            renderItem={renderItem}
+            keyExtractor={(item, idx) => String(item?.id ?? item?.name ?? idx)}
+            showsVerticalScrollIndicator={false}
+            // Allow taps to work while keyboard is open
+            keyboardShouldPersistTaps="handled"
+            // Give some bottom padding so last item isn't hidden behind the handle
+            contentContainerStyle={{ paddingBottom: 24 }}
+          />
+        </Column>
+      </Pressable>
     </SlidingBottomModal>
   );
 });
@@ -113,6 +156,20 @@ const styles = StyleSheet.create({
     fontFamily: "Inter_400Regular",
     fontSize: RFValue(13),
     color: colors.textSecondary,
+  },
+  searchBarContainer: {
+    borderColor: "#e2e2e2ff",
+    borderWidth: 1,
+    borderRadius: 16,
+    paddingVertical: 13,
+    paddingHorizontal: 15,
+    gap: 10,
+    alignItems: "center",
+  },
+  searchBarText: {
+    fontFamily: "Inter_400Regular",
+    fontSize: RFValue(12),
+    color: "black",
   },
 });
 

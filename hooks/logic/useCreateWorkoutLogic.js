@@ -40,7 +40,24 @@ const useCreateWorkoutLogic = () => {
   const splitsList = Object.keys(selectedExercises);
 
   // ----------------------------Exercises in DB----------------------------
-  const { exercises: availableExercises, loading: exLoading } = useExercises();
+  const { exercises: availableExercises = {}, loading: exLoading = true } =
+    useExercises() || {};
+  const allExercises = useMemo(
+    () =>
+      Object.entries(availableExercises)
+        .map(([muscle, exercises]) => {
+          return exercises.map((ex) => {
+            return { ...ex, targetmuscle: muscle };
+          });
+        })
+        .flat(),
+    [availableExercises]
+  );
+
+  const muscles = useMemo(
+    () => ["All", ...Object.keys(availableExercises)],
+    [availableExercises]
+  );
 
   // ---------------------------- Controls ----------------------------------
 
@@ -166,7 +183,9 @@ const useCreateWorkoutLogic = () => {
   return {
     selectedExercises,
     splitsList,
-    availableExercises,
+    availableExercises, // Map
+    allExercises, // Flat
+    muscles,
     saveWorkout,
     controls,
     loadings,
