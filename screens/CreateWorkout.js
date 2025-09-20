@@ -74,6 +74,7 @@ const CreateWorkout = () => {
         ref={pickerRef}
         selectedSplit={selectedSplit}
         controls={controls}
+        availableExercises={availableExercises}
       />
     </View>
   );
