@@ -18,7 +18,6 @@ const { width, height } = Dimensions.get("window");
 const CreateWorkout = () => {
   // Pull flags and actions from context
   const {
-    selectedExercises = { A: [] },
     splitsList = [],
     availableExercises = [],
     allExercises = [],
@@ -41,6 +40,7 @@ const CreateWorkout = () => {
 
   return (
     <View style={styles.container}>
+      {/*Top section */}
       <TopSection
         hasWorkout={hasWorkout}
         splitsList={splitsList}
@@ -50,20 +50,14 @@ const CreateWorkout = () => {
         totalExercises={totalExercises}
         addSplit={controls.addSplit}
         removeSplit={controls.removeSplit}
+        saveWorkout={saveWorkout}
       />
-      {/*<SplitTabsRow />
-
-        {/* New action bar
-        <ActionButtons
-          onAdd={openPicker}
-          onSave={handleSaveWorkout}
-          saving={properties?.isSaving}
-          // optional: disable the save button if invalid
-          disableSave={invalidWorkout}
-        />
-
-        <SelectedExercisesList />*/}
-      <SelectedExercisesList exForSplit={exForSplit} controls={controls} />
+      {/* Exercises list */}
+      <SelectedExercisesList
+        exForSplit={exForSplit}
+        controls={controls}
+        selectedSplit={selectedSplit}
+      />
 
       {/* Sliding bottom-sheet modal */}
       <TouchableOpacity
@@ -79,6 +73,7 @@ const CreateWorkout = () => {
         availableExercises={availableExercises} // Mao
         allExercises={allExercises} // Flat
         muscles={muscles}
+        exForSplit={exForSplit}
       />
     </View>
   );

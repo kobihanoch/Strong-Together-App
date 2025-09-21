@@ -1,31 +1,79 @@
-import React, { forwardRef, useCallback, useEffect, useState } from "react";
+import { FontAwesome5 } from "@expo/vector-icons";
+import { BottomSheetFlatList } from "@gorhom/bottom-sheet";
+import React, {
+  forwardRef,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import {
   Dimensions,
-  FlatList,
-  StyleSheet,
-  View,
-  Text,
-  TouchableOpacity,
-  ScrollView,
-  TextInput,
   Keyboard,
   Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";
-import SlidingBottomModal from "../SlidingBottomModal";
+import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import { colors } from "../../constants/colors";
 import Column from "../Column";
 import Row from "../Row";
-import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
-import { BottomSheetFlatList } from "@gorhom/bottom-sheet";
-// Adjust this import path to where your SlidingBottomModal lives
+import SlidingBottomModal from "../SlidingBottomModal";
+import { Notifier, NotifierComponents } from "react-native-notifier";
 
 const { width, height } = Dimensions.get("window");
 
 const ExercisePickerModal = forwardRef(function ExercisePickerModal(
-  { selectedSplit, controls, availableExercises, allExercises, muscles },
+  {
+    selectedSplit,
+    controls,
+    availableExercises,
+    allExercises,
+    muscles,
+    exForSplit,
+  },
   ref
 ) {
+  const { addExercise } = controls;
+  const handleExPress = (ex) => {
+    addExercise(ex);
+    if (exForSplit.some((_ex) => _ex.id === ex.id)) {
+      Notifier.showNotification({
+        title: "Exercise already added",
+        description: `"${ex?.name}" is already added`,
+        duration: 2500,
+        showAnimationDuration: 250,
+        hideOnPress: true,
+        Component: NotifierComponents.Alert,
+        componentProps: {
+          alertType: "error",
+          titleStyle: { fontSize: 16 },
+          descriptionStyle: { fontSize: 14 },
+        },
+      });
+      return;
+    }
+    ref.current.close();
+    Notifier.showNotification({
+      title: "Exercise Added",
+      description: `"${ex.name}" added to Split ${selectedSplit}`,
+      duration: 2500,
+      showAnimationDuration: 250,
+      hideOnPress: true,
+      Component: NotifierComponents.Alert,
+      componentProps: {
+        alertType: "info",
+        titleStyle: { fontSize: 16 },
+        descriptionStyle: { fontSize: 14 },
+      },
+    });
+  };
+
   const [selectedMuscle, setSelectedMuscle] = useState("All");
   const exToShow =
     selectedMuscle === "All"
@@ -43,13 +91,24 @@ const ExercisePickerModal = forwardRef(function ExercisePickerModal(
 
   const renderItem = useCallback(({ item }) => {
     return (
-      <Column style={styles.exContainer}>
-        <Text style={styles.exName}>{item?.name}</Text>
-        <Text style={styles.exMuscles}>
-          {selectedMuscle === "All" ? item?.targetmuscle : selectedMuscle},{" "}
-          {item?.specificTargetMuscle}
-        </Text>
-      </Column>
+      <TouchableOpacity
+        style={styles.exContainer}
+        onPress={() => handleExPress(item)}
+      >
+        {/* Exercise item */}
+        <Row style={{ gap: 20 }}>
+          <View style={styles.dumbbelIconContainer}>
+            <FontAwesome5 name="dumbbell" size={RFValue(12)} color="grey" />
+          </View>
+          <Column>
+            <Text style={styles.exName}>{item?.name}</Text>
+            <Text style={styles.exMuscles}>
+              {selectedMuscle === "All" ? item?.targetmuscle : selectedMuscle},{" "}
+              {item?.specificTargetMuscle}
+            </Text>
+          </Column>
+        </Row>
+      </TouchableOpacity>
     );
   });
 
@@ -119,12 +178,12 @@ const ExercisePickerModal = forwardRef(function ExercisePickerModal(
           <BottomSheetFlatList
             data={filteredExToShow}
             renderItem={renderItem}
-            keyExtractor={(item, idx) => String(item?.id ?? item?.name ?? idx)}
+            keyExtractor={(item) => item.id}
             showsVerticalScrollIndicator={false}
             // Allow taps to work while keyboard is open
             keyboardShouldPersistTaps="handled"
             // Give some bottom padding so last item isn't hidden behind the handle
-            contentContainerStyle={{ paddingBottom: 24 }}
+            contentContainerStyle={{ paddingBottom: height * 0.8 }}
           />
         </Column>
       </Pressable>
@@ -170,6 +229,32 @@ const styles = StyleSheet.create({
     fontFamily: "Inter_400Regular",
     fontSize: RFValue(12),
     color: "black",
+  },
+  exContainer: {
+    paddingVertical: 10,
+    paddingHorizontal: 10,
+    justifyContent: "center",
+    gap: 3,
+    backgroundColor: "white",
+    borderRadius: 16,
+  },
+  exName: {
+    fontFamily: "Inter_600SemiBold",
+    color: "black",
+    fontSize: RFValue(13),
+  },
+  exMuscles: {
+    fontFamily: "Inter_4ooRegular",
+    color: colors.textSecondary,
+    fontSize: RFValue(10),
+  },
+  dumbbelIconContainer: {
+    height: 30,
+    width: 30,
+    borderRadius: 10,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "rgba(0,0,0,0.04)",
   },
 });
 

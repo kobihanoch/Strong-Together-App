@@ -65,7 +65,7 @@ const useCreateWorkoutLogic = () => {
     getExercisesCountMap(selectedExercises);
 
   const addExercise = useCallback(
-    (selectedSplit, exercise) => {
+    (exercise) => {
       setSelectedExercises((prev) =>
         addExerciseLogic(prev, selectedSplit, exercise)
       );

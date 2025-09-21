@@ -12,6 +12,8 @@ import { RFValue } from "react-native-responsive-fontsize";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import Column from "../Column";
 import { FlatList, ScrollView } from "react-native-gesture-handler";
+import { Dialog } from "react-native-alert-notification";
+import { useNavigation } from "@react-navigation/native";
 
 const { height, width } = Dimensions.get("window");
 const TopSection = ({
@@ -23,7 +25,9 @@ const TopSection = ({
   totalExercises,
   addSplit,
   removeSplit,
+  saveWorkout,
 }) => {
+  const navigation = useNavigation();
   const scrollViewRef = useRef(null);
   const [splitCardW, setSplitCardW] = useState(0);
   // Calculate an x-offset for a given index (includes card width + horizontal margins)
@@ -41,6 +45,33 @@ const TopSection = ({
     [getOffsetX, splitCardW]
   );
 
+  const handleExit = () => {
+    let pressedExit = false;
+
+    Dialog.show({
+      type: "WARNING",
+      title: "Exit editing",
+      titleStyle: {
+        fontSize: 22,
+      },
+      textBody:
+        "Are you sure you want to exit? Any unsaved progress will be lost.",
+      textBodyStyle: {
+        fontSize: 45,
+      },
+      button: "Exit",
+      closeOnOverlayTap: true,
+      onPressButton: () => {
+        pressedExit = true;
+        Dialog.hide();
+        navigation.goBack();
+      },
+      onHide: () => {
+        Dialog.hide();
+      },
+    });
+  };
+
   // When selection changes (including after adding a split), scroll it into view
   useEffect(() => {
     if (!selectedSplit) return;
@@ -51,7 +82,7 @@ const TopSection = ({
   return (
     <Column style={styles.container}>
       <Row style={{ justifyContent: "space-between" }}>
-        <TouchableOpacity style={styles.exitBtnContainer}>
+        <TouchableOpacity style={styles.exitBtnContainer} onPress={handleExit}>
           <MaterialCommunityIcons
             name={"close"}
             size={RFValue(14)}
@@ -72,7 +103,7 @@ const TopSection = ({
             </Text>
           </Row>
         </Column>
-        <TouchableOpacity style={styles.saveBtnContainer}>
+        <TouchableOpacity style={styles.saveBtnContainer} onPress={saveWorkout}>
           <MaterialCommunityIcons
             name={"check"}
             size={RFValue(14)}

@@ -18,10 +18,17 @@ import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityI
 import { colors } from "../../constants/colors";
 import { TextInput } from "react-native-gesture-handler";
 import NumericInputWithRules from "../StartWorkoutComponents/NumericInputWithRules";
+import { Notifier, NotifierComponents } from "react-native-notifier";
 
 const { height, width } = Dimensions.get("window");
 
-const RenderItem = ({ item, drag, removeExercise, updateSets }) => {
+const RenderItem = ({
+  item,
+  drag,
+  removeExercise,
+  updateSets,
+  selectedSplit,
+}) => {
   const exNumber = item.order_index + 1;
   const [setsChose, setSetsChose] = useState(3);
   const [setsArr, setSetsArr] = useState(item?.sets);
@@ -36,6 +43,24 @@ const RenderItem = ({ item, drag, removeExercise, updateSets }) => {
       const next = [...prev];
       next[idx] = val;
       return next;
+    });
+  };
+
+  const handleRemoveExercise = (ex) => {
+    removeExercise(ex);
+
+    Notifier.showNotification({
+      title: "Exercise Removed",
+      description: `"${ex?.name}" removed from Split ${selectedSplit}`,
+      duration: 2500,
+      showAnimationDuration: 250,
+      hideOnPress: true,
+      Component: NotifierComponents.Alert,
+      componentProps: {
+        alertType: "info",
+        titleStyle: { fontSize: 16 },
+        descriptionStyle: { fontSize: 14 },
+      },
     });
   };
 
@@ -103,7 +128,7 @@ const RenderItem = ({ item, drag, removeExercise, updateSets }) => {
           </Column>
           <TouchableOpacity
             style={{ marginLeft: "auto" }}
-            onPress={() => removeExercise(item)}
+            onPress={() => handleRemoveExercise(item)}
           >
             <MaterialCommunityIcons
               name={"close"}
@@ -156,8 +181,8 @@ const RenderItem = ({ item, drag, removeExercise, updateSets }) => {
   );
 };
 
-const SelectedExercisesList = ({ exForSplit, controls }) => {
-  const { addExercise, removeExercise, onDragEnd, updateSets } = controls || {};
+const SelectedExercisesList = ({ exForSplit, controls, selectedSplit }) => {
+  const { removeExercise, onDragEnd, updateSets } = controls || {};
   // Render item with drag handle wired to the left handle
   const renderItem = useCallback(
     ({ item, drag }) => (
@@ -166,6 +191,7 @@ const SelectedExercisesList = ({ exForSplit, controls }) => {
         drag={drag}
         removeExercise={removeExercise}
         updateSets={updateSets}
+        selectedSplit={selectedSplit}
       />
     ),
     [removeExercise]
