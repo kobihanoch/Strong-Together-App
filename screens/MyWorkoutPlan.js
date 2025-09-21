@@ -128,9 +128,11 @@ const MyWorkoutPlan = () => {
           >
             {hasDoneCardioToday ? (
               <Text style={styles.cardioText}>
-                You did{" "}
+                You{" "}
                 <Text style={styles.cardioTextStrong}>
-                  {cardioForToday?.type}
+                  {cardioForToday?.type === "Run"
+                    ? "Ran"
+                    : cardioForToday?.type + "ed"}
                 </Text>{" "}
                 for{" "}
                 <Text style={styles.cardioTextStrong}>
