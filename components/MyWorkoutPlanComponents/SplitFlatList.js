@@ -13,13 +13,14 @@ import Column from "../Column";
 import PageDots from "../PageDots";
 import Row from "../Row";
 import StartWorkoutButton from "./StartWorkoutButton";
+import StartCardioButton from "./StartCardioButton";
 
 const { width, height } = Dimensions.get("window");
 
 const SplitFlatList = ({
   setSelectedSplit,
   selectedSplit,
-  filteredExercises,
+  openCardioModal,
 }) => {
   const { workoutSplits, exerciseCounter } = useMyWorkoutPlanPageLogic();
   const { hasTrainedToday, analyzedExerciseTrackingData } =
@@ -150,10 +151,13 @@ const SplitFlatList = ({
           onScroll={handleScroll}
         />
         {/* CTA */}
-        <StartWorkoutButton
-          hasTrainedToday={hasTrainedToday}
-          selectedSplit={selectedSplit}
-        ></StartWorkoutButton>
+        <Column style={{ gap: 20 }}>
+          <StartWorkoutButton
+            hasTrainedToday={hasTrainedToday}
+            selectedSplit={selectedSplit}
+          ></StartWorkoutButton>
+          <StartCardioButton openCardioModal={openCardioModal} />
+        </Column>
 
         {/* Page Indicator */}
         <PageDots
@@ -161,7 +165,7 @@ const SplitFlatList = ({
           length={workoutSplits?.length}
           activeColor="white"
           inactiveColor="#ffffff7f"
-          style={{ marginTop: height * 0.035, marginBottom: height * 0.32 }}
+          style={{ marginTop: height * 0.035, marginBottom: height * 0.2 }}
         />
       </LinearGradient>
     </View>

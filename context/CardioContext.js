@@ -10,6 +10,7 @@ import { keyCardio } from "../cache/cacheUtils";
 import { getUserCardio } from "../services/CardioService";
 import useCacheAndFetch from "../hooks/useCacheAndFetch";
 import useUpdateGlobalLoading from "../hooks/useUpdateGlobalLoading";
+import moment from "moment";
 
 const CardioContext = createContext();
 
@@ -18,6 +19,10 @@ export const CardioProvider = ({ children }) => {
 
   const [dailyCardioMap, setDailyCardioMap] = useState(null);
   const [weeklyCardioMap, setWeeklyCardioMap] = useState(null);
+  const cardioForToday = useMemo(
+    () => dailyCardioMap?.[moment().format("YYYY-MM-DD")]?.[0] || null
+  );
+  const hasDoneCardioToday = useMemo(() => !!cardioForToday, [dailyCardioMap]);
 
   // -------------------------- useCacheHandler props ------------------------------
 
@@ -54,7 +59,16 @@ export const CardioProvider = ({ children }) => {
   useUpdateGlobalLoading("Cardio", cacheKnown ? loading : true);
 
   return (
-    <CardioContext.Provider value={{ dailyCardioMap, weeklyCardioMap }}>
+    <CardioContext.Provider
+      value={{
+        dailyCardioMap,
+        weeklyCardioMap,
+        setDailyCardioMap,
+        setWeeklyCardioMap,
+        hasDoneCardioToday,
+        cardioForToday,
+      }}
+    >
       {children}
     </CardioContext.Provider>
   );
