@@ -68,9 +68,11 @@ const SlidingBottomModal = forwardRef(function SlidingBottomModal(
               marginTop: 20,
             }}
           ></View>
-          <View style={styles.header}>
-            <Text style={styles.headerTitle}>{title}</Text>
-          </View>
+          {title && (
+            <View style={styles.header}>
+              <Text style={styles.headerTitle}>{title}</Text>
+            </View>
+          )}
         </View>
       </View>
     );

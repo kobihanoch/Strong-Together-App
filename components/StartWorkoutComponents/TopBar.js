@@ -64,7 +64,12 @@ const TopBar = ({
               color={"white"}
             />
           </TouchableOpacity>
-          <TouchableOpacity style={styles.exitBtn} onPress={onExit}>
+          <TouchableOpacity style={styles.exitBtnContainer} onPress={onExit}>
+            <MaterialCommunityIcons
+              name={"close"}
+              size={RFValue(14)}
+              color={"#1A1A1A"}
+            ></MaterialCommunityIcons>
             <Text style={styles.exitBtnText}>Quit</Text>
           </TouchableOpacity>
         </Row>
@@ -135,22 +140,19 @@ const styles = StyleSheet.create({
     fontFamily: "Inter_600SemiBold",
     color: "white",
   },
-  exitBtn: {
-    paddingVertical: 12,
+  exitBtnContainer: {
+    paddingVertical: 10,
     paddingHorizontal: 20,
     justifyContent: "center",
     alignItems: "center",
-    borderRadius: 16,
     backgroundColor: "transparent",
     flexDirection: "row",
     gap: 7,
-    borderWidth: 1,
-    borderColor: colors.primary,
   },
   exitBtnText: {
     fontSize: RFValue(12),
     fontFamily: "Inter_600SemiBold",
-    color: colors.primary,
+    color: colors.textSecondary,
   },
   workoutCompletionText: {
     fontSize: RFValue(11),
