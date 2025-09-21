@@ -111,7 +111,7 @@ function ImagePickerComponent({ user, setMediaLoading }) {
                 ? require("../../assets/man.png")
                 : require("../../assets/woman.png")
             }
-            cachePolicy={profileimagePath ? "disk" : "none"}
+            cachePolicy={"disk"}
             style={styles.image}
           />
         )}

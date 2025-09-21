@@ -30,19 +30,9 @@ const TopComponent = () => {
   const navigation = useNavigation();
 
   // Properties
-  const [msgCount, setMsgCount] = useState();
-  const [username, setUsername] = useState(null);
-  const [fullname, setFullname] = useState(null);
-  const [profileImageUrl, setProfileImageUrl] = useState(null);
-
-  // Image source
-  const imgSrc = profileImageUrl
-    ? {
-        uri: `${process.env.EXPO_PUBLIC_SUPABASE_URL}/storage/v1/object/public/${profileImageUrl}`,
-      }
-    : user?.gender == "Male"
-    ? require("../assets/man.png")
-    : require("../assets/woman.png");
+  const msgCount = unreadMessages?.length;
+  const fullname = user?.name;
+  const profileImageUrl = user?.profile_image_url;
 
   // Animations
   const scaleAnim = useState(new Animated.Value(1))[0];
@@ -62,16 +52,6 @@ const TopComponent = () => {
       ]).start();
     }
   }, [unreadMessages.length]);
-
-  // On load
-  useEffect(() => {
-    if (user && unreadMessages) {
-      setUsername(user.username);
-      setFullname(user.name);
-      setProfileImageUrl(user.profile_image_url);
-      setMsgCount(unreadMessages.length);
-    }
-  }, [user, unreadMessages]);
 
   const [isModalVisible, setIsModalVisible] = useState(false);
 
