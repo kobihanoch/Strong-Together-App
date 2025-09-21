@@ -26,7 +26,7 @@ const StartWorkout = ({ navigation, route }) => {
 
   const modalRef = useRef(null);
   const openModal = useCallback(() => {
-    modalRef?.current?.open?.(1);
+    modalRef?.current?.open?.(0);
   }, []);
 
   const handlePressSave = useCallback(async () => {
@@ -100,7 +100,7 @@ const StartWorkout = ({ navigation, route }) => {
       <SlidingBottomModal
         title="Last Performance"
         ref={modalRef}
-        snapPoints={["50%", "50%", "80%"]}
+        snapPoints={["40%", "50%", "80%"]}
         flatListUsage={false}
       >
         <LastWorkoutData
