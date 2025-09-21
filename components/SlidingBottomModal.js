@@ -1,7 +1,4 @@
-import BottomSheet, {
-  BottomSheetBackdrop,
-  BottomSheetFlatList,
-} from "@gorhom/bottom-sheet";
+import BottomSheet, { BottomSheetFlatList } from "@gorhom/bottom-sheet";
 import React, {
   forwardRef,
   useCallback,
@@ -9,11 +6,59 @@ import React, {
   useMemo,
   useRef,
 } from "react";
-import { Dimensions, StyleSheet, Text, View } from "react-native";
+import { Dimensions, StyleSheet, Text, View, Pressable } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { RFValue } from "react-native-responsive-fontsize";
+import { BlurView } from "expo-blur";
+import Animated, {
+  interpolate,
+  useAnimatedStyle,
+  Extrapolation,
+} from "react-native-reanimated";
 
 const { width, height } = Dimensions.get("window");
+
+// Custom backdrop with Blur + dark overlay
+const CustomBackdrop = ({
+  animatedIndex,
+  close,
+  blurIntensity = 24,
+  tint = "light",
+  overlayAlpha = 0.25,
+}) => {
+  const animatedStyle = useAnimatedStyle(() => {
+    return {
+      opacity: interpolate(
+        animatedIndex.value,
+        [-1, 0, 1],
+        [0, 1, 1],
+        Extrapolation.CLAMP
+      ),
+    };
+  });
+
+  return (
+    <Animated.View
+      pointerEvents="auto"
+      style={[StyleSheet.absoluteFill, animatedStyle]}
+    >
+      <Pressable style={StyleSheet.absoluteFill} onPress={close}>
+        <BlurView
+          intensity={blurIntensity}
+          tint={tint}
+          style={StyleSheet.absoluteFill}
+        />
+        <View
+          pointerEvents="none"
+          style={[
+            StyleSheet.absoluteFill,
+            { backgroundColor: `rgba(0,0,0,${overlayAlpha})` },
+          ]}
+        />
+      </Pressable>
+    </Animated.View>
+  );
+};
 
 const SlidingBottomModal = forwardRef(function SlidingBottomModal(
   {
@@ -41,11 +86,12 @@ const SlidingBottomModal = forwardRef(function SlidingBottomModal(
 
   const renderBackdrop = useCallback(
     (props) => (
-      <BottomSheetBackdrop
+      <CustomBackdrop
         {...props}
-        disappearsOnIndex={-1}
-        appearsOnIndex={0}
-        opacity={0.7}
+        close={() => sheetRef.current?.close?.()}
+        blurIntensity={22}
+        tint="dark"
+        overlayAlpha={0.2}
       />
     ),
     []
@@ -67,7 +113,7 @@ const SlidingBottomModal = forwardRef(function SlidingBottomModal(
               marginBottom: 10,
               marginTop: 20,
             }}
-          ></View>
+          />
           {title && (
             <View style={styles.header}>
               <Text style={styles.headerTitle}>{title}</Text>
@@ -91,13 +137,13 @@ const SlidingBottomModal = forwardRef(function SlidingBottomModal(
     >
       <BottomSheet
         ref={sheetRef}
-        index={initialIndex} // start closed
+        index={initialIndex}
         snapPoints={snapPoints}
         enableDynamicSizing={false}
         backdropComponent={enableBackDrop ? renderBackdrop : undefined}
         enablePanDownToClose={enablePanDownClose}
         handleComponent={Handle}
-        backgroundStyle={styles.sheetBg} // optional, just to see it while testing
+        backgroundStyle={styles.sheetBg}
       >
         {flatListUsage ? (
           <BottomSheetFlatList
@@ -136,19 +182,6 @@ const styles = StyleSheet.create({
     fontSize: RFValue(15),
     color: "black",
     marginTop: 10,
-  },
-  closeBtn: {
-    position: "absolute",
-    right: 12,
-    top: 8,
-    bottom: 8,
-    justifyContent: "center",
-    paddingHorizontal: 8,
-  },
-  closeX: {
-    fontSize: 22,
-    lineHeight: 22,
-    color: "black",
   },
   contentContainer: {
     backgroundColor: "white",
