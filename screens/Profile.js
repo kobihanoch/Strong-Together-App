@@ -20,8 +20,8 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 const { width, height } = Dimensions.get("window");
 
 const Profile = () => {
-  const { user } = useAuth();
-  const { data, mediaLoading, setMediaLoading } = useProfilePageLogic();
+  const { data } = useProfilePageLogic();
+  const { username = null, email = null, fullname = null } = data || {};
 
   const actionSheetRef = useRef(null);
   const openActionSheet = () => {
@@ -39,12 +39,29 @@ const Profile = () => {
         <Row style={{ justifyContent: "space-between", alignItems: "center" }}>
           <Column style={{ gap: 7 }}>
             <Text style={styles.header}>Profile</Text>
-            <Text style={styles.semiHeader}>
-              Manage your account information
-            </Text>
+            <Row style={{ width: "100%" }}>
+              <Text style={styles.semiHeader}>
+                Manage your account information
+              </Text>
+              <TouchableOpacity style={styles.editProfileBtnContainer}>
+                <Row style={{ gap: 5 }}>
+                  <MaterialCommunityIcons
+                    name={"pencil"}
+                    color={"black"}
+                    size={RFValue(10)}
+                  />
+                  <Text style={styles.editProfileBtnText}>Edit profile</Text>
+                </Row>
+              </TouchableOpacity>
+            </Row>
           </Column>
+        </Row>
+      </Column>
+
+      <Column style={styles.infoContainer}>
+        <Row style={{ gap: 15, alignItems: "flex-start", width: "100%" }}>
           <ImagePickerComponent
-            style={{ height: height * 0.06, aspectRatio: 1 }}
+            style={{ height: height * 0.1, aspectRatio: 1 }}
             openActionSheet={openActionSheet}
             closeActionSheet={closeActionSheet}
             triggerImgPicker={triggerImgPicker}
@@ -52,8 +69,64 @@ const Profile = () => {
             setTriggerImgPicker={setTriggerImgPicker}
             setTriggerRemoveImg={setTriggerRemoveImg}
           />
+          <Column style={{ marginTop: 15, gap: 5 }}>
+            <Text style={styles.name}>{data?.fullname}</Text>
+            <Text style={styles.username}>@{data?.username}</Text>
+          </Column>
         </Row>
+        <Column style={{ marginTop: 50, width: "100%", gap: 10 }}>
+          <Row style={{ gap: 5 }}>
+            <MaterialCommunityIcons
+              name={"account"}
+              color={"black"}
+              size={RFValue(13)}
+            />
+            <Text style={styles.contactHeader}>Contact Information</Text>
+          </Row>
+          <Row style={[styles.contactCard, { marginTop: 10 }]}>
+            <MaterialCommunityIcons
+              name={"email-outline"}
+              color={"black"}
+              size={RFValue(15)}
+            />
+            <Column>
+              <Text style={styles.contactCardHeader}>Email</Text>
+              <Text style={styles.contactCardData}>{data?.email}</Text>
+            </Column>
+          </Row>
+          <Row style={styles.contactCard}>
+            <MaterialCommunityIcons
+              name={"calendar-outline"}
+              color={"black"}
+              size={RFValue(15)}
+            />
+            <Column>
+              <Text style={styles.contactCardHeader}>Online Since</Text>
+              <Text style={styles.contactCardData}>{data?.daysOnline}</Text>
+            </Column>
+          </Row>
+        </Column>
       </Column>
+
+      <Row
+        style={[
+          styles.contactCard,
+          { marginTop: "auto", marginHorizontal: 20 },
+        ]}
+      >
+        <MaterialCommunityIcons
+          name={"delete"}
+          color={colors.error}
+          size={RFValue(15)}
+        />
+        <Column>
+          <Text style={styles.dangerZoneHeader}>Danger Zone</Text>
+          <Text style={styles.dangerZoneSemiHeader}>Delete you account</Text>
+        </Column>
+        <TouchableOpacity style={styles.delBtnContainer}>
+          <Text style={styles.delBtnText}>Delete</Text>
+        </TouchableOpacity>
+      </Row>
 
       {/* Action sheet for profile pic */}
       <SlidingBottomModal
@@ -94,6 +167,7 @@ const Profile = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    paddingBottom: 20,
   },
   topSectionContainer: {
     backgroundColor: colors.lightCardBg,
@@ -126,6 +200,80 @@ const styles = StyleSheet.create({
   sheetBtnText: {
     fontSize: RFValue(15),
     fontFamily: "Inter_400Regular",
+  },
+  infoContainer: {
+    padding: 20,
+    alignItems: "flex-start",
+    justifyContent: "flex-start",
+  },
+  name: {
+    fontFamily: "Inter_600SemiBold",
+    fontSize: RFValue(17),
+    color: "black",
+  },
+  username: {
+    fontFamily: "Inter_500Medium",
+    fontSize: RFValue(12),
+    color: colors.textSecondary,
+  },
+  editProfileBtnContainer: {
+    marginLeft: "auto",
+    backgroundColor: "white",
+    padding: 10,
+    borderRadius: 10,
+  },
+  editProfileBtnText: {
+    fontFamily: "Inter_500Medium",
+    color: "black",
+    fontSize: RFValue(10),
+  },
+  contactHeader: {
+    fontFamily: "Inter_600SemiBold",
+    color: "black",
+    fontSize: RFValue(13),
+  },
+  contactCard: {
+    padding: 15,
+    borderColor: "#ddd",
+    borderWidth: 1,
+    borderRadius: 16,
+    gap: 15,
+  },
+  contactCardHeader: {
+    fontFamily: "Inter_400Regular",
+    color: colors.textSecondary,
+    fontSize: RFValue(12),
+  },
+  contactCardData: {
+    fontFamily: "Inter_500Medium",
+    color: "black",
+    fontSize: RFValue(14),
+  },
+  contactCardHeader: {
+    fontFamily: "Inter_400Regular",
+    color: colors.textSecondary,
+    fontSize: RFValue(12),
+  },
+  dangerZoneHeader: {
+    fontFamily: "Inter_600SemiBold",
+    color: colors.error,
+    fontSize: RFValue(14),
+  },
+  dangerZoneSemiHeader: {
+    fontFamily: "Inter_400Regular",
+    color: colors.error,
+    fontSize: RFValue(12),
+  },
+  delBtnContainer: {
+    backgroundColor: colors.error,
+    padding: 15,
+    borderRadius: 16,
+    marginLeft: "auto",
+  },
+  delBtnText: {
+    color: "white",
+    fontFamily: "Inter_600SemiBold",
+    fontSize: RFValue(12),
   },
 });
 /*<View

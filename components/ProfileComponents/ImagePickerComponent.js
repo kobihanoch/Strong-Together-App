@@ -12,6 +12,9 @@ import {
 import api from "../../api/api";
 import { useAuth } from "../../context/AuthContext";
 import useMediaUploads from "../../hooks/useMediaUploads";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { colors } from "../../constants/colors";
+import { RFValue } from "react-native-responsive-fontsize";
 
 const { width, height } = Dimensions.get("window");
 
@@ -108,6 +111,14 @@ function ImagePickerComponent({
           />
         )}
       </TouchableOpacity>
+
+      <View style={styles.cameraIconContainer}>
+        <MaterialCommunityIcons
+          name={"camera-outline"}
+          color={colors.textSecondary}
+          size={RFValue(12)}
+        />
+      </View>
     </View>
   );
 }
@@ -128,6 +139,16 @@ const styles = StyleSheet.create({
     color: "white",
     fontSize: 12,
     fontWeight: "bold",
+  },
+  cameraIconContainer: {
+    position: "absolute",
+    bottom: 0,
+    right: -5,
+    backgroundColor: "#e6e6e6ff",
+    padding: 8,
+    borderRadius: 20,
+    borderColor: "white",
+    borderWidth: 1,
   },
 });
 

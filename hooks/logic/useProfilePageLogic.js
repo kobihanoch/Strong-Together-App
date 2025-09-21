@@ -18,8 +18,6 @@ const useProfilePageLogic = () => {
       : 0;
   }, [analyzedExerciseTrackingData]);
 
-  const [mediaLoading, setMediaLoading] = useState(false);
-
   return {
     data: {
       username,
@@ -28,8 +26,6 @@ const useProfilePageLogic = () => {
       workoutCount,
       daysOnline,
     },
-    mediaLoading,
-    setMediaLoading,
   };
 };
 
