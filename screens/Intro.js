@@ -7,8 +7,10 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import Icon from "react-native-vector-icons/FontAwesome";
+import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import Logo from "../components/Logo";
+import { RFValue } from "react-native-responsive-fontsize";
+import { colors } from "../constants/colors";
 
 const { width, height } = Dimensions.get("window");
 
@@ -28,8 +30,8 @@ const Intro = ({ navigation }) => {
 
           <View style={{ alignItems: "center", marginTop: height * 0.15 }}>
             <Text style={styles.descriptionText}>
-              Enjoy a full world of health, now for free. {"\n"} Don't forget to
-              bring your friends!
+              Welcome to Strong Together.{"\n"}Your goals - powered by your
+              circle.
             </Text>
           </View>
 
@@ -58,11 +60,22 @@ const Intro = ({ navigation }) => {
             >
               <View style={{ flexDirection: "row" }}>
                 <Text style={styles.aboutUsText}>About us</Text>
-                <Icon
-                  name="question-circle"
-                  size={width * 0.04}
-                  color="white"
-                />
+                <View
+                  style={{
+                    backgroundColor: "white",
+                    height: 17,
+                    aspectRatio: 1,
+                    borderRadius: 20,
+                    justifyContent: "center",
+                    alignItems: "center",
+                  }}
+                >
+                  <MaterialCommunityIcons
+                    name={"question-circle"}
+                    size={RFValue(9)}
+                    color={colors.primary}
+                  ></MaterialCommunityIcons>
+                </View>
               </View>
             </TouchableOpacity>
           </View>
