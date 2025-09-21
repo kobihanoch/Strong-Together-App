@@ -28,18 +28,6 @@ const TopBar = ({
   return (
     <Column style={styles.container}>
       <Row style={{ gap: 15, alignItems: "center" }}>
-        <View>
-          <LinearGradient
-            colors={["#2979FF", "#2979FF"]}
-            style={styles.iconContainer}
-          >
-            <MaterialCommunityIcons
-              name={"dumbbell"}
-              size={RFValue(15)}
-              color={"white"}
-            />
-          </LinearGradient>
-        </View>
         <Column style={{ gap: 3 }}>
           <Text style={styles.workoutHeader}>Workout {workoutName}</Text>
           <Row style={{ gap: 15 }}>
@@ -70,13 +58,19 @@ const TopBar = ({
         <Row style={{ marginLeft: "auto", gap: 10 }}>
           <TouchableOpacity style={styles.finishBtn} onPress={saveWorkout}>
             <Text style={styles.finishBtnText}>Finish</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.exitBtn} onPress={onExit}>
             <MaterialCommunityIcons
-              name={"exit-to-app"}
+              name={"check"}
               size={RFValue(12)}
-              color={colors.primary}
+              color={"white"}
             />
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.exitBtnContainer} onPress={onExit}>
+            <MaterialCommunityIcons
+              name={"close"}
+              size={RFValue(14)}
+              color={"#1A1A1A"}
+            ></MaterialCommunityIcons>
+            <Text style={styles.exitBtnText}>Quit</Text>
           </TouchableOpacity>
         </Row>
       </Row>
@@ -146,20 +140,19 @@ const styles = StyleSheet.create({
     fontFamily: "Inter_600SemiBold",
     color: "white",
   },
-  exitBtn: {
-    paddingVertical: 12,
-    paddingHorizontal: 10,
+  exitBtnContainer: {
+    paddingVertical: 10,
+    paddingHorizontal: 20,
     justifyContent: "center",
     alignItems: "center",
-    borderRadius: 16,
     backgroundColor: "transparent",
-    borderWidth: 1,
-    borderColor: colors.primary,
+    flexDirection: "row",
+    gap: 7,
   },
   exitBtnText: {
     fontSize: RFValue(12),
     fontFamily: "Inter_600SemiBold",
-    color: colors.primary,
+    color: colors.textSecondary,
   },
   workoutCompletionText: {
     fontSize: RFValue(11),

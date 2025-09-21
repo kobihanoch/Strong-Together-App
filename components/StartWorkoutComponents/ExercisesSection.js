@@ -36,11 +36,11 @@ const RenderItem = ({
 }) => {
   // Recorded stats
   const {
-    weight: recW,
-    reps: recR,
-    notes: recNotes,
-  } = workoutProgressObj[item?.exercise];
-  const exName = item.exercise;
+    weight: recW = [],
+    reps: recR = [],
+    notes: recNotes = [],
+  } = workoutProgressObj[item?.exercise] || {};
+  const exName = item?.exercise;
   const { lastWorkoutData } = useLastWorkoutExerciseTrackingData(item?.id);
 
   // Controls

@@ -1,4 +1,5 @@
 // components/inputs/NumericInputWithRules.jsx
+// English comments only
 import React, { useEffect, useRef, useState } from "react";
 import { TextInput } from "react-native";
 import { safeParseFloat } from "../../utils/sharedUtils";
@@ -16,9 +17,12 @@ import { safeParseFloat } from "../../utils/sharedUtils";
  *    - If first char is '0' and the next char is not '.', remove the leading zeros while typing.
  * 4) Locked:
  *    - Not editable at all. Never calls onValidChange while locked.
+ * 5) commitOnInitial:
+ *    - If true, also "commit" the initial value (and fire onValidChange) on mount and whenever `initial` changes,
+ *      as long as the value is valid per rules and we're not locked.
  *
  * Notes:
- * - onValidChange fires only on successful commit (blur) with a valid value.
+ * - onValidChange fires only on successful commit (blur or initial-commit when commitOnInitial = true).
  */
 const NumericInputWithRules = ({
   initial = 0,
@@ -29,6 +33,7 @@ const NumericInputWithRules = ({
   precision = 2,
   keyboardType = "numeric",
   onBlur,
+  commitOnInitial = false, // <--- new flag, default false
   ...rest
 }) => {
   // Normalize lock: true | "true" | 1 | "1" are treated as locked
@@ -57,10 +62,37 @@ const NumericInputWithRules = ({
   // Keep in sync if initial/lock change from outside
   useEffect(() => {
     const next = Number.isFinite(initial) ? Number(initial) : 0;
-    lastCommitted.current = next;
+    const rounded = toNumber(next);
+
+    // Always reflect externally provided value in the input
     setText(String(next));
     beforeEdit.current = next;
-  }, [initial, locked]);
+
+    // If commitOnInitial is enabled, try to commit and notify
+    if (commitOnInitial && !locked) {
+      // Valid number and passes zero rule
+      const okNumber = rounded != null && (allowZero || rounded !== 0);
+
+      if (okNumber) {
+        // Notify only if it actually differs from what we already committed
+        if (rounded !== lastCommitted.current) {
+          lastCommitted.current = rounded;
+          if (typeof onValidChange === "function") onValidChange(rounded);
+        } else {
+          // Keep committed value in sync
+          lastCommitted.current = rounded;
+        }
+      } else {
+        // Not committing invalid/zero (when zero disallowed)
+        // Keep lastCommitted aligned to the raw next for internal consistency
+        lastCommitted.current = next;
+      }
+    } else {
+      // No initial commit: just sync the committed value
+      lastCommitted.current = next;
+    }
+    // Including allowZero/commitOnInitial in deps so rule changes apply consistently
+  }, [initial, locked, precision, allowZero, commitOnInitial]);
 
   // Typing rules
   const onChangeText = (val) => {
