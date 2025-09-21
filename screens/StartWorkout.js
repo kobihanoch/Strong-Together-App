@@ -3,11 +3,10 @@ import { Dimensions, StyleSheet, View } from "react-native";
 import { Dialog } from "react-native-alert-notification";
 import { RFValue } from "react-native-responsive-fontsize";
 import SlidingBottomModal from "../components/SlidingBottomModal";
-import BottomTabBarStartWorkout from "../components/StartWorkoutComponents/BottomTabBarStartWorkout";
+import ExercisesSection from "../components/StartWorkoutComponents/ExercisesSection";
 import LastWorkoutData from "../components/StartWorkoutComponents/LastWorkoutData";
 import TopBar from "../components/StartWorkoutComponents/TopBar";
 import useStartWorkoutPageLogic from "../hooks/logic/useStartWorkoutPageLogic";
-import ExercisesSection from "../components/StartWorkoutComponents/ExercisesSection";
 
 const { width, height } = Dimensions.get("window");
 
