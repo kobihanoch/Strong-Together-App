@@ -11,7 +11,7 @@ export const getUserWorkout = async () => {
 };
 
 // Gets user exercise tracking data - including home page ata PR most common etc...
-export const getUserExerciseTracking = async (userId) => {
+export const getUserExerciseTracking = async () => {
   try {
     const response = await api.get("/api/workouts/gettracking");
     return response.data;

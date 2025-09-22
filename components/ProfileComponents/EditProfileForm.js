@@ -15,11 +15,18 @@ import { TextInput } from "react-native-gesture-handler";
 import { RFValue } from "react-native-responsive-fontsize";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { colors } from "../../constants/colors";
+import { showErrorAlert } from "../../errors/errorAlerts";
+import { updateSelfUser } from "../../services/UserService";
+import { Notifier, NotifierComponents } from "react-native-notifier";
 
-const EditProfileForm = ({ initialData, closeEditSheet, openEditSheet }) => {
+const EditProfileForm = ({
+  initialData,
+  closeEditSheet,
+  openEditSheet,
+  setUser,
+}) => {
   const { fullName, gender, email, username } = initialData;
   const [fullNameInput, setFullNameInput] = useState(fullName);
-  const [genderInput, setGenderInput] = useState(gender);
   const [emailInput, setEmailInput] = useState(email);
   const [usernameInput, setUsernameInput] = useState(username);
 
@@ -27,7 +34,50 @@ const EditProfileForm = ({ initialData, closeEditSheet, openEditSheet }) => {
     setFullNameInput(fullName);
     setUsernameInput(username);
     setEmailInput(email);
-    setGenderInput(gender);
+    Keyboard.dismiss();
+    closeEditSheet();
+  };
+
+  const handleSave = async () => {
+    if (
+      !fullNameInput ||
+      fullNameInput.length === 0 ||
+      !emailInput ||
+      emailInput.length === 0 ||
+      !usernameInput ||
+      usernameInput.length === 0
+    ) {
+      showErrorAlert("Error Updating User", "Please fill all fields");
+      return;
+    }
+    if (
+      fullNameInput === fullName &&
+      usernameInput === username &&
+      emailInput === email
+    ) {
+      closeEditSheet();
+      return;
+    }
+    const payload = {
+      username: usernameInput,
+      fullName: fullNameInput,
+      email: emailInput,
+    };
+    const res = await updateSelfUser(payload);
+    setUser(res);
+    Notifier.showNotification({
+      title: "User Updated",
+      description: "Your profile changes has been updated successfully",
+      duration: 2500,
+      showAnimationDuration: 250,
+      hideOnPress: true,
+      Component: NotifierComponents.Alert,
+      componentProps: {
+        alertType: "success",
+        titleStyle: { fontSize: 16 },
+        descriptionStyle: { fontSize: 14 },
+      },
+    });
     Keyboard.dismiss();
     closeEditSheet();
   };
@@ -52,7 +102,6 @@ const EditProfileForm = ({ initialData, closeEditSheet, openEditSheet }) => {
                 onChangeText={setFullNameInput}
                 maxLength={20}
                 onFocus={() => openEditSheet(2)}
-                onBlur={() => openEditSheet(0)}
               />
             </Column>
 
@@ -64,7 +113,6 @@ const EditProfileForm = ({ initialData, closeEditSheet, openEditSheet }) => {
                 onChangeText={setUsernameInput}
                 maxLength={15}
                 onFocus={() => openEditSheet(2)}
-                onBlur={() => openEditSheet(0)}
               />
             </Column>
           </Row>
@@ -79,12 +127,14 @@ const EditProfileForm = ({ initialData, closeEditSheet, openEditSheet }) => {
               keyboardType="email-address"
               autoCapitalize="none"
               onFocus={() => openEditSheet(2)}
-              onBlur={() => openEditSheet(0)}
             />
           </Column>
 
           <Row style={{ marginTop: 20 }}>
-            <TouchableOpacity style={styles.saveBtnContainer}>
+            <TouchableOpacity
+              style={styles.saveBtnContainer}
+              onPress={handleSave}
+            >
               <Row style={{ gap: 10 }}>
                 <MaterialCommunityIcons
                   name={"content-save-outline"}

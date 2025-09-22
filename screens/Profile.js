@@ -13,7 +13,7 @@ import EditProfileForm from "../components/ProfileComponents/EditProfileForm";
 const { width, height } = Dimensions.get("window");
 
 const Profile = () => {
-  const { data } = useProfilePageLogic();
+  const { data, setUser } = useProfilePageLogic();
   const {
     username = null,
     email = null,
@@ -158,7 +158,7 @@ const Profile = () => {
           >
             <MaterialCommunityIcons
               name={"camera"}
-              size={RFValue(20)}
+              size={RFValue(15)}
               color={"black"}
             />
             <Text style={styles.sheetBtnText}>Choose image from gallery</Text>
@@ -169,7 +169,7 @@ const Profile = () => {
           >
             <MaterialCommunityIcons
               name={"delete"}
-              size={RFValue(20)}
+              size={RFValue(15)}
               color={"black"}
             />
             <Text style={styles.sheetBtnText}>Remove image</Text>
@@ -196,6 +196,7 @@ const Profile = () => {
           }}
           closeEditSheet={closeEditSheet}
           openEditSheet={openEditSheet}
+          setUser={setUser}
         />
       </SlidingBottomModal>
     </Column>
@@ -236,7 +237,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
   },
   sheetBtnText: {
-    fontSize: RFValue(15),
+    fontSize: RFValue(12),
     fontFamily: "Inter_400Regular",
   },
   infoContainer: {

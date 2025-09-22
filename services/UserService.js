@@ -11,5 +11,10 @@ export const fetchSelfUserData = async () => {
 };
 
 export const deleteSelfUser = async () => {
-  await api("/api/users/deleteself");
+  await api.delete("/api/users/deleteself");
+};
+
+export const updateSelfUser = async (payload) => {
+  const { data } = await api.put("/api/users/updateself", payload);
+  return data?.user;
 };
