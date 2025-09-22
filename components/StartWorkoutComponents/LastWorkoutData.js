@@ -2,13 +2,14 @@ import React from "react";
 import { Text, TouchableOpacity, View, StyleSheet } from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";
 
-const LastWorkoutData = ({ lastWorkoutData, setIndex }) => {
+const LastWorkoutData = ({ lastWorkoutDataForModal }) => {
   const displayValue = (value) =>
     value === undefined || value === null ? "Not recorded" : value;
-
+  const { lastWorkoutData = null, setIndex = 0 } =
+    lastWorkoutDataForModal || {};
   return (
     <View>
-      {lastWorkoutData?.reps[setIndex] ? (
+      {lastWorkoutData ? (
         <View style={styles.contentContainer}>
           <Text style={styles.exerciseName}>{lastWorkoutData.exercise}</Text>
           <View style={styles.infoRow}>

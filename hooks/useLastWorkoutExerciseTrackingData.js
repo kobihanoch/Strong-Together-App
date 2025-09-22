@@ -6,7 +6,8 @@ const useLastWorkoutExerciseTrackingData = (exerciseToSplitId) => {
   const lastWorkoutData = useMemo(() => {
     const allRecords = exerciseTrackingMaps?.byETSId?.[exerciseToSplitId];
     if (!allRecords) return null;
-    return exerciseTrackingMaps?.byETSId?.[exerciseToSplitId][0];
+    const recordForEx = allRecords[0]; // Latest
+    return recordForEx;
   }, [exerciseTrackingMaps, exerciseToSplitId]);
 
   return { lastWorkoutData };

@@ -123,8 +123,7 @@ const RenderItem = ({
             style={{ marginLeft: "auto" }}
             disabled={isSetLocked}
             onPress={() => {
-              setLastWorkoutDataForModal(lastWorkoutData);
-              setVisibleSetIndexForModal(setIndex);
+              setLastWorkoutDataForModal({ lastWorkoutData, setIndex });
               openModal();
             }}
           >
