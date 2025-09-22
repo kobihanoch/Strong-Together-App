@@ -1,27 +1,26 @@
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 import React, { useRef, useState } from "react";
-import {
-  Alert,
-  Dimensions,
-  Text,
-  TouchableOpacity,
-  View,
-  StyleSheet,
-} from "react-native";
+import { Dimensions, StyleSheet, Text, TouchableOpacity } from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";
-import ImagePickerComponent from "../components/ProfileComponents/ImagePickerComponent";
-import { useAuth } from "../context/AuthContext";
-import useProfilePageLogic from "../hooks/logic/useProfilePageLogic";
 import Column from "../components/Column";
-import { colors } from "../constants/colors";
+import ImagePickerComponent from "../components/ProfileComponents/ImagePickerComponent";
 import Row from "../components/Row";
 import SlidingBottomModal from "../components/SlidingBottomModal";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { colors } from "../constants/colors";
+import useProfilePageLogic from "../hooks/logic/useProfilePageLogic";
+import EditProfileForm from "../components/ProfileComponents/EditProfileForm";
 
 const { width, height } = Dimensions.get("window");
 
 const Profile = () => {
   const { data } = useProfilePageLogic();
-  const { username = null, email = null, fullname = null } = data || {};
+  const {
+    username = null,
+    email = null,
+    fullName = null,
+    gender = null,
+    daysOnline = 0,
+  } = data || {};
 
   const actionSheetRef = useRef(null);
   const openActionSheet = () => {
@@ -30,8 +29,18 @@ const Profile = () => {
   const closeActionSheet = () => {
     actionSheetRef?.current?.close();
   };
+
+  const editSheetRef = useRef(null);
+  const openEditSheet = (i = 0) => {
+    editSheetRef?.current?.open(i);
+  };
+  const closeEditSheet = () => {
+    editSheetRef?.current?.close();
+  };
   const [triggerImgPicker, setTriggerImgPicker] = useState(false);
   const [triggerRemoveImg, setTriggerRemoveImg] = useState(false);
+
+  const handleDelPress = undefined;
 
   return (
     <Column style={styles.container}>
@@ -60,10 +69,20 @@ const Profile = () => {
             setTriggerRemoveImg={setTriggerRemoveImg}
           />
           <Column style={{ marginTop: 15, gap: 5, flex: 1 }}>
-            <Text style={styles.name}>{data?.fullname}</Text>
-            <Text style={styles.username}>@{data?.username}</Text>
+            <Text style={styles.name}>{fullName}</Text>
+            <Text style={styles.username}>@{username}</Text>
+            <Row style={{ gap: 5 }}>
+              <Text style={styles.username}>{gender}</Text>
+              <MaterialCommunityIcons
+                name={`gender-${gender.toLowerCase()}`}
+                color={colors.textSecondary}
+              />
+            </Row>
           </Column>
-          <TouchableOpacity style={styles.editProfileBtnContainer}>
+          <TouchableOpacity
+            style={styles.editProfileBtnContainer}
+            onPress={() => openEditSheet(0)}
+          >
             <Row style={{ gap: 5 }}>
               <Text style={styles.editProfileBtnText}>Edit profile</Text>
             </Row>
@@ -76,7 +95,7 @@ const Profile = () => {
               color={"black"}
               size={RFValue(13)}
             />
-            <Text style={styles.contactHeader}>Contact Information</Text>
+            <Text style={styles.contactHeader}>Account Information</Text>
           </Row>
           <Row style={[styles.contactCard, { marginTop: 10 }]}>
             <MaterialCommunityIcons
@@ -86,7 +105,7 @@ const Profile = () => {
             />
             <Column>
               <Text style={styles.contactCardHeader}>Email</Text>
-              <Text style={styles.contactCardData}>{data?.email}</Text>
+              <Text style={styles.contactCardData}>{email}</Text>
             </Column>
           </Row>
           <Row style={styles.contactCard}>
@@ -97,7 +116,7 @@ const Profile = () => {
             />
             <Column>
               <Text style={styles.contactCardHeader}>Online Since</Text>
-              <Text style={styles.contactCardData}>{data?.daysOnline}</Text>
+              <Text style={styles.contactCardData}>{daysOnline}</Text>
             </Column>
           </Row>
         </Column>
@@ -156,6 +175,28 @@ const Profile = () => {
             <Text style={styles.sheetBtnText}>Remove image</Text>
           </TouchableOpacity>
         </Column>
+      </SlidingBottomModal>
+
+      {/* Edit profile sheet */}
+      <SlidingBottomModal
+        ref={editSheetRef}
+        snapPoints={["60%", "65%", "75%"]}
+        flatListUsage={false}
+        title={null}
+        enablePanDownClose={false}
+        enableBackDrop={false}
+      >
+        <EditProfileForm
+          initialData={{
+            username,
+            email,
+            fullName,
+            gender,
+            daysOnline,
+          }}
+          closeEditSheet={closeEditSheet}
+          openEditSheet={openEditSheet}
+        />
       </SlidingBottomModal>
     </Column>
   );
@@ -320,7 +361,7 @@ const styles = StyleSheet.create({
               color: "black",
             }}
           >
-            {data.fullname}
+            {data.fullName}
           </Text>
           <Text
             style={{

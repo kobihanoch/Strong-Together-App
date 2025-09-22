@@ -9,3 +9,7 @@ export const fetchSelfUserData = async () => {
     throw error;
   }
 };
+
+export const deleteSelfUser = async () => {
+  await api("/api/users/deleteself");
+};
