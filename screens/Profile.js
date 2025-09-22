@@ -43,16 +43,6 @@ const Profile = () => {
               <Text style={styles.semiHeader}>
                 Manage your account information
               </Text>
-              <TouchableOpacity style={styles.editProfileBtnContainer}>
-                <Row style={{ gap: 5 }}>
-                  <MaterialCommunityIcons
-                    name={"pencil"}
-                    color={"black"}
-                    size={RFValue(10)}
-                  />
-                  <Text style={styles.editProfileBtnText}>Edit profile</Text>
-                </Row>
-              </TouchableOpacity>
             </Row>
           </Column>
         </Row>
@@ -69,10 +59,15 @@ const Profile = () => {
             setTriggerImgPicker={setTriggerImgPicker}
             setTriggerRemoveImg={setTriggerRemoveImg}
           />
-          <Column style={{ marginTop: 15, gap: 5 }}>
+          <Column style={{ marginTop: 15, gap: 5, flex: 1 }}>
             <Text style={styles.name}>{data?.fullname}</Text>
             <Text style={styles.username}>@{data?.username}</Text>
           </Column>
+          <TouchableOpacity style={styles.editProfileBtnContainer}>
+            <Row style={{ gap: 5 }}>
+              <Text style={styles.editProfileBtnText}>Edit profile</Text>
+            </Row>
+          </TouchableOpacity>
         </Row>
         <Column style={{ marginTop: 50, width: "100%", gap: 10 }}>
           <Row style={{ gap: 5 }}>
@@ -114,17 +109,19 @@ const Profile = () => {
           { marginTop: "auto", marginHorizontal: 20 },
         ]}
       >
-        <MaterialCommunityIcons
-          name={"delete"}
-          color={colors.error}
-          size={RFValue(15)}
-        />
         <Column>
           <Text style={styles.dangerZoneHeader}>Danger Zone</Text>
           <Text style={styles.dangerZoneSemiHeader}>Delete you account</Text>
         </Column>
         <TouchableOpacity style={styles.delBtnContainer}>
-          <Text style={styles.delBtnText}>Delete</Text>
+          <Row style={{ gap: 7 }}>
+            <MaterialCommunityIcons
+              name={"delete"}
+              color={"white"}
+              size={RFValue(15)}
+            />
+            <Text style={styles.delBtnText}>Delete</Text>
+          </Row>
         </TouchableOpacity>
       </Row>
 
@@ -218,13 +215,12 @@ const styles = StyleSheet.create({
   },
   editProfileBtnContainer: {
     marginLeft: "auto",
-    backgroundColor: "white",
     padding: 10,
-    borderRadius: 10,
+    marginTop: 10,
   },
   editProfileBtnText: {
     fontFamily: "Inter_500Medium",
-    color: "black",
+    color: colors.primary,
     fontSize: RFValue(10),
   },
   contactHeader: {
@@ -266,7 +262,8 @@ const styles = StyleSheet.create({
   },
   delBtnContainer: {
     backgroundColor: colors.error,
-    padding: 15,
+    padding: 10,
+    paddingHorizontal: 15,
     borderRadius: 16,
     marginLeft: "auto",
   },
