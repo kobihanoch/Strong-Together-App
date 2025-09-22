@@ -22,6 +22,7 @@ import Row from "../components/Row.js";
 import { logUserCardio } from "../services/CardioService.js";
 import { Notifier, NotifierComponents } from "react-native-notifier";
 import { useNavigation } from "@react-navigation/native";
+import NoWorkoutPlan from "../components/MyWorkoutPlanComponents/NoWorkoutPlan.js";
 
 const { width, height } = Dimensions.get("window");
 
@@ -237,7 +238,9 @@ const MyWorkoutPlan = () => {
       </View>
     </View>
   ) : (
-    <View />
+    <NoWorkoutPlan
+      onCreatePress={() => nav.navigate("CreateWorkout")}
+    ></NoWorkoutPlan>
   );
 };
 
