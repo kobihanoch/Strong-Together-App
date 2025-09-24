@@ -4,6 +4,7 @@ import React, {
   forwardRef,
   useCallback,
   useEffect,
+  useMemo,
   useRef,
   useState,
 } from "react";
@@ -28,6 +29,30 @@ import { Notifier, NotifierComponents } from "react-native-notifier";
 
 const { width, height } = Dimensions.get("window");
 
+const ExerciseRow = React.memo(({ item, selectedMuscle, handleExPress }) => {
+  //console.log(item.name, "renderd");
+  return (
+    <TouchableOpacity
+      style={styles.exContainer}
+      onPress={() => handleExPress(item)}
+    >
+      {/* Exercise item */}
+      <Row style={{ gap: 20 }}>
+        <View style={styles.dumbbelIconContainer}>
+          <FontAwesome5 name="dumbbell" size={RFValue(12)} color="grey" />
+        </View>
+        <Column>
+          <Text style={styles.exName}>{item?.name}</Text>
+          <Text style={styles.exMuscles}>
+            {selectedMuscle === "All" ? item?.targetmuscle : selectedMuscle},{" "}
+            {item?.specificTargetMuscle}
+          </Text>
+        </Column>
+      </Row>
+    </TouchableOpacity>
+  );
+});
+
 const ExercisePickerModal = forwardRef(function ExercisePickerModal(
   {
     selectedSplit,
@@ -40,9 +65,26 @@ const ExercisePickerModal = forwardRef(function ExercisePickerModal(
   ref
 ) {
   const { addExercise } = controls;
-  const handleExPress = (ex) => {
-    addExercise(ex);
-    if (exForSplit.some((_ex) => _ex.id === ex.id)) {
+
+  // Refs for better optimzation
+  const selectedSplitRef = useRef(null);
+  useEffect(() => {
+    selectedSplitRef.current = selectedSplit;
+  }, [selectedSplit]);
+  const exIdsRef = useRef(new Set(exForSplit?.map((e) => e.id)));
+  useEffect(() => {
+    exIdsRef.current = new Set(exForSplit?.map((e) => e.id));
+  }, [exForSplit]);
+  const addExerciseRef = useRef(null);
+  useEffect(() => {
+    addExerciseRef.current = addExercise;
+  }, [addExercise]);
+
+  const handleExPress = useCallback((ex) => {
+    const currentSplit = selectedSplitRef.current;
+
+    // duplicate check using the latest ids
+    if (exIdsRef.current.has(ex.id)) {
       Notifier.showNotification({
         title: "Exercise already added",
         description: `"${ex?.name}" is already added`,
@@ -58,10 +100,13 @@ const ExercisePickerModal = forwardRef(function ExercisePickerModal(
       });
       return;
     }
-    ref.current.close();
+
+    // add and close
+    addExerciseRef.current(ex);
+    ref?.current?.close();
     Notifier.showNotification({
       title: "Exercise Added",
-      description: `"${ex.name}" added to Split ${selectedSplit}`,
+      description: `"${ex.name}" added to Split ${currentSplit}`,
       duration: 2500,
       showAnimationDuration: 250,
       hideOnPress: true,
@@ -72,45 +117,35 @@ const ExercisePickerModal = forwardRef(function ExercisePickerModal(
         descriptionStyle: { fontSize: 14 },
       },
     });
-  };
+  }, []);
 
   const [selectedMuscle, setSelectedMuscle] = useState("All");
   const exToShow =
     selectedMuscle === "All"
       ? allExercises
       : availableExercises[selectedMuscle];
-  const [filteredExToShow, setFilteredExToShow] = useState(exToShow ?? []);
+
   const [query, setQuery] = useState("");
-  useEffect(() => {
-    setFilteredExToShow(() =>
+  const filteredExToShow = useMemo(
+    () =>
       exToShow.filter((ex) =>
         ex.name.toLowerCase().includes(query.toLowerCase())
-      )
-    );
-  }, [query, exToShow]);
+      ),
+    [exToShow, query]
+  );
 
-  const renderItem = useCallback(({ item }) => {
-    return (
-      <TouchableOpacity
-        style={styles.exContainer}
-        onPress={() => handleExPress(item)}
-      >
-        {/* Exercise item */}
-        <Row style={{ gap: 20 }}>
-          <View style={styles.dumbbelIconContainer}>
-            <FontAwesome5 name="dumbbell" size={RFValue(12)} color="grey" />
-          </View>
-          <Column>
-            <Text style={styles.exName}>{item?.name}</Text>
-            <Text style={styles.exMuscles}>
-              {selectedMuscle === "All" ? item?.targetmuscle : selectedMuscle},{" "}
-              {item?.specificTargetMuscle}
-            </Text>
-          </Column>
-        </Row>
-      </TouchableOpacity>
-    );
-  });
+  const renderItem = useCallback(
+    ({ item }) => (
+      <ExerciseRow
+        item={item}
+        selectedMuscle={selectedMuscle}
+        handleExPress={handleExPress}
+      />
+    ),
+    [selectedMuscle, handleExPress]
+  );
+
+  const keyExtractor = useCallback((item) => item.id, []);
 
   return (
     <SlidingBottomModal
@@ -178,7 +213,7 @@ const ExercisePickerModal = forwardRef(function ExercisePickerModal(
           <BottomSheetFlatList
             data={filteredExToShow}
             renderItem={renderItem}
-            keyExtractor={(item) => item.id}
+            keyExtractor={keyExtractor}
             showsVerticalScrollIndicator={false}
             // Allow taps to work while keyboard is open
             keyboardShouldPersistTaps="handled"
@@ -244,7 +279,7 @@ const styles = StyleSheet.create({
     fontSize: RFValue(13),
   },
   exMuscles: {
-    fontFamily: "Inter_4ooRegular",
+    fontFamily: "Inter_400Regular",
     color: colors.textSecondary,
     fontSize: RFValue(10),
   },

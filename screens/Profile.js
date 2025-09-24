@@ -1,18 +1,350 @@
-import React from "react";
-import { Alert, Dimensions, Text, TouchableOpacity, View } from "react-native";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
+import React, { useRef, useState } from "react";
+import { Dimensions, StyleSheet, Text, TouchableOpacity } from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";
+import Column from "../components/Column";
 import ImagePickerComponent from "../components/ProfileComponents/ImagePickerComponent";
-import { useAuth } from "../context/AuthContext";
+import Row from "../components/Row";
+import SlidingBottomModal from "../components/SlidingBottomModal";
+import { colors } from "../constants/colors";
 import useProfilePageLogic from "../hooks/logic/useProfilePageLogic";
+import EditProfileForm from "../components/ProfileComponents/EditProfileForm";
+import { useAuth } from "../context/AuthContext";
+import { Dialog } from "react-native-alert-notification";
+import { deleteSelfUser } from "../services/UserService";
 
 const { width, height } = Dimensions.get("window");
 
-function Profile({ navigation }) {
-  const { user } = useAuth();
-  const { data, mediaLoading, setMediaLoading } = useProfilePageLogic();
+const Profile = () => {
+  const { data, setUser } = useProfilePageLogic();
+  const { logout } = useAuth();
+  const {
+    username = null,
+    email = null,
+    fullName = null,
+    gender = null,
+    daysOnline = 0,
+  } = data || {};
+
+  const actionSheetRef = useRef(null);
+  const openActionSheet = () => {
+    actionSheetRef?.current?.open(0);
+  };
+  const closeActionSheet = () => {
+    actionSheetRef?.current?.close();
+  };
+
+  const editSheetRef = useRef(null);
+  const openEditSheet = (i = 0) => {
+    editSheetRef?.current?.open(i);
+  };
+  const closeEditSheet = () => {
+    editSheetRef?.current?.close();
+  };
+  const [triggerImgPicker, setTriggerImgPicker] = useState(false);
+  const [triggerRemoveImg, setTriggerRemoveImg] = useState(false);
+
+  const handleDelPress = async () => {
+    Dialog.show({
+      type: "DANGER",
+      title: "Delete Account",
+      titleStyle: {
+        fontSize: 22,
+      },
+      textBody: "Are you sure you want to delete your account?",
+      textBodyStyle: {
+        fontSize: 45,
+      },
+      button: "Yes, delete",
+      closeOnOverlayTap: true,
+      onPressButton: async () => {
+        Dialog.hide();
+        await deleteSelfUser();
+        logout();
+      },
+      onHide: () => {
+        Dialog.hide();
+      },
+    });
+  };
 
   return (
-    <View
+    <Column style={styles.container}>
+      <Column style={styles.topSectionContainer}>
+        <Row style={{ justifyContent: "space-between", alignItems: "center" }}>
+          <Column style={{ gap: 7 }}>
+            <Text style={styles.header}>Profile</Text>
+            <Row style={{ width: "100%" }}>
+              <Text style={styles.semiHeader}>
+                Manage your account information
+              </Text>
+            </Row>
+          </Column>
+        </Row>
+      </Column>
+
+      <Column style={styles.infoContainer}>
+        <Row style={{ gap: 15, alignItems: "flex-start", width: "100%" }}>
+          <ImagePickerComponent
+            style={{ height: height * 0.1, aspectRatio: 1 }}
+            openActionSheet={openActionSheet}
+            closeActionSheet={closeActionSheet}
+            triggerImgPicker={triggerImgPicker}
+            triggerRemoveImg={triggerRemoveImg}
+            setTriggerImgPicker={setTriggerImgPicker}
+            setTriggerRemoveImg={setTriggerRemoveImg}
+          />
+          <Column style={{ marginTop: 15, gap: 5, flex: 1 }}>
+            <Text style={styles.name}>{fullName}</Text>
+            <Text style={styles.username}>@{username}</Text>
+            <Row style={{ gap: 5 }}>
+              <Text style={styles.username}>{gender}</Text>
+              <MaterialCommunityIcons
+                name={`gender-${gender.toLowerCase()}`}
+                color={colors.textSecondary}
+              />
+            </Row>
+          </Column>
+          <TouchableOpacity
+            style={styles.editProfileBtnContainer}
+            onPress={() => openEditSheet(0)}
+          >
+            <Row style={{ gap: 5 }}>
+              <Text style={styles.editProfileBtnText}>Edit profile</Text>
+            </Row>
+          </TouchableOpacity>
+        </Row>
+        <Column style={{ marginTop: 50, width: "100%", gap: 10 }}>
+          <Row style={{ gap: 5 }}>
+            <MaterialCommunityIcons
+              name={"account"}
+              color={"black"}
+              size={RFValue(13)}
+            />
+            <Text style={styles.contactHeader}>Account Information</Text>
+          </Row>
+          <Row style={[styles.contactCard, { marginTop: 10 }]}>
+            <MaterialCommunityIcons
+              name={"email-outline"}
+              color={"black"}
+              size={RFValue(15)}
+            />
+            <Column>
+              <Text style={styles.contactCardHeader}>Email</Text>
+              <Text style={styles.contactCardData}>{email}</Text>
+            </Column>
+          </Row>
+          <Row style={styles.contactCard}>
+            <MaterialCommunityIcons
+              name={"calendar-outline"}
+              color={"black"}
+              size={RFValue(15)}
+            />
+            <Column>
+              <Text style={styles.contactCardHeader}>Online Since</Text>
+              <Text style={styles.contactCardData}>{daysOnline}</Text>
+            </Column>
+          </Row>
+        </Column>
+      </Column>
+
+      <Row
+        style={[
+          styles.contactCard,
+          { marginTop: "auto", marginHorizontal: 20 },
+        ]}
+      >
+        <Column>
+          <Text style={styles.dangerZoneHeader}>Danger Zone</Text>
+          <Text style={styles.dangerZoneSemiHeader}>Delete you account</Text>
+        </Column>
+        <TouchableOpacity
+          style={styles.delBtnContainer}
+          onPress={handleDelPress}
+        >
+          <Row style={{ gap: 7 }}>
+            <MaterialCommunityIcons
+              name={"delete"}
+              color={"white"}
+              size={RFValue(15)}
+            />
+            <Text style={styles.delBtnText}>Delete</Text>
+          </Row>
+        </TouchableOpacity>
+      </Row>
+
+      {/* Action sheet for profile pic */}
+      <SlidingBottomModal
+        ref={actionSheetRef}
+        snapPoints={["25%", "25%", "25%"]}
+        flatListUsage={false}
+        title={null}
+      >
+        <Column style={{ gap: 20, paddingHorizontal: 20, marginTop: 10 }}>
+          <TouchableOpacity
+            style={styles.sheetBtn}
+            onPress={() => setTriggerImgPicker(true)}
+          >
+            <MaterialCommunityIcons
+              name={"camera"}
+              size={RFValue(15)}
+              color={"black"}
+            />
+            <Text style={styles.sheetBtnText}>Choose image from gallery</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.sheetBtn}
+            onPress={() => setTriggerRemoveImg(true)}
+          >
+            <MaterialCommunityIcons
+              name={"delete"}
+              size={RFValue(15)}
+              color={"black"}
+            />
+            <Text style={styles.sheetBtnText}>Remove image</Text>
+          </TouchableOpacity>
+        </Column>
+      </SlidingBottomModal>
+
+      {/* Edit profile sheet */}
+      <SlidingBottomModal
+        ref={editSheetRef}
+        snapPoints={["60%", "65%", "75%"]}
+        flatListUsage={false}
+        title={null}
+        enablePanDownClose={false}
+        enableBackDrop={false}
+      >
+        <EditProfileForm
+          initialData={{
+            username,
+            email,
+            fullName,
+            gender,
+            daysOnline,
+          }}
+          closeEditSheet={closeEditSheet}
+          openEditSheet={openEditSheet}
+          setUser={setUser}
+        />
+      </SlidingBottomModal>
+    </Column>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    paddingBottom: 20,
+  },
+  topSectionContainer: {
+    backgroundColor: colors.lightCardBg,
+    height: height * 0.2,
+    justifyContent: "flex-end",
+    paddingBottom: 20,
+    paddingHorizontal: 20,
+  },
+  header: {
+    fontFamily: "Inter_600SemiBold",
+    color: "black",
+    fontSize: RFValue(20),
+  },
+  semiHeader: {
+    fontFamily: "Inter_400Regular",
+    color: colors.textSecondary,
+    fontSize: RFValue(12),
+  },
+  sheetBtn: {
+    width: "100%",
+    flexDirection: "row",
+    paddingHorizontal: 20,
+    alignItems: "center",
+    paddingVertical: 15,
+    gap: 15,
+    borderRadius: 16,
+    borderColor: "#e4e4e4ff",
+    borderWidth: 1,
+  },
+  sheetBtnText: {
+    fontSize: RFValue(12),
+    fontFamily: "Inter_400Regular",
+  },
+  infoContainer: {
+    padding: 20,
+    alignItems: "flex-start",
+    justifyContent: "flex-start",
+  },
+  name: {
+    fontFamily: "Inter_600SemiBold",
+    fontSize: RFValue(17),
+    color: "black",
+  },
+  username: {
+    fontFamily: "Inter_500Medium",
+    fontSize: RFValue(12),
+    color: colors.textSecondary,
+  },
+  editProfileBtnContainer: {
+    marginLeft: "auto",
+    padding: 10,
+    marginTop: 10,
+  },
+  editProfileBtnText: {
+    fontFamily: "Inter_500Medium",
+    color: colors.primary,
+    fontSize: RFValue(10),
+  },
+  contactHeader: {
+    fontFamily: "Inter_600SemiBold",
+    color: "black",
+    fontSize: RFValue(13),
+  },
+  contactCard: {
+    padding: 15,
+    borderColor: "#ddd",
+    borderWidth: 1,
+    borderRadius: 16,
+    gap: 15,
+  },
+  contactCardHeader: {
+    fontFamily: "Inter_400Regular",
+    color: colors.textSecondary,
+    fontSize: RFValue(12),
+  },
+  contactCardData: {
+    fontFamily: "Inter_500Medium",
+    color: "black",
+    fontSize: RFValue(14),
+  },
+  contactCardHeader: {
+    fontFamily: "Inter_400Regular",
+    color: colors.textSecondary,
+    fontSize: RFValue(12),
+  },
+  dangerZoneHeader: {
+    fontFamily: "Inter_600SemiBold",
+    color: colors.error,
+    fontSize: RFValue(14),
+  },
+  dangerZoneSemiHeader: {
+    fontFamily: "Inter_400Regular",
+    color: colors.error,
+    fontSize: RFValue(12),
+  },
+  delBtnContainer: {
+    backgroundColor: colors.error,
+    padding: 10,
+    paddingHorizontal: 15,
+    borderRadius: 16,
+    marginLeft: "auto",
+  },
+  delBtnText: {
+    color: "white",
+    fontFamily: "Inter_600SemiBold",
+    fontSize: RFValue(12),
+  },
+});
+/*<View
       style={{
         flex: 1,
         alignItems: "center",
@@ -59,7 +391,7 @@ function Profile({ navigation }) {
               color: "black",
             }}
           >
-            {data.fullname}
+            {data.fullName}
           </Text>
           <Text
             style={{
@@ -171,8 +503,6 @@ function Profile({ navigation }) {
           </View>
         </View>
       </View>
-    </View>
-  );
-}
+    </View>*/
 
 export default Profile;

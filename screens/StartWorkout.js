@@ -22,7 +22,6 @@ const StartWorkout = ({ navigation, route }) => {
     route.params?.resumedWorkout
   );
   const [lastWorkoutDataForModal, setLastWorkoutDataForModal] = useState(null);
-  const [visibleSetIndexForModal, setVisibleSetIndexForModal] = useState(0);
 
   const modalRef = useRef(null);
   const openModal = useCallback(() => {
@@ -92,7 +91,6 @@ const StartWorkout = ({ navigation, route }) => {
           controls={controls}
           workoutProgressObj={workoutProgressObj}
           setLastWorkoutDataForModal={setLastWorkoutDataForModal}
-          setVisibleSetIndexForModal={setVisibleSetIndexForModal}
           openModal={openModal}
         />
       </View>
@@ -104,8 +102,7 @@ const StartWorkout = ({ navigation, route }) => {
         flatListUsage={false}
       >
         <LastWorkoutData
-          lastWorkoutData={lastWorkoutDataForModal}
-          setIndex={visibleSetIndexForModal}
+          lastWorkoutDataForModal={lastWorkoutDataForModal}
         ></LastWorkoutData>
       </SlidingBottomModal>
     </View>

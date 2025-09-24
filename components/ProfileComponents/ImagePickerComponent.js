@@ -1,5 +1,6 @@
+import { Image } from "expo-image";
 import * as ImagePicker from "expo-image-picker";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useImperativeHandle, useState } from "react";
 import {
   ActivityIndicator,
   Dimensions,
@@ -8,63 +9,54 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { Image } from "expo-image";
 import api from "../../api/api";
 import { useAuth } from "../../context/AuthContext";
 import useMediaUploads from "../../hooks/useMediaUploads";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { colors } from "../../constants/colors";
+import { RFValue } from "react-native-responsive-fontsize";
 
 const { width, height } = Dimensions.get("window");
 
-function ImagePickerComponent({ user, setMediaLoading }) {
-  const { setUser } = useAuth();
+function ImagePickerComponent({
+  openActionSheet,
+  closeActionSheet,
+  triggerImgPicker,
+  setTriggerImgPicker,
+  triggerRemoveImg,
+  setTriggerRemoveImg,
+  style,
+}) {
+  const { setUser, user } = useAuth();
   const { uploadToStorageAndReturnPath, loading: mediaLoading } =
     useMediaUploads();
 
-  const [profileimagePath, setProfileimagePath] = useState(
-    user?.profile_image_url
-  );
-
-  useEffect(() => {
-    if (setMediaLoading) {
-      setMediaLoading(mediaLoading);
-    }
-  }, [mediaLoading]);
+  const profileimagePath = user?.profile_image_url;
 
   const pickAndUploadImage = async () => {
-    try {
-      await ImagePicker.requestMediaLibraryPermissionsAsync();
+    await ImagePicker.requestMediaLibraryPermissionsAsync();
 
-      const result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ImagePicker.Images,
-        allowsEditing: true,
-        quality: 0.5,
-      });
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.Images,
+      allowsEditing: true,
+      quality: 0.5,
+    });
 
-      if (!result.canceled && result.assets.length > 0) {
-        const asset = result.assets[0];
+    if (!result.canceled && result.assets.length > 0) {
+      const asset = result.assets[0];
 
-        const file = {
-          uri: asset.uri,
-          name: `${user.id}.jpg`,
-          type: "image/jpeg",
-        };
+      const file = {
+        uri: asset.uri,
+        name: `${user.id}.jpg`,
+        type: "image/jpeg",
+      };
 
-        console.log("Older path:", profileimagePath);
-        const { path } = await uploadToStorageAndReturnPath(file);
-
-        // Update in auth context
-        setUser((prev) => ({
-          ...prev,
-          profile_image_url: path,
-        }));
-
-        setProfileimagePath(path);
-        console.log("Newer path:", profileimagePath);
-      }
-    } catch (err) {
-      console.log("Error handling profile image upload:", err);
-    } finally {
-      setMediaLoading(false);
+      const { path } = await uploadToStorageAndReturnPath(file);
+      // Update in auth context
+      setUser((prev) => ({
+        ...prev,
+        profile_image_url: path,
+      }));
     }
   };
 
@@ -72,14 +64,25 @@ function ImagePickerComponent({ user, setMediaLoading }) {
     await api.delete(`/api/users/deleteprofilepic`, {
       data: { path: profileimagePath },
     });
+
     // Update in auth context
     setUser((prev) => ({
       ...prev,
       profile_image_url: null,
     }));
-
-    setProfileimagePath(null);
   };
+
+  useEffect(() => {
+    closeActionSheet();
+    if (triggerImgPicker) pickAndUploadImage();
+    setTriggerImgPicker(false);
+  }, [triggerImgPicker]);
+
+  useEffect(() => {
+    closeActionSheet();
+    if (triggerRemoveImg) deleteProfilePicture();
+    setTriggerRemoveImg(false);
+  }, [triggerRemoveImg]);
 
   return (
     <View
@@ -89,15 +92,7 @@ function ImagePickerComponent({ user, setMediaLoading }) {
         gap: height * 0.02,
       }}
     >
-      {profileimagePath ? (
-        <TouchableOpacity
-          onPress={deleteProfilePicture}
-          style={styles.deleteButton}
-        >
-          <Text style={styles.deleteButtonText}>Remove Picture</Text>
-        </TouchableOpacity>
-      ) : null}
-      <TouchableOpacity onPress={pickAndUploadImage}>
+      <TouchableOpacity onPress={openActionSheet}>
         {mediaLoading ? (
           <ActivityIndicator size="large" />
         ) : (
@@ -112,10 +107,18 @@ function ImagePickerComponent({ user, setMediaLoading }) {
                 : require("../../assets/woman.png")
             }
             cachePolicy={"disk"}
-            style={styles.image}
+            style={[styles.image, style]}
           />
         )}
       </TouchableOpacity>
+
+      <View style={styles.cameraIconContainer}>
+        <MaterialCommunityIcons
+          name={"camera-outline"}
+          color={colors.textSecondary}
+          size={RFValue(12)}
+        />
+      </View>
     </View>
   );
 }
@@ -125,7 +128,6 @@ const styles = StyleSheet.create({
     width: width * 0.3,
     height: width * 0.3,
     borderRadius: height * 0.7,
-    marginBottom: 10,
   },
   deleteButton: {
     backgroundColor: "#ff4444",
@@ -137,6 +139,16 @@ const styles = StyleSheet.create({
     color: "white",
     fontSize: 12,
     fontWeight: "bold",
+  },
+  cameraIconContainer: {
+    position: "absolute",
+    bottom: 0,
+    right: -5,
+    backgroundColor: "#e6e6e6ff",
+    padding: 8,
+    borderRadius: 20,
+    borderColor: "white",
+    borderWidth: 1,
   },
 });
 

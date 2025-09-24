@@ -99,15 +99,15 @@ const useStartWorkoutPageLogic = (selectedSplit, resumedWorkout = null) => {
   }, []);
 
   // --------------------[ Save Workout ]-----------------------------------------
-  const clearCache = () => {
-    cacheDeleteKey(cacheKey);
+  const clearCache = async () => {
+    await cacheDeleteKey(cacheKey);
   };
 
-  const onExit = useCallback(() => {
-    clearCache();
+  const onExit = async () => {
+    await clearCache();
     // Force unmounting
     navigation.replace("MyWorkoutPlan");
-  }, [cacheKey]);
+  };
 
   const { saveWorkoutProcess } = useUserWorkout();
   const [saveStarted, setSaveStarted] = useState(false);
