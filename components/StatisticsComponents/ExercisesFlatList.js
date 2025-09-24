@@ -8,7 +8,7 @@ import { Dimensions, FlatList, StyleSheet, Text } from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";
 import { colors } from "../../constants/colors";
 import Column from "../Column";
-import images from "../images";
+import Images from "../Images";
 import Row from "../Row";
 import RestDayCard from "./RestDayCard";
 import StatsTable from "./StatsTable";
@@ -19,7 +19,7 @@ const ExerciseItem = ({ index, exData, lastPerformanceData }) => {
   const mainMuscle = exData?.exercisetoworkoutsplit?.exercises?.targetmuscle;
   const specificMuscle =
     exData?.exercisetoworkoutsplit?.exercises?.specifictargetmuscle;
-  const imagePath = images[mainMuscle]?.[specificMuscle];
+  const imagePath = Images[mainMuscle]?.[specificMuscle];
 
   const lastLogOfEx = useMemo(() => {
     if (lastPerformanceData) {

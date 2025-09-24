@@ -13,6 +13,8 @@ import { useNavigation } from "@react-navigation/native";
 import { Skeleton } from "moti/skeleton";
 import { useGlobalAppLoadingContext } from "../../context/GlobalAppLoadingContext";
 import { colors } from "../../constants/colors";
+import { useAnalysisContext } from "../../context/AnalysisContext";
+import PercantageCircle from "../PercentageCircle";
 const AnimatedCircle = Animated.createAnimatedComponent(Circle);
 
 const { width, height } = Dimensions.get("window");
@@ -21,6 +23,7 @@ const StartWorkoutCard = ({ data }) => {
   const { workoutSplits, workoutForEdit } = useWorkoutContext();
   const { isLoading } = useGlobalAppLoadingContext();
   const { mostFrequentSplit, totalWorkoutNumber, hasTracking } = data;
+  const { hasTrainedToday = false } = useAnalysisContext() || {};
   const navigation = useNavigation();
 
   const bodyPartsForMostFrqSplit = useMemo(() => {
@@ -36,34 +39,14 @@ const StartWorkoutCard = ({ data }) => {
     return workoutForEdit[data?.mostFrequentSplit?.splitName]?.length;
   }, [workoutForEdit, data, hasTracking]);
 
-  const radius = width * 0.1;
-  const strokeWidth = width * 0.02;
-  const normalizedRadius = radius - strokeWidth / 2;
-  const circumference = 2 * Math.PI * normalizedRadius;
-
   const progress = useMemo(
     () =>
       hasTracking && totalWorkoutNumber
-        ? Math.min(mostFrequentSplit.times / totalWorkoutNumber, 1)
+        ? Math.round((mostFrequentSplit.times / totalWorkoutNumber) * 100)
         : 0,
     [hasTracking, totalWorkoutNumber]
   );
 
-  //console.log(mostFrequentSplit);
-  const animatedValue = useRef(new Animated.Value(0)).current;
-
-  useEffect(() => {
-    Animated.timing(animatedValue, {
-      toValue: progress,
-      duration: 600,
-      useNativeDriver: false,
-    }).start();
-  }, [progress]);
-
-  const strokeDashoffset = animatedValue.interpolate({
-    inputRange: [0, 1],
-    outputRange: [circumference, 0],
-  });
   return (
     <Skeleton.Group show={isLoading}>
       <View style={styles.bgWrapper}>
@@ -141,80 +124,24 @@ const StartWorkoutCard = ({ data }) => {
             </View>
             {/* Circle */}
 
-            <View
-              style={{
-                flexDirection: "column",
-                flex: 2,
-                alignSelf: "flex-start",
-                marginTop: 5,
-              }}
-            >
-              <View
-                style={{
-                  width: radius * 2,
-                  height: radius * 2,
-                  justifyContent: "center",
-                  alignItems: "center",
-                  position: "relative",
-                }}
+            <View style={{}}>
+              <Skeleton
+                colors={[
+                  "rgba(136, 136, 136, 1)",
+                  "rgba(201, 201, 201, 1)",
+                  "rgba(136, 136, 136, 1)",
+                ]}
+                radius={"round"}
               >
-                <Skeleton
-                  colors={[
-                    "rgba(136, 136, 136, 1)",
-                    "rgba(201, 201, 201, 1)",
-                    "rgba(136, 136, 136, 1)",
-                  ]}
-                  radius={"round"}
+                <PercantageCircle
+                  percent={progress}
+                  fullColor="#dddddd4c"
+                  actualColor="white"
+                  size={70}
                 >
-                  <Svg height={radius * 2} width={radius * 2}>
-                    <Circle
-                      stroke="#e6e6e654"
-                      fill="transparent"
-                      strokeWidth={strokeWidth}
-                      r={normalizedRadius}
-                      cx={radius}
-                      cy={radius}
-                    />
-                    <AnimatedCircle
-                      stroke="#ffffffff"
-                      fill="transparent"
-                      strokeWidth={strokeWidth}
-                      strokeLinecap="round"
-                      strokeDasharray={circumference}
-                      strokeDashoffset={strokeDashoffset}
-                      r={normalizedRadius}
-                      cx={radius}
-                      cy={radius}
-                      rotation="-90"
-                      origin={`${radius}, ${radius}`}
-                    />
-                  </Svg>
-                </Skeleton>
-                <View
-                  style={{
-                    position: "absolute",
-                    justifyContent: "center",
-                    alignItems: "center",
-                  }}
-                >
-                  <Text
-                    style={{
-                      fontSize: RFValue(15),
-                      color: "#ffffffff",
-                    }}
-                  >
-                    {isLoading
-                      ? ""
-                      : hasTracking
-                      ? Math.round(
-                          Number(
-                            mostFrequentSplit?.times / totalWorkoutNumber
-                          ) * 100
-                        ) + "%"
-                      : 0 + "%"}
-                  </Text>
-                </View>
-              </View>
+                  <Text style={styles.perText}>{progress}%</Text>
+                </PercantageCircle>
+              </Skeleton>
             </View>
           </View>
 
@@ -222,7 +149,7 @@ const StartWorkoutCard = ({ data }) => {
           <View style={{ width: "100%" }}>
             {isLoading || !hasTracking ? (
               <View style={{ height: 80 }}></View>
-            ) : (
+            ) : !hasTrainedToday ? (
               <SlideToStart
                 onUnlock={() => {
                   navigation.navigate("StartWorkout", {
@@ -232,6 +159,10 @@ const StartWorkoutCard = ({ data }) => {
                   });
                 }}
               />
+            ) : (
+              <Text style={styles.alreadyTrainedText}>
+                Already trained today
+              </Text>
             )}
           </View>
         </LinearGradient>
@@ -278,6 +209,18 @@ const styles = StyleSheet.create({
     fontFamily: "Inter_400Regular",
     color: "rgba(206, 206, 206, 0.86)",
     fontSize: RFValue(13),
+  },
+  perText: {
+    fontFamily: "Inter_600SemiBold",
+    color: "white",
+    fontSize: RFValue(15),
+  },
+  alreadyTrainedText: {
+    fontFamily: "Inter_600SemiBold",
+    color: "white",
+    fontSize: RFValue(15),
+    textAlign: "center",
+    marginTop: 40,
   },
 });
 

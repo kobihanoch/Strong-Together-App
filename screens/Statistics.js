@@ -6,7 +6,7 @@ import CalendarStripCustom from "../components/StatisticsComponents/CalenderStri
 import CardioSection from "../components/StatisticsComponents/CardioSection";
 import ExercisesFlatList from "../components/StatisticsComponents/ExercisesFlatList";
 import TabSelect from "../components/StatisticsComponents/TabSelect";
-import WorkoutHeader from "../components/StatisticsComponents/workoutHeader";
+import WorkoutHeader from "../components/StatisticsComponents/WorkoutHeader";
 import { useAuth } from "../context/AuthContext";
 import { useGlobalAppLoadingContext } from "../context/GlobalAppLoadingContext";
 import useStatisticsPageLogic from "../hooks/logic/useStatisticsPageLogic";

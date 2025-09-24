@@ -9,7 +9,8 @@ import {
   TouchableWithoutFeedback,
   View,
 } from "react-native";
-import Icon from "react-native-vector-icons/FontAwesome";
+import { RFValue } from "react-native-responsive-fontsize";
+import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 
 const { width, height } = Dimensions.get("window");
 
@@ -55,16 +56,15 @@ const SelectField = ({
 
         {/* Right side icons: gender icon + dropdown chevron */}
         <View style={styles.rightIcons}>
-          <Icon
-            name={iconName}
-            size={width * 0.035}
-            color="#e0efff"
-            style={{ marginRight: 8 }}
-          />
-          <Icon
+          {/*<MaterialCommunityIcons
+            name={iconName ?? null}
+            size={RFValue(15)}
+            color={"white"}
+          />*/}
+          <MaterialCommunityIcons
             name={open ? "chevron-up" : "chevron-down"}
-            size={width * 0.035}
-            color="#e0efff"
+            size={RFValue(15)}
+            color={"white"}
           />
         </View>
       </TouchableOpacity>
@@ -98,7 +98,13 @@ const SelectField = ({
                   >
                     {opt}
                   </Text>
-                  {selected && <Icon name="check" size={14} color="#004fa3" />}
+                  {selected && (
+                    <MaterialCommunityIcons
+                      name="check"
+                      size={RFValue(15)}
+                      color="#004fa3"
+                    />
+                  )}
                 </TouchableOpacity>
               );
             })}

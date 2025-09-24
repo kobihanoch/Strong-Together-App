@@ -77,6 +77,9 @@ const getNextSplitNameFromObj = (obj) => {
 
 export const reindexExercises = (arr) => {
   return arr.map((ex, i) => {
+    // If order_index is already correct, keep the same object reference
+    if (ex.order_index === i) return ex;
+    // Otherwise create a new object only for the changed one
     return { ...ex, order_index: i };
   });
 };

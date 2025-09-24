@@ -22,180 +22,188 @@ import { Notifier, NotifierComponents } from "react-native-notifier";
 
 const { height, width } = Dimensions.get("window");
 
-const RenderItem = ({
-  item,
-  drag,
-  removeExercise,
-  updateSets,
-  selectedSplit,
-}) => {
-  const exNumber = item.order_index + 1;
-  const [setsChose, setSetsChose] = useState(3);
-  const [setsArr, setSetsArr] = useState(item?.sets);
+const ExerciseDraggableItem = React.memo(
+  ({ item, drag, removeExercise, updateSets, selectedSplit }) => {
+    const exNumber = item.order_index + 1;
+    const [setsChose, setSetsChose] = useState(3);
+    const [setsArr, setSetsArr] = useState(item?.sets);
 
-  useEffect(() => {
-    updateSets(item, setsArr);
-  }, [setsArr]);
+    useEffect(() => {
+      // Keep chosen count in sync with the current sets array
+      const n = Array.isArray(setsArr) ? setsArr.length : 0;
+      setSetsChose(n || 0);
+    }, [setsArr]);
 
-  const handleChangeAt = (idx) => (val) => {
-    // val is the parsed number from commit()
-    setSetsArr((prev) => {
-      const next = [...prev];
-      next[idx] = val;
-      return next;
-    });
-  };
+    useEffect(() => {
+      updateSets(item, setsArr);
+    }, [setsArr]);
 
-  const handleRemoveExercise = (ex) => {
-    removeExercise(ex);
+    const handleChangeAt = (idx) => (val) => {
+      // val is the parsed number from commit()
+      setSetsArr((prev) => {
+        const next = [...prev];
+        next[idx] = val;
+        return next;
+      });
+    };
 
-    Notifier.showNotification({
-      title: "Exercise Removed",
-      description: `"${ex?.name}" removed from Split ${selectedSplit}`,
-      duration: 2500,
-      showAnimationDuration: 250,
-      hideOnPress: true,
-      Component: NotifierComponents.Alert,
-      componentProps: {
-        alertType: "info",
-        titleStyle: { fontSize: 16 },
-        descriptionStyle: { fontSize: 14 },
-      },
-    });
-  };
+    const handleRemoveExercise = (ex) => {
+      removeExercise(ex);
 
-  const renderSetsChoose = [];
-  for (let i = 0; i < 5; i++) {
-    const isSetChose = i + 1 <= setsChose;
-    renderSetsChoose.push(
-      <TouchableOpacity
-        style={[
-          styles.setContainer,
-          isSetChose ? { backgroundColor: colors.primary } : {},
-        ]}
-        key={i}
-        onPress={() => {
-          const n = i + 1;
-          setSetsChose(n);
-          setSetsArr((prev) => {
-            const arr = Array.isArray(prev) ? [...prev] : [];
-            for (let j = 0; j < n; j++) {
-              if (arr[j] == null) arr[j] = 10;
-            }
-            arr.length = n;
-            return arr;
-          });
-        }}
-      >
-        <Text style={[styles.setText, , isSetChose ? { color: "white" } : {}]}>
-          {i + 1}
-        </Text>
-      </TouchableOpacity>
+      Notifier.showNotification({
+        title: "Exercise Removed",
+        description: `"${ex?.name}" removed from Split ${selectedSplit}`,
+        duration: 2500,
+        showAnimationDuration: 250,
+        hideOnPress: true,
+        Component: NotifierComponents.Alert,
+        componentProps: {
+          alertType: "info",
+          titleStyle: { fontSize: 16 },
+          descriptionStyle: { fontSize: 14 },
+        },
+      });
+    };
+
+    const renderSetsChoose = [];
+    for (let i = 0; i < 5; i++) {
+      const isSetChose = i + 1 <= setsChose;
+      renderSetsChoose.push(
+        <TouchableOpacity
+          style={[
+            styles.setContainer,
+            isSetChose ? { backgroundColor: colors.primary } : {},
+          ]}
+          key={i}
+          onPress={() => {
+            const n = i + 1;
+            setSetsChose(n);
+            setSetsArr((prev) => {
+              const arr = Array.isArray(prev) ? [...prev] : [];
+              for (let j = 0; j < n; j++) {
+                if (arr[j] == null) arr[j] = 10;
+              }
+              arr.length = n;
+              return arr;
+            });
+          }}
+        >
+          <Text
+            style={[styles.setText, , isSetChose ? { color: "white" } : {}]}
+          >
+            {i + 1}
+          </Text>
+        </TouchableOpacity>
+      );
+    }
+
+    return (
+      <ScaleDecorator activeScale={0.98}>
+        <Column style={styles.exerciseItemContainer}>
+          <Row style={{ gap: 10, alignItems: "center" }}>
+            <Pressable
+              onLongPress={drag}
+              delayLongPress={120}
+              style={styles.heandleDrag}
+            >
+              <MaterialCommunityIcons
+                name={"drag"}
+                size={RFValue(20)}
+                color={"black"}
+                opacity={0.4}
+              ></MaterialCommunityIcons>
+            </Pressable>
+            <Column style={{ gap: 2 }}>
+              <Text style={styles.exerciseHeader}>
+                {item.name},{" "}
+                <Text
+                  style={{
+                    fontFamily: "Inter_400Regular",
+                    color: colors.textSecondary,
+                    fontSize: RFValue(12),
+                    opacity: 0.7,
+                  }}
+                >
+                  {item?.targetmuscle}
+                </Text>
+              </Text>
+              <Text style={styles.exerciseCount}>Exercise {exNumber}</Text>
+            </Column>
+            <TouchableOpacity
+              style={{ marginLeft: "auto" }}
+              onPress={() => handleRemoveExercise(item)}
+            >
+              <MaterialCommunityIcons
+                name={"close"}
+                size={RFValue(15)}
+                color={"black"}
+                opacity={0.4}
+              ></MaterialCommunityIcons>
+            </TouchableOpacity>
+          </Row>
+          <Column style={styles.setsSectionContainer}>
+            <Row style={{ alignItems: "flex-start" }}>
+              <Column style={{ gap: 10 }}>
+                <Text style={styles.setsHeader}>Choose sets amount</Text>
+                <Row style={{ gap: 5 }}>{renderSetsChoose}</Row>
+              </Column>
+              <Text style={styles.setsChoseText}>
+                {setsChose + " " + (setsChose === 1 ? "set" : "sets")}
+              </Text>
+            </Row>
+            <Text style={styles.setsHeader}>Reps (Tap to edit)</Text>
+            <Row
+              style={{ gap: 5, justifyContent: "flex-start", flexWrap: "wrap" }}
+            >
+              {setsArr.map((set, i) => {
+                return (
+                  <Column style={styles.setInputContainer} key={i}>
+                    <Row style={{ gap: 10 }}>
+                      <Text style={{ fontSize: RFValue(10), opacity: 0.4 }}>
+                        S{i + 1}
+                      </Text>
+                      <NumericInputWithRules
+                        initial={set || 10}
+                        allowZero={false}
+                        isSetLocked={false}
+                        style={{
+                          fontFamily: "Inter_600SemiBold",
+                          fontSize: RFValue(11),
+                        }}
+                        onValidChange={handleChangeAt(i)}
+                        commitOnInitial={true}
+                      />
+                    </Row>
+                  </Column>
+                );
+              })}
+            </Row>
+          </Column>
+        </Column>
+      </ScaleDecorator>
     );
   }
-
-  return (
-    <ScaleDecorator activeScale={0.98}>
-      <Column style={styles.exerciseItemContainer}>
-        <Row style={{ gap: 10, alignItems: "center" }}>
-          <Pressable
-            onLongPress={drag}
-            delayLongPress={120}
-            style={styles.heandleDrag}
-          >
-            <MaterialCommunityIcons
-              name={"drag"}
-              size={RFValue(20)}
-              color={"black"}
-              opacity={0.4}
-            ></MaterialCommunityIcons>
-          </Pressable>
-          <Column style={{ gap: 2 }}>
-            <Text style={styles.exerciseHeader}>
-              {item.name},{" "}
-              <Text
-                style={{
-                  fontFamily: "Inter_400Regular",
-                  color: colors.textSecondary,
-                  fontSize: RFValue(12),
-                  opacity: 0.7,
-                }}
-              >
-                {item?.targetmuscle}
-              </Text>
-            </Text>
-            <Text style={styles.exerciseCount}>Exercise {exNumber}</Text>
-          </Column>
-          <TouchableOpacity
-            style={{ marginLeft: "auto" }}
-            onPress={() => handleRemoveExercise(item)}
-          >
-            <MaterialCommunityIcons
-              name={"close"}
-              size={RFValue(15)}
-              color={"black"}
-              opacity={0.4}
-            ></MaterialCommunityIcons>
-          </TouchableOpacity>
-        </Row>
-        <Column style={styles.setsSectionContainer}>
-          <Row style={{ alignItems: "flex-start" }}>
-            <Column style={{ gap: 10 }}>
-              <Text style={styles.setsHeader}>Choose sets amount</Text>
-              <Row style={{ gap: 5 }}>{renderSetsChoose}</Row>
-            </Column>
-            <Text style={styles.setsChoseText}>
-              {setsChose + " " + (setsChose === 1 ? "set" : "sets")}
-            </Text>
-          </Row>
-          <Text style={styles.setsHeader}>Reps (Tap to edit)</Text>
-          <Row
-            style={{ gap: 5, justifyContent: "flex-start", flexWrap: "wrap" }}
-          >
-            {setsArr.map((set, i) => {
-              return (
-                <Column style={styles.setInputContainer} key={i}>
-                  <Row style={{ gap: 10 }}>
-                    <Text style={{ fontSize: RFValue(10), opacity: 0.4 }}>
-                      S{i + 1}
-                    </Text>
-                    <NumericInputWithRules
-                      initial={set || 10}
-                      allowZero={false}
-                      isSetLocked={false}
-                      style={{
-                        fontFamily: "Inter_600SemiBold",
-                        fontSize: RFValue(11),
-                      }}
-                      onValidChange={handleChangeAt(i)}
-                      commitOnInitial={true}
-                    />
-                  </Row>
-                </Column>
-              );
-            })}
-          </Row>
-        </Column>
-      </Column>
-    </ScaleDecorator>
-  );
-};
+);
 
 const SelectedExercisesList = ({ exForSplit, controls, selectedSplit }) => {
   const { removeExercise, onDragEnd, updateSets } = controls || {};
-  // Render item with drag handle wired to the left handle
+  const keyExtractor = useCallback((item) => item.id, []);
+
   const renderItem = useCallback(
-    ({ item, drag }) => (
-      <RenderItem
-        item={item}
-        drag={drag}
-        removeExercise={removeExercise}
-        updateSets={updateSets}
-        selectedSplit={selectedSplit}
-      />
-    ),
-    [removeExercise]
+    ({ item, drag }) => {
+      return (
+        <ExerciseDraggableItem
+          item={item}
+          drag={drag}
+          removeExercise={removeExercise}
+          updateSets={updateSets}
+          selectedSplit={selectedSplit}
+        />
+      );
+    },
+    [removeExercise, updateSets, selectedSplit]
   );
+
   if (exForSplit.length === 0) {
     return (
       <View style={{ flex: 7, justifyContent: "center" }}>
