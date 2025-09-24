@@ -9,11 +9,15 @@ import SlidingBottomModal from "../components/SlidingBottomModal";
 import { colors } from "../constants/colors";
 import useProfilePageLogic from "../hooks/logic/useProfilePageLogic";
 import EditProfileForm from "../components/ProfileComponents/EditProfileForm";
+import { useAuth } from "../context/AuthContext";
+import { Dialog } from "react-native-alert-notification";
+import { deleteSelfUser } from "../services/UserService";
 
 const { width, height } = Dimensions.get("window");
 
 const Profile = () => {
   const { data, setUser } = useProfilePageLogic();
+  const { logout } = useAuth();
   const {
     username = null,
     email = null,
@@ -40,7 +44,29 @@ const Profile = () => {
   const [triggerImgPicker, setTriggerImgPicker] = useState(false);
   const [triggerRemoveImg, setTriggerRemoveImg] = useState(false);
 
-  const handleDelPress = undefined;
+  const handleDelPress = async () => {
+    Dialog.show({
+      type: "DANGER",
+      title: "Delete Account",
+      titleStyle: {
+        fontSize: 22,
+      },
+      textBody: "Are you sure you want to delete your account?",
+      textBodyStyle: {
+        fontSize: 45,
+      },
+      button: "Yes, delete",
+      closeOnOverlayTap: true,
+      onPressButton: async () => {
+        Dialog.hide();
+        await deleteSelfUser();
+        logout();
+      },
+      onHide: () => {
+        Dialog.hide();
+      },
+    });
+  };
 
   return (
     <Column style={styles.container}>
@@ -132,7 +158,10 @@ const Profile = () => {
           <Text style={styles.dangerZoneHeader}>Danger Zone</Text>
           <Text style={styles.dangerZoneSemiHeader}>Delete you account</Text>
         </Column>
-        <TouchableOpacity style={styles.delBtnContainer}>
+        <TouchableOpacity
+          style={styles.delBtnContainer}
+          onPress={handleDelPress}
+        >
           <Row style={{ gap: 7 }}>
             <MaterialCommunityIcons
               name={"delete"}

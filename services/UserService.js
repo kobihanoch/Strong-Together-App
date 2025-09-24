@@ -10,6 +10,7 @@ export const fetchSelfUserData = async () => {
   }
 };
 
+// Delete self user - procceed with CAUTION
 export const deleteSelfUser = async () => {
   await api.delete("/api/users/deleteself");
 };
