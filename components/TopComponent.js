@@ -5,6 +5,7 @@ import React, { useEffect, useState } from "react";
 import {
   Animated,
   Dimensions,
+  Easing,
   Modal,
   StyleSheet,
   Text,
@@ -40,14 +41,16 @@ const TopComponent = () => {
     if (unreadMessages) {
       Animated.sequence([
         Animated.timing(scaleAnim, {
-          toValue: 1.4,
-          duration: 150,
+          toValue: 2,
+          duration: 200,
           useNativeDriver: true,
+          easing: Easing.out(Easing.exp), // Slow start → fast end
         }),
         Animated.timing(scaleAnim, {
           toValue: 1,
           duration: 150,
           useNativeDriver: true,
+          easing: Easing.in(Easing.circle), // Fast start → slow end
         }),
       ]).start();
     }
@@ -131,16 +134,15 @@ const TopComponent = () => {
               <Animated.View
                 style={{
                   transform: [{ scale: scaleAnim }],
-                  backgroundColor: "#EF4444",
-                  height: height * 0.015,
-                  borderRadius: height * 0.05,
+                  backgroundColor: "#ff2979",
+                  height: 15,
+                  borderRadius: 50,
                   aspectRatio: 1,
                   position: "absolute",
-                  bottom: 0,
-                  right: 0,
+                  bottom: -2,
+                  right: -2,
                   justifyContent: "center",
                   alignItems: "center",
-                  opacity: isWorkoutMode ? 0 : msgCount == 0 ? 0 : 1,
                 }}
               >
                 <Text
