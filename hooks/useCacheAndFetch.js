@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { TTL_48H } from "../cache/cacheUtils";
 import useGetCache from "./useGetCache";
 import useUpdateCache from "./useUpdateCache";
@@ -33,6 +33,9 @@ const useCacheAndFetch = (
   const [loading, setLoading] = useState(false);
 
   const [cacheKnown, setCacheKnown] = useState(false);
+
+  // Against react strict mode (Dev)
+  const hasFetch = useRef(false);
 
   // Updates cache auto when cached payload refrence is builded again (on data change)
   useUpdateCache(logLabel, cacheKey, cachedPayload, TTL_48H, dataHydrated);
@@ -70,6 +73,7 @@ const useCacheAndFetch = (
   useEffect(() => {
     (async () => {
       if (isValidatedByServerFlag) {
+        if (!cacheKey) return;
         try {
           // Call API
           const dataFromAPI = await fetchFn();
@@ -84,7 +88,7 @@ const useCacheAndFetch = (
         }
       }
     })();
-  }, [isValidatedByServerFlag]);
+  }, [isValidatedByServerFlag, cacheKey]);
 
   return { data, loading, cacheKnown };
 };
