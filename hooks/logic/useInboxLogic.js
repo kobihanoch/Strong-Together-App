@@ -12,12 +12,6 @@ const useInboxLogic = () => {
   const { allReceivedMessages, setAllReceivedMessages } =
     useNotifications(user);
 
-  const sortedMessages = useMemo(() => {
-    return [...allReceivedMessages].sort(
-      (a, b) => new Date(b.sent_at) - new Date(a.sent_at)
-    );
-  }, [allReceivedMessages]);
-
   const markAsRead = useCallback(async (msgId) => {
     await updateMsgReadStatus(msgId);
     // Update state
@@ -53,7 +47,7 @@ const useInboxLogic = () => {
   }, []);
 
   return {
-    sortedMessages,
+    allReceivedMessages,
     confirmAndDeleteMessage,
     markAsRead,
   };

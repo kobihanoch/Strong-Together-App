@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import { Dimensions, Modal, Text, TouchableOpacity, View } from "react-native";
 import { Swipeable } from "react-native-gesture-handler";
 import { RFValue } from "react-native-responsive-fontsize";
+import { useNotifications } from "../../context/NotificationsContext";
 import { formatDate } from "../../utils/statisticsUtils";
 
 const { width, height } = Dimensions.get("window");

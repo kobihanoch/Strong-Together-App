@@ -8,7 +8,7 @@ const { width, height } = Dimensions.get("window");
 
 const Inbox = () => {
   const {
-    sortedMessages = [],
+    allReceivedMessages = [],
     confirmAndDeleteMessage,
     markAsRead,
   } = useInboxLogic() || {};
@@ -43,9 +43,9 @@ const Inbox = () => {
         </Text>
       </View>
       <View style={{ flex: 8.5 }}>
-        {sortedMessages.length != 0 ? (
+        {allReceivedMessages.length != 0 ? (
           <FlatList
-            data={sortedMessages}
+            data={allReceivedMessages}
             renderItem={renderItem}
             keyExtractor={keyExtractor}
             style={{ width: "100%" }}
