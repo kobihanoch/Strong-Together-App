@@ -8,6 +8,7 @@ import {
 } from "react";
 import { keyInbox } from "../cache/cacheUtils.js";
 import useCacheAndFetch from "../hooks/useCacheAndFetch.js";
+import useUpdateGlobalLoading from "../hooks/useUpdateGlobalLoading.js";
 import {
   getUserMessages,
   updateMsgReadStatus,
@@ -18,8 +19,7 @@ import {
 } from "../utils/notificationsContextUtils.js";
 import { registerToMessagesListener } from "../webSockets/socketListeners";
 import { useAuth } from "./AuthContext.js";
-import { useGlobalAppLoadingContext } from "./GlobalAppLoadingContext.js";
-import useUpdateGlobalLoading from "../hooks/useUpdateGlobalLoading.js";
+import { hasBootstrapPayload } from "../api/bootstrapApi";
 
 /**
  * Notifications Flow:

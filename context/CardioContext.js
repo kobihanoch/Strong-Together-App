@@ -11,6 +11,7 @@ import { getUserCardio } from "../services/CardioService";
 import useCacheAndFetch from "../hooks/useCacheAndFetch";
 import useUpdateGlobalLoading from "../hooks/useUpdateGlobalLoading";
 import moment from "moment";
+import { hasBootstrapPayload } from "../api/bootstrapApi";
 
 const CardioContext = createContext();
 

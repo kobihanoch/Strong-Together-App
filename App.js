@@ -58,8 +58,6 @@ function useFontsReady() {
   return ready;
 }
 
-const RootStack = createStackNavigator();
-
 // ---------- App Root ----------
 export default function App() {
   const fontsReady = useFontsReady();

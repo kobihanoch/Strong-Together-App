@@ -11,6 +11,7 @@ import useUpdateGlobalLoading from "../hooks/useUpdateGlobalLoading";
 import { getUserWorkout } from "../services/WorkoutService";
 import { extractWorkoutSplits } from "../utils/workoutContextUtils";
 import { useAuth } from "./AuthContext";
+import { hasBootstrapPayload } from "../api/bootstrapApi";
 
 const WorkoutContext = createContext(null);
 export const useWorkoutContext = () => {
