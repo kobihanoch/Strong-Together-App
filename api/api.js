@@ -5,10 +5,10 @@ import GlobalAuth from "../utils/authUtils";
 import { saveRefreshToken } from "../utils/tokenStore";
 import { API_BASE_URL } from "./apiConfig";
 import {
+  ensureBootstrap,
   isOpen,
   isTracked,
   responseMap,
-  ensureBootstrap,
 } from "./bootstrapApi";
 import {
   isDeviceOnline,

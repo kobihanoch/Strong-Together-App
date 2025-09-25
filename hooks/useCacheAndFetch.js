@@ -34,11 +34,11 @@ const useCacheAndFetch = (
 
   const [cacheKnown, setCacheKnown] = useState(false);
 
-  // Against react strict mode (Dev)
-  const hasFetch = useRef(false);
-
   // Updates cache auto when cached payload refrence is builded again (on data change)
   useUpdateCache(logLabel, cacheKey, cachedPayload, TTL_48H, dataHydrated);
+
+  // Flow:
+  // Load -> has cache? -> If yes procceed with cache | If no notify cache known (bacuse we already know cache stste - false) and now fetch
 
   // Load from cache
   // Functional only when there is a cache key and cache is hydrated (skip mounting phase)
@@ -70,9 +70,10 @@ const useCacheAndFetch = (
   }, [isCacheHydrated, cacheKey]);
 
   // Fetch from API => Triggers when server validates tokens (after refresh tokens endpoint completed with no errors)
+  // Fire only after cache is known
   useEffect(() => {
     (async () => {
-      if (isValidatedByServerFlag) {
+      if (isValidatedByServerFlag && cacheKnown) {
         if (!cacheKey) return;
         try {
           // Call API
@@ -84,11 +85,12 @@ const useCacheAndFetch = (
           setDataHydrated(true);
           // Store in cache (auto)
         } finally {
+          setCacheKnown(true);
           setLoading(false);
         }
       }
     })();
-  }, [isValidatedByServerFlag, cacheKey]);
+  }, [isValidatedByServerFlag, cacheKey, cacheKnown]);
 
   return { data, loading, cacheKnown };
 };

@@ -14,6 +14,7 @@ import {
   unpackFromExerciseTrackingData,
 } from "../utils/analysisContexUtils";
 import { useAuth } from "./AuthContext";
+import { hasBootstrapPayload } from "../api/bootstrapApi";
 
 const AnalysisContext = createContext(null);
 export const useAnalysisContext = () => {

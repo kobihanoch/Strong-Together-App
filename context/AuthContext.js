@@ -32,6 +32,7 @@ import {
 } from "../utils/tokenStore.js";
 import { connectSocket, disconnectSocket } from "../webSockets/socketConfig";
 import { resetBootstrap } from "../api/bootstrapApi";
+import { hasBootstrapPayload } from "../api/bootstrapApi";
 
 const AuthContext = createContext(null);
 export const useAuth = () => useContext(AuthContext);
@@ -89,7 +90,10 @@ export const AuthProvider = ({ children }) => {
   );
 
   // Report auth session loading to global loading
-  useUpdateGlobalLoading("Auth", cacheKnown ? userDataLoading : true);
+  useUpdateGlobalLoading(
+    "Auth",
+    cacheKnown ? userDataLoading : hasBootstrapPayload()
+  );
 
   /**
    * initializeUserSession
@@ -210,17 +214,18 @@ export const AuthProvider = ({ children }) => {
 
       // Start cache hook logic
       // User is fetched from server by cache hook
-      console.log("Still loading in context => is logged in true");
-
+      console.log(
+        "Redirecting to app stack => is logged in true and data is being fetched"
+      );
       setIsLoggedIn(true);
+      setUserIdCache(u);
+      console.log("\x1b[32m[Auth Context]: Login succeeded!\x1b[0m");
       setIsValidatedWithServer(true);
-      setUserIdCache(u.id);
       setAuthPhase("authed");
 
       // Save for later entrance
-      await cacheSetJSON("CACHE:USER_ID", u.id, TTL_48H);
+      await cacheSetJSON("CACHE:USER_ID", u, TTL_48H);
       // For other contexes to start fetching from API after cache
-      console.log("\x1b[32m[Auth Context]: Login succeeded!\x1b[0m");
 
       // Cache stores auto
     } finally {

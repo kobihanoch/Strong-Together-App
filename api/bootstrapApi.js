@@ -23,6 +23,7 @@ let closed = false; // once true, we stop intercepting
 let graceT = null; // short grace so late requests still get slices
 
 export const responseMap = {
+  "/api/users/get": "user",
   "/api/workouts/gettracking": "tracking",
   "/api/aerobics/get": "aerobics",
   "/api/messages/getmessages": "messages",
@@ -34,6 +35,8 @@ export const isTracked = (url) =>
 
 // Interception is open until we mark it closed
 export const isOpen = () => !closed;
+
+export const hasBootstrapPayload = () => !!payload;
 
 // Single-flight bootstrap fetch
 export async function ensureBootstrap() {
@@ -49,7 +52,7 @@ export async function ensureBootstrap() {
     if (graceT) clearTimeout(graceT);
     graceT = setTimeout(() => {
       closed = true;
-    }, 500);
+    }, 150);
 
     inflight = null;
     return payload;
