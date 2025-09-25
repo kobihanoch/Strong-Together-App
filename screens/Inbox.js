@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useCallback } from "react";
 import { Dimensions, Text, View } from "react-native";
 import { FlatList } from "react-native-gesture-handler";
 import { RFValue } from "react-native-responsive-fontsize";
@@ -7,7 +7,26 @@ import useInboxLogic from "../hooks/logic/useInboxLogic";
 const { width, height } = Dimensions.get("window");
 
 const Inbox = () => {
-  const { messages, media } = useInboxLogic();
+  const {
+    sortedMessages = [],
+    confirmAndDeleteMessage,
+    markAsRead,
+  } = useInboxLogic() || {};
+
+  const renderItem = useCallback(
+    ({ item }) => {
+      return (
+        <MessageItem
+          item={item}
+          deleteMessage={confirmAndDeleteMessage}
+          markAsRead={markAsRead}
+        />
+      );
+    },
+    [confirmAndDeleteMessage]
+  );
+
+  const keyExtractor = useCallback((item) => item.id);
   return (
     <View
       style={{ flex: 1, flexDirection: "column", paddingTop: height * 0.07 }}
@@ -24,23 +43,11 @@ const Inbox = () => {
         </Text>
       </View>
       <View style={{ flex: 8.5 }}>
-        {messages.allReceivedMessages.length != 0 ? (
+        {sortedMessages.length != 0 ? (
           <FlatList
-            data={[...messages.allReceivedMessages].sort(
-              (a, b) => new Date(b.sent_at) - new Date(a.sent_at)
-            )}
-            renderItem={({ item }) => (
-              <MessageItem
-                item={item}
-                profileImages={media.profileImagesCache}
-                sender={{
-                  id: item.sender_id,
-                  name: item.sender_full_name,
-                }}
-                deleteMessage={messages.confirmAndDeleteMessage}
-              ></MessageItem>
-            )}
-            keyExtractor={(item) => item.id}
+            data={sortedMessages}
+            renderItem={renderItem}
+            keyExtractor={keyExtractor}
             style={{ width: "100%" }}
           ></FlatList>
         ) : (
