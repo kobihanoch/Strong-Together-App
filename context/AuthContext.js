@@ -31,6 +31,7 @@ import {
   saveRefreshToken,
 } from "../utils/tokenStore.js";
 import { connectSocket, disconnectSocket } from "../webSockets/socketConfig";
+import { resetBootstrap } from "../api/bootstrapApi";
 
 const AuthContext = createContext(null);
 export const useAuth = () => useContext(AuthContext);
@@ -212,8 +213,8 @@ export const AuthProvider = ({ children }) => {
       console.log("Still loading in context => is logged in true");
 
       setIsLoggedIn(true);
-      setUserIdCache(u.id);
       setIsValidatedWithServer(true);
+      setUserIdCache(u.id);
       setAuthPhase("authed");
 
       // Save for later entrance
@@ -270,6 +271,7 @@ export const AuthProvider = ({ children }) => {
     await clearRefreshToken();
     await cacheDeleteAllCache();
     GlobalAuth.setAccessToken(null);
+    resetBootstrap();
     setIsLoggedIn(false);
     setLoading(false);
     setUser(null);
