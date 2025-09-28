@@ -7,20 +7,18 @@ const useSettingsLogic = () => {
     useState(null);
 
   // Derived boolean for UI logic
-  const hasNotificationsPermission = useMemo(
-    () => notificationsPermissionStatus === "granted",
-    [notificationsPermissionStatus]
-  );
+  const hasNotificationsPermission =
+    notificationsPermissionStatus === "granted";
 
   // Check current permission without prompting
-  const checkNotificationsPermission = useCallback(async () => {
+  const checkNotificationsPermission = async () => {
     const perm = await Notifications.getPermissionsAsync();
     setNotificationsPermissionStatus(perm.status);
     return perm;
-  }, []);
+  };
 
   // Ask the user for permission (only if not already granted)
-  const requestNotificationsPermission = useCallback(async () => {
+  const requestNotificationsPermission = async () => {
     const before = await Notifications.getPermissionsAsync();
     if (before.status === "granted") {
       setNotificationsPermissionStatus("granted");
@@ -38,10 +36,9 @@ const useSettingsLogic = () => {
 
     setNotificationsPermissionStatus(after.status);
     return after;
-  }, []);
+  };
 
   useEffect(() => {
-    // Optionally check on mount
     checkNotificationsPermission();
   }, [checkNotificationsPermission]);
 
