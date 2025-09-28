@@ -9,8 +9,10 @@ import {
 
 const useInboxLogic = () => {
   const { user } = useAuth();
-  const { allReceivedMessages, setAllReceivedMessages } =
+  const { allReceivedMessages, setAllReceivedMessages, unreadMessages } =
     useNotifications(user);
+
+  const unreadMessagesCount = unreadMessages?.length;
 
   const markAsRead = useCallback(async (msgId) => {
     await updateMsgReadStatus(msgId);
@@ -48,6 +50,7 @@ const useInboxLogic = () => {
 
   return {
     allReceivedMessages,
+    unreadMessagesCount,
     confirmAndDeleteMessage,
     markAsRead,
   };

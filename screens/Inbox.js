@@ -4,6 +4,7 @@ import { FlatList } from "react-native-gesture-handler";
 import { RFValue } from "react-native-responsive-fontsize";
 import MessageItem from "../components/InboxComponents/MessageItem";
 import useInboxLogic from "../hooks/logic/useInboxLogic";
+import { colors } from "../constants/colors";
 const { width, height } = Dimensions.get("window");
 
 const Inbox = () => {
@@ -11,6 +12,7 @@ const Inbox = () => {
     allReceivedMessages = [],
     confirmAndDeleteMessage,
     markAsRead,
+    unreadMessagesCount = 0,
   } = useInboxLogic() || {};
 
   const renderItem = useCallback(
@@ -28,10 +30,15 @@ const Inbox = () => {
 
   const keyExtractor = useCallback((item) => item.id);
   return (
-    <View
-      style={{ flex: 1, flexDirection: "column", paddingTop: height * 0.07 }}
-    >
-      <View style={{ flex: 1.5, justifyContent: "center" }}>
+    <View style={{ flex: 1, flexDirection: "column" }}>
+      <View
+        style={{
+          flex: 2,
+          justifyContent: "flex-end",
+          paddingBottom: 20,
+          backgroundColor: colors.lightCardBg,
+        }}
+      >
         <Text
           style={{
             fontFamily: "Inter_600SemiBold",
@@ -42,13 +49,35 @@ const Inbox = () => {
           Inbox
         </Text>
       </View>
-      <View style={{ flex: 8.5 }}>
+      <View style={{ flex: 8, marginTop: 20 }}>
+        <Text
+          style={{
+            fontFamily: "Inter_400Regular",
+            fontSize: RFValue(13),
+            color: "black",
+            marginLeft: 15,
+            marginBottom: 20,
+          }}
+        >
+          You have{" "}
+          <Text
+            style={{
+              fontFamily: "Inter_600SemiBold",
+              fontSize: RFValue(13),
+              color: "black",
+            }}
+          >
+            {unreadMessagesCount}
+          </Text>{" "}
+          unread messages
+        </Text>
         {allReceivedMessages.length != 0 ? (
           <FlatList
             data={allReceivedMessages}
             renderItem={renderItem}
             keyExtractor={keyExtractor}
             style={{ width: "100%" }}
+            showsVerticalScrollIndicator={false}
           ></FlatList>
         ) : (
           <View
