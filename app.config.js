@@ -16,7 +16,7 @@ export default {
       color: "#FFFFFF",
     },
     ios: {
-      supportsTablet: true,
+      supportsTablet: false,
       bundleIdentifier: "com.kobihanoch.strongtogether",
       infoPlist: {
         ITSAppUsesNonExemptEncryption: false,
