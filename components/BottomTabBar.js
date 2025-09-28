@@ -13,11 +13,13 @@ import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Dialog } from "react-native-alert-notification";
 import { useAuth } from "../context/AuthContext";
+import { useGlobalAppLoadingContext } from "../context/GlobalAppLoadingContext";
 
 const { width, height } = Dimensions.get("window");
 
 const BottomTabBar = () => {
   const navigation = useNavigation();
+  const { isLoading } = useGlobalAppLoadingContext();
   const routeName = useNavigationState((state) => {
     const appRoute = state?.routes?.[state.index];
     const nested = appRoute?.state;
@@ -29,38 +31,10 @@ const BottomTabBar = () => {
   });
   const { isWorkoutMode } = useAuth();
 
+  const navDisabled = isLoading;
+
   const handleTabPress = (tabName) => {
     navigation.navigate(tabName);
-  };
-
-  //----------------- [ Workout mode ]-----------------
-
-  const confirmExit = () => {
-    pressedExitRef.current = false;
-
-    Dialog.show({
-      type: "WARNING",
-      title: "Exit workout",
-      titleStyle: {
-        fontSize: 22,
-      },
-      textBody: "Are you sure you want to quit?",
-      textBodyStyle: {
-        fontSize: 45,
-      },
-      button: "Exit workout",
-      closeOnOverlayTap: true,
-      onPressButton: () => {
-        pressedExitRef.current = true;
-        Dialog.hide();
-        navigation.goBack();
-      },
-      onHide: () => {
-        if (!pressedExitRef.current) {
-          setShowExitButton(false);
-        }
-      },
-    });
   };
 
   const tabs = [
@@ -83,6 +57,7 @@ const BottomTabBar = () => {
               tab.name === "MyWorkoutPlan" && styles.specialTabButton,
             ]}
             onPress={() => handleTabPress(tab.name)}
+            disabled={navDisabled}
           >
             <MaterialCommunityIcons
               name={tab.icon}

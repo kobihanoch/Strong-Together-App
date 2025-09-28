@@ -15,6 +15,8 @@ import { useGlobalAppLoadingContext } from "../../context/GlobalAppLoadingContex
 import { colors } from "../../constants/colors";
 import { useAnalysisContext } from "../../context/AnalysisContext";
 import PercantageCircle from "../PercentageCircle";
+import NumberCounter from "../NumberCounter";
+import Row from "../Row";
 const AnimatedCircle = Animated.createAnimatedComponent(Circle);
 
 const { width, height } = Dimensions.get("window");
@@ -122,8 +124,8 @@ const StartWorkoutCard = ({ data }) => {
                 </Skeleton>
               </View>
             </View>
-            {/* Circle */}
 
+            {/* Circle */}
             <View style={{}}>
               <Skeleton
                 colors={[
@@ -137,9 +139,18 @@ const StartWorkoutCard = ({ data }) => {
                   percent={progress}
                   fullColor="#dddddd4c"
                   actualColor="white"
-                  size={70}
+                  size={80}
+                  duration={2000}
                 >
-                  <Text style={styles.perText}>{progress}%</Text>
+                  <Row>
+                    <NumberCounter
+                      numStart={0}
+                      numEnd={progress}
+                      duration={2000}
+                      style={styles.perText}
+                    />
+                    <Text style={styles.perText}>%</Text>
+                  </Row>
                 </PercantageCircle>
               </Skeleton>
             </View>

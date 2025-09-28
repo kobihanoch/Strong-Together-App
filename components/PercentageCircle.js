@@ -15,6 +15,7 @@ const PercantageCircle = ({
   // track vs actual stroke colors
   fullColor = "#E5E7EB",
   actualColor = "#2979FF",
+  duration = 650,
   children,
 }) => {
   const clamped = Math.max(0, Math.min(100, percent));
@@ -27,7 +28,7 @@ const PercantageCircle = ({
   useEffect(() => {
     Animated.timing(animatedOffset, {
       toValue: dashOffset,
-      duration: 650,
+      duration: duration,
       easing: Easing.out(Easing.cubic),
       useNativeDriver: false, // layout prop, must be false
     }).start();

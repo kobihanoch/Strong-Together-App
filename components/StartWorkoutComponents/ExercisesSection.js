@@ -22,6 +22,7 @@ import PercantageCircle from "../PercentageCircle";
 import Row from "../Row";
 import NumericInputWithRules from "./NumericInputWithRules";
 import useLastWorkoutExerciseTrackingData from "../../hooks/useLastWorkoutExerciseTrackingData";
+import NumberCounter from "../NumberCounter";
 
 const { width, height } = Dimensions.get("window");
 
@@ -178,14 +179,25 @@ const RenderItem = ({
           percent={exProgress}
           actualColor={colors.primary}
           stroke={4}
+          duration={1000}
         >
-          <Text style={styles.pctText}>
-            {completedAllSets ? (
-              <MaterialCommunityIcons name="check" size={RFValue(12)} />
-            ) : (
-              exProgress + "%"
-            )}
-          </Text>
+          {completedAllSets ? (
+            <MaterialCommunityIcons
+              name="check"
+              size={RFValue(12)}
+              style={styles.pctText}
+            />
+          ) : (
+            <Row>
+              <NumberCounter
+                numStart={0}
+                numEnd={exProgress}
+                duration={1000}
+                style={styles.pctText}
+              />
+              <Text style={styles.pctText}>%</Text>
+            </Row>
+          )}
         </PercantageCircle>
 
         <Column>

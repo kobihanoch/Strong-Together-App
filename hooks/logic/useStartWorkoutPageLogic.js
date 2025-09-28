@@ -132,7 +132,7 @@ const useStartWorkoutPageLogic = (selectedSplit, resumedWorkout = null) => {
         unpackFromExerciseTrackingData(exerciseTrackingAnalysis)
       );
       setIsWorkoutMode(false);
-      clearCache();
+      await clearCache();
       navigation.navigate("Statistics");
     } catch (err) {
       throw err;

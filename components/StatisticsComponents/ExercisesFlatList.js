@@ -15,12 +15,11 @@ import StatsTable from "./StatsTable";
 
 const { width, height } = Dimensions.get("window");
 
-const ExerciseItem = ({ index, exData, lastPerformanceData }) => {
+const ExerciseItem = ({ exData, lastPerformanceData }) => {
   const mainMuscle = exData?.exercisetoworkoutsplit?.exercises?.targetmuscle;
   const specificMuscle =
     exData?.exercisetoworkoutsplit?.exercises?.specifictargetmuscle;
   const imagePath = Images[mainMuscle]?.[specificMuscle];
-
   const lastLogOfEx = useMemo(() => {
     if (lastPerformanceData) {
       const [last] = lastPerformanceData.filter(
@@ -95,14 +94,25 @@ const ExerciseItem = ({ index, exData, lastPerformanceData }) => {
 
       {/* Expanded content inside the tab */}
       <Accordion.Expanded style={{ marginTop: 20 }}>
-        {/* Your list / details */}
+        {/* Stats table */}
         <StatsTable rows={rows}></StatsTable>
+        <Row
+          style={{
+            marginTop: 10,
+            marginLeft: 5,
+            alignItems: "flex-start",
+            gap: 10,
+          }}
+        >
+          <Text style={styles.notesHeader}>Notes:</Text>
+          <Text style={styles.notes}>{exData?.notes}</Text>
+        </Row>
       </Accordion.Expanded>
     </Accordion.Accordion>
   );
 };
 
-const ExercisesFlatList = ({ data, dataToCompare, setIndex }) => {
+const ExercisesFlatList = ({ data, dataToCompare }) => {
   const nav = useNavigation();
 
   const renderItem = useCallback(
@@ -171,6 +181,16 @@ const styles = StyleSheet.create({
     fontFamily: "Inter_500Medium",
     fontSize: RFValue(10),
     color: colors.textSecondary,
+  },
+  notesHeader: {
+    fontFamily: "Inter_600SemiBold",
+    color: "black",
+    fontSize: RFValue(13),
+  },
+  notes: {
+    fontFamily: "Inter_400Regular",
+    color: "black",
+    fontSize: RFValue(13),
   },
 });
 

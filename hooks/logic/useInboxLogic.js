@@ -1,20 +1,28 @@
+import { useCallback, useMemo } from "react";
 import { Dialog } from "react-native-alert-notification";
 import { useAuth } from "../../context/AuthContext";
 import { useNotifications } from "../../context/NotificationsContext";
-import { deleteMessage } from "../../services/MessagesService";
+import {
+  deleteMessage,
+  updateMsgReadStatus,
+} from "../../services/MessagesService";
 
 const useInboxLogic = () => {
   const { user } = useAuth();
-  const {
-    allReceivedMessages,
-    setAllReceivedMessages,
-    unreadMessages,
-    loadingMessages,
-    profileImagesCache,
-    allSendersUsersArr,
-  } = useNotifications(user);
+  const { allReceivedMessages, setAllReceivedMessages, unreadMessages } =
+    useNotifications(user);
 
-  const confirmAndDeleteMessage = (msgId) => {
+  const unreadMessagesCount = unreadMessages?.length;
+
+  const markAsRead = useCallback(async (msgId) => {
+    await updateMsgReadStatus(msgId);
+    // Update state
+    setAllReceivedMessages((prev) =>
+      prev.map((m) => (m.id === msgId ? { ...m, is_read: true } : m))
+    );
+  }, []);
+
+  const confirmAndDeleteMessage = useCallback((msgId) => {
     let pressedYes = false;
 
     Dialog.show({
@@ -38,19 +46,13 @@ const useInboxLogic = () => {
         }
       },
     });
-  };
+  }, []);
 
   return {
-    messages: {
-      allReceivedMessages,
-      unreadMessages,
-      loadingMessages,
-      allSendersUsersArr,
-      confirmAndDeleteMessage,
-    },
-    media: {
-      profileImagesCache,
-    },
+    allReceivedMessages,
+    unreadMessagesCount,
+    confirmAndDeleteMessage,
+    markAsRead,
   };
 };
 
