@@ -182,7 +182,11 @@ const RenderItem = ({
           duration={1000}
         >
           {completedAllSets ? (
-            <MaterialCommunityIcons name="check" size={RFValue(12)} />
+            <MaterialCommunityIcons
+              name="check"
+              size={RFValue(12)}
+              style={styles.pctText}
+            />
           ) : (
             <Row>
               <NumberCounter

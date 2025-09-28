@@ -115,13 +115,12 @@ const TopComponent = () => {
         >
           <View
             style={{
-              marginBottom: 15,
+              marginBottom: 12,
               marginRight: 10,
               opacity: isLoading ? 0 : 1,
             }}
           >
             <TouchableOpacity
-              style={{}}
               onPress={() => navigation.navigate("Inbox")}
               disabled={isWorkoutMode ? true : false}
             >
@@ -139,8 +138,8 @@ const TopComponent = () => {
                   borderRadius: 50,
                   aspectRatio: 1,
                   position: "absolute",
-                  bottom: -2,
-                  right: -2,
+                  bottom: 0,
+                  right: 0,
                   justifyContent: "center",
                   alignItems: "center",
                 }}

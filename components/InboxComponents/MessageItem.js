@@ -1,6 +1,6 @@
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Image } from "expo-image";
-import { useState } from "react";
+import React, { useState } from "react";
 import { Dimensions, Modal, Text, TouchableOpacity, View } from "react-native";
 import { Swipeable } from "react-native-gesture-handler";
 import { RFValue } from "react-native-responsive-fontsize";
@@ -9,11 +9,11 @@ import { formatDate } from "../../utils/statisticsUtils";
 
 const { width, height } = Dimensions.get("window");
 
-const MessageItem = ({ item, profileImages, sender, deleteMessage }) => {
-  const { markAsRead } = useNotifications();
+const MessageItem = React.memo(({ item, deleteMessage, markAsRead }) => {
   // Modal of message
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const imageSource = profileImages[sender.id];
+  const senderName = item?.sender_full_name;
+  const imageSource = `${process.env.EXPO_PUBLIC_SUPABASE_URL}/storage/v1/object/public/${item?.sender_profile_image_url}`;
 
   // UI when swiping right
   const renderRightActions = () => (
@@ -84,14 +84,17 @@ const MessageItem = ({ item, profileImages, sender, deleteMessage }) => {
                 borderRadius: height * 0.04,
                 backgroundColor: "#E0E0E0",
               }}
-              cachePolicy={imageSource ? "disk" : "none"}
+              cachePolicy={"disk"}
               transition={150}
             ></Image>
 
             <Text
-              style={{ fontFamily: "Inter_600SemiBold", fontSize: RFValue(10) }}
+              style={{
+                fontFamily: "Inter_600SemiBold",
+                fontSize: RFValue(10),
+              }}
             >
-              {String(sender?.name)}
+              {senderName}
             </Text>
           </View>
           <Text
@@ -193,7 +196,7 @@ const MessageItem = ({ item, profileImages, sender, deleteMessage }) => {
                 }}
               >
                 <Image
-                  source={profileImages?.[sender?.id]}
+                  source={imageSource}
                   style={{
                     width: height * 0.055,
                     height: height * 0.055,
@@ -210,7 +213,7 @@ const MessageItem = ({ item, profileImages, sender, deleteMessage }) => {
                       color: "#222",
                     }}
                   >
-                    {sender?.name}
+                    {senderName}
                   </Text>
                   <Text
                     style={{
@@ -274,6 +277,6 @@ const MessageItem = ({ item, profileImages, sender, deleteMessage }) => {
       </TouchableOpacity>
     </Swipeable>
   );
-};
+});
 
-export default MessageItem;
+export default React.memo(MessageItem);
