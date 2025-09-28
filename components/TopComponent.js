@@ -142,6 +142,7 @@ const TopComponent = () => {
                   right: 0,
                   justifyContent: "center",
                   alignItems: "center",
+                  display: msgCount === 0 ? "none" : "flex",
                 }}
               >
                 <Text
