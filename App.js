@@ -51,6 +51,9 @@ function useFontsReady() {
         Inter_700Bold,
         Inter_500Medium,
         Inter_600SemiBold,
+
+        // Add icon font
+        MaterialCommunityIcons: require("react-native-vector-icons/Fonts/MaterialCommunityIcons.ttf"),
       });
       setReady(true);
     })();
