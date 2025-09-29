@@ -28,17 +28,17 @@ import { AuthProvider, useAuth } from "./context/AuthContext";
 import { NotificationsProvider } from "./context/NotificationsContext";
 import { WorkoutProvider } from "./context/WorkoutContext";
 
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import Constants from "expo-constants";
+import { NotifierRoot } from "react-native-notifier";
+import { cacheHousekeepingOnBoot } from "./cache/cacheUtils";
 import BottomTabBar from "./components/BottomTabBar";
-import MainLoadingScreen from "./components/MainLoadingScreen";
 import Theme1 from "./components/Theme1";
-import {
-  GlobalAppLoadingProvider,
-  useGlobalAppLoadingContext,
-} from "./context/GlobalAppLoadingContext";
+import { CardioProvider } from "./context/CardioContext";
+import { GlobalAppLoadingProvider } from "./context/GlobalAppLoadingContext";
 import AppStack from "./navigation/AppStack";
 import AuthStack from "./navigation/AuthStack";
 import NotificationsSetup from "./notifications/NotificationsSetup";
-import { NotifierRoot } from "react-native-notifier";
 
 // ---------- Fonts Loader Hook ----------
 function useFontsReady() {
@@ -51,6 +51,9 @@ function useFontsReady() {
         Inter_700Bold,
         Inter_500Medium,
         Inter_600SemiBold,
+
+        // Add icon font
+        MaterialCommunityIcons: require("react-native-vector-icons/Fonts/MaterialCommunityIcons.ttf"),
       });
       setReady(true);
     })();
@@ -58,12 +61,20 @@ function useFontsReady() {
   return ready;
 }
 
-const RootStack = createStackNavigator();
-
 // ---------- App Root ----------
 export default function App() {
   const fontsReady = useFontsReady();
   const navigationRef = useNavigationContainerRef();
+
+  // Delete cache for outdated app versions (against different data structures)
+  useEffect(() => {
+    (async () => {
+      const cacheVer = await AsyncStorage.getItem("__VERSION__");
+      const appVer = Constants.expoConfig.version;
+      if (cacheVer === appVer) return; // already cleaned for this version
+      await cacheHousekeepingOnBoot();
+    })();
+  }, []);
 
   if (!fontsReady) {
     return (
@@ -92,20 +103,15 @@ export default function App() {
 
 // ---------- Navigation Logic (auth-only here) ----------
 function RootNavigator() {
-  const { isLoggedIn, user } = useAuth();
-  const { isLoading } = useGlobalAppLoadingContext();
+  const { isLoggedIn, user, authPhase } = useAuth();
+
+  // Ensures no UI is rendered if auth is not loaded yet
+  if (authPhase === "checking") return null;
 
   return (
     <>
       {/* Always render the tree so providers can mount */}
       {isLoggedIn ? <AppWithProviders key={user?.id} /> : <AuthStack />}
-
-      {/* Full-screen overlay while restoring session */}
-      {isLoading && (
-        <View style={[StyleSheet.absoluteFill, { zIndex: 9999 }]}>
-          <MainLoadingScreen />
-        </View>
-      )}
     </>
   );
 }
@@ -116,7 +122,9 @@ function AppWithProviders() {
     <NotificationsProvider>
       <WorkoutProvider>
         <AnalysisProvider>
-          <MainApp />
+          <CardioProvider>
+            <MainApp />
+          </CardioProvider>
         </AnalysisProvider>
       </WorkoutProvider>
     </NotificationsProvider>

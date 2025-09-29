@@ -1,25 +1,32 @@
-import React, { useCallback, useRef } from "react";
-import {
-  Dimensions,
-  FlatList,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import React, { useCallback, useRef, useState } from "react";
+import { Dimensions, StyleSheet, View } from "react-native";
 import { Dialog } from "react-native-alert-notification";
 import { RFValue } from "react-native-responsive-fontsize";
-import ExerciseBox from "../components/StartWorkoutComponents/ExerciseBox";
+import SlidingBottomModal from "../components/SlidingBottomModal";
+import ExercisesSection from "../components/StartWorkoutComponents/ExercisesSection";
+import LastWorkoutData from "../components/StartWorkoutComponents/LastWorkoutData";
+import TopBar from "../components/StartWorkoutComponents/TopBar";
 import useStartWorkoutPageLogic from "../hooks/logic/useStartWorkoutPageLogic";
 
 const { width, height } = Dimensions.get("window");
 
 const StartWorkout = ({ navigation, route }) => {
-  const { data: workoutData, saving: workoutSaving } = useStartWorkoutPageLogic(
-    route.params?.workoutSplit
+  const {
+    data: workoutData,
+    saving: workoutSaving,
+    controls,
+    workoutProgressObj,
+    onExit,
+  } = useStartWorkoutPageLogic(
+    route.params?.workoutSplit,
+    route.params?.resumedWorkout
   );
+  const [lastWorkoutDataForModal, setLastWorkoutDataForModal] = useState(null);
 
-  const flatListRef = useRef(null);
+  const modalRef = useRef(null);
+  const openModal = useCallback(() => {
+    modalRef?.current?.open?.(0);
+  }, []);
 
   const handlePressSave = useCallback(async () => {
     let pressedYes = false;
@@ -42,72 +49,68 @@ const StartWorkout = ({ navigation, route }) => {
     });
   }, [workoutSaving]);
 
+  const handlePresExit = useCallback(async () => {
+    let pressedYes = false;
+
+    Dialog.show({
+      type: "WARNING",
+      title: "Exit Workout?",
+      textBody:
+        "Are you sure you want to quit the workout? All progress will be lost.",
+      button: "Yes, Exit",
+      closeOnOverlayTap: true,
+      onPressButton: async () => {
+        pressedYes = true;
+        Dialog.hide();
+        await onExit();
+      },
+      onHide: () => {
+        if (!pressedYes) {
+        }
+      },
+    });
+  }, [workoutSaving]);
+
   return (
-    <View
-      style={{
-        flex: 1,
-        backgroundColor: "transparent",
-        flexDirection: "column",
-      }}
-    >
+    <View style={{ flex: 1 }}>
       <View style={styles.container}>
-        <FlatList
-          data={workoutData.exercisesForSelectedSplit}
-          horizontal
-          ref={flatListRef}
-          showsHorizontalScrollIndicator={false}
-          centerContent
-          pagingEnabled
-          style={{ flex: 1 }}
-          contentContainerStyle={{ flexGrow: 1 }}
-          keyExtractor={(item) => item.id.toString()}
-          renderItem={({ item, index }) => (
-            <ExerciseBox
-              item={item}
-              index={index}
-              exerciseCount={workoutData.exercisesForSelectedSplit.length}
-              onScrollNext={() => {
-                flatListRef.current?.scrollToIndex({ index: index + 1 });
-              }}
-              updateWeightArrs={workoutData.setWeightArrs}
-              updateRepsArrs={workoutData.setRepsArrs}
-              weightArrs={workoutData.weightArrs}
-              repsArrs={workoutData.repsArrs}
-            ></ExerciseBox>
-          )}
-        ></FlatList>
-      </View>
-      <View style={{ flex: 2, justifyContent: "center", alignItems: "center" }}>
-        <TouchableOpacity
-          style={{
-            flexDirection: "row",
-            justifyContent: "center",
-            alignItems: "center",
-            backgroundColor: "#2979FF",
-            borderRadius: height * 0.02,
-            width: "50%",
-            height: "40%",
-            gap: width * 0.03,
+        <TopBar
+          workoutName={workoutData?.workoutName}
+          totalSets={workoutData?.totalSets}
+          setsDone={workoutData?.setsDone}
+          timerProps={{
+            startTime: workoutData?.startTime,
+            pausedTotal: workoutData?.pausedTotal,
           }}
-          onPress={handlePressSave}
-        >
-          <Text
-            style={{
-              fontFamily: "Inter_600SemiBold",
-              color: "white",
-              fontSize: RFValue(15),
-            }}
-          >
-            Finish Workout
-          </Text>
-        </TouchableOpacity>
+          saveWorkout={handlePressSave}
+          onExit={handlePresExit}
+        />
+        <ExercisesSection
+          exercises={workoutData?.exercisesForSelectedSplit}
+          exercisesSetsDoneMap={workoutData?.setsDoneWithExerciseNameKey}
+          controls={controls}
+          workoutProgressObj={workoutProgressObj}
+          setLastWorkoutDataForModal={setLastWorkoutDataForModal}
+          openModal={openModal}
+        />
       </View>
+
+      <SlidingBottomModal
+        title="Last Performance"
+        ref={modalRef}
+        snapPoints={["40%", "50%", "80%"]}
+        flatListUsage={false}
+      >
+        <LastWorkoutData
+          lastWorkoutDataForModal={lastWorkoutDataForModal}
+        ></LastWorkoutData>
+      </SlidingBottomModal>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 8 },
+  container: { flex: 1 },
   countdownContainer: {
     position: "absolute",
     top: 0,

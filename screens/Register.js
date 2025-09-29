@@ -11,10 +11,12 @@ import {
   View,
 } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
-import Icon from "react-native-vector-icons/FontAwesome";
+import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import InputField from "../components/InputField";
 import { useAuth } from "../context/AuthContext";
 import { showErrorAlert } from "../errors/errorAlerts";
+import SelectField from "../components/SelectField";
+import { RFValue } from "react-native-responsive-fontsize";
 
 const { width, height } = Dimensions.get("window");
 
@@ -55,11 +57,16 @@ const Register = ({ navigation }) => {
               marginLeft: width * 0.05,
               flexDirection: "row",
               justifyContent: "space-between",
+              alignItems: "center",
             }}
           >
             <TouchableOpacity onPress={() => navigation.goBack()}>
-              <View style={{ flexDirection: "row" }}>
-                <Icon name="arrow-left" size={20} color="white" />
+              <View style={{ flexDirection: "row", alignItems: "center" }}>
+                <MaterialCommunityIcons
+                  name={"arrow-left"}
+                  size={RFValue(15)}
+                  color={"white"}
+                />
                 <Text style={styles.introText}>Intro</Text>
               </View>
             </TouchableOpacity>
@@ -78,7 +85,7 @@ const Register = ({ navigation }) => {
             <View style={styles.inputContainer}>
               <InputField
                 placeholder="Username"
-                iconName="user"
+                iconName="account"
                 value={username}
                 onChangeText={setUsername}
               />
@@ -94,11 +101,10 @@ const Register = ({ navigation }) => {
                 value={fullName}
                 onChangeText={setFullName}
               />
-              <InputField
-                placeholder="Gender"
-                iconName="venus-mars"
+              <SelectField
+                iconName="gender-male"
                 value={gender}
-                onChangeText={setGender}
+                onChange={setGender}
               />
               <InputField
                 placeholder="Password"

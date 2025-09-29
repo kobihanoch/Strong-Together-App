@@ -1,4 +1,7 @@
+import { FontAwesome5 } from "@expo/vector-icons";
+import { BottomSheetFlatList } from "@gorhom/bottom-sheet";
 import React, {
+  forwardRef,
   useCallback,
   useEffect,
   useMemo,
@@ -6,392 +9,287 @@ import React, {
   useState,
 } from "react";
 import {
-  Animated,
   Dimensions,
-  Easing,
-  FlatList,
-  Modal,
+  Keyboard,
   Pressable,
-  SectionList,
+  ScrollView,
   StyleSheet,
   Text,
+  TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";
-import { useCreateWorkout } from "../../context/CreateWorkoutContext";
+import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
+import { colors } from "../../constants/colors";
+import Column from "../Column";
+import Row from "../Row";
+import SlidingBottomModal from "../SlidingBottomModal";
+import { Notifier, NotifierComponents } from "react-native-notifier";
 
 const { width, height } = Dimensions.get("window");
-const SHEET_MAX_H = Math.min(height * 0.85, 720);
 
-const ExercisePickerModal = ({ visible, onClose }) => {
-  // Pull DB from context
-  const { DB, actions } = useCreateWorkout();
-
-  // Animated sheet + backdrop
-  const translateY = useRef(new Animated.Value(SHEET_MAX_H)).current;
-  const backdropOpacity = useRef(new Animated.Value(0)).current;
-
-  // Refs for programmatic scrolling
-  const sectionListRef = useRef(null);
-  const tabsRef = useRef(null);
-
-  // Sections are grouped by targetmuscle; titles are targetmuscle
-  const sections = useMemo(() => {
-    const all = DB?.dbExercises ?? [];
-    const map = {};
-    for (const ex of all) {
-      const key = ex?.targetmuscle ? String(ex.targetmuscle) : "Other";
-      if (!map[key]) map[key] = [];
-      map[key].push(ex);
-    }
-    const titles = Object.keys(map).sort((a, b) => a.localeCompare(b));
-    return titles.map((title) => ({
-      title, // section header is targetmuscle
-      data: map[title].sort((a, b) => {
-        // sort inside section (first by specifictargetmuscle then by name)
-        const sa = String(a?.specifictargetmuscle || "");
-        const sb = String(b?.specifictargetmuscle || "");
-        if (sa !== sb) return sa.localeCompare(sb);
-        return String(a?.name).localeCompare(String(b?.name));
-      }),
-    }));
-  }, [DB?.dbExercises]);
-
-  // Tabs data = section titles (targetmuscle)
-  const tabItems = useMemo(() => sections.map((s) => s.title), [sections]);
-
-  // Selected tab (synced with visible section)
-  const [selectedTab, setSelectedTab] = useState(tabItems[0] || null);
-
-  // Animate in/out
-  useEffect(() => {
-    if (visible) {
-      Animated.parallel([
-        Animated.timing(backdropOpacity, {
-          toValue: 1,
-          duration: 160,
-          useNativeDriver: true,
-          easing: Easing.out(Easing.quad),
-        }),
-        Animated.timing(translateY, {
-          toValue: 0,
-          duration: 220,
-          useNativeDriver: true,
-          easing: Easing.out(Easing.cubic),
-        }),
-      ]).start();
-    } else {
-      translateY.setValue(SHEET_MAX_H);
-      backdropOpacity.setValue(0);
-    }
-  }, [visible, translateY, backdropOpacity]);
-
-  const handleCloseAnimated = useCallback(() => {
-    Animated.parallel([
-      Animated.timing(backdropOpacity, {
-        toValue: 0,
-        duration: 160,
-        useNativeDriver: true,
-        easing: Easing.in(Easing.quad),
-      }),
-      Animated.timing(translateY, {
-        toValue: SHEET_MAX_H,
-        duration: 200,
-        useNativeDriver: true,
-        easing: Easing.in(Easing.cubic),
-      }),
-    ]).start(({ finished }) => {
-      if (finished) onClose();
-    });
-  }, [onClose, backdropOpacity, translateY]);
-
-  // Scroll to section by tab press
-  const handlePressTab = useCallback(
-    (title) => {
-      const sectionIndex = sections.findIndex((s) => s.title === title);
-      if (sectionIndex >= 0 && sectionListRef.current?.scrollToLocation) {
-        setSelectedTab(title);
-        sectionListRef.current.scrollToLocation({
-          sectionIndex,
-          itemIndex: 0,
-          viewPosition: 0,
-          animated: true,
-        });
-        // Also center the pressed tab in the tabs FlatList
-        const tabIndex = tabItems.findIndex((t) => t === title);
-        if (tabIndex >= 0 && tabsRef.current?.scrollToIndex) {
-          tabsRef.current.scrollToIndex({
-            index: tabIndex,
-            animated: true,
-            viewPosition: 0.5,
-          });
-        }
-      }
-    },
-    [sections, tabItems]
-  );
-
-  // Sync selected tab while user scrolls the SectionList
-  const onViewableItemsChanged = useRef(({ viewableItems }) => {
-    // Find first visible section header
-    const firstHeader = viewableItems.find(
-      (vi) => vi.section && vi.index === null
-    );
-    const sec = firstHeader?.section?.title;
-    if (sec && sec !== selectedTab) {
-      setSelectedTab(sec);
-      const idx = tabItems.indexOf(sec);
-      if (idx >= 0 && tabsRef.current?.scrollToIndex) {
-        tabsRef.current.scrollToIndex({
-          index: idx,
-          animated: true,
-          viewPosition: 0.5,
-        });
-      }
-    }
-  }).current;
-
-  const viewConfigRef = useRef({ viewAreaCoveragePercentThreshold: 10 });
-
-  // Render one exercise card
-  const renderItem = ({ item }) => (
+const ExerciseRow = React.memo(({ item, selectedMuscle, handleExPress }) => {
+  //console.log(item.name, "renderd");
+  return (
     <TouchableOpacity
-      onPress={() => {
-        // Add to the current split as the last exercise.
-        actions?.addExercise?.(item);
-        handleCloseAnimated();
-      }}
-      style={styles.card}
-      activeOpacity={0.9}
+      style={styles.exContainer}
+      onPress={() => handleExPress(item)}
     >
-      <View style={{ flexDirection: "row", alignItems: "center" }}>
-        <View style={styles.dot} />
-        <View style={{ flex: 1 }}>
-          <Text style={styles.cardTitle} numberOfLines={1}>
-            {item?.name}
-          </Text>
-          <Text style={styles.cardSub} numberOfLines={1}>
-            {item?.targetmuscle}
-            {item?.specifictargetmuscle
-              ? ` • ${item.specifictargetmuscle}`
-              : ""}
-          </Text>
+      {/* Exercise item */}
+      <Row style={{ gap: 20 }}>
+        <View style={styles.dumbbelIconContainer}>
+          <FontAwesome5 name="dumbbell" size={RFValue(12)} color="grey" />
         </View>
-        <View style={styles.choosePill}>
-          <Text style={styles.chooseText}>Choose</Text>
-        </View>
-      </View>
+        <Column>
+          <Text style={styles.exName}>{item?.name}</Text>
+          <Text style={styles.exMuscles}>
+            {selectedMuscle === "All" ? item?.targetmuscle : selectedMuscle},{" "}
+            {item?.specificTargetMuscle}
+          </Text>
+        </Column>
+      </Row>
     </TouchableOpacity>
   );
+});
 
-  // Section header = targetmuscle
-  const renderSectionHeader = ({ section }) => (
-    <View style={{ marginTop: height * 0.01, marginBottom: height * 0.006 }}>
-      <Text style={styles.sectionTitle}>{section.title}</Text>
-    </View>
+const ExercisePickerModal = forwardRef(function ExercisePickerModal(
+  {
+    selectedSplit,
+    controls,
+    availableExercises,
+    allExercises,
+    muscles,
+    exForSplit,
+  },
+  ref
+) {
+  const { addExercise } = controls;
+
+  // Refs for better optimzation
+  const selectedSplitRef = useRef(null);
+  useEffect(() => {
+    selectedSplitRef.current = selectedSplit;
+  }, [selectedSplit]);
+  const exIdsRef = useRef(new Set(exForSplit?.map((e) => e.id)));
+  useEffect(() => {
+    exIdsRef.current = new Set(exForSplit?.map((e) => e.id));
+  }, [exForSplit]);
+  const addExerciseRef = useRef(null);
+  useEffect(() => {
+    addExerciseRef.current = addExercise;
+  }, [addExercise]);
+
+  const handleExPress = useCallback((ex) => {
+    const currentSplit = selectedSplitRef.current;
+
+    // duplicate check using the latest ids
+    if (exIdsRef.current.has(ex.id)) {
+      Notifier.showNotification({
+        title: "Exercise already added",
+        description: `"${ex?.name}" is already added`,
+        duration: 2500,
+        showAnimationDuration: 250,
+        hideOnPress: true,
+        Component: NotifierComponents.Alert,
+        componentProps: {
+          alertType: "error",
+          titleStyle: { fontSize: 16 },
+          descriptionStyle: { fontSize: 14 },
+        },
+      });
+      return;
+    }
+
+    // add and close
+    addExerciseRef.current(ex);
+    ref?.current?.close();
+    Notifier.showNotification({
+      title: "Exercise Added",
+      description: `"${ex.name}" added to Split ${currentSplit}`,
+      duration: 2500,
+      showAnimationDuration: 250,
+      hideOnPress: true,
+      Component: NotifierComponents.Alert,
+      componentProps: {
+        alertType: "info",
+        titleStyle: { fontSize: 16 },
+        descriptionStyle: { fontSize: 14 },
+      },
+    });
+  }, []);
+
+  const [selectedMuscle, setSelectedMuscle] = useState("All");
+  const exToShow =
+    selectedMuscle === "All"
+      ? allExercises
+      : availableExercises[selectedMuscle];
+
+  const [query, setQuery] = useState("");
+  const filteredExToShow = useMemo(
+    () =>
+      exToShow.filter((ex) =>
+        ex.name.toLowerCase().includes(query.toLowerCase())
+      ),
+    [exToShow, query]
   );
 
-  // Tabs row (FlatList horizontal) for targetmuscle jump
-  const renderTab = ({ item }) => {
-    const selected = item === selectedTab;
-    return (
-      <TouchableOpacity
-        onPress={() => handlePressTab(item)}
-        activeOpacity={0.9}
-        style={[
-          styles.tabBtn,
-          { backgroundColor: selected ? "#2979FF" : "rgb(234,240,246)" },
-        ]}
-      >
-        <Text
-          numberOfLines={1}
-          style={[styles.tabText, { color: selected ? "white" : "#111" }]}
-        >
-          {item}
-        </Text>
-      </TouchableOpacity>
-    );
-  };
+  const renderItem = useCallback(
+    ({ item }) => (
+      <ExerciseRow
+        item={item}
+        selectedMuscle={selectedMuscle}
+        handleExPress={handleExPress}
+      />
+    ),
+    [selectedMuscle, handleExPress]
+  );
+
+  const keyExtractor = useCallback((item) => item.id, []);
 
   return (
-    <Modal
-      visible={visible}
-      transparent
-      animationType="none"
-      onRequestClose={handleCloseAnimated}
+    <SlidingBottomModal
+      ref={ref}
+      snapPoints={["60%", "60%", "80%"]}
+      flatListUsage={false}
+      title={null}
     >
-      <Pressable
-        onPress={handleCloseAnimated}
-        style={{ flex: 1, justifyContent: "flex-end" }}
-      >
-        <Animated.View
-          pointerEvents="none"
-          style={[
-            StyleSheet.absoluteFillObject,
-            { backgroundColor: "rgba(0,0,0,0.55)", opacity: backdropOpacity },
-          ]}
-        />
-        <Animated.View
-          style={[styles.sheet, { transform: [{ translateY }] }]}
-          onStartShouldSetResponder={() => true}
-          onResponderStart={(e) => e.stopPropagation()}
-        >
+      <Pressable onPress={Keyboard.dismiss} accessible={false}>
+        <Column style={{ paddingHorizontal: 15, gap: 20 }}>
           {/* Header */}
-          <View style={styles.headerRow}>
-            <Text style={styles.headerTitle}>Pick an exercise</Text>
-            <TouchableOpacity
-              onPress={handleCloseAnimated}
-              activeOpacity={0.8}
-              style={styles.closeBtn}
-            >
-              <Text style={styles.closeText}>Close</Text>
-            </TouchableOpacity>
-          </View>
+          <Column style={{ marginTop: 15, gap: 5 }}>
+            <Text style={styles.header}>Add Exercise</Text>
+            <Text style={styles.semiHeader}>
+              Choose from our exercise library
+            </Text>
+          </Column>
 
-          {/* Tabs strip (jump between target muscles) */}
-          <FlatList
-            ref={tabsRef}
-            data={tabItems}
-            keyExtractor={(it) => it}
-            renderItem={renderTab}
+          {/* Search Bar */}
+          <Row style={styles.searchBarContainer}>
+            <MaterialCommunityIcons
+              name={"magnify"}
+              color={"#aaaaaaff"}
+              size={RFValue(17)}
+            />
+            <TextInput
+              style={styles.searchBarText}
+              placeholder="Search Exercises..."
+              onBlur={Keyboard.dismiss}
+              onChangeText={(val) => setQuery(val)}
+              keyboardType="default"
+            />
+          </Row>
+          {/* Muscle Tabs */}
+          <ScrollView
             horizontal
             showsHorizontalScrollIndicator={false}
-            contentContainerStyle={{
-              paddingHorizontal: width * 0.02,
-              paddingBottom: height * 0.012,
-            }}
-            getItemLayout={(data, index) => ({
-              length: Math.max(38, height * 0.046) + 12, // approximate for smooth scrollToIndex
-              offset: (Math.max(38, height * 0.046) + 12) * index,
-              index,
+            style={{ overflow: "visible" }}
+          >
+            {muscles?.map((muscle) => {
+              const isMuscleSelected = selectedMuscle === muscle;
+              return (
+                <TouchableOpacity
+                  style={[
+                    styles.muscleTab,
+                    isMuscleSelected ? { backgroundColor: colors.primary } : {},
+                  ]}
+                  key={muscle}
+                  onPress={() => setSelectedMuscle(muscle)}
+                >
+                  <Text
+                    style={[
+                      styles.muscleTabText,
+                      isMuscleSelected
+                        ? { color: "white", fontFamily: "Inter_600SemiBold" }
+                        : {},
+                    ]}
+                  >
+                    {muscle}
+                  </Text>
+                </TouchableOpacity>
+              );
             })}
-          />
-
-          {/* Sectioned list (section header = targetmuscle) */}
-          <SectionList
-            ref={sectionListRef}
-            sections={sections}
-            keyExtractor={(item) => String(item.id)}
+          </ScrollView>
+          <BottomSheetFlatList
+            data={filteredExToShow}
             renderItem={renderItem}
-            renderSectionHeader={renderSectionHeader}
-            stickySectionHeadersEnabled={false}
+            keyExtractor={keyExtractor}
             showsVerticalScrollIndicator={false}
-            contentContainerStyle={{ paddingBottom: height * 0.02 }}
-            onViewableItemsChanged={onViewableItemsChanged}
-            viewabilityConfig={viewConfigRef.current}
-            getItemLayout={(sectionData, index) => {
-              // Optional: implement more precise layout if lists are very large
-              return { length: 64, offset: 64 * index, index };
-            }}
+            // Allow taps to work while keyboard is open
+            keyboardShouldPersistTaps="handled"
+            // Give some bottom padding so last item isn't hidden behind the handle
+            contentContainerStyle={{ paddingBottom: height * 0.8 }}
           />
-        </Animated.View>
+        </Column>
       </Pressable>
-    </Modal>
+    </SlidingBottomModal>
   );
-};
+});
 
 const styles = StyleSheet.create({
-  sheet: {
-    width: "100%",
-    height: SHEET_MAX_H,
-    backgroundColor: "#fff",
-    borderTopLeftRadius: width * 0.06,
-    borderTopRightRadius: width * 0.06,
-    paddingTop: height * 0.018,
-    paddingHorizontal: width * 0.045,
-    shadowColor: "#000",
-    shadowOpacity: 0.2,
-    shadowRadius: 8,
-    elevation: 12,
-  },
-  headerRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: height * 0.012,
-  },
-  headerTitle: {
-    flex: 1,
-    fontFamily: "Inter_700Bold",
-    fontSize: RFValue(16),
-    color: "#111",
-  },
-  closeBtn: {
-    height: 36,
-    minWidth: 36,
-    borderRadius: 18,
+  muscleTab: {
+    backgroundColor: colors.lightCardBg,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "rgba(0,0,0,0.06)",
-    paddingHorizontal: 12,
-  },
-  closeText: {
-    fontSize: RFValue(12),
-    color: "#111",
-    fontFamily: "Inter_600SemiBold",
-  },
-  sectionTitle: {
-    fontFamily: "Inter_700Bold",
-    fontSize: RFValue(12),
-    color: "#1A1A1A",
-    opacity: 0.9,
-  },
-  card: {
-    backgroundColor: "rgb(234, 240, 246)",
-    borderRadius: width * 0.035,
-    paddingVertical: height * 0.016,
-    paddingHorizontal: width * 0.04,
-    marginBottom: height * 0.012,
-    shadowColor: "#000",
-    shadowOpacity: 0.06,
-    shadowRadius: 4,
-    elevation: 2,
-  },
-  dot: {
-    width: 12,
-    height: 12,
-    borderRadius: 6,
-    backgroundColor: "#2979FF",
+    paddingHorizontal: 20,
+    borderRadius: 12,
     marginRight: 10,
+    height: height * 0.04,
   },
-  cardTitle: {
-    fontFamily: "Inter_700Bold",
-    fontSize: RFValue(13),
-    color: "#111",
-    marginBottom: 2,
-  },
-  cardSub: {
+  muscleTabText: {
     fontFamily: "Inter_400Regular",
-    fontSize: RFValue(11),
-    color: "#58606A",
+    fontSize: RFValue(13),
+    color: "black",
   },
-  choosePill: {
-    backgroundColor: "#2979FF",
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 999,
-  },
-  chooseText: {
-    color: "#fff",
+  header: {
     fontFamily: "Inter_600SemiBold",
-    fontSize: RFValue(11),
+    fontSize: RFValue(15),
+    color: "black",
   },
-  tabBtn: {
-    borderRadius: width * 0.025,
-    marginHorizontal: width * 0.012,
-    paddingHorizontal: 14,
-    minWidth: width * 0.22,
-    height: Math.max(38, height * 0.046),
+  semiHeader: {
+    fontFamily: "Inter_400Regular",
+    fontSize: RFValue(13),
+    color: colors.textSecondary,
+  },
+  searchBarContainer: {
+    borderColor: "#e2e2e2ff",
+    borderWidth: 1,
+    borderRadius: 16,
+    paddingVertical: 13,
+    paddingHorizontal: 15,
+    gap: 10,
+    alignItems: "center",
+  },
+  searchBarText: {
+    fontFamily: "Inter_400Regular",
+    fontSize: RFValue(12),
+    color: "black",
+  },
+  exContainer: {
+    paddingVertical: 10,
+    paddingHorizontal: 10,
+    justifyContent: "center",
+    gap: 3,
+    backgroundColor: "white",
+    borderRadius: 16,
+  },
+  exName: {
+    fontFamily: "Inter_600SemiBold",
+    color: "black",
+    fontSize: RFValue(13),
+  },
+  exMuscles: {
+    fontFamily: "Inter_400Regular",
+    color: colors.textSecondary,
+    fontSize: RFValue(10),
+  },
+  dumbbelIconContainer: {
+    height: 30,
+    width: 30,
+    borderRadius: 10,
     alignItems: "center",
     justifyContent: "center",
-    shadowColor: "#000",
-    shadowOpacity: 0.06,
-    shadowRadius: 4,
-    elevation: 2,
-  },
-  tabText: {
-    fontSize: RFValue(12),
-    fontFamily: "Inter_600SemiBold",
+    backgroundColor: "rgba(0,0,0,0.04)",
   },
 });
 

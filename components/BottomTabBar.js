@@ -12,11 +12,14 @@ import { RFValue } from "react-native-responsive-fontsize";
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Dialog } from "react-native-alert-notification";
+import { useAuth } from "../context/AuthContext";
+import { useGlobalAppLoadingContext } from "../context/GlobalAppLoadingContext";
 
 const { width, height } = Dimensions.get("window");
 
 const BottomTabBar = () => {
   const navigation = useNavigation();
+  const { isLoading } = useGlobalAppLoadingContext();
   const routeName = useNavigationState((state) => {
     const appRoute = state?.routes?.[state.index];
     const nested = appRoute?.state;
@@ -26,80 +29,12 @@ const BottomTabBar = () => {
     }
     return appRoute?.name ?? "Home";
   });
+  const { isWorkoutMode } = useAuth();
 
-  //----------------- [ Workout mode ]-----------------
-  const isWorkoutMode = routeName === "StartWorkout";
+  const navDisabled = isLoading;
 
-  // Start time as timestamp
-  const [startTime, setStartTime] = useState(null);
-  // Current time refreshed each second
-  const [currentTime, setCurrentTime] = useState(Date.now());
-  const [showExitButton, setShowExitButton] = useState(false);
-
-  useEffect(() => {
-    if (isWorkoutMode) {
-      const now = Date.now();
-      setStartTime(now); // align start
-      setCurrentTime(now); // align current so diff starts at 0
-      setShowExitButton(false);
-
-      timer = setInterval(() => {
-        setCurrentTime(Date.now());
-      }, 1000);
-
-      return () => clearInterval(timer);
-    }
-  }, [isWorkoutMode]);
-
-  // Calculate how many seconds have passed
-  const elapsedSeconds = startTime
-    ? Math.floor((currentTime - startTime) / 1000)
-    : 0;
-
-  const formatTime = () => {
-    const minutes = String(Math.floor(elapsedSeconds / 60)).padStart(2, "0");
-    const remainingSeconds = String(elapsedSeconds % 60).padStart(2, "0");
-    return `${minutes}:${remainingSeconds}`;
-  };
-
-  //-----------------[ Regular tab bar ]-----------------
   const handleTabPress = (tabName) => {
     navigation.navigate(tabName);
-  };
-
-  const handleTimerPress = () => {
-    setShowExitButton(true);
-    setTimeout(() => setShowExitButton(false), 3000);
-  };
-
-  const pressedExitRef = useRef(false);
-
-  const confirmExit = () => {
-    pressedExitRef.current = false;
-
-    Dialog.show({
-      type: "WARNING",
-      title: "Exit workout",
-      titleStyle: {
-        fontSize: 22,
-      },
-      textBody: "Are you sure you want to quit?",
-      textBodyStyle: {
-        fontSize: 45,
-      },
-      button: "Exit workout",
-      closeOnOverlayTap: true,
-      onPressButton: () => {
-        pressedExitRef.current = true;
-        Dialog.hide();
-        navigation.goBack();
-      },
-      onHide: () => {
-        if (!pressedExitRef.current) {
-          setShowExitButton(false);
-        }
-      },
-    });
   };
 
   const tabs = [
@@ -111,44 +46,29 @@ const BottomTabBar = () => {
   ];
 
   return (
-    <View style={styles.tabBarContainer}>
-      {tabs.map((tab, index) =>
-        isWorkoutMode && tab.name === "MyWorkoutPlan" ? (
+    !isWorkoutMode && (
+      <View style={styles.tabBarContainer}>
+        {tabs.map((tab, index) => (
           <TouchableOpacity
             key={index}
-            style={[styles.tabButton, styles.specialTabButton]}
-            onPress={showExitButton ? confirmExit : handleTimerPress}
+            style={[
+              styles.tabButton,
+              index !== tabs.length - 1 && styles.tabSeparator,
+              tab.name === "MyWorkoutPlan" && styles.specialTabButton,
+            ]}
+            onPress={() => handleTabPress(tab.name)}
+            disabled={navDisabled}
           >
-            {showExitButton ? (
-              <FontAwesome5 name="times" size={RFValue(20)} color="red" />
-            ) : (
-              <Text style={styles.timerText}>{formatTime()}</Text>
-            )}
+            <MaterialCommunityIcons
+              name={tab.icon}
+              size={RFValue(20)}
+              color={routeName === tab.name ? "#2979FF" : "rgb(184, 184, 184)"}
+              style={tab.name === "MyWorkoutPlan" && styles.specialIcon}
+            />
           </TouchableOpacity>
-        ) : (
-          !isWorkoutMode && (
-            <TouchableOpacity
-              key={index}
-              style={[
-                styles.tabButton,
-                index !== tabs.length - 1 && styles.tabSeparator,
-                tab.name === "MyWorkoutPlan" && styles.specialTabButton,
-              ]}
-              onPress={() => handleTabPress(tab.name)}
-            >
-              <MaterialCommunityIcons
-                name={tab.icon}
-                size={RFValue(20)}
-                color={
-                  routeName === tab.name ? "#2979FF" : "rgb(184, 184, 184)"
-                }
-                style={tab.name === "MyWorkoutPlan" && styles.specialIcon}
-              />
-            </TouchableOpacity>
-          )
-        )
-      )}
-    </View>
+        ))}
+      </View>
+    )
   );
 };
 
@@ -158,7 +78,7 @@ const styles = StyleSheet.create({
     alignSelf: "center",
     justifyContent: "center",
     alignItems: "center",
-    height: height * 0.095,
+    height: height * 0.12,
     backgroundColor: "white",
     elevation: 5,
     shadowColor: "#000",
@@ -189,13 +109,14 @@ const styles = StyleSheet.create({
     color: "white",
   },
   timerText: {
-    color: "white",
+    color: "#2979FF",
     fontSize: RFValue(12),
     fontFamily: "Inter_700Bold",
   },
   exitButton: {
-    justifyContent: "center",
-    alignItems: "center",
+    color: "#2979FF",
+    fontSize: RFValue(12),
+    fontFamily: "Inter_700Bold",
   },
 });
 

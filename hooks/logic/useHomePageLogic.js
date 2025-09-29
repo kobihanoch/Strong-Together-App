@@ -1,24 +1,26 @@
 import { useMemo } from "react";
 import { useAnalysisContext } from "../../context/AnalysisContext";
 import { useAuth } from "../../context/AuthContext";
-import { useWorkoutContext } from "../../context/WorkoutContext";
 import { useGlobalAppLoadingContext } from "../../context/GlobalAppLoadingContext";
+import { useWorkoutContext } from "../../context/WorkoutContext";
 
 const useHomePageLogic = () => {
   // Auth state (user + global session loading)
-  const { user, sessionLoading } = useAuth();
+  const { user } = useAuth();
   const { isLoading } = useGlobalAppLoadingContext();
 
   // Workout state (plan + derived maps + loading)
   const {
     workout,
     workoutSplits, // [A,B,C...]
-    loading: workoutLoading,
   } = useWorkoutContext();
 
   // Analysis state (tracking + derived analytics + loading)
-  const { analyzedExerciseTrackingData, loading: analysisLoading } =
-    useAnalysisContext();
+  const { analyzedExerciseTrackingData } = useAnalysisContext();
+  const hasTracking = useMemo(
+    () => !!analyzedExerciseTrackingData,
+    [analyzedExerciseTrackingData]
+  );
 
   // Derive stable user fields
   const { username, userId, firstName, profileImageUrl } = useMemo(() => {
@@ -62,6 +64,7 @@ const useHomePageLogic = () => {
       username,
       userId,
       hasAssignedWorkout,
+      hasTracking,
       profileImageUrl,
       firstName,
       lastWorkoutDate,
@@ -88,6 +91,7 @@ const useHomePageLogic = () => {
 
   return {
     data,
+    isLoading,
   };
 };
 

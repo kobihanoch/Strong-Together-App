@@ -1,38 +1,26 @@
-# 🌟 Strong Together 🌟
-
-**Your Ultimate Gym Tracking Companion**
-
----
+# Strong Together App – Frontend (v3.0.0)
 
 <div align="center">
 
-  <img src="https://img.shields.io/badge/Version-3.0.0-blue" alt="Version 3.0.0" />
-  <img src="https://img.shields.io/badge/Technologies-React%20Native%2C%20JavaScript%2C%20Expo%20Go-green" alt="Technologies" />
-  <img src="https://img.shields.io/badge/License-Personal%20Use-orange" alt="Personal Use License" />
-  <img src="https://img.shields.io/badge/Status-In%20Progress-yellow" alt="Status In Progress" />
-  <img src="https://img.shields.io/badge/Type-Side%20Project-lightgrey" alt="Side Project" />
+  
 
-## </div>
+</div>
 
 <p align="center">
   <img src="assets/icon.png" alt="Strong-Together-App Icon" width="150" />
 </p>
 
-**Strong-Together-App** is the ultimate fitness companion designed to help users achieve their health and fitness goals. From personalized workout plans to real-time progress tracking, this app makes fitness accessible, engaging, and rewarding.
-
----
-
-# Strong Together App – Frontend (v3.0.0)
+ <img src="https://img.shields.io/badge/Technologies-React%20Native%2C%20JavaScript%2C%20Expo%20Go-green" alt="Technologies" />
+ 
 
 Welcome to the **Strong Together App** — a cross-platform mobile
 application for planning, scheduling and tracking your workouts. The
-app lets athletes and trainers collaborate on custom workout plans,
+app lets athletes custom their workout plans,
 log exercise data, send messages and stay accountable. Version 3
-represents a major update: the monolithic Deno/Supabase setup has
-been split into two repositories (frontend and backend) and the
+represents a major update: the monolithic Deno/Supabase setup has removed, and transformed to two repositories (frontend and backend) and the
 backend has been rewritten in **pure Node.js + Express**. This
-transition allowed us to streamline API calls, implement database
-indexes and views, and achieve ~50 % faster UI flow through smart
+transition allowed me to streamline API calls, implement database
+indexes and views, and achieve **~50 % faster** UI flow through smart
 memoization (`useMemo`/`useCallback`) and context state management.
 
 👉 The Backend codebase is maintained in a dedicated repository here:  
@@ -54,11 +42,9 @@ memoization (`useMemo`/`useCallback`) and context state management.
     - [Tracking Flow](#tracking-flow)
     - [Messages Flow](#messages-flow)
     - [Auth Flow](#auth-flow)
-11. [Testing](#testing)
-12. [Deployment](#deployment)
-13. [Roadmap & Future Improvements](#roadmap--future-improvements)
-14. [Contributing](#contributing)
-15. [License](#license)
+11. [Roadmap & Future Improvements](#roadmap--future-improvements)
+12. [Contributing](#contributing)
+13. [License](#license)
 
 ---
 
@@ -91,7 +77,7 @@ SQL views**.
   <br>
   <strong>Intro Screen</strong>: Onboarding walkthrough.
 </p>
-
+<br><br>
 <div align="center">
   <img src="https://github.com/user-attachments/assets/8ccbbf43-3544-4738-8a20-7dbb989b1e89" alt="Edit reps" width="200"/>
   <img src="https://github.com/user-attachments/assets/387ec46b-7976-46aa-b420-07ad2a88abdc" alt="Change exercise order" width="200"/>
@@ -100,24 +86,28 @@ SQL views**.
 <p align="center">
   <strong>Create/Modify</strong>: Edit your workout plan as how much you want.
 </p>
-
+<br><br>
 <div align="center">
   <img src="https://github.com/user-attachments/assets/67f394e9-aea6-4a9e-b286-aab83230de6b" alt="Watch the Program Plan" width="200"/>
 </div>
 <p align="center">
   <strong>Watch the Program Plan</strong>: View and manage workout plans.
 </p>
-
+<br><br>
 <div align="center">
   <img src="https://github.com/user-attachments/assets/6248cf62-7ed0-439a-a6fb-d77d305ca0db" alt="After Workout Statistics" width="200" style="margin-right: 20px;"/>
   <img src="https://github.com/user-attachments/assets/a03f4a65-4db6-4f96-b465-9526573ddcbd" alt="Active Workout" width="200"/>
+  <img src="https://github.com/user-attachments/assets/225515c3-a266-4cfd-989f-839aae8291bc" alt="Compare to last workout" width="200"/>
+  
 </div>
 <p align="center">
   <strong>After Workout Statistics</strong>: Summarized session results.  
   <br>
   <strong>Active Workout</strong>: Real-time tracking of sets, reps, and weights.
+  <br>
+  <strong>Compare Progress</strong>: Check your last performance.
 </p>
-
+<br><br>
 <div align="center">
   <img src="https://github.com/user-attachments/assets/b8364732-6a74-49b3-a881-6fbff174ce91" alt="Message Modal" width="200"/>
 </div>

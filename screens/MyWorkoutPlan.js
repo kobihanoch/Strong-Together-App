@@ -1,67 +1,261 @@
-import { useNavigation } from "@react-navigation/native";
-import React from "react";
-import { Dimensions, StyleSheet, Text, View } from "react-native";
+// English comments only
+import React, { useRef, useState } from "react";
+import {
+  Dimensions,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+  TextInput,
+  Keyboard,
+} from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";
-import ExercisesSection from "../components/MyWorkoutPlanComponents/ExercisesSection.js";
-import HeaderSection from "../components/MyWorkoutPlanComponents/HeaderSection.js";
-import WorkoutSplitsList from "../components/MyWorkoutPlanComponents/WorkoutSplitsList.js";
-import { useAuth } from "../context/AuthContext";
+import Column from "../components/Column.js";
+import RenderItemExercise from "../components/MyWorkoutPlanComponents/RenderItemExercise.js";
+import SplitFlatList from "../components/MyWorkoutPlanComponents/SplitFlatList.js";
+import SlidingBottomModal from "../components/SlidingBottomModal.js";
+import { useCardioContext } from "../context/CardioContext.js";
 import { useMyWorkoutPlanPageLogic } from "../hooks/logic/useMyWorkoutPlanPageLogic.js";
+import useLightStatusBar from "../hooks/useLightStatusBar.js";
+import { formatTime } from "../utils/statisticsUtils.js";
+import Row from "../components/Row.js";
+import { logUserCardio } from "../services/CardioService.js";
+import { Notifier, NotifierComponents } from "react-native-notifier";
+import { useNavigation } from "@react-navigation/native";
+import NoWorkoutPlan from "../components/MyWorkoutPlanComponents/NoWorkoutPlan.js";
 
 const { width, height } = Dimensions.get("window");
 
-const MyWorkoutPlan = () => {
-  const navigation = useNavigation();
-  const { user } = useAuth();
-  const { data: workoutData } = useMyWorkoutPlanPageLogic();
+const onlyDigits = (t) => t.replace(/\D/g, "");
+const clampSec = (t) => {
+  const n = parseInt(t || "0", 10);
+  if (Number.isNaN(n)) return "0";
+  return String(Math.max(0, Math.min(59, n)));
+};
 
-  return (
-    <View
-      style={{
-        flex: 1,
-        alignItems: "center",
-        flexDirection: "column",
-        gap: height * 0.02,
-      }}
-    >
-      {workoutData?.workout ? (
-        <>
-          <HeaderSection user={user}></HeaderSection>
-          <WorkoutSplitsList data={workoutData}></WorkoutSplitsList>
-          <ExercisesSection data={workoutData}></ExercisesSection>
-        </>
-      ) : (
-        <>
-          <View
+const MyWorkoutPlan = () => {
+  const nav = useNavigation();
+  const { hasWorkout, filteredExercises, setSelectedSplit, selectedSplit } =
+    useMyWorkoutPlanPageLogic();
+
+  const {
+    hasDoneCardioToday = false,
+    cardioForToday = null,
+    setDailyCardioMap,
+    setWeeklyCardioMap,
+  } = useCardioContext() || {};
+
+  // Modals
+  const exRef = useRef(null);
+  const cardioRef = useRef(null);
+  const openCardioModal = (i = 0) => {
+    cardioRef?.current?.open?.(i);
+  };
+
+  // Local cardio inputs
+  const [cardioType, setCardioType] = useState("Walk");
+  const [mins, setMins] = useState("");
+  const [secs, setSecs] = useState("");
+
+  const onSaveCardio = async () => {
+    const m = parseInt(mins || "0", 10) || 0;
+    const s = parseInt(clampSec(secs), 10) || 0;
+    if (m === 0 && s === 0) return; // no-op
+    const res = await logUserCardio(m, s, cardioType);
+    const { daily, weekly } = res;
+    setDailyCardioMap(daily);
+    setWeeklyCardioMap(weekly);
+    Keyboard.dismiss();
+    cardioRef.current?.close?.();
+    Notifier.showNotification({
+      title: "Cardio logged",
+      description: null,
+      duration: 2500,
+      showAnimationDuration: 250,
+      hideOnPress: true,
+      Component: NotifierComponents.Alert,
+      componentProps: {
+        alertType: "success",
+        titleStyle: { fontSize: 16 },
+        descriptionStyle: { fontSize: 14 },
+      },
+    });
+    nav.navigate("Statistics");
+  };
+
+  useLightStatusBar();
+
+  return hasWorkout ? (
+    <View style={styles.container}>
+      <View>
+        {/* Splits */}
+        <SplitFlatList
+          setSelectedSplit={setSelectedSplit}
+          selectedSplit={selectedSplit}
+          filteredExercises={filteredExercises}
+          openCardioModal={openCardioModal}
+        />
+
+        {/* Exercises modal */}
+        <SlidingBottomModal
+          title="Exercises"
+          ref={exRef}
+          data={filteredExercises}
+          renderItem={({ item }) => <RenderItemExercise item={item} />}
+          enableBackDrop={false}
+          enablePanDownClose={false}
+          snapPoints={["15%", "50%", "85%"]}
+          flatListUsage={true}
+          initialIndex={0}
+        />
+
+        {/* Cardio modal */}
+        <SlidingBottomModal
+          title="Cardio"
+          ref={cardioRef}
+          enableBackDrop={true}
+          snapPoints={["30%", "50%", "85%"]}
+          flatListUsage={false}
+          initialIndex={-1}
+        >
+          <Column
             style={{
-              flex: 1,
               justifyContent: "center",
               alignItems: "center",
-              flexDirection: "column",
+              marginTop: height * 0.05,
+              paddingHorizontal: 20,
+              gap: 16,
             }}
           >
-            <Text
-              style={{ fontSize: RFValue(23), fontFamily: "Inter_700Bold" }}
-            >
-              No workout available
-            </Text>
-            <Text
-              style={{
-                fontSize: RFValue(18),
-                fontFamily: "Inter_400Regular",
-                color: "gray",
-              }}
-            >
-              Create one to start your journy
-            </Text>
-          </View>
-        </>
-      )}
+            {hasDoneCardioToday ? (
+              <Text style={styles.cardioText}>
+                You{" "}
+                <Text style={styles.cardioTextStrong}>
+                  {cardioForToday?.type === "Run"
+                    ? "Ran"
+                    : cardioForToday?.type + "ed"}
+                </Text>{" "}
+                for{" "}
+                <Text style={styles.cardioTextStrong}>
+                  {formatTime(
+                    cardioForToday?.duration_mins,
+                    cardioForToday?.duration_sec
+                  )}
+                </Text>{" "}
+                today, good job!
+              </Text>
+            ) : (
+              <Column style={styles.cardioCard}>
+                {/* Type selector */}
+                <Row style={{ gap: 10 }}>
+                  {["Walk", "Run"].map((opt) => {
+                    const active = cardioType === opt;
+                    return (
+                      <TouchableOpacity
+                        key={opt}
+                        onPress={() => setCardioType(opt)}
+                        style={[
+                          styles.typePill,
+                          active && { backgroundColor: "#2979FF" },
+                        ]}
+                      >
+                        <Text
+                          style={[
+                            styles.typePillText,
+                            active && {
+                              color: "white",
+                              fontFamily: "Inter_600SemiBold",
+                            },
+                          ]}
+                        >
+                          {opt}
+                        </Text>
+                      </TouchableOpacity>
+                    );
+                  })}
+                </Row>
+
+                {/* Time inputs */}
+                <Row style={styles.timeRow}>
+                  <Column style={styles.timeField}>
+                    <Text style={styles.timeLabel}>Min</Text>
+                    <TextInput
+                      style={styles.timeInput}
+                      value={mins}
+                      onChangeText={(t) => setMins(onlyDigits(t))}
+                      keyboardType="number-pad"
+                      maxLength={3}
+                      placeholder="0"
+                      returnKeyType="done"
+                      onFocus={() => openCardioModal(2)}
+                    />
+                  </Column>
+
+                  <Text style={styles.colon}>:</Text>
+
+                  <Column style={styles.timeField}>
+                    <Text style={styles.timeLabel}>Sec</Text>
+                    <TextInput
+                      style={styles.timeInput}
+                      value={secs}
+                      onChangeText={(t) => setSecs(onlyDigits(t))}
+                      onBlur={() =>
+                        setSecs((s) => {
+                          return clampSec(s);
+                        })
+                      }
+                      keyboardType="number-pad"
+                      maxLength={2}
+                      placeholder="00"
+                      returnKeyType="done"
+                      onFocus={() => openCardioModal(2)}
+                    />
+                  </Column>
+                </Row>
+
+                {/* Save button */}
+                <TouchableOpacity
+                  style={[
+                    styles.plusBtn,
+                    styles.saveBtn,
+                    (parseInt(mins || "0", 10) || 0) === 0 &&
+                      (parseInt(secs || "0", 10) || 0) === 0 && {
+                        opacity: 0.5,
+                      },
+                  ]}
+                  onPress={onSaveCardio}
+                  disabled={
+                    (parseInt(mins || "0", 10) || 0) === 0 &&
+                    (parseInt(secs || "0", 10) || 0) === 0
+                  }
+                >
+                  <Text style={styles.saveText}>Save</Text>
+                </TouchableOpacity>
+              </Column>
+            )}
+          </Column>
+        </SlidingBottomModal>
+      </View>
     </View>
+  ) : (
+    <NoWorkoutPlan
+      onCreatePress={() => nav.navigate("CreateWorkout")}
+    ></NoWorkoutPlan>
   );
 };
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    flexDirection: "column",
+  },
+
+  // Split cards (unchanged)
+  header: {
+    fontFamily: "Inter_700Bold",
+    fontSize: RFValue(20),
+    marginLeft: width * 0.05,
+  },
   loadingContainer: {
     flex: 1,
     justifyContent: "center",
@@ -110,6 +304,89 @@ const styles = StyleSheet.create({
     fontSize: RFValue(12),
     color: "#555",
     marginTop: height * 0.005,
+  },
+
+  // Cardio display text
+  cardioText: {
+    fontFamily: "Inter_400Regular",
+    fontSize: RFValue(14),
+    textAlign: "center",
+  },
+  cardioTextStrong: {
+    fontFamily: "Inter_700Bold",
+    fontSize: RFValue(14),
+    textAlign: "center",
+  },
+
+  // Cardio input card
+  cardioCard: {
+    width: width * 0.9,
+    backgroundColor: "#F3F4F6",
+    borderRadius: 16,
+    padding: 14,
+    gap: 14,
+    alignItems: "center",
+  },
+  typePill: {
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 999,
+    backgroundColor: "#E9EEF6",
+  },
+  typePillText: {
+    fontFamily: "Inter_500Medium",
+    fontSize: RFValue(12),
+    color: "black",
+  },
+  timeRow: {
+    width: "100%",
+    justifyContent: "center",
+    alignItems: "center",
+    gap: 10,
+  },
+  timeField: {
+    width: width * 0.28,
+    backgroundColor: "white",
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: "#e6e6e6",
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+  },
+  timeLabel: {
+    fontFamily: "Inter_500Medium",
+    fontSize: RFValue(10),
+    color: "#666",
+    marginBottom: 4,
+  },
+  timeInput: {
+    fontFamily: "Inter_600SemiBold",
+    fontSize: RFValue(16),
+    color: "black",
+  },
+  colon: {
+    fontFamily: "Inter_600SemiBold",
+    fontSize: RFValue(16),
+    color: "#666",
+    marginHorizontal: 2,
+  },
+
+  // Save button + base plusBtn style
+  plusBtn: {
+    minWidth: 90,
+    paddingVertical: 10,
+    paddingHorizontal: 16,
+    borderRadius: 12,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  saveBtn: {
+    backgroundColor: "#2979FF",
+  },
+  saveText: {
+    fontFamily: "Inter_600SemiBold",
+    fontSize: RFValue(12),
+    color: "white",
   },
 });
 

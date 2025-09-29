@@ -2,13 +2,16 @@ import { LinearGradient } from "expo-linear-gradient";
 import React from "react";
 import {
   Dimensions,
+  Linking,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
 } from "react-native";
-import Icon from "react-native-vector-icons/FontAwesome";
+import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import Logo from "../components/Logo";
+import { RFValue } from "react-native-responsive-fontsize";
+import { colors } from "../constants/colors";
 
 const { width, height } = Dimensions.get("window");
 
@@ -28,8 +31,8 @@ const Intro = ({ navigation }) => {
 
           <View style={{ alignItems: "center", marginTop: height * 0.15 }}>
             <Text style={styles.descriptionText}>
-              Enjoy a full world of health, now for free. {"\n"} Don't forget to
-              bring your friends!
+              Welcome to Strong Together.{"\n"}Your goals - powered by your
+              circle.
             </Text>
           </View>
 
@@ -54,15 +57,22 @@ const Intro = ({ navigation }) => {
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.aboutUs}
-              onPress={() => navigation.navigate("Login")}
+              onPress={() =>
+                Linking.openURL(
+                  "https://kobihanoch.github.io/strongtogether-privacy/"
+                )
+              }
             >
-              <View style={{ flexDirection: "row" }}>
-                <Text style={styles.aboutUsText}>About us</Text>
-                <Icon
-                  name="question-circle"
-                  size={width * 0.04}
-                  color="white"
-                />
+              <View
+                style={{ flexDirection: "row", gap: 7, alignItems: "center" }}
+              >
+                <MaterialCommunityIcons
+                  name={"shield-lock"}
+                  size={RFValue(15)}
+                  color={"white"}
+                ></MaterialCommunityIcons>
+
+                <Text style={styles.aboutUsText}>Privacy Policy</Text>
               </View>
             </TouchableOpacity>
           </View>

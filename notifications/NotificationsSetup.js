@@ -4,13 +4,13 @@ import { useAuth } from "../context/AuthContext";
 import { setupPush } from "./setup";
 
 const NotificationsSetup = () => {
-  const { user } = useAuth();
+  const { user, isValidatedWithServer } = useAuth();
 
   useEffect(() => {
-    if (user?.id) {
+    if (user?.id && isValidatedWithServer) {
       setupPush(user.id).catch(() => {});
     }
-  }, [user?.id]);
+  }, [user?.id, isValidatedWithServer]);
 
   return null;
 };

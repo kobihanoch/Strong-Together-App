@@ -1,9 +1,15 @@
 import axios from "axios";
-import { API_BASE_URL } from "./apiConfig";
-import { GlobalAuth } from "../context/AuthContext.js";
-import { getRefreshToken, saveRefreshToken } from "../utils/tokenStore";
-import { refreshAndRotateTokens } from "../services/AuthService";
 import { showErrorAlert } from "../errors/errorAlerts";
+import { refreshAndRotateTokens } from "../services/AuthService";
+import GlobalAuth from "../utils/authUtils";
+import { saveRefreshToken } from "../utils/tokenStore";
+import { API_BASE_URL } from "./apiConfig";
+import {
+  ensureBootstrap,
+  isOpen,
+  isTracked,
+  responseMap,
+} from "./bootstrapApi";
 import {
   isDeviceOnline,
   notifyOffline,
@@ -12,17 +18,52 @@ import {
 
 const api = axios.create({ baseURL: API_BASE_URL, timeout: 12000 });
 
-// Attach access token to every outgoing request (if present)
+// === WRAP api.get ===
+
+// Store the original axios get
+const rawGet = api.get.bind(api);
+
+// Replace api.get to support bootstrap fan-out on first load
+api.get = async function wrappedGet(url, config) {
+  // Intercept only during first-load for tracked endpoints
+  if (isOpen() && isTracked(url)) {
+    try {
+      const data = await ensureBootstrap(); // single-flight
+      const key = responseMap[url];
+      const slice = data?.[key];
+
+      if (slice === undefined) {
+        // Fallback: no slice found
+        return rawGet(url, config);
+      }
+
+      // Return shaped fake axios response
+      return {
+        data: slice,
+        status: 200,
+        headers: {},
+        config: config ?? {},
+        request: null,
+      };
+    } catch (e) {
+      // Fallback on bootstrap error
+      console.log("Error:", e);
+      return rawGet(url, config);
+    }
+  }
+
+  // Normal path
+  return rawGet(url, config);
+};
+
 api.interceptors.request.use(
   async (config) => {
-    const at = GlobalAuth.getAccessToken && GlobalAuth.getAccessToken();
-    if (at) {
-      config.headers = config.headers || {};
-      config.headers.Authorization = `Bearer ${at}`;
-    }
+    console.log("[Axios]:", config.url);
     return config;
   },
-  (error) => Promise.reject(error)
+  (error) => {
+    return Promise.reject(error);
+  }
 );
 
 // Flow:
@@ -44,23 +85,27 @@ api.interceptors.response.use(
     const status = error.response?.status;
     const data = error.response?.data;
 
-    /*if (status === 401) {
+    if (status === 401) {
       console.log("401 from API:", {
         url: original.url,
         method: original.method,
         resp: data,
         authHeader: original.headers?.Authorization?.slice(0, 32) + "...",
       });
-    }*/
+    }
 
     // Detect if network error - no response
-    if (!error.response) {
-      const online = await isDeviceOnline();
-      if (!online) {
-        notifyOffline();
-      } else {
-        notifyServerDown();
-      }
+    const online = await isDeviceOnline();
+
+    if (!online) {
+      notifyOffline();
+      error.isNetworkError = true;
+      console.log("Offline");
+      return Promise.reject(error);
+    } else if (!error.response) {
+      // Some other fetch/network problem (e.g., DNS, TLS fail)
+      notifyServerDown();
+      console.log("Server down");
       return Promise.reject(error);
     }
 
@@ -98,7 +143,7 @@ api.interceptors.response.use(
         // Some toast to show error
         showErrorAlert("Error", data?.message);
         // Block
-        Promise.reject(refreshErr);
+        return Promise.reject(refreshErr);
       }
     }
 

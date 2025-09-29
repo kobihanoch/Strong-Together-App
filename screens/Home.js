@@ -1,9 +1,12 @@
+import { Skeleton } from "moti/skeleton";
 import React from "react";
-import { Dimensions, StyleSheet, Text, View } from "react-native";
+import { Dimensions, StyleSheet, View } from "react-native";
+import { ScrollView } from "react-native-gesture-handler";
 import { RFValue } from "react-native-responsive-fontsize";
-import LastWorkoutSection from "../components/HomeComponents/LastWorkoutSection";
-import QuickLookSection from "../components/HomeComponents/QuickLookSection";
-import StartWorkoutButton from "../components/HomeComponents/StartWorkoutButton";
+import PRCard from "../components/HomeComponents/PRCard";
+import QuickActions from "../components/HomeComponents/QuickActions";
+import StartWorkoutCard from "../components/HomeComponents/StartWorkoutCard";
+import TopComponent from "../components/TopComponent";
 import useHomePageLogic from "../hooks/logic/useHomePageLogic";
 
 const { width, height } = Dimensions.get("window");
@@ -12,38 +15,25 @@ const Home = ({ navigation }) => {
   // Hook handling
   const { data: userData, isLoading } = useHomePageLogic();
 
-  if (isLoading) {
-    return null;
-  }
   return (
-    <View style={{ flex: 1, paddingVertical: height * 0.02 }}>
-      <View style={styles.midContainer}>
-        {/*flex 2*/}
-        <View
-          style={{
-            flex: 3,
-            flexDirection: "column",
-            gap: height * 0.03,
-            justifyContent: "center",
-            width: "100%",
-            padding: height * 0.03,
-            borderRadius: height * 0.04,
-            shadowColor: "#000",
-            shadowOffset: { width: 0, height: 0 },
-            shadowOpacity: 0.05,
-            shadowRadius: 5,
-            elevation: 1,
-          }}
-        >
-          <Text style={styles.headerText}>Hello, {userData?.firstName}!</Text>
-          <StartWorkoutButton></StartWorkoutButton>
-        </View>
-
-        {/*flex 1*/}
-        <LastWorkoutSection data={userData}></LastWorkoutSection>
-
-        {/*flex 6*/}
-        <QuickLookSection data={userData}></QuickLookSection>
+    <View style={{ flex: 1, flexDirection: "column" }}>
+      <View style={{ flex: 2 }}>
+        <TopComponent />
+      </View>
+      <View style={{ flex: 8 }}>
+        <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false}>
+          <View style={styles.midContainer}>
+            <StartWorkoutCard data={userData}></StartWorkoutCard>
+            <PRCard
+              PR={userData.PR}
+              hasAssignedWorkout={userData.hasAssignedWorkout}
+              hasTracking={userData.hasTracking}
+            ></PRCard>
+            <QuickActions
+              hasAssignedWorkout={userData.hasAssignedWorkout}
+            ></QuickActions>
+          </View>
+        </ScrollView>
       </View>
     </View>
   );
@@ -70,11 +60,10 @@ const styles = StyleSheet.create({
   },
 
   midContainer: {
-    flex: 1,
     flexDirection: "column",
     justifyContent: "flex-start",
     alignItems: "center",
-    gap: height * 0.005,
+    gap: height * 0.03,
   },
 
   bottomContainer: {

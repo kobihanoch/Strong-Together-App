@@ -5,11 +5,24 @@ import { useWorkoutContext } from "../../context/WorkoutContext";
 export const useMyWorkoutPlanPageLogic = () => {
   const {
     workout,
+    workoutForEdit,
     workoutSplits,
     exercises: allExercises,
   } = useWorkoutContext();
 
-  const { exerciseTracking, analyzedExerciseTrackingData, hasTrainedToday } =
+  const hasWorkout = useMemo(() => !!workout, [workout]);
+
+  const exerciseCounter = useMemo(() => {
+    if (!hasWorkout) return;
+    return Object.entries(workoutForEdit).reduce((acc, [s, ex]) => {
+      const exCount = ex.length;
+      const splitName = s;
+      acc[splitName] = exCount;
+      return acc;
+    }, {});
+  }, [hasWorkout, workoutForEdit]);
+
+  const { analyzedExerciseTrackingData, hasTrainedToday } =
     useAnalysisContext();
   const [selectedSplit, setSelectedSplit] = useState(null);
 
@@ -28,10 +41,11 @@ export const useMyWorkoutPlanPageLogic = () => {
 
   // Gets preformed split count
   const splitTrainedCount = useMemo(() => {
+    if (!analyzedExerciseTrackingData) return;
     return (
-      analyzedExerciseTrackingData.splitDaysByName[selectedSplit?.name] ?? 0
+      analyzedExerciseTrackingData?.splitDaysByName?.[selectedSplit?.name] ?? 0
     );
-  }, [exerciseTracking, selectedSplit]);
+  }, [analyzedExerciseTrackingData, selectedSplit]);
 
   // Handling selection of split
   const handleWorkoutSplitPress = useCallback((split) => {
@@ -39,16 +53,16 @@ export const useMyWorkoutPlanPageLogic = () => {
   }, []);
 
   return {
-    data: {
-      workout,
-      workoutSplits,
-      allExercises,
-      selectedSplit,
-      setSelectedSplit,
-      handleWorkoutSplitPress,
-      filteredExercises,
-      splitTrainedCount,
-      hasTrainedToday,
-    },
+    workout,
+    hasWorkout,
+    workoutSplits,
+    allExercises,
+    selectedSplit,
+    setSelectedSplit,
+    handleWorkoutSplitPress,
+    filteredExercises,
+    splitTrainedCount,
+    hasTrainedToday,
+    exerciseCounter,
   };
 };

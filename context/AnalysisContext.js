@@ -2,15 +2,19 @@ import React, {
   createContext,
   useCallback,
   useContext,
-  useEffect,
   useMemo,
   useState,
 } from "react";
-import { useAuth } from "./AuthContext";
+import { keyTracking } from "../cache/cacheUtils";
+import useCacheAndFetch from "../hooks/useCacheAndFetch";
+import useUpdateGlobalLoading from "../hooks/useUpdateGlobalLoading";
 import { getUserExerciseTracking } from "../services/WorkoutService";
-import { unpackFromExerciseTrackingData } from "../utils/authUtils";
-import { useGlobalAppLoadingContext } from "./GlobalAppLoadingContext";
-import { getExerciseTrackingMapped } from "../utils/statisticsUtils";
+import {
+  checkHasTrainedToday,
+  unpackFromExerciseTrackingData,
+} from "../utils/analysisContexUtils";
+import { useAuth } from "./AuthContext";
+import { hasBootstrapPayload } from "../api/bootstrapApi";
 
 const AnalysisContext = createContext(null);
 export const useAnalysisContext = () => {
@@ -35,55 +39,61 @@ export const useAnalysisContext = () => {
  */
 
 export const AnalysisProvider = ({ children }) => {
-  // Global loading
-  const { setLoading: setGlobalLoading } = useGlobalAppLoadingContext();
-
-  const { user, sessionLoading } = useAuth();
+  const { user, isValidatedWithServer } = useAuth();
 
   // Raw and derived analysis state
   const [exerciseTrackingMaps, setExerciseTrackingMaps] = useState(null);
 
   const [analyzedExerciseTrackingData, setAnalyzedExerciseTrackingData] =
     useState(null);
-  const [hasTrainedToday, setHasTrainedToday] = useState(false);
 
-  // Loading flag for this context
-  const [loading, setLoading] = useState(true);
+  const hasTrainedToday = useMemo(
+    () => checkHasTrainedToday(analyzedExerciseTrackingData?.lastWorkoutDate),
+    [analyzedExerciseTrackingData?.lastWorkoutDate]
+  );
 
-  useEffect(() => {
-    console.log("Analysis Mounted");
-    (async () => {
-      if (user) {
-        try {
-          setLoading(true);
-          const { exerciseTrackingAnalysis, exerciseTrackingMaps } =
-            await getUserExerciseTracking();
+  // -------------------------- useCacheHandler props ------------------------------
 
-          setExerciseTrackingMaps(exerciseTrackingMaps ?? []);
-          setAnalyzedExerciseTrackingData(
-            unpackFromExerciseTrackingData(exerciseTrackingAnalysis)
-          );
-          setHasTrainedToday(!!res?.hasTrainedToday);
-        } finally {
-          setLoading(false);
-        }
-      }
-    })();
+  // Fetch function
+  const fetchFn = useCallback(async () => await getUserExerciseTracking(), []);
 
-    return logoutCleanup;
-  }, [user]);
-
-  useEffect(() => {
-    setGlobalLoading("analysis", loading);
-    return () => setGlobalLoading("analysis", false);
-  }, [loading, setGlobalLoading]);
-
-  const logoutCleanup = useCallback(() => {
-    setAnalyzedExerciseTrackingData(null);
-    setHasTrainedToday(false);
-    setLoading(false);
-    console.log("Analysis Unmounted");
+  // On data function
+  const onDataFn = useCallback((data) => {
+    // Raw data from server - unpack
+    // Data from cache - already unpacked
+    setExerciseTrackingMaps(data?.exerciseTrackingMaps ?? []);
+    // Determines if data retreived from API or cache
+    try {
+      setAnalyzedExerciseTrackingData(
+        unpackFromExerciseTrackingData(data?.exerciseTrackingAnalysis)
+      );
+    } catch (error) {
+      setAnalyzedExerciseTrackingData(data?.analyzedExerciseTrackingData);
+    }
   }, []);
+
+  // Cache payload
+  const cachePayload = useMemo(
+    () => ({
+      exerciseTrackingMaps: exerciseTrackingMaps,
+      analyzedExerciseTrackingData: analyzedExerciseTrackingData,
+    }),
+    [exerciseTrackingMaps, analyzedExerciseTrackingData]
+  );
+
+  // Hook usage
+  const { loading, cacheKnown } = useCacheAndFetch(
+    user, // user prop
+    keyTracking, // key builder
+    isValidatedWithServer, // flag from server
+    fetchFn, // fetch cb
+    onDataFn, // on data cb
+    cachePayload, // cache payload
+    "Analysis Context" // log
+  );
+
+  // Report analysis loading to global loading
+  useUpdateGlobalLoading("Analysis", cacheKnown ? loading : true);
 
   // Memoized context value
   const value = useMemo(
@@ -93,7 +103,6 @@ export const AnalysisProvider = ({ children }) => {
       analyzedExerciseTrackingData,
       setAnalyzedExerciseTrackingData,
       hasTrainedToday,
-      setHasTrainedToday,
       loading,
     }),
     [

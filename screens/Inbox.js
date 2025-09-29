@@ -1,16 +1,44 @@
-import React from "react";
+import React, { useCallback } from "react";
 import { Dimensions, Text, View } from "react-native";
 import { FlatList } from "react-native-gesture-handler";
 import { RFValue } from "react-native-responsive-fontsize";
 import MessageItem from "../components/InboxComponents/MessageItem";
 import useInboxLogic from "../hooks/logic/useInboxLogic";
+import { colors } from "../constants/colors";
 const { width, height } = Dimensions.get("window");
 
 const Inbox = () => {
-  const { messages, media } = useInboxLogic();
+  const {
+    allReceivedMessages = [],
+    confirmAndDeleteMessage,
+    markAsRead,
+    unreadMessagesCount = 0,
+  } = useInboxLogic() || {};
+
+  const renderItem = useCallback(
+    ({ item }) => {
+      return (
+        <MessageItem
+          item={item}
+          deleteMessage={confirmAndDeleteMessage}
+          markAsRead={markAsRead}
+        />
+      );
+    },
+    [confirmAndDeleteMessage]
+  );
+
+  const keyExtractor = useCallback((item) => item.id);
   return (
     <View style={{ flex: 1, flexDirection: "column" }}>
-      <View style={{ flex: 1.5, justifyContent: "center" }}>
+      <View
+        style={{
+          flex: 2,
+          justifyContent: "flex-end",
+          paddingBottom: 20,
+          backgroundColor: colors.lightCardBg,
+        }}
+      >
         <Text
           style={{
             fontFamily: "Inter_600SemiBold",
@@ -21,25 +49,35 @@ const Inbox = () => {
           Inbox
         </Text>
       </View>
-      <View style={{ flex: 8.5 }}>
-        {messages.allReceivedMessages.length != 0 ? (
+      <View style={{ flex: 8, marginTop: 20 }}>
+        <Text
+          style={{
+            fontFamily: "Inter_400Regular",
+            fontSize: RFValue(13),
+            color: "black",
+            marginLeft: 15,
+            marginBottom: 20,
+          }}
+        >
+          You have{" "}
+          <Text
+            style={{
+              fontFamily: "Inter_600SemiBold",
+              fontSize: RFValue(13),
+              color: "black",
+            }}
+          >
+            {unreadMessagesCount}
+          </Text>{" "}
+          unread messages
+        </Text>
+        {allReceivedMessages.length != 0 ? (
           <FlatList
-            data={[...messages.allReceivedMessages].sort(
-              (a, b) => new Date(b.sent_at) - new Date(a.sent_at)
-            )}
-            renderItem={({ item }) => (
-              <MessageItem
-                item={item}
-                profileImages={media.profileImagesCache}
-                sender={{
-                  id: item.sender_id,
-                  name: item.sender_full_name,
-                }}
-                deleteMessage={messages.confirmAndDeleteMessage}
-              ></MessageItem>
-            )}
-            keyExtractor={(item) => item.id}
+            data={allReceivedMessages}
+            renderItem={renderItem}
+            keyExtractor={keyExtractor}
             style={{ width: "100%" }}
+            showsVerticalScrollIndicator={false}
           ></FlatList>
         ) : (
           <View

@@ -6,15 +6,13 @@ import {
   useMemo,
   useState,
 } from "react";
-import {
-  getUserMessages,
-  updateMsgReadStatus,
-} from "../services/MessagesService.js";
-import { filterMessagesByUnread } from "../utils/authUtils";
-import { cacheProfileImagesAndGetMap } from "../utils/notificationsUtils.js";
+import { keyInbox } from "../cache/cacheUtils.js";
+import useCacheAndFetch from "../hooks/useCacheAndFetch.js";
+import useUpdateGlobalLoading from "../hooks/useUpdateGlobalLoading.js";
+import { getUserMessages } from "../services/MessagesService.js";
+import { filterMessagesByUnread } from "../utils/notificationsContextUtils.js";
 import { registerToMessagesListener } from "../webSockets/socketListeners";
 import { useAuth } from "./AuthContext.js";
-import { useGlobalAppLoadingContext } from "./GlobalAppLoadingContext.js";
 
 /**
  * Notifications Flow:
@@ -32,10 +30,7 @@ export const NotificationsContext = createContext();
 export const useNotifications = () => useContext(NotificationsContext);
 
 export const NotificationsProvider = ({ children }) => {
-  // Global loading
-  const { setLoading: setGlobalLoading } = useGlobalAppLoadingContext();
-
-  const { user, sessionLoading } = useAuth();
+  const { user, isValidatedWithServer } = useAuth();
 
   // All user's received messages
   const [allReceivedMessages, setAllReceivedMessages] = useState([]);
@@ -45,72 +40,43 @@ export const NotificationsProvider = ({ children }) => {
     return filterMessagesByUnread(allReceivedMessages);
   }, [allReceivedMessages]);
 
-  /// All senders
-  const [allSendersUsersArr, setAllSendersUsersArr] = useState([]);
+  // -------------------------- useCacheHandler props ------------------------------
 
-  // ALl profile images
-  const [profileImagesCache, setProfileImagesCache] = useState({});
+  // Fetch function
+  const fetchFn = useCallback(async () => await getUserMessages(), []);
 
-  // Loading
-  const [loadingMessages, setLoadingMessages] = useState(true);
+  // On data function
+  const onDataFn = useCallback((data) => {
+    setAllReceivedMessages(data?.messages);
+  }, []);
+
+  // Cache payload
+  const cachePayload = useMemo(
+    () => ({ messages: allReceivedMessages }),
+    [allReceivedMessages]
+  );
+
+  // Hook usage
+  const { loading: loadingMessages, cacheKnown } = useCacheAndFetch(
+    user, // user prop
+    keyInbox, // key builder
+    isValidatedWithServer, // flag from server
+    fetchFn, // fetch cb
+    onDataFn, // on data cb
+    cachePayload, // cache payload
+    "Notifications Context" // log
+  );
+
+  // Report inbox loading to global loading
+  useUpdateGlobalLoading("Notifications", cacheKnown ? loadingMessages : true);
 
   // Load listener
   useEffect(() => {
     if (user) {
-      const cleanup = registerToMessagesListener(
-        setAllReceivedMessages,
-        setAllSendersUsersArr
-      );
+      const cleanup = registerToMessagesListener(setAllReceivedMessages);
       return cleanup;
     }
   }, [user]);
-
-  // Load messages on start
-  // Load senders on start (same API call)
-  useEffect(() => {
-    (async () => {
-      if (user) {
-        setLoadingMessages(true);
-        try {
-          const messages = await getUserMessages();
-          setAllReceivedMessages(messages.messages);
-          setAllSendersUsersArr(messages.senders);
-        } finally {
-          setLoadingMessages(false);
-        }
-      }
-    })();
-
-    return logoutCleanup;
-  }, [user, sessionLoading]);
-
-  useEffect(() => {
-    setGlobalLoading("notifications", loadingMessages);
-    return () => setGlobalLoading("notifications", false);
-  }, [loadingMessages]);
-
-  const logoutCleanup = useCallback(() => {
-    setAllReceivedMessages([]);
-    setAllSendersUsersArr([]);
-    setProfileImagesCache({});
-    setLoadingMessages(false);
-  }, []);
-
-  // Prefetch images and return mapping of profile images when senders updated
-  useEffect(() => {
-    (async () => {
-      const map = await cacheProfileImagesAndGetMap(allSendersUsersArr);
-      setProfileImagesCache(map);
-    })();
-  }, [allSendersUsersArr]);
-
-  const markAsRead = async (msgId) => {
-    await updateMsgReadStatus(msgId);
-    // Update state
-    setAllReceivedMessages((prev) =>
-      prev.map((m) => (m.id === msgId ? { ...m, is_read: true } : m))
-    );
-  };
 
   return (
     <NotificationsContext.Provider
@@ -119,9 +85,6 @@ export const NotificationsProvider = ({ children }) => {
         allReceivedMessages,
         setAllReceivedMessages,
         loadingMessages,
-        profileImagesCache,
-        allSendersUsersArr,
-        markAsRead,
       }}
     >
       {children}

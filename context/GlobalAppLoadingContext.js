@@ -4,6 +4,7 @@ import {
   useMemo,
   useState,
   useCallback,
+  useEffect,
 } from "react";
 
 const GlobalAppLoadingContext = createContext();

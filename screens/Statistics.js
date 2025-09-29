@@ -1,8 +1,14 @@
-import React from "react";
-import { Dimensions, StyleSheet, View } from "react-native";
-import CalendarCard from "../components/StatisticsComponents/CalendarCard";
+import React, { useEffect, useRef, useState } from "react";
+import { Dimensions, StyleSheet } from "react-native";
+import { ScrollView } from "react-native-gesture-handler";
+import { RFValue } from "react-native-responsive-fontsize";
+import CalendarStripCustom from "../components/StatisticsComponents/CalenderStripCustom";
+import CardioSection from "../components/StatisticsComponents/CardioSection";
 import ExercisesFlatList from "../components/StatisticsComponents/ExercisesFlatList";
+import TabSelect from "../components/StatisticsComponents/TabSelect";
+import WorkoutHeader from "../components/StatisticsComponents/WorkoutHeader";
 import { useAuth } from "../context/AuthContext";
+import { useGlobalAppLoadingContext } from "../context/GlobalAppLoadingContext";
 import useStatisticsPageLogic from "../hooks/logic/useStatisticsPageLogic";
 
 const { width, height } = Dimensions.get("window");
@@ -12,59 +18,85 @@ const StatisticsPage = () => {
   const {
     selectedDate,
     setSelectedDate,
-    exerciseTrackingByDate,
-    exerciseTrackingByDatePrev,
-    exerciseTrackingWithETSIdKey,
-    exerciseTrackingWithDateKey,
+    exerciseTrackingByDate, // Workout for date X
+    exerciseTrackingByDatePrev, // Array of all last performences of all exercises
+    exerciseTrackingWithDateKey, // Map of [date] => [...exercisetracking logs]
+    cardioByDate, // Cardio for date X
+    cardioForWeek, // Cardio for week starting at sunday date Y
   } = useStatisticsPageLogic(user);
 
+  const { isLoading } = useGlobalAppLoadingContext();
+
+  const [index, setIndex] = useState(0);
+
+  const cardioDotRef = useRef(null);
+
+  useEffect(() => {
+    if (cardioByDate) cardioDotRef.current.showCardioDot();
+    else {
+      cardioDotRef.current.hideCardioDot();
+    }
+  }, [cardioByDate]);
+
+  useEffect(() => {
+    setIndex(
+      exerciseTrackingByDate && exerciseTrackingByDate.length
+        ? 0
+        : cardioByDate
+        ? 1
+        : 0
+    );
+  }, [exerciseTrackingByDate, cardioByDate]);
+
+  if (isLoading) return null;
+
   return (
-    <View
-      style={[
-        styles.pageContainer,
-        {
-          flex: 6,
-          borderRadius: height * 0.0,
-          flexDirection: "column",
-          paddingHorizontal: width * 0.05,
-        },
-      ]}
+    <ScrollView
+      style={styles.pageContainer}
+      showsVerticalScrollIndicator={false}
     >
-      <View
-        style={{
-          flex: 2.5,
-          width: "100%",
-          justifyContent: "center",
-          alignItems: "center",
-        }}
-      >
-        <CalendarCard
+      <CalendarStripCustom
+        onDateSelect={setSelectedDate}
+        selectedDate={selectedDate}
+        userExerciseLogs={exerciseTrackingWithDateKey}
+      />
+      <TabSelect
+        index={index}
+        setIndex={setIndex}
+        ref={cardioDotRef}
+      ></TabSelect>
+      {index == 0 ? (
+        <WorkoutHeader
+          data={exerciseTrackingByDate}
           selectedDate={selectedDate}
-          setSelectedDate={setSelectedDate}
-          userExerciseLogs={exerciseTrackingWithDateKey || []}
-        />
-      </View>
-      <View style={{ flex: 7.5 }}>
+        ></WorkoutHeader>
+      ) : null}
+      {index === 0 ? (
         <ExercisesFlatList
           data={exerciseTrackingByDate}
           dataToCompare={exerciseTrackingByDatePrev || []}
-          byETSId={exerciseTrackingWithETSIdKey}
+          setIndex={setIndex}
         ></ExercisesFlatList>
-      </View>
-    </View>
+      ) : (
+        <CardioSection
+          daily={cardioByDate}
+          weekly={cardioForWeek}
+        ></CardioSection>
+      )}
+    </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
+  header: {
+    fontFamily: "Inter_600SemiBold",
+    fontSize: RFValue(17),
+  },
   pageContainer: {
     flex: 1,
-    paddingVertical: height * 0.03,
     flexDirection: "column",
-  },
-  contentContainer: {
-    width: "90%",
-    justifyContent: "center",
-    alignItems: "center",
+    paddingVertical: height * 0,
+    paddingHorizontal: width * 0,
   },
 });
 

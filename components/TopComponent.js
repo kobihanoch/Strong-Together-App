@@ -5,6 +5,7 @@ import React, { useEffect, useState } from "react";
 import {
   Animated,
   Dimensions,
+  Easing,
   Modal,
   StyleSheet,
   Text,
@@ -15,6 +16,8 @@ import { RFValue } from "react-native-responsive-fontsize";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import { useAuth } from "../context/AuthContext";
 import { useNotifications } from "../context/NotificationsContext";
+import { useGlobalAppLoadingContext } from "../context/GlobalAppLoadingContext";
+import { Skeleton } from "moti/skeleton";
 
 const { width, height } = Dimensions.get("window");
 
@@ -22,24 +25,15 @@ const TopComponent = () => {
   // Context
   const { user, isWorkoutMode } = useAuth();
   const { unreadMessages } = useNotifications();
+  const { isLoading } = useGlobalAppLoadingContext();
 
   // Navigation
   const navigation = useNavigation();
 
   // Properties
-  const [msgCount, setMsgCount] = useState();
-  const [username, setUsername] = useState(null);
-  const [fullname, setFullname] = useState(null);
-  const [profileImageUrl, setProfileImageUrl] = useState(null);
-
-  // Image source
-  const imgSrc = profileImageUrl
-    ? {
-        uri: `${process.env.EXPO_PUBLIC_SUPABASE_URL}/storage/v1/object/public/${profileImageUrl}`,
-      }
-    : user?.gender == "Male"
-    ? require("../assets/man.png")
-    : require("../assets/woman.png");
+  const msgCount = unreadMessages?.length;
+  const fullname = user?.name;
+  const profileImageUrl = user?.profile_image_url;
 
   // Animations
   const scaleAnim = useState(new Animated.Value(1))[0];
@@ -47,28 +41,20 @@ const TopComponent = () => {
     if (unreadMessages) {
       Animated.sequence([
         Animated.timing(scaleAnim, {
-          toValue: 1.4,
-          duration: 150,
+          toValue: 2,
+          duration: 200,
           useNativeDriver: true,
+          easing: Easing.out(Easing.exp), // Slow start → fast end
         }),
         Animated.timing(scaleAnim, {
           toValue: 1,
           duration: 150,
           useNativeDriver: true,
+          easing: Easing.in(Easing.circle), // Fast start → slow end
         }),
       ]).start();
     }
   }, [unreadMessages.length]);
-
-  // On load
-  useEffect(() => {
-    if (user && unreadMessages) {
-      setUsername(user.username);
-      setFullname(user.name);
-      setProfileImageUrl(user.profile_image_url);
-      setMsgCount(unreadMessages.length);
-    }
-  }, [user, unreadMessages]);
 
   const [isModalVisible, setIsModalVisible] = useState(false);
 
@@ -81,121 +67,150 @@ const TopComponent = () => {
   };
 
   return (
-    <LinearGradient
-      colors={["transparent", "transparent"]}
-      style={styles.topContainer}
-    >
-      <View
-        style={{
-          flexDirection: "row",
-          justifyContent: "flex-start",
-          alignItems: "center",
-          flex: 0.5,
-        }}
+    <Skeleton.Group show={isLoading}>
+      <LinearGradient
+        colors={["transparent", "transparent"]}
+        style={styles.topContainer}
       >
-        <TouchableOpacity onPress={handleImagePress}>
-          <Image
-            source={
-              profileImageUrl
-                ? {
-                    uri: `${process.env.EXPO_PUBLIC_SUPABASE_URL}/storage/v1/object/public/${profileImageUrl}`,
-                  }
-                : user?.gender == "Male"
-                ? require("../assets/man.png")
-                : require("../assets/woman.png")
-            }
-            style={styles.profileImage}
-            cachePolicy={profileImageUrl ? "disk" : "none"}
-            transition={150}
-          />
-        </TouchableOpacity>
-        <View style={{ marginLeft: width * 0.04 }}>
-          <Text
-            style={{
-              fontFamily: "Inter_600SemiBold",
-              fontSize: RFValue(18),
-              color: "black",
-            }}
-          >
-            {fullname}
-          </Text>
-          <Text
-            style={{
-              fontFamily: "Inter_400Regular",
-              fontSize: RFValue(13),
-              color: "black",
-              opacity: 0.7,
-            }}
-          >
-            @{username}
-          </Text>
-        </View>
-      </View>
-      <View style={{ flexDirection: "row", gap: width * 0.02 }}>
-        <TouchableOpacity
-          style={{ marginBottom: height * 0.02 }}
-          onPress={() => navigation.navigate("Inbox")}
-          disabled={isWorkoutMode ? true : false}
+        <View
+          style={{
+            flexDirection: "row",
+            justifyContent: "flex-start",
+            alignItems: "center",
+            flex: 0.5,
+          }}
         >
-          <MaterialCommunityIcons
-            name={"bell"}
-            size={RFValue(20)}
-            color={"#1A1A1A"}
-            opacity={isWorkoutMode ? 0 : 0.8}
-          ></MaterialCommunityIcons>
-          <Animated.View
+          <View style={{}}>
+            <Skeleton colorMode="light" width={150}>
+              <Text
+                style={{
+                  fontFamily: "Inter_400Regular",
+                  fontSize: RFValue(15),
+                  color: "black",
+                  opacity: 1,
+                }}
+              >
+                Hello,
+              </Text>
+            </Skeleton>
+            <Skeleton colorMode="light" height={20} width={100}>
+              <Text
+                style={{
+                  fontFamily: "Inter_600SemiBold",
+                  fontSize: RFValue(17),
+                  color: "black",
+                }}
+              >
+                {isLoading ? "" : fullname}
+              </Text>
+            </Skeleton>
+          </View>
+        </View>
+        <View
+          style={{
+            flexDirection: "row",
+            gap: width * 0.02,
+            alignItems: "flex-end",
+          }}
+        >
+          <View
             style={{
-              transform: [{ scale: scaleAnim }],
-              backgroundColor: "#EF4444",
-              height: height * 0.015,
-              borderRadius: height * 0.05,
-              aspectRatio: 1,
-              position: "absolute",
-              bottom: 0,
-              right: 0,
-              justifyContent: "center",
-              alignItems: "center",
-              opacity: isWorkoutMode ? 0 : msgCount == 0 ? 0 : 1,
+              marginBottom: 12,
+              marginRight: 10,
+              opacity: isLoading ? 0 : 1,
             }}
           >
-            <Text
-              style={{
-                color: "white",
-                fontSize: RFValue(6),
-                fontFamily: "Inter_600SemiBold",
-              }}
+            <TouchableOpacity
+              onPress={() => navigation.navigate("Inbox")}
+              disabled={isWorkoutMode ? true : false}
             >
-              {msgCount > 99 ? "!" : msgCount}
-            </Text>
-          </Animated.View>
-        </TouchableOpacity>
-      </View>
-
-      {/* Modal */}
-      <Modal
-        visible={isModalVisible}
-        transparent={true}
-        animationType="fade"
-        onRequestClose={closeModal}
-      >
-        <View style={styles.modalContainer}>
-          <TouchableOpacity style={styles.modalBackground} onPress={closeModal}>
-            <Image
-              source={
-                profileImageUrl
-                  ? {
-                      uri: `${process.env.EXPO_PUBLIC_SUPABASE_URL}/storage/v1/object/public/${profileImageUrl}`,
-                    }
-                  : user?.gender == "Male"
-                  ? require("../assets/man.png")
-                  : require("../assets/woman.png")
-              }
-              style={styles.enlargedImage}
-            />
-          </TouchableOpacity>
+              <MaterialCommunityIcons
+                name={"bell"}
+                size={RFValue(20)}
+                color={"#1A1A1A"}
+                opacity={isWorkoutMode ? 0 : 0.8}
+              ></MaterialCommunityIcons>
+              <Animated.View
+                style={{
+                  transform: [{ scale: scaleAnim }],
+                  backgroundColor: "#ff2979",
+                  height: 15,
+                  borderRadius: 50,
+                  aspectRatio: 1,
+                  position: "absolute",
+                  bottom: 0,
+                  right: 0,
+                  justifyContent: "center",
+                  alignItems: "center",
+                  display: msgCount === 0 ? "none" : "flex",
+                }}
+              >
+                <Text
+                  style={{
+                    color: "white",
+                    fontSize: RFValue(6),
+                    fontFamily: "Inter_600SemiBold",
+                  }}
+                >
+                  {msgCount > 99 ? "!" : msgCount}
+                </Text>
+              </Animated.View>
+            </TouchableOpacity>
+          </View>
+          <Skeleton
+            height={height * 0.06}
+            width={height * 0.06}
+            radius="round"
+            colorMode="light"
+          >
+            <TouchableOpacity onPress={handleImagePress}>
+              <Image
+                source={
+                  profileImageUrl
+                    ? {
+                        uri: `${process.env.EXPO_PUBLIC_SUPABASE_URL}/storage/v1/object/public/${profileImageUrl}`,
+                      }
+                    : user?.gender == "Male"
+                    ? require("../assets/man.png")
+                    : require("../assets/woman.png")
+                }
+                style={styles.profileImage}
+                cachePolicy={profileImageUrl ? "disk" : "none"}
+                transition={150}
+              />
+            </TouchableOpacity>
+          </Skeleton>
         </View>
-      </Modal>
-    </LinearGradient>
+
+        {/* Modal */}
+        <Modal
+          visible={isModalVisible}
+          transparent={true}
+          animationType="fade"
+          onRequestClose={closeModal}
+        >
+          <View style={styles.modalContainer}>
+            <TouchableOpacity
+              style={styles.modalBackground}
+              onPress={closeModal}
+            >
+              <Image
+                source={
+                  profileImageUrl
+                    ? {
+                        uri: `${process.env.EXPO_PUBLIC_SUPABASE_URL}/storage/v1/object/public/${profileImageUrl}`,
+                      }
+                    : user?.gender == "Male"
+                    ? require("../assets/man.png")
+                    : require("../assets/woman.png")
+                }
+                style={styles.enlargedImage}
+              />
+            </TouchableOpacity>
+          </View>
+        </Modal>
+      </LinearGradient>
+    </Skeleton.Group>
   );
 };
 
@@ -208,14 +223,14 @@ const styles = StyleSheet.create({
     alignItems: "flex-end",
     paddingHorizontal: width * 0.06,
     paddingVertical: height * 0.01,
-    backgroundColor: "#F9F9F9",
-    borderBottomWidth: 0.5,
+    backgroundColor: "rgba(255, 255, 255, 1)",
+    borderBottomWidth: 0,
     borderBottomColor: "rgba(219, 219, 219, 0.8)",
   },
   profileImage: {
     height: height * 0.06,
     aspectRatio: 1,
-    resizeMode: "stretch",
+    contentFit: "stretch",
     borderWidth: 0.5,
     borderRadius: 40,
     borderColor: "white",

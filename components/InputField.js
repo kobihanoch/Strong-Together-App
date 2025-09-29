@@ -1,8 +1,9 @@
 import React from "react";
 import { Dimensions, StyleSheet, TextInput, View } from "react-native";
-import Icon from "react-native-vector-icons/FontAwesome";
+import { RFValue } from "react-native-responsive-fontsize";
+import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 
-const { width, height } = Dimensions.get("window"); // לקבלת רוחב וגובה המסך
+const { width, height } = Dimensions.get("window");
 
 const InputField = ({
   placeholder,
@@ -21,11 +22,10 @@ const InputField = ({
         secureTextEntry={secureTextEntry}
         placeholderTextColor="#e0efff"
       />
-      <Icon
+      <MaterialCommunityIcons
         name={iconName}
-        size={width * 0.035}
-        color="#e0efff"
-        style={styles.icon}
+        size={RFValue(12)}
+        color={"white"}
       />
     </View>
   );
