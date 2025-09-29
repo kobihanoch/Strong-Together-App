@@ -2,6 +2,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import React from "react";
 import {
   Dimensions,
+  Linking,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -56,26 +57,22 @@ const Intro = ({ navigation }) => {
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.aboutUs}
-              onPress={() => navigation.navigate("Login")}
+              onPress={() =>
+                Linking.openURL(
+                  "https://kobihanoch.github.io/strongtogether-privacy/"
+                )
+              }
             >
-              <View style={{ flexDirection: "row" }}>
-                <Text style={styles.aboutUsText}>About us</Text>
-                <View
-                  style={{
-                    backgroundColor: "white",
-                    height: 17,
-                    aspectRatio: 1,
-                    borderRadius: 20,
-                    justifyContent: "center",
-                    alignItems: "center",
-                  }}
-                >
-                  <MaterialCommunityIcons
-                    name={"question-circle"}
-                    size={RFValue(9)}
-                    color={colors.primary}
-                  ></MaterialCommunityIcons>
-                </View>
+              <View
+                style={{ flexDirection: "row", gap: 7, alignItems: "center" }}
+              >
+                <MaterialCommunityIcons
+                  name={"shield-lock"}
+                  size={RFValue(15)}
+                  color={"white"}
+                ></MaterialCommunityIcons>
+
+                <Text style={styles.aboutUsText}>Privacy Policy</Text>
               </View>
             </TouchableOpacity>
           </View>

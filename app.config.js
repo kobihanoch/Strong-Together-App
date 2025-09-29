@@ -2,7 +2,7 @@ export default {
   expo: {
     name: "Strong Together",
     slug: "strong-together",
-    version: "3.0.0",
+    version: "4.0.0",
     orientation: "portrait",
     icon: "./assets/icon.png",
     userInterfaceStyle: "light",
@@ -16,7 +16,7 @@ export default {
       color: "#FFFFFF",
     },
     ios: {
-      supportsTablet: true,
+      supportsTablet: false,
       bundleIdentifier: "com.kobihanoch.strongtogether",
       infoPlist: {
         ITSAppUsesNonExemptEncryption: false,
