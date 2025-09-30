@@ -143,7 +143,6 @@ const useCreateWorkoutLogic = () => {
     // Passed validation -> proceed to save
     setIsSaving(true);
     console.log("[Create Workout]: Started saving...");
-
     (async () => {
       try {
         const data = await addWorkout(map);

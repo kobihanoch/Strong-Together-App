@@ -28,11 +28,13 @@ export const getDaysSince = (lastDateString) => {
 
 export const getBodyPartsForSplit = (split) => {
   if (!split) return;
-  const groups = split.muscleGroup
-    .replace(/\s*\([^)]*\)/g, "")
-    .split(",")
-    .map((s) => s.trim())
-    .filter(Boolean);
+  const groups =
+    split.muscleGroup ||
+    ""
+      .replace(/\s*\([^)]*\)/g, "")
+      .split(",")
+      .map((s) => s.trim())
+      .filter(Boolean);
 
   // 3) Remove "Abs" (case-insensitive)
   const cleaned = groups.filter((g) => g.toLowerCase() !== "abs");
