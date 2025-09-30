@@ -27,7 +27,7 @@ export const getDaysSince = (lastDateString) => {
 };
 
 export const getBodyPartsForSplit = (split) => {
-  if (!split) return;
+  if (!split || !split?.muscleGroup) return;
   const groups = split.muscleGroup
     .replace(/\s*\([^)]*\)/g, "")
     .split(",")

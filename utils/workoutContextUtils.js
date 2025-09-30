@@ -9,7 +9,7 @@ export const extractWorkoutSplits = (workout) => {
 
   const map = workout.workoutsplits.reduce((acc, split) => {
     const splitName = split.name;
-    const splitExFields = split.exercisetoworkoutsplit;
+    const splitExFields = split.exercisetoworkoutsplit || [];
     acc[splitName] = [...splitExFields];
     return acc;
   }, {});
