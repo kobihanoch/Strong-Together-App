@@ -10,12 +10,12 @@
 <div align="center"><img src="https://img.shields.io/badge/Technologies-React%20Native%2C%20JavaScript%2C%20Expo%20Go-green" alt="Technologies" /></div>
 <br><br>
 <p align="center">
-  <a href="https://apps.apple.com/app/idYOUR_APP_ID">
+  <a href="https://apps.apple.com/app/id6745721821">
     <img src="https://developer.apple.com/assets/elements/badges/download-on-the-app-store.svg" alt="Download on the App Store" height="48">
   </a>
 </p>
 <p align="center">
-  <strong>📱 Now available on the <a href="https://apps.apple.com/app/idYOUR_APP_ID">App Store</a>!</strong>
+  <strong>📱 Now available on the <a href="https://apps.apple.com/app/id6745721821">App Store</a>!</strong>
 </p>
 
 ---
