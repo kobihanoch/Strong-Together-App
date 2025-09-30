@@ -72,8 +72,8 @@ Version 4 builds on top of this by introducing a **smart cache layer**, **offli
 ### App Previews
 
 <div align="center">
-  <img src="https://github.com/user-attachments/assets/b51b3dff-1732-4c59-9d1a-7ffbe5fd6362" alt="Home Screen" width="200" style="margin-right: 20px;"/>
-  <img src="assets/ssintroduction.png" alt="Intro Screen" width="200"/>
+  <img src="https://github.com/user-attachments/assets/24a25ef5-a434-49d6-8b8b-1a5b5d808cf9" alt="Home Screen" width="200" style="margin-right: 20px;"/>
+  <img src="https://github.com/user-attachments/assets/46c7b894-5061-4d7f-82de-21e4dd4a1825" alt="Intro Screen" width="200"/>
 </div>
 <p align="center">
   <strong>Home Screen</strong>: Access fitness summaries and plans.  
@@ -82,40 +82,47 @@ Version 4 builds on top of this by introducing a **smart cache layer**, **offli
 </p>
 <br><br>
 <div align="center">
-  <img src="https://github.com/user-attachments/assets/8ccbbf43-3544-4738-8a20-7dbb989b1e89" alt="Edit reps" width="200"/>
-  <img src="https://github.com/user-attachments/assets/387ec46b-7976-46aa-b420-07ad2a88abdc" alt="Change exercise order" width="200"/>
-  <img src="https://github.com/user-attachments/assets/83d38cf0-f289-4bf6-a63f-438bed8bcaf2" alt="Add split" width="200"/>
+  <img src="https://github.com/user-attachments/assets/7e4a8841-a23a-42bd-a82f-c6a5d83726e5" alt="Edit reps" width="200"/>
+  <img src="https://github.com/user-attachments/assets/2740105b-1b40-4239-8451-dd910d5629fa" alt="Change exercise order" width="200"/>
+  <img src="https://github.com/user-attachments/assets/9b0e89b7-437f-4a8c-9682-e4ff70f99903" alt="Add split" width="200"/>
 </div>
 <p align="center">
   <strong>Create/Modify</strong>: Edit your workout plan as how much you want.
 </p>
 <br><br>
 <div align="center">
-  <img src="https://github.com/user-attachments/assets/67f394e9-aea6-4a9e-b286-aab83230de6b" alt="Watch the Program Plan" width="200"/>
+  <img src="https://github.com/user-attachments/assets/e755f060-8bd5-47a2-bb06-4f071fa04f9f" alt="Watch the Program Plan" width="200"/>
+  <img src="https://github.com/user-attachments/assets/ad04532a-b656-4483-bbb6-a68723e5edad" alt="Watch the Program Plan" width="200"/>
 </div>
 <p align="center">
   <strong>Watch the Program Plan</strong>: View and manage workout plans.
 </p>
 <br><br>
 <div align="center">
-  <img src="https://github.com/user-attachments/assets/6248cf62-7ed0-439a-a6fb-d77d305ca0db" alt="After Workout Statistics" width="200" style="margin-right: 20px;"/>
-  <img src="https://github.com/user-attachments/assets/a03f4a65-4db6-4f96-b465-9526573ddcbd" alt="Active Workout" width="200"/>
-  <img src="https://github.com/user-attachments/assets/225515c3-a266-4cfd-989f-839aae8291bc" alt="Compare to last workout" width="200"/>
+  <img src="https://github.com/user-attachments/assets/324fa910-1d07-40de-a260-d139429ac02e" alt="Watch the Program Plan" width="200"/>
+  <img src="https://github.com/user-attachments/assets/ae6004ff-cb5a-4670-9de2-b519ebf41bbc" alt="Watch the Program Plan" width="200"/>
+</div>
+<p align="center">
+  <strong>Train. Hard.</strong>: Start your live tracking.
+</p>
+<br><br>
+<div align="center">
+  <img src="https://github.com/user-attachments/assets/7f252f1b-f4bb-431b-9e74-e427e9f660f0" alt="After Workout Statistics" width="200" style="margin-right: 20px;"/>
+  <img src="https://github.com/user-attachments/assets/43c5fc84-b3f5-4300-8fd7-edc24acdf9e0" alt="Compare to last workout" width="200"/>
+  <img src="https://github.com/user-attachments/assets/c57f129e-defc-4ce1-8c4b-fc454fec55fb" alt="Compare to last workout" width="200"/>
+  <img src="https://github.com/user-attachments/assets/f480110c-81af-48db-8d7a-e7a0c1edb133" alt="Compare to last workout" width="200"/>
   
 </div>
 <p align="center">
-  <strong>After Workout Statistics</strong>: Summarized session results.  
-  <br>
-  <strong>Active Workout</strong>: Real-time tracking of sets, reps, and weights.
-  <br>
-  <strong>Compare Progress</strong>: Check your last performance.
+  <strong>Statistics and Workout Analysis</strong>: Summarized workout results.  
 </p>
 <br><br>
 <div align="center">
   <img src="https://github.com/user-attachments/assets/b8364732-6a74-49b3-a881-6fbff174ce91" alt="Message Modal" width="200"/>
+  <img src="https://github.com/user-attachments/assets/9d973ac3-cf98-4868-a29e-0471e088d8dc" alt="Message Modal" width="200"/>
 </div>
 <p align="center">
-  <strong>Message Modal</strong>: Compose or view messages.
+  <strong>Inbox</strong>: View system messages.
 </p>
 
 ## Main Features
@@ -275,7 +282,7 @@ defines tables for users, messages, workout plans, splits, exercises
 and tracking logs. The simplified ER diagram below shows how the
 entities relate to each other:
 
-![Database schema overview](https://github.com/user-attachments/assets/797d6621-b5b2-4959-87e8-40319b720c1a)
+![Database schema overview](https://github.com/user-attachments/assets/e9cdce3f-dc29-4034-8840-6a89a932df94)
 
 Important points about the schema:
 
@@ -304,7 +311,7 @@ Important points about the schema:
 
 ### Workout Flow
 
-![Database workout flow](https://github.com/user-attachments/assets/e61c060e-222e-43b8-9819-aedf67963e15)
+![Database workout flow](https://github.com/user-attachments/assets/7a634d62-9c30-4546-b24e-46df64781a6a)
 
 1. **Create a Plan** – A user (or trainer) starts by creating a
    `WorkoutPlan` with a name and difficulty level. This inserts a
@@ -321,19 +328,22 @@ Important points about the schema:
 
 ### Tracking Flow
 
-![Database workout tracking flow](https://github.com/user-attachments/assets/9ffa26e2-d762-465e-bbbd-28460373e0a7)
+![Database workout tracking flow](https://github.com/user-attachments/assets/21dba52e-1cb9-459c-a2f6-2b4e9a3e9588)
 
-1. **Select a split** – On the day of training, the user
-   opens a split and sees the list of exercises in order.
-2. **Record Sets** – For each exercise, the user logs weight and
-   repetitions. Each entry is persisted as a row in the
-   `exercisetracking` table with a reference to the
-   `exercisetoworkoutsplit` identifier, the performing `user_id` and
-   the date of the workout.
-3. **Review Progress** – The app aggregates tracking data to show
-   charts of personal records, trends over time and progress against
-   planned sets. These analytics are built on SQL views in the
-   backend for efficiency.
+- **Workouts**
+  1. **Select a split** – On the day of training, the user
+     opens a split and sees the list of exercises in order.
+  2. **Record Sets** – For each exercise, the user logs weight and
+     repetitions. Each entry is persisted as a row in the
+     `exercisetracking` table with a reference to the
+     `exercisetoworkoutsplit` identifier, the performing `user_id` and
+     the date of the workout.
+  3. **Review Progress** – The app aggregates tracking data to show
+     charts of personal records, trends over time and progress against
+     planned sets. These analytics are built on SQL views in the
+     backend for efficiency.
+- **Cardio**
+  1. **Log daily** - log daily cardio, for now it's just walk/run, and duration.
 
 ### Messages Flow
 
