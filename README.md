@@ -1,35 +1,36 @@
-# Strong Together App – Frontend (v3.0.0)
-
+# Strong Together App – Frontend (v4.0.0) 
+<br><br>
 <div align="center">
-
-  
-
 </div>
 
 <p align="center">
   <img src="assets/icon.png" alt="Strong-Together-App Icon" width="150" />
 </p>
 
- <img src="https://img.shields.io/badge/Technologies-React%20Native%2C%20JavaScript%2C%20Expo%20Go-green" alt="Technologies" />
- 
+<div align="center"><img src="https://img.shields.io/badge/Technologies-React%20Native%2C%20JavaScript%2C%20Expo%20Go-green" alt="Technologies" /></div>
+<br><br>
+<p align="center">
+  <a href="https://apps.apple.com/app/idYOUR_APP_ID">
+    <img src="https://developer.apple.com/assets/elements/badges/download-on-the-app-store.svg" alt="Download on the App Store" height="48">
+  </a>
+</p>
+<p align="center">
+  <strong>📱 Now available on the <a href="https://apps.apple.com/app/idYOUR_APP_ID">App Store</a>!</strong>
+</p>
 
-Welcome to the **Strong Together App** — a cross-platform mobile
-application for planning, scheduling and tracking your workouts. The
-app lets athletes custom their workout plans,
-log exercise data, send messages and stay accountable. Version 3
-represents a major update: the monolithic Deno/Supabase setup has removed, and transformed to two repositories (frontend and backend) and the
-backend has been rewritten in **pure Node.js + Express**. This
-transition allowed me to streamline API calls, implement database
-indexes and views, and achieve **~50 % faster** UI flow through smart
-memoization (`useMemo`/`useCallback`) and context state management.
+---
 
-👉 The Backend codebase is maintained in a dedicated repository here:  
-[`Strong-Together-Backend`](https://github.com/kobihanoch/Strong-Together-Backend)
+Welcome to the **Strong Together App** - a cross-platform mobile application for planning, scheduling and tracking your workouts. The app lets athletes customize their workout plans, log exercise data, send messages, and stay accountable.
+
+Version 4 introduces major improvements to performance, user experience, and cache architecture, including full offline support and a custom-built SWR-inspired cache layer.
+
+> 👉 **The backend codebase is maintained in a dedicated repository:**  
+> [`Strong-Together-Backend`](https://github.com/kobihanoch/Strong-Together-Backend)
 
 ## Table of Contents
 
 1. [Project Overview](#project-overview)
-2. [Sreenshots](#screenshots)
+2. [Screenshots](#screenshots)
 3. [Main Features](#main-features)
 4. [Architecture Overview](#architecture-overview)
 5. [Tech Stack](#tech-stack)
@@ -51,7 +52,7 @@ memoization (`useMemo`/`useCallback`) and context state management.
 ## Project Overview
 
 The Strong Together App helps users build healthier habits by
-combining **workout planning** and**exercise tracking**. Users can create custom workout plans with splits
+combining **workout planning** and **exercise tracking**. Users can create custom workout plans with splits
 and exercises, schedule workouts on specific days of the week,
 receive notifications before a session and log each set’s weight and
 repetitions. All data is stored in a
@@ -60,9 +61,11 @@ PostgreSQL database and synchronized with a backend API.
 Version 3 separated the client and server into two distinct
 repositories. While previous versions relied on Supabase client
 libraries and server‑side functions written in Deno, I now use a
-dedicated Node.js/Express API for authentication, CRUD operations, WebSockets connection for realtime features (messages). This change enables more flexible deployment
-options and made it easier to optimise queries with **indexes and
-SQL views**.
+dedicated Node.js/Express API for authentication, CRUD operations, and WebSocket support for real-time messaging.
+
+Version 4 builds on top of this by introducing a **smart cache layer**, **offline mode**, **bootstrap API logic**, and **a full UI redesign** - all tailored for high performance and low latency mobile experience.
+
+---
 
 ## Screenshots
 
@@ -120,12 +123,12 @@ SQL views**.
 - **Custom workout plans** – Create workout plans containing
   configurable splits (e.g. push/pull/legs) and assign exercises to
   each split. Each user can design their own routines. (AI integration in next update).
-- **Notifications** – Get a daily push notification
+- **Notifications** – Get a daily push notification.
 - **Exercise tracking** – Log sets, repetitions and weight for each
   exercise. Tracking records are stored with a reference to the
   underlying split so you can review progress over time.
 - **In‑app messaging** – Receive system messages at first login and after each successful workout.
-- **Authentication & roles** – Sign up and log in securely, used access and refresh tokens. User
+- **Authentication & roles** – Sign up and log in securely, using access and refresh tokens. User
   accounts include profile information and optional push tokens for notifications.
 - **Smart performance** – Heavy screens use `useMemo`,
   `useCallback` and context providers to avoid unnecessary re‑renders.
@@ -133,8 +136,14 @@ SQL views**.
   navigation latency by **roughly 50 % compared with previous versions.**
 - **Modular backend** – All network communication goes through a
   RESTful API implemented in a separate repository using Node.js and
-  Express. This decoupling simplifies versioning and makes it easy to
-  swap backend implementations without touching the client.
+  Express.
+- **Smart SWR-style cache layer (NEW)** – A custom-built caching mechanism inspired by SWR, but implemented entirely without libraries. Each data context uses a unified hook (`useCacheAndFetch`) to hydrate from cache, fallback to API if needed, and auto-update in-memory state. Caching logic includes TTL support (planned), safe fallback handling, and background sync.
+- **Bootstrap API pattern (NEW)** – On app launch, a single "bootstrap" call fetches all critical data (user profile, workouts, messages, etc.) to hydrate the app in one go. Greatly reduces network overhead and improves UX during initial load.
+- **Offline mode support (NEW)** – All major screens load from cache when offline. Token refresh happens in background once network returns.
+- **Unfinished workout recovery (NEW)** – If the app closes during an active workout, the session will be restored via cache flush when reopened.
+- **User deletion support (NEW)** – Added the ability to permanently delete an account and all related data from the settings page.
+- **Cardio input logging (NEW)** – Users can now log one cardio session per day (duration), to be expanded with full analytics in future releases.
+- **Version-aware cache housekeeping (NEW)** – When the app updates, outdated cached data is safely cleaned to prevent inconsistency.
 
 ## Architecture Overview
 
@@ -143,22 +152,26 @@ The project follows a **two‑tier architecture**:
 ```
 ┌───────────────────────────┐     HTTPS        ┌─────────────────────────┐
 │    React Native Client    │ ───────────────> │  Node.js/Express Server │
-│ (Strong Together App v3)  │   API Requests   │      (Backend Repo)     │
+│   (Strong Together App)   │   API Requests   │      (Backend Repo)     │
 └───────────────────────────┘                  └─────────────────────────┘
 ```
 
-- **Frontend** (this repository) – built with React Native and
-  supporting both iOS and Android. (Currently shared at TestFlight, soon at AppStore and Google Play). State is managed via React
+- **Frontend**
+  - **General Structure** – built with React Native and
+  supporting both iOS and Android. State is managed via React
   context and hooks, screens are organised under a specific folder
   and navigation is handled by React Navigation. The app interacts
   with the backend through a thin API client (e.g. using
   `axios`).
 
+  - **Smart Caching Layer** – Each context in the app loads data through a custom hook that checks cache first, then falls back to API only if needed. A central cache store holds hydrated values for all major domains (workouts, messages, etc.), improving responsiveness across navigation.
+
+  - **Bootstrap API Gate** – All contexts consume a unified `bootstrapAPIInstance` that populates them on app launch with one single API call. If bootstrap fails, each context falls back to individual endpoint logic. This reduces server load and perceived latency.
+
 - **Backend** – a separate Node.js/Express server that exposes
   authenticated endpoints for users, workouts, exercises, messages
   and tracking. It uses PostgreSQL as its primary datastore and
-  defines indexes and views to speed up complex queries. Please
-  refer to the backend repository for route documentation.
+  defines indexes and views to speed up complex queries.
   **[`Backend repository`](https://github.com/kobihanoch/Strong-Together-Backend) for Backend API documentation.**
 
 > **Note:** When upgrading from version 2.x, be aware that all
@@ -177,9 +190,12 @@ The main technologies and libraries used in the frontend and backend include:
 | **Navigation**       | [`React Navigation`](https://reactnavigation.org/)    |
 | **HTTP client**      | [`axios`](https://axios-http.com/)                    |
 | **Backend API**      | Node.js + Express (separate repository)               |
-| **Cache**            | Redis cache                                           |
+| **Cache Layer**      | Server side Redis cache & Custom SWR-inspired logic at client side (`useCacheAndFetch`)        |
+| **Bootstrap API**    | Unified bootstrap instance   |
+| **Offline support**  | Built-in hydration from cache                         |
 | **Deploying**        | Docker + Render                                       |
 | **Database**         | Supabase PostgreSQL with indexes & views              |
+
 
 ## Installation & Setup
 
@@ -272,8 +288,8 @@ Important points about the schema:
   descriptions and targeted muscle groups.
 - **ExerciseToWorkoutSplit** is a join table mapping exercises to
   splits with an order index and number of sets.
-- **ExerciseTracking** records actual performance data — weight and
-  repetitions — for each workout date and split mapping.
+- **ExerciseTracking** records actual performance data - weight and
+  repetitions - for each workout date and split mapping.
 - **ScheduledWorkouts** allows users to attach a split to a day of the
   week and optionally specify a notification time.
 - **Messages** stores subject/body along with sender and receiver
@@ -345,17 +361,11 @@ Important points about the schema:
 
 ## Roadmap & Future Improvements
 
-- **Better offline support** – cache workout plans and tracking data
-  locally when the device is offline and sync with the server once
-  connectivity is restored.
-- **Analytics & Insights** – provide deeper insights such as
-  one‑rep max estimations, volume trends and periodisation tools.
-- **Group training features** – enable group plans where multiple
-  users can share progress and compete.
-- **Internationalisation** – expand language support beyond the
-  current default and allow dynamic language switching.
+- **Group training features** – enable group plans where multiple users can share progress and compete.
+- **Internationalisation** – expand language support beyond the current default and allow dynamic language switching.
 - **Scheduling** - scheduled workouts in next update.
-- **AI Integration** - for building workouts and analyze performance.
+- **AI Integration** - for building workouts and analyzing performance.
+- **Cache TTL enforcement** – currently TTL logic exists but is not yet enforced. Will be implemented in the next version to support true time-based cache invalidation.
 
 ## Contributing
 
