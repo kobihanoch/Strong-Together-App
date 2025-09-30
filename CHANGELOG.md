@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [4.0.1](https://github.com/kobihanoch/Strong-Together-App/compare/v4.0.0...v4.0.1) (2025-09-30)
+
+
+### Bug Fixes
+
+* **Crash:** Fixed crashing on no exercises ([da975fc](https://github.com/kobihanoch/Strong-Together-App/commit/da975fc76d5120ef33c4b244f3b88081bedc3379))
+* **Crash:** Fixed crashing on no muscle group ([a95c448](https://github.com/kobihanoch/Strong-Together-App/commit/a95c4480523b2b11c6e65d53d42b94bf1b72fcdf))
+
 ## [4.0.0](https://github.com/kobihanoch/Strong-Together-App/compare/v3.0.0...v4.0.0) (2025-09-29)
 
 
