@@ -20,6 +20,8 @@ export default {
       bundleIdentifier: "com.kobihanoch.strongtogether",
       infoPlist: {
         ITSAppUsesNonExemptEncryption: false,
+        NSPhotoLibraryUsageDescription:
+          "We use your photo library so you can select a profile picture for your account.",
       },
     },
 

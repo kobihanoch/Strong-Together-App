@@ -176,7 +176,7 @@ const Overview = ({ overViewData, hasData }) => {
                     fontSize: RFValue(14),
                   }}
                 >
-                  {workoutPlan.created_at
+                  {workoutPlan.updated_at
                     .split("T")[0]
                     .split("-")
                     .reverse()
