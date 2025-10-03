@@ -2,7 +2,6 @@ import { LinearGradient } from "expo-linear-gradient";
 import React, { useState } from "react";
 import {
   ActivityIndicator,
-  Alert,
   Dimensions,
   Image,
   StyleSheet,
@@ -11,12 +10,12 @@ import {
   View,
 } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import { RFValue } from "react-native-responsive-fontsize";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import InputField from "../components/InputField";
+import SelectField from "../components/SelectField";
 import { useAuth } from "../context/AuthContext";
 import { showErrorAlert } from "../errors/errorAlerts";
-import SelectField from "../components/SelectField";
-import { RFValue } from "react-native-responsive-fontsize";
 
 const { width, height } = Dimensions.get("window");
 
@@ -27,13 +26,18 @@ const Register = ({ navigation }) => {
   const [gender, setGender] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [errors, setErrors] = useState([]);
 
   const { register, loading } = useAuth();
 
   const handleRegister = async () => {
     if (!hasErrors()) {
       await register(email, password, username, fullName, gender);
+      navigation.replace("Login", {
+        needToVerify: true,
+        email: email,
+        password_: password,
+        username_: username,
+      });
     }
   };
 

@@ -33,6 +33,7 @@ import {
 import { connectSocket, disconnectSocket } from "../webSockets/socketConfig";
 import { resetBootstrap } from "../api/bootstrapApi";
 import { hasBootstrapPayload } from "../api/bootstrapApi";
+import { Notifier, NotifierComponents } from "react-native-notifier";
 
 const AuthContext = createContext(null);
 export const useAuth = () => useContext(AuthContext);
@@ -242,12 +243,25 @@ export const AuthProvider = ({ children }) => {
       setLoading(true);
       try {
         await registerUser(email, password, username, fullName, gender);
-        await login(username, password);
+        //await login(username, password);
+        Notifier.showNotification({
+          title: "Please verify your account",
+          description: `An email has been sent to ${email}`,
+          duration: 5000,
+          showAnimationDuration: 250,
+          hideOnPress: true,
+          Component: NotifierComponents.Alert,
+          componentProps: {
+            alertType: "success", // "success" | "warn" | "error"
+            titleStyle: { fontSize: 16 },
+            descriptionStyle: { fontSize: 14 },
+          },
+        });
       } finally {
         setLoading(false);
       }
     },
-    [login]
+    []
   );
 
   /**

@@ -1,5 +1,5 @@
 import { LinearGradient } from "expo-linear-gradient";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Dimensions,
@@ -18,10 +18,24 @@ import { RFValue } from "react-native-responsive-fontsize";
 
 const { width, height } = Dimensions.get("window");
 
-const Login = ({ navigation }) => {
+const Login = ({ navigation, route }) => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const { login, loading } = useAuth();
+  const {
+    needToVerify = false,
+    email = null,
+    password_ = null,
+    username_ = null,
+  } = route.params || {};
+
+  useEffect(() => {
+    if (route.params && password_ && username_) {
+      console.log("Setting params", { password_, username_ });
+      setUsername(username_);
+      setPassword(password_);
+    }
+  }, [route.params]);
 
   const handleLogin = async () => {
     // Validate inputs
@@ -59,40 +73,79 @@ const Login = ({ navigation }) => {
           </View>
 
           <View style={styles.body}>
-            <Text style={styles.welcomeText}>Welcome back</Text>
-            <Text style={styles.loginText}>Log in now</Text>
-
-            <View style={styles.divider} />
-
-            <View style={styles.inputContainer}>
-              <InputField
-                placeholder="Username"
-                iconName="account"
-                value={username}
-                onChangeText={setUsername}
-              />
-              <View style={{ marginTop: 0 }} />
-              <InputField
-                placeholder="Password"
-                secureTextEntry
-                value={password}
-                onChangeText={setPassword}
-                iconName="lock"
-              />
-              <TouchableOpacity
-                style={styles.buttonLogin}
-                onPress={handleLogin}
-                disabled={loading}
-              >
-                <View style={styles.buttonContent}>
-                  {loading ? (
-                    <ActivityIndicator />
-                  ) : (
-                    <Text style={styles.buttonLoginText}>Log in</Text>
-                  )}
+            {needToVerify ? (
+              <View style={styles.verifyCard}>
+                <View style={styles.verifyIconCircle}>
+                  <MaterialCommunityIcons
+                    name="email-check-outline"
+                    size={RFValue(28)}
+                    color="#2ecc71"
+                  />
                 </View>
-              </TouchableOpacity>
-            </View>
+
+                <Text style={styles.verifyTitle}>An email has been sent</Text>
+                <Text style={styles.verifySubtitle}>
+                  Please check your inbox:
+                </Text>
+                <Text style={styles.verifyEmail}>{email}</Text>
+
+                <View style={styles.verifyButtons}>
+                  <TouchableOpacity
+                    style={styles.btnPrimary}
+                    onPress={handleLogin}
+                  >
+                    <Text style={styles.btnPrimaryText}>Log in</Text>
+                  </TouchableOpacity>
+
+                  <TouchableOpacity
+                    style={styles.btnSecondary}
+                    onPress={() => navigation.navigate("Register")}
+                  >
+                    <Text style={styles.btnSecondaryText}>Change email</Text>
+                  </TouchableOpacity>
+                </View>
+
+                <Text style={styles.verifyHint}>
+                  It can take up to a minute. Also check your spam folder.
+                </Text>
+              </View>
+            ) : (
+              <>
+                <Text style={styles.welcomeText}>Welcome back</Text>
+                <Text style={styles.loginText}>Log in now</Text>
+
+                <View style={styles.divider} />
+                <View style={styles.inputContainer}>
+                  <InputField
+                    placeholder="Username"
+                    iconName="account"
+                    value={username}
+                    onChangeText={setUsername}
+                  />
+                  <View style={{ marginTop: 0 }} />
+                  <InputField
+                    placeholder="Password"
+                    secureTextEntry
+                    value={password}
+                    onChangeText={setPassword}
+                    iconName="lock"
+                  />
+                  <TouchableOpacity
+                    style={styles.buttonLogin}
+                    onPress={handleLogin}
+                    disabled={loading}
+                  >
+                    <View style={styles.buttonContent}>
+                      {loading ? (
+                        <ActivityIndicator />
+                      ) : (
+                        <Text style={styles.buttonLoginText}>Log in</Text>
+                      )}
+                    </View>
+                  </TouchableOpacity>
+                </View>
+              </>
+            )}
           </View>
         </View>
       </LinearGradient>
@@ -174,5 +227,84 @@ const styles = StyleSheet.create({
     flex: 1,
     textAlign: "center",
     fontFamily: "Inter_400Regular",
+  },
+  verifyCard: {
+    width: width * 0.85,
+    backgroundColor: "rgba(255,255,255,0.12)",
+    borderColor: "rgba(255,255,255,0.25)",
+    borderWidth: StyleSheet.hairlineWidth,
+    borderRadius: 16,
+    paddingVertical: 22,
+    paddingHorizontal: 18,
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOpacity: 0.18,
+    shadowRadius: 12,
+    shadowOffset: { width: 0, height: 6 },
+    elevation: 3,
+  },
+  verifyIconCircle: {
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    backgroundColor: "rgba(255,255,255,0.18)",
+    justifyContent: "center",
+    alignItems: "center",
+    marginBottom: 12,
+  },
+  verifyTitle: {
+    fontSize: 26,
+    color: "white",
+    fontFamily: "Inter_400Regular",
+    textAlign: "center",
+  },
+  verifySubtitle: {
+    marginTop: 6,
+    fontSize: 14,
+    color: "rgba(255,255,255,0.9)",
+    fontFamily: "Inter_400Regular",
+    textAlign: "center",
+  },
+  verifyEmail: {
+    marginTop: 4,
+    fontSize: 16,
+    color: "#fff",
+    fontFamily: "Inter_400Regular",
+    textAlign: "center",
+  },
+  verifyButtons: {
+    flexDirection: "row",
+    gap: 10,
+    marginTop: 18,
+  },
+  btnPrimary: {
+    backgroundColor: "#f0f0f0",
+    paddingVertical: height * 0.012,
+    paddingHorizontal: width * 0.06,
+    borderRadius: 24,
+  },
+  btnPrimaryText: {
+    color: "#007bff",
+    fontSize: 16,
+    fontFamily: "Inter_400Regular",
+  },
+  btnSecondary: {
+    borderColor: "rgba(255,255,255,0.7)",
+    borderWidth: StyleSheet.hairlineWidth,
+    paddingVertical: height * 0.012,
+    paddingHorizontal: width * 0.06,
+    borderRadius: 24,
+  },
+  btnSecondaryText: {
+    color: "white",
+    fontSize: 16,
+    fontFamily: "Inter_400Regular",
+  },
+  verifyHint: {
+    marginTop: 12,
+    fontSize: 12,
+    color: "rgba(255,255,255,0.8)",
+    fontFamily: "Inter_400Regular",
+    textAlign: "center",
   },
 });
