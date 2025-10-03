@@ -64,3 +64,11 @@ export const registerUser = async (
     throw error;
   }
 };
+
+export const changeEmail = async (username, password, newEmail) => {
+  await api.put("api/auth/changeemailverify", {
+    username,
+    password,
+    newEmail,
+  });
+};
