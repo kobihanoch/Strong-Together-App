@@ -1,3 +1,4 @@
+// English comments only inside the code
 import { LinearGradient } from "expo-linear-gradient";
 import React, { useEffect, useState } from "react";
 import {
@@ -15,13 +16,17 @@ import InputField from "../components/InputField";
 import { useAuth } from "../context/AuthContext";
 import { showErrorAlert } from "../errors/errorAlerts";
 import { RFValue } from "react-native-responsive-fontsize";
+import { changeEmail } from "../services/AuthService";
 
 const { width, height } = Dimensions.get("window");
 
 const Login = ({ navigation, route }) => {
+  // Login state
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const { login, loading } = useAuth();
+
+  // Verify card params
   const {
     needToVerify = false,
     email = null,
@@ -29,22 +34,58 @@ const Login = ({ navigation, route }) => {
     username_ = null,
   } = route.params || {};
 
+  // Local state for change-email UX
+  const [showChange, setShowChange] = useState(false);
+  const [newEmail, setNewEmail] = useState("");
+  const [changing, setChanging] = useState(false);
+  const [displayEmail, setDisplayEmail] = useState(email);
+
   useEffect(() => {
+    // Prefill username/password when coming back from register
     if (route.params && password_ && username_) {
-      console.log("Setting params", { password_, username_ });
       setUsername(username_);
       setPassword(password_);
     }
-  }, [route.params]);
+  }, [route.params, password_, username_]);
+
+  useEffect(() => {
+    // Keep the displayed email in sync with route
+    setDisplayEmail(email);
+  }, [email]);
 
   const handleLogin = async () => {
     // Validate inputs
-    if (password.length == 0 || username.length == 0) {
+    if (password.length === 0 || username.length === 0) {
       showErrorAlert("Error", "Please fill username and password");
       return;
     }
-
     await login(username, password);
+  };
+
+  const handleToggleChangeEmail = () => {
+    // Toggle the small form to change email
+    setShowChange((s) => !s);
+  };
+
+  const handleSubmitChangeEmail = async () => {
+    // Basic validation before calling the API
+    if (!username || !password || !newEmail) {
+      showErrorAlert("Error", "Please fill username, password and new email");
+      return;
+    }
+    if (!/\S+@\S+\.\S+/.test(newEmail)) {
+      showErrorAlert("Invalid email", "Please enter a valid email address");
+      return;
+    }
+    setChanging(true);
+    try {
+      await changeEmail(username, password, newEmail);
+      setDisplayEmail(newEmail);
+      setNewEmail("");
+      setShowChange(false);
+    } finally {
+      setChanging(false);
+    }
   };
 
   return (
@@ -87,23 +128,71 @@ const Login = ({ navigation, route }) => {
                 <Text style={styles.verifySubtitle}>
                   Please check your inbox:
                 </Text>
-                <Text style={styles.verifyEmail}>{email}</Text>
+                <Text style={styles.verifyEmail}>{displayEmail}</Text>
 
                 <View style={styles.verifyButtons}>
                   <TouchableOpacity
                     style={styles.btnPrimary}
                     onPress={handleLogin}
+                    disabled={loading}
                   >
                     <Text style={styles.btnPrimaryText}>Log in</Text>
                   </TouchableOpacity>
 
                   <TouchableOpacity
                     style={styles.btnSecondary}
-                    onPress={() => navigation.navigate("Register")}
+                    onPress={handleToggleChangeEmail}
                   >
                     <Text style={styles.btnSecondaryText}>Change email</Text>
                   </TouchableOpacity>
                 </View>
+
+                {showChange && (
+                  <View style={styles.changeForm}>
+                    <InputField
+                      placeholder="Username"
+                      iconName="account"
+                      value={username}
+                      onChangeText={setUsername}
+                    />
+                    <View style={{ marginTop: 8 }} />
+                    <InputField
+                      placeholder="Password"
+                      secureTextEntry
+                      value={password}
+                      onChangeText={setPassword}
+                      iconName="lock"
+                    />
+                    <View style={{ marginTop: 8 }} />
+                    <InputField
+                      placeholder="New email"
+                      iconName="email"
+                      value={newEmail}
+                      onChangeText={setNewEmail}
+                      keyboardType="email-address"
+                      autoCapitalize="none"
+                    />
+
+                    <TouchableOpacity
+                      style={[
+                        styles.btnPrimary,
+                        { marginTop: 12, opacity: changing ? 0.7 : 1 },
+                      ]}
+                      onPress={handleSubmitChangeEmail}
+                      disabled={changing}
+                    >
+                      <View style={styles.buttonContent}>
+                        {changing ? (
+                          <ActivityIndicator />
+                        ) : (
+                          <Text style={styles.btnPrimaryText}>
+                            Save & resend
+                          </Text>
+                        )}
+                      </View>
+                    </TouchableOpacity>
+                  </View>
+                )}
 
                 <Text style={styles.verifyHint}>
                   It can take up to a minute. Also check your spam folder.
@@ -218,11 +307,11 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
-    width: "100%",
+    paddingHorizontal: 20,
     paddingVertical: height * 0.015,
   },
   buttonLoginText: {
-    fontSize: 18,
+    fontSize: RFValue(13),
     color: "#007bff",
     flex: 1,
     textAlign: "center",
@@ -287,6 +376,7 @@ const styles = StyleSheet.create({
     color: "#007bff",
     fontSize: 16,
     fontFamily: "Inter_400Regular",
+    textAlign: "center",
   },
   btnSecondary: {
     borderColor: "rgba(255,255,255,0.7)",
@@ -306,5 +396,12 @@ const styles = StyleSheet.create({
     color: "rgba(255,255,255,0.8)",
     fontFamily: "Inter_400Regular",
     textAlign: "center",
+  },
+  // New styles for the small change-email form
+  changeForm: {
+    width: width * 0.85,
+    marginTop: 14,
+    alignSelf: "center",
+    alignItems: "center",
   },
 });
