@@ -83,6 +83,7 @@ const StartWorkout = ({ navigation, route }) => {
             pausedTotal: workoutData?.pausedTotal,
           }}
           saveWorkout={handlePressSave}
+          isSaving={workoutSaving?.saveStarted}
           onExit={handlePresExit}
         />
         <ExercisesSection

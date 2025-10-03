@@ -5,6 +5,7 @@ import {
   StyleSheet,
   Dimensions,
   TouchableOpacity,
+  ActivityIndicator,
 } from "react-native";
 import Column from "../Column";
 import Timer from "../Timer";
@@ -24,6 +25,7 @@ const TopBar = ({
   timerProps,
   saveWorkout,
   onExit,
+  isSaving,
 }) => {
   return (
     <Column style={styles.container}>
@@ -56,15 +58,29 @@ const TopBar = ({
           </Row>
         </Column>
         <Row style={{ marginLeft: "auto", gap: 10 }}>
-          <TouchableOpacity style={styles.finishBtn} onPress={saveWorkout}>
-            <Text style={styles.finishBtnText}>Finish</Text>
-            <MaterialCommunityIcons
-              name={"check"}
-              size={RFValue(12)}
-              color={"white"}
-            />
+          <TouchableOpacity
+            style={styles.finishBtn}
+            onPress={saveWorkout}
+            disabled={isSaving}
+          >
+            {isSaving ? (
+              <ActivityIndicator animating={true} color={"white"} />
+            ) : (
+              <>
+                <Text style={styles.finishBtnText}>Finish</Text>
+                <MaterialCommunityIcons
+                  name={"check"}
+                  size={RFValue(12)}
+                  color={"white"}
+                />
+              </>
+            )}
           </TouchableOpacity>
-          <TouchableOpacity style={styles.exitBtnContainer} onPress={onExit}>
+          <TouchableOpacity
+            style={styles.exitBtnContainer}
+            onPress={onExit}
+            disabled={isSaving}
+          >
             <MaterialCommunityIcons
               name={"close"}
               size={RFValue(14)}
