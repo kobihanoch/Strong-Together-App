@@ -11,9 +11,12 @@ const InputField = ({
   onChangeText,
   secureTextEntry,
   iconName,
+  textContentType,
+  autoComplete,
+  style,
 }) => {
   return (
-    <View style={styles.inputContainer}>
+    <View style={[styles.inputContainer, style]}>
       <TextInput
         style={styles.input}
         placeholder={placeholder}
@@ -21,6 +24,8 @@ const InputField = ({
         onChangeText={onChangeText}
         secureTextEntry={secureTextEntry}
         placeholderTextColor="#e0efff"
+        textContentType={textContentType}
+        autoComplete={autoComplete}
       />
       <MaterialCommunityIcons
         name={iconName}
