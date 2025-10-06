@@ -92,18 +92,24 @@ const Register = ({ navigation }) => {
                 iconName="account"
                 value={username}
                 onChangeText={setUsername}
+                textContentType="username"
+                autoComplete="username"
               />
               <InputField
                 placeholder="Email"
                 iconName="at"
                 value={email}
                 onChangeText={setEmail}
+                textContentType="emailAddress"
+                autoComplete="email"
               />
               <InputField
                 placeholder="Full name"
                 iconName="pencil"
                 value={fullName}
                 onChangeText={setFullName}
+                textContentType="name"
+                autoComplete="name"
               />
               <SelectField
                 iconName="gender-male"
@@ -116,6 +122,8 @@ const Register = ({ navigation }) => {
                 value={password}
                 onChangeText={setPassword}
                 iconName="lock"
+                textContentType="password"
+                autoComplete="password"
               />
               <InputField
                 placeholder="Confirm password"
@@ -123,6 +131,7 @@ const Register = ({ navigation }) => {
                 value={confirmPassword}
                 onChangeText={setConfirmPassword}
                 iconName="lock"
+                textContentType="password"
               />
               <TouchableOpacity
                 style={styles.buttonRegister}
