@@ -86,3 +86,7 @@ export const checkUserVerify = async (username) => {
   );
   return data;
 };
+
+export const sendVerificationMail = async (email) => {
+  await api.post("api/auth/sendverificationemail", { email });
+};

@@ -20,6 +20,7 @@ import {
   changeEmail,
   checkUserVerify,
   forgotPassword,
+  sendVerificationMail,
 } from "../services/AuthService";
 
 const { width, height } = Dimensions.get("window");
@@ -44,6 +45,9 @@ const Login = ({ navigation, route }) => {
   const [passwordForChangeEmail, setPasswordForChangeEmail] = useState("");
   const [changing, setChanging] = useState(false);
   const [displayEmail, setDisplayEmail] = useState(email);
+
+  // Button enable
+  const [pressedForgot, setPressedForgot] = useState(false);
 
   // Prefill username/password when coming back from register
   // For fallback, so states will have the updated values for login
@@ -98,7 +102,7 @@ const Login = ({ navigation, route }) => {
 
   const handleSubmitChangeEmail = async () => {
     // Basic validation before calling the API
-    if (!password || !newEmail) {
+    if (!passwordForChangeEmail || !newEmail) {
       showErrorAlert("Error", "Please fill password and new email");
       return;
     }
@@ -115,6 +119,16 @@ const Login = ({ navigation, route }) => {
     } finally {
       setChanging(false);
     }
+  };
+
+  const sendEmailLockRef = useRef(0);
+  const handleSendVerificationEmailAgain = async () => {
+    if (sendEmailLockRef.current >= 3) {
+      showErrorAlert("Error", "You requested too many verfication mails.");
+      return;
+    }
+    sendEmailLockRef.current += 1;
+    await sendVerificationMail(email);
   };
 
   return (
@@ -220,6 +234,20 @@ const Login = ({ navigation, route }) => {
                 <Text style={styles.verifyHint}>
                   It can take up to a minute. Also check your spam folder.
                 </Text>
+
+                <TouchableOpacity onPress={handleSendVerificationEmailAgain}>
+                  <Text
+                    style={{
+                      fontFamily: "Inter_400Regular",
+                      fontSize: RFValue(13),
+                      color: "white",
+                      marginTop: 20,
+                      textDecorationLine: "underline",
+                    }}
+                  >
+                    I didn't receive an email, Send me again
+                  </Text>
+                </TouchableOpacity>
               </View>
             ) : (
               <>
@@ -254,7 +282,7 @@ const Login = ({ navigation, route }) => {
                         opacity: 0.9,
                       }}
                     >
-                      Forgot your passsword ?
+                      Forgot your password?
                     </Text>
                   </TouchableOpacity>
                   <TouchableOpacity
