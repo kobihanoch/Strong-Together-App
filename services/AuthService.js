@@ -72,3 +72,14 @@ export const changeEmail = async (username, password, newEmail) => {
     newEmail,
   });
 };
+
+export const forgotPassword = async (email) => {
+  await api.post("api/auth/forgotpassemail", { email });
+};
+
+export const checkUserVerify = async (username) => {
+  const { data } = await api.get(
+    `api/auth/checkuserverify?username=${username}`
+  );
+  return data;
+};

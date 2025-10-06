@@ -1,8 +1,8 @@
-// English comments only inside the code
 import { LinearGradient } from "expo-linear-gradient";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   ActivityIndicator,
+  AppState,
   Dimensions,
   Image,
   StyleSheet,
@@ -16,7 +16,7 @@ import InputField from "../components/InputField";
 import { useAuth } from "../context/AuthContext";
 import { showErrorAlert } from "../errors/errorAlerts";
 import { RFValue } from "react-native-responsive-fontsize";
-import { changeEmail } from "../services/AuthService";
+import { changeEmail, checkUserVerify } from "../services/AuthService";
 
 const { width, height } = Dimensions.get("window");
 
@@ -40,13 +40,37 @@ const Login = ({ navigation, route }) => {
   const [changing, setChanging] = useState(false);
   const [displayEmail, setDisplayEmail] = useState(email);
 
+  // Prefill username/password when coming back from register
+  // For fallback, so states will have the updated values for login
   useEffect(() => {
-    // Prefill username/password when coming back from register
     if (route.params && password_ && username_) {
       setUsername(username_);
       setPassword(password_);
     }
   }, [route.params, password_, username_]);
+
+  // For user returning from email to app, to auto login (works only if user is verifying via phone)
+  const timesAllowedRef = useRef(0);
+  useEffect(() => {
+    if (!route.params) return;
+    const sub = AppState.addEventListener("change", async (state) => {
+      if (state === "active") {
+        // Flush immediately
+        if (timesAllowedRef.current >= 3) return;
+        const res = await checkUserVerify(username_);
+        timesAllowedRef.current += 1;
+        if (!res) {
+          showErrorAlert(
+            "Not yet verified",
+            "Please verify your email before logging in"
+          );
+          return;
+        }
+        await login(username_, password_);
+      }
+    });
+    return () => sub.remove();
+  }, [route.params]);
 
   useEffect(() => {
     // Keep the displayed email in sync with route
