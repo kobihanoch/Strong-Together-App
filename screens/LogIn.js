@@ -16,13 +16,17 @@ import InputField from "../components/InputField";
 import { useAuth } from "../context/AuthContext";
 import { showErrorAlert } from "../errors/errorAlerts";
 import { RFValue } from "react-native-responsive-fontsize";
-import { changeEmail, checkUserVerify } from "../services/AuthService";
+import {
+  changeEmail,
+  checkUserVerify,
+  forgotPassword,
+} from "../services/AuthService";
 
 const { width, height } = Dimensions.get("window");
 
 const Login = ({ navigation, route }) => {
   // Login state
-  const [username, setUsername] = useState("");
+  const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
   const { login, loading } = useAuth();
 
@@ -37,6 +41,7 @@ const Login = ({ navigation, route }) => {
   // Local state for change-email UX
   const [showChange, setShowChange] = useState(false);
   const [newEmail, setNewEmail] = useState("");
+  const [passwordForChangeEmail, setPasswordForChangeEmail] = useState("");
   const [changing, setChanging] = useState(false);
   const [displayEmail, setDisplayEmail] = useState(email);
 
@@ -44,7 +49,7 @@ const Login = ({ navigation, route }) => {
   // For fallback, so states will have the updated values for login
   useEffect(() => {
     if (route.params && password_ && username_) {
-      setUsername(username_);
+      setIdentifier(username_);
       setPassword(password_);
     }
   }, [route.params, password_, username_]);
@@ -79,11 +84,11 @@ const Login = ({ navigation, route }) => {
 
   const handleLogin = async () => {
     // Validate inputs
-    if (password.length === 0 || username.length === 0) {
-      showErrorAlert("Error", "Please fill username and password");
+    if (password.length === 0 || identifier.length === 0) {
+      showErrorAlert("Error", "Please fill all fields");
       return;
     }
-    await login(username, password);
+    await login(identifier, password);
   };
 
   const handleToggleChangeEmail = () => {
@@ -93,8 +98,8 @@ const Login = ({ navigation, route }) => {
 
   const handleSubmitChangeEmail = async () => {
     // Basic validation before calling the API
-    if (!username || !password || !newEmail) {
-      showErrorAlert("Error", "Please fill username, password and new email");
+    if (!password || !newEmail) {
+      showErrorAlert("Error", "Please fill password and new email");
       return;
     }
     if (!/\S+@\S+\.\S+/.test(newEmail)) {
@@ -103,7 +108,7 @@ const Login = ({ navigation, route }) => {
     }
     setChanging(true);
     try {
-      await changeEmail(username, password, newEmail);
+      await changeEmail(username_, passwordForChangeEmail, newEmail);
       setDisplayEmail(newEmail);
       setNewEmail("");
       setShowChange(false);
@@ -173,18 +178,12 @@ const Login = ({ navigation, route }) => {
 
                 {showChange && (
                   <View style={styles.changeForm}>
-                    <InputField
-                      placeholder="Username"
-                      iconName="account"
-                      value={username}
-                      onChangeText={setUsername}
-                    />
                     <View style={{ marginTop: 8 }} />
                     <InputField
                       placeholder="Password"
                       secureTextEntry
-                      value={password}
-                      onChangeText={setPassword}
+                      value={passwordForChangeEmail}
+                      onChangeText={setPasswordForChangeEmail}
                       iconName="lock"
                     />
                     <View style={{ marginTop: 8 }} />
@@ -230,10 +229,10 @@ const Login = ({ navigation, route }) => {
                 <View style={styles.divider} />
                 <View style={styles.inputContainer}>
                   <InputField
-                    placeholder="Username"
+                    placeholder="Username or Email"
                     iconName="account"
-                    value={username}
-                    onChangeText={setUsername}
+                    value={identifier}
+                    onChangeText={setIdentifier}
                   />
                   <View style={{ marginTop: 0 }} />
                   <InputField
@@ -243,6 +242,21 @@ const Login = ({ navigation, route }) => {
                     onChangeText={setPassword}
                     iconName="lock"
                   />
+                  <TouchableOpacity
+                    style={{ marginTop: 10 }}
+                    onPress={async () => await forgotPassword(identifier)}
+                  >
+                    <Text
+                      style={{
+                        fontFamily: "Inter_400Regular",
+                        color: "white",
+                        fontSize: RFValue(10),
+                        opacity: 0.9,
+                      }}
+                    >
+                      Forgot your passsword ?
+                    </Text>
+                  </TouchableOpacity>
                   <TouchableOpacity
                     style={styles.buttonLogin}
                     onPress={handleLogin}

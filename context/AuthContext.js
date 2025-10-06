@@ -202,14 +202,14 @@ export const AuthProvider = ({ children }) => {
    * - Logs in with username/password.
    * - Saves refresh token, sets access token, sets user, runs initializeUserSession.
    */
-  const login = useCallback(async (username, password) => {
+  const login = useCallback(async (identifier, password) => {
     setLoading(true);
     try {
       const {
         accessToken: at,
         refreshToken: rt,
         user: u,
-      } = await loginUser(username, password);
+      } = await loginUser(identifier, password);
       await saveRefreshToken(rt);
       GlobalAuth.setAccessToken(at);
 
