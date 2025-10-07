@@ -12,7 +12,9 @@ export const updateMsgReadStatus = async (msgId) => {
 // Get messages
 export const getUserMessages = async () => {
   try {
-    const response = await api.get("/api/messages/getmessages");
+    const response = await api.get("/api/messages/getmessages", {
+      params: { tz: Intl.DateTimeFormat().resolvedOptions().timeZone },
+    });
     return response.data;
   } catch (error) {
     console.log(error);
