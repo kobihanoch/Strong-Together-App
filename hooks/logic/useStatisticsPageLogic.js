@@ -1,12 +1,12 @@
-import moment from "moment";
-import { useEffect, useMemo, useState } from "react";
+import moment from "moment-timezone";
+import { useMemo, useState } from "react";
 import { useAnalysisContext } from "../../context/AnalysisContext";
-import { getLastWorkoutForEachExercise } from "../../utils/statisticsUtils";
 import { useCardioContext } from "../../context/CardioContext";
+import { getLastWorkoutForEachExercise } from "../../utils/statisticsUtils";
 
 const useStatisticsPageLogic = () => {
   const { exerciseTrackingMaps = null } = useAnalysisContext() || {};
-
+  const timezone = "Asia/Jerusalem";
   // Map with date keys: Date, ETSId, splitName
   const {
     byDate: exerciseTrackingWithDateKey = null,
@@ -19,17 +19,20 @@ const useStatisticsPageLogic = () => {
 
   // Start as today's date
   const [selectedDate, setSelectedDate] = useState(
-    moment().format("YYYY-MM-DD")
+    moment.tz(timezone).format("YYYY-MM-DD")
   );
 
   // Calculate formatted date for each change of date
   const formattedDate = useMemo(() => {
-    return moment(selectedDate).format("YYYY-MM-DD");
+    return moment.tz(selectedDate, "YYYY-MM-DD", timezone).format("YYYY-MM-DD");
   }, [selectedDate]);
 
   // For weekly map
   const startOfWeekDay = useMemo(() => {
-    return moment(selectedDate).startOf("week").format("YYYY-MM-DD");
+    return moment
+      .tz(selectedDate, "YYYY-MM-DD", timezone)
+      .startOf("week")
+      .format("YYYY-MM-DD");
   }, [formattedDate]);
 
   const cardioForWeek = useMemo(
