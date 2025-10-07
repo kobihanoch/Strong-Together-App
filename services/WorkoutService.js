@@ -13,7 +13,9 @@ export const getUserWorkout = async () => {
 // Gets user exercise tracking data - including home page ata PR most common etc...
 export const getUserExerciseTracking = async () => {
   try {
-    const response = await api.get("/api/workouts/gettracking");
+    const response = await api.get(`/api/workouts/gettracking`, {
+      params: { tz: Intl.DateTimeFormat().resolvedOptions().timeZone },
+    });
     return response.data;
   } catch (error) {
     throw error;
@@ -44,6 +46,7 @@ export const saveWorkoutData = async (dataOfWorkout) => {
   }
   const { data } = await api.post("/api/workouts/finishworkout", {
     workout: dataOfWorkout,
+    tz: Intl.DateTimeFormat().resolvedOptions().timeZone,
   });
   return data;
 };
