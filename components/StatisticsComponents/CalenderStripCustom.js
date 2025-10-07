@@ -12,6 +12,7 @@ import { RFValue } from "react-native-responsive-fontsize";
 import { colors } from "../../constants/colors";
 import useGenerateDays from "../../hooks/useGenerateDays";
 import Row from "../Row";
+import * as Localization from "expo-localization";
 
 const { width, height } = Dimensions.get("window");
 // Use fixed item math so FlatList can jump directly to the right index
@@ -24,8 +25,8 @@ const CalendarStripCustom = ({
   selectedDate,
   userExerciseLogs,
 }) => {
-  const { datesList } = useGenerateDays();
-  const timezone = "Asia/Jerusalem";
+  const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+  const { datesList } = useGenerateDays(timezone);
 
   const handleDatePress = (date) => {
     onDateSelect &&

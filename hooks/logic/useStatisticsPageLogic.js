@@ -6,7 +6,7 @@ import { getLastWorkoutForEachExercise } from "../../utils/statisticsUtils";
 
 const useStatisticsPageLogic = () => {
   const { exerciseTrackingMaps = null } = useAnalysisContext() || {};
-  const timezone = "Asia/Jerusalem";
+  const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
   // Map with date keys: Date, ETSId, splitName
   const {
     byDate: exerciseTrackingWithDateKey = null,
