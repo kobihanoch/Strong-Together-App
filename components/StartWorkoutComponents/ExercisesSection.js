@@ -258,6 +258,7 @@ const RenderItem = ({
         style={[styles.notesInput, { textAlignVertical: "top" }]}
         multiline
         numberOfLines={3}
+        maxLength={50}
         onEndEditing={({ nativeEvent }) => {
           addNotes(exName, nativeEvent.text);
         }}
