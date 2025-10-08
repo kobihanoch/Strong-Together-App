@@ -2,6 +2,34 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [4.1.0](https://github.com/kobihanoch/Strong-Together-App/compare/v4.0.1...v4.1.0) (2025-10-08)
+
+
+### Features
+
+* **API:** Inject username and appversion to requests ([c39d909](https://github.com/kobihanoch/Strong-Together-App/commit/c39d909157554288e79105440d77d521b4bced23))
+* **Auth:** Added cange email in verification ([e98adc4](https://github.com/kobihanoch/Strong-Together-App/commit/e98adc4e13af36560bb8bd2fdf31768936e3771b))
+* **Auth:** Added state listner to auto log in after verifying (fallback via button) ([846aade](https://github.com/kobihanoch/Strong-Together-App/commit/846aadeaa074639db0b903dc83f8f3cdc8f97445))
+* **Auth:** Reset password is implemented, and login with email/username ([3220962](https://github.com/kobihanoch/Strong-Together-App/commit/32209624b4ac5533409d0139b135146cd509b6f3))
+* **Auth:** User verification via email has implemented ([5739b2f](https://github.com/kobihanoch/Strong-Together-App/commit/5739b2f0b8377c25b2198c59f80e32f00d181ca9))
+* **Date and Time:** Adjusted pr date to UTC ([3606b0d](https://github.com/kobihanoch/Strong-Together-App/commit/3606b0d1a0cccb2d8b12e1d19c90d241f283f15a))
+* **Date and Time:** Timezoned aerobics ([e86a547](https://github.com/kobihanoch/Strong-Together-App/commit/e86a547ab95c2fd7a8a7d73f06a12d787e3c7ffc))
+* **Date and Time:** Using auto location timezone ([861a497](https://github.com/kobihanoch/Strong-Together-App/commit/861a497b983d29d851b598dd28577d97331da668))
+* **Date and Time:** Workout updated_at and messages sent_at by timezone ([e8ac29e](https://github.com/kobihanoch/Strong-Together-App/commit/e8ac29e25ddc2815af93cc1820c6c0b47c35607b))
+* **Errors:** Added a modal to get 426 update required error ([d30cccd](https://github.com/kobihanoch/Strong-Together-App/commit/d30cccd839a774ea46913e2c0f2fb8bf18606467))
+* **Register:** Defined inputs types for iOS auto complete ([a530253](https://github.com/kobihanoch/Strong-Together-App/commit/a530253f54959963223cb1f160bd035ee041bf12))
+* **Statistics:** Supports timezone view ([7c0d056](https://github.com/kobihanoch/Strong-Together-App/commit/7c0d056a189c1a3c47dbdb51bb65a2f250fe6f53))
+* **Verification:** Added send email again ([533401b](https://github.com/kobihanoch/Strong-Together-App/commit/533401be0d0628cd5dc3d3494339d65e39237258))
+
+
+### Bug Fixes
+
+* **Cardio:** Added a UI spinner when loading ([cc16147](https://github.com/kobihanoch/Strong-Together-App/commit/cc16147fc3a2e68354fa985a8d58011e530fd417))
+* **Create Workout:** Limit 10 exercises per split ([6ea53dc](https://github.com/kobihanoch/Strong-Together-App/commit/6ea53dc9efd9d6549f0734ba0f3e1a0759913194))
+* **Start Workout:** Caching with debounce of 1 s ([083ec7b](https://github.com/kobihanoch/Strong-Together-App/commit/083ec7b6be8ef3a8c318ad59b2f91ec17fa15829))
+* **Start Workout:** Max notes chars is 50 ([6fd80e3](https://github.com/kobihanoch/Strong-Together-App/commit/6fd80e33cb008543eea282092a4f1a2af03395d7))
+* **Workout:** DIsabled multiple presses on save workout button on loading with activiry indicator and lock ref ([7715fe5](https://github.com/kobihanoch/Strong-Together-App/commit/7715fe5dd84a53a10e0e17317c94255f05bce1c0))
+
 ### [4.0.1](https://github.com/kobihanoch/Strong-Together-App/compare/v4.0.0...v4.0.1) (2025-09-30)
 
 
