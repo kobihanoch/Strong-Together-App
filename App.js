@@ -3,7 +3,6 @@ import {
   NavigationContainer,
   useNavigationContainerRef,
 } from "@react-navigation/native";
-import { createStackNavigator } from "@react-navigation/stack";
 import * as Font from "expo-font";
 import React, { useEffect, useState } from "react";
 import {
@@ -34,6 +33,7 @@ import { NotifierRoot } from "react-native-notifier";
 import { cacheHousekeepingOnBoot } from "./cache/cacheUtils";
 import BottomTabBar from "./components/BottomTabBar";
 import Theme1 from "./components/Theme1";
+import UpdateAppModal from "./components/UpdateAppModal";
 import { CardioProvider } from "./context/CardioContext";
 import { GlobalAppLoadingProvider } from "./context/GlobalAppLoadingContext";
 import AppStack from "./navigation/AppStack";
@@ -93,6 +93,7 @@ export default function App() {
             <NavigationContainer ref={navigationRef}>
               <RootNavigator />
               <NotifierRoot />
+              <UpdateAppModal />
             </NavigationContainer>
           </AuthProvider>
         </GlobalAppLoadingProvider>
