@@ -82,7 +82,22 @@ const ExercisePickerModal = forwardRef(function ExercisePickerModal(
 
   const handleExPress = useCallback((ex) => {
     const currentSplit = selectedSplitRef.current;
-
+    if (exIdsRef.current.size >= 10) {
+      Notifier.showNotification({
+        title: "Can't add exericse",
+        description: `Max exercises per split is 10`,
+        duration: 2500,
+        showAnimationDuration: 250,
+        hideOnPress: true,
+        Component: NotifierComponents.Alert,
+        componentProps: {
+          alertType: "error",
+          titleStyle: { fontSize: 16 },
+          descriptionStyle: { fontSize: 14 },
+        },
+      });
+      return;
+    }
     // duplicate check using the latest ids
     if (exIdsRef.current.has(ex.id)) {
       Notifier.showNotification({

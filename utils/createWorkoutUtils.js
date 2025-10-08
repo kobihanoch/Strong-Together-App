@@ -2,6 +2,7 @@ import { showErrorAlert } from "../errors/errorAlerts";
 
 export const addExerciseLogic = (prev, splitName, exercise) => {
   const splitExercises = prev[splitName] ?? [];
+  if (splitExercises.length >= 10) return prev;
   const exWithOrderIndex = {
     ...exercise,
     sets: [10, 10, 10],
