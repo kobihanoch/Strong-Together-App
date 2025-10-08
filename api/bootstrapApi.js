@@ -1,5 +1,6 @@
 import axios from "axios";
 import { API_BASE_URL } from "./apiConfig";
+import Constants from "expo-constants";
 
 // Use a separate axios instance to avoid circular import
 export const bootstrapApi = axios.create({
@@ -10,6 +11,7 @@ export const bootstrapApi = axios.create({
 bootstrapApi.interceptors.request.use(
   async (config) => {
     console.log("[Bootstrap]:", config.url);
+    config.headers.set("x-app-version", Constants.expoConfig.version);
     return config; // << MUST return config
   },
   (err) => {
@@ -45,7 +47,11 @@ export async function ensureBootstrap() {
     return inflight;
   }
   inflight = (async () => {
-    const res = await bootstrapApi.get("/api/bootstrap/get"); // real server call
+    const res = await bootstrapApi.get(
+      `/api/bootstrap/get?tz=${
+        Intl.DateTimeFormat().resolvedOptions().timeZone
+      }`
+    ); // real server call
     payload = res?.data || {};
 
     // Give a short grace window so "just-arrived" requests still use the payload

@@ -111,8 +111,11 @@ const useStartWorkoutPageLogic = (selectedSplit, resumedWorkout = null) => {
 
   const { saveWorkoutProcess } = useUserWorkout();
   const [saveStarted, setSaveStarted] = useState(false);
+  const saveLock = useRef(false);
 
   const saveData = useCallback(async () => {
+    if (saveLock.current) return;
+    saveLock.current = true;
     setSaveStarted(true);
     console.log("Saving started!");
     try {
@@ -138,6 +141,7 @@ const useStartWorkoutPageLogic = (selectedSplit, resumedWorkout = null) => {
       throw err;
     } finally {
       setSaveStarted(false);
+      saveLock.current = false;
     }
   }, [workoutProgressObj, cacheKey]);
 

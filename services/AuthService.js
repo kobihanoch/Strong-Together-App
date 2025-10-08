@@ -16,9 +16,12 @@ export const refreshAndRotateTokens = async () => {
 };
 
 // Login
-export const loginUser = async (username, password) => {
+export const loginUser = async (identifier, password) => {
   try {
-    const { data } = await api.post("/api/auth/login", { username, password });
+    const { data } = await api.post("/api/auth/login", {
+      identifier,
+      password,
+    });
     return data;
   } catch (error) {
     throw error;
@@ -63,4 +66,27 @@ export const registerUser = async (
   } catch (error) {
     throw error;
   }
+};
+
+export const changeEmail = async (username, password, newEmail) => {
+  await api.put("api/auth/changeemailverify", {
+    username,
+    password,
+    newEmail,
+  });
+};
+
+export const forgotPassword = async (identifier) => {
+  await api.post("api/auth/forgotpassemail", { identifier });
+};
+
+export const checkUserVerify = async (username) => {
+  const { data } = await api.get(
+    `api/auth/checkuserverify?username=${username}`
+  );
+  return data;
+};
+
+export const sendVerificationMail = async (email) => {
+  await api.post("api/auth/sendverificationemail", { email });
 };

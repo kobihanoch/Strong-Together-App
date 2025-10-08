@@ -1,13 +1,5 @@
-// English comments only inside code
-
-import moment from "moment";
-import React, {
-  useEffect,
-  useRef,
-  useState,
-  useMemo,
-  useCallback,
-} from "react";
+import moment from "moment-timezone";
+import React, { useCallback, useMemo, useRef, useState } from "react";
 import {
   Dimensions,
   FlatList,
@@ -20,6 +12,7 @@ import { RFValue } from "react-native-responsive-fontsize";
 import { colors } from "../../constants/colors";
 import useGenerateDays from "../../hooks/useGenerateDays";
 import Row from "../Row";
+import * as Localization from "expo-localization";
 
 const { width, height } = Dimensions.get("window");
 // Use fixed item math so FlatList can jump directly to the right index
@@ -32,21 +25,28 @@ const CalendarStripCustom = ({
   selectedDate,
   userExerciseLogs,
 }) => {
-  const { datesList } = useGenerateDays();
+  const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+  const { datesList } = useGenerateDays(timezone);
 
   const handleDatePress = (date) => {
-    onDateSelect && onDateSelect(date.format("YYYY-MM-DD"));
+    onDateSelect &&
+      onDateSelect(date.clone().tz(timezone).format("YYYY-MM-DD"));
   };
+
+  const selectedDateMoment = useMemo(
+    () => moment.tz(selectedDate, "YYYY-MM-DD", timezone),
+    [selectedDate]
+  );
 
   // Compute initialScrollIndex so the list renders at the selected day without a visible jump
   const initialScrollIndex = useMemo(() => {
     if (!datesList || !selectedDate) return undefined;
     const idx = datesList.findIndex((d) => d.isSame(selectedDate, "day"));
     return idx;
-  }, [datesList, selectedDate]);
+  }, [datesList, selectedDateMoment]);
 
   // Small memo to avoid moment() per-item for "today"
-  const today = useMemo(() => moment(), []);
+  const today = useMemo(() => moment.tz(timezone), []);
 
   // Initae with current month of today's date
   const [currentMonth, setCurrentMonth] = useState(
@@ -73,7 +73,7 @@ const CalendarStripCustom = ({
 
   const renderItem = useCallback(
     ({ item }) => {
-      const isSelected = item.isSame(selectedDate, "day");
+      const isSelected = item.isSame(selectedDateMoment, "day");
       const isToday = item.isSame(today, "day");
 
       const dateKey = item.format("YYYY-MM-DD");
@@ -151,7 +151,7 @@ const CalendarStripCustom = ({
         </TouchableOpacity>
       );
     },
-    [selectedDate, today, userExerciseLogs]
+    [selectedDateMoment, today, userExerciseLogs]
   );
 
   return (

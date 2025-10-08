@@ -8,6 +8,7 @@ import {
   View,
   TextInput,
   Keyboard,
+  ActivityIndicator,
 } from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";
 import Column from "../components/Column.js";
@@ -56,31 +57,41 @@ const MyWorkoutPlan = () => {
   const [cardioType, setCardioType] = useState("Walk");
   const [mins, setMins] = useState("");
   const [secs, setSecs] = useState("");
+  const [isCardioSave, setIsCardioSave] = useState(false);
 
+  const saveLockRef = useRef(false);
   const onSaveCardio = async () => {
-    const m = parseInt(mins || "0", 10) || 0;
-    const s = parseInt(clampSec(secs), 10) || 0;
-    if (m === 0 && s === 0) return; // no-op
-    const res = await logUserCardio(m, s, cardioType);
-    const { daily, weekly } = res;
-    setDailyCardioMap(daily);
-    setWeeklyCardioMap(weekly);
-    Keyboard.dismiss();
-    cardioRef.current?.close?.();
-    Notifier.showNotification({
-      title: "Cardio logged",
-      description: null,
-      duration: 2500,
-      showAnimationDuration: 250,
-      hideOnPress: true,
-      Component: NotifierComponents.Alert,
-      componentProps: {
-        alertType: "success",
-        titleStyle: { fontSize: 16 },
-        descriptionStyle: { fontSize: 14 },
-      },
-    });
-    nav.navigate("Statistics");
+    if (saveLockRef.current) return;
+    saveLockRef.current = true;
+    try {
+      setIsCardioSave(true);
+      const m = parseInt(mins || "0", 10) || 0;
+      const s = parseInt(clampSec(secs), 10) || 0;
+      if (m === 0 && s === 0) return; // no-op
+      const res = await logUserCardio(m, s, cardioType);
+      const { daily, weekly } = res;
+      setDailyCardioMap(daily);
+      setWeeklyCardioMap(weekly);
+      Keyboard.dismiss();
+      cardioRef.current?.close?.();
+      Notifier.showNotification({
+        title: "Cardio logged",
+        description: "Cardio added successfully",
+        duration: 2500,
+        showAnimationDuration: 250,
+        hideOnPress: true,
+        Component: NotifierComponents.Alert,
+        componentProps: {
+          alertType: "success",
+          titleStyle: { fontSize: 16 },
+          descriptionStyle: { fontSize: 14 },
+        },
+      });
+      nav.replace("Statistics");
+    } finally {
+      saveLockRef.current = false;
+      setIsCardioSave(false);
+    }
   };
 
   useLightStatusBar();
@@ -214,23 +225,28 @@ const MyWorkoutPlan = () => {
                 </Row>
 
                 {/* Save button */}
-                <TouchableOpacity
-                  style={[
-                    styles.plusBtn,
-                    styles.saveBtn,
-                    (parseInt(mins || "0", 10) || 0) === 0 &&
-                      (parseInt(secs || "0", 10) || 0) === 0 && {
-                        opacity: 0.5,
-                      },
-                  ]}
-                  onPress={onSaveCardio}
-                  disabled={
-                    (parseInt(mins || "0", 10) || 0) === 0 &&
-                    (parseInt(secs || "0", 10) || 0) === 0
-                  }
-                >
-                  <Text style={styles.saveText}>Save</Text>
-                </TouchableOpacity>
+                {isCardioSave ? (
+                  <ActivityIndicator />
+                ) : (
+                  <TouchableOpacity
+                    style={[
+                      styles.plusBtn,
+                      styles.saveBtn,
+                      (parseInt(mins || "0", 10) || 0) === 0 &&
+                        (parseInt(secs || "0", 10) || 0) === 0 && {
+                          opacity: 0.5,
+                        },
+                    ]}
+                    onPress={onSaveCardio}
+                    disabled={
+                      ((parseInt(mins || "0", 10) || 0) === 0 &&
+                        (parseInt(secs || "0", 10) || 0) === 0) ||
+                      isCardioSave
+                    }
+                  >
+                    <Text style={styles.saveText}>Save</Text>
+                  </TouchableOpacity>
+                )}
               </Column>
             )}
           </Column>

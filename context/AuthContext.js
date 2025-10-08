@@ -7,6 +7,8 @@ import React, {
   useRef,
   useState,
 } from "react";
+import { Notifier, NotifierComponents } from "react-native-notifier";
+import { hasBootstrapPayload, resetBootstrap } from "../api/bootstrapApi";
 import {
   cacheDeleteAllCache,
   cacheGetJSON,
@@ -31,8 +33,6 @@ import {
   saveRefreshToken,
 } from "../utils/tokenStore.js";
 import { connectSocket, disconnectSocket } from "../webSockets/socketConfig";
-import { resetBootstrap } from "../api/bootstrapApi";
-import { hasBootstrapPayload } from "../api/bootstrapApi";
 
 const AuthContext = createContext(null);
 export const useAuth = () => useContext(AuthContext);
@@ -94,6 +94,10 @@ export const AuthProvider = ({ children }) => {
     "Auth",
     cacheKnown ? userDataLoading : hasBootstrapPayload()
   );
+
+  useEffect(() => {
+    if (user?.username) GlobalAuth.setUsernameInHeader(user?.username);
+  }, [user]);
 
   /**
    * initializeUserSession
@@ -201,14 +205,14 @@ export const AuthProvider = ({ children }) => {
    * - Logs in with username/password.
    * - Saves refresh token, sets access token, sets user, runs initializeUserSession.
    */
-  const login = useCallback(async (username, password) => {
+  const login = useCallback(async (identifier, password) => {
     setLoading(true);
     try {
       const {
         accessToken: at,
         refreshToken: rt,
         user: u,
-      } = await loginUser(username, password);
+      } = await loginUser(identifier, password);
       await saveRefreshToken(rt);
       GlobalAuth.setAccessToken(at);
 
@@ -242,12 +246,25 @@ export const AuthProvider = ({ children }) => {
       setLoading(true);
       try {
         await registerUser(email, password, username, fullName, gender);
-        await login(username, password);
+        //await login(username, password);
+        Notifier.showNotification({
+          title: "Please verify your account",
+          description: `An email has been sent to ${email}`,
+          duration: 5000,
+          showAnimationDuration: 250,
+          hideOnPress: true,
+          Component: NotifierComponents.Alert,
+          componentProps: {
+            alertType: "success", // "success" | "warn" | "error"
+            titleStyle: { fontSize: 16 },
+            descriptionStyle: { fontSize: 14 },
+          },
+        });
       } finally {
         setLoading(false);
       }
     },
-    [login]
+    []
   );
 
   /**
@@ -276,6 +293,7 @@ export const AuthProvider = ({ children }) => {
     await clearRefreshToken();
     await cacheDeleteAllCache();
     GlobalAuth.setAccessToken(null);
+    GlobalAuth.setUsernameInHeader(null);
     resetBootstrap();
     setIsLoggedIn(false);
     setLoading(false);

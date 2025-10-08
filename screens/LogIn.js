@@ -1,7 +1,6 @@
 import { LinearGradient } from "expo-linear-gradient";
-import React, { useState } from "react";
+import React from "react";
 import {
-  ActivityIndicator,
   Dimensions,
   Image,
   StyleSheet,
@@ -11,27 +10,20 @@ import {
 } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
-import InputField from "../components/InputField";
-import { useAuth } from "../context/AuthContext";
-import { showErrorAlert } from "../errors/errorAlerts";
 import { RFValue } from "react-native-responsive-fontsize";
+import VerifyCard from "../components/LoginComponents/VerifyCard";
+import LoginForm from "../components/LoginComponents/LoginForm";
 
 const { width, height } = Dimensions.get("window");
 
-const Login = ({ navigation }) => {
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-  const { login, loading } = useAuth();
-
-  const handleLogin = async () => {
-    // Validate inputs
-    if (password.length == 0 || username.length == 0) {
-      showErrorAlert("Error", "Please fill username and password");
-      return;
-    }
-
-    await login(username, password);
-  };
+const Login = ({ navigation, route }) => {
+  // Decide which child to render based on route params
+  const {
+    needToVerify = false,
+    email = null,
+    password_: routePassword = null,
+    username_: routeUsername = null,
+  } = route.params || {};
 
   return (
     <KeyboardAwareScrollView
@@ -41,6 +33,7 @@ const Login = ({ navigation }) => {
     >
       <LinearGradient colors={["#007bff", "#004fa3"]} style={{ flex: 1 }}>
         <View style={{ flex: 1, marginTop: height * 0.08 }}>
+          {/* Top header */}
           <View style={styles.header}>
             <TouchableOpacity onPress={() => navigation.goBack()}>
               <View style={{ flexDirection: "row" }}>
@@ -58,41 +51,17 @@ const Login = ({ navigation }) => {
             />
           </View>
 
+          {/* Body */}
           <View style={styles.body}>
-            <Text style={styles.welcomeText}>Welcome back</Text>
-            <Text style={styles.loginText}>Log in now</Text>
-
-            <View style={styles.divider} />
-
-            <View style={styles.inputContainer}>
-              <InputField
-                placeholder="Username"
-                iconName="account"
-                value={username}
-                onChangeText={setUsername}
+            {needToVerify ? (
+              <VerifyCard
+                username={routeUsername}
+                password={routePassword}
+                initialEmail={email}
               />
-              <View style={{ marginTop: 0 }} />
-              <InputField
-                placeholder="Password"
-                secureTextEntry
-                value={password}
-                onChangeText={setPassword}
-                iconName="lock"
-              />
-              <TouchableOpacity
-                style={styles.buttonLogin}
-                onPress={handleLogin}
-                disabled={loading}
-              >
-                <View style={styles.buttonContent}>
-                  {loading ? (
-                    <ActivityIndicator />
-                  ) : (
-                    <Text style={styles.buttonLoginText}>Log in</Text>
-                  )}
-                </View>
-              </TouchableOpacity>
-            </View>
+            ) : (
+              <LoginForm />
+            )}
           </View>
         </View>
       </LinearGradient>
@@ -102,6 +71,7 @@ const Login = ({ navigation }) => {
 
 export default Login;
 
+/* ------------------------------ Parent styles ------------------------------ */
 const styles = StyleSheet.create({
   header: {
     marginLeft: width * 0.05,
@@ -126,53 +96,5 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     flex: 1,
-  },
-  welcomeText: {
-    fontSize: 40,
-    color: "white",
-    fontFamily: "Inter_400Regular",
-    textAlign: "center",
-  },
-  loginText: {
-    fontSize: 20,
-    color: "white",
-    fontFamily: "Inter_400Regular",
-  },
-  divider: {
-    height: 0.5,
-    width: width * 0.7,
-    backgroundColor: "white",
-    marginTop: height * 0.05,
-    marginBottom: 0,
-  },
-  inputContainer: {
-    flexDirection: "column",
-    alignItems: "center",
-    marginTop: height * 0.15,
-  },
-  buttonLogin: {
-    backgroundColor: "#f0f0f0",
-    paddingVertical: height * 0.01,
-    paddingHorizontal: width * 0.1,
-    borderRadius: 25,
-    width: width * 0.45,
-    justifyContent: "center",
-    alignItems: "center",
-    marginTop: height * 0.04,
-    opacity: 1,
-  },
-  buttonContent: {
-    flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "center",
-    width: "100%",
-    paddingVertical: height * 0.015,
-  },
-  buttonLoginText: {
-    fontSize: 18,
-    color: "#007bff",
-    flex: 1,
-    textAlign: "center",
-    fontFamily: "Inter_400Regular",
   },
 });

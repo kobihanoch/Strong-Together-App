@@ -1,10 +1,15 @@
 import axios from "axios";
-import { showErrorAlert } from "../errors/errorAlerts";
+import {
+  showAppUpdateModal,
+  showErrorAlert,
+  UpdateAppModalError,
+} from "../errors/errorAlerts";
 import { refreshAndRotateTokens } from "../services/AuthService";
 import GlobalAuth from "../utils/authUtils";
 import { saveRefreshToken } from "../utils/tokenStore";
 import { API_BASE_URL } from "./apiConfig";
 import {
+  bootstrapApi,
   ensureBootstrap,
   isOpen,
   isTracked,
@@ -15,6 +20,8 @@ import {
   notifyOffline,
   notifyServerDown,
 } from "./networkCheck";
+import Constants from "expo-constants";
+import { openUpdateModal } from "../utils/imperativeUpdateModal";
 
 const api = axios.create({ baseURL: API_BASE_URL, timeout: 12000 });
 
@@ -56,9 +63,21 @@ api.get = async function wrappedGet(url, config) {
   return rawGet(url, config);
 };
 
+bootstrapApi.interceptors.response.use(
+  (res) => res,
+  (err) => {
+    if (err.response?.status === 426) {
+      console.log("426");
+      openUpdateModal(); // <-- imperative show
+      return Promise.reject(err); // always reject
+    }
+  }
+);
+
 api.interceptors.request.use(
   async (config) => {
-    console.log("[Axios]:", config.url);
+    console.log("[API]:", config.url);
+    config.headers.set("x-app-version", Constants.expoConfig.version);
     return config;
   },
   (error) => {
@@ -84,6 +103,12 @@ api.interceptors.response.use(
     const original = error.config || {};
     const status = error.response?.status;
     const data = error.response?.data;
+
+    // Update required
+    if (status === 426) {
+      openUpdateModal(); // <-- imperative show
+      return Promise.reject(error); // always reject
+    }
 
     if (status === 401) {
       console.log("401 from API:", {

@@ -54,7 +54,7 @@ export const useStartWorkoutCache = (
       if (timeoutRef.current) clearTimeout(timeoutRef.current);
       timeoutRef.current = setTimeout(async () => {
         saveToCache();
-      }, 5000);
+      }, 1000);
     })();
 
     return () => clearTimeout(timeoutRef.current);

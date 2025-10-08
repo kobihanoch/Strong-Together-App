@@ -48,7 +48,11 @@ export const AnalysisProvider = ({ children }) => {
     useState(null);
 
   const hasTrainedToday = useMemo(
-    () => checkHasTrainedToday(analyzedExerciseTrackingData?.lastWorkoutDate),
+    () =>
+      checkHasTrainedToday(
+        analyzedExerciseTrackingData?.lastWorkoutDate,
+        Intl.DateTimeFormat().resolvedOptions().timeZone
+      ),
     [analyzedExerciseTrackingData?.lastWorkoutDate]
   );
 

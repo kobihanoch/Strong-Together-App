@@ -8,10 +8,9 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { RFValue } from "react-native-responsive-fontsize";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import Logo from "../components/Logo";
-import { RFValue } from "react-native-responsive-fontsize";
-import { colors } from "../constants/colors";
 
 const { width, height } = Dimensions.get("window");
 
