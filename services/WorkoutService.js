@@ -3,7 +3,9 @@ import api from "../api/api";
 // Fetch self workout plan
 export const getUserWorkout = async () => {
   try {
-    const response = await api.get("/api/workouts/getworkout");
+    const response = await api.get("/api/workouts/getworkout", {
+      params: { tz: Intl.DateTimeFormat().resolvedOptions().timeZone },
+    });
     return response.data;
   } catch (error) {
     throw error;
@@ -13,7 +15,9 @@ export const getUserWorkout = async () => {
 // Gets user exercise tracking data - including home page ata PR most common etc...
 export const getUserExerciseTracking = async () => {
   try {
-    const response = await api.get("/api/workouts/gettracking");
+    const response = await api.get(`/api/workouts/gettracking`, {
+      params: { tz: Intl.DateTimeFormat().resolvedOptions().timeZone },
+    });
     return response.data;
   } catch (error) {
     throw error;
@@ -33,6 +37,7 @@ export const deleteWorkout = async () => {
 export const addWorkout = async (workoutData) => {
   const { data } = await api.post("/api/workouts/add", {
     workoutData: workoutData,
+    tz: Intl.DateTimeFormat().resolvedOptions().timeZone,
   });
   return data;
 };
@@ -44,6 +49,7 @@ export const saveWorkoutData = async (dataOfWorkout) => {
   }
   const { data } = await api.post("/api/workouts/finishworkout", {
     workout: dataOfWorkout,
+    tz: Intl.DateTimeFormat().resolvedOptions().timeZone,
   });
   return data;
 };

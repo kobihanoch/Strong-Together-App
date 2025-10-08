@@ -210,7 +210,7 @@ export const normalizeDataToWeeklyCardioGraph = (data) => {
 
   // Step 2: Fill values from actual data
   data.forEach((rec) => {
-    const label = getDayAbbreviation(rec.workout_date); // e.g., "Tue"
+    const label = getDayAbbreviation(rec.workout_time_utc); // e.g., "Tue"
     if (label in dayMap) {
       dayMap[label] += rec.duration_mins ?? 0;
     }

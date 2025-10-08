@@ -45,7 +45,11 @@ export async function ensureBootstrap() {
     return inflight;
   }
   inflight = (async () => {
-    const res = await bootstrapApi.get("/api/bootstrap/get"); // real server call
+    const res = await bootstrapApi.get(
+      `/api/bootstrap/get?tz=${
+        Intl.DateTimeFormat().resolvedOptions().timeZone
+      }`
+    ); // real server call
     payload = res?.data || {};
 
     // Give a short grace window so "just-arrived" requests still use the payload
