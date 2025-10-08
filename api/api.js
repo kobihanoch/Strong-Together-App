@@ -15,6 +15,7 @@ import {
   notifyOffline,
   notifyServerDown,
 } from "./networkCheck";
+import Constants from "expo-constants";
 
 const api = axios.create({ baseURL: API_BASE_URL, timeout: 12000 });
 
@@ -58,7 +59,8 @@ api.get = async function wrappedGet(url, config) {
 
 api.interceptors.request.use(
   async (config) => {
-    console.log("[Axios]:", config.url);
+    console.log("[API]:", config.url);
+    config.headers.set("x-app-version", Constants.expoConfig.version);
     return config;
   },
   (error) => {

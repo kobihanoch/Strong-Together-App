@@ -7,6 +7,8 @@ import React, {
   useRef,
   useState,
 } from "react";
+import { Notifier, NotifierComponents } from "react-native-notifier";
+import { hasBootstrapPayload, resetBootstrap } from "../api/bootstrapApi";
 import {
   cacheDeleteAllCache,
   cacheGetJSON,
@@ -31,9 +33,6 @@ import {
   saveRefreshToken,
 } from "../utils/tokenStore.js";
 import { connectSocket, disconnectSocket } from "../webSockets/socketConfig";
-import { resetBootstrap } from "../api/bootstrapApi";
-import { hasBootstrapPayload } from "../api/bootstrapApi";
-import { Notifier, NotifierComponents } from "react-native-notifier";
 
 const AuthContext = createContext(null);
 export const useAuth = () => useContext(AuthContext);
@@ -95,6 +94,10 @@ export const AuthProvider = ({ children }) => {
     "Auth",
     cacheKnown ? userDataLoading : hasBootstrapPayload()
   );
+
+  useEffect(() => {
+    if (user?.username) GlobalAuth.setUsernameInHeader(user?.username);
+  }, [user]);
 
   /**
    * initializeUserSession
@@ -290,6 +293,7 @@ export const AuthProvider = ({ children }) => {
     await clearRefreshToken();
     await cacheDeleteAllCache();
     GlobalAuth.setAccessToken(null);
+    GlobalAuth.setUsernameInHeader(null);
     resetBootstrap();
     setIsLoggedIn(false);
     setLoading(false);

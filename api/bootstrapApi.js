@@ -1,5 +1,6 @@
 import axios from "axios";
 import { API_BASE_URL } from "./apiConfig";
+import Constants from "expo-constants";
 
 // Use a separate axios instance to avoid circular import
 export const bootstrapApi = axios.create({
@@ -10,6 +11,7 @@ export const bootstrapApi = axios.create({
 bootstrapApi.interceptors.request.use(
   async (config) => {
     console.log("[Bootstrap]:", config.url);
+    config.headers.set("x-app-version", Constants.expoConfig.version);
     return config; // << MUST return config
   },
   (err) => {

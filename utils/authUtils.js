@@ -7,6 +7,10 @@ const GlobalAuth = {
     bootstrapApi.defaults.headers.common.Authorization = `Bearer ${t}`;
   },
   logout: null,
+  setUsernameInHeader: (username) => {
+    api.defaults.headers.common["x-username"] = username;
+    bootstrapApi.defaults.headers.common["x-username"] = username;
+  },
 };
 
 export default GlobalAuth;
