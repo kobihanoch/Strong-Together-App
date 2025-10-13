@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [4.1.1](https://github.com/kobihanoch/Strong-Together-App/compare/v4.1.0...v4.1.1) (2025-10-13)
+
+
+### Bug Fixes
+
+* **Auth:** Ensure user stays logged in after update (housekeeping) ([b58b23a](https://github.com/kobihanoch/Strong-Together-App/commit/b58b23a6aff8582a304033c8306d99d9d2aaa06e))
+* **Start Workout:** Fixed resume workout error after saved workout ([bbaab60](https://github.com/kobihanoch/Strong-Together-App/commit/bbaab60ba85a2190d05ca7f69c4836804eaf754e))
+
 ## [4.1.0](https://github.com/kobihanoch/Strong-Together-App/compare/v4.0.1...v4.1.0) (2025-10-08)
 
 
