@@ -13,7 +13,11 @@ import {
 } from "../../utils/startWorkoutUtils";
 import { useUserWorkout } from "../useUserWorkout";
 import { showErrorAlert } from "../../errors/errorAlerts";
-import { cacheDeleteKey, cacheGetJSON } from "../../cache/cacheUtils";
+import {
+  cacheDeleteKey,
+  cacheGetJSON,
+  keyStartWorkout,
+} from "../../cache/cacheUtils";
 import { useStartWorkoutCache } from "../useStartWorkoutCache";
 
 const useStartWorkoutPageLogic = (selectedSplit, resumedWorkout = null) => {
@@ -99,9 +103,9 @@ const useStartWorkoutPageLogic = (selectedSplit, resumedWorkout = null) => {
   }, []);
 
   // --------------------[ Save Workout ]-----------------------------------------
-  const clearCache = async () => {
-    await cacheDeleteKey(cacheKey);
-  };
+  const clearCache = useCallback(async () => {
+    await cacheDeleteKey(keyStartWorkout(user?.id));
+  }, [cacheKey]);
 
   const onExit = async () => {
     await clearCache();
