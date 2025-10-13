@@ -82,11 +82,31 @@ export async function cacheDeleteAllCache() {
   console.log("\x1b[96m[Cache]: All user cache deleted\x1b[0m");
 }
 
+// Delete all user's cache
+export async function cacheDeleteAllCacheWithoutUserId() {
+  const allKeys = await AsyncStorage.getAllKeys();
+  // All out of user id
+  const toDelete = allKeys.filter(
+    (k) => k.startsWith("CACHE:") && k !== "CACHE:USER_ID"
+  );
+  if (!toDelete.length) return;
+
+  const CHUNK = 100;
+  for (let i = 0; i < toDelete.length; i += CHUNK) {
+    await AsyncStorage.multiRemove(toDelete.slice(i, i + CHUNK));
+  }
+  console.log("\x1b[96m[Cache]: All user cache deleted\x1b[0m");
+}
+
 export async function cacheHousekeepingOnBoot() {
   try {
     const keys = await AsyncStorage.getAllKeys();
+    // Everything out of user id for soft login after udpate
     const stale = keys.filter(
-      (k) => k.startsWith("CACHE:") && !k.endsWith(`:${CACHE_VERSION}`)
+      (k) =>
+        k.startsWith("CACHE:") &&
+        !k.endsWith(`:${CACHE_VERSION}`) &&
+        k !== "CACHE:USER_ID"
     );
 
     if (stale.length) {
