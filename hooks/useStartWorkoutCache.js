@@ -48,13 +48,13 @@ export const useStartWorkoutCache = (
 
   const timeoutRef = useRef(null);
 
-  // Debounce caching each workout progress change
+  // Debounce caching each workout progress change - REGULAR SAVE FOR NOW
   useEffect(() => {
     (async () => {
       if (timeoutRef.current) clearTimeout(timeoutRef.current);
       timeoutRef.current = setTimeout(async () => {
         saveToCache();
-      }, 1000);
+      }, 0);
     })();
 
     return () => clearTimeout(timeoutRef.current);
