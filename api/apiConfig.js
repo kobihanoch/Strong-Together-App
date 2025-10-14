@@ -6,8 +6,9 @@
 
 // Uncomment by production or dev environment
 
-// ------{PRODUCTION}-------
-export const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL;
+const ENVIRONMENT = process.env.EXPO_PUBLIC_ENVIROMENT;
 
-// ------{DEVELOPMENT}-------
-//export const API_BASE_URL = `http://10.0.0.32:5000`;
+export const API_BASE_URL =
+  ENVIRONMENT === "development"
+    ? process.env.EXPO_PUBLIC_DEV_API
+    : process.env.EXPO_PUBLIC_API_URL;
