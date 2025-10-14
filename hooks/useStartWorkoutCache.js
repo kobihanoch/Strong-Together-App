@@ -33,6 +33,7 @@ export const useStartWorkoutCache = (
 
   // Debounced caching (kept exactly with the commented call)
   const saveToCache = useCallback(async () => {
+    if (disabledRef.current) return;
     await cacheSetJSON(
       cacheKey,
       {
@@ -61,6 +62,7 @@ export const useStartWorkoutCache = (
   }, [workoutProgressObj, pausedTotal, saveToCache]);
 
   // App state listener
+  const disabledRef = useRef(false);
   useEffect(() => {
     const sub = AppState.addEventListener("change", (state) => {
       if (state === "inactive" || state === "background") {
@@ -71,9 +73,12 @@ export const useStartWorkoutCache = (
     return () => sub.remove();
   }, [saveToCache]);
 
+  const disableCache = () => (disabledRef.current = true);
+
   return {
     cacheKey,
     startTime,
     pausedTotal,
+    disableCache,
   };
 };

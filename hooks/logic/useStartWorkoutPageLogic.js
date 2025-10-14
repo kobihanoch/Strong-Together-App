@@ -70,12 +70,13 @@ const useStartWorkoutPageLogic = (selectedSplit, resumedWorkout = null) => {
   }, [workoutProgressObj]);*/
 
   // --------------------[ Timer + Caching ]----------------------
-  const { cacheKey, startTime, pausedTotal } = useStartWorkoutCache(
-    user.id,
-    selectedSplit,
-    resumedWorkout,
-    workoutProgressObj
-  );
+  const { cacheKey, startTime, pausedTotal, disableCache } =
+    useStartWorkoutCache(
+      user.id,
+      selectedSplit,
+      resumedWorkout,
+      workoutProgressObj
+    );
 
   // Count only after both fields has updated and count
   // Count only until planned sets by original workout plan
@@ -139,8 +140,9 @@ const useStartWorkoutPageLogic = (selectedSplit, resumedWorkout = null) => {
         unpackFromExerciseTrackingData(exerciseTrackingAnalysis)
       );
       setIsWorkoutMode(false);
+      disableCache();
       await clearCache();
-      navigation.navigate("Statistics");
+      navigation.replace("Statistics");
     } catch (err) {
       throw err;
     } finally {
