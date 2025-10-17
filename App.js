@@ -3,7 +3,7 @@ import {
   useNavigationContainerRef,
 } from "@react-navigation/native";
 import * as Font from "expo-font";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   ActivityIndicator,
   StatusBar,
@@ -65,11 +65,17 @@ function useFontsReady() {
 export default function App() {
   const fontsReady = useFontsReady();
   const navigationRef = useNavigationContainerRef();
+  const [keyPairReady, setKeyPairReady] = useState(false);
 
   // Dpop key pair
   useEffect(() => {
-    (async () => await ensureDpopKeyPair())();
-  }, []);
+    (async () => {
+      if (!keyPairReady) {
+        await ensureDpopKeyPair();
+        setKeyPairReady(true);
+      }
+    })();
+  }, [keyPairReady]);
 
   // Delete cache for outdated app versions (against different data structures)
   useEffect(() => {
@@ -91,19 +97,21 @@ export default function App() {
   }
 
   return (
-    <AlertNotificationRoot>
-      <GestureHandlerRootView style={{ flex: 1 }}>
-        <GlobalAppLoadingProvider>
-          <AuthProvider>
-            <NavigationContainer ref={navigationRef}>
-              <RootNavigator />
-              <NotifierRoot />
-              <UpdateAppModal />
-            </NavigationContainer>
-          </AuthProvider>
-        </GlobalAppLoadingProvider>
-      </GestureHandlerRootView>
-    </AlertNotificationRoot>
+    keyPairReady && (
+      <AlertNotificationRoot>
+        <GestureHandlerRootView style={{ flex: 1 }}>
+          <GlobalAppLoadingProvider>
+            <AuthProvider>
+              <NavigationContainer ref={navigationRef}>
+                <RootNavigator />
+                <NotifierRoot />
+                <UpdateAppModal />
+              </NavigationContainer>
+            </AuthProvider>
+          </GlobalAppLoadingProvider>
+        </GestureHandlerRootView>
+      </AlertNotificationRoot>
+    )
   );
 }
 

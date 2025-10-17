@@ -1,9 +1,8 @@
-import "react-native-get-random-values";
-import { crypto as rnCrypto } from "react-native-webcrypto";
-import * as SecureStore from "expo-secure-store";
 import { p256 } from "@noble/curves/p256";
 import { base64url } from "@scure/base";
-import { importJWK } from "jose";
+import * as SecureStore from "expo-secure-store";
+import "react-native-get-random-values";
+import { crypto as rnCrypto } from "react-native-webcrypto";
 
 // 1) Polyfill: make sure globalThis.crypto/subtle exist before jose uses them
 if (!globalThis.crypto || !globalThis.crypto.subtle) {

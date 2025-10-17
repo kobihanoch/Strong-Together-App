@@ -1,6 +1,7 @@
 import axios from "axios";
 import { API_BASE_URL } from "./apiConfig";
 import Constants from "expo-constants";
+import buildDpopProof from "./DPoP/buildDpopProof";
 
 // Use a separate axios instance to avoid circular import
 export const bootstrapApi = axios.create({
@@ -12,6 +13,8 @@ bootstrapApi.interceptors.request.use(
   async (config) => {
     console.log("[Bootstrap]:", config.url);
     config.headers.set("x-app-version", Constants.expoConfig.version);
+    const dpop = await buildDpopProof(config.method, config.url);
+    config.headers.set("dpop", dpop);
     return config; // << MUST return config
   },
   (err) => {

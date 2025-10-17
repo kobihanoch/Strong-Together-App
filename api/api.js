@@ -1,11 +1,9 @@
 import axios from "axios";
-import {
-  showAppUpdateModal,
-  showErrorAlert,
-  UpdateAppModalError,
-} from "../errors/errorAlerts";
+import Constants from "expo-constants";
+import { showErrorAlert } from "../errors/errorAlerts";
 import { refreshAndRotateTokens } from "../services/AuthService";
 import GlobalAuth from "../utils/authUtils";
+import { openUpdateModal } from "../utils/imperativeUpdateModal";
 import { saveRefreshToken } from "../utils/tokenStore";
 import { API_BASE_URL } from "./apiConfig";
 import {
@@ -20,8 +18,7 @@ import {
   notifyOffline,
   notifyServerDown,
 } from "./networkCheck";
-import Constants from "expo-constants";
-import { openUpdateModal } from "../utils/imperativeUpdateModal";
+import buildDpopProof from "./DPoP/buildDpopProof";
 
 const api = axios.create({ baseURL: API_BASE_URL, timeout: 12000 });
 
@@ -77,6 +74,8 @@ bootstrapApi.interceptors.response.use(
 api.interceptors.request.use(
   async (config) => {
     console.log("[API]:", config.url);
+    const dpop = await buildDpopProof(config.method, config.url);
+    config.headers.set("dpop", dpop);
     config.headers.set("x-app-version", Constants.expoConfig.version);
     return config;
   },

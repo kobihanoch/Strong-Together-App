@@ -8,7 +8,12 @@
 
 const ENVIRONMENT = process.env.EXPO_PUBLIC_ENVIROMENT;
 
-export const API_BASE_URL =
+/*export const API_BASE_URL =
   ENVIRONMENT === "development"
+    ? process.env.EXPO_PUBLIC_DEV_API
+    : process.env.EXPO_PUBLIC_API_URL;*/
+
+export const API_BASE_URL =
+  ENVIRONMENT !== "development"
     ? process.env.EXPO_PUBLIC_DEV_API
     : process.env.EXPO_PUBLIC_API_URL;
