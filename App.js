@@ -1,4 +1,3 @@
-// App.js
 import {
   NavigationContainer,
   useNavigationContainerRef,

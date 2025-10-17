@@ -5,7 +5,7 @@ const APP_NAME_BASE = "Strong Together";
 const BUNDLE_ID_BASE = "com.kobihanoch.strongtogether";
 
 // Retrieve the current build profile (defaults to 'development' if not set, e.g., when running 'expo start')
-const buildProfile = process.env.EAS_BUILD_PROFILE || 'development';
+const buildProfile = process.env.EAS_BUILD_PROFILE || "development";
 
 const config = ({ config }) => {
   // Start with the base configuration from your original app.json
@@ -33,6 +33,7 @@ const config = ({ config }) => {
       ["expo-notifications", { mode: "production" }],
       "expo-localization",
       "expo-font",
+      "expo-secure-store",
     ],
     extra: {
       eas: {
@@ -61,14 +62,14 @@ const config = ({ config }) => {
         backgroundColor: "#2979ff",
       },
       package: BUNDLE_ID_BASE, // Default: Production ID
-    }
+    },
   };
 
   // -----------------------------------------------------------------
   // |                Specific Adjustments for Development (DEV) Build              |
   // -----------------------------------------------------------------
 
-  if (buildProfile === 'development') {
+  if (buildProfile === "development") {
     const DEV_SUFFIX = " (Dev)";
     const DEV_BUNDLE_SUFFIX = ".dev";
 
@@ -83,7 +84,7 @@ const config = ({ config }) => {
     // 3. Change Android Package: "com.kobihanoch.strongtogether.dev"
     // This is CRITICAL for Android to allow parallel installation.
     newConfig.android.package = BUNDLE_ID_BASE + DEV_BUNDLE_SUFFIX;
-    
+
     // Optional: Change notification color to indicate Dev environment
     newConfig.notification.color = "#FFC107"; // Example: Yellow for development alerts
   }
