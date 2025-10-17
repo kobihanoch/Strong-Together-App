@@ -39,6 +39,7 @@ import { GlobalAppLoadingProvider } from "./context/GlobalAppLoadingContext";
 import AppStack from "./navigation/AppStack";
 import AuthStack from "./navigation/AuthStack";
 import NotificationsSetup from "./notifications/NotificationsSetup";
+import ensureDpopKeyPair from "./api/DPoP/ensureDpopKeyPair";
 
 // ---------- Fonts Loader Hook ----------
 function useFontsReady() {
@@ -65,6 +66,11 @@ function useFontsReady() {
 export default function App() {
   const fontsReady = useFontsReady();
   const navigationRef = useNavigationContainerRef();
+
+  // Dpop key pair
+  useEffect(() => {
+    (async () => await ensureDpopKeyPair())();
+  }, []);
 
   // Delete cache for outdated app versions (against different data structures)
   useEffect(() => {
