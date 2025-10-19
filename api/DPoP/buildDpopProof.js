@@ -1,11 +1,9 @@
 import { SignJWT } from "jose";
+import calculateATH from "./calculateATH";
 import ensureDpopKeyPair from "./ensureDpopKeyPair";
+import { v4 as uuidv4 } from "uuid";
 
-function simpleJti() {
-  return `${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
-}
-
-export default async function buildDpopProof(htm, htu) {
+export default async function buildDpopProof(htm, htu, at = null) {
   try {
     // 1) Load persisted JWKs (not CryptoKeys)
     const { privateJwk, publicJwk } = await ensureDpopKeyPair();
@@ -18,13 +16,18 @@ export default async function buildDpopProof(htm, htu) {
       // key_ops already includes ["sign"] from your export; leaving it is fine
     };
 
+    // If request used for authenticated users
+    const ath = calculateATH(at);
+
     // 3) Claims
     const payload = {
-      jti: simpleJti(), // random-enough ID; ok for DPoP
+      jti: uuidv4(), // random-enough ID; ok for DPoP
       htm: (htm || "GET").toUpperCase(),
       htu: htu, // absolute URL
       iat: Math.floor(Date.now() / 1000),
     };
+
+    if (ath) payload.ath = ath;
 
     // 4) Protected header (embed public JWK per spec)
     const protectedHeader = {

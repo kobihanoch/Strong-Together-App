@@ -18,7 +18,11 @@ bootstrapApi.interceptors.request.use(
       // Build DPoP for other requests
       const finalUrl = new URL(config.url, config.baseURL);
       const htu = `${finalUrl.origin}${finalUrl.pathname}`;
-      const dpop = await buildDpopProof(config.method, htu);
+      const dpop = await buildDpopProof(
+        config.method,
+        htu,
+        config.headers?.Authorization?.split(" ")[1] || null
+      );
       config.headers.set("dpop", dpop);
     } catch {}
     return config;

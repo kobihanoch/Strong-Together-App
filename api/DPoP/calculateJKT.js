@@ -13,5 +13,9 @@ export default async function calculateJKT() {
 
   const hash = sha256(new TextEncoder().encode(canonicalJwk));
 
-  return base64url.encode(hash);
+  return base64url
+    .encode(hash)
+    .replace(/\+/g, "-")
+    .replace(/\//g, "_")
+    .replace(/=+$/, "");
 }
