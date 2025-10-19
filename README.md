@@ -144,13 +144,18 @@ Version 4 builds on top of this by introducing a **smart cache layer**, **offli
 - **Modular backend** – All network communication goes through a
   RESTful API implemented in a separate repository using Node.js and
   Express.
-- **Smart SWR-style cache layer (NEW)** – A custom-built caching mechanism inspired by SWR, but implemented entirely without libraries. Each data context uses a unified hook (`useCacheAndFetch`) to hydrate from cache, fallback to API if needed, and auto-update in-memory state. Caching logic includes TTL support (planned), safe fallback handling, and background sync.
-- **Bootstrap API pattern (NEW)** – On app launch, a single "bootstrap" call fetches all critical data (user profile, workouts, messages, etc.) to hydrate the app in one go. Greatly reduces network overhead and improves UX during initial load.
-- **Offline mode support (NEW)** – All major screens load from cache when offline. Token refresh happens in background once network returns.
-- **Unfinished workout recovery (NEW)** – If the app closes during an active workout, the session will be restored via cache flush when reopened.
-- **User deletion support (NEW)** – Added the ability to permanently delete an account and all related data from the settings page.
-- **Cardio input logging (NEW)** – Users can now log one cardio session per day (duration), to be expanded with full analytics in future releases.
-- **Version-aware cache housekeeping (NEW)** – When the app updates, outdated cached data is safely cleaned to prevent inconsistency.
+- **Smart SWR-style cache layer** – A custom-built caching mechanism inspired by SWR, but implemented entirely without libraries. Each data context uses a unified hook (`useCacheAndFetch`) to hydrate from cache, fallback to API if needed, and auto-update in-memory state. Caching logic includes TTL support (planned), safe fallback handling, and background sync.
+- **Bootstrap API pattern** – On app launch, a single "bootstrap" call fetches all critical data (user profile, workouts, messages, etc.) to hydrate the app in one go. Greatly reduces network overhead and improves UX during initial load.
+- **Offline mode support** – All major screens load from cache when offline. Token refresh happens in background once network returns.
+- **Unfinished workout recovery** – If the app closes during an active workout, the session will be restored via cache flush when reopened.
+- **User deletion support** – Added the ability to permanently delete an account and all related data from the settings page.
+- **Cardio input logging** – Users can now log one cardio session per day (duration), to be expanded with full analytics in future releases.
+- **Version-aware cache housekeeping** – When the app updates, outdated cached data is safely cleaned to prevent inconsistency.
+- **DPoP Client Proofs (NEW)** – Every API request can include a **DPoP proof** (Demonstration of Proof-of-Possession) signed on-device with an **ES256** key pair.  
+  - The app **generates and persists** a P‑256 key pair on first launch using `jose.generateKeyPair("ES256")`. The keys are exported as **JWKs** via `crypto.subtle.exportKey("jwk", ...)` and stored in **Expo SecureStore**.  
+  - Before rendering the app tree, we **ensure the key pair exists** (see `ensureDpopKeyPair`) and gate UI on `keyPairReady`.  
+  - For each request, a `dpop+jwt` is built (`buildDpopProof`) with claims: `jti` (nonce-like id), `htm` (HTTP method), `htu` (absolute URL), and `iat` (issued-at). The **public JWK** is embedded in the JWT header so the backend can verify the signature.  
+  - This materially hardens token theft scenarios by requiring possession of the private key to mint valid proofs tied to the exact **method + URL**. Backend validation (documented in the backend repo) checks signature, `htu/htm` match, `iat` freshness, and protects against replay via `jti` storage.
 
 ## Architecture Overview
 
@@ -174,6 +179,8 @@ The project follows a **two‑tier architecture**:
   - **Smart Caching Layer** – Each context in the app loads data through a custom hook that checks cache first, then falls back to API only if needed. A central cache store holds hydrated values for all major domains (workouts, messages, etc.), improving responsiveness across navigation.
 
   - **Bootstrap API Gate** – All contexts consume a unified `bootstrapAPIInstance` that populates them on app launch with one single API call. If bootstrap fails, each context falls back to individual endpoint logic. This reduces server load and perceived latency.
+
+  - **Security: DPoP proofs** – The client maintains a persistent ES256 key pair (stored as JWKs in SecureStore). A `dpop+jwt` is attached per request with `htm`, `htu`, `iat`, and `jti`, and the public JWK in the protected header, enabling server-side PoP verification.
 
 - **Backend** – a separate Node.js/Express server that exposes
   authenticated endpoints for users, workouts, exercises, messages
@@ -301,8 +308,7 @@ Important points about the schema:
   week and optionally specify a notification time.
 - **Messages** stores subject/body along with sender and receiver
   identifiers.
-- **BlacklistedTokens** are used by the backend to invalidate JWTs
-  after logout or password reset.
+- **Auth/Versioning** – The server employs **token versioning (CAS)** on the users table to invalidate tokens: bumping the `token_version` atomically invalidates all previously issued refresh/access tokens for that user without maintaining a blacklist table.
 
 > **Optimisations:** In version 3, indexes were added on the
 > foreign‑key columns (e.g. `workout_id`, `user_id`) and SQL views were
@@ -362,12 +368,13 @@ Important points about the schema:
 
 ### Auth Flow
 
-![Database authentication flow](https://github.com/user-attachments/assets/1516ac04-941f-4792-a4c9-31036a1d9de2)
+<!-- Removed the previous diagram to avoid implying a blacklist-based flow -->
 
 1. **Login & Token Issuance** – On successful login, the server issues an `access_token` (short-lived) and a `refresh_token` (long-lived).
 2. **Access Control** – Each API request requires a valid `access_token`. If the token is missing, expired, or invalid, the request is denied.
 3. **Token Refresh** – When the `access_token` expires, the client uses the `refresh_token` to obtain a new pair of tokens without re-logging in.
-4. **Blacklisting** – On logout or suspected compromise, the `refresh_token` (and optionally the `access_token`) is stored in the `blacklistedtokens` table. Any attempt to reuse blacklisted tokens is rejected.
+4. **Token Versioning (CAS)** – On sensitive events (logout, password change, suspected compromise), the backend **atomically bumps `token_version`** for the user. Any token minted against an older version is rejected, so a single bump invalidates all outstanding tokens without a blacklist.
+5. **DPoP Proof Binding** – Each protected request can carry a **DPoP proof** (`dpop+jwt`) signed with the device’s ES256 private key and embedding the public JWK in the header. The backend verifies the signature, validates `htm/htu/iat`, enforces **replay protection** via `jti`, and (where applicable) binds access tokens to the DPoP key.
 
 ## Roadmap & Future Improvements
 
