@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [4.2.0](https://github.com/kobihanoch/Strong-Together-App/compare/v4.1.1...v4.2.0) (2025-10-19)
+
+
+### Features
+
+* **Auth:** Keep user logged in with server down errors ([1a4ccbe](https://github.com/kobihanoch/Strong-Together-App/commit/1a4ccbe9476214f875929b54dda534e41ea4f52f))
+* **DPoP:** Added DPoP proof to header ([e49f71d](https://github.com/kobihanoch/Strong-Together-App/commit/e49f71d17ce9f44673f8ac0b76e4188bea506d80))
+* **DPoP:** DPoP is implemented ([ac23e71](https://github.com/kobihanoch/Strong-Together-App/commit/ac23e712b7b084f4b29d55926211284950532e2f))
+* **DPoP:** Keypair creating at app startup (per device) ([ad391a0](https://github.com/kobihanoch/Strong-Together-App/commit/ad391a0b0ba28effe7d748c17d9649e6a1eebb6c))
+* **Update Modal:** If upgrade is required don't log out user ([53c45b2](https://github.com/kobihanoch/Strong-Together-App/commit/53c45b288c04fd2de877e20abe4e90fb95c30fa3))
+
 ### [4.1.1](https://github.com/kobihanoch/Strong-Together-App/compare/v4.1.0...v4.1.1) (2025-10-13)
 
 
