@@ -1,10 +1,10 @@
-// App.js
+require("./global");
 import {
   NavigationContainer,
   useNavigationContainerRef,
 } from "@react-navigation/native";
 import * as Font from "expo-font";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   ActivityIndicator,
   StatusBar,
@@ -39,6 +39,7 @@ import { GlobalAppLoadingProvider } from "./context/GlobalAppLoadingContext";
 import AppStack from "./navigation/AppStack";
 import AuthStack from "./navigation/AuthStack";
 import NotificationsSetup from "./notifications/NotificationsSetup";
+import ensureDpopKeyPair from "./api/DPoP/ensureDpopKeyPair";
 
 // ---------- Fonts Loader Hook ----------
 function useFontsReady() {
@@ -65,6 +66,17 @@ function useFontsReady() {
 export default function App() {
   const fontsReady = useFontsReady();
   const navigationRef = useNavigationContainerRef();
+  const [keyPairReady, setKeyPairReady] = useState(false);
+
+  // Dpop key pair
+  useEffect(() => {
+    (async () => {
+      if (!keyPairReady) {
+        await ensureDpopKeyPair();
+        setKeyPairReady(true);
+      }
+    })();
+  }, [keyPairReady]);
 
   // Delete cache for outdated app versions (against different data structures)
   useEffect(() => {
@@ -86,19 +98,21 @@ export default function App() {
   }
 
   return (
-    <AlertNotificationRoot>
-      <GestureHandlerRootView style={{ flex: 1 }}>
-        <GlobalAppLoadingProvider>
-          <AuthProvider>
-            <NavigationContainer ref={navigationRef}>
-              <RootNavigator />
-              <NotifierRoot />
-              <UpdateAppModal />
-            </NavigationContainer>
-          </AuthProvider>
-        </GlobalAppLoadingProvider>
-      </GestureHandlerRootView>
-    </AlertNotificationRoot>
+    keyPairReady && (
+      <AlertNotificationRoot>
+        <GestureHandlerRootView style={{ flex: 1 }}>
+          <GlobalAppLoadingProvider>
+            <AuthProvider>
+              <NavigationContainer ref={navigationRef}>
+                <RootNavigator />
+                <NotifierRoot />
+                <UpdateAppModal />
+              </NavigationContainer>
+            </AuthProvider>
+          </GlobalAppLoadingProvider>
+        </GestureHandlerRootView>
+      </AlertNotificationRoot>
+    )
   );
 }
 
