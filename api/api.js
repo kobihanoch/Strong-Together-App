@@ -19,6 +19,7 @@ import {
   notifyServerDown,
 } from "./networkCheck";
 import buildDpopProof from "./DPoP/buildDpopProof";
+import calculateJKT from "./DPoP/calculateJKT";
 
 const api = axios.create({ baseURL: API_BASE_URL, timeout: 12000 });
 
@@ -60,22 +61,22 @@ api.get = async function wrappedGet(url, config) {
   return rawGet(url, config);
 };
 
-bootstrapApi.interceptors.response.use(
-  (res) => res,
-  (err) => {
-    if (err.response?.status === 426) {
-      console.log("426");
-      openUpdateModal(); // <-- imperative show
-      return Promise.reject(err); // always reject
-    }
-  }
-);
-
 api.interceptors.request.use(
   async (config) => {
     console.log("[API]:", config.url);
-    const dpop = await buildDpopProof(config.method, config.url);
-    config.headers.set("dpop", dpop);
+    try {
+      if (config.url.includes("login")) {
+        // Build JKT for tokens signing (login)
+        const res = await calculateJKT();
+        config.headers.set("dpop-key-binding", res);
+      } else {
+        // Build DPoP for other requests
+        const finalUrl = new URL(config.url, config.baseURL);
+        const htu = `${finalUrl.origin}${finalUrl.pathname}`;
+        const dpop = await buildDpopProof(config.method, htu);
+        config.headers.set("dpop", dpop);
+      }
+    } catch {}
     config.headers.set("x-app-version", Constants.expoConfig.version);
     return config;
   },

@@ -1,72 +1,46 @@
-import { p256 } from "@noble/curves/p256";
-import { sha256 } from "@noble/hashes/sha256";
-import { base64url } from "@scure/base";
+// English comments only inside the code
+
+import { SignJWT } from "jose";
 import ensureDpopKeyPair from "./ensureDpopKeyPair";
 
-const enc = (s) => new TextEncoder().encode(s);
-
-// Safe base64url.encode (requires Uint8Array)
-const b64u = (bytes) => {
-  if (!(bytes instanceof Uint8Array)) {
-    throw new Error("base64url.encode expects Uint8Array");
-  }
-  return base64url.encode(bytes);
-};
-
-// Convert base64url string to Uint8Array
-const b64uToBytes = (s) => base64url.decode(s);
-
-// Ensure value is Uint8Array
-const toU8 = (v) => (v instanceof Uint8Array ? v : Uint8Array.from(v));
-
-function makeJti() {
-  return `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+function simpleJti() {
+  return `${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
 }
 
-/**
- * Build a DPoP proof (compact JWS) using noble (no WebCrypto)
- */
 export default async function buildDpopProof(htm, htu) {
-  const { privateJwk, publicJwk } = await ensureDpopKeyPair();
+  try {
+    // 1) Load persisted JWKs (not CryptoKeys)
+    const { privateJwk, publicJwk } = await ensureDpopKeyPair();
 
-  // 1) Protected header and payload
-  const header = {
-    alg: "ES256",
-    typ: "dpop+jwt",
-    jwk: publicJwk,
-  };
+    // 2) Hand JWK directly to jose; add 'alg'/'use' to be explicit
+    const privateJwkForJose = {
+      ...privateJwk,
+      alg: "ES256",
+      use: "sig",
+      // key_ops already includes ["sign"] from your export; leaving it is fine
+    };
 
-  const now = Math.floor(Date.now() / 1000);
-  const payload = {
-    jti: makeJti(),
-    htm: (htm || "GET").toUpperCase(),
-    htu,
-    iat: now,
-  };
+    // 3) Claims
+    const payload = {
+      jti: simpleJti(), // random-enough ID; ok for DPoP
+      htm: (htm || "GET").toUpperCase(),
+      htu: htu, // absolute URL
+      iat: Math.floor(Date.now() / 1000),
+    };
 
-  // 2) JWS signing input
-  const hB64 = b64u(enc(JSON.stringify(header)));
-  const pB64 = b64u(enc(JSON.stringify(payload)));
-  const signingInput = `${hB64}.${pB64}`;
-  const signingInputBytes = enc(signingInput);
+    // 4) Protected header (embed public JWK per spec)
+    const protectedHeader = {
+      alg: "ES256",
+      typ: "dpop+jwt",
+      jwk: publicJwk,
+    };
 
-  // 3) Hash + ECDSA-P256 sign
-  const digest = sha256(signingInputBytes);
-
-  // IMPORTANT: force raw (r||s) 64-byte signature, not DER
-  const privScalar = b64uToBytes(privateJwk.d); // 32-byte scalar
-  let sig = p256.sign(digest, privScalar, { der: false });
-  // Some noble versions may return a Signature object; normalize to Uint8Array
-  if (!(sig instanceof Uint8Array)) {
-    // try compact export if available, otherwise coerce
-    sig =
-      typeof sig.toCompactRawBytes === "function"
-        ? sig.toCompactRawBytes()
-        : toU8(sig);
+    // 5) Sign using the JWK directly (no realm mismatch)
+    return await new SignJWT(payload)
+      .setProtectedHeader(protectedHeader)
+      .sign(privateJwkForJose);
+  } catch (err) {
+    console.error("[DPoP buildDpopProof] error:", err);
+    throw err;
   }
-
-  const sB64 = b64u(sig);
-
-  // 4) Compact JWS
-  return `${signingInput}.${sB64}`;
 }

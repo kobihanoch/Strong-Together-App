@@ -1,3 +1,4 @@
+require("./global");
 import {
   NavigationContainer,
   useNavigationContainerRef,

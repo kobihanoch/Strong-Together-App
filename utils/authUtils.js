@@ -3,8 +3,8 @@ import { bootstrapApi } from "../api/bootstrapApi";
 
 const GlobalAuth = {
   setAccessToken: (t) => {
-    api.defaults.headers.common.Authorization = `Bearer ${t}`;
-    bootstrapApi.defaults.headers.common.Authorization = `Bearer ${t}`;
+    api.defaults.headers.common.Authorization = `DPoP ${t}`;
+    bootstrapApi.defaults.headers.common.Authorization = `DPoP ${t}`;
   },
   logout: null,
   setUsernameInHeader: (username) => {
