@@ -135,7 +135,21 @@ export const AuthProvider = ({ children }) => {
       //Alert.alert("Validation completed!");
       // Store in cache (auto)
     } catch (e) {
+      if (e.isUpgradeRequired) {
+        console.log(
+          "\x1b[31m[Auth Context]: Upgrade required. Modal is up.\x1b[0m"
+        );
+        setIsValidatedWithServer(false);
+        return;
+      }
       if (e.isNetworkError) {
+        console.log(
+          "\x1b[33m[Auth Context]: Server validation skipped (offline). Staying logged-in with cached data.\x1b[0m"
+        );
+        setIsValidatedWithServer(false);
+        return;
+      }
+      if (e.isServerError) {
         console.log(
           "\x1b[33m[Auth Context]: Server validation skipped (offline). Staying logged-in with cached data.\x1b[0m"
         );

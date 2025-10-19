@@ -1,5 +1,3 @@
-// English comments only inside the code
-
 // Palette: first 3 are exactly as requested, followed by more accents
 export const PIE_COLORS = [
   "#29ffaf", // warm: amber

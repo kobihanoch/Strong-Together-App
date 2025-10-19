@@ -41,7 +41,6 @@ const Timer = forwardRef(
     }));
 
     useEffect(() => {
-      // English comments only
       if (startTime) startAtRef.current = startTime;
       pausedTimeInSecRef.current = Math.floor((pausedTotal || 0) / 1000);
 

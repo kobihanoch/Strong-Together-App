@@ -1,4 +1,3 @@
-// English comments only inside the code
 import React from "react";
 import { Dimensions, StyleSheet, Text, View } from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";

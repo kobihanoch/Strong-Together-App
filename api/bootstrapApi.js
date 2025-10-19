@@ -1,6 +1,8 @@
 import axios from "axios";
 import { API_BASE_URL } from "./apiConfig";
 import Constants from "expo-constants";
+import buildDpopProof from "./DPoP/buildDpopProof";
+import { openUpdateModal } from "../utils/imperativeUpdateModal";
 
 // Use a separate axios instance to avoid circular import
 export const bootstrapApi = axios.create({
@@ -12,10 +14,28 @@ bootstrapApi.interceptors.request.use(
   async (config) => {
     console.log("[Bootstrap]:", config.url);
     config.headers.set("x-app-version", Constants.expoConfig.version);
-    return config; // << MUST return config
+    try {
+      // Build DPoP for other requests
+      const finalUrl = new URL(config.url, config.baseURL);
+      const htu = `${finalUrl.origin}${finalUrl.pathname}`;
+      const dpop = await buildDpopProof(config.method, htu);
+      config.headers.set("dpop", dpop);
+    } catch {}
+    return config;
   },
   (err) => {
     Promise.reject(err);
+  }
+);
+
+bootstrapApi.interceptors.response.use(
+  (res) => res,
+  (err) => {
+    if (err.response?.status === 426) {
+      console.log("426");
+      openUpdateModal();
+      return Promise.reject(err);
+    }
   }
 );
 

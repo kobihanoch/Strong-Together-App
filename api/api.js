@@ -1,11 +1,9 @@
 import axios from "axios";
-import {
-  showAppUpdateModal,
-  showErrorAlert,
-  UpdateAppModalError,
-} from "../errors/errorAlerts";
+import Constants from "expo-constants";
+import { showErrorAlert } from "../errors/errorAlerts";
 import { refreshAndRotateTokens } from "../services/AuthService";
 import GlobalAuth from "../utils/authUtils";
+import { openUpdateModal } from "../utils/imperativeUpdateModal";
 import { saveRefreshToken } from "../utils/tokenStore";
 import { API_BASE_URL } from "./apiConfig";
 import {
@@ -20,8 +18,8 @@ import {
   notifyOffline,
   notifyServerDown,
 } from "./networkCheck";
-import Constants from "expo-constants";
-import { openUpdateModal } from "../utils/imperativeUpdateModal";
+import buildDpopProof from "./DPoP/buildDpopProof";
+import calculateJKT from "./DPoP/calculateJKT";
 
 const api = axios.create({ baseURL: API_BASE_URL, timeout: 12000 });
 
@@ -63,20 +61,22 @@ api.get = async function wrappedGet(url, config) {
   return rawGet(url, config);
 };
 
-bootstrapApi.interceptors.response.use(
-  (res) => res,
-  (err) => {
-    if (err.response?.status === 426) {
-      console.log("426");
-      openUpdateModal(); // <-- imperative show
-      return Promise.reject(err); // always reject
-    }
-  }
-);
-
 api.interceptors.request.use(
   async (config) => {
     console.log("[API]:", config.url);
+    try {
+      if (config.url.includes("login")) {
+        // Build JKT for tokens signing (login)
+        const res = await calculateJKT();
+        config.headers.set("dpop-key-binding", res);
+      } else {
+        // Build DPoP for other requests
+        const finalUrl = new URL(config.url, config.baseURL);
+        const htu = `${finalUrl.origin}${finalUrl.pathname}`;
+        const dpop = await buildDpopProof(config.method, htu);
+        config.headers.set("dpop", dpop);
+      }
+    } catch {}
     config.headers.set("x-app-version", Constants.expoConfig.version);
     return config;
   },
@@ -107,6 +107,7 @@ api.interceptors.response.use(
     // Update required
     if (status === 426) {
       openUpdateModal(); // <-- imperative show
+      error.isUpgradeRequired = true;
       return Promise.reject(error); // always reject
     }
 
@@ -130,6 +131,7 @@ api.interceptors.response.use(
     } else if (!error.response) {
       // Some other fetch/network problem (e.g., DNS, TLS fail)
       notifyServerDown();
+      error.isServerError = true;
       console.log("Server down");
       return Promise.reject(error);
     }
@@ -158,7 +160,7 @@ api.interceptors.response.use(
         await saveRefreshToken(refreshToken);
         GlobalAuth.setAccessToken(accessToken);
         original.headers = original.headers || {};
-        original.headers.Authorization = `Bearer ${accessToken}`;
+        original.headers.Authorization = `DPoP ${accessToken}`;
         return api(original);
       } catch (refreshErr) {
         // If got here failed at refresh

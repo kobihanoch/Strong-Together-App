@@ -7,7 +7,6 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 const { width, height } = Dimensions.get("window");
 
 const RestDayCard = ({ onPlanPress }) => {
-  // English comments only
   return (
     <View style={styles.card}>
       {/* Accent ribbon */}

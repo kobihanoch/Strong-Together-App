@@ -1,5 +1,3 @@
-// English comments only inside the code
-
 import React, { useCallback, useRef, useState } from "react";
 import { Dimensions, StyleSheet, View } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";

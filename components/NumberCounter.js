@@ -2,7 +2,6 @@ import React, { useEffect, useRef } from "react";
 import { View, Text, Animated, Easing } from "react-native";
 import { TextInput } from "react-native-gesture-handler";
 
-// English comments only
 const NumberCounter = ({ numStart = 0, numEnd, duration = 2000, style }) => {
   const inputRef = useRef(null);
   const anim = useRef(new Animated.Value(numStart)).current;

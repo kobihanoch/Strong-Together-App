@@ -1,4 +1,3 @@
-// English comments only
 import React, { useRef, useState } from "react";
 import {
   Dimensions,

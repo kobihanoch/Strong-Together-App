@@ -1,4 +1,3 @@
-// English comments only
 import React, { useEffect, useRef, useState, useMemo } from "react";
 import { View, Text, Animated, Easing } from "react-native";
 
