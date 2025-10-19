@@ -159,7 +159,7 @@ api.interceptors.response.use(
         await saveRefreshToken(refreshToken);
         GlobalAuth.setAccessToken(accessToken);
         original.headers = original.headers || {};
-        original.headers.Authorization = `Bearer ${accessToken}`;
+        original.headers.Authorization = `DPoP ${accessToken}`;
         return api(original);
       } catch (refreshErr) {
         // If got here failed at refresh

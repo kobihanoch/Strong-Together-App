@@ -2,6 +2,7 @@ import axios from "axios";
 import { API_BASE_URL } from "./apiConfig";
 import Constants from "expo-constants";
 import buildDpopProof from "./DPoP/buildDpopProof";
+import { openUpdateModal } from "../utils/imperativeUpdateModal";
 
 // Use a separate axios instance to avoid circular import
 export const bootstrapApi = axios.create({
