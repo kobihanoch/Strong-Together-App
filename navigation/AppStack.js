@@ -1,5 +1,5 @@
 // AppStack.jsx
-// English comments only
+
 import { createStackNavigator } from "@react-navigation/stack";
 import React, { useEffect, useState } from "react";
 import Analytics from "../screens/Analytics";

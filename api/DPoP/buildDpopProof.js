@@ -1,5 +1,3 @@
-// English comments only inside the code
-
 import { SignJWT } from "jose";
 import ensureDpopKeyPair from "./ensureDpopKeyPair";
 

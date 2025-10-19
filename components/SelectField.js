@@ -1,5 +1,3 @@
-// English comments only inside the code
-
 import React, { useMemo, useState } from "react";
 import {
   Dimensions,

@@ -1,4 +1,3 @@
-// English comments only
 import React, { useMemo } from "react";
 import { View, Text, Dimensions } from "react-native";
 import { BarChart } from "react-native-gifted-charts";

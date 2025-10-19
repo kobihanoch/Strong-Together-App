@@ -1,5 +1,3 @@
-// English comments only inside the code
-
 import React, { useMemo } from "react";
 import { Dimensions, Text, View, TouchableOpacity } from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";

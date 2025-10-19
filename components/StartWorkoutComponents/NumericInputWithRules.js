@@ -1,5 +1,5 @@
 // components/inputs/NumericInputWithRules.jsx
-// English comments only
+
 import React, { useEffect, useRef, useState } from "react";
 import { TextInput } from "react-native";
 import { safeParseFloat } from "../../utils/sharedUtils";

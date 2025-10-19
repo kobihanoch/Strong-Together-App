@@ -1,5 +1,3 @@
-// English comments only inside the code
-
 import React, { useCallback, useMemo, useState } from "react";
 import { Dimensions, FlatList, Text, View } from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";

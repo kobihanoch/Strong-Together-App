@@ -1,4 +1,3 @@
-// English comments only
 import React from "react";
 import { Dimensions, StyleSheet, Text, View } from "react-native";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";

@@ -1,4 +1,3 @@
-// English comments only
 import React, { useEffect, useRef } from "react";
 import { View, StyleSheet, Dimensions, Animated, Easing } from "react-native";
 import Svg, { Circle, G } from "react-native-svg";
