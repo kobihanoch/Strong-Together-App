@@ -1,4 +1,4 @@
-# Strong Together App – Frontend (v4.1.1) 
+# Strong Together App – Frontend (v4.2.0) 
 <br><br>
 <div align="center">
 </div>
