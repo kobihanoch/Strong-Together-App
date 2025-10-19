@@ -107,6 +107,7 @@ api.interceptors.response.use(
     // Update required
     if (status === 426) {
       openUpdateModal(); // <-- imperative show
+      error.isUpgradeRequired = true;
       return Promise.reject(error); // always reject
     }
 
