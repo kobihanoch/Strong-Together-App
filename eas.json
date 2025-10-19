@@ -6,14 +6,17 @@
   "build": {
     "development": {
       "developmentClient": true,
-      "distribution": "internal"
+      "distribution": "internal",
+      "env": { "APP_PROFILE": "development" }
     },
     "preview": {
-      "distribution": "internal"
+      "distribution": "internal",
+      "env": { "APP_PROFILE": "development" }
     },
     "production": {
       "autoIncrement": true,
-      "ios": { "image": "latest" }
+      "ios": { "image": "latest" },
+      "env": { "APP_PROFILE": "production" }
     }
   },
   "submit": {
