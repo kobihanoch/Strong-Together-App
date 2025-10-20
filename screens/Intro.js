@@ -11,6 +11,9 @@ import {
 import { RFValue } from "react-native-responsive-fontsize";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import Logo from "../components/Logo";
+import Row from "../components/Row";
+import { Image } from "expo-image";
+import Column from "../components/Column";
 
 const { width, height } = Dimensions.get("window");
 
@@ -22,13 +25,13 @@ const Intro = ({ navigation }) => {
           style={{
             flexDirection: "column",
             alignItems: "center",
-            marginTop: height * 0.2,
+            marginTop: height * 0.15,
             flex: 1,
           }}
         >
           <Logo />
 
-          <View style={{ alignItems: "center", marginTop: height * 0.15 }}>
+          <View style={{ alignItems: "center", marginTop: height * 0.05 }}>
             <Text style={styles.descriptionText}>
               Welcome to Strong Together.{"\n"}Your goals - powered by your
               circle.
@@ -37,23 +40,128 @@ const Intro = ({ navigation }) => {
 
           <View style={styles.divider} />
 
-          <View style={{ flexDirection: "column", marginTop: 0 }}>
-            <TouchableOpacity
-              style={styles.buttonRegister}
-              onPress={() => navigation.navigate("Register")}
+          <Column
+            style={{
+              alignItems: "center",
+            }}
+          >
+            <Column
+              style={{
+                alignItems: "center",
+                gap: 15,
+              }}
             >
-              <View style={styles.buttonContent}>
-                <Text style={styles.buttonRegisterText}>Register</Text>
-              </View>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.buttonLogin}
-              onPress={() => navigation.navigate("Login")}
+              <TouchableOpacity
+                style={styles.buttonRegister}
+                onPress={() => navigation.navigate("Register")}
+              >
+                <View style={styles.buttonContent}>
+                  <Text style={styles.buttonRegisterText}>Register</Text>
+                </View>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.buttonLogin}
+                onPress={() => navigation.navigate("Login")}
+              >
+                <View style={styles.buttonContent}>
+                  <Text style={styles.buttonLoginText}>Log in</Text>
+                </View>
+              </TouchableOpacity>
+            </Column>
+
+            <Text
+              style={{
+                marginVertical: height * 0.04,
+                fontSize: RFValue(12),
+                color: "white",
+                fontFamily: "Inter_400Regular",
+                opacity: 0.8,
+              }}
             >
-              <View style={styles.buttonContent}>
-                <Text style={styles.buttonLoginText}>Log in</Text>
-              </View>
-            </TouchableOpacity>
+              Or, continue with
+            </Text>
+
+            <Column
+              style={{
+                alignItems: "center",
+                gap: 15,
+              }}
+            >
+              <TouchableOpacity
+                style={[
+                  styles.buttonLogin,
+                  {
+                    paddingHorizontal: 0,
+                    paddingVertical: 0,
+                    backgroundColor: "black",
+                    borderColor: "black",
+                  },
+                ]}
+                onPress={() => navigation.navigate("Login")}
+              >
+                <Row
+                  style={{
+                    width: "100%",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    height: height * 0.065,
+                    paddingHorizontal: width * 0.05,
+                  }}
+                >
+                  <MaterialCommunityIcons
+                    name={"apple"}
+                    size={24}
+                    color={"white"}
+                  ></MaterialCommunityIcons>
+                  <Text
+                    style={[
+                      styles.buttonLoginText,
+                      { color: "white", fontFamily: "Inter_600SemiBold" },
+                    ]}
+                  >
+                    Sign in with Apple
+                  </Text>
+                </Row>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[
+                  styles.buttonLogin,
+                  {
+                    paddingHorizontal: 0,
+                    paddingVertical: 0,
+                    backgroundColor: "#F2F2F2",
+                    borderColor: "#747775",
+                    borderWidth: 1,
+                  },
+                ]}
+                onPress={() => navigation.navigate("Login")}
+              >
+                <Row
+                  style={{
+                    width: "100%",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    height: height * 0.065,
+                    paddingHorizontal: width * 0.05,
+                  }}
+                >
+                  <Image
+                    source={require("../assets/googleicon.png")}
+                    style={{ height: 28, aspectRatio: 1 }}
+                    contentFit="contain"
+                    cachePolicy="disk"
+                  />
+                  <Text
+                    style={[
+                      styles.buttonLoginText,
+                      { color: "black", fontFamily: "Inter_600SemiBold" },
+                    ]}
+                  >
+                    Sign in with Google
+                  </Text>
+                </Row>
+              </TouchableOpacity>
+            </Column>
             <TouchableOpacity
               style={styles.aboutUs}
               onPress={() =>
@@ -74,7 +182,7 @@ const Intro = ({ navigation }) => {
                 <Text style={styles.aboutUsText}>Privacy Policy</Text>
               </View>
             </TouchableOpacity>
-          </View>
+          </Column>
         </View>
       </View>
     </LinearGradient>
@@ -88,19 +196,22 @@ const styles = StyleSheet.create({
     textAlign: "center",
     fontSize: width * 0.04,
     color: "white",
+    fontFamily: "Inter_400Regular",
+    fontSize: RFValue(11),
   },
   divider: {
-    height: 0.2,
+    height: 0.5,
     width: width * 0.7,
     backgroundColor: "white",
-    marginTop: height * 0.05,
-    marginBottom: height * 0.08,
+    marginTop: height * 0.03,
+    marginBottom: height * 0.05,
+    opacity: 0.8,
   },
   buttonRegister: {
     backgroundColor: "#f0f0f0",
-    paddingVertical: height * 0.015,
-    paddingHorizontal: width * 0.1,
-    borderRadius: 25,
+    height: height * 0.07,
+    paddingHorizontal: width * 0.05,
+    borderRadius: 18,
     width: width * 0.6,
     justifyContent: "center",
     alignItems: "center",
@@ -121,9 +232,9 @@ const styles = StyleSheet.create({
   },
   buttonLogin: {
     backgroundColor: "transparent",
-    paddingVertical: height * 0.015,
-    paddingHorizontal: width * 0.1,
-    borderRadius: 25,
+    height: height * 0.07,
+    paddingHorizontal: width * 0.05,
+    borderRadius: 18,
     alignSelf: "center",
     width: width * 0.6,
     justifyContent: "center",
@@ -131,7 +242,6 @@ const styles = StyleSheet.create({
     borderColor: "#d5e4f5",
     borderStyle: "solid",
     borderWidth: 1,
-    marginTop: height * 0.03,
   },
   buttonLoginText: {
     fontSize: width * 0.04,
