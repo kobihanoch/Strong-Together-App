@@ -1,5 +1,6 @@
+import { Image } from "expo-image";
 import { LinearGradient } from "expo-linear-gradient";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   Dimensions,
   Linking,
@@ -10,14 +11,19 @@ import {
 } from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
+import Column from "../components/Column";
 import Logo from "../components/Logo";
 import Row from "../components/Row";
-import { Image } from "expo-image";
-import Column from "../components/Column";
+import { showErrorAlert } from "../errors/errorAlerts";
+import { useAppleAuth } from "../hooks/oAuth/useAppleAuth";
+import { useGoogleAuth } from "../hooks/oAuth/useGoogleAuth";
+import { useAuth } from "../context/AuthContext";
 
 const { width, height } = Dimensions.get("window");
 
 const Intro = ({ navigation }) => {
+  const { loading, handleAppleAuth, handleGoogleAuth } = useAuth();
+
   return (
     <LinearGradient colors={["#007bff", "#004fa3"]} style={{ flex: 1 }}>
       <View style={{ flex: 1 }}>
@@ -97,7 +103,7 @@ const Intro = ({ navigation }) => {
                     borderColor: "black",
                   },
                 ]}
-                onPress={() => navigation.navigate("Login")}
+                onPress={handleAppleAuth}
               >
                 <Row
                   style={{
@@ -134,7 +140,7 @@ const Intro = ({ navigation }) => {
                     borderWidth: 1,
                   },
                 ]}
-                onPress={() => navigation.navigate("Login")}
+                onPress={handleGoogleAuth}
               >
                 <Row
                   style={{

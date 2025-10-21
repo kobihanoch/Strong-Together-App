@@ -99,7 +99,9 @@
     "use-latest-callback": "^0.2.1",
     "uuid": "^13.0.0",
     "victory-native": "^41.19.3",
-    "which": "5.0.0"
+    "which": "5.0.0",
+    "expo-auth-session": "~7.0.8",
+    "expo-apple-authentication": "~8.0.7"
   },
   "devDependencies": {
     "@babel/core": "^7.26.0",

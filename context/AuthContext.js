@@ -33,6 +33,9 @@ import {
   saveRefreshToken,
 } from "../utils/tokenStore.js";
 import { connectSocket, disconnectSocket } from "../webSockets/socketConfig";
+import { useGoogleAuth } from "../hooks/oAuth/useGoogleAuth";
+import { useAppleAuth } from "../hooks/oAuth/useAppleAuth";
+import { showErrorAlert } from "../errors/errorAlerts";
 
 const AuthContext = createContext(null);
 export const useAuth = () => useContext(AuthContext);
@@ -64,6 +67,10 @@ export const AuthProvider = ({ children }) => {
   const isOnline = useNetworkStatus();
   const attemptedServerValidationRef = useRef(false);
   const serverValidatingLockRef = useRef(false);
+
+  // --- OAuth ---
+  const { signInWithGoogle } = useGoogleAuth();
+  const { signInWithApple } = useAppleAuth();
 
   // --- Flag for below contexes for fetching with API ---
   const [isValidatedWithServer, setIsValidatedWithServer] = useState(false);
@@ -303,6 +310,74 @@ export const AuthProvider = ({ children }) => {
     }
   }, []);
 
+  const handleGoogleAuth = useCallback(async () => {
+    setLoading(true);
+    try {
+      const {
+        accessToken: at,
+        refreshToken: rt,
+        user: u,
+      } = await signInWithGoogle();
+      await saveRefreshToken(rt);
+      GlobalAuth.setAccessToken(at);
+
+      // Start cache hook logic
+      // User is fetched from server by cache hook
+      console.log(
+        "Redirecting to app stack => is logged in true and data is being fetched"
+      );
+      setIsLoggedIn(true);
+      setUserIdCache(u);
+      console.log("\x1b[32m[Auth Context]: Login succeeded!\x1b[0m");
+      setIsValidatedWithServer(true);
+      setAuthPhase("authed");
+
+      // Save for later entrance
+      await cacheSetJSON("CACHE:USER_ID", u, TTL_48H);
+      // For other contexes to start fetching from API after cache
+
+      // Cache stores auto
+    } catch (e) {
+      showErrorAlert("Error signing in with Google", e.message);
+    } finally {
+      setLoading(false);
+    }
+  }, [signInWithGoogle]);
+
+  const handleAppleAuth = useCallback(async () => {
+    setLoading(true);
+    try {
+      const {
+        accessToken: at,
+        refreshToken: rt,
+        user: u,
+      } = await signInWithApple();
+      await saveRefreshToken(rt);
+      GlobalAuth.setAccessToken(at);
+
+      // Start cache hook logic
+      // User is fetched from server by cache hook
+      console.log(
+        "Redirecting to app stack => is logged in true and data is being fetched"
+      );
+      setIsLoggedIn(true);
+      setUserIdCache(u);
+      console.log("\x1b[32m[Auth Context]: Login succeeded!\x1b[0m");
+      setIsValidatedWithServer(true);
+      setAuthPhase("authed");
+
+      // Save for later entrance
+      await cacheSetJSON("CACHE:USER_ID", u, TTL_48H);
+      // For other contexes to start fetching from API after cache
+
+      // Cache stores auto
+    } catch (e) {
+      showErrorAlert("Error signing in with Apple", e.message);
+    } finally {
+      setLoading(false);
+    }
+  }, [signInWithApple]);
+
   const clearContext = useCallback(async () => {
     await clearRefreshToken();
     await cacheDeleteAllCache();
@@ -341,6 +416,8 @@ export const AuthProvider = ({ children }) => {
       // actions
       register,
       login,
+      handleAppleAuth,
+      handleGoogleAuth,
       logout,
       // init fns (exposed for bootstrappers if needed)
       initial: {
@@ -358,6 +435,8 @@ export const AuthProvider = ({ children }) => {
       userDataLoading,
       register,
       login,
+      handleAppleAuth,
+      handleGoogleAuth,
       logout,
       initializeUserSession,
       isWorkoutMode,
