@@ -1,7 +1,8 @@
 import { Image } from "expo-image";
 import { LinearGradient } from "expo-linear-gradient";
-import React, { useEffect, useState } from "react";
+import React from "react";
 import {
+  ActivityIndicator,
   Dimensions,
   Linking,
   StyleSheet,
@@ -14,15 +15,33 @@ import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityI
 import Column from "../components/Column";
 import Logo from "../components/Logo";
 import Row from "../components/Row";
-import { showErrorAlert } from "../errors/errorAlerts";
-import { useAppleAuth } from "../hooks/oAuth/useAppleAuth";
-import { useGoogleAuth } from "../hooks/oAuth/useGoogleAuth";
 import { useAuth } from "../context/AuthContext";
 
 const { width, height } = Dimensions.get("window");
 
 const Intro = ({ navigation }) => {
-  const { loading, handleAppleAuth, handleGoogleAuth } = useAuth();
+  const { appleLoading, googleLoading, handleAppleAuth, handleGoogleAuth } =
+    useAuth();
+
+  const handleApplePress = async () => {
+    const { missingFields, accessToken } = await handleAppleAuth();
+    if (missingFields) {
+      navigation.navigate("OAuthCompleteFields", {
+        missingFields,
+        accessToken,
+      });
+    }
+  };
+
+  const handleGooglePress = async () => {
+    const { missingFields, accessToken } = await handleGoogleAuth();
+    if (missingFields) {
+      navigation.navigate("OAuthCompleteFields", {
+        missingFields,
+        accessToken,
+      });
+    }
+  };
 
   return (
     <LinearGradient colors={["#007bff", "#004fa3"]} style={{ flex: 1 }}>
@@ -103,31 +122,36 @@ const Intro = ({ navigation }) => {
                     borderColor: "black",
                   },
                 ]}
-                onPress={handleAppleAuth}
+                onPress={handleApplePress}
+                disabled={appleLoading}
               >
-                <Row
-                  style={{
-                    width: "100%",
-                    justifyContent: "center",
-                    alignItems: "center",
-                    height: height * 0.065,
-                    paddingHorizontal: width * 0.05,
-                  }}
-                >
-                  <MaterialCommunityIcons
-                    name={"apple"}
-                    size={24}
-                    color={"white"}
-                  ></MaterialCommunityIcons>
-                  <Text
-                    style={[
-                      styles.buttonLoginText,
-                      { color: "white", fontFamily: "Inter_600SemiBold" },
-                    ]}
+                {appleLoading ? (
+                  <ActivityIndicator />
+                ) : (
+                  <Row
+                    style={{
+                      width: "100%",
+                      justifyContent: "center",
+                      alignItems: "center",
+                      height: height * 0.065,
+                      paddingHorizontal: width * 0.05,
+                    }}
                   >
-                    Sign in with Apple
-                  </Text>
-                </Row>
+                    <MaterialCommunityIcons
+                      name={"apple"}
+                      size={24}
+                      color={"white"}
+                    ></MaterialCommunityIcons>
+                    <Text
+                      style={[
+                        styles.buttonLoginText,
+                        { color: "white", fontFamily: "Inter_600SemiBold" },
+                      ]}
+                    >
+                      Sign in with Apple
+                    </Text>
+                  </Row>
+                )}
               </TouchableOpacity>
               <TouchableOpacity
                 style={[
@@ -140,32 +164,37 @@ const Intro = ({ navigation }) => {
                     borderWidth: 1,
                   },
                 ]}
-                onPress={handleGoogleAuth}
+                onPress={handleGooglePress}
+                disabled={googleLoading}
               >
-                <Row
-                  style={{
-                    width: "100%",
-                    justifyContent: "center",
-                    alignItems: "center",
-                    height: height * 0.065,
-                    paddingHorizontal: width * 0.05,
-                  }}
-                >
-                  <Image
-                    source={require("../assets/googleicon.png")}
-                    style={{ height: 28, aspectRatio: 1 }}
-                    contentFit="contain"
-                    cachePolicy="disk"
-                  />
-                  <Text
-                    style={[
-                      styles.buttonLoginText,
-                      { color: "black", fontFamily: "Inter_600SemiBold" },
-                    ]}
+                {googleLoading ? (
+                  <ActivityIndicator />
+                ) : (
+                  <Row
+                    style={{
+                      width: "100%",
+                      justifyContent: "center",
+                      alignItems: "center",
+                      height: height * 0.065,
+                      paddingHorizontal: width * 0.05,
+                    }}
                   >
-                    Sign in with Google
-                  </Text>
-                </Row>
+                    <Image
+                      source={require("../assets/googleicon.png")}
+                      style={{ height: 28, aspectRatio: 1 }}
+                      contentFit="contain"
+                      cachePolicy="disk"
+                    />
+                    <Text
+                      style={[
+                        styles.buttonLoginText,
+                        { color: "black", fontFamily: "Inter_600SemiBold" },
+                      ]}
+                    >
+                      Sign in with Google
+                    </Text>
+                  </Row>
+                )}
               </TouchableOpacity>
             </Column>
             <TouchableOpacity

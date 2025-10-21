@@ -36,6 +36,7 @@ import { connectSocket, disconnectSocket } from "../webSockets/socketConfig";
 import { useGoogleAuth } from "../hooks/oAuth/useGoogleAuth";
 import { useAppleAuth } from "../hooks/oAuth/useAppleAuth";
 import { showErrorAlert } from "../errors/errorAlerts";
+import { useNavigation } from "@react-navigation/native";
 
 const AuthContext = createContext(null);
 export const useAuth = () => useContext(AuthContext);
@@ -57,6 +58,8 @@ export const AuthProvider = ({ children }) => {
   // --- Auth & session state ---
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [loading, setLoading] = useState(false); // UI loading for login/register
+  const [appleLoading, setAppleLoading] = useState(false);
+  const [googleLoading, setGoogleLoading] = useState(false);
   const [user, setUser] = useState(null);
   const [isWorkoutMode, setIsWorkoutMode] = useState(false); // For start workout
 
@@ -311,41 +314,42 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   const handleGoogleAuth = useCallback(async () => {
-    setLoading(true);
+    setGoogleLoading(true);
     try {
       const {
         accessToken: at,
         refreshToken: rt,
         user: u,
+        missingFields,
       } = await signInWithGoogle();
-      await saveRefreshToken(rt);
-      GlobalAuth.setAccessToken(at);
-
-      // Start cache hook logic
-      // User is fetched from server by cache hook
-      console.log(
-        "Redirecting to app stack => is logged in true and data is being fetched"
-      );
-      setIsLoggedIn(true);
-      setUserIdCache(u);
-      console.log("\x1b[32m[Auth Context]: Login succeeded!\x1b[0m");
-      setIsValidatedWithServer(true);
-      setAuthPhase("authed");
-
-      // Save for later entrance
-      await cacheSetJSON("CACHE:USER_ID", u, TTL_48H);
-      // For other contexes to start fetching from API after cache
-
-      // Cache stores auto
+      // If logged in (no missing fields)
+      if (!missingFields) {
+        await saveRefreshToken(rt);
+        GlobalAuth.setAccessToken(at);
+        // Start cache hook logic
+        // User is fetched from server by cache hook
+        console.log(
+          "Redirecting to app stack => is logged in true and data is being fetched"
+        );
+        setIsLoggedIn(true);
+        setUserIdCache(u);
+        console.log("\x1b[32m[Auth Context]: Login succeeded!\x1b[0m");
+        setIsValidatedWithServer(true);
+        setAuthPhase("authed");
+        await cacheSetJSON("CACHE:USER_ID", u, TTL_48H);
+      } else {
+        // Missing fields
+        return { missingFields, accessToken: at };
+      }
     } catch (e) {
       showErrorAlert("Error signing in with Google", e.message);
     } finally {
-      setLoading(false);
+      setGoogleLoading(false);
     }
   }, [signInWithGoogle]);
 
   const handleAppleAuth = useCallback(async () => {
-    setLoading(true);
+    setAppleLoading(true);
     try {
       const {
         accessToken: at,
@@ -374,7 +378,7 @@ export const AuthProvider = ({ children }) => {
     } catch (e) {
       showErrorAlert("Error signing in with Apple", e.message);
     } finally {
-      setLoading(false);
+      setAppleLoading(false);
     }
   }, [signInWithApple]);
 
@@ -386,6 +390,8 @@ export const AuthProvider = ({ children }) => {
     resetBootstrap();
     setIsLoggedIn(false);
     setLoading(false);
+    setAppleLoading(false);
+    setGoogleLoading(false);
     setUser(null);
     setIsWorkoutMode(false);
     setUserIdCache(null);
@@ -416,6 +422,8 @@ export const AuthProvider = ({ children }) => {
       // actions
       register,
       login,
+      googleLoading,
+      appleLoading,
       handleAppleAuth,
       handleGoogleAuth,
       logout,
@@ -432,6 +440,8 @@ export const AuthProvider = ({ children }) => {
       user,
       setUser,
       loading,
+      googleLoading,
+      appleLoading,
       userDataLoading,
       register,
       login,
