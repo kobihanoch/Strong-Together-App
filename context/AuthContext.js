@@ -16,6 +16,9 @@ import {
   keyAuth,
   TTL_48H,
 } from "../cache/cacheUtils";
+import { showErrorAlert } from "../errors/errorAlerts";
+import { useAppleAuth } from "../hooks/oAuth/useAppleAuth";
+import { useGoogleAuth } from "../hooks/oAuth/useGoogleAuth";
 import useCacheAndFetch from "../hooks/useCacheAndFetch";
 import { useNetworkStatus } from "../hooks/useNetworkStatus";
 import useUpdateGlobalLoading from "../hooks/useUpdateGlobalLoading";
@@ -25,6 +28,7 @@ import {
   refreshAndRotateTokens,
   registerUser,
 } from "../services/AuthService";
+import { loginOAuthWithAccessToken } from "../services/OAuthService";
 import { fetchSelfUserData } from "../services/UserService";
 import GlobalAuth from "../utils/authUtils";
 import {
@@ -33,10 +37,6 @@ import {
   saveRefreshToken,
 } from "../utils/tokenStore.js";
 import { connectSocket, disconnectSocket } from "../webSockets/socketConfig";
-import { useGoogleAuth } from "../hooks/oAuth/useGoogleAuth";
-import { useAppleAuth } from "../hooks/oAuth/useAppleAuth";
-import { showErrorAlert } from "../errors/errorAlerts";
-import { useNavigation } from "@react-navigation/native";
 
 const AuthContext = createContext(null);
 export const useAuth = () => useContext(AuthContext);
@@ -313,40 +313,43 @@ export const AuthProvider = ({ children }) => {
     }
   }, []);
 
-  const handleGoogleAuth = useCallback(async () => {
-    setGoogleLoading(true);
-    try {
-      const {
-        accessToken: at,
-        refreshToken: rt,
-        user: u,
-        missingFields,
-      } = await signInWithGoogle();
-      // If logged in (no missing fields)
-      if (!missingFields) {
-        await saveRefreshToken(rt);
-        GlobalAuth.setAccessToken(at);
-        // Start cache hook logic
-        // User is fetched from server by cache hook
-        console.log(
-          "Redirecting to app stack => is logged in true and data is being fetched"
-        );
-        setIsLoggedIn(true);
-        setUserIdCache(u);
-        console.log("\x1b[32m[Auth Context]: Login succeeded!\x1b[0m");
-        setIsValidatedWithServer(true);
-        setAuthPhase("authed");
-        await cacheSetJSON("CACHE:USER_ID", u, TTL_48H);
-      } else {
-        // Missing fields
-        return { missingFields, accessToken: at };
+  const handleGoogleAuth = useCallback(
+    async (loginWithAt = false) => {
+      setGoogleLoading(true);
+      try {
+        const {
+          accessToken: at,
+          refreshToken: rt,
+          user: u,
+          missingFields,
+        } = loginWithAt
+          ? await loginOAuthWithAccessToken()
+          : await signInWithGoogle();
+
+        // If logged in (no missing fields)
+        if (!missingFields) {
+          await saveRefreshToken(rt);
+          GlobalAuth.setAccessToken(at);
+
+          setIsLoggedIn(true);
+          setUserIdCache(u);
+          console.log("\x1b[32m[Auth Context]: Login succeeded!\x1b[0m");
+          setIsValidatedWithServer(true);
+          setAuthPhase("authed");
+          await cacheSetJSON("CACHE:USER_ID", u, TTL_48H);
+        } else {
+          // Missing fields
+          GlobalAuth.setAccessToken(at); // To be able to update user fields
+          return { missingFields };
+        }
+      } catch (e) {
+        showErrorAlert("Error signing in with Google", e.message);
+      } finally {
+        setGoogleLoading(false);
       }
-    } catch (e) {
-      showErrorAlert("Error signing in with Google", e.message);
-    } finally {
-      setGoogleLoading(false);
-    }
-  }, [signInWithGoogle]);
+    },
+    [signInWithGoogle]
+  );
 
   const handleAppleAuth = useCallback(async () => {
     setAppleLoading(true);

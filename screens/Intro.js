@@ -24,21 +24,21 @@ const Intro = ({ navigation }) => {
     useAuth();
 
   const handleApplePress = async () => {
-    const { missingFields, accessToken } = await handleAppleAuth();
+    const { missingFields } = await handleAppleAuth();
     if (missingFields) {
       navigation.navigate("OAuthCompleteFields", {
         missingFields,
-        accessToken,
+        provider: "apple",
       });
     }
   };
 
   const handleGooglePress = async () => {
-    const { missingFields, accessToken } = await handleGoogleAuth();
+    const { missingFields } = await handleGoogleAuth();
     if (missingFields) {
       navigation.navigate("OAuthCompleteFields", {
         missingFields,
-        accessToken,
+        provider: "google",
       });
     }
   };

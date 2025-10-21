@@ -2,39 +2,51 @@
 import { LinearGradient } from "expo-linear-gradient";
 import React, { useState } from "react";
 import {
+  ActivityIndicator,
   Dimensions,
   StyleSheet,
-  View,
   Text,
   TouchableOpacity,
-  KeyboardAvoidingView,
-  Platform,
-  ActivityIndicator,
+  View,
 } from "react-native";
-import InputField from "../components/InputField";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { RFValue } from "react-native-responsive-fontsize";
+import InputField from "../components/InputField";
+import { useAuth } from "../context/AuthContext";
 import { showErrorAlert } from "../errors/errorAlerts";
 import { updateSelfUser } from "../services/UserService";
-import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
 const { width, height } = Dimensions.get("window");
 
 const OAuthCompleteFields = ({ navigation, route }) => {
+  const { handleAppleAuth, handleGoogleAuth } = useAuth();
+
   const [email, setEmail] = useState("");
   const [fullName, setFullName] = useState("");
-  const missingFields = route.params?.missingFields || [];
+  const { missingFields = [], provider = null } = route.params || {};
   const [isSending, setIsSending] = useState(false);
 
-  const handleUpdateUserMissingFields = async (email, fullName) => {
-    if (
-      (missingFields.includes("email") && !email.length) ||
-      (missingFields.includes("fullName") && !fullName.length)
-    ) {
-      showErrorAlert("Error", "Please fill all requested fields to continue");
-      return;
-    }
+  const handleUpdateUserMissingFields = async () => {
     try {
       setIsSending(true);
+      console.log(route.params);
+      if (
+        (missingFields.includes("email") && !email.length > 0) ||
+        (missingFields.includes("name") && !fullName.length > 0)
+      ) {
+        showErrorAlert("Error", "Please fill all requested fields to continue");
+        return;
+      }
+
+      await updateSelfUser({
+        setCompletedOnOAuth: true,
+        email: missingFields.includes("email") ? email : undefined,
+        fullName: missingFields.includes("name") ? fullName : undefined,
+      });
+
+      provider === "google"
+        ? await handleGoogleAuth(true)
+        : await handleAppleAuth(true);
     } catch {
     } finally {
       setIsSending(false);
