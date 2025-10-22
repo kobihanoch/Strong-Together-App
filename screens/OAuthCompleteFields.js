@@ -15,6 +15,7 @@ import InputField from "../components/InputField";
 import { useAuth } from "../context/AuthContext";
 import { showErrorAlert } from "../errors/errorAlerts";
 import { updateSelfUser } from "../services/UserService";
+import { colors } from "../constants/colors";
 
 const { width, height } = Dimensions.get("window");
 
@@ -62,7 +63,7 @@ const OAuthCompleteFields = ({ navigation, route }) => {
       scrollEnabled
     >
       <LinearGradient
-        colors={["#007bff", "#004fa3"]}
+        colors={[colors.primaryDark, colors.primary]}
         style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
       >
         <Text style={styles.title}>Complete your profile</Text>
