@@ -43,7 +43,7 @@ const Register = ({ navigation }) => {
   };
 
   const hasErrors = () => {
-    if (!username || !email || !password || !gender || !fullName) {
+    if (!username || !email || !password /*|| !gender*/ || !fullName) {
       showErrorAlert("Error", "Please fill all fields.");
       return true;
     } else if (password != confirmPassword) {
