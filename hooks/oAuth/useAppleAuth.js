@@ -31,15 +31,12 @@ export function useAppleAuth() {
         throw { ok: false, message: "Canceled or missing identityToken" };
       }
 
-      // Call your backend (axios interceptor will add dpop-key-binding)
+      // Call backend (axios interceptor will add dpop-key-binding)
       const { data } = await api.post("/api/oauth/apple", {
-        identityToken: result.identityToken,
+        idToken: result.identityToken,
         rawNonce,
         email: result.email || null,
-        name:
-          result.fullName?.givenName ||
-          result.fullName?.familyName ||
-          "Apple User",
+        name: result.fullName,
       });
 
       return data;

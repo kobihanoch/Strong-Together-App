@@ -351,39 +351,43 @@ export const AuthProvider = ({ children }) => {
     [signInWithGoogle]
   );
 
-  const handleAppleAuth = useCallback(async () => {
-    setAppleLoading(true);
-    try {
-      const {
-        accessToken: at,
-        refreshToken: rt,
-        user: u,
-      } = await signInWithApple();
-      await saveRefreshToken(rt);
-      GlobalAuth.setAccessToken(at);
+  const handleAppleAuth = useCallback(
+    async (loginWithAt = false) => {
+      setAppleLoading(true);
+      try {
+        const {
+          accessToken: at,
+          refreshToken: rt,
+          user: u,
+          missingFields,
+        } = loginWithAt
+          ? await loginOAuthWithAccessToken()
+          : await signInWithApple();
 
-      // Start cache hook logic
-      // User is fetched from server by cache hook
-      console.log(
-        "Redirecting to app stack => is logged in true and data is being fetched"
-      );
-      setIsLoggedIn(true);
-      setUserIdCache(u);
-      console.log("\x1b[32m[Auth Context]: Login succeeded!\x1b[0m");
-      setIsValidatedWithServer(true);
-      setAuthPhase("authed");
+        // If logged in (no missing fields)
+        if (!missingFields) {
+          await saveRefreshToken(rt);
+          GlobalAuth.setAccessToken(at);
 
-      // Save for later entrance
-      await cacheSetJSON("CACHE:USER_ID", u, TTL_48H);
-      // For other contexes to start fetching from API after cache
-
-      // Cache stores auto
-    } catch (e) {
-      showErrorAlert("Error signing in with Apple", e.message);
-    } finally {
-      setAppleLoading(false);
-    }
-  }, [signInWithApple]);
+          setIsLoggedIn(true);
+          setUserIdCache(u);
+          console.log("\x1b[32m[Auth Context]: Login succeeded!\x1b[0m");
+          setIsValidatedWithServer(true);
+          setAuthPhase("authed");
+          await cacheSetJSON("CACHE:USER_ID", u, TTL_48H);
+        } else {
+          // Missing fields
+          GlobalAuth.setAccessToken(at); // To be able to update user fields
+          return { missingFields };
+        }
+      } catch (e) {
+        showErrorAlert("Error signing in with Apple", e.message);
+      } finally {
+        setAppleLoading(false);
+      }
+    },
+    [signInWithApple]
+  );
 
   const clearContext = useCallback(async () => {
     await clearRefreshToken();
