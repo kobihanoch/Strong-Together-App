@@ -73,7 +73,7 @@ Version 4 builds on top of this by introducing a **smart cache layer**, **offli
 
 <div align="center">
   <img src="https://github.com/user-attachments/assets/24a25ef5-a434-49d6-8b8b-1a5b5d808cf9" alt="Home Screen" width="200" style="margin-right: 20px;"/>
-  <img src="https://github.com/user-attachments/assets/46c7b894-5061-4d7f-82de-21e4dd4a1825" alt="Intro Screen" width="200"/>
+  <img src="https://github.com/user-attachments/assets/563ff3b9-58ea-4c8a-a98e-93acdabfd40f" alt="Intro Screen" width="200"/>
 </div>
 <p align="center">
   <strong>Home Screen</strong>: Access fitness summaries and plans.  
@@ -135,8 +135,8 @@ Version 4 builds on top of this by introducing a **smart cache layer**, **offli
   exercise. Tracking records are stored with a reference to the
   underlying split so you can review progress over time.
 - **In‑app messaging** – Receive system messages at first login and after each successful workout.
-- **Authentication & roles** – Sign up and log in securely, using access and refresh tokens. User
-  accounts include profile information and optional push tokens for notifications.
+- **Authentication & roles** – Secure login with traditional credentials **or OAuth (Google & Apple)**.
+- Uses access/refresh tokens with role-based permissions. User accounts include profile information and optional push tokens for notifications.
 - **Smart performance** – Heavy screens use `useMemo`,
   `useCallback` and context providers to avoid unnecessary re‑renders.
   Combined with batched API calls, these optimisations cut perceived
@@ -369,6 +369,17 @@ Important points about the schema:
 ### Auth Flow
 
 <!-- Removed the previous diagram to avoid implying a blacklist-based flow -->
+### OAuth Integration (Google & Apple)
+
+Version 4.3.0 introduces full **OAuth 2.0 integration** with **Google** and **Apple**, allowing users to sign in securely using their existing accounts.
+
+- **Google Sign-In** – Implemented using `expo-auth-session` with the official Google provider. The app obtains an ID token verified by the backend before linking to an internal user record.
+- **Apple Sign-In** – Implemented via `expo-apple-authentication`, generating a secure authorization code and identity token validated server-side.
+- Both providers link to the same `users` table via an `oauth_accounts` relation, ensuring one consolidated user profile per email.
+- If a user signs in with multiple providers (e.g. Google + Apple), their accounts are automatically merged under the same profile.
+- The backend handles token validation, user linking, and fallbacks for missing fields (e.g. name, email) during onboarding.
+
+> 🔐 All OAuth logins fully support the existing **DPoP proof binding** and **token versioning (CAS)** architecture, maintaining the same level of security as traditional credential-based authentication.
 
 1. **Login & Token Issuance** – On successful login, the server issues an `access_token` (short-lived) and a `refresh_token` (long-lived).
 2. **Access Control** – Each API request requires a valid `access_token`. If the token is missing, expired, or invalid, the request is denied.
