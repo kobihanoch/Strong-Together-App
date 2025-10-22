@@ -2,7 +2,7 @@ import { createStackNavigator } from "@react-navigation/stack";
 import Intro from "../screens/Intro";
 import Login from "../screens/LogIn";
 import Register from "../screens/Register";
-import ForgotPassword from "../screens/ForgotPassword";
+import OAuthCompleteFields from "../screens/OAuthCompleteFields";
 
 const Stack = createStackNavigator();
 
@@ -25,8 +25,8 @@ const AuthStack = () => {
         options={{ headerShown: false }}
       />
       <Stack.Screen
-        name="ForgotPassword"
-        component={ForgotPassword}
+        name="OAuthCompleteFields"
+        component={OAuthCompleteFields}
         options={{ headerShown: false }}
       />
     </Stack.Navigator>

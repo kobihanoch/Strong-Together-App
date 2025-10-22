@@ -212,10 +212,10 @@ const styles = StyleSheet.create({
     paddingVertical: height * 0.015,
   },
   buttonLoginText: {
-    fontSize: RFValue(13),
+    fontSize: RFValue(14),
     color: "#007bff",
     flex: 1,
     textAlign: "center",
-    fontFamily: "Inter_400Regular",
+    fontFamily: "Inter_600SemiBold",
   },
 });

@@ -65,10 +65,13 @@ api.interceptors.request.use(
   async (config) => {
     console.log("[API]:", config.url);
     try {
-      if (config.url.includes("login")) {
+      if (
+        config.url.includes("login") ||
+        config.url.includes("oauth/google") ||
+        config.url.includes("oauth/apple")
+      ) {
         // Build JKT for tokens signing (login)
         const res = await calculateJKT();
-        console.log({ jkt: res });
         config.headers.set("dpop-key-binding", res);
       } else {
         // Build DPoP for other requests

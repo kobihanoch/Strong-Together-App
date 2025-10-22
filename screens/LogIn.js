@@ -13,6 +13,7 @@ import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityI
 import { RFValue } from "react-native-responsive-fontsize";
 import VerifyCard from "../components/LoginComponents/VerifyCard";
 import LoginForm from "../components/LoginComponents/LoginForm";
+import { colors } from "../constants/colors";
 
 const { width, height } = Dimensions.get("window");
 
@@ -31,7 +32,10 @@ const Login = ({ navigation, route }) => {
       resetScrollToCoords={{ x: 0, y: 0 }}
       scrollEnabled
     >
-      <LinearGradient colors={["#007bff", "#004fa3"]} style={{ flex: 1 }}>
+      <LinearGradient
+        colors={[colors.primaryDark, colors.primary]}
+        style={{ flex: 1 }}
+      >
         <View style={{ flex: 1, marginTop: height * 0.08 }}>
           {/* Top header */}
           <View style={styles.header}>

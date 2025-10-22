@@ -16,6 +16,9 @@ import {
   keyAuth,
   TTL_48H,
 } from "../cache/cacheUtils";
+import { showErrorAlert } from "../errors/errorAlerts";
+import { useAppleAuth } from "../hooks/oAuth/useAppleAuth";
+import { useGoogleAuth } from "../hooks/oAuth/useGoogleAuth";
 import useCacheAndFetch from "../hooks/useCacheAndFetch";
 import { useNetworkStatus } from "../hooks/useNetworkStatus";
 import useUpdateGlobalLoading from "../hooks/useUpdateGlobalLoading";
@@ -25,6 +28,7 @@ import {
   refreshAndRotateTokens,
   registerUser,
 } from "../services/AuthService";
+import { loginOAuthWithAccessToken } from "../services/OAuthService";
 import { fetchSelfUserData } from "../services/UserService";
 import GlobalAuth from "../utils/authUtils";
 import {
@@ -54,6 +58,8 @@ export const AuthProvider = ({ children }) => {
   // --- Auth & session state ---
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [loading, setLoading] = useState(false); // UI loading for login/register
+  const [appleLoading, setAppleLoading] = useState(false);
+  const [googleLoading, setGoogleLoading] = useState(false);
   const [user, setUser] = useState(null);
   const [isWorkoutMode, setIsWorkoutMode] = useState(false); // For start workout
 
@@ -64,6 +70,10 @@ export const AuthProvider = ({ children }) => {
   const isOnline = useNetworkStatus();
   const attemptedServerValidationRef = useRef(false);
   const serverValidatingLockRef = useRef(false);
+
+  // --- OAuth ---
+  const { signInWithGoogle } = useGoogleAuth();
+  const { signInWithApple } = useAppleAuth();
 
   // --- Flag for below contexes for fetching with API ---
   const [isValidatedWithServer, setIsValidatedWithServer] = useState(false);
@@ -303,6 +313,82 @@ export const AuthProvider = ({ children }) => {
     }
   }, []);
 
+  const handleGoogleAuth = useCallback(
+    async (loginWithAt = false) => {
+      setGoogleLoading(true);
+      try {
+        const {
+          accessToken: at,
+          refreshToken: rt,
+          user: u,
+          missingFields,
+        } = loginWithAt
+          ? await loginOAuthWithAccessToken()
+          : await signInWithGoogle();
+
+        // If logged in (no missing fields)
+        if (!missingFields) {
+          await saveRefreshToken(rt);
+          GlobalAuth.setAccessToken(at);
+
+          setIsLoggedIn(true);
+          setUserIdCache(u);
+          console.log("\x1b[32m[Auth Context]: Login succeeded!\x1b[0m");
+          setIsValidatedWithServer(true);
+          setAuthPhase("authed");
+          await cacheSetJSON("CACHE:USER_ID", u, TTL_48H);
+        } else {
+          // Missing fields
+          GlobalAuth.setAccessToken(at); // To be able to update user fields
+          return { missingFields };
+        }
+      } catch (e) {
+        showErrorAlert("Error signing in with Google", e.message);
+      } finally {
+        setGoogleLoading(false);
+      }
+    },
+    [signInWithGoogle]
+  );
+
+  const handleAppleAuth = useCallback(
+    async (loginWithAt = false) => {
+      setAppleLoading(true);
+      try {
+        const {
+          accessToken: at,
+          refreshToken: rt,
+          user: u,
+          missingFields,
+        } = loginWithAt
+          ? await loginOAuthWithAccessToken()
+          : await signInWithApple();
+
+        // If logged in (no missing fields)
+        if (!missingFields) {
+          await saveRefreshToken(rt);
+          GlobalAuth.setAccessToken(at);
+
+          setIsLoggedIn(true);
+          setUserIdCache(u);
+          console.log("\x1b[32m[Auth Context]: Login succeeded!\x1b[0m");
+          setIsValidatedWithServer(true);
+          setAuthPhase("authed");
+          await cacheSetJSON("CACHE:USER_ID", u, TTL_48H);
+        } else {
+          // Missing fields
+          GlobalAuth.setAccessToken(at); // To be able to update user fields
+          return { missingFields };
+        }
+      } catch (e) {
+        showErrorAlert("Error signing in with Apple", e.message);
+      } finally {
+        setAppleLoading(false);
+      }
+    },
+    [signInWithApple]
+  );
+
   const clearContext = useCallback(async () => {
     await clearRefreshToken();
     await cacheDeleteAllCache();
@@ -311,6 +397,8 @@ export const AuthProvider = ({ children }) => {
     resetBootstrap();
     setIsLoggedIn(false);
     setLoading(false);
+    setAppleLoading(false);
+    setGoogleLoading(false);
     setUser(null);
     setIsWorkoutMode(false);
     setUserIdCache(null);
@@ -341,6 +429,10 @@ export const AuthProvider = ({ children }) => {
       // actions
       register,
       login,
+      googleLoading,
+      appleLoading,
+      handleAppleAuth,
+      handleGoogleAuth,
       logout,
       // init fns (exposed for bootstrappers if needed)
       initial: {
@@ -355,9 +447,13 @@ export const AuthProvider = ({ children }) => {
       user,
       setUser,
       loading,
+      googleLoading,
+      appleLoading,
       userDataLoading,
       register,
       login,
+      handleAppleAuth,
+      handleGoogleAuth,
       logout,
       initializeUserSession,
       isWorkoutMode,

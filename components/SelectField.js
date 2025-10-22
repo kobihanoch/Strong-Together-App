@@ -16,7 +16,7 @@ const SelectField = ({
   value,
   onChange,
   iconName = "venus-mars",
-  placeholder = "Gender",
+  placeholder = "Gender (Optional)",
   options = ["Male", "Female"],
 }) => {
   // Local state for dropdown open/close

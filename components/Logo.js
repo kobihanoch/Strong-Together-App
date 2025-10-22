@@ -28,16 +28,17 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   text: {
-    fontSize: RFValue(40), // שומרים על גודל קבוע
+    fontSize: RFValue(35),
     color: "white",
     textAlign: "right",
+    fontFamily: "Inter_400Regular",
   },
   boldText: {
-    fontWeight: "bold",
+    fontFamily: "Inter_700Bold",
   },
   logoImage: {
-    width: width * 0.3, // שומרים על גודל קבוע
-    height: width * 0.3, // שומרים על גודל קבוע
+    width: width * 0.3,
+    height: width * 0.3,
     resizeMode: "contain",
   },
 });

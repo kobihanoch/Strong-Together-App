@@ -16,6 +16,7 @@ import InputField from "../components/InputField";
 import SelectField from "../components/SelectField";
 import { useAuth } from "../context/AuthContext";
 import { showErrorAlert } from "../errors/errorAlerts";
+import { colors } from "../constants/colors";
 
 const { width, height } = Dimensions.get("window");
 
@@ -42,7 +43,7 @@ const Register = ({ navigation }) => {
   };
 
   const hasErrors = () => {
-    if (!username || !email || !password || !gender || !fullName) {
+    if (!username || !email || !password /*|| !gender*/ || !fullName) {
       showErrorAlert("Error", "Please fill all fields.");
       return true;
     } else if (password != confirmPassword) {
@@ -54,7 +55,10 @@ const Register = ({ navigation }) => {
 
   return (
     <KeyboardAwareScrollView contentContainerStyle={{ flex: 1 }}>
-      <LinearGradient colors={["#007bff", "#004fa3"]} style={{ flex: 1 }}>
+      <LinearGradient
+        colors={[colors.primaryDark, colors.primary]}
+        style={{ flex: 1 }}
+      >
         <View style={{ flex: 1, marginTop: height * 0.1 }}>
           <View
             style={{
@@ -214,11 +218,11 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
   },
   buttonRegisterText: {
-    fontSize: 18,
+    fontSize: RFValue(14),
     color: "#007bff",
     flex: 1,
     textAlign: "center",
-    fontFamily: "Inter_400Regular",
+    fontFamily: "Inter_600SemiBold",
   },
 });
 
