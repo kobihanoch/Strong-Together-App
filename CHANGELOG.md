@@ -2,6 +2,23 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [4.3.0](https://github.com/kobihanoch/Strong-Together-App/compare/v4.2.0...v4.3.0) (2025-10-22)
+
+
+### Features
+
+* **Intro:** New gradient background ([4e22744](https://github.com/kobihanoch/Strong-Together-App/commit/4e22744484bf4d199e18455d11a10a84390badc1))
+* **OAuth:** Added buttons to intro screen for signing in with Google/Apple ([fbcbff6](https://github.com/kobihanoch/Strong-Together-App/commit/fbcbff68b5b2f9e2398153cea01a2fefbaa8d14d))
+* **OAuth:** Client implemented sign in with Google or Apple ([b5d2937](https://github.com/kobihanoch/Strong-Together-App/commit/b5d2937ac6fa0e6d3d4354365f1b9d1ced58f7f0))
+* **OAuth:** Created a complete fields page ([aec636c](https://github.com/kobihanoch/Strong-Together-App/commit/aec636cc20742e1f8ae230347df8f6cfd9eccd7f))
+* **OAuth:** Sign in with apple ([9ec9070](https://github.com/kobihanoch/Strong-Together-App/commit/9ec90703b8dd9a9a8ed29f28b4da05f071903d45))
+* **Profile:** Change email requires email verification ([7ddfdb5](https://github.com/kobihanoch/Strong-Together-App/commit/7ddfdb57ba7cc98bca591e75fc3bdb02ac41cd7c))
+
+
+### Bug Fixes
+
+* **Register:** Gender is optional ([50f4f2c](https://github.com/kobihanoch/Strong-Together-App/commit/50f4f2c7ca302b67f4265060aed35c5b8dc9cdde))
+
 ## [4.2.0](https://github.com/kobihanoch/Strong-Together-App/compare/v4.1.1...v4.2.0) (2025-10-19)
 
 
