@@ -8,6 +8,7 @@ import {
   KeyboardAvoidingView,
   Platform,
   TouchableWithoutFeedback,
+  ActivityIndicator,
 } from "react-native";
 import Column from "../Column";
 import Row from "../Row";
@@ -29,6 +30,8 @@ const EditProfileForm = ({
   const [fullNameInput, setFullNameInput] = useState(fullName);
   const [emailInput, setEmailInput] = useState(email);
   const [usernameInput, setUsernameInput] = useState(username);
+
+  const [updating, setUpdating] = useState(false);
 
   const handleCancel = () => {
     setFullNameInput(fullName);
@@ -63,23 +66,48 @@ const EditProfileForm = ({
       fullName: fullNameInput,
       email: emailInput,
     };
-    const res = await updateSelfUser(payload);
-    setUser(res);
-    Notifier.showNotification({
-      title: "User Updated",
-      description: "Your profile changes has been updated successfully",
-      duration: 2500,
-      showAnimationDuration: 250,
-      hideOnPress: true,
-      Component: NotifierComponents.Alert,
-      componentProps: {
-        alertType: "success",
-        titleStyle: { fontSize: 16 },
-        descriptionStyle: { fontSize: 14 },
-      },
-    });
-    Keyboard.dismiss();
-    closeEditSheet();
+    // Sets all user updated profile out of email (old email is showing)
+    // Server sent an email request
+
+    let res;
+    try {
+      setUpdating(true);
+      res = await updateSelfUser(payload);
+      setUser(res?.user);
+      if (res?.emailChanged) {
+        Notifier.showNotification({
+          title: "An email has beent sent to you",
+          description: `Please confirm this new email. Check ${emailInput} inbox or spam.`,
+          duration: 7000,
+          showAnimationDuration: 250,
+          hideOnPress: true,
+          Component: NotifierComponents.Alert,
+          componentProps: {
+            alertType: "success",
+            titleStyle: { fontSize: 16 },
+            descriptionStyle: { fontSize: 14 },
+          },
+        });
+      } else {
+        Notifier.showNotification({
+          title: "User Updated",
+          description: "Your profile changes has been updated successfully",
+          duration: 2500,
+          showAnimationDuration: 250,
+          hideOnPress: true,
+          Component: NotifierComponents.Alert,
+          componentProps: {
+            alertType: "success",
+            titleStyle: { fontSize: 16 },
+            descriptionStyle: { fontSize: 14 },
+          },
+        });
+      }
+      Keyboard.dismiss();
+      closeEditSheet();
+    } finally {
+      setUpdating(false);
+    }
   };
 
   return (
@@ -134,20 +162,26 @@ const EditProfileForm = ({
             <TouchableOpacity
               style={styles.saveBtnContainer}
               onPress={handleSave}
+              disabled={updating}
             >
-              <Row style={{ gap: 10 }}>
-                <MaterialCommunityIcons
-                  name={"content-save-outline"}
-                  size={RFValue(13)}
-                  color={"white"}
-                />
-                <Text style={styles.saveBtnText}>Save Changes</Text>
-              </Row>
+              {updating ? (
+                <ActivityIndicator />
+              ) : (
+                <Row style={{ gap: 10 }}>
+                  <MaterialCommunityIcons
+                    name={"content-save-outline"}
+                    size={RFValue(13)}
+                    color={"white"}
+                  />
+                  <Text style={styles.saveBtnText}>Save Changes</Text>
+                </Row>
+              )}
             </TouchableOpacity>
 
             <TouchableOpacity
               style={styles.cancelBtnContainer}
               onPress={handleCancel}
+              disabled={updating}
             >
               <Row style={{ gap: 10 }}>
                 <Text style={styles.cancelBtnText}>Cancel</Text>

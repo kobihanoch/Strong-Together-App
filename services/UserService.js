@@ -17,5 +17,5 @@ export const deleteSelfUser = async () => {
 
 export const updateSelfUser = async (payload) => {
   const { data } = await api.put("/api/users/updateself", payload);
-  return data?.user;
+  return data;
 };

@@ -6,7 +6,7 @@
 
 // Uncomment by production or dev environment
 
-const ENVIRONMENT = process.env.EXPO_PUBLIC_ENVIROMENT;
+const ENVIRONMENT = process.env.EXPO_PUBLIC_ENVIRONMENT;
 
 export const API_BASE_URL =
   ENVIRONMENT === "development"

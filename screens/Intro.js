@@ -1,6 +1,8 @@
+import { Image } from "expo-image";
 import { LinearGradient } from "expo-linear-gradient";
 import React from "react";
 import {
+  ActivityIndicator,
   Dimensions,
   Linking,
   StyleSheet,
@@ -10,25 +12,55 @@ import {
 } from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
+import Column from "../components/Column";
 import Logo from "../components/Logo";
+import Row from "../components/Row";
+import { useAuth } from "../context/AuthContext";
+import { colors } from "../constants/colors";
 
 const { width, height } = Dimensions.get("window");
 
 const Intro = ({ navigation }) => {
+  const { appleLoading, googleLoading, handleAppleAuth, handleGoogleAuth } =
+    useAuth();
+
+  const handleApplePress = async () => {
+    const { missingFields } = await handleAppleAuth();
+    if (missingFields) {
+      navigation.navigate("OAuthCompleteFields", {
+        missingFields,
+        provider: "apple",
+      });
+    }
+  };
+
+  const handleGooglePress = async () => {
+    const { missingFields } = await handleGoogleAuth();
+    if (missingFields) {
+      navigation.navigate("OAuthCompleteFields", {
+        missingFields,
+        provider: "google",
+      });
+    }
+  };
+
   return (
-    <LinearGradient colors={["#007bff", "#004fa3"]} style={{ flex: 1 }}>
-      <View style={{ flex: 1 }}>
-        <View
-          style={{
-            flexDirection: "column",
-            alignItems: "center",
-            marginTop: height * 0.2,
-            flex: 1,
-          }}
-        >
+    <LinearGradient
+      colors={[colors.primaryDark, colors.primary]}
+      style={{ flex: 1 }}
+    >
+      <Column
+        style={{
+          alignItems: "center",
+          justifyContent: "flex-end",
+          flex: 1,
+          paddingBottom: height * 0.05,
+        }}
+      >
+        <Column style={{ marginBottom: height * 0.09 }}>
           <Logo />
 
-          <View style={{ alignItems: "center", marginTop: height * 0.15 }}>
+          <View style={{ alignItems: "center", marginTop: height * 0.05 }}>
             <Text style={styles.descriptionText}>
               Welcome to Strong Together.{"\n"}Your goals - powered by your
               circle.
@@ -37,7 +69,12 @@ const Intro = ({ navigation }) => {
 
           <View style={styles.divider} />
 
-          <View style={{ flexDirection: "column", marginTop: 0 }}>
+          <Column
+            style={{
+              alignItems: "center",
+              gap: 15,
+            }}
+          >
             <TouchableOpacity
               style={styles.buttonRegister}
               onPress={() => navigation.navigate("Register")}
@@ -54,29 +91,137 @@ const Intro = ({ navigation }) => {
                 <Text style={styles.buttonLoginText}>Log in</Text>
               </View>
             </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.aboutUs}
-              onPress={() =>
-                Linking.openURL(
-                  "https://kobihanoch.github.io/strongtogether-privacy/"
-                )
-              }
-            >
-              <View
-                style={{ flexDirection: "row", gap: 7, alignItems: "center" }}
-              >
-                <MaterialCommunityIcons
-                  name={"shield-lock"}
-                  size={RFValue(15)}
-                  color={"white"}
-                ></MaterialCommunityIcons>
+          </Column>
+        </Column>
 
-                <Text style={styles.aboutUsText}>Privacy Policy</Text>
-              </View>
+        <Column style={{ alignItems: "center" }}>
+          <Text
+            style={{
+              marginBottom: height * 0.015,
+              fontSize: RFValue(12),
+              color: "white",
+              fontFamily: "Inter_400Regular",
+              opacity: 0.8,
+            }}
+          >
+            Or, continue with
+          </Text>
+
+          <Column
+            style={{
+              alignItems: "center",
+              gap: 10,
+            }}
+          >
+            <TouchableOpacity
+              style={[
+                styles.buttonLogin,
+                {
+                  paddingHorizontal: 0,
+                  paddingVertical: 0,
+                  backgroundColor: "black",
+                  borderColor: "black",
+                  height: height * 0.06,
+                },
+              ]}
+              onPress={handleApplePress}
+              disabled={appleLoading}
+            >
+              {appleLoading ? (
+                <ActivityIndicator />
+              ) : (
+                <Row
+                  style={{
+                    width: "100%",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    height: height * 0.065,
+                    paddingHorizontal: width * 0.05,
+                  }}
+                >
+                  <MaterialCommunityIcons
+                    name={"apple"}
+                    size={24}
+                    color={"white"}
+                  ></MaterialCommunityIcons>
+                  <Text
+                    style={[
+                      styles.buttonLoginText,
+                      { color: "white", fontFamily: "Inter_600SemiBold" },
+                    ]}
+                  >
+                    Sign in with Apple
+                  </Text>
+                </Row>
+              )}
             </TouchableOpacity>
-          </View>
-        </View>
-      </View>
+            <TouchableOpacity
+              style={[
+                styles.buttonLogin,
+                {
+                  paddingHorizontal: 0,
+                  paddingVertical: 0,
+                  backgroundColor: "#F2F2F2",
+                  borderColor: "#747775",
+                  borderWidth: 1,
+                  height: height * 0.06,
+                },
+              ]}
+              onPress={handleGooglePress}
+              disabled={googleLoading}
+            >
+              {googleLoading ? (
+                <ActivityIndicator />
+              ) : (
+                <Row
+                  style={{
+                    width: "100%",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    height: height * 0.065,
+                    paddingHorizontal: width * 0.05,
+                  }}
+                >
+                  <Image
+                    source={require("../assets/googleicon.png")}
+                    style={{ height: 28, aspectRatio: 1 }}
+                    contentFit="contain"
+                    cachePolicy="disk"
+                  />
+                  <Text
+                    style={[
+                      styles.buttonLoginText,
+                      { color: "black", fontFamily: "Inter_600SemiBold" },
+                    ]}
+                  >
+                    Sign in with Google
+                  </Text>
+                </Row>
+              )}
+            </TouchableOpacity>
+          </Column>
+          <TouchableOpacity
+            style={styles.aboutUs}
+            onPress={() =>
+              Linking.openURL(
+                "https://kobihanoch.github.io/strongtogether-privacy/"
+              )
+            }
+          >
+            <View
+              style={{ flexDirection: "row", gap: 7, alignItems: "center" }}
+            >
+              <MaterialCommunityIcons
+                name={"shield-lock"}
+                size={RFValue(15)}
+                color={"white"}
+              ></MaterialCommunityIcons>
+
+              <Text style={styles.aboutUsText}>Privacy Policy</Text>
+            </View>
+          </TouchableOpacity>
+        </Column>
+      </Column>
     </LinearGradient>
   );
 };
@@ -88,19 +233,22 @@ const styles = StyleSheet.create({
     textAlign: "center",
     fontSize: width * 0.04,
     color: "white",
+    fontFamily: "Inter_400Regular",
+    fontSize: RFValue(11),
   },
   divider: {
-    height: 0.2,
+    height: 0.5,
     width: width * 0.7,
     backgroundColor: "white",
-    marginTop: height * 0.05,
-    marginBottom: height * 0.08,
+    marginTop: height * 0.03,
+    marginBottom: height * 0.05,
+    opacity: 0.8,
   },
   buttonRegister: {
     backgroundColor: "#f0f0f0",
-    paddingVertical: height * 0.015,
-    paddingHorizontal: width * 0.1,
-    borderRadius: 25,
+    height: height * 0.07,
+    paddingHorizontal: width * 0.05,
+    borderRadius: 18,
     width: width * 0.6,
     justifyContent: "center",
     alignItems: "center",
@@ -121,9 +269,9 @@ const styles = StyleSheet.create({
   },
   buttonLogin: {
     backgroundColor: "transparent",
-    paddingVertical: height * 0.015,
-    paddingHorizontal: width * 0.1,
-    borderRadius: 25,
+    height: height * 0.07,
+    paddingHorizontal: width * 0.05,
+    borderRadius: 18,
     alignSelf: "center",
     width: width * 0.6,
     justifyContent: "center",
@@ -131,7 +279,6 @@ const styles = StyleSheet.create({
     borderColor: "#d5e4f5",
     borderStyle: "solid",
     borderWidth: 1,
-    marginTop: height * 0.03,
   },
   buttonLoginText: {
     fontSize: width * 0.04,
