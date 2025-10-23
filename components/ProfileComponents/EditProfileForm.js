@@ -62,10 +62,11 @@ const EditProfileForm = ({
       return;
     }
     const payload = {
-      username: usernameInput,
-      fullName: fullNameInput,
-      email: emailInput,
+      username: usernameInput === username ? undefined : usernameInput,
+      fullName: fullNameInput === fullName ? undefined : fullNameInput,
+      email: emailInput === email ? undefined : emailInput,
     };
+
     // Sets all user updated profile out of email (old email is showing)
     // Server sent an email request
 

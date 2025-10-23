@@ -33,6 +33,7 @@ const TopComponent = () => {
   // Properties
   const msgCount = unreadMessages?.length;
   const fullname = user?.name;
+  const username = user?.username;
   const profileImageUrl = user?.profile_image_url;
 
   // Animations
@@ -64,6 +65,13 @@ const TopComponent = () => {
 
   const closeModal = () => {
     setIsModalVisible(false);
+  };
+
+  const isEnglishName = (name) => {
+    if (!name) return false;
+    // Allow only English letters, spaces, hyphens, and apostrophes
+    const englishRegex = /^[A-Za-z\s'-]+$/;
+    return englishRegex.test(name.trim());
   };
 
   return (
@@ -101,7 +109,7 @@ const TopComponent = () => {
                   color: "black",
                 }}
               >
-                {isLoading ? "" : fullname}
+                {isLoading ? "" : isEnglishName(fullname) ? fullname : username}
               </Text>
             </Skeleton>
           </View>

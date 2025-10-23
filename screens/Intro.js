@@ -203,9 +203,7 @@ const Intro = ({ navigation }) => {
           <TouchableOpacity
             style={styles.aboutUs}
             onPress={() =>
-              Linking.openURL(
-                "https://kobihanoch.github.io/strongtogether-privacy/"
-              )
+              Linking.openURL("https://strongtogether.kobihanoch.com/privacy")
             }
           >
             <View

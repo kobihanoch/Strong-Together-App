@@ -23,7 +23,7 @@ const OAuthCompleteFields = ({ navigation, route }) => {
   const { handleAppleAuth, handleGoogleAuth } = useAuth();
 
   const [email, setEmail] = useState("");
-  const [fullName, setFullName] = useState("");
+  //const [fullName, setFullName] = useState("");
   const { missingFields = [], provider = null } = route.params || {};
   const [isSending, setIsSending] = useState(false);
 
@@ -32,8 +32,9 @@ const OAuthCompleteFields = ({ navigation, route }) => {
       setIsSending(true);
       console.log(route.params);
       if (
-        (missingFields.includes("email") && !email.length > 0) ||
-        (missingFields.includes("name") && !fullName.length > 0)
+        missingFields.includes("email") &&
+        !email.length > 0 /*||
+        (missingFields.includes("name") && !fullName.length > 0)*/
       ) {
         showErrorAlert("Error", "Please fill all requested fields to continue");
         return;
@@ -42,7 +43,7 @@ const OAuthCompleteFields = ({ navigation, route }) => {
       await updateSelfUser({
         setCompletedOnOAuth: true,
         email: missingFields.includes("email") ? email : undefined,
-        fullName: missingFields.includes("name") ? fullName : undefined,
+        //fullName: missingFields.includes("name") ? fullName : undefined,
       });
 
       provider === "google"
@@ -68,7 +69,7 @@ const OAuthCompleteFields = ({ navigation, route }) => {
       >
         <Text style={styles.title}>Complete your profile</Text>
         <Text style={styles.subtitle}>
-          We need a few more details to finish setting up your account
+          We need your email so we can communicate with you
         </Text>
 
         <View style={styles.inputsContainer}>
@@ -82,7 +83,7 @@ const OAuthCompleteFields = ({ navigation, route }) => {
               autoComplete="email"
             />
           )}
-          {missingFields.includes("name") && (
+          {/*missingFields.includes("name") && (
             <InputField
               placeholder="Full name"
               iconName="pencil"
@@ -91,7 +92,7 @@ const OAuthCompleteFields = ({ navigation, route }) => {
               textContentType="name"
               autoComplete="name"
             />
-          )}
+          )*/}
         </View>
 
         <TouchableOpacity

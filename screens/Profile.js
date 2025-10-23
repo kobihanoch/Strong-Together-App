@@ -97,13 +97,16 @@ const Profile = () => {
           <Column style={{ marginTop: 15, gap: 5, flex: 1 }}>
             <Text style={styles.name}>{fullName}</Text>
             <Text style={styles.username}>@{username}</Text>
-            <Row style={{ gap: 5 }}>
-              <Text style={styles.username}>{gender}</Text>
-              <MaterialCommunityIcons
-                name={`gender-${gender.toLowerCase()}`}
-                color={colors.textSecondary}
-              />
-            </Row>
+            {gender === "male" ||
+              (gender === "female" && (
+                <Row style={{ gap: 5 }}>
+                  <Text style={styles.username}>{gender}</Text>
+                  <MaterialCommunityIcons
+                    name={`gender-${gender.toLowerCase()}`}
+                    color={colors.textSecondary}
+                  />
+                </Row>
+              ))}
           </Column>
           <TouchableOpacity
             style={styles.editProfileBtnContainer}

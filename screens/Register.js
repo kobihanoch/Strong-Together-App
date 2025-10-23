@@ -43,7 +43,12 @@ const Register = ({ navigation }) => {
   };
 
   const hasErrors = () => {
-    if (!username || !email || !password /*|| !gender*/ || !fullName) {
+    if (
+      !username ||
+      !email ||
+      !password ||
+      !confirmPassword /*|| !gender*/ /*|| /*!fullName*/
+    ) {
       showErrorAlert("Error", "Please fill all fields.");
       return true;
     } else if (password != confirmPassword) {
@@ -108,7 +113,7 @@ const Register = ({ navigation }) => {
                 autoComplete="email"
               />
               <InputField
-                placeholder="Full name"
+                placeholder="Full name (Optional)"
                 iconName="pencil"
                 value={fullName}
                 onChangeText={setFullName}
