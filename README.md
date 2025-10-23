@@ -289,13 +289,13 @@ defines tables for users, messages, workout plans, splits, exercises
 and tracking logs. The simplified ER diagram below shows how the
 entities relate to each other:
 
-![Database schema overview](https://github.com/user-attachments/assets/e9cdce3f-dc29-4034-8840-6a89a932df94)
+![Database schema overview](https://github.com/user-attachments/assets/a595f01f-40ad-4fcd-b4ea-8c749d77c160)
 
 Important points about the schema:
 
 - **Users** table stores authentication credentials and profile
   metadata (`username`, `email`, `role`, `push_token`, etc.).
-- **WorkoutPlans** contain high‑level programmes created by a user or
+- **WorkoutPlans** contain programmes created by a user or
   trainer. Each plan has multiple **WorkoutSplits** (e.g. chest day,
   legs day).
 - **Exercises** catalog the available movements along with
@@ -304,8 +304,6 @@ Important points about the schema:
   splits with an order index and number of sets.
 - **ExerciseTracking** records actual performance data - weight and
   repetitions - for each workout date and split mapping.
-- **ScheduledWorkouts** allows users to attach a split to a day of the
-  week and optionally specify a notification time.
 - **Messages** stores subject/body along with sender and receiver
   identifiers.
 - **Auth/Versioning** – The server employs **token versioning (CAS)** on the users table to invalidate tokens: bumping the `token_version` atomically invalidates all previously issued refresh/access tokens for that user without maintaining a blacklist table.
@@ -367,7 +365,7 @@ Important points about the schema:
    deleted in the database.
 
 ### Auth Flow
-
+![Database workout tracking flow](https://github.com/user-attachments/assets/eb0c0c2a-84bc-4409-9b7a-b7019c1ebd27)
 <!-- Removed the previous diagram to avoid implying a blacklist-based flow -->
 ### OAuth Integration (Google & Apple)
 
