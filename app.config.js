@@ -24,7 +24,7 @@ const config = ({ config }) => {
     name: isProd ? APP_NAME_BASE : `${APP_NAME_BASE} (Dev)`,
     scheme: "strongtogether",
     slug: "strong-together",
-    version: "4.3.0",
+    version: "4.3.1",
     orientation: "portrait",
     icon: "./assets/icon.png",
     userInterfaceStyle: "light",
