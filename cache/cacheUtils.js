@@ -48,12 +48,12 @@ export async function cacheGetJSON(key) {
 
   try {
     const obj = JSON.parse(raw);
-    if (!obj || typeof obj.exp !== "number") return null;
-    if (Date.now() > obj.exp) {
+    //if (!obj || typeof obj.exp !== "number") return null;
+    /*if (Date.now() > obj.exp) {
       // Expired: remove and return null
       await AsyncStorage.removeItem(key);
       return null;
-    }
+    }*/
     return obj.data;
   } catch {
     // Corrupted value: remove and treat as miss
