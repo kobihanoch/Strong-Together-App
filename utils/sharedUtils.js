@@ -32,3 +32,13 @@ export const safeParseFloat = (val) => {
   const num = parseFloat(cleaned);
   return Number.isFinite(num) ? num : undefined;
 };
+
+export const ymdInCurrentTZ = (ms) => {
+  const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC";
+  return new Intl.DateTimeFormat("en-CA", {
+    timeZone: tz,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).format(new Date(ms)); // e.g., "2025-10-26"
+};

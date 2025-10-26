@@ -1,9 +1,11 @@
-// AppStack.jsx
-
 import { useNavigation } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 import React, { useEffect } from "react";
-import { cacheGetJSON, keyStartWorkout } from "../cache/cacheUtils";
+import {
+  cacheDeleteKey,
+  cacheGetJSON,
+  keyStartWorkout,
+} from "../cache/cacheUtils";
 import { useAuth } from "../context/AuthContext";
 import Analytics from "../screens/Analytics";
 import CreateWorkout from "../screens/CreateWorkout";
@@ -14,6 +16,7 @@ import Profile from "../screens/Profile";
 import Settings from "../screens/Settings";
 import StartWorkout from "../screens/StartWorkout";
 import Statistics from "../screens/Statistics";
+import { ymdInCurrentTZ } from "../utils/sharedUtils";
 
 const Stack = createStackNavigator();
 
@@ -24,17 +27,29 @@ const AppStack = () => {
   // Resume workout if interuptted
   useEffect(() => {
     (async () => {
-      const payload = await cacheGetJSON(keyStartWorkout(userIdCache));
-      if (payload?.workout && payload?.startTime && nav) {
-        nav.navigate("StartWorkout", {
-          workoutSplit: payload.selectedSplit,
-          resumedWorkout: {
-            workout: payload.workout,
-            startTime: payload.startTime,
-            pausedTotal: payload.pausedTotal,
-            lastPause: payload.lastPause,
-          },
-        });
+      if (userIdCache) {
+        const payload = await cacheGetJSON(keyStartWorkout(userIdCache));
+        if (payload?.workout && payload?.startTime && nav) {
+          // If workout is not from today -> delete cache
+          const startDay = ymdInCurrentTZ(payload.startTime);
+          const today = ymdInCurrentTZ(Date.now());
+          console.log({ startDay, today });
+          const isStale = startDay !== today;
+          if (isStale) {
+            // English-only comments: If from a previous day → delete and stop (no resume)
+            await cacheDeleteKey(keyStartWorkout(userIdCache));
+            return;
+          }
+          nav.navigate("StartWorkout", {
+            workoutSplit: payload.selectedSplit,
+            resumedWorkout: {
+              workout: payload.workout,
+              startTime: payload.startTime,
+              pausedTotal: payload.pausedTotal,
+              lastPause: payload.lastPause,
+            },
+          });
+        }
       }
     })();
   }, [userIdCache, nav]);
