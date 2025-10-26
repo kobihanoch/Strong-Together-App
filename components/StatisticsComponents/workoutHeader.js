@@ -16,7 +16,7 @@ const WorkoutHeader = ({ data, selectedDate }) => {
       </View>
       <Column>
         <Text style={styles.workoutTitle}>
-          {data ? "Workout" + data[0].splitname : "Rest day"}
+          {data ? "Workout " + data[0].splitname : "Rest day"}
         </Text>
         <Text style={styles.dateText}>{formatDate(selectedDate)}</Text>
       </Column>
