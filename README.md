@@ -1,5 +1,7 @@
-# Strong Together App – Frontend (v4.3.0) 
+# Strong Together App – Frontend (v4.3.1)
+
 <br><br>
+
 <div align="center">
 </div>
 
@@ -151,10 +153,10 @@ Version 4 builds on top of this by introducing a **smart cache layer**, **offli
 - **User deletion support** – Added the ability to permanently delete an account and all related data from the settings page.
 - **Cardio input logging** – Users can now log one cardio session per day (duration), to be expanded with full analytics in future releases.
 - **Version-aware cache housekeeping** – When the app updates, outdated cached data is safely cleaned to prevent inconsistency.
-- **DPoP Client Proofs (NEW)** – Every API request can include a **DPoP proof** (Demonstration of Proof-of-Possession) signed on-device with an **ES256** key pair.  
-  - The app **generates and persists** a P‑256 key pair on first launch using `jose.generateKeyPair("ES256")`. The keys are exported as **JWKs** via `crypto.subtle.exportKey("jwk", ...)` and stored in **Expo SecureStore**.  
-  - Before rendering the app tree, we **ensure the key pair exists** (see `ensureDpopKeyPair`) and gate UI on `keyPairReady`.  
-  - For each request, a `dpop+jwt` is built (`buildDpopProof`) with claims: `jti` (nonce-like id), `htm` (HTTP method), `htu` (absolute URL), and `iat` (issued-at). The **public JWK** is embedded in the JWT header so the backend can verify the signature.  
+- **DPoP Client Proofs (NEW)** – Every API request can include a **DPoP proof** (Demonstration of Proof-of-Possession) signed on-device with an **ES256** key pair.
+  - The app **generates and persists** a P‑256 key pair on first launch using `jose.generateKeyPair("ES256")`. The keys are exported as **JWKs** via `crypto.subtle.exportKey("jwk", ...)` and stored in **Expo SecureStore**.
+  - Before rendering the app tree, we **ensure the key pair exists** (see `ensureDpopKeyPair`) and gate UI on `keyPairReady`.
+  - For each request, a `dpop+jwt` is built (`buildDpopProof`) with claims: `jti` (nonce-like id), `htm` (HTTP method), `htu` (absolute URL), and `iat` (issued-at). The **public JWK** is embedded in the JWT header so the backend can verify the signature.
   - This materially hardens token theft scenarios by requiring possession of the private key to mint valid proofs tied to the exact **method + URL**. Backend validation (documented in the backend repo) checks signature, `htu/htm` match, `iat` freshness, and protects against replay via `jti` storage.
 
 ## Architecture Overview
@@ -169,12 +171,13 @@ The project follows a **two‑tier architecture**:
 ```
 
 - **Frontend**
+
   - **General Structure** – built with React Native and
-  supporting both iOS and Android. State is managed via React
-  context and hooks, screens are organised under a specific folder
-  and navigation is handled by React Navigation. The app interacts
-  with the backend through a thin API client (e.g. using
-  `axios`).
+    supporting both iOS and Android. State is managed via React
+    context and hooks, screens are organised under a specific folder
+    and navigation is handled by React Navigation. The app interacts
+    with the backend through a thin API client (e.g. using
+    `axios`).
 
   - **Smart Caching Layer** – Each context in the app loads data through a custom hook that checks cache first, then falls back to API only if needed. A central cache store holds hydrated values for all major domains (workouts, messages, etc.), improving responsiveness across navigation.
 
@@ -197,19 +200,18 @@ The project follows a **two‑tier architecture**:
 
 The main technologies and libraries used in the frontend and backend include:
 
-| Layer                | Technology                                            |
-| -------------------- | ----------------------------------------------------- |
-| **Framework**        | [`React Native`](https://reactnative.dev/) (Expo/CLI) |
-| **State management** | React Context + hooks (`useState`, `useReducer`)      |
-| **Navigation**       | [`React Navigation`](https://reactnavigation.org/)    |
-| **HTTP client**      | [`axios`](https://axios-http.com/)                    |
-| **Backend API**      | Node.js + Express (separate repository)               |
-| **Cache Layer**      | Server side Redis cache & Custom SWR-inspired logic at client side (`useCacheAndFetch`)        |
-| **Bootstrap API**    | Unified bootstrap instance   |
-| **Offline support**  | Built-in hydration from cache                         |
-| **Deploying**        | Docker + Render                                       |
-| **Database**         | Supabase PostgreSQL with indexes & views              |
-
+| Layer                | Technology                                                                              |
+| -------------------- | --------------------------------------------------------------------------------------- |
+| **Framework**        | [`React Native`](https://reactnative.dev/) (Expo/CLI)                                   |
+| **State management** | React Context + hooks (`useState`, `useReducer`)                                        |
+| **Navigation**       | [`React Navigation`](https://reactnavigation.org/)                                      |
+| **HTTP client**      | [`axios`](https://axios-http.com/)                                                      |
+| **Backend API**      | Node.js + Express (separate repository)                                                 |
+| **Cache Layer**      | Server side Redis cache & Custom SWR-inspired logic at client side (`useCacheAndFetch`) |
+| **Bootstrap API**    | Unified bootstrap instance                                                              |
+| **Offline support**  | Built-in hydration from cache                                                           |
+| **Deploying**        | Docker + Render                                                                         |
+| **Database**         | Supabase PostgreSQL with indexes & views                                                |
 
 ## Installation & Setup
 
@@ -365,8 +367,11 @@ Important points about the schema:
    deleted in the database.
 
 ### Auth Flow
+
 ![Database workout tracking flow](https://github.com/user-attachments/assets/eb0c0c2a-84bc-4409-9b7a-b7019c1ebd27)
+
 <!-- Removed the previous diagram to avoid implying a blacklist-based flow -->
+
 ### OAuth Integration (Google & Apple)
 
 Version 4.3.0 introduces full **OAuth 2.0 integration** with **Google** and **Apple**, allowing users to sign in securely using their existing accounts.
