@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [4.3.1](https://github.com/kobihanoch/Strong-Together-App/compare/v4.3.0...v4.3.1) (2025-10-26)
+
+
+### Features
+
+* **Offline Mode:** Delete stale data of cached workout. If another day pased by current timezone delete cache ([782d7cc](https://github.com/kobihanoch/Strong-Together-App/commit/782d7ccd6a491374adb7abc7dd3be7a04c1823b1))
+* **Offline Mode:** Load unfinished workout without the message with userIdCache. Error log out wont delete start workout cache ([b5153be](https://github.com/kobihanoch/Strong-Together-App/commit/b5153be4e1c3c1213421d08e77d7847b0d75c6c9))
+
+
+### Bug Fixes
+
+* **Start Workout:** FIxed unexpeted autoscroll on unfocus ([4236932](https://github.com/kobihanoch/Strong-Together-App/commit/42369326388cfa3ad7e82f5fd5e82bbb489b1623))
+
 ## [4.3.0](https://github.com/kobihanoch/Strong-Together-App/compare/v4.2.0...v4.3.0) (2025-10-22)
 
 
