@@ -2,6 +2,7 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { debounce } from "lodash";
 import React, { useEffect, useMemo, useState } from "react";
 import {
+  ActivityIndicator,
   Dimensions,
   FlatList,
   StyleSheet,
@@ -279,6 +280,29 @@ const ExercisesSection = ({
   setVisibleSetIndexForModal,
   openModal,
 }) => {
+  if (!exercises?.length) {
+    return (
+      <Column
+        style={{
+          alignSelf: "center",
+          marginTop: "auto",
+          marginBottom: "auto",
+          gap: 20,
+        }}
+      >
+        <ActivityIndicator animating={true} size={"large"} />
+        <Text
+          style={{
+            fontFamily: "Inter_500SemiBold",
+            fontSize: RFValue(15),
+            color: "black",
+          }}
+        >
+          Loading exercises...
+        </Text>
+      </Column>
+    );
+  }
   return (
     <KeyboardAwareFlatList
       data={exercises}

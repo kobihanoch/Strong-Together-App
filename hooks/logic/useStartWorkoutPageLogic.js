@@ -1,8 +1,10 @@
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
+import { cacheDeleteKey, keyStartWorkout } from "../../cache/cacheUtils";
 import { useAnalysisContext } from "../../context/AnalysisContext";
 import { useAuth } from "../../context/AuthContext";
 import { useWorkoutContext } from "../../context/WorkoutContext";
+import { showErrorAlert } from "../../errors/errorAlerts";
 import { unpackFromExerciseTrackingData } from "../../utils/analysisContexUtils";
 import {
   applyNotes,
@@ -11,20 +13,14 @@ import {
   countSetsDone,
   createArrayForDataBase,
 } from "../../utils/startWorkoutUtils";
-import { useUserWorkout } from "../useUserWorkout";
-import { showErrorAlert } from "../../errors/errorAlerts";
-import {
-  cacheDeleteKey,
-  cacheGetJSON,
-  keyStartWorkout,
-} from "../../cache/cacheUtils";
 import { useStartWorkoutCache } from "../useStartWorkoutCache";
+import { useUserWorkout } from "../useUserWorkout";
 
 const useStartWorkoutPageLogic = (selectedSplit, resumedWorkout = null) => {
   // --------------------[ Navigation ]--------------------------------------
   const navigation = useNavigation();
   // --------------------[ Context ]--------------------------------------
-  const { user, setIsWorkoutMode } = useAuth();
+  const { user, setIsWorkoutMode, userIdCache } = useAuth();
   const { exercises = {} } = useWorkoutContext() || {};
   const {
     setExerciseTrackingMaps = null,
@@ -72,7 +68,7 @@ const useStartWorkoutPageLogic = (selectedSplit, resumedWorkout = null) => {
   // --------------------[ Timer + Caching ]----------------------
   const { cacheKey, startTime, pausedTotal, disableCache } =
     useStartWorkoutCache(
-      user.id,
+      userIdCache, // Save cache with user id from cache for better offline experience
       selectedSplit,
       resumedWorkout,
       workoutProgressObj
@@ -105,7 +101,7 @@ const useStartWorkoutPageLogic = (selectedSplit, resumedWorkout = null) => {
 
   // --------------------[ Save Workout ]-----------------------------------------
   const clearCache = useCallback(async () => {
-    await cacheDeleteKey(keyStartWorkout(user?.id));
+    await cacheDeleteKey(keyStartWorkout(userIdCache));
   }, [cacheKey]);
 
   const onExit = async () => {

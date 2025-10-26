@@ -70,6 +70,7 @@ export async function cacheDeleteKey(key) {
 }
 
 // Delete all user's cache
+// Used in user's decision to logout
 export async function cacheDeleteAllCache() {
   const allKeys = await AsyncStorage.getAllKeys();
   const toDelete = allKeys.filter((k) => k.startsWith("CACHE:"));
@@ -79,15 +80,16 @@ export async function cacheDeleteAllCache() {
   for (let i = 0; i < toDelete.length; i += CHUNK) {
     await AsyncStorage.multiRemove(toDelete.slice(i, i + CHUNK));
   }
+
   console.log("\x1b[96m[Cache]: All user cache deleted\x1b[0m");
 }
 
-// Delete all user's cache
-export async function cacheDeleteAllCacheWithoutUserId() {
+// Delete all user's cache withou start workout
+// Used in logout cache deletion on errors etc..., to keep workout cache alive
+export async function cacheDeleteAllCacheWithoutStartWorkout() {
   const allKeys = await AsyncStorage.getAllKeys();
-  // All out of user id
   const toDelete = allKeys.filter(
-    (k) => k.startsWith("CACHE:") && k !== "CACHE:USER_ID"
+    (k) => !k.startsWith("CACHE:STARTWORKOUT:") && k.startsWith("CACHE:")
   );
   if (!toDelete.length) return;
 
@@ -95,9 +97,12 @@ export async function cacheDeleteAllCacheWithoutUserId() {
   for (let i = 0; i < toDelete.length; i += CHUNK) {
     await AsyncStorage.multiRemove(toDelete.slice(i, i + CHUNK));
   }
-  console.log("\x1b[96m[Cache]: All user cache deleted\x1b[0m");
+  console.log(
+    "\x1b[96m[Cache]: All user cache deleted (without start workout).\x1b[0m"
+  );
 }
 
+// Clear all cache without USER_ID
 export async function cacheHousekeepingOnBoot() {
   try {
     const keys = await AsyncStorage.getAllKeys();
@@ -116,7 +121,7 @@ export async function cacheHousekeepingOnBoot() {
       }
     }
     await AsyncStorage.setItem(META_VERSION_KEY, CACHE_VERSION);
-    console.log("[Cache]: Housekeeping suscceeded.");
+    console.log("[Cache]: Housekeeping suscceeded. User id kept.");
   } catch (e) {
     console.warn("[Cache] Housekeeping failed:", e?.message);
   }

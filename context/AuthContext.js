@@ -11,6 +11,7 @@ import { Notifier, NotifierComponents } from "react-native-notifier";
 import { hasBootstrapPayload, resetBootstrap } from "../api/bootstrapApi";
 import {
   cacheDeleteAllCache,
+  cacheDeleteAllCacheWithoutStartWorkout,
   cacheGetJSON,
   cacheSetJSON,
   keyAuth,
@@ -193,9 +194,9 @@ export const AuthProvider = ({ children }) => {
         await clearContext();
         return;
       }
-      setIsLoggedIn(true);
       // Triggers SWR hook logic chain
       setUserIdCache(cacheUserId);
+      setIsLoggedIn(true);
       setAuthPhase("authed");
 
       // Try to validate with server
@@ -245,8 +246,9 @@ export const AuthProvider = ({ children }) => {
       console.log(
         "Redirecting to app stack => is logged in true and data is being fetched"
       );
-      setIsLoggedIn(true);
       setUserIdCache(u);
+      setIsLoggedIn(true);
+
       console.log("\x1b[32m[Auth Context]: Login succeeded!\x1b[0m");
       setIsValidatedWithServer(true);
       setAuthPhase("authed");
@@ -299,9 +301,10 @@ export const AuthProvider = ({ children }) => {
    */
   const logout = useCallback(async () => {
     try {
+      await logoutUser();
       setIsLoggedIn(false);
       setUser(null);
-      await logoutUser(); // best-effort
+      await cacheDeleteAllCache();
     } catch (err) {
       // Log but do not block local cleanup
       console.log(err?.response?.data || err.message);
@@ -391,7 +394,7 @@ export const AuthProvider = ({ children }) => {
 
   const clearContext = useCallback(async () => {
     await clearRefreshToken();
-    await cacheDeleteAllCache();
+    await cacheDeleteAllCacheWithoutStartWorkout();
     GlobalAuth.setAccessToken(null);
     GlobalAuth.setUsernameInHeader(null);
     resetBootstrap();
@@ -424,6 +427,7 @@ export const AuthProvider = ({ children }) => {
       isLoggedIn,
       user,
       setUser,
+      userIdCache,
       loading,
       userDataLoading,
       // actions
@@ -446,6 +450,7 @@ export const AuthProvider = ({ children }) => {
       isLoggedIn,
       user,
       setUser,
+      userIdCache,
       loading,
       googleLoading,
       appleLoading,
