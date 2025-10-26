@@ -306,6 +306,7 @@ const ExercisesSection = ({
   return (
     <KeyboardAwareFlatList
       data={exercises}
+      enableResetScrollToCoords={false}
       renderItem={({ item }) => (
         <RenderItem
           item={item}
