@@ -16,6 +16,7 @@ import Profile from "../screens/Profile";
 import Settings from "../screens/Settings";
 import StartWorkout from "../screens/StartWorkout";
 import Statistics from "../screens/Statistics";
+import UpgradeSub from "../screens/UpgradeSub";
 import { ymdInCurrentTZ } from "../utils/sharedUtils";
 
 const Stack = createStackNavigator();
@@ -72,6 +73,7 @@ const AppStack = () => {
       <Stack.Screen name="Statistics" component={Statistics} />
       <Stack.Screen name="Inbox" component={Inbox} />
       <Stack.Screen name="Analytics" component={Analytics} />
+      <Stack.Screen name="UpgradeSub" component={UpgradeSub} />
     </Stack.Navigator>
   );
 };

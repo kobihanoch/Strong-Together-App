@@ -35,8 +35,13 @@ const clampSec = (t) => {
 
 const MyWorkoutPlan = () => {
   const nav = useNavigation();
-  const { hasWorkout, filteredExercises, setSelectedSplit, selectedSplit } =
-    useMyWorkoutPlanPageLogic();
+  const {
+    hasWorkout,
+    filteredExercises,
+    setSelectedSplit,
+    selectedSplit,
+    canWorkout,
+  } = useMyWorkoutPlanPageLogic();
 
   const {
     hasDoneCardioToday = false,
@@ -104,6 +109,7 @@ const MyWorkoutPlan = () => {
           selectedSplit={selectedSplit}
           filteredExercises={filteredExercises}
           openCardioModal={openCardioModal}
+          canWorkout={canWorkout}
         />
 
         {/* Exercises modal */}

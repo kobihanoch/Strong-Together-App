@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useAnalysisContext } from "../../context/AnalysisContext";
 import { useWorkoutContext } from "../../context/WorkoutContext";
+import { useAuth } from "../../context/AuthContext";
 
 export const useMyWorkoutPlanPageLogic = () => {
   const {
@@ -24,6 +25,8 @@ export const useMyWorkoutPlanPageLogic = () => {
 
   const { analyzedExerciseTrackingData, hasTrainedToday } =
     useAnalysisContext();
+  const { workoutCount = 0 } = analyzedExerciseTrackingData || {};
+  const canWorkout = workoutCount <= 3;
   const [selectedSplit, setSelectedSplit] = useState(null);
 
   // Set selected split at startup
@@ -64,5 +67,6 @@ export const useMyWorkoutPlanPageLogic = () => {
     splitTrainedCount,
     hasTrainedToday,
     exerciseCounter,
+    canWorkout,
   };
 };

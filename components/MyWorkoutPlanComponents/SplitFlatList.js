@@ -20,6 +20,7 @@ const SplitFlatList = ({
   setSelectedSplit,
   selectedSplit,
   openCardioModal,
+  canWorkout,
 }) => {
   const { workoutSplits, exerciseCounter } = useMyWorkoutPlanPageLogic();
   const { hasTrainedToday, analyzedExerciseTrackingData } =
@@ -154,6 +155,7 @@ const SplitFlatList = ({
           <StartWorkoutButton
             hasTrainedToday={hasTrainedToday}
             selectedSplit={selectedSplit}
+            canWorkout={canWorkout}
           ></StartWorkoutButton>
           <StartCardioButton openCardioModal={openCardioModal} />
         </Column>

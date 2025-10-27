@@ -3,31 +3,48 @@ import { useNavigation } from "@react-navigation/native";
 import React from "react";
 import { Dimensions, StyleSheet, Text, TouchableOpacity } from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";
+import { colors } from "../../constants/colors";
 
 const { width, height } = Dimensions.get("window");
 
-const StartWorkoutButton = ({ hasTrainedToday, selectedSplit }) => {
+const StartWorkoutButton = ({ hasTrainedToday, selectedSplit, canWorkout }) => {
   const navigation = useNavigation();
   return (
     <TouchableOpacity
       style={[styles.cta, { opacity: hasTrainedToday ? 0.7 : 1 }]}
       disabled={!!hasTrainedToday}
       onPress={() =>
-        navigation.navigate("StartWorkout", {
-          workoutSplit: selectedSplit,
-        })
+        canWorkout
+          ? navigation.navigate("StartWorkout", {
+              workoutSplit: selectedSplit,
+            })
+          : navigation.navigate("UpgradeSub")
       }
     >
-      {hasTrainedToday && (
+      {hasTrainedToday ? (
         <MaterialCommunityIcons
           name="lock"
           color="#FFFFFF"
           size={RFValue(14)}
           style={{ marginRight: 6 }}
         />
+      ) : (
+        !canWorkout && (
+          <MaterialCommunityIcons
+            name="lock"
+            color={colors.warning}
+            size={RFValue(14)}
+            style={{ marginRight: 6 }}
+          />
+        )
       )}
+
       <Text style={styles.ctaText}>
-        {hasTrainedToday ? "Already trained today" : "Start workout"}
+        {hasTrainedToday
+          ? "Already trained today"
+          : canWorkout
+          ? "Start Workout"
+          : "Upgrade to Pro"}
       </Text>
     </TouchableOpacity>
   );
