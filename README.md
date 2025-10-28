@@ -29,43 +29,47 @@ Version 4 introduces major improvements to performance, user experience, and cac
 > 👉 **The backend codebase is maintained in a dedicated repository:**  
 > [`Strong-Together-Backend`](https://github.com/kobihanoch/Strong-Together-Backend)
 
+---
+
 ## Table of Contents
 
 1. [Project Overview](#project-overview)
 2. [Screenshots](#screenshots)
 3. [Main Features](#main-features)
 4. [Architecture Overview](#architecture-overview)
-5. [Tech Stack](#tech-stack)
-6. [Installation & Setup](#installation--setup)
-7. [Environment Variables](#environment-variables)
-8. [Running the App Locally](#running-the-app-locally)
-9. [Database Schema](#database-schema)
-10. [Application Flows](#application-flows)
+5. [Realtime Messaging (WebSocket)](#realtime-messaging-websocket)
+6. [Tech Stack](#tech-stack)
+7. [Installation & Setup](#installation--setup)
+8. [Environment Variables](#environment-variables)
+9. [Running the App Locally](#running-the-app-locally)
+10. [Database Schema](#database-schema)
+11. [Application Flows](#application-flows)
     - [Workout Flow](#workout-flow)
     - [Tracking Flow](#tracking-flow)
     - [Messages Flow](#messages-flow)
     - [Auth Flow](#auth-flow)
-11. [Roadmap & Future Improvements](#roadmap--future-improvements)
-12. [Contributing](#contributing)
-13. [License](#license)
+    - [OAuth Integration (Google & Apple)](#oauth-integration-google--apple)
+12. [Roadmap & Future Improvements](#roadmap--future-improvements)
+13. [Contributing](#contributing)
+14. [License](#license)
 
 ---
 
 ## Project Overview
 
-The Strong Together App helps users build healthier habits by
+The Strong Together App helps users build healthier habits by
 combining **workout planning** and **exercise tracking**. Users can create custom workout plans with splits
 and exercises, schedule workouts on specific days of the week,
 receive notifications before a session and log each set’s weight and
 repetitions. All data is stored in a
 PostgreSQL database and synchronized with a backend API.
 
-Version 3 separated the client and server into two distinct
+Version 3 separated the client and server into two distinct
 repositories. While previous versions relied on Supabase client
-libraries and server‑side functions written in Deno, I now use a
+libraries and server-side functions written in Deno, I now use a
 dedicated Node.js/Express API for authentication, CRUD operations, and WebSocket support for real-time messaging.
 
-Version 4 builds on top of this by introducing a **smart cache layer**, **offline mode**, **bootstrap API logic**, and **a full UI redesign** - all tailored for high performance and low latency mobile experience.
+Version 4 builds on top of this by introducing a **smart cache layer**, **offline mode**, **bootstrap API logic**, and **a full UI redesign** - all tailored for high performance and low latency mobile experience.
 
 ---
 
@@ -127,25 +131,18 @@ Version 4 builds on top of this by introducing a **smart cache layer**, **offli
   <strong>Inbox</strong>: View system messages.
 </p>
 
+---
+
 ## Main Features
 
-- **Custom workout plans** – Create workout plans containing
-  configurable splits (e.g. push/pull/legs) and assign exercises to
-  each split. Each user can design their own routines. (AI integration in next update).
+- **Custom workout plans** – Create workout plans containing configurable splits (e.g. push/pull/legs) and assign exercises to each split. Each user can design their own routines. (AI integration in next update).
 - **Notifications** – Get a daily push notification.
-- **Exercise tracking** – Log sets, repetitions and weight for each
-  exercise. Tracking records are stored with a reference to the
-  underlying split so you can review progress over time.
-- **In‑app messaging** – Receive system messages at first login and after each successful workout.
+- **Exercise tracking** – Log sets, repetitions and weight for each exercise. Tracking records are stored with a reference to the underlying split so you can review progress over time.
+- **In-app messaging** – Receive system messages at first login and after each successful workout.
 - **Authentication & roles** – Secure login with traditional credentials **or OAuth (Google & Apple)**.
 - Uses access/refresh tokens with role-based permissions. User accounts include profile information and optional push tokens for notifications.
-- **Smart performance** – Heavy screens use `useMemo`,
-  `useCallback` and context providers to avoid unnecessary re‑renders.
-  Combined with batched API calls, these optimisations cut perceived
-  navigation latency by **roughly 50 % compared with previous versions.**
-- **Modular backend** – All network communication goes through a
-  RESTful API implemented in a separate repository using Node.js and
-  Express.
+- **Smart performance** – Heavy screens use `useMemo`, `useCallback` and context providers to avoid unnecessary re-renders. Combined with batched API calls, these optimisations cut perceived navigation latency by **roughly 50 % compared with previous versions.**
+- **Modular backend** – All network communication goes through a RESTful API implemented in a separate repository using Node.js and Express.
 - **Smart SWR-style cache layer** – A custom-built caching mechanism inspired by SWR, but implemented entirely without libraries. Each data context uses a unified hook (`useCacheAndFetch`) to hydrate from cache, fallback to API if needed, and auto-update in-memory state. Caching logic includes TTL support (planned), safe fallback handling, and background sync.
 - **Bootstrap API pattern** – On app launch, a single "bootstrap" call fetches all critical data (user profile, workouts, messages, etc.) to hydrate the app in one go. Greatly reduces network overhead and improves UX during initial load.
 - **Offline mode support** – All major screens load from cache when offline. Token refresh happens in background once network returns.
@@ -154,14 +151,15 @@ Version 4 builds on top of this by introducing a **smart cache layer**, **offli
 - **Cardio input logging** – Users can now log one cardio session per day (duration), to be expanded with full analytics in future releases.
 - **Version-aware cache housekeeping** – When the app updates, outdated cached data is safely cleaned to prevent inconsistency.
 - **DPoP Client Proofs (NEW)** – Every API request can include a **DPoP proof** (Demonstration of Proof-of-Possession) signed on-device with an **ES256** key pair.
-  - The app **generates and persists** a P‑256 key pair on first launch using `jose.generateKeyPair("ES256")`. The keys are exported as **JWKs** via `crypto.subtle.exportKey("jwk", ...)` and stored in **Expo SecureStore**.
-  - Before rendering the app tree, we **ensure the key pair exists** (see `ensureDpopKeyPair`) and gate UI on `keyPairReady`.
-  - For each request, a `dpop+jwt` is built (`buildDpopProof`) with claims: `jti` (nonce-like id), `htm` (HTTP method), `htu` (absolute URL), and `iat` (issued-at). The **public JWK** is embedded in the JWT header so the backend can verify the signature.
-  - This materially hardens token theft scenarios by requiring possession of the private key to mint valid proofs tied to the exact **method + URL**. Backend validation (documented in the backend repo) checks signature, `htu/htm` match, `iat` freshness, and protects against replay via `jti` storage.
+  - The app **generates and persists** a P-256 key pair on first launch using `jose.generateKeyPair("ES256")`.
+  - The **public JWK** is embedded in the JWT header so the backend can verify the signature.
+  - This hardens token theft scenarios by requiring possession of the private key to mint valid proofs tied to the exact **method + URL**.
+
+---
 
 ## Architecture Overview
 
-The project follows a **two‑tier architecture**:
+The project follows a **two-tier architecture**:
 
 ```
 ┌───────────────────────────┐     HTTPS        ┌─────────────────────────┐
@@ -195,6 +193,40 @@ The project follows a **two‑tier architecture**:
 > Supabase client calls have been removed from the frontend. Instead,
 > configure the `API_URL` environment variable to point at your
 > running Express server.
+
+## Realtime Messaging (WebSocket)
+
+Version 4.4 introduces a new **secure WebSocket connection** for realtime events (messages, notifications) using **Socket.IO**.
+
+The client first requests a **short-lived connection ticket** from the backend:
+
+```js
+// Example flow
+const res = await axios.post(`${API_URL}/api/ws/generateticket`);
+const { ticket } = res.data;
+
+const socket = io(API_URL, {
+  path: "/socket.io",
+  transports: ["websocket"],
+  auth: { ticket },
+});
+```
+
+Each ticket is a JWT signed by the backend (`audience: "socket"`, TTL ≈ 90 minutes).
+On connection, the server validates the ticket and assigns the socket to a private room matching the user’s ID.
+
+### Behavior
+
+- When the app goes to background → socket disconnects naturally (**ping timeout**).
+- When the app returns to foreground → it automatically reconnects;
+  if the ticket expired, the app silently fetches a new one and retries.
+- All `new_message` events are received via the user’s private room.
+
+### Security benefits
+
+- No permanent session IDs or credentials are sent through the socket.
+- Tickets expire quickly and are validated per connection.
+- Each user’s socket is fully isolated — no cross-user events possible.
 
 ## Tech Stack
 
@@ -230,6 +262,8 @@ The main technologies and libraries used in the frontend and backend include:
    git clone https://github.com/kobihanoch/Strong-Together-App.git
    cd Strong-Together-App
    ```
+
+````
 
 2. **Install dependencies**:
 
@@ -400,14 +434,14 @@ Version 4.3.0 introduces full **OAuth 2.0 integration** with **Google** and **Ap
 
 ## Contributing
 
-Currently a personal project. Contributions are not open.  
+Currently a personal project. Contributions are not open.
 (Will consider in future versions).
 
 ---
 
 ## License
 
-This project is licensed under the **MIT License**.  
+This project is licensed under the **MIT License**.
 See the `LICENSE` file for details.
 
 ---
@@ -416,3 +450,4 @@ Thank you for checking out the Strong Together App! We hope this
 updated README helps you get started quickly, understand the
 underlying architecture and contribute effectively. Feel free to
 open an issue if something is unclear or missing.
+````
