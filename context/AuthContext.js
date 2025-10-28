@@ -115,8 +115,8 @@ export const AuthProvider = ({ children }) => {
    * - Called after we have a valid user + tokens.
    * - Responsible for one-time side effects (e.g., socket connect).
    */
-  const initializeUserSession = useCallback(async (userId, username) => {
-    await connectSocket(userId, username);
+  const initializeUserSession = useCallback(async (username) => {
+    await connectSocket(username);
   }, []);
 
   // Attempting server validation fuction

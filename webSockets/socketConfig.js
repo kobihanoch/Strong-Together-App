@@ -57,14 +57,10 @@ export const connectSocket = async (username) => {
     });
 
     socket.on("connect_error", (err) => {
-      const msg = err?.message || "";
-      console.error("[WebSocket]: connect_error:", msg);
-    });
-
-    // Optional: when socket.io tries automatic reconnect, refresh ticket first
-    socket.io.on("reconnect_attempt", async () => {
-      await reconnectWithFreshTicket(username);
-      console.log("[WebSocket]: Reconnected");
+      const msg = (err?.message || "").toLowerCase();
+      if (/(missing|invalid|expired|unauth)/i.test(msg)) {
+        reconnectWithFreshTicket(username);
+      }
     });
   }
 
