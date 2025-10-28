@@ -99,7 +99,7 @@ const StartWorkout = ({ navigation, route }) => {
       <SlidingBottomModal
         title="Last Performance"
         ref={modalRef}
-        snapPoints={["40%", "50%", "80%"]}
+        snapPoints={["50%", "60%", "80%"]}
         flatListUsage={false}
       >
         <LastWorkoutData
