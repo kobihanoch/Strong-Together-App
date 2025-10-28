@@ -75,10 +75,6 @@ export const connectSocket = async (username) => {
 export const getSocket = () => socket;
 
 export const disconnectSocket = () => {
-  if (appStateSub) {
-    appStateSub.remove();
-    appStateSub = null;
-  }
   if (socket) {
     socket.removeAllListeners();
     socket.disconnect();
