@@ -263,8 +263,6 @@ The main technologies and libraries used in the frontend and backend include:
    cd Strong-Together-App
    ```
 
-````
-
 2. **Install dependencies**:
 
    ```bash
@@ -450,4 +448,3 @@ Thank you for checking out the Strong Together App! We hope this
 updated README helps you get started quickly, understand the
 underlying architecture and contribute effectively. Feel free to
 open an issue if something is unclear or missing.
-````
