@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [4.4.0](https://github.com/kobihanoch/Strong-Together-App/compare/v4.3.1...v4.4.0) (2025-10-28)
+
+
+### Features
+
+* **Start Workout:** Added notes to previous workout lookup ([8e12173](https://github.com/kobihanoch/Strong-Together-App/commit/8e121739979af9377a8b98e72deec3aa0d4b862c))
+* **Web Socket:** Added DPoP validation to web socket handshake with generated ticket from server ([85c8277](https://github.com/kobihanoch/Strong-Together-App/commit/85c82773cc40fa984c8c5a818ca02d9329e29672))
+* **Web Socket:** Reconnection attepmt only on connection errors ([f7ad988](https://github.com/kobihanoch/Strong-Together-App/commit/f7ad988234487e8e0fbff8d2a5396931e7863ab6))
+
 ### [4.3.1](https://github.com/kobihanoch/Strong-Together-App/compare/v4.3.0...v4.3.1) (2025-10-26)
 
 
