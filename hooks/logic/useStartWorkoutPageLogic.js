@@ -127,7 +127,7 @@ const useStartWorkoutPageLogic = (selectedSplit, resumedWorkout = null) => {
         return;
       }
 
-      const res = await saveWorkoutProcess(arr);
+      const res = await saveWorkoutProcess(arr, startTime, Date.now());
       const { exerciseTrackingMaps, exerciseTrackingAnalysis } = res;
 
       // Update context

@@ -33,7 +33,6 @@ const AppStack = () => {
           // If workout is not from today -> delete cache
           const startDay = ymdInCurrentTZ(payload.startTime);
           const today = ymdInCurrentTZ(Date.now());
-          console.log({ startDay, today });
           const isStale = startDay !== today;
           if (isStale) {
             // English-only comments: If from a previous day → delete and stop (no resume)
