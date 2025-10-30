@@ -1,4 +1,5 @@
 export const getDaysSince = (lastDateString) => {
+  if (!lastDateString) return "today";
   const lastDate = new Date(lastDateString);
   const today = new Date();
 

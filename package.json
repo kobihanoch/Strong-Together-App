@@ -9,12 +9,19 @@
     "ios": "expo start --ios",
     "web": "expo start --web",
     "release": "standard-version",
-    "test": "jest --watchAll"
+    "test": "jest"
   },
   "jest": {
     "preset": "jest-expo",
+    "setupFilesAfterEnv": [
+      "<rootDir>/tests/setup.js"
+    ],
     "transformIgnorePatterns": [
       "node_modules/(?!((jest-)?react-native|@react-native(-community)?|expo(nent)?|@expo(nent)?/.*|@expo-google-fonts/.*|react-navigation|@react-navigation/.*|@sentry/react-native|native-base|react-native-svg))"
+    ],
+    "testMatch": [
+      "**/__tests__/**/*.test.js?(x)",
+      "**/?(*.)+(spec|test).js?(x)"
     ]
   },
   "dependencies": {
@@ -114,11 +121,15 @@
   "devDependencies": {
     "@babel/core": "^7.26.0",
     "@eslint/js": "^9.23.0",
+    "@testing-library/jest-native": "^5.4.3",
+    "@testing-library/react-native": "^13.3.3",
     "@types/react": "~19.1.12",
     "eslint": "^9.23.0",
     "eslint-plugin-react": "^7.37.4",
     "globals": "^16.0.0",
     "isexe": "^3.1.1",
+    "jest": "^29.7.0",
+    "jest-expo": "^54.0.13",
     "standard-version": "^9.5.0",
     "typescript": "~5.9.2"
   },
