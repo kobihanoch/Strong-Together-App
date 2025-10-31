@@ -1,4 +1,4 @@
-# Strong Together App – Frontend (v4.4.0)
+# Strong Together App – Frontend (v4.5.0)
 
 <br><br>
 
