@@ -154,6 +154,7 @@ Version 4 builds on top of this by introducing a **smart cache layer**, **offlin
   - The app **generates and persists** a P-256 key pair on first launch using `jose.generateKeyPair("ES256")`.
   - The **public JWK** is embedded in the JWT header so the backend can verify the signature.
   - This hardens token theft scenarios by requiring possession of the private key to mint valid proofs tied to the exact **method + URL**.
+- **Workout Reminders (coming soon)** – personalized daily push notifications based on your workout history and habits, powered by the new backend reminder engine.
 
 ---
 
@@ -318,89 +319,118 @@ installs native modules.
 
 ## Database Schema
 
-The backend uses PostgreSQL as its primary datastore. The schema
-defines tables for users, messages, workout plans, splits, exercises
-and tracking logs. The simplified ER diagram below shows how the
-entities relate to each other:
+The backend uses PostgreSQL as its primary datastore.  
+The schema defines tables for **users**, **messages**, **workout plans**, **splits**, **exercises**, **tracking logs**, **workout summaries**, and **user reminder configurations** (`user_split_information`, `user_split_settings`).
 
-![Database schema overview](https://github.com/user-attachments/assets/a595f01f-40ad-4fcd-b4ea-8c749d77c160)
+The simplified ER diagram below shows how the entities relate to each other:
+
+![Database schema overview](https://github.com/user-attachments/assets/c5223959-3de0-4f5d-a48a-6c8e85ce6c3b)
 
 Important points about the schema:
 
-- **Users** table stores authentication credentials and profile
-  metadata (`username`, `email`, `role`, `push_token`, etc.).
-- **WorkoutPlans** contain programmes created by a user or
-  trainer. Each plan has multiple **WorkoutSplits** (e.g. chest day,
-  legs day).
-- **Exercises** catalog the available movements along with
-  descriptions and targeted muscle groups.
-- **ExerciseToWorkoutSplit** is a join table mapping exercises to
-  splits with an order index and number of sets.
-- **ExerciseTracking** records actual performance data - weight and
-  repetitions - for each workout date and split mapping.
-- **Messages** stores subject/body along with sender and receiver
-  identifiers.
-- **Auth/Versioning** – The server employs **token versioning (CAS)** on the users table to invalidate tokens: bumping the `token_version` atomically invalidates all previously issued refresh/access tokens for that user without maintaining a blacklist table.
+- **Users** – Stores authentication credentials and profile metadata (`username`, `email`, `role`, `push_token`, etc.).  
+  Token versioning (CAS) is used to invalidate all active tokens atomically when needed.
 
-> **Optimisations:** In version 3, indexes were added on the
-> foreign‑key columns (e.g. `workout_id`, `user_id`) and SQL views were
-> introduced for common joins. These changes reduce query latency and
-> improve performance when fetching nested data.
+- **WorkoutPlans** – Contain workout programs created by users or trainers.  
+  Each plan links to multiple **WorkoutSplits** (e.g., push/pull/legs).
+
+- **WorkoutSplits** – Represent logical divisions within a plan (e.g., “Chest Day”).  
+  Each split connects to exercises via the join table `ExerciseToWorkoutSplit`.
+
+- **ExerciseToWorkoutSplit** – Join table mapping exercises to splits, including `order_index`, `num_sets`, and `notes`.  
+  This structure defines the *planned* workout layout.
+
+- **ExerciseTracking** – Stores *performed* data: `weight`, `repetitions`, `set_index`, `user_id`, and the associated `ExerciseToWorkoutSplit` reference.  
+  Each log is now linked to a **WorkoutSummary** entry (see below).
+
+- **WorkoutSummary** *(NEW)* – Groups all tracking rows from a single session under one `workout_summary_id`.  
+  Enables full-session analysis, PR tracking, and session-level metrics (duration, total volume, etc.).
+
+- **User_Split_Information** *(NEW)* – Stores daily computed data per user and split, such as the next workout time, day of week, and UTC time for scheduling reminders.  
+  This table is refreshed nightly by the function `refresh_user_split_information()`.
+
+- **User_Split_Settings** *(NEW)* – Stores each user's reminder preferences (e.g., offset minutes before workout, enable/disable reminders).  
+  The backend reads from this table hourly to send notifications through the push service.
+
+- **Messages** – Stores system messages and notifications.  
+  Each message includes a `subject`, `body`, `sender_id`, `receiver_id`, and `is_read` flag.
+
+> **Optimisations:**  
+> All foreign key columns (`user_id`, `workout_id`, `split_id`, `summary_id`) are indexed.  
+> SQL **views** and **materialized functions** are used to optimize analytics and daily cron operations.
+
+---
 
 ### Workout Flow
 
 ![Database workout flow](https://github.com/user-attachments/assets/7a634d62-9c30-4546-b24e-46df64781a6a)
 
-1. **Create a Plan** – A user (or trainer) starts by creating a
-   `WorkoutPlan` with a name and difficulty level. This inserts a
-   record into the `workoutplans` table with a `user_id` pointing to
-   the owner.
-2. **Add Splits** – For each plan, the user defines one or more
-   `WorkoutSplits`. Each split represents a training session (e.g.
-   “Upper Body”) and is stored in the `workoutsplits` table with a
-   foreign key back to its plan.
-3. **Assign Exercises** – Using the exercise catalogue, the user
-   selects movements for each split. These associations are stored
-   in the `exercisetoworkoutsplit` table along with an order index
-   (position in the workout) and planned number of sets.
+1. **Create a Plan** – The user (or trainer) creates a record in `workoutplans`.  
+2. **Add Splits** – Each plan includes one or more entries in `workoutsplits`.  
+3. **Assign Exercises** – Exercises are attached to splits via `exercisetoworkoutsplit`.  
+4. **Sync Reminder Data** – When a split is added or updated, `refresh_user_split_information()` recalculates reminder info.
+
+---
 
 ### Tracking Flow
 
-![Database workout tracking flow](https://github.com/user-attachments/assets/21dba52e-1cb9-459c-a2f6-2b4e9a3e9588)
+![Database workout tracking flow](https://github.com/user-attachments/assets/f373dd1e-909a-425d-a1cf-e991550f22cc)
 
 - **Workouts**
-  1. **Select a split** – On the day of training, the user
-     opens a split and sees the list of exercises in order.
-  2. **Record Sets** – For each exercise, the user logs weight and
-     repetitions. Each entry is persisted as a row in the
-     `exercisetracking` table with a reference to the
-     `exercisetoworkoutsplit` identifier, the performing `user_id` and
-     the date of the workout.
-  3. **Review Progress** – The app aggregates tracking data to show
-     charts of personal records, trends over time and progress against
-     planned sets. These analytics are built on SQL views in the
-     backend for efficiency.
+  1. **Select a split** – The user opens a `WorkoutSplit` and loads assigned exercises.
+  2. **Start Session** – A new `WorkoutSummary` entry is created.
+  3. **Record Sets** – Each logged set inserts a new row into `ExerciseTracking`, linked to the current summary.
+  4. **Finish Workout** – The summary is updated with session stats (duration, total sets, etc.).
+  5. **Review Progress** – The frontend aggregates data by `workout_summary_id` for per-session analytics.
+
 - **Cardio**
-  1. **Log daily** - log daily cardio, for now it's just walk/run, and duration.
+  1. **Log daily cardio** – Users can log cardio duration once per day (e.g. walk/run).  
+     This will be merged into workout analytics in a future version.
+
+---
 
 ### Messages Flow
 
 ![Database workout tracking flow](https://github.com/user-attachments/assets/d0e6754a-9123-4443-9fe5-eaecca6885a8)
 
-1. **Compose Message** – System messages after a workout.
-   Each message includes a `subject` and `msg` body. When a message
-   is sent, a record is inserted into the `messages` table with
-   `sender_id` and `receiver_id` foreign keys.
-2. **Receive & Read** – Recipients fetch their inbox via the API.
-   When a message is opened, the `is_read` flag is updated to `true`.
-   The app may also use push notifications to alert users of new
-   messages.
-3. **Delete** – Messages can be removed from the inbox by issuing a delete request, which marks the record as
-   deleted in the database.
+1. **Compose Message** – System-generated (e.g. after completing a workout).  
+2. **Receive & Read** – Users fetch messages via the API; reading marks `is_read = true`.  
+3. **Delete** – Messages can be soft-deleted for audit history.
+
+---
 
 ### Auth Flow
 
 ![Database workout tracking flow](https://github.com/user-attachments/assets/eb0c0c2a-84bc-4409-9b7a-b7019c1ebd27)
+
+1. **User Authentication** – Supports email/password and OAuth (Google, Apple).  
+2. **Access & Refresh Tokens** – Issued JWTs may include **DPoP proof binding**.  
+3. **Token Versioning (CAS)** – Any logout or password change invalidates all previous tokens.  
+4. **DPoP Proofs** – Each protected request includes a signed `dpop+jwt` verifying method, URL, and key binding.  
+5. **Push Tokens** – Stored per user to support reminder notifications.
+
+---
+
+### Reminder Flow
+
+![Reminder Flow Diagram Placeholder](https://github.com/user-attachments/assets/39a0c9fb-aba8-4e27-8c6d-2568167e546c)
+
+1. **Data Preparation (Nightly Job)**  
+   - The function `refresh_user_split_information()` runs at **02:00 UTC** to compute the next upcoming workouts for each user.  
+   - It updates `user_split_information` with the exact UTC times for each split.
+
+2. **Reminder Scheduling (Daily Job)**  
+   - Every day, the backend job reads both `user_split_information` and `user_split_settings`.  
+   - It calculates which workouts are approaching (based on each user's `reminder_offset_minutes`).  
+   - Push messages are queued via the **Expo Push API** for delivery.
+   - Push notifications are enqueued with a **delayMs**, for hourly notifications.
+
+3. **Push Delivery**  
+   - Notifications are sent directly to the user's device using their saved `push_token`.  
+   - Example:  
+     _“Kobi, your Push Day workout starts in 30 minutes.”_
+
+---
 
 <!-- Removed the previous diagram to avoid implying a blacklist-based flow -->
 
