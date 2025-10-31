@@ -13,23 +13,25 @@ export const useStartWorkoutCache = (
   const cacheKey = keyStartWorkout(userId);
 
   // Start time calculated once at mounting, clears on unmounting
+  // UNCOMMENT TO ENABLE TIME PAUSE DURING BREAKOFFS
   const [pausedTotal, setPausedTotal] = useState(
-    resumedWorkout ? resumedWorkout.pausedTotal : 0
+    /*resumedWorkout ? resumedWorkout.pausedTotal : */ 0
   );
   const startTime = useMemo(
     () => (resumedWorkout ? resumedWorkout.startTime : Date.now()),
     [resumedWorkout]
   );
 
+  // UNCOMMENT TO ENABLE TIME PAUSE DURING BREAKOFFS
   // Total pause time
-  useEffect(() => {
+  /*useEffect(() => {
     const lp = resumedWorkout?.lastPause;
     if (typeof lp === "number" && Number.isFinite(lp)) {
       const delta = Math.max(0, Date.now() - lp); // clamp against negatives
       setPausedTotal((prev) => prev + delta);
     }
     // run once on mount; do not re-run on prop identity changes
-  }, []);
+  }, []);*/
 
   // Debounced caching (kept exactly with the commented call)
   const saveToCache = useCallback(async () => {
