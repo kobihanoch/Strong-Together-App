@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [4.5.0](https://github.com/kobihanoch/Strong-Together-App/compare/v4.4.0...v4.5.0) (2025-10-31)
+
+
+### Features
+
+* **Start Workout:** Client sends start and end time ([713dd0d](https://github.com/kobihanoch/Strong-Together-App/commit/713dd0dae0263bd882377716e33fa5158907159d))
+* **Tests:** Applied tests for multiple components ([7c37add](https://github.com/kobihanoch/Strong-Together-App/commit/7c37addfe426af9719577fe37dc642fe8471d5bb))
+* **Tests:** Installed jest ([0908c5a](https://github.com/kobihanoch/Strong-Together-App/commit/0908c5a43129a2c5f46a6949379ca19d012b202d))
+
 ## [4.4.0](https://github.com/kobihanoch/Strong-Together-App/compare/v4.3.1...v4.4.0) (2025-10-28)
 
 
