@@ -324,7 +324,7 @@ The schema defines tables for **users**, **messages**, **workout plans**, **spli
 
 The simplified ER diagram below shows how the entities relate to each other:
 
-![Database schema overview](https://github.com/user-attachments/assets/c5223959-3de0-4f5d-a48a-6c8e85ce6c3b)
+![Database schema overview](https://github.com/user-attachments/assets/9e518921-8f86-4882-8d05-96bbbd0c8d47)
 
 Important points about the schema:
 
@@ -340,7 +340,7 @@ Important points about the schema:
 - **ExerciseToWorkoutSplit** – Join table mapping exercises to splits, including `order_index`, `num_sets`, and `notes`.  
   This structure defines the *planned* workout layout.
 
-- **ExerciseTracking** – Stores *performed* data: `weight`, `repetitions`, `set_index`, `user_id`, and the associated `ExerciseToWorkoutSplit` reference.  
+- **ExerciseTracking** – Stores *performed* data: `weight`, `repetitions`, `set_index`, and the associated `ExerciseToWorkoutSplit` reference.  
   Each log is now linked to a **WorkoutSummary** entry (see below).
 
 - **WorkoutSummary** *(NEW)* – Groups all tracking rows from a single session under one `workout_summary_id`.  
@@ -374,7 +374,7 @@ Important points about the schema:
 
 ### Tracking Flow
 
-![Database workout tracking flow](https://github.com/user-attachments/assets/f373dd1e-909a-425d-a1cf-e991550f22cc)
+![Database workout tracking flow](https://github.com/user-attachments/assets/be800fc7-5411-40f5-9740-2395af151f08)
 
 - **Workouts**
   1. **Select a split** – The user opens a `WorkoutSplit` and loads assigned exercises.
@@ -382,6 +382,10 @@ Important points about the schema:
   3. **Record Sets** – Each logged set inserts a new row into `ExerciseTracking`, linked to the current summary.
   4. **Finish Workout** – The summary is updated with session stats (duration, total sets, etc.).
   5. **Review Progress** – The frontend aggregates data by `workout_summary_id` for per-session analytics.
+ 
+- **WorkoutSummary** – Groups all tracking rows from a single session under one workout_summary_id.
+Holds the session-level fields such as: user_id, workout_start_utc, workout_end_utc, maybe split_id / workout_id, totals, etc.
+Because of that, exercise_tracking rows don’t need user_id or per-row timestamps anymore – they just point to the summary.
 
 - **Cardio**
   1. **Log daily cardio** – Users can log cardio duration once per day (e.g. walk/run).  
