@@ -1,11 +1,16 @@
 // api/DPoP/ensureDpopKeyPair.js
-import * as SecureStore from "expo-secure-store";
-import { generateKeyPair } from "jose";
+import * as SecureStore from 'expo-secure-store';
+import { generateKeyPair, JWK } from 'jose';
 
-const PRIV_JWK_KEY = "dpop_private_jwk";
-const PUB_JWK_KEY = "dpop_public_jwk";
+const PRIV_JWK_KEY = 'dpop_private_jwk';
+const PUB_JWK_KEY = 'dpop_public_jwk';
 
-let _cached = null;
+interface KeyPair {
+  privateJwk: JWK;
+  publicJwk: JWK;
+}
+
+let _cached: KeyPair | null = null;
 
 /**
  * Ensures a persistent ES256 key pair for DPoP.
@@ -13,7 +18,7 @@ let _cached = null;
  * - Exports JWKs via crypto.subtle.exportKey to avoid class/realm mismatches.
  * - Persists only JWKs; import them later when you need CryptoKey objects.
  */
-export default async function ensureDpopKeyPair() {
+export default async function ensureDpopKeyPair(): Promise<KeyPair> {
   try {
     if (_cached) return _cached;
     // 1) Try to load from storage (do NOT delete here)
@@ -23,20 +28,20 @@ export default async function ensureDpopKeyPair() {
     ]);
 
     if (privJson && pubJson) {
-      const privateJwk = JSON.parse(privJson);
-      const publicJwk = JSON.parse(pubJson);
+      const privateJwk = JSON.parse(privJson) as JWK;
+      const publicJwk = JSON.parse(pubJson) as JWK;
       _cached = { privateJwk, publicJwk };
       return _cached;
     }
 
     // 2) Generate new keys (extractable so we can export JWKs)
-    const { publicKey, privateKey } = await generateKeyPair("ES256", {
+    const { publicKey, privateKey } = await generateKeyPair('ES256', {
       extractable: true,
     });
 
     // 3) Export JWKs via the SAME engine that created the keys (no realm mismatch)
-    const privateJwk = await global.crypto.subtle.exportKey("jwk", privateKey);
-    const publicJwk = await global.crypto.subtle.exportKey("jwk", publicKey);
+    const privateJwk = await global.crypto.subtle.exportKey('jwk', privateKey);
+    const publicJwk = await global.crypto.subtle.exportKey('jwk', publicKey);
 
     // 4) Persist
     await Promise.all([
@@ -48,5 +53,6 @@ export default async function ensureDpopKeyPair() {
     return _cached;
   } catch (e) {
     console.error(e);
+    throw e;
   }
 }

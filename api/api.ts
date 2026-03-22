@@ -1,27 +1,32 @@
-import axios from "axios";
-import Constants from "expo-constants";
-import { showErrorAlert } from "../errors/errorAlerts";
-import { refreshAndRotateTokens } from "../services/AuthService";
-import GlobalAuth from "../utils/authUtils";
-import { openUpdateModal } from "../utils/imperativeUpdateModal";
-import { saveRefreshToken } from "../utils/tokenStore";
-import { API_BASE_URL } from "./apiConfig";
-import {
-  bootstrapApi,
-  ensureBootstrap,
-  isOpen,
-  isTracked,
-  responseMap,
-} from "./bootstrapApi";
-import {
-  isDeviceOnline,
-  notifyOffline,
-  notifyServerDown,
-} from "./networkCheck";
-import buildDpopProof from "./DPoP/buildDpopProof";
-import calculateJKT from "./DPoP/calculateJKT";
+import axios, { AxiosError, AxiosRequestConfig, AxiosResponse, InternalAxiosRequestConfig } from 'axios';
+import Constants from 'expo-constants';
+import { showErrorAlert } from '../errors/errorAlerts';
+import { refreshAndRotateTokens } from '../services/AuthService';
+import GlobalAuth from '../utils/authUtils';
+import { openUpdateModal } from '../utils/imperativeUpdateModal';
+import { saveRefreshToken } from '../utils/tokenStore';
+import { API_BASE_URL } from './apiConfig';
+import { ensureBootstrap, isOpen, isTracked, responseMap } from './bootstrapApi';
+import buildDpopProof from './DPoP/buildDpopProof';
+import calculateJKT from './DPoP/calculateJKT';
+import { isDeviceOnline, notifyOffline, notifyServerDown } from './networkCheck';
 
-const api = axios.create({ baseURL: API_BASE_URL, timeout: 12000 });
+declare module 'axios' {
+  export interface AxiosRequestConfig {
+    _retry?: boolean;
+    isUpgradeRequired?: boolean;
+    isNetworkError?: boolean;
+    isServerError?: boolean;
+  }
+
+  export interface AxiosError {
+    isUpgradeRequired?: boolean;
+    isNetworkError?: boolean;
+    isServerError?: boolean;
+  }
+}
+
+const api = axios.create({ baseURL: API_BASE_URL!, timeout: 12000 });
 
 // === WRAP api.get ===
 
@@ -29,7 +34,10 @@ const api = axios.create({ baseURL: API_BASE_URL, timeout: 12000 });
 const rawGet = api.get.bind(api);
 
 // Replace api.get to support bootstrap fan-out on first load
-api.get = async function wrappedGet(url, config) {
+api.get = async function wrappedGet<T = unknown, R = AxiosResponse<T>, D = unknown>(
+  url: string,
+  config?: AxiosRequestConfig<D>,
+): Promise<R> {
   // Intercept only during first-load for tracked endpoints
   if (isOpen() && isTracked(url)) {
     try {
@@ -46,13 +54,14 @@ api.get = async function wrappedGet(url, config) {
       return {
         data: slice,
         status: 200,
+        statusText: 'OK',
         headers: {},
-        config: config ?? {},
+        config: config || ({} as InternalAxiosRequestConfig),
         request: null,
-      };
+      } as unknown as R;
     } catch (e) {
       // Fallback on bootstrap error
-      console.log("Error:", e);
+      console.log('Error:', e);
       return rawGet(url, config);
     }
   }
@@ -62,35 +71,31 @@ api.get = async function wrappedGet(url, config) {
 };
 
 api.interceptors.request.use(
-  async (config) => {
-    console.log("[API]:", config.url);
+  async (config: InternalAxiosRequestConfig) => {
+    console.log('[API]:', config.url);
     try {
-      if (
-        config.url.includes("login") ||
-        config.url.includes("oauth/google") ||
-        config.url.includes("oauth/apple")
-      ) {
+      const url = config.url || '';
+      if (url.includes('login') || url.includes('oauth/google') || url.includes('oauth/apple')) {
         // Build JKT for tokens signing (login)
         const res = await calculateJKT();
-        config.headers.set("dpop-key-binding", res);
+        config.headers.set('dpop-key-binding', res);
       } else {
         // Build DPoP for other requests
-        const finalUrl = new URL(config.url, config.baseURL);
+        const finalUrl = new URL(url, config.baseURL);
         const htu = `${finalUrl.origin}${finalUrl.pathname}`;
-        const dpop = await buildDpopProof(
-          config.method,
-          htu,
-          config.headers?.Authorization?.split(" ")[1] || null
-        );
-        config.headers.set("dpop", dpop);
+        const authHeader = config.headers.Authorization as string | undefined;
+        const accessToken = (authHeader?.split(' ')[1] || null) as string | null;
+
+        const dpop = await buildDpopProof(config.method?.toUpperCase() || 'GET', htu, accessToken);
+        config.headers.set('dpop', dpop);
       }
     } catch {}
-    config.headers.set("x-app-version", Constants.expoConfig.version);
+    config.headers.set('x-app-version', Constants.expoConfig!.version);
     return config;
   },
   (error) => {
     return Promise.reject(error);
-  }
+  },
 );
 
 // Flow:
@@ -107,8 +112,10 @@ api.interceptors.request.use(
 
 api.interceptors.response.use(
   (res) => res,
-  async (error) => {
-    const original = error.config || {};
+  async (error: AxiosError<{ message?: string }>) => {
+    const original = error.config;
+    if (!original) return Promise.reject(error);
+
     const status = error.response?.status;
     const data = error.response?.data;
 
@@ -120,11 +127,11 @@ api.interceptors.response.use(
     }
 
     if (status === 401) {
-      console.log("401 from API:", {
+      console.log('401 from API:', {
         url: original.url,
         method: original.method,
         resp: data,
-        authHeader: original.headers?.Authorization?.slice(0, 32) + "...",
+        authHeader: String(original.headers?.Authorization)?.slice(0, 32) + '...',
       });
     }
 
@@ -134,27 +141,27 @@ api.interceptors.response.use(
     if (!online) {
       notifyOffline();
       error.isNetworkError = true;
-      console.log("Offline");
+      console.log('Offline');
       return Promise.reject(error);
     } else if (!error.response) {
       // Some other fetch/network problem (e.g., DNS, TLS fail)
       notifyServerDown();
       error.isServerError = true;
-      console.log("Server down");
+      console.log('Server down');
       return Promise.reject(error);
     }
 
     // Don't go for refresh logic for them - just logout or keep logged out and reject
-    const url = original?.url || "";
+    const url = original?.url || '';
     if (
       original?._retry ||
-      url.includes("/api/auth/refresh") ||
-      url.includes("/api/auth/login") ||
-      url.includes("/api/users/create") ||
-      url.includes("/api/auth/logout")
+      url.includes('/api/auth/refresh') ||
+      url.includes('/api/auth/login') ||
+      url.includes('/api/users/create') ||
+      url.includes('/api/auth/logout')
     ) {
       // Some toast to show error
-      showErrorAlert("Error", data?.message);
+      showErrorAlert('Error', data?.message);
       return Promise.reject(error);
     }
 
@@ -172,20 +179,21 @@ api.interceptors.response.use(
         return api(original);
       } catch (refreshErr) {
         // If got here failed at refresh
-        if (refreshErr?.response?.status === 401) {
-          if (GlobalAuth.logout) GlobalAuth.logout();
+        const isAuthError = (refreshErr as AxiosError).response?.status === 401;
+        if (isAuthError && GlobalAuth.logout) {
+          GlobalAuth.logout();
         }
         // Some toast to show error
-        showErrorAlert("Error", data?.message);
+        showErrorAlert('Error', data?.message || 'Session expired');
         // Block
         return Promise.reject(refreshErr);
       }
     }
 
-    showErrorAlert("Error", data?.message);
+    showErrorAlert('Error', data?.message || 'Something went wrong');
     // Bloack all types of error
     return Promise.reject(error);
-  }
+  },
 );
 
 export default api;

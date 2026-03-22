@@ -1,1 +1,3 @@
-export type BootstrapRequestQuery = z.infer<typeof bootstrapRequest.shape.query>;
+export type BootstrapRequestQuery = {
+  tz?: string | undefined;
+};
