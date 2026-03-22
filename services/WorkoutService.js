@@ -25,13 +25,13 @@ export const getUserExerciseTracking = async () => {
 };
 
 // Removes a workout plan
-export const deleteWorkout = async () => {
+/*export const deleteWorkout = async () => {
   try {
     await api.delete("/api/workouts/delete");
   } catch (error) {
     throw error;
   }
-};
+};*/
 
 // Add a new workout plan
 export const addWorkout = async (workoutData) => {

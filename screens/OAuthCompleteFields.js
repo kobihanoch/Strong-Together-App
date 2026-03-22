@@ -1,5 +1,5 @@
 // Only English comments inside the code
-import { LinearGradient } from "expo-linear-gradient";
+/*import { LinearGradient } from "expo-linear-gradient";
 import React, { useState } from "react";
 import {
   ActivityIndicator,
@@ -35,7 +35,7 @@ const OAuthCompleteFields = ({ navigation, route }) => {
         missingFields.includes("email") &&
         !email.length > 0 /*||
         (missingFields.includes("name") && !fullName.length > 0)*/
-      ) {
+/*) {
         showErrorAlert("Error", "Please fill all requested fields to continue");
         return;
       }
@@ -53,9 +53,9 @@ const OAuthCompleteFields = ({ navigation, route }) => {
     } finally {
       setIsSending(false);
     }
-  };
+  };*/
 
-  return (
+/*return (
     <KeyboardAwareScrollView
       contentContainerStyle={{
         flex: 1,
@@ -92,8 +92,8 @@ const OAuthCompleteFields = ({ navigation, route }) => {
               textContentType="name"
               autoComplete="name"
             />
-          )*/}
-        </View>
+          )*/ //}
+/*</View>
 
         <TouchableOpacity
           style={styles.buttonRegister}
@@ -188,4 +188,4 @@ const styles = StyleSheet.create({
     textAlign: "center",
     fontFamily: "Inter_400Regular",
   },
-});
+});*/

@@ -26,22 +26,22 @@ const Intro = ({ navigation }) => {
 
   const handleApplePress = async () => {
     const { missingFields } = await handleAppleAuth();
-    if (missingFields) {
+    /*if (missingFields) {
       navigation.navigate("OAuthCompleteFields", {
         missingFields,
         provider: "apple",
       });
-    }
+    }*/
   };
 
   const handleGooglePress = async () => {
     const { missingFields } = await handleGoogleAuth();
-    if (missingFields) {
+    /*if (missingFields) {
       navigation.navigate("OAuthCompleteFields", {
         missingFields,
         provider: "google",
       });
-    }
+    }*/
   };
 
   return (
