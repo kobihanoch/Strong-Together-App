@@ -1,8 +1,8 @@
-import { useMemo } from "react";
-import { useAnalysisContext } from "../../context/AnalysisContext";
-import { useAuth } from "../../context/AuthContext";
-import { useGlobalAppLoadingContext } from "../../context/GlobalAppLoadingContext";
-import { useWorkoutContext } from "../../context/WorkoutContext";
+import { useMemo } from 'react';
+import { useAnalysisContext } from '../../context/AnalysisContext';
+import { useAuth } from '../../context/AuthContext';
+import { useGlobalAppLoadingContext } from '../../context/GlobalAppLoadingContext';
+import { useWorkoutContext } from '../../context/WorkoutContext';
 
 const useHomePageLogic = () => {
   // Auth state (user + global session loading)
@@ -17,24 +17,21 @@ const useHomePageLogic = () => {
 
   // Analysis state (tracking + derived analytics + loading)
   const { analyzedExerciseTrackingData } = useAnalysisContext();
-  const hasTracking = useMemo(
-    () => !!analyzedExerciseTrackingData,
-    [analyzedExerciseTrackingData]
-  );
+  const hasTracking = useMemo(() => !!analyzedExerciseTrackingData, [analyzedExerciseTrackingData]);
 
   // Derive stable user fields
-  const { username, userId, firstName, profileImageUrl } = useMemo(() => {
-    const u = user ?? {};
-    // Safe split for first name
-    const fName =
-      typeof u.name === "string" && u.name.trim().length
-        ? u.name.trim().split(" ")[0]
-        : "";
+  const {
+    username = '',
+    userId = '',
+    firstName = '',
+    profileImageUrl = '',
+  } = useMemo(() => {
+    const u = user!;
     return {
-      username: u.username ?? "",
-      userId: u.id ?? "",
-      firstName: fName,
-      profileImageUrl: u.profile_image_url ?? "",
+      username: u.username ?? '',
+      userId: u.id ?? '',
+      firstName: u.name!.trim().split(' ')[0],
+      profileImageUrl: u.profile_image_url ?? '',
     };
   }, [user]);
 
@@ -47,16 +44,15 @@ const useHomePageLogic = () => {
   }, [workout, workoutSplits]);
 
   // Derived analysis fields
-  const { PR, totalWorkoutNumber, mostFrequentSplit, lastWorkoutDate } =
-    useMemo(() => {
-      const a = analyzedExerciseTrackingData ?? {};
-      return {
-        PR: a.pr ?? null,
-        totalWorkoutNumber: a.workoutCount ?? 0,
-        mostFrequentSplit: a.mostFrequentSplit ?? null,
-        lastWorkoutDate: a.lastWorkoutDate ?? "none",
-      };
-    }, [analyzedExerciseTrackingData]);
+  const { PR, totalWorkoutNumber, mostFrequentSplit, lastWorkoutDate } = useMemo(() => {
+    const a = analyzedExerciseTrackingData;
+    return {
+      PR: a?.pr ?? null,
+      totalWorkoutNumber: a?.workoutCount ?? 0,
+      mostFrequentSplit: a?.mostFrequentSplit ?? null,
+      lastWorkoutDate: a?.lastWorkoutDate ?? 'none',
+    };
+  }, [analyzedExerciseTrackingData]);
 
   // Stable data object for easy consumption in components
   const data = useMemo(
@@ -86,7 +82,7 @@ const useHomePageLogic = () => {
       mostFrequentSplit,
       PR,
       isLoading,
-    ]
+    ],
   );
 
   return {

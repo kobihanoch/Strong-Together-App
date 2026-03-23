@@ -1,4 +1,5 @@
 import { ExerciseEntity } from '../entities/exercise.entity.ts';
+import { WorkoutSplitEntity } from '../entities/workoutSplit.entity.ts';
 
 export interface WorkoutRMRecord {
   exercise: ExerciseEntity['name'];
@@ -7,7 +8,7 @@ export interface WorkoutRMRecord {
   max_1rm: number;
 }
 
-export type WorkoutRMsResponse = Record<string, WorkoutRMRecord>; // Key is exercise_id
+export type WorkoutRMsResponse = Record<ExerciseEntity['id'], WorkoutRMRecord>; // Key is exercise_id
 
 export interface AdherenceExerciseStats {
   planned: number;
@@ -16,6 +17,6 @@ export interface AdherenceExerciseStats {
 }
 
 export type GoalAdherenceResponse = Record<
-  string, // splitname
+  NonNullable<WorkoutSplitEntity['name']>, // splitname
   Record<string, AdherenceExerciseStats> // exercise name -> stats
 >;
