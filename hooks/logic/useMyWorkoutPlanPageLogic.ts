@@ -1,20 +1,17 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { useAnalysisContext } from "../../context/AnalysisContext";
-import { useWorkoutContext } from "../../context/WorkoutContext";
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useAnalysisContext } from '../../context/AnalysisContext';
+import { WorkoutContextWorkoutSplit } from '../../context/types/workoutContextTypes.dto';
+import { useWorkoutContext } from '../../context/WorkoutContext';
+import { ExerciseCounter } from '../types/useMyWorkoutPlanTypes.dto';
 
 export const useMyWorkoutPlanPageLogic = () => {
-  const {
-    workout,
-    workoutForEdit,
-    workoutSplits,
-    exercises: allExercises,
-  } = useWorkoutContext();
+  const { workout, workoutForEdit, workoutSplits, exercises: allExercises } = useWorkoutContext();
 
   const hasWorkout = useMemo(() => !!workout, [workout]);
 
   const exerciseCounter = useMemo(() => {
     if (!hasWorkout) return;
-    return Object.entries(workoutForEdit).reduce((acc, [s, ex]) => {
+    return Object.entries(workoutForEdit!).reduce((acc: ExerciseCounter, [s, ex]) => {
       const exCount = ex.length;
       const splitName = s;
       acc[splitName] = exCount;
@@ -22,9 +19,8 @@ export const useMyWorkoutPlanPageLogic = () => {
     }, {});
   }, [hasWorkout, workoutForEdit]);
 
-  const { analyzedExerciseTrackingData, hasTrainedToday } =
-    useAnalysisContext();
-  const [selectedSplit, setSelectedSplit] = useState(null);
+  const { analyzedExerciseTrackingData, hasTrainedToday } = useAnalysisContext();
+  const [selectedSplit, setSelectedSplit] = useState<WorkoutContextWorkoutSplit | null>(null);
 
   // Set selected split at startup
   useEffect(() => {
@@ -41,14 +37,12 @@ export const useMyWorkoutPlanPageLogic = () => {
 
   // Gets preformed split count
   const splitTrainedCount = useMemo(() => {
-    if (!analyzedExerciseTrackingData) return;
-    return (
-      analyzedExerciseTrackingData?.splitDaysByName?.[selectedSplit?.name] ?? 0
-    );
+    if (!analyzedExerciseTrackingData || !selectedSplit) return;
+    return analyzedExerciseTrackingData.splitDaysByName[selectedSplit.name] ?? 0;
   }, [analyzedExerciseTrackingData, selectedSplit]);
 
   // Handling selection of split
-  const handleWorkoutSplitPress = useCallback((split) => {
+  const handleWorkoutSplitPress = useCallback((split: WorkoutContextWorkoutSplit) => {
     setSelectedSplit(split);
   }, []);
 
