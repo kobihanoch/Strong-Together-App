@@ -1,23 +1,18 @@
-import React, {
-  createContext,
-  useCallback,
-  useContext,
-  useMemo,
-  useState,
-} from "react";
-import { keyWorkoutPlan } from "../cache/cacheUtils";
-import useCacheAndFetch from "../hooks/useCacheAndFetch";
-import useUpdateGlobalLoading from "../hooks/useUpdateGlobalLoading";
-import { getUserWorkout } from "../services/WorkoutService";
-import { extractWorkoutSplits } from "../utils/workoutContextUtils";
-import { useAuth } from "./AuthContext";
-import { hasBootstrapPayload } from "../api/bootstrapApi";
+import React, { createContext, useCallback, useContext, useMemo, useState } from 'react';
+import { keyWorkoutPlan } from '../cache/cacheUtils';
+import useCacheAndFetch from '../hooks/useCacheAndFetch';
+import useUpdateGlobalLoading from '../hooks/useUpdateGlobalLoading';
+import { getUserWorkout } from '../services/WorkoutService';
+import { extractWorkoutSplits } from '../utils/workoutContextUtils';
+import { useAuth } from './AuthContext';
+import { WholeUserWorkoutPlan, WorkoutSplitsMap } from '../types/dto/workoutPlans.dto';
+import { GetWholeUserWorkoutPlanResponse } from '../types/api/workouts/responses';
+import { WorkoutContextCachePayload, WorkoutContextValue } from './types/workoutContextTypes.dto';
 
-const WorkoutContext = createContext(null);
+const WorkoutContext = createContext<WorkoutContextValue | null>(null);
 export const useWorkoutContext = () => {
   const ctx = useContext(WorkoutContext);
-  if (!ctx)
-    throw new Error("useWorkoutContext must be used within a WorkoutProvider");
+  if (!ctx) throw new Error('useWorkoutContext must be used within a WorkoutProvider');
   return ctx;
 };
 
@@ -30,11 +25,11 @@ export const useWorkoutContext = () => {
  * - Provide an editable copy (workoutForEdit)
  */
 
-export const WorkoutProvider = ({ children }) => {
+export const WorkoutProvider = ({ children }: { children: React.ReactNode }) => {
   const { user, isValidatedWithServer } = useAuth();
 
   // Raw workout plan from API
-  const [workout, setWorkout] = useState(null);
+  const [workout, setWorkout] = useState<WholeUserWorkoutPlan | null>(null);
 
   // Derived data from workout
   const { workoutSplits, exercises } = useMemo(() => {
@@ -42,7 +37,7 @@ export const WorkoutProvider = ({ children }) => {
   }, [workout]);
 
   // Editable version for edit workout
-  const [workoutForEdit, setWorkoutForEdit] = useState(null);
+  const [workoutForEdit, setWorkoutForEdit] = useState<WorkoutSplitsMap | null>(null);
 
   // -------------------------- useCacheHandler props ------------------------------
 
@@ -50,7 +45,7 @@ export const WorkoutProvider = ({ children }) => {
   const fetchFn = useCallback(async () => await getUserWorkout(), []);
 
   // On data function
-  const onDataFn = useCallback((data) => {
+  const onDataFn = useCallback((data: GetWholeUserWorkoutPlanResponse | WorkoutContextCachePayload): void => {
     setWorkout(data?.workoutPlan ?? null);
     setWorkoutForEdit(data?.workoutPlanForEditWorkout ?? null);
   }, []);
@@ -58,25 +53,25 @@ export const WorkoutProvider = ({ children }) => {
   // Cache payload
   const cachePayload = useMemo(
     () => ({ workoutPlan: workout, workoutPlanForEditWorkout: workoutForEdit }),
-    [workout, workoutForEdit]
+    [workout, workoutForEdit],
   );
 
   // Hook usage
-  const { loading, cacheKnown } = useCacheAndFetch(
+  const { loading, cacheKnown } = useCacheAndFetch<WorkoutContextCachePayload, GetWholeUserWorkoutPlanResponse>(
     user, // user prop
     keyWorkoutPlan, // key builder
     isValidatedWithServer, // flag from server
     fetchFn, // fetch cb
     onDataFn, // on data cb
     cachePayload, // cache payload
-    "Workout Context" // log
+    'Workout Context', // log
   );
 
   // Report workout plan loading to global loading
-  useUpdateGlobalLoading("WorkoutPlan", cacheKnown ? loading : true);
+  useUpdateGlobalLoading('WorkoutPlan', cacheKnown ? loading : true);
 
   // Memoized context value
-  const value = useMemo(
+  const value = useMemo<WorkoutContextValue>(
     () => ({
       workout,
       setWorkout,
@@ -86,10 +81,8 @@ export const WorkoutProvider = ({ children }) => {
       setWorkoutForEdit,
       loading,
     }),
-    [workout, workoutSplits, exercises, workoutForEdit, loading]
+    [workout, workoutSplits, exercises, workoutForEdit, loading],
   );
 
-  return (
-    <WorkoutContext.Provider value={value}>{children}</WorkoutContext.Provider>
-  );
+  return <WorkoutContext.Provider value={value}>{children}</WorkoutContext.Provider>;
 };

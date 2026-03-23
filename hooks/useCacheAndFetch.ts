@@ -1,38 +1,36 @@
-import { useEffect, useMemo, useRef, useState } from "react";
-import { TTL_48H } from "../cache/cacheUtils";
-import useGetCache from "./useGetCache";
-import useUpdateCache from "./useUpdateCache";
+import { useEffect, useMemo, useState } from 'react';
+import { TTL_48H } from '../cache/cacheUtils';
+import { AppUser } from '../context/types/authContextTypes.dto';
+import useGetCache from './useGetCache';
+import useUpdateCache from './useUpdateCache';
 
-const useCacheAndFetch = (
-  user,
-  keyBuilderFn,
-  isValidatedByServerFlag,
-  fetchFn,
-  onDataFn,
-  cachedPayload,
-  logLabel
+const useCacheAndFetch = <CachePaylodType, APIDataType>(
+  user: AppUser | { id: AppUser['id'] | null } | null, // {id} only for auth context
+  keyBuilderFn: (id: AppUser['id']) => string,
+  isValidatedByServerFlag: boolean,
+  fetchFn: () => Promise<APIDataType>, // Async function
+  onDataFn: (data: APIDataType | CachePaylodType) => void,
+  cachedPayload: CachePaylodType | null,
+  logLabel: string,
 ) => {
   // Stable cache key
-  const cacheKey = useMemo(
-    () => (user?.id ? keyBuilderFn(user.id) : null),
-    [user?.id]
-  );
+  const cacheKey = useMemo(() => (user?.id ? keyBuilderFn(user.id) : null), [user?.id]);
 
   // Get cache
   // Triggers on key builded
-  const { cached, hydrated: isCacheHydrated } = useGetCache(cacheKey);
+  const { cached, hydrated: isCacheHydrated } = useGetCache<CachePaylodType>(cacheKey);
 
   // Flag for API data hydration to enable cache writing
   // Flag stays true until context is unmounting on logout (guard against initial refrence building)
-  const [dataHydrated, setDataHydrated] = useState(false);
+  const [dataHydrated, setDataHydrated] = useState<boolean>(false);
 
   // Data fetched from cache / API
-  const [data, setData] = useState(null);
+  const [data, setData] = useState<APIDataType | CachePaylodType | null>(null);
 
   // Loading state
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState<boolean>(false);
 
-  const [cacheKnown, setCacheKnown] = useState(false);
+  const [cacheKnown, setCacheKnown] = useState<boolean>(false);
 
   // Updates cache auto when cached payload refrence is builded again (on data change)
   useUpdateCache(logLabel, cacheKey, cachedPayload, TTL_48H, dataHydrated);

@@ -1,28 +1,16 @@
-import React, {
-  createContext,
-  useCallback,
-  useContext,
-  useMemo,
-  useState,
-} from "react";
-import { keyTracking } from "../cache/cacheUtils";
-import useCacheAndFetch from "../hooks/useCacheAndFetch";
-import useUpdateGlobalLoading from "../hooks/useUpdateGlobalLoading";
-import { getUserExerciseTracking } from "../services/WorkoutService";
-import {
-  checkHasTrainedToday,
-  unpackFromExerciseTrackingData,
-} from "../utils/analysisContexUtils";
-import { useAuth } from "./AuthContext";
-import { hasBootstrapPayload } from "../api/bootstrapApi";
+import { createContext, useCallback, useContext, useMemo, useState } from 'react';
+import { keyTracking } from '../cache/cacheUtils';
+import useCacheAndFetch from '../hooks/useCacheAndFetch';
+import useUpdateGlobalLoading from '../hooks/useUpdateGlobalLoading';
+import { getUserExerciseTracking } from '../services/WorkoutService';
+import { checkHasTrainedToday, unpackFromExerciseTrackingData } from '../utils/analysisContexUtils';
+import { useAuth } from './AuthContext';
 
 const AnalysisContext = createContext(null);
 export const useAnalysisContext = () => {
   const ctx = useContext(AnalysisContext);
   if (!ctx) {
-    throw new Error(
-      "useAnalysisContext must be used within a AnalysisProvider"
-    );
+    throw new Error('useAnalysisContext must be used within a AnalysisProvider');
   }
   return ctx;
 };
@@ -44,16 +32,15 @@ export const AnalysisProvider = ({ children }) => {
   // Raw and derived analysis state
   const [exerciseTrackingMaps, setExerciseTrackingMaps] = useState(null);
 
-  const [analyzedExerciseTrackingData, setAnalyzedExerciseTrackingData] =
-    useState(null);
+  const [analyzedExerciseTrackingData, setAnalyzedExerciseTrackingData] = useState(null);
 
   const hasTrainedToday = useMemo(
     () =>
       checkHasTrainedToday(
         analyzedExerciseTrackingData?.lastWorkoutDate,
-        Intl.DateTimeFormat().resolvedOptions().timeZone
+        Intl.DateTimeFormat().resolvedOptions().timeZone,
       ),
-    [analyzedExerciseTrackingData?.lastWorkoutDate]
+    [analyzedExerciseTrackingData?.lastWorkoutDate],
   );
 
   // -------------------------- useCacheHandler props ------------------------------
@@ -68,9 +55,7 @@ export const AnalysisProvider = ({ children }) => {
     setExerciseTrackingMaps(data?.exerciseTrackingMaps ?? []);
     // Determines if data retreived from API or cache
     try {
-      setAnalyzedExerciseTrackingData(
-        unpackFromExerciseTrackingData(data?.exerciseTrackingAnalysis)
-      );
+      setAnalyzedExerciseTrackingData(unpackFromExerciseTrackingData(data?.exerciseTrackingAnalysis));
     } catch (error) {
       setAnalyzedExerciseTrackingData(data?.analyzedExerciseTrackingData);
     }
@@ -82,7 +67,7 @@ export const AnalysisProvider = ({ children }) => {
       exerciseTrackingMaps: exerciseTrackingMaps,
       analyzedExerciseTrackingData: analyzedExerciseTrackingData,
     }),
-    [exerciseTrackingMaps, analyzedExerciseTrackingData]
+    [exerciseTrackingMaps, analyzedExerciseTrackingData],
   );
 
   // Hook usage
@@ -93,11 +78,11 @@ export const AnalysisProvider = ({ children }) => {
     fetchFn, // fetch cb
     onDataFn, // on data cb
     cachePayload, // cache payload
-    "Analysis Context" // log
+    'Analysis Context', // log
   );
 
   // Report analysis loading to global loading
-  useUpdateGlobalLoading("Analysis", cacheKnown ? loading : true);
+  useUpdateGlobalLoading('Analysis', cacheKnown ? loading : true);
 
   // Memoized context value
   const value = useMemo(
@@ -109,17 +94,8 @@ export const AnalysisProvider = ({ children }) => {
       hasTrainedToday,
       loading,
     }),
-    [
-      exerciseTrackingMaps,
-      analyzedExerciseTrackingData,
-      hasTrainedToday,
-      loading,
-    ]
+    [exerciseTrackingMaps, analyzedExerciseTrackingData, hasTrainedToday, loading],
   );
 
-  return (
-    <AnalysisContext.Provider value={value}>
-      {children}
-    </AnalysisContext.Provider>
-  );
+  return <AnalysisContext.Provider value={value}>{children}</AnalysisContext.Provider>;
 };

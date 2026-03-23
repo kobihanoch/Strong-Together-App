@@ -1,10 +1,10 @@
 import api from '../api/api';
 import { UpdateUserBody } from '../types/api/user/requests';
-import { UpdateAuthenticatedUserResponse, UserDataResponse } from '../types/api/user/responses';
+import { GetAuthenticatedUserByIdResponse, UpdateAuthenticatedUserResponse } from '../types/api/user/responses';
 
 // Fetch self data
-export const fetchSelfUserData = async (): Promise<UserDataResponse> => {
-  const { data } = await api.get<UserDataResponse>('/api/users/get');
+export const fetchSelfUserData = async (): Promise<GetAuthenticatedUserByIdResponse> => {
+  const { data } = await api.get<GetAuthenticatedUserByIdResponse>('/api/users/get');
   return data;
 };
 

@@ -1,6 +1,15 @@
-import { showErrorAlert } from "../errors/errorAlerts";
+import { showErrorAlert } from '../errors/errorAlerts';
+import { ExerciseCandidate, SelectedExercise } from '../hooks/types/useCreateWorkoutTypes.dto';
+import { ExerciseToWorkoutSplitEntity } from '../types/entities/exerciseToWorkoutSplit.entity';
+import { WorkoutSplitEntity } from '../types/entities/workoutSplit.entity';
 
-export const addExerciseLogic = (prev, splitName, exercise) => {
+type SplitName = NonNullable<WorkoutSplitEntity['name']>;
+
+export const addExerciseLogic = (
+  prev: Record<SplitName, SelectedExercise[]>,
+  splitName: string,
+  exercise: ExerciseCandidate,
+): Record<SplitName, SelectedExercise[]> => {
   const splitExercises = prev[splitName] ?? [];
   if (splitExercises.length >= 10) return prev;
   const exWithOrderIndex = {
@@ -16,13 +25,15 @@ export const addExerciseLogic = (prev, splitName, exercise) => {
   return prev;
 };
 
-export const removeExerciseLogic = (prev, splitName, exercise) => {
+export const removeExerciseLogic = (
+  prev: Record<SplitName, SelectedExercise[]>,
+  splitName: SplitName,
+  exercise: ExerciseCandidate,
+): Record<SplitName, SelectedExercise[]> => {
   const splitExercises = prev[splitName] ?? [];
   const isExExists = splitExercises.some((ex) => ex.id === exercise.id);
   if (isExExists) {
-    const updatedSplitExercises = splitExercises.filter(
-      (ex) => ex.id !== exercise.id
-    );
+    const updatedSplitExercises = splitExercises.filter((ex) => ex.id !== exercise.id);
     return {
       ...prev,
       [splitName]: reindexExercises(updatedSplitExercises),
@@ -31,12 +42,17 @@ export const removeExerciseLogic = (prev, splitName, exercise) => {
   return prev;
 };
 
-export const updateSetsLogic = (prev, splitName, exercise, updatedSetsArr) => {
+export const updateSetsLogic = (
+  prev: Record<SplitName, SelectedExercise[]>,
+  splitName: SplitName,
+  exercise: ExerciseCandidate,
+  updatedSetsArr: ExerciseToWorkoutSplitEntity['sets'],
+): Record<SplitName, SelectedExercise[]> => {
   const splitExercises = prev[splitName] ?? [];
   const isExExists = splitExercises.some((ex) => ex.id === exercise.id);
   if (isExExists) {
     const updatedSplitExercises = splitExercises.map((ex) =>
-      ex.id === exercise.id ? { ...ex, sets: updatedSetsArr } : ex
+      ex.id === exercise.id ? { ...ex, sets: updatedSetsArr } : ex,
     );
     return {
       ...prev,
@@ -46,11 +62,13 @@ export const updateSetsLogic = (prev, splitName, exercise, updatedSetsArr) => {
   return prev;
 };
 
-export const addSplitLogic = (prev) => {
+export const addSplitLogic = (
+  prev: Record<SplitName, SelectedExercise[]>,
+): { next: Record<SplitName, SelectedExercise[]>; lastAdded: SplitName | null; didAdd: boolean } => {
   const splitsList = Object.keys(prev);
 
   if (splitsList.length >= 6) {
-    showErrorAlert("Error", "Max splits allowed is 6");
+    showErrorAlert('Error', 'Max splits allowed is 6');
     return { next: prev, lastAdded: null, didAdd: false };
   }
 
@@ -67,16 +85,16 @@ export const addSplitLogic = (prev) => {
 };
 
 // Next name based on existing object keys (A..Z). Assumes keys are single uppercase letters.
-const getNextSplitNameFromObj = (obj) => {
+const getNextSplitNameFromObj = (obj: Record<SplitName, SelectedExercise[]>): string => {
   const keys = Object.keys(obj).sort(); // e.g., ["A", "B", "C"]
-  if (keys.length === 0) return "A";
+  if (keys.length === 0) return 'A';
   const last = keys.at(-1);
-  const nextCharCode = last.charCodeAt(0) + 1;
-  if (nextCharCode > 90) return null; // 'Z' overflow
+  const nextCharCode = last!.charCodeAt(0) + 1;
+  //if (nextCharCode > 90) return null; // 'Z' overflow
   return String.fromCharCode(nextCharCode); // e.g., "D"
 };
 
-export const reindexExercises = (arr) => {
+export const reindexExercises = (arr: SelectedExercise[]): SelectedExercise[] => {
   return arr.map((ex, i) => {
     // If order_index is already correct, keep the same object reference
     if (ex.order_index === i) return ex;
@@ -85,12 +103,19 @@ export const reindexExercises = (arr) => {
   });
 };
 
-export const onDragEndLogic = (prev, splitName, data) => {
+export const onDragEndLogic = (
+  prev: Record<SplitName, SelectedExercise[]>,
+  splitName: SplitName,
+  data: SelectedExercise[],
+): Record<SplitName, SelectedExercise[]> => {
   // return new state (immutable!)
   return { ...prev, [splitName]: reindexExercises(data) };
 };
 
-export const removeSplitLogic = (prev, splitName) => {
+export const removeSplitLogic = (
+  prev: Record<SplitName, SelectedExercise[]>,
+  splitName: SplitName,
+): { next: Record<SplitName, SelectedExercise[]>; nextSelected: SplitName } => {
   const copy = { ...prev };
   const splitNames = Object.keys(copy);
   const indexToRemove = splitNames.indexOf(splitName);
@@ -101,7 +126,7 @@ export const removeSplitLogic = (prev, splitName) => {
   if (Object.keys(copy).length === 0) {
     return {
       next: { A: [] },
-      nextSelected: "A",
+      nextSelected: 'A',
     };
   }
 
@@ -125,16 +150,16 @@ export const removeSplitLogic = (prev, splitName) => {
   };
 };
 
-export const moveItem = (arr, from, to) => {
+/*export const moveItem = (arr, from, to) => {
   const copy = arr.slice();
   const [moved] = copy.splice(from, 1);
   copy.splice(to, 0, moved);
   return copy;
-};
+};*/
 
-const normalizeSplitKeys = (obj) => {
+const normalizeSplitKeys = (obj: Record<SplitName, SelectedExercise[]>): Record<SplitName, SelectedExercise[]> => {
   const keys = Object.keys(obj).sort(); // ensure deterministic order: A,B,C,...
-  const out = {};
+  const out: Record<SplitName, SelectedExercise[]> = {};
   keys.forEach((oldKey, idx) => {
     const newKey = String.fromCharCode(65 + idx); // 65 === 'A'
     out[newKey] = obj[oldKey]; // keep the same exercises array
@@ -142,15 +167,12 @@ const normalizeSplitKeys = (obj) => {
   return out;
 };
 
-export const getExercisesCountMap = (selectedExercises) => {
+export const getExercisesCountMap = (selectedExercises: Record<SplitName, SelectedExercise[]>) => {
   let sum = 0;
-  const map = Object.entries(selectedExercises).reduce(
-    (acc, [split, exercises]) => {
-      sum += exercises.length;
-      acc[split] = exercises.length;
-      return acc;
-    },
-    {}
-  );
+  const map = Object.entries(selectedExercises).reduce((acc: Record<SplitName, number>, [split, exercises]) => {
+    sum += exercises.length;
+    acc[split] = exercises.length;
+    return acc;
+  }, {});
   return { totalExercises: sum, map };
 };

@@ -2,9 +2,9 @@ import api from '../api/api';
 import { bootstrapApi } from '../api/bootstrapApi';
 
 const GlobalAuth: {
-  setAccessToken: (t: string) => void;
+  setAccessToken: (t: string | null) => void;
   logout: (() => void) | null;
-  setUsernameInHeader: (username: string) => void;
+  setUsernameInHeader: (username: string | null) => void;
 } = {
   setAccessToken: (t) => {
     api.defaults.headers.common.Authorization = `DPoP ${t}`;

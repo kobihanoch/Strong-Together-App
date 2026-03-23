@@ -26,14 +26,14 @@ export interface AddWorkoutSplitPayload {
     order_index?: number | undefined;
   }>;
 }
-
-export interface WorkoutSplitsMap {
-  [splitName: string]: Array<
+export type WorkoutSplitsMap = Record<
+  string,
+  Array<
     {
       id: number;
       name: string | null;
       sets: number[] | null;
       order_index: number | null;
     } & ExerciseMetadata
-  >;
-}
+  >
+>;

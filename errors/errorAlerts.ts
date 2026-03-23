@@ -1,6 +1,7 @@
 import { Notifier, NotifierComponents } from 'react-native-notifier';
 
-export function showErrorAlert(title: string, description: string): void {
+export function showErrorAlert(title: string, description: string | undefined | null): void {
+  description = description ? description : '';
   Notifier.showNotification({
     title,
     description,
