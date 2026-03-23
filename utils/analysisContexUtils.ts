@@ -1,28 +1,12 @@
 import { DateTime } from 'luxon';
+import { AnalysisContextAnalyzedExerciseTrackingData } from '../context/types/analysisContextTypes.dto';
 import { GetExerciseTrackingResponse } from '../types/api/workouts/responses';
 
-type etDataUnpacked = {
-  pr: {
-    maxReps: Exclude<GetExerciseTrackingResponse['exerciseTrackingAnalysis']['prs']['pr_max'], null>['reps'];
-    maxWeight: Exclude<GetExerciseTrackingResponse['exerciseTrackingAnalysis']['prs']['pr_max'], null>['weight'];
-    maxExercise: Exclude<GetExerciseTrackingResponse['exerciseTrackingAnalysis']['prs']['pr_max'], null>['exercise'];
-    maxDate: Exclude<
-      GetExerciseTrackingResponse['exerciseTrackingAnalysis']['prs']['pr_max'],
-      null
-    >['workout_time_utc'];
-  };
-  workoutCount: GetExerciseTrackingResponse['exerciseTrackingAnalysis']['unique_days'];
-  mostFrequentSplit: {
-    splitName: GetExerciseTrackingResponse['exerciseTrackingAnalysis']['most_frequent_split'];
-    times: GetExerciseTrackingResponse['exerciseTrackingAnalysis']['most_frequent_split_days'];
-  };
-  lastWorkoutDate: GetExerciseTrackingResponse['exerciseTrackingAnalysis']['lastWorkoutDate'];
-  splitDaysByName: GetExerciseTrackingResponse['exerciseTrackingAnalysis']['splitDaysByName'];
-};
+type ETUnpacked = AnalysisContextAnalyzedExerciseTrackingData;
 
 export const unpackFromExerciseTrackingData = (
   exerciseTrackingData: GetExerciseTrackingResponse['exerciseTrackingAnalysis'],
-): etDataUnpacked => {
+): ETUnpacked => {
   const pr = exerciseTrackingData.prs.pr_max;
   return {
     //prMapExId: exerciseTrackingData.prs.pr_map_exercise_id,
@@ -43,7 +27,10 @@ export const unpackFromExerciseTrackingData = (
   };
 };
 
-export const checkHasTrainedToday = (lastWorkoutDate: string, tz: string = 'Asia/Jerusalem'): boolean => {
+export const checkHasTrainedToday = (
+  lastWorkoutDate: string | null | undefined,
+  tz: string = 'Asia/Jerusalem',
+): boolean => {
   if (!lastWorkoutDate) return false;
   return lastWorkoutDate === DateTime.now().setZone(tz).toISODate(); // '2025-08-28'
 };

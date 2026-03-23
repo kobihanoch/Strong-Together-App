@@ -3,7 +3,7 @@ import type { WholeUserWorkoutPlan, WorkoutSplitsMap } from '../../dto/workoutPl
 
 export interface GetWholeUserWorkoutPlanResponse {
   workoutPlan: WholeUserWorkoutPlan | null;
-  workoutPlanForEditWorkout?: WorkoutSplitsMap;
+  workoutPlanForEditWorkout: WorkoutSplitsMap | null;
 }
 
 export type GetExerciseTrackingResponse = ExerciseTrackingAndStats;

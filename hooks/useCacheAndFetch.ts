@@ -6,7 +6,7 @@ import useUpdateCache from './useUpdateCache';
 
 const useCacheAndFetch = <CachePaylodType, APIDataType>(
   user: AppUser | { id: AppUser['id'] | null } | null, // {id} only for auth context
-  keyBuilderFn: (id: AppUser['id']) => string,
+  keyBuilderFn: (id: string, days?: number) => string,
   isValidatedByServerFlag: boolean,
   fetchFn: () => Promise<APIDataType>, // Async function
   onDataFn: (data: APIDataType | CachePaylodType) => void,

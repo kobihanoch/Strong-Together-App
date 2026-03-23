@@ -13,7 +13,7 @@ export const TTL_36H = 36 * 60 * 60; // seconds
 
 export const keyWorkoutPlan = (userId: string): string => `CACHE:WORKOUTPLAN:${userId}:${CACHE_VERSION}`;
 export const keyAnalytics = (userId: string): string => `CACHE:ANALYTICS:${userId}:${CACHE_VERSION}`;
-export const keyTracking = (userId: string, days: number): string =>
+export const keyTracking = (userId: string, days: number = 45): string =>
   `CACHE:TRACKING:${userId}:${days}:${CACHE_VERSION}`;
 export const keyAuth = (userId: string): string => `CACHE:AUTH:${userId}:${CACHE_VERSION}`;
 export const keyInbox = (userId: string): string => `CACHE:INBOX:${userId}:${CACHE_VERSION}`;

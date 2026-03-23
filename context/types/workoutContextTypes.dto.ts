@@ -1,10 +1,10 @@
 import { ExerciseInPlan, WholeUserWorkoutPlan, WorkoutSplitsMap } from '../../types/dto/workoutPlans.dto';
 import { WorkoutSplitEntity } from '../../types/entities/workoutSplit.entity';
 
-export interface WorkoutContextCachePayload {
+export type WorkoutContextCachePayload = {
   workoutPlan: WholeUserWorkoutPlan | null;
   workoutPlanForEditWorkout: WorkoutSplitsMap | null;
-}
+};
 
 export interface WorkoutContextWorkoutSplit {
   name: NonNullable<WorkoutSplitEntity['name']>;
@@ -12,8 +12,12 @@ export interface WorkoutContextWorkoutSplit {
   muscleGroup: WorkoutSplitEntity['muscle_group'];
 }
 
+export type WorkoutContextWorkoutPlan = WholeUserWorkoutPlan;
+
+export type WorkoutPlanForEdit = WorkoutSplitsMap;
+
 export interface WorkoutContextValue {
-  workout: WholeUserWorkoutPlan | null;
+  workout: WorkoutContextWorkoutPlan | null;
   setWorkout: React.Dispatch<React.SetStateAction<WholeUserWorkoutPlan | null>>;
   workoutSplits: WorkoutContextWorkoutSplit[];
   exercises: Record<string, ExerciseInPlan[]>;

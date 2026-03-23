@@ -3,10 +3,17 @@ import { keyTracking } from '../cache/cacheUtils';
 import useCacheAndFetch from '../hooks/useCacheAndFetch';
 import useUpdateGlobalLoading from '../hooks/useUpdateGlobalLoading';
 import { getUserExerciseTracking } from '../services/WorkoutService';
+import { GetExerciseTrackingResponse } from '../types/api/workouts/responses';
 import { checkHasTrainedToday, unpackFromExerciseTrackingData } from '../utils/analysisContexUtils';
 import { useAuth } from './AuthContext';
+import {
+  AnalysisContextAnalyzedExerciseTrackingData,
+  AnalysisContextCachePayload,
+  AnalysisContextExerciseTrackingMaps,
+  AnalysisContextValue,
+} from './types/analysisContextTypes.dto';
 
-const AnalysisContext = createContext(null);
+const AnalysisContext = createContext<AnalysisContextValue | null>(null);
 export const useAnalysisContext = () => {
   const ctx = useContext(AnalysisContext);
   if (!ctx) {
@@ -26,16 +33,17 @@ export const useAnalysisContext = () => {
  * - Reset state when user logs out (user becomes null)
  */
 
-export const AnalysisProvider = ({ children }) => {
+export const AnalysisProvider = ({ children }: { children: React.ReactNode }) => {
   const { user, isValidatedWithServer } = useAuth();
 
   // Raw and derived analysis state
-  const [exerciseTrackingMaps, setExerciseTrackingMaps] = useState(null);
+  const [exerciseTrackingMaps, setExerciseTrackingMaps] = useState<AnalysisContextExerciseTrackingMaps | null>(null);
 
-  const [analyzedExerciseTrackingData, setAnalyzedExerciseTrackingData] = useState(null);
+  const [analyzedExerciseTrackingData, setAnalyzedExerciseTrackingData] =
+    useState<AnalysisContextAnalyzedExerciseTrackingData | null>(null);
 
   const hasTrainedToday = useMemo(
-    () =>
+    (): boolean =>
       checkHasTrainedToday(
         analyzedExerciseTrackingData?.lastWorkoutDate,
         Intl.DateTimeFormat().resolvedOptions().timeZone,
@@ -46,32 +54,35 @@ export const AnalysisProvider = ({ children }) => {
   // -------------------------- useCacheHandler props ------------------------------
 
   // Fetch function
-  const fetchFn = useCallback(async () => await getUserExerciseTracking(), []);
+  const fetchFn = useCallback(async (): Promise<GetExerciseTrackingResponse> => await getUserExerciseTracking(), []);
 
   // On data function
-  const onDataFn = useCallback((data) => {
+  const onDataFn = useCallback((data: GetExerciseTrackingResponse | AnalysisContextCachePayload): void => {
+    if (!data) return;
     // Raw data from server - unpack
     // Data from cache - already unpacked
-    setExerciseTrackingMaps(data?.exerciseTrackingMaps ?? []);
-    // Determines if data retreived from API or cache
-    try {
-      setAnalyzedExerciseTrackingData(unpackFromExerciseTrackingData(data?.exerciseTrackingAnalysis));
-    } catch (error) {
-      setAnalyzedExerciseTrackingData(data?.analyzedExerciseTrackingData);
+    setExerciseTrackingMaps(data.exerciseTrackingMaps); // Empty maps if doen;t exist
+    // API data (packed)
+    if ('exerciseTrackingAnalysis' in data) {
+      setAnalyzedExerciseTrackingData(unpackFromExerciseTrackingData(data.exerciseTrackingAnalysis));
+    }
+    // Cached data (unpacked)
+    else if ('exerciseTrackingAnalysisUnpacked' in data) {
+      setAnalyzedExerciseTrackingData(data.exerciseTrackingAnalysisUnpacked);
     }
   }, []);
 
   // Cache payload
-  const cachePayload = useMemo(
+  const cachePayload: AnalysisContextCachePayload = useMemo(
     () => ({
       exerciseTrackingMaps: exerciseTrackingMaps,
-      analyzedExerciseTrackingData: analyzedExerciseTrackingData,
+      exerciseTrackingAnalysisUnpacked: analyzedExerciseTrackingData,
     }),
     [exerciseTrackingMaps, analyzedExerciseTrackingData],
   );
 
   // Hook usage
-  const { loading, cacheKnown } = useCacheAndFetch(
+  const { loading, cacheKnown } = useCacheAndFetch<AnalysisContextCachePayload, GetExerciseTrackingResponse>(
     user, // user prop
     keyTracking, // key builder
     isValidatedWithServer, // flag from server
@@ -85,7 +96,7 @@ export const AnalysisProvider = ({ children }) => {
   useUpdateGlobalLoading('Analysis', cacheKnown ? loading : true);
 
   // Memoized context value
-  const value = useMemo(
+  const value = useMemo<AnalysisContextValue>(
     () => ({
       exerciseTrackingMaps,
       setExerciseTrackingMaps,

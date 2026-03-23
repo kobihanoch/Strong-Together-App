@@ -5,9 +5,13 @@ import useUpdateGlobalLoading from '../hooks/useUpdateGlobalLoading';
 import { getUserWorkout } from '../services/WorkoutService';
 import { extractWorkoutSplits } from '../utils/workoutContextUtils';
 import { useAuth } from './AuthContext';
-import { WholeUserWorkoutPlan, WorkoutSplitsMap } from '../types/dto/workoutPlans.dto';
 import { GetWholeUserWorkoutPlanResponse } from '../types/api/workouts/responses';
-import { WorkoutContextCachePayload, WorkoutContextValue } from './types/workoutContextTypes.dto';
+import {
+  WorkoutContextCachePayload,
+  WorkoutContextValue,
+  WorkoutContextWorkoutPlan,
+  WorkoutPlanForEdit,
+} from './types/workoutContextTypes.dto';
 
 const WorkoutContext = createContext<WorkoutContextValue | null>(null);
 export const useWorkoutContext = () => {
@@ -29,7 +33,7 @@ export const WorkoutProvider = ({ children }: { children: React.ReactNode }) => 
   const { user, isValidatedWithServer } = useAuth();
 
   // Raw workout plan from API
-  const [workout, setWorkout] = useState<WholeUserWorkoutPlan | null>(null);
+  const [workout, setWorkout] = useState<WorkoutContextWorkoutPlan | null>(null);
 
   // Derived data from workout
   const { workoutSplits, exercises } = useMemo(() => {
@@ -37,7 +41,7 @@ export const WorkoutProvider = ({ children }: { children: React.ReactNode }) => 
   }, [workout]);
 
   // Editable version for edit workout
-  const [workoutForEdit, setWorkoutForEdit] = useState<WorkoutSplitsMap | null>(null);
+  const [workoutForEdit, setWorkoutForEdit] = useState<WorkoutPlanForEdit | null>(null);
 
   // -------------------------- useCacheHandler props ------------------------------
 
@@ -46,8 +50,9 @@ export const WorkoutProvider = ({ children }: { children: React.ReactNode }) => 
 
   // On data function
   const onDataFn = useCallback((data: GetWholeUserWorkoutPlanResponse | WorkoutContextCachePayload): void => {
-    setWorkout(data?.workoutPlan ?? null);
-    setWorkoutForEdit(data?.workoutPlanForEditWorkout ?? null);
+    if (!data) return;
+    setWorkout(data.workoutPlan); // Null if doesnt exist
+    setWorkoutForEdit(data.workoutPlanForEditWorkout); // Null if doesnt exist
   }, []);
 
   // Cache payload

@@ -1,8 +1,8 @@
 import { CreateUserBody, LoginRequestBody } from '../../types/api/auth/requests';
-import { UserDataResponse } from '../../types/api/user/responses';
+import { GetAuthenticatedUserByIdResponse } from '../../types/api/user/responses';
 
-export type AppUser = UserDataResponse['user_data'];
-export type UserCachePayload = AppUser;
+export type AppUser = GetAuthenticatedUserByIdResponse;
+export type UserCachePayload = AppUser | null;
 
 export interface AuthContextValue {
   // State
