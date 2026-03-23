@@ -1,5 +1,15 @@
-import React, { useEffect, useRef, useState, useMemo } from "react";
-import { View, Text, Animated, Easing } from "react-native";
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { Animated, Easing, Text, View } from 'react-native';
+
+interface AdherenceBarProps {
+  name: string;
+  actual?: number;
+  planned?: number;
+  pct?: number;
+  showPct?: boolean;
+  changeColors?: boolean; // NEW: animate color changes along the progress (default true)
+  colorStatic?: string; // Optional: fixed color when changeColors=false
+}
 
 export function AdherenceBar({
   name,
@@ -9,7 +19,7 @@ export function AdherenceBar({
   showPct = true,
   changeColors = true, // NEW: animate color changes along the progress (default true)
   colorStatic, // Optional: fixed color when changeColors=false
-}) {
+}: AdherenceBarProps) {
   // Compute % and clamp to [0,100]
   const p = pct ?? (planned > 0 ? (actual / planned) * 100 : 0);
   const shown = Math.max(0, Math.min(100, p));
@@ -21,23 +31,21 @@ export function AdherenceBar({
   const BAR_H = 10;
 
   // Helper: map percentage to a color bucket
-  const colorFromPct = (percent) => {
-    if (percent >= 85) return "#16a34a"; // green
-    if (percent >= 60) return "#2979ff"; // blue
-    if (percent >= 35) return "#f59e0b"; // orange
-    return "#dc2626"; // red
+  const colorFromPct = (percent: number): string => {
+    if (percent >= 85) return '#16a34a'; // green
+    if (percent >= 60) return '#2979ff'; // blue
+    if (percent >= 35) return '#f59e0b'; // orange
+    return '#dc2626'; // red
   };
 
   // Fallback fixed color when changeColors=false (backward compatible behavior)
   const fixedColor = useMemo(() => {
     if (colorStatic) return colorStatic;
-    return shown >= 50 ? "#2979ff" : "#dc2626";
+    return shown >= 50 ? '#2979ff' : '#dc2626';
   }, [shown, colorStatic]);
 
   // Current bar color (state only used when changeColors=true)
-  const [barColor, setBarColor] = useState(
-    changeColors ? colorFromPct(shown) : fixedColor
-  );
+  const [barColor, setBarColor] = useState<string>(changeColors ? colorFromPct(shown) : fixedColor);
 
   // Keep barColor in sync if the inputs change
   useEffect(() => {
@@ -66,8 +74,7 @@ export function AdherenceBar({
     let lastBucket = -1;
     const subId = progress.addListener(({ value }) => {
       const percent = Math.round(value * 100);
-      const bucket =
-        percent >= 85 ? 3 : percent >= 60 ? 2 : percent >= 35 ? 1 : 0;
+      const bucket = percent >= 85 ? 3 : percent >= 60 ? 2 : percent >= 35 ? 1 : 0;
       if (bucket !== lastBucket) {
         lastBucket = bucket;
         setBarColor(colorFromPct(percent));
@@ -90,12 +97,10 @@ export function AdherenceBar({
 
   return (
     <View>
-      <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
-        <Text style={{ fontWeight: "600" }}>{name}</Text>
-        <View style={{ flexDirection: "column", marginTop: -15 }}>
-          <Text style={{ opacity: 0.7 }}>
-            {showPct ? Math.round(shown) + "%" : null}
-          </Text>
+      <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+        <Text style={{ fontWeight: '600' }}>{name}</Text>
+        <View style={{ flexDirection: 'column', marginTop: -15 }}>
+          <Text style={{ opacity: 0.7 }}>{showPct ? Math.round(shown) + '%' : null}</Text>
         </View>
       </View>
 
@@ -104,10 +109,10 @@ export function AdherenceBar({
         onLayout={(e) => setTrackW(e.nativeEvent.layout.width)}
         style={{
           height: BAR_H,
-          backgroundColor: "#e5e7eb",
+          backgroundColor: '#e5e7eb',
           borderRadius: 6,
           marginTop: 6,
-          position: "relative",
+          position: 'relative',
         }}
       >
         {/* Animated fill */}
@@ -124,20 +129,20 @@ export function AdherenceBar({
         {trackW > 0 && (
           <Animated.View
             style={{
-              position: "absolute",
+              position: 'absolute',
               top: (BAR_H - DOT) / 2, // vertically center around the bar
               left: 0,
-              transform: [{ translateX: dotX }],
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              transform: [{ translateX: dotX as any }],
               width: DOT,
               height: DOT,
               borderRadius: DOT / 2,
-              backgroundColor: "#ffffff",
+              backgroundColor: '#ffffff',
               borderWidth: 1,
               borderColor: barColor,
               // subtle elevation/shadow
-              shadowColor: "#000",
+              shadowColor: '#000',
               shadowOpacity: 0.1,
-              shadowOffset: { width: 0, height: 1 },
               shadowRadius: 2,
               elevation: 1,
             }}

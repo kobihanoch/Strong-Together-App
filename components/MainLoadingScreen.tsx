@@ -1,17 +1,13 @@
-// components/MainLoadingScreen.js (בלי moti)
-import { LinearGradient } from "expo-linear-gradient";
-import React, { useEffect, useRef, useState } from "react";
-import { Animated, Easing, StyleSheet, Text, View } from "react-native";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-require-imports */
+import { LinearGradient } from 'expo-linear-gradient';
+import React, { useEffect, useRef, useState } from 'react';
+import { Animated, Easing, StyleSheet, Text, View } from 'react-native';
 
-const MESSAGES = [
-  "Checking session…",
-  "Loading profile…",
-  "Syncing workouts…",
-  "Almost ready…",
-];
+const MESSAGES: string[] = ['Checking session…', 'Loading profile…', 'Syncing workouts…', 'Almost ready…'];
 
-const MainLoadingScreen = () => {
-  const [idx, setIdx] = useState(0);
+const MainLoadingScreen: React.FC = () => {
+  const [idx, setIdx] = useState<number>(0);
 
   // Pulse + slight rotate
   const scale = useRef(new Animated.Value(1)).current;
@@ -47,11 +43,11 @@ const MainLoadingScreen = () => {
             useNativeDriver: true,
           }),
         ]),
-      ])
+      ]),
     );
     loop.start();
     return () => loop.stop();
-  }, []);
+  }, [scale, rotate]);
 
   // Fake progress
   const progress = useRef(new Animated.Value(0)).current;
@@ -62,16 +58,16 @@ const MainLoadingScreen = () => {
       easing: Easing.out(Easing.cubic),
       useNativeDriver: false,
     }).start();
-  }, []);
+  }, [progress]);
 
   // Rotate interpolation
   const rotateDeg = rotate.interpolate({
     inputRange: [0, 1],
-    outputRange: ["0deg", "5deg"],
+    outputRange: ['0deg', '5deg'],
   });
   const widthInterpolate = progress.interpolate({
     inputRange: [0, 1],
-    outputRange: ["0%", "100%"],
+    outputRange: ['0%', '100%'],
   });
 
   // Change status message
@@ -83,14 +79,14 @@ const MainLoadingScreen = () => {
   return (
     <View style={styles.container}>
       <LinearGradient
-        colors={["#0A66D6", "#2E7BEA", "#4FA0FF"]}
+        colors={['#0A66D6', '#2E7BEA', '#4FA0FF']}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
         style={StyleSheet.absoluteFill}
       />
 
       <Animated.Image
-        source={require("../assets/logo_512.png")}
+        source={require('../assets/logo_512.png')}
         style={[styles.logo, { transform: [{ scale }, { rotate: rotateDeg }] }]}
         resizeMode="contain"
       />
@@ -98,29 +94,29 @@ const MainLoadingScreen = () => {
       <Text style={styles.message}>{MESSAGES[idx]}</Text>
 
       <View style={styles.track}>
-        <Animated.View style={[styles.fill, { width: widthInterpolate }]} />
+        <Animated.View style={[styles.fill, { width: widthInterpolate as any }]} />
       </View>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, alignItems: "center", justifyContent: "center" },
+  container: { flex: 1, alignItems: 'center', justifyContent: 'center' },
   logo: { width: 160, height: 160, marginBottom: 50 },
   message: {
-    fontFamily: "Inter_500Medium",
+    fontFamily: 'Inter_500Medium',
     fontSize: 20,
-    color: "white",
+    color: 'white',
     marginBottom: 15,
   },
   track: {
     width: 200,
     height: 8,
-    backgroundColor: "rgba(255,255,255,0.3)",
+    backgroundColor: 'rgba(255,255,255,0.3)',
     borderRadius: 999,
-    overflow: "hidden",
+    overflow: 'hidden',
   },
-  fill: { height: "100%", backgroundColor: "white", borderRadius: 999 },
+  fill: { height: '100%', backgroundColor: 'white', borderRadius: 999 },
 });
 
 export default React.memo(MainLoadingScreen);
