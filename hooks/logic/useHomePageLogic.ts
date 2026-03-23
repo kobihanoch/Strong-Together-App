@@ -3,8 +3,9 @@ import { useAnalysisContext } from '../../context/AnalysisContext';
 import { useAuth } from '../../context/AuthContext';
 import { useGlobalAppLoadingContext } from '../../context/GlobalAppLoadingContext';
 import { useWorkoutContext } from '../../context/WorkoutContext';
+import { HomePageData } from '../types/useHomePageTypes.dto';
 
-const useHomePageLogic = () => {
+const useHomePageLogic = (): { data: HomePageData } => {
   // Auth state (user + global session loading)
   const { user } = useAuth();
   const { isLoading } = useGlobalAppLoadingContext();
@@ -26,12 +27,12 @@ const useHomePageLogic = () => {
     firstName = '',
     profileImageUrl = '',
   } = useMemo(() => {
-    const u = user!;
+    const u = user;
     return {
-      username: u.username ?? '',
-      userId: u.id ?? '',
-      firstName: u.name!.trim().split(' ')[0],
-      profileImageUrl: u.profile_image_url ?? '',
+      username: u?.username ?? '',
+      userId: u?.id ?? '',
+      firstName: u?.name!.trim().split(' ')[0],
+      profileImageUrl: u?.profile_image_url ?? '',
     };
   }, [user]);
 
@@ -55,7 +56,7 @@ const useHomePageLogic = () => {
   }, [analyzedExerciseTrackingData]);
 
   // Stable data object for easy consumption in components
-  const data = useMemo(
+  const data = useMemo<HomePageData>(
     () => ({
       username,
       userId,
@@ -87,7 +88,6 @@ const useHomePageLogic = () => {
 
   return {
     data,
-    isLoading,
   };
 };
 

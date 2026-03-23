@@ -41,7 +41,7 @@ export function useAppleAuth() {
 
       return data;
     } catch (e) {
-      console.log(e.message);
+      console.log((e as Error).message);
       throw new Error("Unexpected error during Apple sign-in");
     }
   }, []);

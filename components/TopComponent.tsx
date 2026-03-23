@@ -1,25 +1,20 @@
-import { useNavigation } from "@react-navigation/native";
-import { Image } from "expo-image";
-import { LinearGradient } from "expo-linear-gradient";
-import React, { useEffect, useState } from "react";
-import {
-  Animated,
-  Dimensions,
-  Easing,
-  Modal,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
-import { RFValue } from "react-native-responsive-fontsize";
-import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
-import { useAuth } from "../context/AuthContext";
-import { useNotifications } from "../context/NotificationsContext";
-import { useGlobalAppLoadingContext } from "../context/GlobalAppLoadingContext";
-import { Skeleton } from "moti/skeleton";
+/* eslint-disable @typescript-eslint/no-require-imports */
+import { useNavigation } from '@react-navigation/native';
+import { StackNavigationProp } from '@react-navigation/stack';
+import { Image } from 'expo-image';
+import { LinearGradient } from 'expo-linear-gradient';
+import { Skeleton } from 'moti/skeleton';
+import React, { useEffect, useState } from 'react';
+import { Animated, Dimensions, Easing, Modal, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { RFValue } from 'react-native-responsive-fontsize';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import { useAuth } from '../context/AuthContext';
+import { useGlobalAppLoadingContext } from '../context/GlobalAppLoadingContext';
+import { useNotifications } from '../context/NotificationsContext';
+import { AppUser } from '../context/types/authContextTypes.dto';
+import { RootParamList } from '../navigation/types/appStackTypes';
 
-const { width, height } = Dimensions.get("window");
+const { width, height } = Dimensions.get('window');
 
 const TopComponent = () => {
   // Context
@@ -28,7 +23,7 @@ const TopComponent = () => {
   const { isLoading } = useGlobalAppLoadingContext();
 
   // Navigation
-  const navigation = useNavigation();
+  const navigation = useNavigation<StackNavigationProp<RootParamList>>();
 
   // Properties
   const msgCount = unreadMessages?.length;
@@ -67,7 +62,7 @@ const TopComponent = () => {
     setIsModalVisible(false);
   };
 
-  const isEnglishName = (name) => {
+  const isEnglishName = (name: AppUser['name']) => {
     if (!name) return false;
     // Allow only English letters, spaces, hyphens, and apostrophes
     const englishRegex = /^[A-Za-z\s'-]+$/;
@@ -76,15 +71,12 @@ const TopComponent = () => {
 
   return (
     <Skeleton.Group show={isLoading}>
-      <LinearGradient
-        colors={["transparent", "transparent"]}
-        style={styles.topContainer}
-      >
+      <LinearGradient colors={['transparent', 'transparent']} style={styles.topContainer}>
         <View
           style={{
-            flexDirection: "row",
-            justifyContent: "flex-start",
-            alignItems: "center",
+            flexDirection: 'row',
+            justifyContent: 'flex-start',
+            alignItems: 'center',
             flex: 0.5,
           }}
         >
@@ -92,9 +84,9 @@ const TopComponent = () => {
             <Skeleton colorMode="light" width={150}>
               <Text
                 style={{
-                  fontFamily: "Inter_400Regular",
+                  fontFamily: 'Inter_400Regular',
                   fontSize: RFValue(15),
-                  color: "black",
+                  color: 'black',
                   opacity: 1,
                 }}
               >
@@ -104,21 +96,21 @@ const TopComponent = () => {
             <Skeleton colorMode="light" height={20} width={100}>
               <Text
                 style={{
-                  fontFamily: "Inter_600SemiBold",
+                  fontFamily: 'Inter_600SemiBold',
                   fontSize: RFValue(17),
-                  color: "black",
+                  color: 'black',
                 }}
               >
-                {isLoading ? "" : isEnglishName(fullname) ? fullname : username}
+                {isLoading ? '' : isEnglishName(fullname!) ? fullname : username}
               </Text>
             </Skeleton>
           </View>
         </View>
         <View
           style={{
-            flexDirection: "row",
+            flexDirection: 'row',
             gap: width * 0.02,
-            alignItems: "flex-end",
+            alignItems: 'flex-end',
           }}
         >
           <View
@@ -128,49 +120,41 @@ const TopComponent = () => {
               opacity: isLoading ? 0 : 1,
             }}
           >
-            <TouchableOpacity
-              onPress={() => navigation.navigate("Inbox")}
-              disabled={isWorkoutMode ? true : false}
-            >
+            <TouchableOpacity onPress={() => navigation.navigate('Inbox')} disabled={isWorkoutMode ? true : false}>
               <MaterialCommunityIcons
-                name={"bell"}
+                name={'bell'}
                 size={RFValue(20)}
-                color={"#1A1A1A"}
-                opacity={isWorkoutMode ? 0 : 0.8}
+                color={'#1A1A1A'}
+                style={{ opacity: isWorkoutMode ? 0 : 0.8 }}
               ></MaterialCommunityIcons>
               <Animated.View
                 style={{
                   transform: [{ scale: scaleAnim }],
-                  backgroundColor: "#ff2979",
+                  backgroundColor: '#ff2979',
                   height: 15,
                   borderRadius: 50,
                   aspectRatio: 1,
-                  position: "absolute",
+                  position: 'absolute',
                   bottom: 0,
                   right: 0,
-                  justifyContent: "center",
-                  alignItems: "center",
-                  display: msgCount === 0 ? "none" : "flex",
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  display: msgCount === 0 ? 'none' : 'flex',
                 }}
               >
                 <Text
                   style={{
-                    color: "white",
+                    color: 'white',
                     fontSize: RFValue(6),
-                    fontFamily: "Inter_600SemiBold",
+                    fontFamily: 'Inter_600SemiBold',
                   }}
                 >
-                  {msgCount > 99 ? "!" : msgCount}
+                  {msgCount > 99 ? '!' : msgCount}
                 </Text>
               </Animated.View>
             </TouchableOpacity>
           </View>
-          <Skeleton
-            height={height * 0.06}
-            width={height * 0.06}
-            radius="round"
-            colorMode="light"
-          >
+          <Skeleton height={height * 0.06} width={height * 0.06} radius="round" colorMode="light">
             <TouchableOpacity onPress={handleImagePress}>
               <Image
                 source={
@@ -178,12 +162,12 @@ const TopComponent = () => {
                     ? {
                         uri: `${process.env.EXPO_PUBLIC_SUPABASE_URL}/storage/v1/object/public/${profileImageUrl}`,
                       }
-                    : user?.gender == "Male"
-                    ? require("../assets/man.png")
-                    : require("../assets/woman.png")
+                    : user?.gender == 'Male'
+                      ? require('../assets/man.png')
+                      : require('../assets/woman.png')
                 }
                 style={styles.profileImage}
-                cachePolicy={profileImageUrl ? "disk" : "none"}
+                cachePolicy={profileImageUrl ? 'disk' : 'none'}
                 transition={150}
               />
             </TouchableOpacity>
@@ -191,26 +175,18 @@ const TopComponent = () => {
         </View>
 
         {/* Modal */}
-        <Modal
-          visible={isModalVisible}
-          transparent={true}
-          animationType="fade"
-          onRequestClose={closeModal}
-        >
+        <Modal visible={isModalVisible} transparent={true} animationType="fade" onRequestClose={closeModal}>
           <View style={styles.modalContainer}>
-            <TouchableOpacity
-              style={styles.modalBackground}
-              onPress={closeModal}
-            >
+            <TouchableOpacity style={styles.modalBackground} onPress={closeModal}>
               <Image
                 source={
                   profileImageUrl
                     ? {
                         uri: `${process.env.EXPO_PUBLIC_SUPABASE_URL}/storage/v1/object/public/${profileImageUrl}`,
                       }
-                    : user?.gender == "Male"
-                    ? require("../assets/man.png")
-                    : require("../assets/woman.png")
+                    : user?.gender == 'Male'
+                      ? require('../assets/man.png')
+                      : require('../assets/woman.png')
                 }
                 style={styles.enlargedImage}
               />
@@ -225,44 +201,44 @@ const TopComponent = () => {
 const styles = StyleSheet.create({
   topContainer: {
     flex: 1,
-    width: "100%",
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "flex-end",
+    width: '100%',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-end',
     paddingHorizontal: width * 0.06,
     paddingVertical: height * 0.01,
-    backgroundColor: "rgba(255, 255, 255, 1)",
+    backgroundColor: 'rgba(255, 255, 255, 1)',
     borderBottomWidth: 0,
-    borderBottomColor: "rgba(219, 219, 219, 0.8)",
+    borderBottomColor: 'rgba(219, 219, 219, 0.8)',
   },
   profileImage: {
     height: height * 0.06,
     aspectRatio: 1,
-    contentFit: "stretch",
+    resizeMode: 'stretch',
     borderWidth: 0.5,
     borderRadius: 40,
-    borderColor: "white",
+    borderColor: 'white',
   },
   logoImage: {
     height: height * 0.025,
     width: height * 0.025,
-    resizeMode: "contain",
+    resizeMode: 'contain',
   },
   modalContainer: {
     flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "rgba(0, 0, 0, 0.8)",
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.8)',
   },
   modalBackground: {
     flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   enlargedImage: {
     width: width * 0.8,
     height: width * 0.8,
-    resizeMode: "contain",
+    resizeMode: 'contain',
   },
 });
 
