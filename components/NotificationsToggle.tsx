@@ -1,19 +1,13 @@
-import React, { useEffect, useRef, useState } from "react";
-import { View, Switch, Linking, AppState } from "react-native";
-import { Dialog, ALERT_TYPE } from "react-native-alert-notification";
-import useSettingsLogic from "../hooks/logic/useSettingsLogic";
-import { Notifier, NotifierComponents } from "react-native-notifier";
+import React, { useEffect, useRef, useState } from 'react';
+import { View, Switch, Linking, AppState, AppStateStatus } from 'react-native';
+import { Dialog, ALERT_TYPE } from 'react-native-alert-notification';
+import useSettingsLogic from '../hooks/logic/useSettingsLogic';
+import { Notifier, NotifierComponents } from 'react-native-notifier';
+import * as Notifications from 'expo-notifications';
 
-function notify(type, title, description) {
+function notify(type: 'success' | 'warning' | 'error', title: string, description: string) {
   // Map logical type -> Notifier "alertType"
-  const alertType =
-    type === "success"
-      ? "success"
-      : type === "warning"
-      ? "warn"
-      : type === "error"
-      ? "error"
-      : "info";
+  const alertType = type === 'success' ? 'success' : type === 'warning' ? 'warn' : type === 'error' ? 'error' : 'info';
 
   Notifier.showNotification({
     title,
@@ -34,8 +28,8 @@ export default function NotificationsToggle() {
     requestNotificationsPermission,
   } = useSettingsLogic();
 
-  const [isEnabled, setIsEnabled] = useState(false);
-  const [isBusy, setIsBusy] = useState(false);
+  const [isEnabled, setIsEnabled] = useState<boolean>(false);
+  const [isBusy, setIsBusy] = useState<boolean>(false);
 
   // Keep UI toggle in sync with OS permission
   useEffect(() => {
@@ -43,63 +37,52 @@ export default function NotificationsToggle() {
   }, [hasNotificationsPermission]);
 
   // Re-check permission when returning from Settings
-  const appStateRef = useRef(AppState.currentState);
+  const appStateRef = useRef<AppStateStatus>(AppState.currentState);
   useEffect(() => {
-    const sub = AppState.addEventListener("change", (next) => {
+    const sub = AppState.addEventListener('change', (next) => {
       const prev = appStateRef.current;
       appStateRef.current = next;
-      if ((prev === "background" || prev === "inactive") && next === "active") {
+      if ((prev === 'background' || prev === 'inactive') && next === 'active') {
         checkNotificationsPermission();
       }
     });
     return () => sub.remove();
   }, [checkNotificationsPermission]);
 
-  const handleToggle = async (nextValue) => {
+  const handleToggle = async (nextValue: boolean) => {
     if (isBusy) return;
     setIsBusy(true);
     try {
       if (nextValue) {
         // Turning ON: request permission if needed
-        if (notificationsPermissionStatus !== "granted") {
+        if (notificationsPermissionStatus !== Notifications.PermissionStatus.GRANTED) {
           const res = await requestNotificationsPermission();
-          const granted = res?.status === "granted";
+          const granted = res?.status === Notifications.PermissionStatus.GRANTED;
           setIsEnabled(granted);
           notify(
-            granted ? "success" : "warning",
-            granted ? "Notifications enabled" : "Permission not granted",
-            granted
-              ? "You will receive notifications."
-              : "Enable notifications in Settings to receive alerts."
+            granted ? 'success' : 'warning',
+            granted ? 'Notifications enabled' : 'Permission not granted',
+            granted ? 'You will receive notifications.' : 'Enable notifications in Settings to receive alerts.',
           );
         } else {
           setIsEnabled(true);
-          notify(
-            "success",
-            "Notifications enabled",
-            "You will receive notifications."
-          );
+          notify('success', 'Notifications enabled', 'You will receive notifications.');
         }
       } else {
         // Turning OFF: cannot revoke in-app; ask to open OS settings
         Dialog.show({
           type: ALERT_TYPE.WARNING,
-          title: "Turn off notifications",
-          textBody:
-            "To disable notifications, open your device settings and turn them off for this app.",
-          button: "Open Settings",
+          title: 'Turn off notifications',
+          textBody: 'To disable notifications, open your device settings and turn them off for this app.',
+          button: 'Open Settings',
           closeOnOverlayTap: true,
           onPressButton: async () => {
             try {
               await Linking.openSettings();
               // AppState listener will refresh status when returning
-            } catch (e) {
+            } catch {
               checkNotificationsPermission();
-              notify(
-                "error",
-                "Could not open settings",
-                "Please open settings manually."
-              );
+              notify('error', 'Could not open settings', 'Please open settings manually.');
             }
           },
         });
@@ -113,8 +96,8 @@ export default function NotificationsToggle() {
   return (
     <View style={{ transform: [{ scaleX: 0.9 }, { scaleY: 0.9 }] }}>
       <Switch
-        trackColor={{ false: "#D1D5DB", true: "#86EFAC" }}
-        thumbColor={isEnabled ? "#22C55E" : "#F9FAFB"}
+        trackColor={{ false: '#D1D5DB', true: '#86EFAC' }}
+        thumbColor={isEnabled ? '#22C55E' : '#F9FAFB'}
         ios_backgroundColor="#D1D5DB"
         onValueChange={handleToggle}
         value={isEnabled}

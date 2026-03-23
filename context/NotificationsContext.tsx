@@ -27,7 +27,13 @@ import { GetAllUserMessagesResponse } from '../types/api/messages/responses.js';
 
 const NotificationsContext = createContext<NotificationsContextValue | null>(null);
 
-export const useNotifications = () => useContext(NotificationsContext);
+export const useNotifications = () => {
+  const context = useContext(NotificationsContext);
+  if (!context) {
+    throw new Error('useNotificationsContext must be used within a NotificationsProvider');
+  }
+  return context;
+};
 
 export const NotificationsProvider = ({ children }: { children: ReactNode }) => {
   const { user, isValidatedWithServer } = useAuth();
