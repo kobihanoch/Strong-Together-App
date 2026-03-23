@@ -1,18 +1,17 @@
-import NetInfo from "@react-native-community/netinfo";
-import { useEffect, useRef, useState } from "react";
-import { Notifier, NotifierComponents } from "react-native-notifier";
-import { notifyOffline } from "../api/networkCheck";
+import NetInfo from '@react-native-community/netinfo';
+import { useEffect, useRef, useState } from 'react';
+import { Notifier, NotifierComponents } from 'react-native-notifier';
+import { notifyOffline } from '../api/networkCheck';
 
-export const useNetworkStatus = () => {
-  const [isOnline, setIsOnline] = useState(true);
-  const prevOnlineRef = useRef(undefined); // undefined means "no emission yet"
+export const useNetworkStatus = (): boolean => {
+  const [isOnline, setIsOnline] = useState<boolean>(true);
+  const prevOnlineRef = useRef<boolean | undefined>(undefined); // undefined means "no emission yet"
 
   useEffect(() => {
     const unsubscribe = NetInfo.addEventListener((state) => {
       // Normalize reachable: treat null as "unknown" -> default to true
       const reachable = state.isInternetReachable;
-      const connected =
-        !!state.isConnected && (reachable === null ? true : !!reachable);
+      const connected = !!state.isConnected && (reachable === null ? true : !!reachable);
 
       // First emission: seed prev without notifying
       if (prevOnlineRef.current === undefined) {
@@ -32,10 +31,10 @@ export const useNetworkStatus = () => {
 
       if (connected) {
         Notifier.showNotification({
-          title: "You are back online!",
-          description: "Connection restored",
+          title: 'You are back online!',
+          description: 'Connection restored',
           Component: NotifierComponents.Alert,
-          componentProps: { alertType: "success" },
+          componentProps: { alertType: 'success' },
           duration: 4000,
           showAnimationDuration: 300,
           hideOnPress: true,

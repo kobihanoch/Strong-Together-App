@@ -1,7 +1,7 @@
 import api from '../api/api';
 import { SetProfilePicAndUpdateDBResponse } from '../types/api/user/responses';
 
-type UploadableFile = {
+export type UploadableFile = {
   uri: string;
   name?: string;
   type?: string;

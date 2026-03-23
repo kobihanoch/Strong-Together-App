@@ -36,16 +36,16 @@ export const addWorkout = async (workoutData: AddWorkoutBody['workoutData']): Pr
 // Saves a workout after working out - startworkout.js
 export const saveWorkoutData = async (
   dataOfWorkout: FinishUserWorkoutBody['workout'],
-  startTime: FinishUserWorkoutBody['workout_start_utc'],
-  endTime: FinishUserWorkoutBody['workout_end_utc'],
+  startTime: number,
+  endTime: number,
 ): Promise<FinishUserWorkoutResponse> => {
-  startTime = new Date(startTime).toISOString();
-  endTime = new Date(endTime).toISOString();
+  const startTimeISO = new Date(startTime).toISOString();
+  const endTimeISO = new Date(endTime).toISOString();
 
   const { data } = await api.post<FinishUserWorkoutResponse>('/api/workouts/finishworkout', {
     workout: dataOfWorkout,
-    workout_start_utc: startTime,
-    workout_end_utc: endTime,
+    workout_start_utc: startTimeISO,
+    workout_end_utc: endTimeISO,
     tz: Intl.DateTimeFormat().resolvedOptions().timeZone,
   });
   return data;

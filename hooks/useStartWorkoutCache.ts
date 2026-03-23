@@ -1,26 +1,24 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { cacheSetJSON, keyStartWorkout, TTL_36H } from "../cache/cacheUtils";
-import { AppState } from "react-native";
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { cacheSetJSON, keyStartWorkout, TTL_36H } from '../cache/cacheUtils';
+import { AppState } from 'react-native';
+import { AppUser } from '../context/types/authContextTypes.dto';
+import { WorkoutContextWorkoutSplit } from '../context/types/workoutContextTypes.dto';
+import { ExercisesDuringWorkout, ResumeWorkoutCachePayload } from './types/useStartWorkoutTypes.dto';
 
 // Encapsulates: startTime, pausedTotal, and debounced cache writes (kept exactly as-is)
 export const useStartWorkoutCache = (
-  userId,
-  selectedSplit,
-  resumedWorkout,
-  workoutProgressObj
+  userId: AppUser['id'],
+  selectedSplit: WorkoutContextWorkoutSplit,
+  resumedWorkout: ResumeWorkoutCachePayload,
+  workoutProgressObj: ExercisesDuringWorkout,
 ) => {
   // Cache key per user
   const cacheKey = keyStartWorkout(userId);
 
   // Start time calculated once at mounting, clears on unmounting
   // UNCOMMENT TO ENABLE TIME PAUSE DURING BREAKOFFS
-  const [pausedTotal, setPausedTotal] = useState(
-    /*resumedWorkout ? resumedWorkout.pausedTotal : */ 0
-  );
-  const startTime = useMemo(
-    () => (resumedWorkout ? resumedWorkout.startTime : Date.now()),
-    [resumedWorkout]
-  );
+  const [pausedTotal /*setPausedTotal*/] = useState<number>(/*resumedWorkout ? resumedWorkout.pausedTotal : */ 0);
+  const startTime = useMemo(() => (resumedWorkout ? resumedWorkout.startTime : Date.now()), [resumedWorkout]);
 
   // UNCOMMENT TO ENABLE TIME PAUSE DURING BREAKOFFS
   // Total pause time
@@ -45,11 +43,11 @@ export const useStartWorkoutCache = (
         lastPause: Date.now(),
         pausedTotal,
       },
-      TTL_36H
+      TTL_36H,
     );
   }, [cacheKey, selectedSplit, workoutProgressObj, startTime, pausedTotal]);
 
-  const timeoutRef = useRef(null);
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Debounce caching each workout progress change - REGULAR SAVE FOR NOW
   useEffect(() => {
@@ -60,14 +58,18 @@ export const useStartWorkoutCache = (
       }, 0);
     })();
 
-    return () => clearTimeout(timeoutRef.current);
+    return () => {
+      if (timeoutRef.current !== null) {
+        clearTimeout(timeoutRef.current);
+      }
+    };
   }, [workoutProgressObj, pausedTotal, saveToCache]);
 
   // App state listener
   const disabledRef = useRef(false);
   useEffect(() => {
-    const sub = AppState.addEventListener("change", (state) => {
-      if (state === "inactive" || state === "background") {
+    const sub = AppState.addEventListener('change', (state) => {
+      if (state === 'inactive' || state === 'background') {
         // Flush immediately
         saveToCache();
       }
