@@ -1,5 +1,6 @@
 import { ExerciseToWorkoutSplitEntity } from '../../types/entities/exerciseToWorkoutSplit.entity';
 import { ExerciseEntity } from '../../types/entities/exercise.entity';
+import { WorkoutSplitEntity } from '../../types/entities/workoutSplit.entity';
 
 export interface ExerciseCandidate {
   id: ExerciseEntity['id'];
@@ -7,6 +8,8 @@ export interface ExerciseCandidate {
 }
 
 export interface SelectedExercise extends ExerciseCandidate {
-  sets: ExerciseToWorkoutSplitEntity['sets'];
-  order_index: ExerciseToWorkoutSplitEntity['order_index'];
+  sets: NonNullable<ExerciseToWorkoutSplitEntity['sets']>;
+  order_index: NonNullable<ExerciseToWorkoutSplitEntity['order_index']>;
 }
+
+export type SelectedExercises = Record<NonNullable<WorkoutSplitEntity['name']>, SelectedExercise[]>;

@@ -1,8 +1,12 @@
-import { useNavigation } from "@react-navigation/native";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Dialog } from "react-native-alert-notification";
-import { useWorkoutContext } from "../../context/WorkoutContext";
-import { addWorkout } from "../../services/WorkoutService";
+import { SelectedExercise } from './../types/useCreateWorkoutTypes.dto';
+import { useNavigation } from '@react-navigation/native';
+import { StackNavigationProp } from '@react-navigation/stack';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { ALERT_TYPE, Dialog } from 'react-native-alert-notification';
+import { useWorkoutContext } from '../../context/WorkoutContext';
+import { RootParamList } from '../../navigation/types/appStackTypes';
+import { addWorkout } from '../../services/WorkoutService';
+import { WorkoutSplitEntity } from '../../types/entities/workoutSplit.entity';
 import {
   addExerciseLogic,
   addSplitLogic,
@@ -11,37 +15,36 @@ import {
   removeExerciseLogic,
   removeSplitLogic,
   updateSetsLogic,
-} from "../../utils/createWorkoutUtils";
-import useExercises from "../useExercises";
+} from '../../utils/createWorkoutUtils';
+import { ExerciseCandidate, SelectedExercises } from '../types/useCreateWorkoutTypes.dto';
+import useExercises from '../useExercises';
+import { ExerciseToWorkoutSplitEntity } from '../../types/entities/exerciseToWorkoutSplit.entity';
 
 const useCreateWorkoutLogic = () => {
   // ----------------------------Workout and Analysis contexes----------------------------
-  const { setWorkout, setWorkoutForEdit, workoutForEdit } =
-    useWorkoutContext() || {};
+  const { setWorkout, setWorkoutForEdit, workoutForEdit } = useWorkoutContext();
   const hasWorkout = !!workoutForEdit;
 
   // ----------------------------Navigation----------------------------
-  const navigation = useNavigation();
+  const navigation = useNavigation<StackNavigationProp<RootParamList>>();
 
   // ----------------------------Saving----------------------------
-  const [isSaving, setIsSaving] = useState(false);
+  const [isSaving, setIsSaving] = useState<boolean>(false);
 
   // ----------------------------Editing----------------------------
-  const [selectedSplit, setSelectedSplit] = useState("A");
+  const [selectedSplit, setSelectedSplit] = useState<NonNullable<WorkoutSplitEntity['name']>>('A');
   // Keep a map: { splitName: [...Exercises] }
-  const [selectedExercises, setSelectedExercises] = useState({ A: [] });
+  const [selectedExercises, setSelectedExercises] = useState<SelectedExercises>({ A: [] });
   const exForSplit = selectedExercises[selectedSplit] || [];
 
   // Update dynamiclly if there is a workout
   useEffect(() => {
-    if (hasWorkout)
-      setSelectedExercises(JSON.parse(JSON.stringify(workoutForEdit)));
+    if (hasWorkout) setSelectedExercises(JSON.parse(JSON.stringify(workoutForEdit)));
   }, [hasWorkout, workoutForEdit]);
   const splitsList = Object.keys(selectedExercises);
 
   // ----------------------------Exercises in DB----------------------------
-  const { exercises: availableExercises = {}, loading: exLoading = true } =
-    useExercises() || {};
+  const { exercises: availableExercises = {}, loading: exLoading = true } = useExercises() || {};
   const allExercises = useMemo(
     () =>
       Object.entries(availableExercises)
@@ -51,54 +54,44 @@ const useCreateWorkoutLogic = () => {
           });
         })
         .flat(),
-    [availableExercises]
+    [availableExercises],
   );
 
-  const muscles = useMemo(
-    () => ["All", ...Object.keys(availableExercises)],
-    [availableExercises]
-  );
+  const muscles = useMemo(() => ['All', ...Object.keys(availableExercises)], [availableExercises]);
 
   // ---------------------------- Controls ----------------------------------
 
-  const { map: exerciseCountMap, totalExercises } =
-    getExercisesCountMap(selectedExercises);
+  const { map: exerciseCountMap, totalExercises } = getExercisesCountMap(selectedExercises);
 
   const addExercise = useCallback(
-    (exercise) => {
-      setSelectedExercises((prev) =>
-        addExerciseLogic(prev, selectedSplit, exercise)
-      );
+    (exercise: ExerciseCandidate) => {
+      setSelectedExercises((prev) => addExerciseLogic(prev, selectedSplit, exercise));
     },
-    [selectedSplit]
+    [selectedSplit],
   );
 
   const removeExercise = useCallback(
-    (exercise) => {
-      setSelectedExercises((prev) =>
-        removeExerciseLogic(prev, selectedSplit, exercise)
-      );
+    (exercise: ExerciseCandidate) => {
+      setSelectedExercises((prev) => removeExerciseLogic(prev, selectedSplit, exercise));
     },
-    [selectedSplit]
+    [selectedSplit],
   );
 
   const updateSets = useCallback(
-    (exercise, updatedSetsArr) => {
-      setSelectedExercises((prev) =>
-        updateSetsLogic(prev, selectedSplit, exercise, updatedSetsArr)
-      );
+    (exercise: ExerciseCandidate, updatedSetsArr: NonNullable<ExerciseToWorkoutSplitEntity['sets']>) => {
+      setSelectedExercises((prev) => updateSetsLogic(prev, selectedSplit, exercise, updatedSetsArr));
     },
-    [selectedSplit]
+    [selectedSplit],
   );
 
   const onDragEnd = useCallback(
-    ({ data }) => {
+    ({ data }: { data: SelectedExercise[] }) => {
       setSelectedExercises((prev) => onDragEndLogic(prev, selectedSplit, data));
     },
-    [selectedSplit]
+    [selectedSplit],
   );
 
-  const removeSplit = useCallback((splitName) => {
+  const removeSplit = useCallback((splitName: NonNullable<WorkoutSplitEntity['name']>) => {
     setSelectedExercises((prev) => {
       const { next, nextSelected } = removeSplitLogic(prev, splitName);
       setSelectedSplit(nextSelected);
@@ -109,7 +102,7 @@ const useCreateWorkoutLogic = () => {
   const addSplit = useCallback(() => {
     setSelectedExercises((prev) => {
       const { next, lastAdded, didAdd } = addSplitLogic(prev);
-      if (didAdd) setSelectedSplit(lastAdded); // Only when we actually added
+      if (didAdd) setSelectedSplit(lastAdded!); // Only when we actually added
       return next; // Always return a valid state object
     });
   }, []);
@@ -128,33 +121,32 @@ const useCreateWorkoutLogic = () => {
     if (hasNoSplits || hasEmptySplit) {
       saveLock.current = false; // release immediately
       Dialog.show({
-        type: "WARNING",
-        title: "Workout is incomplete",
-        textBody:
-          "Each split must include at least one exercise. Add exercises or remove empty splits before saving.",
-        button: "OK",
+        type: ALERT_TYPE.WARNING,
+        title: 'Workout is incomplete',
+        textBody: 'Each split must include at least one exercise. Add exercises or remove empty splits before saving.',
+        button: 'OK',
         autoClose: true,
         onPressButton: () => Dialog.hide(),
-        onTouchOutside: () => Dialog.hide(),
+        //onTouchOutside: () => Dialog.hide(),
       });
       return;
     }
 
     // Passed validation -> proceed to save
     setIsSaving(true);
-    console.log("[Create Workout]: Started saving...");
+    console.log('[Create Workout]: Started saving...');
     (async () => {
       try {
         const data = await addWorkout(map);
         setWorkout(data.workoutPlan);
         setWorkoutForEdit(data.workoutPlanForEditWorkout);
-        navigation.navigate("MyWorkoutPlan");
+        navigation.navigate('MyWorkoutPlan');
       } catch (e) {
         console.log(`[Create Workout]: ${e}`);
       } finally {
         saveLock.current = false;
         setIsSaving(false);
-        console.log("[Create Workout]: Workout saved susccessfuly");
+        console.log('[Create Workout]: Workout saved susccessfuly');
       }
     })();
   };
@@ -168,7 +160,7 @@ const useCreateWorkoutLogic = () => {
       removeSplit,
       onDragEnd,
     }),
-    [addExercise, addSplit, updateSets, removeExercise, removeSplit, onDragEnd]
+    [addExercise, addSplit, updateSets, removeExercise, removeSplit, onDragEnd],
   );
 
   const loadings = useMemo(
@@ -176,7 +168,7 @@ const useCreateWorkoutLogic = () => {
       isSaving,
       exLoading,
     }),
-    [isSaving, exLoading]
+    [isSaving, exLoading],
   );
 
   return {
