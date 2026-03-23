@@ -22,7 +22,13 @@
     "exactOptionalPropertyTypes": true,
     "noImplicitOverride": true,
     "useUnknownInCatchVariables": true,
-    "types": ["jest", "react-native"]
+    "types": [
+      "jest",
+      "react-native"
+    ]
   },
-  "include": ["**/*.ts", "**/*.tsx", "expo-env.d.ts"]
+  "include": [
+    "**/*.ts",
+    "**/*.tsx"
+  ]
 }
