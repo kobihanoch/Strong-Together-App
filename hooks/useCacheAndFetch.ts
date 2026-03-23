@@ -33,7 +33,7 @@ const useCacheAndFetch = <CachePaylodType, APIDataType>(
   const [cacheKnown, setCacheKnown] = useState<boolean>(false);
 
   // Updates cache auto when cached payload refrence is builded again (on data change)
-  useUpdateCache(logLabel, cacheKey, cachedPayload, TTL_48H, dataHydrated);
+  useUpdateCache<CachePaylodType>(logLabel, cacheKey, cachedPayload, TTL_48H, dataHydrated);
 
   // Flow:
   // Load -> has cache? -> If yes procceed with cache | If no notify cache known (bacuse we already know cache stste - false) and now fetch

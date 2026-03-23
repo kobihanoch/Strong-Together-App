@@ -1,7 +1,13 @@
-import { useEffect } from "react";
-import { cacheSetJSON } from "../cache/cacheUtils";
+import { useEffect } from 'react';
+import { cacheSetJSON } from '../cache/cacheUtils';
 
-const useUpdateCache = (logLabel, key, value, TTL, enabled = false) => {
+const useUpdateCache = <CachePayloadType>(
+  logLabel: string,
+  key: string | null,
+  value: CachePayloadType | null,
+  TTL: number,
+  enabled: boolean = false,
+): void => {
   useEffect(() => {
     (async () => {
       // Enabled flag is for data hydration => If data is hydrated from real API info than store cache
