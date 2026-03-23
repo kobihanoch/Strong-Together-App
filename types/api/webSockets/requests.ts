@@ -1,1 +1,3 @@
-export type GenerateTicketBody = z.infer<typeof generateTicketRequest.shape.body>;
+export type GenerateTicketBody = {
+  username: string;
+};

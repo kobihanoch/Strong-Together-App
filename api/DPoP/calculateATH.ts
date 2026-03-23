@@ -1,7 +1,7 @@
 // English comments only inside the code
 
-import { sha256 } from "@noble/hashes/sha256";
-import { base64url } from "@scure/base";
+import { sha256 } from '@noble/hashes/sha256';
+import { base64url } from '@scure/base';
 
 /**
  * Computes the DPoP "ath" (Access Token Hash)
@@ -9,7 +9,7 @@ import { base64url } from "@scure/base";
  * - Input: accessToken (string)
  * - Output: base64url(SHA256(accessToken))
  */
-export default function calculateATH(accessToken) {
+export default function calculateATH(accessToken: string | null): string | null {
   if (!accessToken) {
     return null;
   }
@@ -21,10 +21,6 @@ export default function calculateATH(accessToken) {
   const hash = sha256(tokenBytes);
 
   // Step 3: Base64url encode the hash (no padding)
-  const base64UrlAth = base64url
-    .encode(hash)
-    .replace(/\+/g, "-")
-    .replace(/\//g, "_")
-    .replace(/=+$/, "");
+  const base64UrlAth = base64url.encode(hash).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
   return base64UrlAth;
 }

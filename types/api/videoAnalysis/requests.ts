@@ -1,2 +1,8 @@
-export type PublishVideoAnalysisJobBody = z.infer<typeof publishVideoAnalysisJobRequest.shape.body>;
-export type GetPresignedUrlFromS3Body = z.infer<typeof getPresignedUrlS3Request.shape.body>;
+export type PublishVideoAnalysisJobBody = {
+  fileKey: string;
+  exercise: string;
+};
+export type GetPresignedUrlFromS3Body = {
+  fileName: string;
+  fileType: string;
+};
