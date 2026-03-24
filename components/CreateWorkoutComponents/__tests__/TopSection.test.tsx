@@ -41,7 +41,7 @@ jest.mock('../../Row', () => {
 
 import TopSection from '../TopSection';
 
-const createProps = () => ({
+const createProps = (): React.ComponentProps<typeof TopSection> => ({
   hasWorkout: false,
   splitsList: ['A', 'B'],
   setSelectedSplit: jest.fn(),
@@ -50,7 +50,7 @@ const createProps = () => ({
   totalExercises: 3,
   addSplit: jest.fn(),
   removeSplit: jest.fn(),
-  saveWorkout: jest.fn(),
+  saveWorkout: jest.fn(async () => {}),
 });
 
 describe('TopSection', () => {

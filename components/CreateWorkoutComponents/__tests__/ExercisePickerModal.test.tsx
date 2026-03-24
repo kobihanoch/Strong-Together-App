@@ -188,7 +188,16 @@ describe('ExercisePickerModal', () => {
 
   it('shows a duplicate notification and does not add the exercise again', async () => {
     const props = createProps({
-      exForSplit: [{ id: 1, name: 'Bench Press', order_index: 0, sets: [10, 10, 10] }],
+      exForSplit: [
+        {
+          id: 1,
+          name: 'Bench Press',
+          targetmuscle: 'Chest',
+          specificTargetMuscle: 'Upper Chest',
+          order_index: 0,
+          sets: [10, 10, 10],
+        },
+      ],
     });
 
     const { getByText } = render(<ExercisePickerModal ref={React.createRef()} {...props} />);
@@ -212,6 +221,8 @@ describe('ExercisePickerModal', () => {
       exForSplit: Array.from({ length: 10 }, (_, index) => ({
         id: 100 + index,
         name: `Exercise ${index + 1}`,
+        targetmuscle: 'Chest',
+        specificTargetMuscle: 'Upper Chest',
         order_index: index,
         sets: [10, 10, 10],
       })),

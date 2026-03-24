@@ -44,8 +44,26 @@ jest.mock('../../../services/WorkoutService', () => ({
 import useCreateWorkoutLogic from '../useCreateWorkoutLogic';
 
 const createWorkoutPlanForEdit = () => ({
-  A: [{ id: 1, name: 'Bench Press', sets: [10, 10, 10], order_index: 0 }],
-  B: [{ id: 2, name: 'Barbell Row', sets: [12, 12, 12], order_index: 0 }],
+  A: [
+    {
+      id: 1,
+      name: 'Bench Press',
+      targetmuscle: 'Chest',
+      specificTargetMuscle: 'Upper Chest',
+      sets: [10, 10, 10],
+      order_index: 0,
+    },
+  ],
+  B: [
+    {
+      id: 2,
+      name: 'Barbell Row',
+      targetmuscle: 'Back',
+      specificTargetMuscle: 'Lats',
+      sets: [12, 12, 12],
+      order_index: 0,
+    },
+  ],
 });
 
 const createAddWorkoutResponse = (): AddWorkoutResponse =>
@@ -93,7 +111,16 @@ describe('useCreateWorkoutLogic', () => {
     await waitFor(() => {
       expect(result.current.hasWorkout).toBe(true);
       expect(result.current.splitsList).toEqual(['A', 'B']);
-      expect(result.current.exForSplit).toEqual([{ id: 1, name: 'Bench Press', sets: [10, 10, 10], order_index: 0 }]);
+      expect(result.current.exForSplit).toEqual([
+        {
+          id: 1,
+          name: 'Bench Press',
+          targetmuscle: 'Chest',
+          specificTargetMuscle: 'Upper Chest',
+          sets: [10, 10, 10],
+          order_index: 0,
+        },
+      ]);
     });
   });
 
@@ -119,7 +146,12 @@ describe('useCreateWorkoutLogic', () => {
     const { result } = renderHook(() => useCreateWorkoutLogic());
 
     await act(async () => {
-      result.current.controls.addExercise({ id: 1, name: 'Bench Press' });
+      result.current.controls.addExercise({
+        id: 1,
+        name: 'Bench Press',
+        targetmuscle: 'Chest',
+        specificTargetMuscle: 'Upper Chest',
+      });
     });
 
     act(() => {
@@ -141,7 +173,12 @@ describe('useCreateWorkoutLogic', () => {
     const { result } = renderHook(() => useCreateWorkoutLogic());
 
     await act(async () => {
-      result.current.controls.addExercise({ id: 1, name: 'Bench Press' });
+      result.current.controls.addExercise({
+        id: 1,
+        name: 'Bench Press',
+        targetmuscle: 'Chest',
+        specificTargetMuscle: 'Upper Chest',
+      });
     });
 
     await act(async () => {
@@ -162,7 +199,12 @@ describe('useCreateWorkoutLogic', () => {
     const { result } = renderHook(() => useCreateWorkoutLogic());
 
     await act(async () => {
-      result.current.controls.addExercise({ id: 1, name: 'Bench Press' });
+      result.current.controls.addExercise({
+        id: 1,
+        name: 'Bench Press',
+        targetmuscle: 'Chest',
+        specificTargetMuscle: 'Upper Chest',
+      });
     });
 
     act(() => {

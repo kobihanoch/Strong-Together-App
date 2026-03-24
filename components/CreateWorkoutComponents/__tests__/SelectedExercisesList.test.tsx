@@ -83,7 +83,10 @@ jest.mock('../../Row', () => {
 import SelectedExercisesList from '../SelectedExercisesList';
 
 const createControls = () => ({
+  addExercise: jest.fn(),
+  addSplit: jest.fn(),
   removeExercise: jest.fn(),
+  removeSplit: jest.fn(),
   onDragEnd: jest.fn(),
   updateSets: jest.fn(),
 });
@@ -93,6 +96,7 @@ const createExercises = () => [
     id: 1,
     name: 'Bench Press',
     targetmuscle: 'Chest',
+    specificTargetMuscle: 'Upper Chest',
     order_index: 0,
     sets: [10, 10, 10],
   },
@@ -100,6 +104,7 @@ const createExercises = () => [
     id: 2,
     name: 'Barbell Row',
     targetmuscle: 'Back',
+    specificTargetMuscle: 'Lats',
     order_index: 1,
     sets: [12, 12, 12],
   },

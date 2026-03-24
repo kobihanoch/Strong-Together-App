@@ -15,6 +15,7 @@
   },
   "jest": {
     "preset": "jest-expo",
+    "maxWorkers": 1,
     "setupFilesAfterEnv": [
       "<rootDir>/tests/setup.js"
     ],

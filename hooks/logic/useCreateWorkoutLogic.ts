@@ -71,14 +71,14 @@ const useCreateWorkoutLogic = () => {
   );
 
   const removeExercise = useCallback(
-    (exercise: ExerciseCandidate) => {
+    (exercise: SelectedExercise) => {
       setSelectedExercises((prev) => removeExerciseLogic(prev, selectedSplit, exercise));
     },
     [selectedSplit],
   );
 
   const updateSets = useCallback(
-    (exercise: ExerciseCandidate, updatedSetsArr: NonNullable<ExerciseToWorkoutSplitEntity['sets']>) => {
+    (exercise: SelectedExercise, updatedSetsArr: NonNullable<ExerciseToWorkoutSplitEntity['sets']>) => {
       setSelectedExercises((prev) => updateSetsLogic(prev, selectedSplit, exercise, updatedSetsArr));
     },
     [selectedSplit],

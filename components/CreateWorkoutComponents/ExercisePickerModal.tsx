@@ -61,7 +61,7 @@ type ExercisePicketModalProps = {
   selectedSplit: NonNullable<WorkoutSplitEntity['name']>;
   controls: CreateWorkoutControls;
   availableExercises: ExercisesMapByMuscle;
-  allExercises: (GetAllExercisesExercise & { targetmuscle: ExerciseEntity['targetmuscle'] })[];
+  allExercises: ExerciseCandidate[];
   muscles: string[];
   exForSplit: SelectedExercise[];
 };

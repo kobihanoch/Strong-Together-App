@@ -88,7 +88,16 @@ import CreateWorkout from '../CreateWorkout';
 
 const createLogicState = (): UseCreateWorkoutLogicReturn => ({
   selectedExercises: {
-    A: [{ id: 1, name: 'Bench Press', order_index: 0, sets: [10, 10, 10] }],
+    A: [
+      {
+        id: 1,
+        name: 'Bench Press',
+        targetmuscle: 'Chest',
+        specificTargetMuscle: 'Upper Chest',
+        order_index: 0,
+        sets: [10, 10, 10],
+      },
+    ],
     B: [],
   },
   splitsList: ['A', 'B'],
@@ -115,7 +124,16 @@ const createLogicState = (): UseCreateWorkoutLogicReturn => ({
   selectedSplit: 'A',
   exerciseCountMap: { A: 1, B: 0 },
   totalExercises: 1,
-  exForSplit: [{ id: 1, name: 'Bench Press', order_index: 0, sets: [10, 10, 10] }],
+  exForSplit: [
+    {
+      id: 1,
+      name: 'Bench Press',
+      targetmuscle: 'Chest',
+      specificTargetMuscle: 'Upper Chest',
+      order_index: 0,
+      sets: [10, 10, 10],
+    },
+  ],
 });
 
 describe('CreateWorkout screen', () => {
@@ -180,10 +198,33 @@ describe('CreateWorkout screen', () => {
     mockLogic.mockImplementation(() => {
       const [selectedSplit, setSelectedSplit] = React.useState<'A' | 'B'>('A');
       const exercisesBySplit = {
-        A: [{ id: 1, name: 'Bench Press', order_index: 0, sets: [10, 10, 10] }],
+        A: [
+          {
+            id: 1,
+            name: 'Bench Press',
+            targetmuscle: 'Chest',
+            specificTargetMuscle: 'Upper Chest',
+            order_index: 0,
+            sets: [10, 10, 10],
+          },
+        ],
         B: [
-          { id: 2, name: 'Barbell Row', order_index: 0, sets: [12, 12, 12] },
-          { id: 3, name: 'Lat Pulldown', order_index: 1, sets: [10, 10, 10] },
+          {
+            id: 2,
+            name: 'Barbell Row',
+            targetmuscle: 'Back',
+            specificTargetMuscle: 'Lats',
+            order_index: 0,
+            sets: [12, 12, 12],
+          },
+          {
+            id: 3,
+            name: 'Lat Pulldown',
+            targetmuscle: 'Back',
+            specificTargetMuscle: 'Lats',
+            order_index: 1,
+            sets: [10, 10, 10],
+          },
         ],
       };
 
@@ -217,7 +258,16 @@ describe('CreateWorkout screen', () => {
     state.selectedSplit = 'B';
     state.totalExercises = 4;
     state.selectedExercises = {
-      A: [{ id: 1, name: 'Bench Press', order_index: 0, sets: [10, 10, 10] }],
+      A: [
+        {
+          id: 1,
+          name: 'Bench Press',
+          targetmuscle: 'Chest',
+          specificTargetMuscle: 'Upper Chest',
+          order_index: 0,
+          sets: [10, 10, 10],
+        },
+      ],
       B: [],
     };
     state.exForSplit = [];

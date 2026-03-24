@@ -1,67 +1,71 @@
-// components/inputs/NumericInputWithRules.jsx
+import React, { useEffect, useRef, useState } from 'react';
+import { TextInput, TextInputProps, StyleProp, TextStyle } from 'react-native';
+import { safeParseFloat } from '../../utils/sharedUtils';
 
-import React, { useEffect, useRef, useState } from "react";
-import { TextInput } from "react-native";
-import { safeParseFloat } from "../../utils/sharedUtils";
+interface NumericInputWithRulesProps extends Omit<TextInputProps, 'style'> {
+  initial?: number | string;
+  allowZero?: boolean;
+  isSetLocked?: boolean | number | string;
+  onValidChange?: (value: number) => void;
+  style?: StyleProp<TextStyle>;
+  precision?: number;
+  commitOnInitial?: boolean;
+}
 
 /**
  * NumericInputWithRules
  *
  * Behavior:
  * 1) If allowZero === false:
- *    - User can type anything.
- *    - On blur, if parsed value is 0 (or invalid/empty) -> revert to the value before edit, do NOT notify.
+ * - User can type anything.
+ * - On blur, if parsed value is 0 (or invalid/empty) -> revert to the value before edit, do NOT notify.
  * 2) If allowZero === true:
- *    - Normal numeric behavior, including 0.
+ * - Normal numeric behavior, including 0.
  * 3) Leading zero rule:
- *    - If first char is '0' and the next char is not '.', remove the leading zeros while typing.
+ * - If first char is '0' and the next char is not '.', remove the leading zeros while typing.
  * 4) Locked:
- *    - Not editable at all. Never calls onValidChange while locked.
+ * - Not editable at all. Never calls onValidChange while locked.
  * 5) commitOnInitial:
- *    - If true, also "commit" the initial value (and fire onValidChange) on mount and whenever `initial` changes,
- *      as long as the value is valid per rules and we're not locked.
+ * - If true, also "commit" the initial value (and fire onValidChange) on mount and whenever `initial` changes,
+ * as long as the value is valid per rules and we're not locked.
  *
  * Notes:
  * - onValidChange fires only on successful commit (blur or initial-commit when commitOnInitial = true).
  */
-const NumericInputWithRules = ({
+const NumericInputWithRules: React.FC<NumericInputWithRulesProps> = ({
   initial = 0,
   allowZero = false,
   isSetLocked = false, // can be boolean/number/string
   onValidChange,
   style,
   precision = 2,
-  keyboardType = "numeric",
+  keyboardType = 'numeric',
   onBlur,
   commitOnInitial = false, // <--- new flag, default false
   ...rest
 }) => {
   // Normalize lock: true | "true" | 1 | "1" are treated as locked
-  const locked =
-    isSetLocked === true ||
-    isSetLocked === "true" ||
-    isSetLocked === 1 ||
-    isSetLocked === "1";
+  const locked = isSetLocked === true || isSetLocked === 'true' || isSetLocked === 1 || isSetLocked === '1';
 
   // Parse + round to precision; returns number or null
-  const toNumber = (raw) => {
-    const s = String(raw ?? "").replace(",", ".");
+  const toNumber = (raw: string | number | null | undefined): number | null => {
+    const s = String(raw ?? '').replace(',', '.');
     const n = safeParseFloat(s);
     if (!Number.isFinite(n)) return null;
-    return Number(n.toFixed(precision));
+    return Number(n?.toFixed(precision));
   };
 
   // Last committed valid value
-  const startNum = Number.isFinite(initial) ? Number(initial) : 0;
-  const [text, setText] = useState(String(startNum));
-  const lastCommitted = useRef(startNum);
+  const startNum = Number.isFinite(Number(initial)) ? Number(initial) : 0;
+  const [text, setText] = useState<string>(String(startNum));
+  const lastCommitted = useRef<number>(startNum);
 
   // Snapshot taken exactly when the user focused (used for reverts)
-  const beforeEdit = useRef(startNum);
+  const beforeEdit = useRef<number>(startNum);
 
   // Keep in sync if initial/lock change from outside
   useEffect(() => {
-    const next = Number.isFinite(initial) ? Number(initial) : 0;
+    const next = Number.isFinite(Number(initial)) ? Number(initial) : 0;
     const rounded = toNumber(next);
 
     // Always reflect externally provided value in the input
@@ -73,11 +77,11 @@ const NumericInputWithRules = ({
       // Valid number and passes zero rule
       const okNumber = rounded != null && (allowZero || rounded !== 0);
 
-      if (okNumber) {
+      if (okNumber && rounded !== null) {
         // Notify only if it actually differs from what we already committed
         if (rounded !== lastCommitted.current) {
           lastCommitted.current = rounded;
-          if (typeof onValidChange === "function") onValidChange(rounded);
+          if (typeof onValidChange === 'function') onValidChange(rounded);
         } else {
           // Keep committed value in sync
           lastCommitted.current = rounded;
@@ -95,16 +99,16 @@ const NumericInputWithRules = ({
   }, [initial, locked, precision, allowZero, commitOnInitial]);
 
   // Typing rules
-  const onChangeText = (val) => {
+  const onChangeText = (val: string) => {
     if (locked) return; // not editable when locked
 
     // Replace comma with dot to help locales
-    let v = (val ?? "").replace(",", ".");
+    let v = (val ?? '').replace(',', '.');
 
     // Leading zero rule:
     // If starts with one or more zeros followed by a digit (not a dot) -> strip leading zeros
     if (/^0+\d/.test(v)) {
-      v = v.replace(/^0+/, "");
+      v = v.replace(/^0+/, '');
     }
 
     setText(v);
@@ -143,7 +147,7 @@ const NumericInputWithRules = ({
     // Accept and notify immediately
     lastCommitted.current = parsed;
     setText(String(parsed));
-    if (typeof onValidChange === "function") onValidChange(parsed);
+    if (typeof onValidChange === 'function') onValidChange(parsed);
   };
 
   return (
@@ -154,7 +158,7 @@ const NumericInputWithRules = ({
         beforeEdit.current = lastCommitted.current;
       }}
       onChangeText={onChangeText}
-      onBlur={(e) => {
+      onBlur={(e: Parameters<NonNullable<TextInputProps['onBlur']>>[0]) => {
         commit();
         onBlur?.(e);
       }}
