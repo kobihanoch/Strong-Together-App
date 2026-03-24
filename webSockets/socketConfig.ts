@@ -1,32 +1,33 @@
 // English-only comments inside code
-import { io } from "socket.io-client";
-import api from "../api/api";
-import { API_BASE_URL } from "../api/apiConfig";
+import { io, Socket } from 'socket.io-client';
+import api from '../api/api';
+import { API_BASE_URL } from '../api/apiConfig';
+import { AppUser } from '../context/types/authContextTypes.dto';
 
-let socket = null;
+let socket: Socket | null = null;
 
 // Helper to mint a fresh short-lived ticket
-async function mintTicket(username) {
+async function mintTicket(username: AppUser['username']) {
   // NOTE: adjust path to match your api base (avoid double "api")
-  const res = await api.post("api/ws/generateticket", { username });
+  const res = await api.post('api/ws/generateticket', { username });
   const ticket = res?.data?.ticket;
-  if (!ticket) throw new Error("Failed to get socket ticket");
+  if (!ticket) throw new Error('Failed to get socket ticket');
   return ticket;
 }
 
 // English-only comments: reconnect with a fresh ticket (idempotent)
-async function reconnectWithFreshTicket(username) {
+async function reconnectWithFreshTicket(username: AppUser['username']) {
   if (!socket) return;
   try {
     const fresh = await mintTicket(username);
     socket.auth = { ticket: fresh };
     socket.connect();
   } catch (e) {
-    console.error("[WebSocket]: Ticket refresh failed:", e?.message || e);
+    console.error('[WebSocket]: Ticket refresh failed:', (e as Error).message || e);
   }
 }
 
-export const connectSocket = async (username) => {
+export const connectSocket = async (username: AppUser['username']) => {
   // Reuse already-connected instance
   if (socket && socket.connected) return socket;
 
@@ -35,8 +36,8 @@ export const connectSocket = async (username) => {
     const firstTicket = await mintTicket(username);
 
     socket = io(API_BASE_URL, {
-      path: "/socket.io",
-      transports: ["websocket"],
+      path: '/socket.io',
+      transports: ['websocket'],
       upgrade: false,
       autoConnect: false,
       reconnection: true,
@@ -47,17 +48,17 @@ export const connectSocket = async (username) => {
       auth: { ticket: firstTicket },
     });
 
-    socket.on("connect", () => {
-      console.log("[WebSocket]: Socket connected");
-      socket.emit("user_loggedin");
+    socket.on('connect', () => {
+      console.log('[WebSocket]: Socket connected');
+      socket!.emit('user_loggedin');
     });
 
-    socket.on("disconnect", (reason) => {
-      console.log("[WebSocket]: Socket disconnected:", reason);
+    socket.on('disconnect', (reason) => {
+      console.log('[WebSocket]: Socket disconnected:', reason);
     });
 
-    socket.on("connect_error", (err) => {
-      const msg = (err?.message || "").toLowerCase();
+    socket.on('connect_error', (err) => {
+      const msg = (err?.message || '').toLowerCase();
       if (/(missing|invalid|expired|unauth)/i.test(msg)) {
         reconnectWithFreshTicket(username);
       }
