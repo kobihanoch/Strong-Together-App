@@ -1,25 +1,29 @@
-import React, { useEffect, useRef } from "react";
-import { View, Text, Animated, Easing } from "react-native";
-import { TextInput } from "react-native-gesture-handler";
+/* eslint-disable @typescript-eslint/ban-ts-comment */
+import React, { useEffect, useRef } from 'react';
+import { Animated, Easing, StyleProp, TextStyle } from 'react-native';
+import { TextInput } from 'react-native-gesture-handler';
 
-const NumberCounter = ({ numStart = 0, numEnd, duration = 2000, style }) => {
-  const inputRef = useRef(null);
+interface NumberCounterProps {
+  numStart?: number;
+  numEnd: number;
+  duration?: number;
+  style?: StyleProp<TextStyle>;
+}
+
+const NumberCounter: React.FC<NumberCounterProps> = ({ numStart = 0, numEnd, duration = 2000, style }) => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const inputRef = useRef<any>(null);
   const anim = useRef(new Animated.Value(numStart)).current;
 
   useEffect(() => {
-    const sub = anim.addListener(({ value }) => {
-      const n = Number(value).toFixed(0);
-      inputRef.current?.setNativeProps({ text: String(n) });
-    });
-
     Animated.timing(anim, {
       toValue: numEnd,
       duration,
       easing: Easing.out(Easing.cubic),
-      useNativeDriver: false, // text prop update is layout-bound
+      useNativeDriver: false,
     }).start();
 
-    return () => anim.removeListener(sub);
+    return () => anim.removeAllListeners();
   }, [numEnd, duration, anim]);
 
   return (
@@ -29,19 +33,17 @@ const NumberCounter = ({ numStart = 0, numEnd, duration = 2000, style }) => {
       caretHidden
       pointerEvents="none"
       underlineColorAndroid="transparent"
-      // critical: keep width stable and center the text
+      defaultValue={String(numStart)}
       style={[
         style,
         {
-          // fixed-width numerals -> no width wobble
-          fontVariant: ["tabular-nums"],
+          fontVariant: ['tabular-nums'],
+          // @ts-ignore - fontFeatureSettings
           fontFeatureSettings: "'tnum'",
           includeFontPadding: false,
-          textAlign: "center",
-          // don't stretch across the Row
+          textAlign: 'center',
           flex: undefined,
-          // avoid accidental background blends
-          backgroundColor: "transparent",
+          backgroundColor: 'transparent',
         },
       ]}
     />

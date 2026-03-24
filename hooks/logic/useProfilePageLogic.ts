@@ -1,11 +1,14 @@
-import { useAuth } from "../../context/AuthContext";
-import { getDaysSince } from "../../utils/homePageUtils";
+import { useAuth } from '../../context/AuthContext';
+import { getDaysSince } from '../../utils/homePageUtils';
 
 const useProfilePageLogic = () => {
   const { user, setUser } = useAuth();
-  const { username, email, name: fullName, gender } = user;
-
-  const daysOnline = getDaysSince(user.created_at.split("T")[0]);
+  const username = user?.username ?? '';
+  const email = user?.email ?? '';
+  const fullName = user?.name ?? '';
+  const gender = user?.gender ?? null;
+  const createdAtDate = user?.created_at?.split('T')[0];
+  const daysOnline = createdAtDate ? getDaysSince(createdAtDate) : 0;
 
   return {
     data: {

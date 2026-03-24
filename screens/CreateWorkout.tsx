@@ -1,39 +1,33 @@
-import React, { useCallback, useMemo, useRef } from "react";
-import {
-  Dimensions,
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-} from "react-native";
-import ExercisePickerModal from "../components/CreateWorkoutComponents/ExercisePickerModal";
-import useCreateWorkoutLogic from "../hooks/logic/useCreateWorkoutLogic";
-import TopSection from "../components/CreateWorkoutComponents/TopSection";
-import { colors } from "../constants/colors";
-import { RFValue } from "react-native-responsive-fontsize";
-import SelectedExercisesList from "../components/CreateWorkoutComponents/SelectedExercisesList";
+import React, { useCallback, useRef } from 'react';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { RFValue } from 'react-native-responsive-fontsize';
+import ExercisePickerModal from '../components/CreateWorkoutComponents/ExercisePickerModal';
+import SelectedExercisesList from '../components/CreateWorkoutComponents/SelectedExercisesList';
+import TopSection from '../components/CreateWorkoutComponents/TopSection';
+import { colors } from '../constants/colors';
+import useCreateWorkoutLogic from '../hooks/logic/useCreateWorkoutLogic';
+import { SlidingBottomModalRef } from '../components/SlidingBottomModal';
 
-const { width, height } = Dimensions.get("window");
+//const { width, height } = Dimensions.get('window');
 
 const CreateWorkout = () => {
   // Pull flags and actions from context
   const {
-    splitsList = [],
-    availableExercises = [],
-    allExercises = [],
-    muscles = [],
+    splitsList,
+    availableExercises,
+    allExercises,
+    muscles,
     saveWorkout,
-    controls = {},
-    loadings = {},
-    hasWorkout = false,
+    controls,
+    hasWorkout,
     setSelectedSplit,
-    selectedSplit = "A",
-    exerciseCountMap = { A: 0 },
-    totalExercises = 0,
+    selectedSplit,
+    exerciseCountMap,
+    totalExercises,
     exForSplit,
-  } = useCreateWorkoutLogic() || {};
+  } = useCreateWorkoutLogic();
 
-  const pickerRef = useRef(null);
+  const pickerRef = useRef<SlidingBottomModalRef | null>(null);
   const openPicker = useCallback(() => {
     pickerRef.current?.open?.(1);
   }, [pickerRef]);
@@ -53,17 +47,10 @@ const CreateWorkout = () => {
         saveWorkout={saveWorkout}
       />
       {/* Exercises list */}
-      <SelectedExercisesList
-        exForSplit={exForSplit}
-        controls={controls}
-        selectedSplit={selectedSplit}
-      />
+      <SelectedExercisesList exForSplit={exForSplit} controls={controls} selectedSplit={selectedSplit} />
 
       {/* Sliding bottom-sheet modal */}
-      <TouchableOpacity
-        style={styles.openExercisesModalBtn}
-        onPress={openPicker}
-      >
+      <TouchableOpacity style={styles.openExercisesModalBtn} onPress={openPicker}>
         <Text style={styles.plusText}>+</Text>
       </TouchableOpacity>
       <ExercisePickerModal
@@ -88,20 +75,20 @@ const styles = StyleSheet.create({
     height: 60,
     aspectRatio: 1,
     borderRadius: 80,
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: 'center',
+    alignItems: 'center',
     shadowColor: colors.primary,
     shadowOpacity: 0.4,
     shadowRadius: 5,
     shadowOffset: { width: 0, height: 0 },
     // Android shadow
     elevation: 6,
-    position: "absolute",
+    position: 'absolute',
     bottom: 20,
     right: 20,
   },
   plusText: {
-    color: "white",
+    color: 'white',
     fontSize: RFValue(25),
   },
 });
