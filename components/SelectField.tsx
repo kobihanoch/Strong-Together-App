@@ -1,26 +1,27 @@
-import React, { useMemo, useState } from "react";
-import {
-  Dimensions,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  TouchableWithoutFeedback,
-  View,
-} from "react-native";
-import { RFValue } from "react-native-responsive-fontsize";
-import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
+import React, { useMemo, useState } from 'react';
+import { Dimensions, StyleSheet, Text, TouchableOpacity, TouchableWithoutFeedback, View } from 'react-native';
+import { RFValue } from 'react-native-responsive-fontsize';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
-const { width, height } = Dimensions.get("window");
+const { width, height } = Dimensions.get('window');
 
-const SelectField = ({
+interface SelectFieldProps {
+  value: string;
+  onChange: (option: string) => void;
+  iconName?: string;
+  placeholder?: string;
+  options?: string[];
+}
+
+const SelectField: React.FC<SelectFieldProps> = ({
   value,
   onChange,
-  iconName = "venus-mars",
-  placeholder = "Gender (Optional)",
-  options = ["Male", "Female"],
+  //iconName = 'venus-mars',
+  placeholder = 'Gender (Optional)',
+  options = ['Male', 'Female'],
 }) => {
   // Local state for dropdown open/close
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState<boolean>(false);
 
   // Label to show in the closed state
   const label = useMemo(() => value || placeholder, [value, placeholder]);
@@ -29,7 +30,7 @@ const SelectField = ({
   const toggle = () => setOpen((v) => !v);
 
   // Select an option and close
-  const select = (opt) => {
+  const select = (opt: string) => {
     onChange?.(opt);
     setOpen(false);
   };
@@ -37,11 +38,7 @@ const SelectField = ({
   return (
     <View style={styles.wrapper}>
       {/* Field (closed state look) */}
-      <TouchableOpacity
-        activeOpacity={0.8}
-        onPress={toggle}
-        style={styles.inputContainer}
-      >
+      <TouchableOpacity activeOpacity={0.8} onPress={toggle} style={styles.inputContainer}>
         <Text
           style={[
             styles.valueText,
@@ -59,11 +56,7 @@ const SelectField = ({
             size={RFValue(15)}
             color={"white"}
           />*/}
-          <MaterialCommunityIcons
-            name={open ? "chevron-up" : "chevron-down"}
-            size={RFValue(15)}
-            color={"white"}
-          />
+          <MaterialCommunityIcons name={open ? 'chevron-up' : 'chevron-down'} size={RFValue(15)} color={'white'} />
         </View>
       </TouchableOpacity>
 
@@ -82,27 +75,11 @@ const SelectField = ({
                 <TouchableOpacity
                   key={opt}
                   onPress={() => select(opt)}
-                  style={[
-                    styles.optionRow,
-                    selected && styles.optionRowSelected,
-                  ]}
+                  style={[styles.optionRow, selected && styles.optionRowSelected]}
                   activeOpacity={0.85}
                 >
-                  <Text
-                    style={[
-                      styles.optionText,
-                      selected && styles.optionTextSelected,
-                    ]}
-                  >
-                    {opt}
-                  </Text>
-                  {selected && (
-                    <MaterialCommunityIcons
-                      name="check"
-                      size={RFValue(15)}
-                      color="#004fa3"
-                    />
-                  )}
+                  <Text style={[styles.optionText, selected && styles.optionTextSelected]}>{opt}</Text>
+                  {selected && <MaterialCommunityIcons name="check" size={RFValue(15)} color="#004fa3" />}
                 </TouchableOpacity>
               );
             })}
@@ -124,34 +101,34 @@ const styles = StyleSheet.create({
   },
   inputContainer: {
     // Same visual language as your InputField
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
     borderWidth: 1,
-    borderColor: "white",
+    borderColor: 'white',
     borderRadius: 10,
     padding: height * 0.013,
-    backgroundColor: "transparent",
-    width: "100%",
+    backgroundColor: 'transparent',
+    width: '100%',
   },
   valueText: {
     flex: 1,
-    color: "white",
-    fontFamily: "Inter_400Regular",
+    color: 'white',
+    fontFamily: 'Inter_400Regular',
     fontSize: width * 0.04,
-    textAlign: "left",
+    textAlign: 'left',
   },
   placeholderText: {
-    color: "#e0efffff", // slightly dimmed
+    color: '#e0efffff', // slightly dimmed
   },
   rightIcons: {
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
     marginLeft: 10,
   },
 
   // Full-screen overlay to catch outside taps
   overlay: {
-    position: "absolute",
+    position: 'absolute',
     top: -height, // extend far enough
     left: -width,
     right: -width,
@@ -160,37 +137,37 @@ const styles = StyleSheet.create({
 
   // Dropdown panel below the field
   dropdown: {
-    position: "absolute",
-    top: "100%",
+    position: 'absolute',
+    top: '100%',
     left: 0,
-    width: "100%",
+    width: '100%',
     borderWidth: 1,
-    borderColor: "white",
+    borderColor: 'white',
     borderRadius: 10,
     marginTop: 6,
-    backgroundColor: "rgba(255, 255, 255, 1)", // translucent over gradient
-    backdropFilter: "blur(2px)", // harmless on RN web; ignored native
-    overflow: "hidden",
+    backgroundColor: 'rgba(255, 255, 255, 1)', // translucent over gradient
+    // backdropFilter: "blur(2px)", // harmless on RN web; ignored native
+    overflow: 'hidden',
   },
   optionRow: {
     paddingVertical: 10,
     paddingHorizontal: 14,
-    backgroundColor: "transparent",
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
+    backgroundColor: 'transparent',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
   },
   optionRowSelected: {
-    backgroundColor: "#e0efff",
+    backgroundColor: '#e0efff',
   },
   optionText: {
-    fontFamily: "Inter_400Regular",
+    fontFamily: 'Inter_400Regular',
     fontSize: width * 0.04,
-    color: "#004fa3",
+    color: '#004fa3',
   },
   optionTextSelected: {
-    color: "#004fa3",
-    fontWeight: "bold",
+    color: '#004fa3',
+    fontWeight: 'bold',
   },
 });
 

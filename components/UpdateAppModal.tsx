@@ -1,13 +1,10 @@
-import React, { useEffect, useState } from "react";
-import { Modal, Text, View, TouchableOpacity, Linking } from "react-native";
-import { RFValue } from "react-native-responsive-fontsize";
-import {
-  registerUpdateModal,
-  unregisterUpdateModal,
-} from "../utils/imperativeUpdateModal";
+import React, { useEffect, useState } from 'react';
+import { Modal, Text, View, TouchableOpacity, Linking } from 'react-native';
+import { RFValue } from 'react-native-responsive-fontsize';
+import { registerUpdateModal, unregisterUpdateModal } from '../utils/imperativeUpdateModal';
 
 export default function UpdateAppModal() {
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState<boolean>(false);
 
   useEffect(() => {
     // Register imperative methods on mount
@@ -26,23 +23,23 @@ export default function UpdateAppModal() {
       <View
         style={{
           flex: 1,
-          backgroundColor: "rgba(0,0,0,0.55)",
-          alignItems: "center",
-          justifyContent: "center",
+          backgroundColor: 'rgba(0,0,0,0.55)',
+          alignItems: 'center',
+          justifyContent: 'center',
         }}
       >
         <View
           style={{
-            backgroundColor: "white",
+            backgroundColor: 'white',
             padding: 24,
             borderRadius: 14,
-            width: "86%",
+            width: '86%',
           }}
         >
           <Text
             style={{
               fontSize: RFValue(16),
-              fontFamily: "Inter_600SemiBold",
+              fontFamily: 'Inter_600SemiBold',
               marginBottom: 8,
             }}
           >
@@ -51,28 +48,26 @@ export default function UpdateAppModal() {
           <Text
             style={{
               fontSize: RFValue(14),
-              fontFamily: "Inter_400Regular",
+              fontFamily: 'Inter_400Regular',
               marginBottom: 16,
             }}
           >
             A newer app version is required. Please update to continue.
           </Text>
           <TouchableOpacity
-            onPress={() =>
-              Linking.openURL("itms-apps://itunes.apple.com/app/id6745721821")
-            }
+            onPress={() => Linking.openURL('itms-apps://itunes.apple.com/app/id6745721821')}
             style={{
               paddingVertical: 12,
               borderRadius: 10,
-              backgroundColor: "#2979FF",
-              alignItems: "center",
+              backgroundColor: '#2979FF',
+              alignItems: 'center',
             }}
           >
             <Text
               style={{
-                color: "white",
+                color: 'white',
                 fontSize: RFValue(14),
-                fontFamily: "Inter_600SemiBold",
+                fontFamily: 'Inter_600SemiBold',
               }}
             >
               Open App Store
