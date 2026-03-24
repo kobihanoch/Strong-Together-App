@@ -12,6 +12,6 @@ export type RootParamList = {
   Analytics: undefined;
   StartWorkout: {
     workoutSplit?: WorkoutContextWorkoutSplit;
-    resumedWorkout?: ResumeWorkoutCachePayload;
+    resumedWorkout?: Omit<ResumeWorkoutCachePayload, 'selectedSplit'>;
   };
 };
