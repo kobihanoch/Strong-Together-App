@@ -11,7 +11,9 @@ export interface AnalysisContextAnalyzedExerciseTrackingData {
   pr: {
     maxReps: Exclude<GetExerciseTrackingResponse['exerciseTrackingAnalysis']['prs']['pr_max'], null>['reps'];
     maxWeight: Exclude<GetExerciseTrackingResponse['exerciseTrackingAnalysis']['prs']['pr_max'], null>['weight'];
-    maxExercise: Exclude<GetExerciseTrackingResponse['exerciseTrackingAnalysis']['prs']['pr_max'], null>['exercise'];
+    maxExercise:
+      | Exclude<GetExerciseTrackingResponse['exerciseTrackingAnalysis']['prs']['pr_max'], null>['exercise']
+      | null;
     maxDate: Exclude<
       GetExerciseTrackingResponse['exerciseTrackingAnalysis']['prs']['pr_max'],
       null

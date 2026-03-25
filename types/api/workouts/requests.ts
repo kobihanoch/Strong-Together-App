@@ -24,7 +24,7 @@ export type AddWorkoutBody = {
     {
       id: number;
       sets: number | number[];
-      order_index?: number | undefined;
+      order_index: number;
     }[]
   >;
   tz: string;
