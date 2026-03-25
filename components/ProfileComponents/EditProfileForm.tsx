@@ -1,32 +1,40 @@
-import React, { useState } from "react";
+import { MaterialCommunityIcons } from '@expo/vector-icons';
+import React, { useState } from 'react';
 import {
-  View,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
+  ActivityIndicator,
   Keyboard,
   KeyboardAvoidingView,
   Platform,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
   TouchableWithoutFeedback,
-  ActivityIndicator,
-} from "react-native";
-import Column from "../Column";
-import Row from "../Row";
-import { TextInput } from "react-native-gesture-handler";
-import { RFValue } from "react-native-responsive-fontsize";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { colors } from "../../constants/colors";
-import { showErrorAlert } from "../../errors/errorAlerts";
-import { updateSelfUser } from "../../services/UserService";
-import { Notifier, NotifierComponents } from "react-native-notifier";
+} from 'react-native';
+import { TextInput } from 'react-native-gesture-handler';
+import { Notifier, NotifierComponents } from 'react-native-notifier';
+import { RFValue } from 'react-native-responsive-fontsize';
+import { colors } from '../../constants/colors';
+import { showErrorAlert } from '../../errors/errorAlerts';
+import { updateSelfUser } from '../../services/UserService';
+import Column from '../Column';
+import Row from '../Row';
+import { UserEntity } from '../../types/entities/user.entity';
 
-const EditProfileForm = ({
-  initialData,
-  closeEditSheet,
-  openEditSheet,
-  setUser,
-}) => {
-  const { fullName, gender, email, username } = initialData;
+type EditProfileFormProps = {
+  initialData: {
+    username: string;
+    email: string;
+    fullName: string;
+    gender: string;
+    daysOnline: string;
+  };
+  closeEditSheet: () => void;
+  openEditSheet: (i?: number) => void;
+  setUser: React.Dispatch<React.SetStateAction<Omit<UserEntity, 'password'> | null>>;
+};
+
+const EditProfileForm = ({ initialData, closeEditSheet, openEditSheet, setUser }: EditProfileFormProps) => {
+  const { fullName, email, username } = initialData;
   const [fullNameInput, setFullNameInput] = useState(fullName);
   const [emailInput, setEmailInput] = useState(email);
   const [usernameInput, setUsernameInput] = useState(username);
@@ -50,14 +58,10 @@ const EditProfileForm = ({
       !usernameInput ||
       usernameInput.length === 0
     ) {
-      showErrorAlert("Error Updating User", "Please fill all fields");
+      showErrorAlert('Error Updating User', 'Please fill all fields');
       return;
     }
-    if (
-      fullNameInput === fullName &&
-      usernameInput === username &&
-      emailInput === email
-    ) {
+    if (fullNameInput === fullName && usernameInput === username && emailInput === email) {
       closeEditSheet();
       return;
     }
@@ -77,28 +81,28 @@ const EditProfileForm = ({
       setUser(res?.user);
       if (res?.emailChanged) {
         Notifier.showNotification({
-          title: "An email has beent sent to you",
+          title: 'An email has beent sent to you',
           description: `Please confirm this new email. Check ${emailInput} inbox or spam.`,
           duration: 7000,
           showAnimationDuration: 250,
           hideOnPress: true,
           Component: NotifierComponents.Alert,
           componentProps: {
-            alertType: "success",
+            alertType: 'success',
             titleStyle: { fontSize: 16 },
             descriptionStyle: { fontSize: 14 },
           },
         });
       } else {
         Notifier.showNotification({
-          title: "User Updated",
-          description: "Your profile changes has been updated successfully",
+          title: 'User Updated',
+          description: 'Your profile changes has been updated successfully',
           duration: 2500,
           showAnimationDuration: 250,
           hideOnPress: true,
           Component: NotifierComponents.Alert,
           componentProps: {
-            alertType: "success",
+            alertType: 'success',
             titleStyle: { fontSize: 16 },
             descriptionStyle: { fontSize: 14 },
           },
@@ -114,16 +118,16 @@ const EditProfileForm = ({
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : undefined}
-        keyboardVerticalOffset={Platform.OS === "ios" ? 60 : 0}
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 60 : 0}
       >
         <Column style={{ padding: 15, paddingHorizontal: 20, gap: 20 }}>
           <Row>
             <Text style={styles.header}>Edit Profile</Text>
           </Row>
 
-          <Row style={{ width: "100%", gap: 10 }}>
-            <Column style={[styles.inputComponent, { width: "50%" }]}>
+          <Row style={{ width: '100%', gap: 10 }}>
+            <Column style={[styles.inputComponent, { width: '50%' }]}>
               <Text style={styles.inputHeader}>Full Name</Text>
               <TextInput
                 style={styles.inputText}
@@ -134,7 +138,7 @@ const EditProfileForm = ({
               />
             </Column>
 
-            <Column style={[styles.inputComponent, { width: "50%" }]}>
+            <Column style={[styles.inputComponent, { width: '50%' }]}>
               <Text style={styles.inputHeader}>Username</Text>
               <TextInput
                 style={styles.inputText}
@@ -160,30 +164,18 @@ const EditProfileForm = ({
           </Column>
 
           <Row style={{ marginTop: 20 }}>
-            <TouchableOpacity
-              style={styles.saveBtnContainer}
-              onPress={handleSave}
-              disabled={updating}
-            >
+            <TouchableOpacity style={styles.saveBtnContainer} onPress={handleSave} disabled={updating}>
               {updating ? (
                 <ActivityIndicator />
               ) : (
                 <Row style={{ gap: 10 }}>
-                  <MaterialCommunityIcons
-                    name={"content-save-outline"}
-                    size={RFValue(13)}
-                    color={"white"}
-                  />
+                  <MaterialCommunityIcons name={'content-save-outline'} size={RFValue(13)} color={'white'} />
                   <Text style={styles.saveBtnText}>Save Changes</Text>
                 </Row>
               )}
             </TouchableOpacity>
 
-            <TouchableOpacity
-              style={styles.cancelBtnContainer}
-              onPress={handleCancel}
-              disabled={updating}
-            >
+            <TouchableOpacity style={styles.cancelBtnContainer} onPress={handleCancel} disabled={updating}>
               <Row style={{ gap: 10 }}>
                 <Text style={styles.cancelBtnText}>Cancel</Text>
               </Row>
@@ -197,30 +189,30 @@ const EditProfileForm = ({
 
 const styles = StyleSheet.create({
   header: {
-    fontFamily: "Inter_600SemiBold",
+    fontFamily: 'Inter_600SemiBold',
     fontSize: RFValue(15),
-    color: "black",
+    color: 'black',
   },
   inputComponent: {
     gap: 5,
-    alignItems: "flex-start",
+    alignItems: 'flex-start',
   },
   inputHeader: {
-    fontFamily: "Inter_500Medium",
-    color: "black",
+    fontFamily: 'Inter_500Medium',
+    color: 'black',
     fontSize: RFValue(13),
   },
   inputText: {
-    fontFamily: "Inter_400Regular",
-    color: "black",
+    fontFamily: 'Inter_400Regular',
+    color: 'black',
     fontSize: RFValue(12),
     padding: 15,
     paddingHorizontal: 15,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: "#ddd",
-    width: "100%",
-    textAlign: "left",
+    borderColor: '#ddd',
+    width: '100%',
+    textAlign: 'left',
   },
   saveBtnContainer: {
     paddingHorizontal: 15,
@@ -229,18 +221,18 @@ const styles = StyleSheet.create({
     backgroundColor: colors.primary,
   },
   saveBtnText: {
-    fontFamily: "Inter_500Medium",
-    color: "white",
+    fontFamily: 'Inter_500Medium',
+    color: 'white',
     fontSize: RFValue(13),
   },
   cancelBtnContainer: {
     paddingHorizontal: 15,
     paddingVertical: 10,
     borderRadius: 16,
-    backgroundColor: "transparent",
+    backgroundColor: 'transparent',
   },
   cancelBtnText: {
-    fontFamily: "Inter_400Regular",
+    fontFamily: 'Inter_400Regular',
     color: colors.textSecondary,
     fontSize: RFValue(13),
   },

@@ -6,9 +6,9 @@ const useProfilePageLogic = () => {
   const username = user?.username ?? '';
   const email = user?.email ?? '';
   const fullName = user?.name ?? '';
-  const gender = user?.gender ?? null;
-  const createdAtDate = user?.created_at?.split('T')[0];
-  const daysOnline = createdAtDate ? getDaysSince(createdAtDate) : 0;
+  const gender = user?.gender ?? '';
+  const createdAtDate = user?.created_at?.split('T')[0] ?? '';
+  const daysOnline = createdAtDate ? getDaysSince(createdAtDate) : '';
 
   return {
     data: {

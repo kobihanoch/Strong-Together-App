@@ -1,22 +1,28 @@
-import { Image } from "expo-image";
-import * as ImagePicker from "expo-image-picker";
-import React, { useEffect, useImperativeHandle, useState } from "react";
-import {
-  ActivityIndicator,
-  Dimensions,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
-import api from "../../api/api";
-import { useAuth } from "../../context/AuthContext";
-import useMediaUploads from "../../hooks/useMediaUploads";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { colors } from "../../constants/colors";
-import { RFValue } from "react-native-responsive-fontsize";
+/* eslint-disable @typescript-eslint/no-require-imports */
+import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { Image } from 'expo-image';
+import * as ImagePicker from 'expo-image-picker';
+import React, { useEffect } from 'react';
+import { ActivityIndicator, Dimensions, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { RFValue } from 'react-native-responsive-fontsize';
+import api from '../../api/api';
+import { colors } from '../../constants/colors';
+import { useAuth } from '../../context/AuthContext';
+import useMediaUploads from '../../hooks/useMediaUploads';
+import { UserEntity } from '../../types/entities/user.entity';
 
-const { width, height } = Dimensions.get("window");
+const { width, height } = Dimensions.get('window');
+
+type ImagePickerComponentProps = {
+  openActionSheet: () => void;
+  closeActionSheet: () => void;
+  triggerImgPicker: boolean;
+  triggerRemoveImg: boolean;
+  setTriggerImgPicker: React.Dispatch<React.SetStateAction<boolean>>;
+  setTriggerRemoveImg: React.Dispatch<React.SetStateAction<boolean>>;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  style: any;
+};
 
 function ImagePickerComponent({
   openActionSheet,
@@ -26,10 +32,9 @@ function ImagePickerComponent({
   triggerRemoveImg,
   setTriggerRemoveImg,
   style,
-}) {
+}: ImagePickerComponentProps) {
   const { setUser, user } = useAuth();
-  const { uploadToStorageAndReturnPath, loading: mediaLoading } =
-    useMediaUploads();
+  const { uploadToStorageAndReturnPath, loading: mediaLoading } = useMediaUploads();
 
   const profileimagePath = user?.profile_image_url;
 
@@ -37,7 +42,7 @@ function ImagePickerComponent({
     await ImagePicker.requestMediaLibraryPermissionsAsync();
 
     const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.Images,
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,
       quality: 0.5,
     });
@@ -47,16 +52,19 @@ function ImagePickerComponent({
 
       const file = {
         uri: asset.uri,
-        name: `${user.id}.jpg`,
-        type: "image/jpeg",
+        name: `${user!.id}.jpg`,
+        type: 'image/jpeg',
       };
 
       const { path } = await uploadToStorageAndReturnPath(file);
       // Update in auth context
-      setUser((prev) => ({
-        ...prev,
-        profile_image_url: path,
-      }));
+      setUser(
+        (prev) =>
+          ({
+            ...prev,
+            profile_image_url: path,
+          }) as UserEntity,
+      );
     }
   };
 
@@ -66,10 +74,13 @@ function ImagePickerComponent({
     });
 
     // Update in auth context
-    setUser((prev) => ({
-      ...prev,
-      profile_image_url: null,
-    }));
+    setUser(
+      (prev) =>
+        ({
+          ...prev,
+          profile_image_url: null,
+        }) as UserEntity,
+    );
   };
 
   useEffect(() => {
@@ -87,8 +98,8 @@ function ImagePickerComponent({
   return (
     <View
       style={{
-        alignItems: "center",
-        flexDirection: "column",
+        alignItems: 'center',
+        flexDirection: 'column',
         gap: height * 0.02,
       }}
     >
@@ -102,22 +113,18 @@ function ImagePickerComponent({
                 ? {
                     uri: `${process.env.EXPO_PUBLIC_SUPABASE_URL}/storage/v1/object/public/${profileimagePath}`,
                   }
-                : user?.gender == "Male"
-                ? require("../../assets/man.png")
-                : require("../../assets/woman.png")
+                : user?.gender == 'Male'
+                  ? require('../../assets/man.png')
+                  : require('../../assets/woman.png')
             }
-            cachePolicy={"disk"}
+            cachePolicy={'disk'}
             style={[styles.image, style]}
           />
         )}
       </TouchableOpacity>
 
       <View style={styles.cameraIconContainer}>
-        <MaterialCommunityIcons
-          name={"camera-outline"}
-          color={colors.textSecondary}
-          size={RFValue(12)}
-        />
+        <MaterialCommunityIcons name={'camera-outline'} color={colors.textSecondary} size={RFValue(12)} />
       </View>
     </View>
   );
@@ -130,24 +137,24 @@ const styles = StyleSheet.create({
     borderRadius: height * 0.7,
   },
   deleteButton: {
-    backgroundColor: "#ff4444",
+    backgroundColor: '#ff4444',
     paddingHorizontal: 15,
     paddingVertical: 6,
     borderRadius: 15,
   },
   deleteButtonText: {
-    color: "white",
+    color: 'white',
     fontSize: 12,
-    fontWeight: "bold",
+    fontWeight: 'bold',
   },
   cameraIconContainer: {
-    position: "absolute",
+    position: 'absolute',
     bottom: 0,
     right: -5,
-    backgroundColor: "#e6e6e6ff",
+    backgroundColor: '#e6e6e6ff',
     padding: 8,
     borderRadius: 20,
-    borderColor: "white",
+    borderColor: 'white',
     borderWidth: 1,
   },
 });
