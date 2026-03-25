@@ -2,9 +2,8 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Animated, Easing, Text, View } from 'react-native';
 
 interface AdherenceBarProps {
-  name: string;
-  actual?: number;
-  planned?: number;
+  actual: number;
+  planned: number;
   pct?: number;
   showPct?: boolean;
   changeColors?: boolean; // NEW: animate color changes along the progress (default true)
@@ -12,9 +11,8 @@ interface AdherenceBarProps {
 }
 
 export function AdherenceBar({
-  name,
-  actual = 0,
-  planned = 0,
+  actual,
+  planned,
   pct,
   showPct = true,
   changeColors = true, // NEW: animate color changes along the progress (default true)
@@ -98,7 +96,7 @@ export function AdherenceBar({
   return (
     <View>
       <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-        <Text style={{ fontWeight: '600' }}>{name}</Text>
+        <Text style={{ fontWeight: '600' }}>{null}</Text>
         <View style={{ flexDirection: 'column', marginTop: -15 }}>
           <Text style={{ opacity: 0.7 }}>{showPct ? Math.round(shown) + '%' : null}</Text>
         </View>

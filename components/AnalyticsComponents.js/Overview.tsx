@@ -1,20 +1,28 @@
-import React, { useMemo } from "react";
-import { Dimensions, Text, View } from "react-native";
-import { RFValue } from "react-native-responsive-fontsize";
-import { splitsCounterToPieData } from "../../utils/analyticsUtils";
-import Card from "./Card";
-import PieDiagramSplitsCounter from "./PieDiagramSplitsCounter";
+import React, { useMemo } from 'react';
+import { Dimensions, Text, View } from 'react-native';
+import { RFValue } from 'react-native-responsive-fontsize';
+import { splitsCounterToPieData } from '../../utils/analyticsUtils';
+import Card from './Card';
+import PieDiagramSplitsCounter from './PieDiagramSplitsCounter';
+import { AnalysisContextAnalyzedExerciseTrackingData } from '../../context/types/analysisContextTypes.dto';
+import { WholeUserWorkoutPlan } from '../../types/dto/workoutPlans.dto';
 
-const { width, height } = Dimensions.get("window");
+const { height } = Dimensions.get('window');
 
-const Overview = ({ overViewData, hasData }) => {
+type OverviewProps = {
+  overViewData: {
+    workoutCount: number;
+    splitsCounter: AnalysisContextAnalyzedExerciseTrackingData['splitDaysByName'];
+    workoutPlan: WholeUserWorkoutPlan | null;
+  };
+  hasData: boolean;
+};
+
+const Overview = ({ overViewData, hasData }: OverviewProps) => {
   const { workoutCount, splitsCounter, workoutPlan } = overViewData;
-  const splitsCounterWithColors = useMemo(
-    () => splitsCounterToPieData(splitsCounter),
-    [splitsCounter]
-  );
+  const splitsCounterWithColors = useMemo(() => splitsCounterToPieData(splitsCounter), [splitsCounter]);
 
-  const renderDot = (color) => {
+  const renderDot = (color: string) => {
     return (
       <View
         style={{
@@ -34,15 +42,12 @@ const Overview = ({ overViewData, hasData }) => {
         {Object.entries(splitsCounter).length > 0 &&
           splitsCounterWithColors.map((s) => {
             return (
-              <View
-                style={{ flexDirection: "row", alignItems: "center" }}
-                key={s.text}
-              >
+              <View style={{ flexDirection: 'row', alignItems: 'center' }} key={s.text}>
                 {renderDot(s.color)}
                 <Text
                   style={{
-                    fontFamily: "Inter_400Regular",
-                    color: "white",
+                    fontFamily: 'Inter_400Regular',
+                    color: 'white',
                     fontSize: RFValue(15),
                     opacity: 0.8,
                   }}
@@ -58,31 +63,31 @@ const Overview = ({ overViewData, hasData }) => {
 
   return (
     <Card
-      style={{ width: "90%", alignSelf: "center", marginTop: height * 0.04 }}
+      style={{ width: '90%', alignSelf: 'center', marginTop: height * 0.04 }}
       height={120}
-      iconName={"information"}
-      iconColor={"white"}
-      title={"Overview"}
-      subtitle={"Workout performances"}
+      iconName={'information'}
+      iconColor={'white'}
+      title={'Overview'}
+      subtitle={'Workout performances'}
       useGradient={true}
-      gradientColors={["#2979FF", "#2979FF"]}
+      gradientColors={['#2979FF', '#2979FF']}
       titleColor="#E5E7EB"
       subtitleColor="#E5E7EB"
     >
-      <View style={{ flexDirection: "column" }}>
-        {hasData ? (
+      <View style={{ flexDirection: 'column' }}>
+        {hasData && workoutPlan ? (
           <>
             <View
               style={{
                 height: height * 0.3,
-                flexDirection: "row",
+                flexDirection: 'row',
               }}
             >
               <View
                 style={{
                   flex: 6,
-                  justifyContent: "center",
-                  alignItems: "center",
+                  justifyContent: 'center',
+                  alignItems: 'center',
                 }}
               >
                 <PieDiagramSplitsCounter
@@ -93,29 +98,25 @@ const Overview = ({ overViewData, hasData }) => {
               <View
                 style={{
                   flex: 4,
-                  justifyContent: "center",
-                  alignItems: "center",
+                  justifyContent: 'center',
+                  alignItems: 'center',
                 }}
               >
-                <View style={{ gap: height * 0.02 }}>
-                  {renderLegendComponent()}
-                </View>
+                <View style={{ gap: height * 0.02 }}>{renderLegendComponent()}</View>
               </View>
             </View>
-            <View
-              style={{ flexDirection: "row", justifyContent: "space-between" }}
-            >
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
               <View
                 style={{
-                  flexDirection: "column",
-                  alignItems: "center",
-                  justifyContent: "center",
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  justifyContent: 'center',
                 }}
               >
                 <Text
                   style={{
-                    fontFamily: "Inter_600SemiBold",
-                    color: "white",
+                    fontFamily: 'Inter_600SemiBold',
+                    color: 'white',
                     fontSize: RFValue(14),
                   }}
                 >
@@ -123,8 +124,8 @@ const Overview = ({ overViewData, hasData }) => {
                 </Text>
                 <Text
                   style={{
-                    fontFamily: "Inter_400Regular",
-                    color: "white",
+                    fontFamily: 'Inter_400Regular',
+                    color: 'white',
                     fontSize: RFValue(12),
                     opacity: 0.7,
                     marginTop: height * 0.01,
@@ -136,15 +137,15 @@ const Overview = ({ overViewData, hasData }) => {
 
               <View
                 style={{
-                  flexDirection: "column",
-                  alignItems: "center",
-                  justifyContent: "center",
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  justifyContent: 'center',
                 }}
               >
                 <Text
                   style={{
-                    fontFamily: "Inter_600SemiBold",
-                    color: "white",
+                    fontFamily: 'Inter_600SemiBold',
+                    color: 'white',
                     fontSize: RFValue(14),
                   }}
                 >
@@ -152,8 +153,8 @@ const Overview = ({ overViewData, hasData }) => {
                 </Text>
                 <Text
                   style={{
-                    fontFamily: "Inter_400Regular",
-                    color: "white",
+                    fontFamily: 'Inter_400Regular',
+                    color: 'white',
                     fontSize: RFValue(12),
                     opacity: 0.7,
                     marginTop: height * 0.01,
@@ -164,28 +165,24 @@ const Overview = ({ overViewData, hasData }) => {
               </View>
               <View
                 style={{
-                  flexDirection: "column",
-                  alignItems: "center",
-                  justifyContent: "center",
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  justifyContent: 'center',
                 }}
               >
                 <Text
                   style={{
-                    fontFamily: "Inter_600SemiBold",
-                    color: "white",
+                    fontFamily: 'Inter_600SemiBold',
+                    color: 'white',
                     fontSize: RFValue(14),
                   }}
                 >
-                  {workoutPlan.updated_at
-                    .split("T")[0]
-                    .split("-")
-                    .reverse()
-                    .join("/")}
+                  {workoutPlan.updated_at.split('T')[0].split('-').reverse().join('/')}
                 </Text>
                 <Text
                   style={{
-                    fontFamily: "Inter_400Regular",
-                    color: "white",
+                    fontFamily: 'Inter_400Regular',
+                    color: 'white',
                     fontSize: RFValue(12),
                     opacity: 0.7,
                     marginTop: height * 0.01,

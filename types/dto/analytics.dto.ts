@@ -18,5 +18,5 @@ export interface AdherenceExerciseStats {
 
 export type GoalAdherenceResponse = Record<
   WorkoutSplitEntity['name'], // splitname
-  Record<string, AdherenceExerciseStats> // exercise name -> stats
+  Record<ExerciseEntity['name'], AdherenceExerciseStats> // exercise name -> stats
 >;
