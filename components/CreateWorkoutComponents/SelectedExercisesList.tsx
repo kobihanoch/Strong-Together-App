@@ -16,8 +16,8 @@ type ExerciseDraggableItemProps = {
   item: SelectedExercise;
   drag: () => void;
   removeExercise: (exercise: SelectedExercise) => void;
-  updateSets: (exercise: SelectedExercise, updatedSetsArr: NonNullable<ExerciseToWorkoutSplitEntity['sets']>) => void;
-  selectedSplit: NonNullable<WorkoutSplitEntity['name']>;
+  updateSets: (exercise: SelectedExercise, updatedSetsArr: ExerciseToWorkoutSplitEntity['sets']) => void;
+  selectedSplit: WorkoutSplitEntity['name'];
 };
 
 const ExerciseDraggableItem = React.memo(
@@ -168,7 +168,7 @@ ExerciseDraggableItem.displayName = 'ExerciseDraggableItem';
 type SelectedExercisesList = {
   exForSplit: SelectedExercise[];
   controls: CreateWorkoutControls;
-  selectedSplit: NonNullable<WorkoutSplitEntity['name']>;
+  selectedSplit: WorkoutSplitEntity['name'];
 };
 
 const SelectedExercisesList = ({ exForSplit, controls, selectedSplit }: SelectedExercisesList) => {

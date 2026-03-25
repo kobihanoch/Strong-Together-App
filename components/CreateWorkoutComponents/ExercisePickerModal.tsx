@@ -58,7 +58,7 @@ const ExerciseRow = React.memo(({ item, selectedMuscle, handleExPress }: Exercis
 ExerciseRow.displayName = 'ExerciseRow';
 
 type ExercisePicketModalProps = {
-  selectedSplit: NonNullable<WorkoutSplitEntity['name']>;
+  selectedSplit: WorkoutSplitEntity['name'];
   controls: CreateWorkoutControls;
   availableExercises: ExercisesMapByMuscle;
   allExercises: ExerciseCandidate[];
@@ -73,7 +73,7 @@ const ExercisePickerModal = forwardRef<SlidingBottomModalRef, ExercisePicketModa
   const { addExercise } = controls;
 
   // Refs for better optimzation
-  const selectedSplitRef = useRef<NonNullable<WorkoutSplitEntity['name']> | null>(null);
+  const selectedSplitRef = useRef<WorkoutSplitEntity['name'] | null>(null);
   useEffect(() => {
     selectedSplitRef.current = selectedSplit;
   }, [selectedSplit]);

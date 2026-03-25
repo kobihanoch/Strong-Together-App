@@ -1,7 +1,7 @@
 import { ExerciseInPlan, WholeUserWorkoutPlan } from '../types/dto/workoutPlans.dto';
 import { WorkoutSplitEntity } from '../types/entities/workoutSplit.entity';
 
-type SplitName = NonNullable<WorkoutSplitEntity['name']>;
+type SplitName = WorkoutSplitEntity['name'];
 type SplitId = WorkoutSplitEntity['id'];
 type MuscleGroup = WorkoutSplitEntity['muscle_group'];
 

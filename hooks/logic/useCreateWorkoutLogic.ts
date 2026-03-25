@@ -32,7 +32,7 @@ const useCreateWorkoutLogic = () => {
   const [isSaving, setIsSaving] = useState<boolean>(false);
 
   // ----------------------------Editing----------------------------
-  const [selectedSplit, setSelectedSplit] = useState<NonNullable<WorkoutSplitEntity['name']>>('A');
+  const [selectedSplit, setSelectedSplit] = useState<WorkoutSplitEntity['name']>('A');
   // Keep a map: { splitName: [...Exercises] }
   const [selectedExercises, setSelectedExercises] = useState<SelectedExercises>({ A: [] });
   const exForSplit = selectedExercises[selectedSplit] || [];
@@ -78,7 +78,7 @@ const useCreateWorkoutLogic = () => {
   );
 
   const updateSets = useCallback(
-    (exercise: SelectedExercise, updatedSetsArr: NonNullable<ExerciseToWorkoutSplitEntity['sets']>) => {
+    (exercise: SelectedExercise, updatedSetsArr: ExerciseToWorkoutSplitEntity['sets']) => {
       setSelectedExercises((prev) => updateSetsLogic(prev, selectedSplit, exercise, updatedSetsArr));
     },
     [selectedSplit],
@@ -91,7 +91,7 @@ const useCreateWorkoutLogic = () => {
     [selectedSplit],
   );
 
-  const removeSplit = useCallback((splitName: NonNullable<WorkoutSplitEntity['name']>) => {
+  const removeSplit = useCallback((splitName: WorkoutSplitEntity['name']) => {
     setSelectedExercises((prev) => {
       const { next, nextSelected } = removeSplitLogic(prev, splitName);
       setSelectedSplit(nextSelected);

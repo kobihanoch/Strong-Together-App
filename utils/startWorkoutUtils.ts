@@ -42,9 +42,9 @@ export const createArrayForDataBase = (workoutObj: ExercisesDuringWorkout): Fini
 };
 
 const dropInvalidPairs = (
-  weights: NonNullable<ExerciseTrackingEntity['weight']> = [],
-  reps: NonNullable<ExerciseTrackingEntity['reps']> = [],
-): { weight: NonNullable<ExerciseTrackingEntity['weight']>; reps: NonNullable<ExerciseTrackingEntity['reps']> } => {
+  weights: ExerciseTrackingEntity['weight'] = [],
+  reps: ExerciseTrackingEntity['reps'] = [],
+): { weight: ExerciseTrackingEntity['weight']; reps: ExerciseTrackingEntity['reps'] } => {
   const isValid = (v: SetValue): boolean => Number.isFinite(+v) && +v !== 0;
 
   const maxLen = Math.min(weights.length, reps.length);

@@ -15,13 +15,13 @@ const { height } = Dimensions.get('window');
 
 type TopSectionProps = {
   hasWorkout: boolean;
-  splitsList: NonNullable<WorkoutSplitEntity['name']>[];
-  setSelectedSplit: Dispatch<SetStateAction<NonNullable<WorkoutSplitEntity['name']>>>;
-  selectedSplit: NonNullable<WorkoutSplitEntity['name']>;
-  exerciseCountMap: Record<NonNullable<WorkoutSplitEntity['name']>, number>;
+  splitsList: WorkoutSplitEntity['name'][];
+  setSelectedSplit: Dispatch<SetStateAction<WorkoutSplitEntity['name']>>;
+  selectedSplit: WorkoutSplitEntity['name'];
+  exerciseCountMap: Record<WorkoutSplitEntity['name'], number>;
   totalExercises: number;
   addSplit: () => void;
-  removeSplit: (splitName: NonNullable<WorkoutSplitEntity['name']>) => void;
+  removeSplit: (splitName: WorkoutSplitEntity['name']) => void;
   saveWorkout: () => Promise<void>;
 };
 

@@ -15,11 +15,11 @@ export type ResumeWorkoutCachePayload = {
 } | null;
 
 export type ExercisesDuringWorkout = Record<
-  NonNullable<ExerciseEntity['name']>,
+  ExerciseEntity['name'],
   {
-    etsid: NonNullable<ExerciseToWorkoutSplitEntity['id']>;
-    weight: NonNullable<ExerciseTrackingEntity['weight']>;
-    reps: NonNullable<ExerciseTrackingEntity['reps']>;
+    etsid: ExerciseToWorkoutSplitEntity['id'];
+    weight: ExerciseTrackingEntity['weight'];
+    reps: ExerciseTrackingEntity['reps'];
     notes: ExerciseTrackingEntity['notes'];
   }
 >;
@@ -49,5 +49,5 @@ export interface StartWorkoutPageLogicReturn {
 
 export type SetCountByExercise = Record<ExerciseName, unknown>;
 export type WorkoutPayloadRow = FinishUserWorkoutBody['workout'][number];
-export type ExerciseName = NonNullable<ExerciseEntity['name']>;
-export type SetValue = NonNullable<ExerciseTrackingEntity['weight']>[number];
+export type ExerciseName = ExerciseEntity['name'];
+export type SetValue = ExerciseTrackingEntity['weight'][number];
