@@ -23,7 +23,7 @@ export type AddWorkoutBody = {
     string,
     {
       id: number;
-      sets: number | number[];
+      sets: number[];
       order_index: number;
     }[]
   >;
