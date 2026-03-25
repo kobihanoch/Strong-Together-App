@@ -1,7 +1,7 @@
-let controller = null; // holds the mounted modal's methods
+let controller: { open: () => void; close: () => void } | null = null; // holds the mounted modal's methods
 let queuedOpen = false; // if open() is called before mount
 
-export function registerUpdateModal(ctrl) {
+export function registerUpdateModal(ctrl: { open: () => void; close: () => void }) {
   controller = ctrl;
   if (queuedOpen) {
     queuedOpen = false;
@@ -14,7 +14,7 @@ export function unregisterUpdateModal() {
 }
 
 export function openUpdateModal() {
-  if (controller && typeof controller.open === "function") {
+  if (controller && typeof controller.open === 'function') {
     controller.open();
   } else {
     // modal not mounted yet; remember to open once it registers
@@ -23,7 +23,7 @@ export function openUpdateModal() {
 }
 
 export function closeUpdateModal() {
-  if (controller && typeof controller.close === "function") {
+  if (controller && typeof controller.close === 'function') {
     controller.close();
   }
 }

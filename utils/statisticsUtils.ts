@@ -75,35 +75,35 @@
   return { byDate, byETSId, bySplitName };
 };*/
 
-import { colors } from "../constants/colors";
+import { colors } from '../constants/colors';
+import { WeeklyData } from '../types/dto/aerobics.dto';
+import { TrackingMapItem } from '../types/dto/exerciseTracking.dto';
+import { ExerciseToWorkoutSplitEntity } from '../types/entities/exerciseToWorkoutSplit.entity';
+import { WorkoutSplitEntity } from '../types/entities/workoutSplit.entity';
 
 export const getLastWorkoutForEachExercise = (
-  date,
-  byDate,
-  bySplitName,
-  byETSId,
-  splitDatesDesc
+  date: string,
+  byDate: Record<string, Array<Omit<TrackingMapItem, 'workoutdate'>>>,
+  bySplitName: Record<WorkoutSplitEntity['name'], Array<Omit<TrackingMapItem, 'splitname'>>>,
+  byETSId: Record<ExerciseToWorkoutSplitEntity['id'], TrackingMapItem[]>,
 ) => {
   const etRecords = byDate[date];
   if (!Array.isArray(etRecords) || etRecords.length === 0) return [];
 
   // Iterate over each exercise record of selected date
-  return etRecords.reduce((acc, ex) => {
+  return etRecords.reduce((acc: ((TrackingMapItem | undefined) & { isLastWorkout: boolean })[], ex) => {
     // Get all instances of specific exercise
     const etsArr = byETSId[ex.exercisetosplit_id] ?? [];
 
     // Find index of last log
     const iNow = etsArr.findIndex((r) => r.workoutdate === date);
-    const lastLog =
-      iNow >= 0 ? etsArr[iNow + 1] : etsArr.find((r) => r.workoutdate < date);
+    const lastLog = iNow >= 0 ? etsArr[iNow + 1] : etsArr.find((r) => r.workoutdate < date);
 
     // If no last log of exercise => Continue to next exercise
     if (!lastLog) return acc;
 
     // Get date of last workout same as this one
-    const dates = splitDatesDesc?.[ex.splitname] ?? [
-      ...new Set((bySplitName[ex.splitname] || []).map((r) => r.workoutdate)),
-    ];
+    const dates = [...new Set((bySplitName[ex.splitname] || []).map((r) => r.workoutdate))];
     const j = dates.indexOf(date);
     const lastSplitDate = j >= 0 ? dates[j + 1] : dates.find((d) => d < date);
 
@@ -115,8 +115,14 @@ export const getLastWorkoutForEachExercise = (
   }, []);
 };
 
-// PR for the same exercise
-export const isSetPR = (exId, weight, reps, prsByExId, workoutDate) => {
+/*// PR for the same exercise
+export const isSetPR = (
+  exId: ExerciseEntity['id'],
+  weight: ExerciseTrackingEntity['weight'],
+  reps: ExerciseTrackingEntity['reps'],
+  prsByExId,
+  workoutDate,
+) => {
   const prForExercise = prsByExId[exId];
   if (!prForExercise) return true;
 
@@ -129,36 +135,18 @@ export const isSetPR = (exId, weight, reps, prsByExId, workoutDate) => {
     }
   }
   return false;
-};
+};*/
 
 // Format a date string (YYYY-MM-DD) into "Mon DD, YYYY"
-export const formatDate = (dateToFormat) => {
-  const monthNames = [
-    "Jan",
-    "Feb",
-    "Mar",
-    "Apr",
-    "May",
-    "Jun",
-    "Jul",
-    "Aug",
-    "Sep",
-    "Oct",
-    "Nov",
-    "Dec",
-  ];
+export const formatDate = (dateToFormat: string) => {
+  const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
   let year, month, day;
 
   // Handle both "YYYY-MM-DD" strings and Date objects
-  if (
-    typeof dateToFormat === "string" &&
-    /^\d{4}-\d{2}-\d{2}$/.test(dateToFormat)
-  ) {
+  if (typeof dateToFormat === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(dateToFormat)) {
     // Parse manually to avoid timezone issues
-    [year, month, day] = dateToFormat
-      .split("-")
-      .map((part) => parseInt(part, 10));
+    [year, month, day] = dateToFormat.split('-').map((part) => parseInt(part, 10));
     // month is 1-based, convert to 0-based
     month = month - 1;
   } else {
@@ -172,33 +160,25 @@ export const formatDate = (dateToFormat) => {
   return `${monthName} ${day}, ${year}`;
 };
 
-export const formatTime = (min, sec) => {
+export const formatTime = (min: number, sec: number) => {
   const hrs = Math.floor(min / 60);
   const mins = min - hrs * 60;
-  const hrsText = hrs > 0 ? (hrs == 1 ? hrs + " hr" : hrs + " hrs") : null;
-  const minText =
-    mins > 0 ? (mins == 1 ? mins + " min" : mins + " mins") : null;
-  const secText =
-    hrs < 1
-      ? sec > 0
-        ? sec == 1
-          ? sec + " sec"
-          : sec + " secs"
-        : null
-      : null;
-  return [hrsText, minText, secText].filter(Boolean).join(" ");
+  const hrsText = hrs > 0 ? (hrs == 1 ? hrs + ' hr' : hrs + ' hrs') : null;
+  const minText = mins > 0 ? (mins == 1 ? mins + ' min' : mins + ' mins') : null;
+  const secText = hrs < 1 ? (sec > 0 ? (sec == 1 ? sec + ' sec' : sec + ' secs') : null) : null;
+  return [hrsText, minText, secText].filter(Boolean).join(' ');
 };
 
-export const getDayAbbreviation = (dateStr) => {
+export const getDayAbbreviation = (dateStr: string) => {
   const date = new Date(dateStr);
-  return date.toLocaleDateString("en-US", { weekday: "short" }); // e.g., "Sun"
+  return date.toLocaleDateString('en-US', { weekday: 'short' }); // e.g., "Sun"
 };
 
-export const normalizeDataToWeeklyCardioGraph = (data) => {
+export const normalizeDataToWeeklyCardioGraph = (data: WeeklyData['records']) => {
   if (!Array.isArray(data)) return [];
 
   // Step 1: Initialize empty week map
-  const dayMap = {
+  const dayMap: Record<string, number> = {
     Sun: 0,
     Mon: 0,
     Tue: 0,
@@ -217,7 +197,7 @@ export const normalizeDataToWeeklyCardioGraph = (data) => {
   });
 
   // Step 3: Return as array in correct order
-  return ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((label) => ({
+  return ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((label) => ({
     label,
     value: dayMap[label],
     frontColor: colors.primary,
