@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import BottomSheet, { BottomSheetBackdropProps, BottomSheetFlatList } from '@gorhom/bottom-sheet';
 import { BlurView } from 'expo-blur';
 import React, { forwardRef, ReactNode, useCallback, useImperativeHandle, useMemo, useRef } from 'react';
@@ -50,8 +51,8 @@ export interface SlidingBottomModalRef {
 }
 
 interface SlidingBottomModalProps {
-  data?: unknown[];
-  renderItem?: ListRenderItem<unknown>;
+  data?: any[] | undefined;
+  renderItem?: ListRenderItem<any>;
   title?: string;
   snapPoints?: string[];
   initialIndex?: number;
@@ -126,7 +127,6 @@ const SlidingBottomModal = forwardRef<SlidingBottomModalRef, SlidingBottomModalP
     );
   }, [title]);
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const keyExtractor = useCallback((item: any, index: number) => {
     if (Array.isArray(item)) return String(item[0]);
     if (item && (item.id ?? item.key)) return String(item.id ?? item.key);

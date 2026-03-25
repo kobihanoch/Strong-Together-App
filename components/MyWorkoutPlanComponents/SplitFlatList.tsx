@@ -1,33 +1,35 @@
-import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { Image } from "expo-image";
-import { LinearGradient } from "expo-linear-gradient";
-import React, { useCallback, useMemo, useState } from "react";
-import { Dimensions, FlatList, StyleSheet, Text, View } from "react-native";
-import { RFValue } from "react-native-responsive-fontsize";
-import { useAnalysisContext } from "../../context/AnalysisContext";
-import { useMyWorkoutPlanPageLogic } from "../../hooks/logic/useMyWorkoutPlanPageLogic";
-import { getBodyPartsForSplit } from "../../utils/homePageUtils";
-import Badge from "../Badge";
-import Column from "../Column";
-import PageDots from "../PageDots";
-import Row from "../Row";
-import StartWorkoutButton from "./StartWorkoutButton";
-import StartCardioButton from "./StartCardioButton";
+import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { Image } from 'expo-image';
+import { LinearGradient } from 'expo-linear-gradient';
+import React, { Dispatch, SetStateAction, useCallback, useMemo, useState } from 'react';
+import { Dimensions, FlatList, NativeScrollEvent, NativeSyntheticEvent, StyleSheet, Text, View } from 'react-native';
+import { RFValue } from 'react-native-responsive-fontsize';
+import { useAnalysisContext } from '../../context/AnalysisContext';
+import { useMyWorkoutPlanPageLogic } from '../../hooks/logic/useMyWorkoutPlanPageLogic';
+import { getBodyPartsForSplit } from '../../utils/homePageUtils';
+import Badge from '../Badge';
+import Column from '../Column';
+import PageDots from '../PageDots';
+import Row from '../Row';
+import StartWorkoutButton from './StartWorkoutButton';
+import StartCardioButton from './StartCardioButton';
+import { WorkoutContextWorkoutSplit } from '../../context/types/workoutContextTypes.dto';
 
-const { width, height } = Dimensions.get("window");
+const { width, height } = Dimensions.get('window');
 
-const SplitFlatList = ({
-  setSelectedSplit,
-  selectedSplit,
-  openCardioModal,
-}) => {
+type SplitFlatListProps = {
+  setSelectedSplit: Dispatch<SetStateAction<WorkoutContextWorkoutSplit | null>>;
+  selectedSplit: WorkoutContextWorkoutSplit | null;
+  openCardioModal: (i?: number) => void;
+};
+
+const SplitFlatList = ({ setSelectedSplit, selectedSplit, openCardioModal }: SplitFlatListProps) => {
   const { workoutSplits, exerciseCounter } = useMyWorkoutPlanPageLogic();
-  const { hasTrainedToday, analyzedExerciseTrackingData } =
-    useAnalysisContext();
+  const { hasTrainedToday, analyzedExerciseTrackingData } = useAnalysisContext();
 
   const splitDaysCompletions = useMemo(
     () => analyzedExerciseTrackingData?.splitDaysByName ?? {},
-    [analyzedExerciseTrackingData]
+    [analyzedExerciseTrackingData],
   );
 
   // Page width for FlatList paging
@@ -35,10 +37,8 @@ const SplitFlatList = ({
   const [curPageIndex, setCurPageIndex] = useState(0);
 
   const renderItem = useCallback(
-    ({ item }) => {
-      const musclesText = (item?.muscleGroup || "")
-        .replace(/\s*\([^)]*\)/g, "")
-        .trim();
+    ({ item }: { item: WorkoutContextWorkoutSplit }) => {
+      const musclesText = (item?.muscleGroup || '').replace(/\s*\([^)]*\)/g, '').trim();
 
       const exCount = exerciseCounter?.[item.name] ?? 0;
       const completions = splitDaysCompletions?.[item.name] ?? 0;
@@ -56,23 +56,14 @@ const SplitFlatList = ({
 
             {/* Small soft tag at the corner */}
             <View style={styles.softTag}>
-              <MaterialCommunityIcons
-                name="lightning-bolt-outline"
-                size={RFValue(12)}
-                color="#fff"
-              />
+              <MaterialCommunityIcons name="lightning-bolt-outline" size={RFValue(12)} color="#fff" />
               <Text style={styles.softTagText}>Ready</Text>
             </View>
           </Row>
 
           {/* Chips row */}
           <Row style={styles.chipsRow}>
-            <Badge
-              bg="#2979FF"
-              color="#FFFFFF"
-              label={getBodyPartsForSplit(item)}
-              style={styles.badgeText}
-            />
+            <Badge bg="#2979FF" color="#FFFFFF" label={getBodyPartsForSplit(item)} style={styles.badgeText} />
           </Row>
 
           {/* Muscles list (multi-line, airy line-height) */}
@@ -85,11 +76,7 @@ const SplitFlatList = ({
           <Row style={styles.statsRow}>
             <Column style={styles.statBox}>
               <Row style={styles.statHeader}>
-                <MaterialCommunityIcons
-                  name="whistle-outline"
-                  size={RFValue(14)}
-                  color="#FFFFFF"
-                />
+                <MaterialCommunityIcons name="whistle-outline" size={RFValue(14)} color="#FFFFFF" />
                 <Text style={styles.statLabel}>Exercises</Text>
               </Row>
               <Text style={styles.statValue}>{exCount}</Text>
@@ -99,11 +86,7 @@ const SplitFlatList = ({
 
             <Column style={styles.statBox}>
               <Row style={styles.statHeader}>
-                <MaterialCommunityIcons
-                  name="check-circle-outline"
-                  size={RFValue(14)}
-                  color="#FFFFFF"
-                />
+                <MaterialCommunityIcons name="check-circle-outline" size={RFValue(14)} color="#FFFFFF" />
                 <Text style={styles.statLabel}>Completions</Text>
               </Row>
               <Text style={styles.statValue}>× {completions}</Text>
@@ -112,24 +95,26 @@ const SplitFlatList = ({
         </View>
       );
     },
-    [pageW, exerciseCounter, splitDaysCompletions]
+    [pageW, exerciseCounter, splitDaysCompletions],
   );
 
   const handleScroll = useCallback(
-    (e) => {
+    (e: NativeSyntheticEvent<NativeScrollEvent>) => {
+      if (pageW <= 0 || !workoutSplits?.length) return;
       const x = e.nativeEvent.contentOffset.x;
       const page = Math.round(x / pageW);
-      const item = workoutSplits?.[page];
+      const item = workoutSplits[page] ?? null;
       setSelectedSplit(item);
       setCurPageIndex(page);
     },
-    [pageW, workoutSplits, setSelectedSplit]
+    [pageW, workoutSplits, setSelectedSplit],
   );
 
   return (
-    <View style={{ height: "100%" }}>
+    <View style={{ height: '100%' }}>
       <Image
-        source={require("../../assets/workoutplanbg.png")}
+        // eslint-disable-next-line @typescript-eslint/no-require-imports
+        source={require('../../assets/workoutplanbg.png')}
         style={styles.bgImage}
         contentFit="cover"
         cachePolicy="disk"
@@ -137,11 +122,11 @@ const SplitFlatList = ({
       />
 
       {/* Foreground overlay + content */}
-      <LinearGradient colors={["#0A0A0A70", "#0A0A0AD8"]} style={styles.card}>
+      <LinearGradient colors={['#0A0A0A70', '#0A0A0AD8']} style={styles.card}>
         <FlatList
           data={workoutSplits}
           renderItem={renderItem}
-          keyExtractor={(item) => item.id}
+          keyExtractor={(item: WorkoutContextWorkoutSplit) => item.id.toString()}
           horizontal
           pagingEnabled
           style={{ flex: 1 }}
@@ -151,10 +136,7 @@ const SplitFlatList = ({
         />
         {/* CTA */}
         <Column style={{ gap: 20 }}>
-          <StartWorkoutButton
-            hasTrainedToday={hasTrainedToday}
-            selectedSplit={selectedSplit}
-          ></StartWorkoutButton>
+          <StartWorkoutButton hasTrainedToday={hasTrainedToday} selectedSplit={selectedSplit}></StartWorkoutButton>
           <StartCardioButton openCardioModal={openCardioModal} />
         </Column>
 
@@ -174,8 +156,8 @@ const SplitFlatList = ({
 const styles = StyleSheet.create({
   // Card wrapper with rounded clip
   cardWrapper: {
-    overflow: "hidden",
-    flexDirection: "column",
+    overflow: 'hidden',
+    flexDirection: 'column',
     gap: 10,
   },
 
@@ -190,47 +172,47 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     paddingTop: height * 0.12,
     paddingHorizontal: width * 0.05,
-    justifyContent: "space-between",
+    justifyContent: 'space-between',
   },
 
   // Top row
   topRow: {
-    alignItems: "flex-start",
+    alignItems: 'flex-start',
   },
 
   // Title + accent number/letter
   title: {
-    fontFamily: "Inter_700Bold",
+    fontFamily: 'Inter_700Bold',
     fontSize: RFValue(22),
-    color: "#FFFFFF",
+    color: '#FFFFFF',
     letterSpacing: 0.3,
   },
   titleAccent: {
-    color: "#FFFFFF",
+    color: '#FFFFFF',
     opacity: 0.9,
   },
   subtitle: {
-    fontFamily: "Inter_400Regular",
+    fontFamily: 'Inter_400Regular',
     fontSize: RFValue(12),
-    color: "rgba(230,230,230,0.85)",
+    color: 'rgba(230,230,230,0.85)',
     marginTop: 4,
     letterSpacing: 0.2,
   },
 
   // Soft tag (small rounded pill)
   softTag: {
-    backgroundColor: "rgba(255,255,255,0.12)",
+    backgroundColor: 'rgba(255,255,255,0.12)',
     borderRadius: 999,
     paddingHorizontal: 10,
     paddingVertical: 6,
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
     gap: 6,
   },
   softTagText: {
-    fontFamily: "Inter_500Medium",
+    fontFamily: 'Inter_500Medium',
     fontSize: RFValue(11),
-    color: "#FFFFFF",
+    color: '#FFFFFF',
   },
 
   // Chips row
@@ -244,49 +226,49 @@ const styles = StyleSheet.create({
   // Muscles multi-line
   muscles: {
     marginTop: height * 0.01,
-    fontFamily: "Inter_500Medium",
+    fontFamily: 'Inter_500Medium',
     fontSize: RFValue(13.5),
     lineHeight: RFValue(18),
-    color: "#FFFFFF",
+    color: '#FFFFFF',
     opacity: 0.95,
   },
 
   // Divider
   divider: {
     height: StyleSheet.hairlineWidth,
-    backgroundColor: "rgba(255,255,255,0.18)",
+    backgroundColor: 'rgba(255,255,255,0.18)',
     marginTop: height * 0.03,
     marginBottom: height * 0.012,
   },
 
   // Stats grid
   statsRow: {
-    alignItems: "center",
+    alignItems: 'center',
   },
   statBox: {
     flex: 1,
   },
   statHeader: {
-    alignItems: "center",
+    alignItems: 'center',
     gap: 8,
   },
   statLabel: {
-    fontFamily: "Inter_500Medium",
+    fontFamily: 'Inter_500Medium',
     fontSize: RFValue(12),
-    color: "#FFFFFF",
+    color: '#FFFFFF',
     opacity: 0.9,
   },
   statValue: {
     marginTop: 6,
-    fontFamily: "Inter_700Bold",
+    fontFamily: 'Inter_700Bold',
     fontSize: RFValue(18),
-    color: "#FFFFFF",
+    color: '#FFFFFF',
     letterSpacing: 0.3,
   },
   vSeparator: {
     width: 1,
-    height: "100%",
-    backgroundColor: "rgba(255,255,255,0.14)",
+    height: '100%',
+    backgroundColor: 'rgba(255,255,255,0.14)',
     marginHorizontal: 14,
   },
 });

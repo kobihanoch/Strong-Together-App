@@ -11,10 +11,11 @@ import {
 import { fireEvent, render } from '@testing-library/react-native';
 import type { RouteProp } from '@react-navigation/native';
 import type { AuthRootParamList } from '../../navigation/types/authStackTypes';
+import type { StackNavigationProp } from '@react-navigation/stack';
 
 const mockGoBack = jestObject.fn();
 const mockLoginForm = jestObject.fn(() => null);
-const mockVerifyCard = jestObject.fn(() => null);
+const mockVerifyCard = jestObject.fn((_: any) => null);
 
 jestObject.mock('@react-navigation/native', () => ({
   useNavigation: () => ({
@@ -59,13 +60,18 @@ const createRoute = (
     params: params as AuthRootParamList['Login'],
   }) as RouteProp<AuthRootParamList, 'Login'>;
 
+const createNavigation = (): StackNavigationProp<AuthRootParamList, 'Login'> =>
+  ({
+    goBack: mockGoBack,
+  }) as unknown as StackNavigationProp<AuthRootParamList, 'Login'>;
+
 jestDescribe('LogIn screen', () => {
   jestBeforeEach(() => {
     jestObject.clearAllMocks();
   });
 
   jestIt('renders LoginForm when route params are missing', () => {
-    render(React.createElement(Login, { route: createRoute(undefined) }));
+    render(React.createElement(Login, { route: createRoute(undefined), navigation: createNavigation() }));
 
     jestExpect(mockLoginForm).toHaveBeenCalledTimes(1);
     jestExpect(mockVerifyCard).not.toHaveBeenCalled();
@@ -80,6 +86,7 @@ jestDescribe('LogIn screen', () => {
           password_: 'Secret123',
           username_: 'johnny',
         }),
+        navigation: createNavigation(),
       }),
     );
 
@@ -96,6 +103,7 @@ jestDescribe('LogIn screen', () => {
           password_: 'Secret123',
           username_: 'johnny',
         }),
+        navigation: createNavigation(),
       }),
     );
 
@@ -116,6 +124,7 @@ jestDescribe('LogIn screen', () => {
           password_: null,
           username_: null,
         }),
+        navigation: createNavigation(),
       }),
     );
 

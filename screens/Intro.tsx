@@ -72,7 +72,17 @@ const Intro = () => {
                 <Text style={styles.buttonRegisterText}>Register</Text>
               </View>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.buttonLogin} onPress={() => navigation.navigate('Login')}>
+            <TouchableOpacity
+              style={styles.buttonLogin}
+              onPress={() =>
+                navigation.navigate('Login', {
+                  needToVerify: false,
+                  email: null,
+                  password_: null,
+                  username_: null,
+                })
+              }
+            >
               <View style={styles.buttonContent}>
                 <Text style={styles.buttonLoginText}>Log in</Text>
               </View>

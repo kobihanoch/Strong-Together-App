@@ -161,6 +161,7 @@ export const formatDate = (dateToFormat: string) => {
 };
 
 export const formatTime = (min: number, sec: number) => {
+  if (!min || !sec) return 'None';
   const hrs = Math.floor(min / 60);
   const mins = min - hrs * 60;
   const hrsText = hrs > 0 ? (hrs == 1 ? hrs + ' hr' : hrs + ' hrs') : null;

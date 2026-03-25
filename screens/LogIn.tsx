@@ -8,13 +8,16 @@ import { RFValue } from 'react-native-responsive-fontsize';
 import VerifyCard from '../components/LoginComponents/VerifyCard';
 import LoginForm from '../components/LoginComponents/LoginForm';
 import { colors } from '../constants/colors';
-import { RouteProp, useNavigation } from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
+import { StackScreenProps } from '@react-navigation/stack';
 import { AuthRootParamList } from '../navigation/types/authStackTypes';
 
 const { width, height } = Dimensions.get('window');
 
-const Login = ({ route }: { route: RouteProp<AuthRootParamList, 'Login'> }) => {
+type LoginScreenProps = StackScreenProps<AuthRootParamList, 'Login'>;
+
+const Login = ({ route }: LoginScreenProps) => {
   const navigation = useNavigation<StackNavigationProp<AuthRootParamList>>();
   // Decide which child to render based on route params
   const {
