@@ -5,11 +5,12 @@
 //
 // IMPORTANT: add this file path to "jest.setupFiles" in package.json.
 
-import "@testing-library/jest-native/extend-expect";
+import '@testing-library/jest-native/extend-expect';
+import { jest } from '@jest/globals';
 
 // Silence console.log during tests (keeps output readable)
-jest.spyOn(console, "log").mockImplementation(() => {});
+jest.spyOn(console, 'log').mockImplementation(() => {});
 
-jest.mock("react-native-responsive-fontsize", () => ({
-  RFValue: (v) => v,
+jest.mock('react-native-responsive-fontsize', () => ({
+  RFValue: (v: number) => v,
 }));

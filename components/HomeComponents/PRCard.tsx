@@ -8,12 +8,12 @@ import { useGlobalAppLoadingContext } from '../../context/GlobalAppLoadingContex
 
 const { width, height } = Dimensions.get('window');
 
-interface PRData {
-  maxExercise?: string | null;
-  maxDate?: string;
-  maxWeight?: number;
-  maxReps?: number;
-}
+type PRData = {
+  maxExercise: string | null;
+  maxDate: string;
+  maxWeight: number;
+  maxReps: number;
+} | null;
 
 interface PRCardProps {
   hasAssignedWorkout?: boolean;
@@ -61,7 +61,7 @@ const PRCard: React.FC<PRCardProps> = ({ PR, hasTracking }) => {
                     <Text style={styles.cardHeader}>Date</Text>
                   </View>
                   <Text style={[styles.maxEntity, { fontSize: RFValue(12), marginTop: 15 }]}>
-                    {hasTracking ? formatDate(PR?.maxDate) : 'No data yet'}
+                    {hasTracking ? formatDate(PR!.maxDate) : 'No data yet'}
                   </Text>
                 </View>
               </Skeleton>
