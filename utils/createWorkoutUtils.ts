@@ -3,7 +3,7 @@ import { ExerciseCandidate, SelectedExercise, SelectedExercises } from '../hooks
 import { ExerciseToWorkoutSplitEntity } from '../types/entities/exerciseToWorkoutSplit.entity';
 import { WorkoutSplitEntity } from '../types/entities/workoutSplit.entity';
 
-type SplitName = NonNullable<WorkoutSplitEntity['name']>;
+type SplitName = WorkoutSplitEntity['name'];
 
 export const addExerciseLogic = (
   prev: SelectedExercises,
@@ -46,7 +46,7 @@ export const updateSetsLogic = (
   prev: SelectedExercises,
   splitName: SplitName,
   exercise: ExerciseCandidate,
-  updatedSetsArr: NonNullable<ExerciseToWorkoutSplitEntity['sets']>,
+  updatedSetsArr: ExerciseToWorkoutSplitEntity['sets'],
 ): SelectedExercises => {
   const splitExercises = prev[splitName] ?? [];
   const isExExists = splitExercises.some((ex) => ex.id === exercise.id);

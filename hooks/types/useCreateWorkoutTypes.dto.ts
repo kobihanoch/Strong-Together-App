@@ -12,20 +12,20 @@ export interface ExerciseCandidate {
 
 export interface SelectedExercise extends ExerciseCandidate {
   // Chosen exercise
-  sets: NonNullable<ExerciseToWorkoutSplitEntity['sets']>;
-  order_index: NonNullable<ExerciseToWorkoutSplitEntity['order_index']>;
+  sets: ExerciseToWorkoutSplitEntity['sets'];
+  order_index: ExerciseToWorkoutSplitEntity['order_index'];
 }
 
-export type SelectedExercises = Record<NonNullable<WorkoutSplitEntity['name']>, SelectedExercise[]>; // ALl workout plan
+export type SelectedExercises = Record<WorkoutSplitEntity['name'], SelectedExercise[]>; // ALl workout plan
 
 // Return types ----------------------------------------------------------------------------------------
 
 export interface CreateWorkoutControls {
   addExercise: (exercise: ExerciseCandidate) => void;
   addSplit: () => void;
-  updateSets: (exercise: SelectedExercise, updatedSetsArr: NonNullable<ExerciseToWorkoutSplitEntity['sets']>) => void;
+  updateSets: (exercise: SelectedExercise, updatedSetsArr: ExerciseToWorkoutSplitEntity['sets']) => void;
   removeExercise: (exercise: SelectedExercise) => void;
-  removeSplit: (splitName: NonNullable<WorkoutSplitEntity['name']>) => void;
+  removeSplit: (splitName: WorkoutSplitEntity['name']) => void;
   onDragEnd: (params: { data: SelectedExercise[] }) => void;
 }
 
@@ -44,9 +44,9 @@ export interface UseCreateWorkoutLogicReturn {
   controls: CreateWorkoutControls;
   loadings: CreateWorkoutLoadings;
   hasWorkout: boolean;
-  setSelectedSplit: React.Dispatch<React.SetStateAction<NonNullable<WorkoutSplitEntity['name']>>>;
-  exerciseCountMap: Record<NonNullable<WorkoutSplitEntity['name']>, number>;
+  setSelectedSplit: React.Dispatch<React.SetStateAction<WorkoutSplitEntity['name']>>;
+  exerciseCountMap: Record<WorkoutSplitEntity['name'], number>;
   totalExercises: number;
-  selectedSplit: NonNullable<WorkoutSplitEntity['name']>;
+  selectedSplit: WorkoutSplitEntity['name'];
   exForSplit: SelectedExercise[];
 }

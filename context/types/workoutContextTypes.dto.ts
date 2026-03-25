@@ -7,7 +7,7 @@ export type WorkoutContextCachePayload = {
 };
 
 export interface WorkoutContextWorkoutSplit {
-  name: NonNullable<WorkoutSplitEntity['name']>;
+  name: WorkoutSplitEntity['name'];
   id: WorkoutSplitEntity['id'];
   muscleGroup: WorkoutSplitEntity['muscle_group'];
 }
