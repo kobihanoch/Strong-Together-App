@@ -1,45 +1,32 @@
-require("./global");
-import {
-  NavigationContainer,
-  useNavigationContainerRef,
-} from "@react-navigation/native";
-import * as Font from "expo-font";
-import React, { useEffect, useRef, useState } from "react";
-import {
-  ActivityIndicator,
-  StatusBar,
-  StyleSheet,
-  Text,
-  View,
-} from "react-native";
-import { AlertNotificationRoot } from "react-native-alert-notification";
-import { GestureHandlerRootView } from "react-native-gesture-handler";
+/* eslint-disable @typescript-eslint/no-require-imports */
+require('./global');
+import { NavigationContainer, useNavigationContainerRef } from '@react-navigation/native';
+import * as Font from 'expo-font';
+import React, { useEffect, useState } from 'react';
+import { ActivityIndicator, StatusBar, StyleSheet, Text, View } from 'react-native';
+import { AlertNotificationRoot } from 'react-native-alert-notification';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
-import {
-  Inter_400Regular,
-  Inter_500Medium,
-  Inter_600SemiBold,
-  Inter_700Bold,
-} from "@expo-google-fonts/inter";
+import { Inter_400Regular, Inter_500Medium, Inter_600SemiBold, Inter_700Bold } from '@expo-google-fonts/inter';
 
-import { AnalysisProvider } from "./context/AnalysisContext";
-import { AuthProvider, useAuth } from "./context/AuthContext";
-import { NotificationsProvider } from "./context/NotificationsContext";
-import { WorkoutProvider } from "./context/WorkoutContext";
+import { AnalysisProvider } from './context/AnalysisContext';
+import { AuthProvider, useAuth } from './context/AuthContext';
+import { NotificationsProvider } from './context/NotificationsContext';
+import { WorkoutProvider } from './context/WorkoutContext';
 
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import Constants from "expo-constants";
-import { NotifierRoot } from "react-native-notifier";
-import { cacheHousekeepingOnBoot } from "./cache/cacheUtils";
-import BottomTabBar from "./components/BottomTabBar";
-import Theme1 from "./components/Theme1";
-import UpdateAppModal from "./components/UpdateAppModal";
-import { CardioProvider } from "./context/CardioContext";
-import { GlobalAppLoadingProvider } from "./context/GlobalAppLoadingContext";
-import AppStack from "./navigation/AppStack";
-import AuthStack from "./navigation/AuthStack";
-import NotificationsSetup from "./notifications/NotificationsSetup";
-import ensureDpopKeyPair from "./api/DPoP/ensureDpopKeyPair";
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import Constants from 'expo-constants';
+import { NotifierRoot } from 'react-native-notifier';
+import ensureDpopKeyPair from './api/DPoP/ensureDpopKeyPair';
+import { cacheHousekeepingOnBoot } from './cache/cacheUtils';
+import BottomTabBar from './components/BottomTabBar';
+import Theme1 from './components/Theme1';
+import UpdateAppModal from './components/UpdateAppModal';
+import { CardioProvider } from './context/CardioContext';
+import { GlobalAppLoadingProvider } from './context/GlobalAppLoadingContext';
+import AppStack from './navigation/AppStack';
+import AuthStack from './navigation/AuthStack';
+import NotificationsSetup from './notifications/NotificationsSetup';
 
 // ---------- Fonts Loader Hook ----------
 function useFontsReady() {
@@ -47,14 +34,14 @@ function useFontsReady() {
   useEffect(() => {
     (async () => {
       await Font.loadAsync({
-        PoppinsLight: require("./assets/fonts/Poppins-Light.ttf"),
+        PoppinsLight: require('./assets/fonts/Poppins-Light.ttf'),
         Inter_400Regular,
         Inter_700Bold,
         Inter_500Medium,
         Inter_600SemiBold,
 
         // Add icon font
-        MaterialCommunityIcons: require("react-native-vector-icons/Fonts/MaterialCommunityIcons.ttf"),
+        MaterialCommunityIcons: require('react-native-vector-icons/Fonts/MaterialCommunityIcons.ttf'),
       });
       setReady(true);
     })();
@@ -81,8 +68,8 @@ export default function App() {
   // Delete cache for outdated app versions (against different data structures)
   useEffect(() => {
     (async () => {
-      const cacheVer = await AsyncStorage.getItem("__VERSION__");
-      const appVer = Constants.expoConfig.version;
+      const cacheVer = await AsyncStorage.getItem('__VERSION__');
+      const appVer = Constants?.expoConfig?.version;
       if (cacheVer === appVer) return; // already cleaned for this version
       await cacheHousekeepingOnBoot();
     })();
@@ -121,7 +108,7 @@ function RootNavigator() {
   const { isLoggedIn, user, authPhase } = useAuth();
 
   // Ensures no UI is rendered if auth is not loaded yet
-  if (authPhase === "checking") return null;
+  if (authPhase === 'checking') return null;
 
   return (
     <>
@@ -164,7 +151,7 @@ function MainApp() {
 const styles = StyleSheet.create({
   loadingContainer: {
     flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });
