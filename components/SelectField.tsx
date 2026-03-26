@@ -5,21 +5,21 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 
 const { width, height } = Dimensions.get('window');
 
-interface SelectFieldProps {
-  value: string;
-  onChange: (option: string) => void;
+interface SelectFieldProps<T extends string> {
+  value: T;
+  onChange: React.Dispatch<React.SetStateAction<T>>;
   iconName?: string;
   placeholder?: string;
-  options?: string[];
+  options?: T[];
 }
 
-const SelectField: React.FC<SelectFieldProps> = ({
+function SelectField<T extends string>({
   value,
   onChange,
   //iconName = 'venus-mars',
-  placeholder = 'Gender (Optional)',
-  options = ['Male', 'Female'],
-}) => {
+  placeholder = 'Select',
+  options,
+}: SelectFieldProps<T>) {
   // Local state for dropdown open/close
   const [open, setOpen] = useState<boolean>(false);
 
@@ -30,7 +30,7 @@ const SelectField: React.FC<SelectFieldProps> = ({
   const toggle = () => setOpen((v) => !v);
 
   // Select an option and close
-  const select = (opt: string) => {
+  const select = (opt: T) => {
     onChange?.(opt);
     setOpen(false);
   };
@@ -61,7 +61,7 @@ const SelectField: React.FC<SelectFieldProps> = ({
       </TouchableOpacity>
 
       {/* Dropdown menu */}
-      {open && (
+      {open && options && (
         <>
           {/* Tap outside to close */}
           <TouchableWithoutFeedback onPress={() => setOpen(false)}>
@@ -88,7 +88,7 @@ const SelectField: React.FC<SelectFieldProps> = ({
       )}
     </View>
   );
-};
+}
 
 const BOX_WIDTH = width * 0.5;
 
