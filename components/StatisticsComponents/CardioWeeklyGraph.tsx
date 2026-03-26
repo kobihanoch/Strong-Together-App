@@ -1,15 +1,13 @@
-import React, { useMemo } from "react";
-import { View, Text, Dimensions } from "react-native";
-import { BarChart } from "react-native-gifted-charts";
-import { normalizeDataToWeeklyCardioGraph } from "../../utils/statisticsUtils";
+import React, { useMemo } from 'react';
+import { View, Text, Dimensions } from 'react-native';
+import { BarChart } from 'react-native-gifted-charts';
+import { normalizeDataToWeeklyCardioGraph } from '../../utils/statisticsUtils';
+import { AerobicsWeeklyRecord } from '../../types/dto/aerobics.dto';
 
-const { width, height } = Dimensions.get("window");
+const { width, height } = Dimensions.get('window');
 
-const CardioWeeklyGraph = ({ data, cardWidth }) => {
-  const formattedData = useMemo(
-    () => normalizeDataToWeeklyCardioGraph(data),
-    [data]
-  );
+const CardioWeeklyGraph = ({ data, cardWidth }: { data: AerobicsWeeklyRecord[]; cardWidth: number }) => {
+  const formattedData = useMemo(() => normalizeDataToWeeklyCardioGraph(data), [data]);
 
   if (!cardWidth) return null;
 
@@ -20,7 +18,11 @@ const CardioWeeklyGraph = ({ data, cardWidth }) => {
   if (!Number.isFinite(spacingW) || spacingW < 0) spacingW = 0;
 
   // Tooltip for the pressed bar (library handles which bar is focused)
-  const renderTooltip = (item /*, index */) => {
+  interface BarDataItem {
+    label: string;
+    value: number;
+  }
+  const renderTooltip = (item: BarDataItem /*, index */) => {
     if (!item) return null;
     return (
       <View
@@ -28,19 +30,17 @@ const CardioWeeklyGraph = ({ data, cardWidth }) => {
           paddingHorizontal: 8,
           paddingVertical: 6,
           borderRadius: 8,
-          backgroundColor: "rgba(0,0,0,0.8)",
+          backgroundColor: 'rgba(0,0,0,0.8)',
         }}
       >
-        <Text style={{ color: "white", fontSize: 12, fontWeight: "600" }}>
-          {item.label}
-        </Text>
-        <Text style={{ color: "white", fontSize: 12 }}>{item.value} mins</Text>
+        <Text style={{ color: 'white', fontSize: 12, fontWeight: '600' }}>{item.label}</Text>
+        <Text style={{ color: 'white', fontSize: 12 }}>{item.value} mins</Text>
       </View>
     );
   };
 
   return (
-    <View style={{ width: innerW, overflow: "hidden" }}>
+    <View style={{ width: innerW, overflow: 'hidden' }}>
       <BarChart
         width={innerW}
         data={formattedData}

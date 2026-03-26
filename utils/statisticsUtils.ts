@@ -160,7 +160,7 @@ export const formatDate = (dateToFormat: string) => {
   return `${monthName} ${day}, ${year}`;
 };
 
-export const formatTime = (min: number, sec: number) => {
+export const formatTime = (min: number | null, sec: number | null) => {
   if (!min || !sec) return 'None';
   const hrs = Math.floor(min / 60);
   const mins = min - hrs * 60;

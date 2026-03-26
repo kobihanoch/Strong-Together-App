@@ -1,30 +1,38 @@
-import { Accordion } from "@animatereactnative/accordion";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { useNavigation } from "@react-navigation/native";
-import { Image } from "expo-image";
-import { LinearGradient } from "expo-linear-gradient";
-import React, { useCallback, useMemo } from "react";
-import { Dimensions, FlatList, StyleSheet, Text } from "react-native";
-import { RFValue } from "react-native-responsive-fontsize";
-import { colors } from "../../constants/colors";
-import Column from "../Column";
-import Images from "../Images";
-import Row from "../Row";
-import RestDayCard from "./RestDayCard";
-import StatsTable from "./StatsTable";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { Accordion } from '@animatereactnative/accordion';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native';
+import { Image } from 'expo-image';
+import { LinearGradient } from 'expo-linear-gradient';
+import React, { useCallback, useMemo } from 'react';
+import { Dimensions, FlatList, StyleSheet, Text } from 'react-native';
+import { RFValue } from 'react-native-responsive-fontsize';
+import { colors } from '../../constants/colors';
+import { TrackingMapItem } from '../../types/dto/exerciseTracking.dto';
+import Column from '../Column';
+import Images from '../Images';
+import Row from '../Row';
+import RestDayCard from './RestDayCard';
+import StatsTable from './StatsTable';
+import { StackNavigationProp } from '@react-navigation/stack';
+import { RootParamList } from '../../navigation/types/appStackTypes';
 
-const { width, height } = Dimensions.get("window");
+const { width, height } = Dimensions.get('window');
 
-const ExerciseItem = ({ exData, lastPerformanceData }) => {
-  const mainMuscle = exData?.exercisetoworkoutsplit?.exercises?.targetmuscle;
-  const specificMuscle =
-    exData?.exercisetoworkoutsplit?.exercises?.specifictargetmuscle;
-  const imagePath = Images[mainMuscle]?.[specificMuscle];
+type ExerciseDataProps = {
+  exData: Omit<TrackingMapItem, 'workoutdate'>;
+  lastPerformanceData: (TrackingMapItem & {
+    isLastWorkout: boolean;
+  })[];
+};
+
+const ExerciseItem = ({ exData, lastPerformanceData }: ExerciseDataProps) => {
+  const mainMuscle = exData?.exercisetoworkoutsplit.exercises.targetmuscle as keyof typeof Images;
+  const specificMuscle = exData?.exercisetoworkoutsplit?.exercises?.specifictargetmuscle;
+  const imagePath = mainMuscle && specificMuscle ? (Images[mainMuscle] as Record<string, any>)[specificMuscle] : null;
   const lastLogOfEx = useMemo(() => {
     if (lastPerformanceData) {
-      const [last] = lastPerformanceData.filter(
-        (ex) => ex.exercisetosplit_id === exData.exercisetosplit_id
-      );
+      const [last] = lastPerformanceData.filter((ex) => ex.exercisetosplit_id === exData.exercisetosplit_id);
       if (last) return { lastReps: last.reps, lastWeight: last.weight };
     }
     return { lastReps: [], lastWeight: [] };
@@ -54,11 +62,11 @@ const ExerciseItem = ({ exData, lastPerformanceData }) => {
     <Accordion.Accordion style={styles.itemContainer}>
       <Accordion.Header>
         {/* Header */}
-        <Row style={{ width: "100%", alignItems: "center" }}>
+        <Row style={{ width: '100%', alignItems: 'center' }}>
           {/* Left group: image + text */}
-          <Row style={{ flex: 1, alignItems: "center", gap: 12 }}>
+          <Row style={{ flex: 1, alignItems: 'center', gap: 12 }}>
             <LinearGradient
-              colors={["#fafafaff", "#f1f8ffff"]}
+              colors={['#fafafaff', '#f1f8ffff']}
               start={[0, 0]}
               end={[1, 1]}
               style={styles.imageContainer}
@@ -67,7 +75,7 @@ const ExerciseItem = ({ exData, lastPerformanceData }) => {
                 source={imagePath}
                 cachePolicy="disk"
                 contentFit="contain" // keep proportions, no stretching
-                style={{ width: "100%", height: "100%" }} // let the container size it
+                style={{ width: '100%', height: '100%' }} // let the container size it
               />
             </LinearGradient>
 
@@ -75,19 +83,13 @@ const ExerciseItem = ({ exData, lastPerformanceData }) => {
               <Text style={styles.exerciseTitle} numberOfLines={1}>
                 {exData.exercise}
               </Text>
-              <Text style={styles.pressableText}>
-                Tap to toggle information
-              </Text>
+              <Text style={styles.pressableText}>Tap to toggle information</Text>
             </Column>
           </Row>
 
           {/* Right: chevron */}
           <Accordion.HeaderIcon>
-            <MaterialCommunityIcons
-              name="chevron-down"
-              size={RFValue(20)}
-              color="black"
-            />
+            <MaterialCommunityIcons name="chevron-down" size={RFValue(20)} color="black" />
           </Accordion.HeaderIcon>
         </Row>
       </Accordion.Header>
@@ -100,7 +102,7 @@ const ExerciseItem = ({ exData, lastPerformanceData }) => {
           style={{
             marginTop: 10,
             marginLeft: 5,
-            alignItems: "flex-start",
+            alignItems: 'flex-start',
             gap: 10,
           }}
         >
@@ -112,20 +114,21 @@ const ExerciseItem = ({ exData, lastPerformanceData }) => {
   );
 };
 
-const ExercisesFlatList = ({ data, dataToCompare }) => {
-  const nav = useNavigation();
+type ExercisesFlatListProps = {
+  data: Omit<TrackingMapItem, 'workoutdate'>[] | undefined;
+  dataToCompare: (TrackingMapItem & {
+    isLastWorkout: boolean;
+  })[];
+};
+
+const ExercisesFlatList = ({ data, dataToCompare }: ExercisesFlatListProps) => {
+  const nav = useNavigation<StackNavigationProp<RootParamList>>();
 
   const renderItem = useCallback(
-    ({ item, index }) => {
-      return (
-        <ExerciseItem
-          index={index}
-          exData={item}
-          lastPerformanceData={dataToCompare}
-        ></ExerciseItem>
-      );
+    ({ item }: { item: Omit<TrackingMapItem, 'workoutdate'> }) => {
+      return <ExerciseItem exData={item} lastPerformanceData={dataToCompare}></ExerciseItem>;
     },
-    [dataToCompare]
+    [dataToCompare],
   );
 
   return data && data.length ? (
@@ -140,13 +143,13 @@ const ExercisesFlatList = ({ data, dataToCompare }) => {
         removeClippedSubviews
         showsHorizontalScrollIndicator={false}
         scrollEnabled={false}
-        ItemSeparatorComponent={<Column style={{ height: 10 }}></Column>}
+        ItemSeparatorComponent={() => <Column style={{ height: 10 }} />}
       />
     </Column>
   ) : (
     <RestDayCard
       onPlanPress={() => {
-        nav.navigate("MyWorkoutPlan");
+        nav.navigate('MyWorkoutPlan');
       }}
     />
   );
@@ -154,14 +157,14 @@ const ExercisesFlatList = ({ data, dataToCompare }) => {
 
 const styles = StyleSheet.create({
   itemContainer: {
-    width: "95%",
-    alignSelf: "center",
+    width: '95%',
+    alignSelf: 'center',
     borderRadius: 15,
     borderWidth: 1,
-    borderColor: "rgba(17,24,39,0.06)",
+    borderColor: 'rgba(17,24,39,0.06)',
     paddingVertical: height * 0.02,
     paddingHorizontal: width * 0.04,
-    backgroundColor: "#fff",
+    backgroundColor: '#fff',
   },
   imageContainer: {
     height: height * 0.1, // square
@@ -169,27 +172,27 @@ const styles = StyleSheet.create({
     backgroundColor: colors.lightCardBg,
     padding: 12, // was 20; gives the image room
     borderRadius: 16,
-    overflow: "hidden", // ensure rounded corners actually clip the image
+    overflow: 'hidden', // ensure rounded corners actually clip the image
   },
   exerciseTitle: {
-    fontFamily: "Inter_500Medium",
+    fontFamily: 'Inter_500Medium',
     fontSize: RFValue(14),
     // optional: improve vertical rhythm
     lineHeight: RFValue(17),
   },
   pressableText: {
-    fontFamily: "Inter_500Medium",
+    fontFamily: 'Inter_500Medium',
     fontSize: RFValue(10),
     color: colors.textSecondary,
   },
   notesHeader: {
-    fontFamily: "Inter_600SemiBold",
-    color: "black",
+    fontFamily: 'Inter_600SemiBold',
+    color: 'black',
     fontSize: RFValue(13),
   },
   notes: {
-    fontFamily: "Inter_400Regular",
-    color: "black",
+    fontFamily: 'Inter_400Regular',
+    color: 'black',
     fontSize: RFValue(13),
   },
 });
