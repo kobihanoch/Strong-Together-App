@@ -16,7 +16,7 @@ import { ymdInCurrentTZ } from '../utils/sharedUtils';
 import { ResumeWorkoutCachePayload } from '../hooks/types/useStartWorkoutTypes.dto';
 import { RootParamList } from './types/appStackTypes';
 
-const Stack = createStackNavigator();
+const Stack = createStackNavigator<RootParamList>();
 
 const AppStack = () => {
   const { userIdCache } = useAuth();

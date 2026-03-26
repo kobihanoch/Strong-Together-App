@@ -9,7 +9,7 @@ import { ExercisesDuringWorkout, ResumeWorkoutCachePayload } from './types/useSt
 export const useStartWorkoutCache = (
   userId: AppUser['id'],
   selectedSplit: WorkoutContextWorkoutSplit,
-  resumedWorkout: ResumeWorkoutCachePayload,
+  resumedWorkout: Omit<ResumeWorkoutCachePayload, 'selectedSplit'> | undefined,
   workoutProgressObj: ExercisesDuringWorkout,
 ) => {
   // Cache key per user
@@ -34,7 +34,7 @@ export const useStartWorkoutCache = (
   // Debounced caching (kept exactly with the commented call)
   const saveToCache = useCallback(async () => {
     if (disabledRef.current) return;
-    await cacheSetJSON(
+    await cacheSetJSON<ResumeWorkoutCachePayload>(
       cacheKey,
       {
         selectedSplit,

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-require-imports */
 import React from 'react';
@@ -51,9 +52,7 @@ jestObject.mock('../../components/LoginComponents/VerifyCard', () => (props: any
 
 import Login from '../LogIn';
 
-const createRoute = (
-  params?: Partial<AuthRootParamList['Login']>,
-): RouteProp<AuthRootParamList, 'Login'> =>
+const createRoute = (params?: Partial<AuthRootParamList['Login']>): RouteProp<AuthRootParamList, 'Login'> =>
   ({
     key: 'Login-key',
     name: 'Login',

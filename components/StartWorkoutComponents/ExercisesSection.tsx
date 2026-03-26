@@ -1,31 +1,39 @@
-import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { debounce } from "lodash";
-import React, { useEffect, useMemo, useState } from "react";
-import {
-  ActivityIndicator,
-  Dimensions,
-  FlatList,
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
-} from "react-native";
-import {
-  KeyboardAwareFlatList,
-  KeyboardAwareScrollView,
-} from "react-native-keyboard-aware-scroll-view";
-import { RFValue } from "react-native-responsive-fontsize";
-import { colors } from "../../constants/colors";
-import Column from "../Column";
-import PageDots from "../PageDots";
-import PercantageCircle from "../PercentageCircle";
-import Row from "../Row";
-import NumericInputWithRules from "./NumericInputWithRules";
-import useLastWorkoutExerciseTrackingData from "../../hooks/useLastWorkoutExerciseTrackingData";
-import NumberCounter from "../NumberCounter";
+import { MaterialCommunityIcons } from '@expo/vector-icons';
+import React, { useState } from 'react';
+import { ActivityIndicator, Dimensions, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { KeyboardAwareFlatList } from 'react-native-keyboard-aware-scroll-view';
+import { RFValue } from 'react-native-responsive-fontsize';
+import { colors } from '../../constants/colors';
+import { ExercisesDuringWorkout, SetCountByExercise } from '../../hooks/types/useStartWorkoutTypes.dto';
+import useLastWorkoutExerciseTrackingData from '../../hooks/useLastWorkoutExerciseTrackingData';
+import { TrackingMapItem } from '../../types/dto/exerciseTracking.dto';
+import { ExerciseInPlan } from '../../types/dto/workoutPlans.dto';
+import Column from '../Column';
+import NumberCounter from '../NumberCounter';
+import PageDots from '../PageDots';
+import PercantageCircle from '../PercentageCircle';
+import Row from '../Row';
+import NumericInputWithRules from './NumericInputWithRules';
 
-const { width, height } = Dimensions.get("window");
+const { height } = Dimensions.get('window');
+
+type RenderItemProps = {
+  item: ExerciseInPlan;
+  exercisesSetsDoneMap: SetCountByExercise;
+  controls: {
+    addNotes: (exerciseName: string, notes: string | null) => void;
+    addRepsRecord: (exerciseName: string, setIndex: number, reps: number) => void;
+    addWeightRecord: (exerciseName: string, setIndex: number, weight: number) => void;
+  };
+  workoutProgressObj: ExercisesDuringWorkout;
+  setLastWorkoutDataForModal: React.Dispatch<
+    React.SetStateAction<{
+      lastWorkoutData: TrackingMapItem | null;
+      setIndex: number;
+    } | null>
+  >;
+  openModal: () => void;
+};
 
 const RenderItem = ({
   item,
@@ -33,15 +41,10 @@ const RenderItem = ({
   controls,
   workoutProgressObj,
   setLastWorkoutDataForModal,
-  setVisibleSetIndexForModal,
   openModal,
-}) => {
+}: RenderItemProps) => {
   // Recorded stats
-  const {
-    weight: recW = [],
-    reps: recR = [],
-    notes: recNotes = [],
-  } = workoutProgressObj[item?.exercise] || {};
+  const { weight: recW = [], reps: recR = [], notes: recNotes } = workoutProgressObj[item?.exercise] || {};
   const exName = item?.exercise;
   const { lastWorkoutData } = useLastWorkoutExerciseTrackingData(item?.id);
 
@@ -49,18 +52,16 @@ const RenderItem = ({
   const { addNotes, addWeightRecord, addRepsRecord } = controls || {};
 
   // Safe destructuring with defaults
-  const { planned: plannedSets = 0, done: setsDone = 0 } =
-    exercisesSetsDoneMap[item.exercise] || {};
+  const { planned: plannedSets = 0, done: setsDone = 0 } = exercisesSetsDoneMap[item.exercise] || {};
 
   // Extra sets
-  const [extraSets, setExtraSets] = useState(0);
+  const [extraSets /*, setExtraSets*/] = useState(0);
 
   // Pre-calc totals
   const totalSets = plannedSets + extraSets;
 
   // Progress: compute vs totalSets; clamp to [0, 100]
-  const exProgress =
-    totalSets > 0 ? Math.min(100, Math.floor((setsDone / totalSets) * 100)) : 0;
+  const exProgress = totalSets > 0 ? Math.min(100, Math.floor((setsDone / totalSets) * 100)) : 0;
 
   // Current set number (do not exceed totalSets)
   const currentSetNumber = Math.min(setsDone + 1, Math.max(1, totalSets));
@@ -89,13 +90,11 @@ const RenderItem = ({
             backgroundColor: isSetCompleted
               ? colors.completedLightTransparent
               : isSetInProgress
-              ? colors.lightCardBg
-              : "#f2f2f2ff",
+                ? colors.lightCardBg
+                : '#f2f2f2ff',
             opacity: isSetLocked ? 0.4 : 1,
             borderWidth: isSetLocked ? 0 : 1,
-            borderColor: isSetCompleted
-              ? colors.completedLight
-              : colors.primary,
+            borderColor: isSetCompleted ? colors.completedLight : colors.primary,
           },
         ]}
       >
@@ -107,22 +106,18 @@ const RenderItem = ({
                 backgroundColor: isSetCompleted
                   ? colors.completedLight
                   : isSetInProgress
-                  ? colors.primary
-                  : "#a3a3a3ff",
+                    ? colors.primary
+                    : '#a3a3a3ff',
               },
             ]}
           >
             <Text style={styles.itemCurrentSetNumberText}>
-              {isSetLocked ? (
-                <MaterialCommunityIcons name="lock" size={RFValue(10)} />
-              ) : (
-                setNumber
-              )}
+              {isSetLocked ? <MaterialCommunityIcons name="lock" size={RFValue(10)} /> : setNumber}
             </Text>
           </View>
           <Text style={styles.itemCurrentSetText}>Set {setNumber}</Text>
           <TouchableOpacity
-            style={{ marginLeft: "auto" }}
+            style={{ marginLeft: 'auto' }}
             disabled={isSetLocked}
             onPress={() => {
               setLastWorkoutDataForModal({ lastWorkoutData, setIndex });
@@ -136,11 +131,11 @@ const RenderItem = ({
           style={{
             marginTop: 20,
             gap: 20,
-            justifyContent: "center",
+            justifyContent: 'center',
             paddingHorizontal: 10,
           }}
         >
-          <Column style={{ width: "50%", gap: 5 }}>
+          <Column style={{ width: '50%', gap: 5 }}>
             <Text style={styles.inputHeader}>Weight (kg)</Text>
             <NumericInputWithRules
               initial={setIndex in recW ? recW[setIndex] : 0}
@@ -150,10 +145,10 @@ const RenderItem = ({
                 addWeightRecord(exName, setIndex, val);
               }}
               style={styles.weightInput}
-              keyboardType={"numeric"}
+              keyboardType={'numeric'}
             />
           </Column>
-          <Column style={{ width: "50%", gap: 5 }}>
+          <Column style={{ width: '50%', gap: 5 }}>
             <Text style={styles.inputHeader}>Reps</Text>
             <NumericInputWithRules
               initial={setIndex in recR ? recR[setIndex] : 0}
@@ -163,11 +158,11 @@ const RenderItem = ({
                 addRepsRecord(exName, setIndex, val);
               }}
               style={styles.weightInput}
-              keyboardType={"number-pad"}
+              keyboardType={'number-pad'}
             />
           </Column>
         </Row>
-      </Column>
+      </Column>,
     );
   }
 
@@ -176,26 +171,12 @@ const RenderItem = ({
   return (
     <Column style={styles.itemCard}>
       <Row style={{ gap: 10, marginBottom: 20 }}>
-        <PercantageCircle
-          percent={exProgress}
-          actualColor={colors.primary}
-          stroke={4}
-          duration={1000}
-        >
+        <PercantageCircle percent={exProgress} actualColor={colors.primary} stroke={4} duration={1000}>
           {completedAllSets ? (
-            <MaterialCommunityIcons
-              name="check"
-              size={RFValue(12)}
-              style={styles.pctText}
-            />
+            <MaterialCommunityIcons name="check" size={RFValue(12)} style={styles.pctText} />
           ) : (
             <Row>
-              <NumberCounter
-                numStart={0}
-                numEnd={exProgress}
-                duration={1000}
-                style={styles.pctText}
-              />
+              <NumberCounter numStart={0} numEnd={exProgress} duration={1000} style={styles.pctText} />
               <Text style={styles.pctText}>%</Text>
             </Row>
           )}
@@ -204,17 +185,15 @@ const RenderItem = ({
         <Column>
           <Text style={styles.itemExerciseName}>{item.exercise}</Text>
           {/* If you want to show progress vs total including extras: */}
-          <Text style={styles.itemSetIndicatorText}>
-            {`${setsDone} of ${totalSets} completed`}
-          </Text>
+          <Text style={styles.itemSetIndicatorText}>{`${setsDone} of ${totalSets} completed`}</Text>
           {/* If you prefer “planned only”, keep your original line instead */}
         </Column>
 
         <Column
           style={{
-            marginLeft: "auto",
-            alignItems: "center",
-            justifyContent: "center",
+            marginLeft: 'auto',
+            alignItems: 'center',
+            justifyContent: 'center',
             gap: 4,
           }}
         >
@@ -231,9 +210,7 @@ const RenderItem = ({
             style={[
               styles.badge,
               {
-                backgroundColor: completedAllSets
-                  ? colors.completedLight
-                  : colors.lightCardBg,
+                backgroundColor: completedAllSets ? colors.completedLight : colors.lightCardBg,
               },
             ]}
           >
@@ -241,13 +218,11 @@ const RenderItem = ({
               style={[
                 styles.badgeText,
                 {
-                  color: completedAllSets
-                    ? colors.completedDark
-                    : colors.primary,
+                  color: completedAllSets ? colors.completedDark : colors.primary,
                 },
               ]}
             >
-              {completedAllSets ? "Done" : `Set ${currentSetNumber}`}
+              {completedAllSets ? 'Done' : `Set ${currentSetNumber}`}
             </Text>
           </View>
         </Column>
@@ -256,19 +231,37 @@ const RenderItem = ({
       {renderedSets}
 
       <TextInput
-        style={[styles.notesInput, { textAlignVertical: "top" }]}
+        style={[styles.notesInput, { textAlignVertical: 'top' }]}
         multiline
         numberOfLines={3}
         maxLength={50}
         onEndEditing={({ nativeEvent }) => {
           addNotes(exName, nativeEvent.text);
         }}
-        defaultValue={recNotes ?? ""}
+        defaultValue={recNotes ?? ''}
         placeholder="Add any notes..."
         returnKeyType="none"
       />
     </Column>
   );
+};
+
+type ExercisesSectionProps = {
+  exercises: ExerciseInPlan[];
+  exercisesSetsDoneMap: SetCountByExercise;
+  controls: {
+    addNotes: (exerciseName: string, notes: string | null) => void;
+    addRepsRecord: (exerciseName: string, setIndex: number, reps: number) => void;
+    addWeightRecord: (exerciseName: string, setIndex: number, weight: number) => void;
+  };
+  workoutProgressObj: ExercisesDuringWorkout;
+  setLastWorkoutDataForModal: React.Dispatch<
+    React.SetStateAction<{
+      lastWorkoutData: TrackingMapItem | null;
+      setIndex: number;
+    } | null>
+  >;
+  openModal: () => void;
 };
 
 const ExercisesSection = ({
@@ -277,25 +270,24 @@ const ExercisesSection = ({
   controls,
   workoutProgressObj,
   setLastWorkoutDataForModal,
-  setVisibleSetIndexForModal,
   openModal,
-}) => {
+}: ExercisesSectionProps) => {
   if (!exercises?.length) {
     return (
       <Column
         style={{
-          alignSelf: "center",
-          marginTop: "auto",
-          marginBottom: "auto",
+          alignSelf: 'center',
+          marginTop: 'auto',
+          marginBottom: 'auto',
           gap: 20,
         }}
       >
-        <ActivityIndicator animating={true} size={"large"} />
+        <ActivityIndicator animating={true} size={'large'} />
         <Text
           style={{
-            fontFamily: "Inter_500SemiBold",
+            fontFamily: 'Inter_500SemiBold',
             fontSize: RFValue(15),
-            color: "black",
+            color: 'black',
           }}
         >
           Loading exercises...
@@ -307,14 +299,13 @@ const ExercisesSection = ({
     <KeyboardAwareFlatList
       data={exercises}
       enableResetScrollToCoords={false}
-      renderItem={({ item }) => (
+      renderItem={({ item }: { item: ExerciseInPlan }) => (
         <RenderItem
           item={item}
           exercisesSetsDoneMap={exercisesSetsDoneMap}
           controls={controls}
           workoutProgressObj={workoutProgressObj}
           setLastWorkoutDataForModal={setLastWorkoutDataForModal}
-          setVisibleSetIndexForModal={setVisibleSetIndexForModal}
           openModal={openModal}
         />
       )}
@@ -330,14 +321,14 @@ const ExercisesSection = ({
 
 const styles = StyleSheet.create({
   itemCard: {
-    alignSelf: "center",
-    width: "90%",
+    alignSelf: 'center',
+    width: '90%',
     borderRadius: 16,
-    backgroundColor: "white",
+    backgroundColor: 'white',
     paddingHorizontal: 20,
     paddingVertical: 20,
     marginVertical: 25,
-    shadowColor: "#585858ff",
+    shadowColor: '#585858ff',
     shadowOpacity: 0.1,
     shadowRadius: 5,
     shadowOffset: { width: 0, height: 0 },
@@ -345,17 +336,17 @@ const styles = StyleSheet.create({
     elevation: 6,
   },
   itemExerciseName: {
-    fontFamily: "Inter_600SemiBold",
+    fontFamily: 'Inter_600SemiBold',
     fontSize: RFValue(13),
-    color: "black",
+    color: 'black',
   },
   itemSetIndicatorText: {
-    fontFamily: "Inter_400Refular",
+    fontFamily: 'Inter_400Refular',
     fontSize: RFValue(12),
     color: colors.textSecondary,
   },
   pctText: {
-    fontFamily: "Inter_400Regular",
+    fontFamily: 'Inter_400Regular',
     fontSize: RFValue(10),
     color: colors.primary,
   },
@@ -366,12 +357,12 @@ const styles = StyleSheet.create({
     borderRadius: 12,
   },
   badgeText: {
-    fontFamily: "Inter_400Regular",
+    fontFamily: 'Inter_400Regular',
     fontSize: RFValue(10),
     color: colors.primary,
   },
   itemSetContainer: {
-    width: "100%",
+    width: '100%',
     backgroundColor: colors.lightCardBg,
     borderWidth: 1,
     borderColor: colors.primaryDark,
@@ -385,49 +376,49 @@ const styles = StyleSheet.create({
     height: 30,
     aspectRatio: 1,
     borderRadius: 8,
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   itemCurrentSetNumberText: {
-    fontFamily: "Inter_400Regular",
+    fontFamily: 'Inter_400Regular',
     fontSize: RFValue(10),
-    color: "white",
+    color: 'white',
   },
   itemCurrentSetText: {
-    fontFamily: "Inter_500Medium",
+    fontFamily: 'Inter_500Medium',
     fontSize: RFValue(10),
-    color: "black",
+    color: 'black',
   },
   notesInput: {
     height: height * 0.08,
-    justifyContent: "flex-start",
-    alignItems: "flex-start",
-    backgroundColor: "#f5f5f57a",
-    color: "black",
-    fontFamily: "Inter_400Regular",
+    justifyContent: 'flex-start',
+    alignItems: 'flex-start',
+    backgroundColor: '#f5f5f57a',
+    color: 'black',
+    fontFamily: 'Inter_400Regular',
     padding: 10,
-    borderColor: "#e4e4e4ff",
+    borderColor: '#e4e4e4ff',
     borderWidth: 1,
     borderRadius: 16,
     marginTop: 30,
   },
   weightInput: {
     height: height * 0.06,
-    width: "100%",
-    textAlign: "center",
-    backgroundColor: "transparent",
-    color: "black",
-    fontFamily: "Inter_400Regular",
+    width: '100%',
+    textAlign: 'center',
+    backgroundColor: 'transparent',
+    color: 'black',
+    fontFamily: 'Inter_400Regular',
     padding: 10,
-    borderColor: "#d2d2d2ff",
+    borderColor: '#d2d2d2ff',
     borderWidth: 0.5,
     borderRadius: 10,
     fontSize: RFValue(13),
   },
   inputHeader: {
-    fontFamily: "Inter_400Regular",
+    fontFamily: 'Inter_400Regular',
     fontSize: RFValue(12),
-    color: "black",
+    color: 'black',
   },
 });
 

@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-require-imports */
 import React from 'react';
 import {
@@ -72,9 +71,7 @@ jestDescribe('MyWorkoutPlan leaf components', () => {
   jestDescribe('StartWorkoutButton', () => {
     jestIt('navigates to StartWorkout with the selected split when training is allowed', () => {
       const selectedSplit = createSplit();
-      const { getByText } = render(
-        React.createElement(StartWorkoutButton, { hasTrainedToday: false, selectedSplit }),
-      );
+      const { getByText } = render(React.createElement(StartWorkoutButton, { hasTrainedToday: false, selectedSplit }));
 
       fireEvent.press(getByText('Start workout'));
 

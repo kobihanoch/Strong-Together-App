@@ -1,29 +1,32 @@
-import React, { useCallback, useRef, useState } from "react";
-import { Dimensions, StyleSheet, View } from "react-native";
-import { Dialog } from "react-native-alert-notification";
-import { RFValue } from "react-native-responsive-fontsize";
-import SlidingBottomModal from "../components/SlidingBottomModal";
-import ExercisesSection from "../components/StartWorkoutComponents/ExercisesSection";
-import LastWorkoutData from "../components/StartWorkoutComponents/LastWorkoutData";
-import TopBar from "../components/StartWorkoutComponents/TopBar";
-import useStartWorkoutPageLogic from "../hooks/logic/useStartWorkoutPageLogic";
+import React, { useCallback, useRef, useState } from 'react';
+import { Dimensions, StyleSheet, View } from 'react-native';
+import { ALERT_TYPE, Dialog } from 'react-native-alert-notification';
+import { RFValue } from 'react-native-responsive-fontsize';
+import SlidingBottomModal, { SlidingBottomModalRef } from '../components/SlidingBottomModal';
+import ExercisesSection from '../components/StartWorkoutComponents/ExercisesSection';
+import LastWorkoutData from '../components/StartWorkoutComponents/LastWorkoutData';
+import TopBar from '../components/StartWorkoutComponents/TopBar';
+import useStartWorkoutPageLogic from '../hooks/logic/useStartWorkoutPageLogic';
+import { RootParamList } from '../navigation/types/appStackTypes';
+import { StackScreenProps } from '@react-navigation/stack';
+import { TrackingMapItem } from '../types/dto/exerciseTracking.dto';
 
-const { width, height } = Dimensions.get("window");
+const { width, height } = Dimensions.get('window');
 
-const StartWorkout = ({ navigation, route }) => {
+const StartWorkout = ({ route }: StackScreenProps<RootParamList, 'StartWorkout'>) => {
   const {
     data: workoutData,
     saving: workoutSaving,
     controls,
     workoutProgressObj,
     onExit,
-  } = useStartWorkoutPageLogic(
-    route.params?.workoutSplit,
-    route.params?.resumedWorkout
-  );
-  const [lastWorkoutDataForModal, setLastWorkoutDataForModal] = useState(null);
+  } = useStartWorkoutPageLogic(route.params.workoutSplit, route.params.resumedWorkout);
+  const [lastWorkoutDataForModal, setLastWorkoutDataForModal] = useState<{
+    lastWorkoutData: TrackingMapItem | null;
+    setIndex: number;
+  } | null>(null);
 
-  const modalRef = useRef(null);
+  const modalRef = useRef<SlidingBottomModalRef | null>(null);
   const openModal = useCallback(() => {
     modalRef?.current?.open?.(0);
   }, []);
@@ -32,10 +35,10 @@ const StartWorkout = ({ navigation, route }) => {
     let pressedYes = false;
 
     Dialog.show({
-      type: "SUCCESS",
-      title: "Finish Workout?",
-      textBody: "Are you sure you’ve completed your workout?",
-      button: "Yes, Finish",
+      type: ALERT_TYPE.SUCCESS,
+      title: 'Finish Workout?',
+      textBody: 'Are you sure you’ve completed your workout?',
+      button: 'Yes, Finish',
       closeOnOverlayTap: true,
       onPressButton: async () => {
         pressedYes = true;
@@ -53,11 +56,10 @@ const StartWorkout = ({ navigation, route }) => {
     let pressedYes = false;
 
     Dialog.show({
-      type: "WARNING",
-      title: "Exit Workout?",
-      textBody:
-        "Are you sure you want to quit the workout? All progress will be lost.",
-      button: "Yes, Exit",
+      type: ALERT_TYPE.WARNING,
+      title: 'Exit Workout?',
+      textBody: 'Are you sure you want to quit the workout? All progress will be lost.',
+      button: 'Yes, Exit',
       closeOnOverlayTap: true,
       onPressButton: async () => {
         pressedYes = true;
@@ -99,12 +101,10 @@ const StartWorkout = ({ navigation, route }) => {
       <SlidingBottomModal
         title="Last Performance"
         ref={modalRef}
-        snapPoints={["50%", "60%", "80%"]}
+        snapPoints={['50%', '60%', '80%']}
         flatListUsage={false}
       >
-        <LastWorkoutData
-          lastWorkoutDataForModal={lastWorkoutDataForModal}
-        ></LastWorkoutData>
+        <LastWorkoutData lastWorkoutDataForModal={lastWorkoutDataForModal}></LastWorkoutData>
       </SlidingBottomModal>
     </View>
   );
@@ -113,60 +113,60 @@ const StartWorkout = ({ navigation, route }) => {
 const styles = StyleSheet.create({
   container: { flex: 1 },
   countdownContainer: {
-    position: "absolute",
+    position: 'absolute',
     top: 0,
     left: 0,
     right: 0,
     bottom: 0,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "#00142a",
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#00142a',
     zIndex: 1,
   },
   countdownText: {
     fontSize: RFValue(80),
-    color: "white",
-    fontFamily: "PoppinsBold",
+    color: 'white',
+    fontFamily: 'PoppinsBold',
   },
-  exerciseContainer: { width, flex: 1, backgroundColor: "white" },
+  exerciseContainer: { width, flex: 1, backgroundColor: 'white' },
   infoContainer: {
     flex: 0.4,
-    justifyContent: "center",
-    alignItems: "center",
-    flexDirection: "row",
+    justifyContent: 'center',
+    alignItems: 'center',
+    flexDirection: 'row',
   },
   exerciseName: {
-    fontFamily: "PoppinsBold",
+    fontFamily: 'PoppinsBold',
     fontSize: RFValue(20),
-    color: "white",
+    color: 'white',
     marginTop: height * 0.03,
   },
   exerciseDescription: {
-    fontFamily: "PoppinsRegular",
+    fontFamily: 'PoppinsRegular',
     fontSize: RFValue(15),
-    color: "#8ca7d1",
+    color: '#8ca7d1',
     marginTop: height * 0.01,
   },
   setContainer: {
-    alignItems: "center",
+    alignItems: 'center',
     flex: 1,
-    backgroundColor: "white",
-    justifyContent: "center",
-    alignSelf: "center",
+    backgroundColor: 'white',
+    justifyContent: 'center',
+    alignSelf: 'center',
   },
   setLabel: {
     fontSize: RFValue(25),
-    color: "#00142a",
+    color: '#00142a',
   },
   input: {
-    backgroundColor: "#fafafa",
+    backgroundColor: '#fafafa',
     borderRadius: 5,
     paddingVertical: 10,
     paddingHorizontal: 20,
     marginBottom: 5,
     fontSize: RFValue(18),
-    justifyContent: "center",
-    textAlign: "center",
+    justifyContent: 'center',
+    textAlign: 'center',
   },
 });
 

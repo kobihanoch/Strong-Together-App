@@ -1,29 +1,31 @@
-import React from "react";
-import { Text, View, StyleSheet, ScrollView } from "react-native";
-import { RFValue } from "react-native-responsive-fontsize";
+import React from 'react';
+import { Text, View, StyleSheet, ScrollView } from 'react-native';
+import { RFValue } from 'react-native-responsive-fontsize';
+import { TrackingMapItem } from '../../types/dto/exerciseTracking.dto';
 
-const LastWorkoutData = ({ lastWorkoutDataForModal }) => {
+const LastWorkoutData = ({
+  lastWorkoutDataForModal,
+}: {
+  lastWorkoutDataForModal: {
+    lastWorkoutData: TrackingMapItem | null;
+    setIndex: number;
+  } | null;
+}) => {
   // English-only comments: Guarded formatter that returns a friendly fallback
-  const displayValue = (value) =>
-    value === undefined || value === null ? "Not recorded" : value;
+  const displayValue = (value: number | string) => (value === undefined || value === null ? 'Not recorded' : value);
 
-  const { lastWorkoutData = null, setIndex = 0 } =
-    lastWorkoutDataForModal || {};
+  const { lastWorkoutData = null, setIndex = 0 } = lastWorkoutDataForModal || {};
 
   if (!lastWorkoutData) {
     return (
       <View style={styles.emptyContainer}>
         <Text style={styles.emptyTextTitle}>No previous data found</Text>
-        <Text style={styles.emptyTextSubtitle}>
-          Once you complete a set for this exercise, it will appear here.
-        </Text>
+        <Text style={styles.emptyTextSubtitle}>Once you complete a set for this exercise, it will appear here.</Text>
       </View>
     );
   }
 
-  const dateStr = lastWorkoutData?.workoutdate
-    ? new Date(lastWorkoutData.workoutdate).toLocaleDateString()
-    : "—";
+  const dateStr = lastWorkoutData?.workoutdate ? new Date(lastWorkoutData.workoutdate).toLocaleDateString() : '—';
 
   return (
     <View style={styles.card}>
@@ -37,15 +39,11 @@ const LastWorkoutData = ({ lastWorkoutDataForModal }) => {
       <View style={styles.metricsRow}>
         <View style={styles.metricCard}>
           <Text style={styles.metricLabel}>Weight</Text>
-          <Text style={styles.metricValue}>
-            {displayValue(lastWorkoutData?.weight?.[setIndex])} kg
-          </Text>
+          <Text style={styles.metricValue}>{displayValue(lastWorkoutData.weight[setIndex])} kg</Text>
         </View>
         <View style={styles.metricCard}>
           <Text style={styles.metricLabel}>Reps</Text>
-          <Text style={styles.metricValue}>
-            {displayValue(lastWorkoutData?.reps?.[setIndex])}
-          </Text>
+          <Text style={styles.metricValue}>{displayValue(lastWorkoutData.reps[setIndex])}</Text>
         </View>
       </View>
 
@@ -61,9 +59,7 @@ const LastWorkoutData = ({ lastWorkoutDataForModal }) => {
             contentContainerStyle={{ paddingVertical: 2 }}
             showsVerticalScrollIndicator={false}
           >
-            <Text style={styles.notesText}>
-              {displayValue(lastWorkoutData?.notes ?? "None")}
-            </Text>
+            <Text style={styles.notesText}>{displayValue(lastWorkoutData?.notes ?? 'None')}</Text>
           </ScrollView>
         </View>
       </View>
@@ -74,7 +70,7 @@ const LastWorkoutData = ({ lastWorkoutDataForModal }) => {
 const styles = StyleSheet.create({
   // --- Card wrapper ---
   card: {
-    backgroundColor: "#fff",
+    backgroundColor: '#fff',
     borderRadius: 18,
     padding: 16,
     gap: 12,
@@ -83,49 +79,49 @@ const styles = StyleSheet.create({
   // --- Header ---
   exerciseName: {
     fontSize: RFValue(17),
-    fontFamily: "Inter_600SemiBold",
-    textAlign: "center",
-    color: "#0f172a",
+    fontFamily: 'Inter_600SemiBold',
+    textAlign: 'center',
+    color: '#0f172a',
   },
   dateChip: {
-    alignSelf: "center",
-    backgroundColor: "#f1f5f9",
+    alignSelf: 'center',
+    backgroundColor: '#f1f5f9',
     paddingHorizontal: 10,
     paddingVertical: 4,
     borderRadius: 999,
     borderWidth: 1,
-    borderColor: "#e2e8f0",
+    borderColor: '#e2e8f0',
   },
   dateChipText: {
-    fontFamily: "Inter_400Regular",
+    fontFamily: 'Inter_400Regular',
     fontSize: RFValue(12),
-    color: "#334155",
+    color: '#334155',
   },
 
   // --- Metrics ---
   metricsRow: {
-    flexDirection: "row",
+    flexDirection: 'row',
     gap: 12,
   },
   metricCard: {
     flex: 1,
-    backgroundColor: "#f8fafc",
+    backgroundColor: '#f8fafc',
     borderWidth: 1,
-    borderColor: "#e5e7eb",
+    borderColor: '#e5e7eb',
     borderRadius: 14,
     paddingVertical: 12,
     paddingHorizontal: 14,
   },
   metricLabel: {
     fontSize: RFValue(12),
-    fontFamily: "Inter_500Medium",
-    color: "#6b7280",
+    fontFamily: 'Inter_500Medium',
+    color: '#6b7280',
     marginBottom: 4,
   },
   metricValue: {
     fontSize: RFValue(16),
-    fontFamily: "Inter_700Bold",
-    color: "#111827",
+    fontFamily: 'Inter_700Bold',
+    color: '#111827',
   },
 
   // --- Notes ---
@@ -135,40 +131,40 @@ const styles = StyleSheet.create({
   },
   notesLabel: {
     fontSize: RFValue(13),
-    fontFamily: "Inter_500Medium",
-    color: "#6b7280",
+    fontFamily: 'Inter_500Medium',
+    color: '#6b7280',
   },
   notesBox: {
-    backgroundColor: "#f8fafc",
+    backgroundColor: '#f8fafc',
     borderWidth: 1,
-    borderColor: "#e5e7eb",
+    borderColor: '#e5e7eb',
     borderRadius: 12,
     paddingHorizontal: 12,
     paddingVertical: 8,
   },
   notesText: {
     fontSize: RFValue(14),
-    fontFamily: "Inter_400Regular",
-    color: "#1f2937",
+    fontFamily: 'Inter_400Regular',
+    color: '#1f2937',
     lineHeight: RFValue(18),
   },
 
   // --- Empty state ---
   emptyContainer: {
-    alignItems: "center",
+    alignItems: 'center',
     paddingVertical: 24,
     paddingHorizontal: 16,
   },
   emptyTextTitle: {
     fontSize: RFValue(16),
-    fontFamily: "Inter_600SemiBold",
-    color: "#6b7280",
+    fontFamily: 'Inter_600SemiBold',
+    color: '#6b7280',
   },
   emptyTextSubtitle: {
     fontSize: RFValue(13),
-    fontFamily: "Inter_400Regular",
-    color: "#9ca3af",
-    textAlign: "center",
+    fontFamily: 'Inter_400Regular',
+    color: '#9ca3af',
+    textAlign: 'center',
     marginTop: 4,
   },
 });

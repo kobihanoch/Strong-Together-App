@@ -12,7 +12,7 @@ export type ResumeWorkoutCachePayload = {
   startTime: number;
   lastPause: number;
   pausedTotal: number;
-} | null;
+};
 
 export type ExercisesDuringWorkout = Record<
   ExerciseEntity['name'],
@@ -47,7 +47,7 @@ export interface StartWorkoutPageLogicReturn {
   workoutProgressObj: ExercisesDuringWorkout;
 }
 
-export type SetCountByExercise = Record<ExerciseName, unknown>;
+export type SetCountByExercise = Record<ExerciseName, { done: number; planned: number }>;
 export type WorkoutPayloadRow = FinishUserWorkoutBody['workout'][number];
 export type ExerciseName = ExerciseEntity['name'];
 export type SetValue = ExerciseTrackingEntity['weight'][number];

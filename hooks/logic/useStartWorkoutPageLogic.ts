@@ -29,7 +29,7 @@ import { FinishUserWorkoutBody } from '../../types/api/workouts/requests';
 
 const useStartWorkoutPageLogic = (
   selectedSplit: WorkoutContextWorkoutSplit,
-  resumedWorkout: ResumeWorkoutCachePayload = null,
+  resumedWorkout?: Omit<ResumeWorkoutCachePayload, 'selectedSplit'>,
 ): StartWorkoutPageLogicReturn => {
   // --------------------[ Navigation ]--------------------------------------
   const navigation = useNavigation<StackNavigationProp<RootParamList>>();
