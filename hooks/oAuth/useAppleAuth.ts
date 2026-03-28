@@ -4,6 +4,7 @@ import { Platform } from 'react-native';
 import { useCallback } from 'react';
 import api from '../../api/api'; // <-- call backend here for symmetry
 import { OAuthLoginResponse } from '../../types/api/oAuth/responses';
+import { AppleOAuthBody } from '../../types/api/oAuth/requests';
 
 export function useAppleAuth() {
   const signInWithApple = useCallback(async () => {
@@ -35,7 +36,7 @@ export function useAppleAuth() {
         rawNonce,
         email: result.email || null,
         name: result.fullName,
-      });
+      } satisfies AppleOAuthBody);
 
       return data;
     } catch (e) {
