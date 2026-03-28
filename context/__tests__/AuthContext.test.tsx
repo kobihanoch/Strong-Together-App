@@ -1,0 +1,295 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import React from 'react';
+import { beforeEach, describe, expect, it, jest } from '@jest/globals';
+import { act, renderHook, waitFor } from '@testing-library/react-native';
+
+type VoidPromiseFn = () => Promise<void>;
+type NullableStringPromiseFn = () => Promise<string | null>;
+type CacheGetFn = <T>(key: string) => Promise<T | null>;
+type CacheSetFn = <T>(key: string, value: T, ttl: number) => Promise<void>;
+type LoginResponse = { accessToken: string; refreshToken: string; user: string };
+type RefreshResponse = { accessToken: string; refreshToken: string; userId: string };
+type UseCacheAndFetchResponse = { loading: boolean; cacheKnown: boolean };
+type UseCacheAndFetchMockFn = (
+  user: unknown,
+  keyBuilderFn: unknown,
+  isValidatedByServerFlag: boolean,
+  fetchFn: unknown,
+  onDataFn: unknown,
+  cachedPayload: unknown,
+  logLabel: string,
+) => UseCacheAndFetchResponse;
+
+const mockCacheGetJSON = jest.fn<CacheGetFn>();
+const mockCacheSetJSON = jest.fn<CacheSetFn>();
+const mockCacheDeleteAllCache = jest.fn<VoidPromiseFn>();
+const mockCacheDeleteAllCacheWithoutStartWorkout = jest.fn<VoidPromiseFn>();
+const mockHasBootstrapPayload = jest.fn<() => boolean>();
+const mockResetBootstrap = jest.fn<() => void>();
+const mockUseGoogleAuth = jest.fn<() => { signInWithGoogle: ReturnType<typeof jest.fn> }>();
+const mockUseAppleAuth = jest.fn<() => { signInWithApple: ReturnType<typeof jest.fn> }>();
+const mockUseCacheAndFetch = jest.fn<UseCacheAndFetchMockFn>();
+const mockUseNetworkStatus = jest.fn<() => boolean>();
+const mockUseUpdateGlobalLoading = jest.fn<(...args: any[]) => void>();
+const mockLoginUser = jest.fn<(identifier: string, password: string) => Promise<LoginResponse>>();
+const mockLogoutUser = jest.fn<VoidPromiseFn>();
+const mockRefreshAndRotateTokens = jest.fn<() => Promise<RefreshResponse>>();
+const mockRegisterUser = jest.fn<(...args: any[]) => Promise<void>>();
+const mockLoginOAuthWithAccessToken = jest.fn<() => Promise<void>>();
+const mockFetchSelfUserData = jest.fn<() => Promise<null>>();
+const mockClearRefreshToken = jest.fn<VoidPromiseFn>();
+const mockGetRefreshToken = jest.fn<NullableStringPromiseFn>();
+const mockSaveRefreshToken = jest.fn<(rt: string) => Promise<void>>();
+const mockConnectSocket = jest.fn<(username: string) => Promise<void>>();
+const mockDisconnectSocket = jest.fn<() => void>();
+const mockSetAccessToken = jest.fn<(token: string | null) => void>();
+const mockSetUsernameInHeader = jest.fn<(username: string | null) => void>();
+const mockShowErrorAlert = jest.fn<(title: string, message: string) => void>();
+
+const cacheDeleteAllCacheMock = () => mockCacheDeleteAllCache();
+const cacheDeleteAllCacheWithoutStartWorkoutMock = () => mockCacheDeleteAllCacheWithoutStartWorkout();
+const cacheGetJSONMock = <T,>(key: string) => mockCacheGetJSON(key) as Promise<T | null>;
+const cacheSetJSONMock = <T,>(key: string, value: T, ttl: number) => mockCacheSetJSON(key, value, ttl) as Promise<void>;
+const useCacheAndFetchMock = (
+  user: unknown,
+  keyBuilderFn: unknown,
+  isValidatedByServerFlag: boolean,
+  fetchFn: unknown,
+  onDataFn: unknown,
+  cachedPayload: unknown,
+  logLabel: string,
+) =>
+  mockUseCacheAndFetch(user, keyBuilderFn, isValidatedByServerFlag, fetchFn, onDataFn, cachedPayload, logLabel);
+const useUpdateGlobalLoadingMock = (key: string, value: boolean) => mockUseUpdateGlobalLoading(key, value);
+const loginUserMock = (identifier: string, password: string) => mockLoginUser(identifier, password);
+const logoutUserMock = () => mockLogoutUser();
+const refreshAndRotateTokensMock = () => mockRefreshAndRotateTokens();
+const registerUserMock = (...args: any[]) => mockRegisterUser(...args);
+const loginOAuthWithAccessTokenMock = () => mockLoginOAuthWithAccessToken();
+const fetchSelfUserDataMock = () => mockFetchSelfUserData();
+const clearRefreshTokenMock = () => mockClearRefreshToken();
+const getRefreshTokenMock = () => mockGetRefreshToken();
+const saveRefreshTokenMock = (rt: string) => mockSaveRefreshToken(rt);
+const connectSocketMock = (username: string) => mockConnectSocket(username);
+const disconnectSocketMock = () => mockDisconnectSocket();
+const setAccessTokenMock = (token: string | null) => mockSetAccessToken(token);
+const setUsernameInHeaderMock = (username: string | null) => mockSetUsernameInHeader(username);
+const showErrorAlertMock = (title: string, message: string) => mockShowErrorAlert(title, message);
+
+jest.mock('react-native-notifier', () => ({
+  Notifier: {
+    showNotification: jest.fn(),
+  },
+  NotifierComponents: {
+    Alert: 'Alert',
+  },
+}));
+
+jest.mock('../../api/bootstrapApi', () => ({
+  hasBootstrapPayload: () => mockHasBootstrapPayload(),
+  resetBootstrap: () => mockResetBootstrap(),
+}));
+
+jest.mock('../../cache/cacheUtils', () => ({
+  cacheDeleteAllCache: cacheDeleteAllCacheMock,
+  cacheDeleteAllCacheWithoutStartWorkout: cacheDeleteAllCacheWithoutStartWorkoutMock,
+  cacheGetJSON: cacheGetJSONMock,
+  cacheSetJSON: cacheSetJSONMock,
+  keyAuth: (id: string) => `CACHE:AUTH:${id}:test-version`,
+  TTL_48H: 172800,
+}));
+
+jest.mock('../../hooks/oAuth/useGoogleAuth', () => ({
+  useGoogleAuth: () => mockUseGoogleAuth(),
+}));
+
+jest.mock('../../hooks/oAuth/useAppleAuth', () => ({
+  useAppleAuth: () => mockUseAppleAuth(),
+}));
+
+jest.mock('../../hooks/useCacheAndFetch', () => ({
+  __esModule: true,
+  default: useCacheAndFetchMock,
+}));
+
+jest.mock('../../hooks/useNetworkStatus', () => ({
+  useNetworkStatus: () => mockUseNetworkStatus(),
+}));
+
+jest.mock('../../hooks/useUpdateGlobalLoading', () => ({
+  __esModule: true,
+  default: useUpdateGlobalLoadingMock,
+}));
+
+jest.mock('../../services/AuthService', () => ({
+  loginUser: loginUserMock,
+  logoutUser: logoutUserMock,
+  refreshAndRotateTokens: refreshAndRotateTokensMock,
+  registerUser: registerUserMock,
+}));
+
+jest.mock('../../services/OAuthService', () => ({
+  loginOAuthWithAccessToken: loginOAuthWithAccessTokenMock,
+}));
+
+jest.mock('../../services/UserService', () => ({
+  fetchSelfUserData: fetchSelfUserDataMock,
+}));
+
+jest.mock('../../utils/tokenStore', () => ({
+  clearRefreshToken: clearRefreshTokenMock,
+  getRefreshToken: getRefreshTokenMock,
+  saveRefreshToken: saveRefreshTokenMock,
+}));
+
+jest.mock('../../webSockets/socketConfig', () => ({
+  connectSocket: connectSocketMock,
+  disconnectSocket: disconnectSocketMock,
+}));
+
+jest.mock('../../utils/authUtils', () => ({
+  __esModule: true,
+  default: {
+    setAccessToken: setAccessTokenMock,
+    logout: null,
+    setUsernameInHeader: setUsernameInHeaderMock,
+  },
+}));
+
+jest.mock('../../errors/errorAlerts', () => ({
+  showErrorAlert: showErrorAlertMock,
+}));
+
+import { AuthProvider, useAuth } from '../AuthContext';
+
+const wrapper = ({ children }: { children: React.ReactNode }) => <AuthProvider>{children}</AuthProvider>;
+
+describe('AuthContext', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+
+    mockHasBootstrapPayload.mockReturnValue(false);
+    mockUseGoogleAuth.mockReturnValue({
+      signInWithGoogle: jest.fn(),
+    });
+    mockUseAppleAuth.mockReturnValue({
+      signInWithApple: jest.fn(),
+    });
+    mockUseCacheAndFetch.mockReturnValue({
+      loading: false,
+      cacheKnown: true,
+    });
+    mockUseNetworkStatus.mockReturnValue(true);
+    mockGetRefreshToken.mockResolvedValue(null);
+    mockCacheGetJSON.mockResolvedValue(null);
+    mockRefreshAndRotateTokens.mockResolvedValue({
+      accessToken: 'access-token',
+      refreshToken: 'refresh-token',
+      userId: 'user-1',
+    });
+    mockLoginUser.mockResolvedValue({
+      accessToken: 'access-token',
+      refreshToken: 'refresh-token',
+      user: 'user-1',
+    });
+    mockLogoutUser.mockResolvedValue(undefined);
+    mockClearRefreshToken.mockResolvedValue(undefined);
+    mockCacheDeleteAllCache.mockResolvedValue(undefined);
+    mockCacheDeleteAllCacheWithoutStartWorkout.mockResolvedValue(undefined);
+    mockCacheSetJSON.mockResolvedValue(undefined);
+    mockSaveRefreshToken.mockResolvedValue(undefined);
+    mockConnectSocket.mockResolvedValue(undefined);
+    mockDisconnectSocket.mockReturnValue(undefined);
+    mockFetchSelfUserData.mockResolvedValue(null);
+    mockRegisterUser.mockResolvedValue(undefined);
+    mockLoginOAuthWithAccessToken.mockResolvedValue(undefined);
+  });
+
+  it('falls back to the guest state when no stored session exists on boot', async () => {
+    const { result } = renderHook(() => useAuth(), { wrapper });
+
+    await waitFor(() => {
+      expect(result.current.authPhase).toBe('guest');
+    });
+
+    expect(result.current.isLoggedIn).toBe(false);
+    expect(result.current.user).toBeNull();
+    expect(result.current.userIdCache).toBeNull();
+    expect(result.current.isValidatedWithServer).toBe(false);
+    expect(mockClearRefreshToken).toHaveBeenCalledTimes(1);
+    expect(mockCacheDeleteAllCacheWithoutStartWorkout).toHaveBeenCalledTimes(1);
+    expect(mockResetBootstrap).toHaveBeenCalledTimes(1);
+  });
+
+  it('restores a stored session and validates it with the server on boot', async () => {
+    mockGetRefreshToken.mockResolvedValue('existing-refresh-token');
+    mockCacheGetJSON.mockResolvedValue('user-1');
+
+    const { result } = renderHook(() => useAuth(), { wrapper });
+
+    await waitFor(() => {
+      expect(result.current.authPhase).toBe('authed');
+    });
+
+    await waitFor(() => {
+      expect(mockRefreshAndRotateTokens).toHaveBeenCalledTimes(1);
+    });
+
+    expect(result.current.isLoggedIn).toBe(true);
+    expect(result.current.userIdCache).toBe('user-1');
+    expect(result.current.isValidatedWithServer).toBe(true);
+    expect(mockSaveRefreshToken).toHaveBeenCalledWith('refresh-token');
+    expect(mockSetAccessToken).toHaveBeenCalledWith('access-token');
+    expect(mockCacheSetJSON).toHaveBeenCalledWith('CACHE:USER_ID', 'user-1', 172800);
+  });
+
+  it('logs in with credentials and stores the session metadata for downstream contexts', async () => {
+    const { result } = renderHook(() => useAuth(), { wrapper });
+
+    await waitFor(() => {
+      expect(result.current.authPhase).toBe('guest');
+    });
+
+    await act(async () => {
+      await result.current.login('johnny', 'Secret123');
+    });
+
+    expect(mockLoginUser).toHaveBeenCalledWith('johnny', 'Secret123');
+    expect(mockSaveRefreshToken).toHaveBeenCalledWith('refresh-token');
+    expect(mockSetAccessToken).toHaveBeenCalledWith('access-token');
+    expect(result.current.isLoggedIn).toBe(true);
+    expect(result.current.userIdCache).toBe('user-1');
+    expect(result.current.isValidatedWithServer).toBe(true);
+    expect(result.current.authPhase).toBe('authed');
+    expect(result.current.loading).toBe(false);
+    expect(mockCacheSetJSON).toHaveBeenCalledWith('CACHE:USER_ID', 'user-1', 172800);
+  });
+
+  it('logs out by clearing local auth state even after the server call succeeds', async () => {
+    mockGetRefreshToken.mockResolvedValue('existing-refresh-token');
+    mockCacheGetJSON.mockResolvedValue('user-1');
+
+    const { result } = renderHook(() => useAuth(), { wrapper });
+
+    await waitFor(() => {
+      expect(result.current.isLoggedIn).toBe(true);
+    });
+
+    await act(async () => {
+      await result.current.logout();
+    });
+
+    await waitFor(() => {
+      expect(result.current.authPhase).toBe('guest');
+    });
+
+    expect(mockLogoutUser).toHaveBeenCalledTimes(1);
+    expect(mockDisconnectSocket).toHaveBeenCalledTimes(1);
+    expect(mockCacheDeleteAllCache).toHaveBeenCalledTimes(1);
+    expect(mockClearRefreshToken).toHaveBeenCalled();
+    expect(result.current.isLoggedIn).toBe(false);
+    expect(result.current.user).toBeNull();
+    expect(result.current.userIdCache).toBeNull();
+    expect(result.current.isValidatedWithServer).toBe(false);
+  });
+});
