@@ -1,6 +1,6 @@
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { Notifier, NotifierComponents } from 'react-native-notifier';
-import { hasBootstrapPayload, resetBootstrap } from '../api/bootstrapApi.js';
+import { hasBootstrapPayload, resetBootstrap } from '../api/bootstrapApi';
 import {
   cacheDeleteAllCache,
   cacheDeleteAllCacheWithoutStartWorkout,
@@ -8,22 +8,22 @@ import {
   cacheSetJSON,
   keyAuth,
   TTL_48H,
-} from '../cache/cacheUtils.js';
-import { showErrorAlert } from '../errors/errorAlerts.js';
-import { useAppleAuth } from '../hooks/oAuth/useAppleAuth.js';
-import { useGoogleAuth } from '../hooks/oAuth/useGoogleAuth.js';
-import useCacheAndFetch from '../hooks/useCacheAndFetch.js';
-import { useNetworkStatus } from '../hooks/useNetworkStatus.js';
-import useUpdateGlobalLoading from '../hooks/useUpdateGlobalLoading.js';
-import { loginUser, logoutUser, refreshAndRotateTokens, registerUser } from '../services/AuthService.js';
-import { fetchSelfUserData } from '../services/UserService.js';
-import GlobalAuth from '../utils/authUtils.js';
-import { clearRefreshToken, getRefreshToken, saveRefreshToken } from '../utils/tokenStore.js';
-import { connectSocket, disconnectSocket } from '../webSockets/socketConfig.js';
-import { AppUser, AuthContextValue, UserCachePayload } from './types/authContextTypes.dto.js';
-import { GetAuthenticatedUserByIdResponse } from '../types/api/user/responses.js';
+} from '../cache/cacheUtils';
+import { showErrorAlert } from '../errors/errorAlerts';
+import { useAppleAuth } from '../hooks/oAuth/useAppleAuth';
+import { useGoogleAuth } from '../hooks/oAuth/useGoogleAuth';
+import useCacheAndFetch from '../hooks/useCacheAndFetch';
+import { useNetworkStatus } from '../hooks/useNetworkStatus';
+import useUpdateGlobalLoading from '../hooks/useUpdateGlobalLoading';
+import { loginUser, logoutUser, refreshAndRotateTokens, registerUser } from '../services/AuthService';
+import { fetchSelfUserData } from '../services/UserService';
+import GlobalAuth from '../utils/authUtils';
+import { clearRefreshToken, getRefreshToken, saveRefreshToken } from '../utils/tokenStore';
+import { connectSocket, disconnectSocket } from '../webSockets/socketConfig';
+import { AppUser, AuthContextValue, UserCachePayload } from './types/authContextTypes.dto';
+import { GetAuthenticatedUserByIdResponse } from '../types/api/user/responses';
 import { AxiosError } from 'axios';
-import { CreateUserBody, LoginRequestBody } from '../types/api/auth/requests.js';
+import { CreateUserBody, LoginRequestBody } from '../types/api/auth/requests';
 
 const AuthContext = createContext<AuthContextValue | null>(null);
 export const useAuth = () => {

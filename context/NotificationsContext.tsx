@@ -1,18 +1,18 @@
 import { createContext, ReactNode, useCallback, useContext, useEffect, useMemo, useState } from 'react';
-import { keyInbox } from '../cache/cacheUtils.js';
-import useCacheAndFetch from '../hooks/useCacheAndFetch.js';
-import useUpdateGlobalLoading from '../hooks/useUpdateGlobalLoading.js';
-import { getUserMessages } from '../services/MessagesService.js';
-import { AllUserMessages } from '../types/dto/messages.dto.js';
-import { filterMessagesByUnread } from '../utils/notificationsContextUtils.js';
-import { registerToMessagesListener } from '../webSockets/socketListeners.js';
-import { useAuth } from './AuthContext.js';
+import { keyInbox } from '../cache/cacheUtils';
+import useCacheAndFetch from '../hooks/useCacheAndFetch';
+import useUpdateGlobalLoading from '../hooks/useUpdateGlobalLoading';
+import { getUserMessages } from '../services/MessagesService';
+import { GetAllUserMessagesResponse } from '../types/api/messages/responses';
+import { AllUserMessages } from '../types/dto/messages.dto';
+import { filterMessagesByUnread } from '../utils/notificationsContextUtils';
+import { registerToMessagesListener } from '../webSockets/socketListeners';
+import { useAuth } from './AuthContext';
 import {
   NotificationsContextAllReceivedMessages,
   NotificationsContextCachePayload,
   NotificationsContextValue,
-} from './types/notificationsContextTypes.dto.js';
-import { GetAllUserMessagesResponse } from '../types/api/messages/responses.js';
+} from './types/notificationsContextTypes.dto';
 
 /**
  * Notifications Flow:

@@ -1,11 +1,11 @@
 import React, { useCallback, useRef, useState } from 'react';
 import { Dimensions, View } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
-import Estimated1RM from '../components/AnalyticsComponents.js/Estimated1RM';
-import GoalAdherence from '../components/AnalyticsComponents.js/GoalAdherence';
-import Overview from '../components/AnalyticsComponents.js/Overview';
-import RenderEst1RMItem from '../components/AnalyticsComponents.js/RenderEst1RMItem';
-import RenderGoalAdherenceItem from '../components/AnalyticsComponents.js/RenderGoalAdherenceItem';
+import Estimated1RM from '../components/AnalyticsComponents/Estimated1RM';
+import GoalAdherence from '../components/AnalyticsComponents/GoalAdherence';
+import Overview from '../components/AnalyticsComponents/Overview';
+import RenderEst1RMItem from '../components/AnalyticsComponents/RenderEst1RMItem';
+import RenderGoalAdherenceItem from '../components/AnalyticsComponents/RenderGoalAdherenceItem';
 import SlidingBottomModal, { SlidingBottomModalRef } from '../components/SlidingBottomModal';
 import useAnalysticsLogic from '../hooks/logic/useAnalysticsLogic';
 import { WorkoutSplitEntity } from '../types/entities/workoutSplit.entity';

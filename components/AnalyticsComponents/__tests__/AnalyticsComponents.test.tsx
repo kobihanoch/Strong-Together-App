@@ -1,13 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-require-imports */
 import React from 'react';
-import {
-  beforeEach,
-  describe,
-  expect,
-  it,
-  jest,
-} from '@jest/globals';
+import { beforeEach, describe, expect, it, jest } from '@jest/globals';
 import { Animated, FlatList } from 'react-native';
 import { fireEvent, render } from '@testing-library/react-native';
 import type {
@@ -122,16 +116,14 @@ const createGoalAdherenceResponse = (): GoalAdherenceResponse => ({
 describe('Analytics components', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    jest.spyOn(Animated, 'timing').mockImplementation(
-      ((value: Animated.Value, config: { toValue: number }) => ({
-        start: (callback?: (result: { finished: boolean }) => void) => {
-          value.setValue(config.toValue);
-          callback?.({ finished: true });
-        },
-        stop: jest.fn(),
-        reset: jest.fn(),
-      })) as any,
-    );
+    jest.spyOn(Animated, 'timing').mockImplementation(((value: Animated.Value, config: { toValue: number }) => ({
+      start: (callback?: (result: { finished: boolean }) => void) => {
+        value.setValue(config.toValue);
+        callback?.({ finished: true });
+      },
+      stop: jest.fn(),
+      reset: jest.fn(),
+    })) as any);
   });
 
   describe('Overview', () => {
@@ -258,9 +250,7 @@ describe('Analytics components', () => {
     });
 
     it('renders safely when the split has no exercises and the button is disabled by props', () => {
-      const { getByText, queryByText } = render(
-        <RenderGoalAdherenceItem name="Recovery" v={{}} showSeeAll={false} />,
-      );
+      const { getByText, queryByText } = render(<RenderGoalAdherenceItem name="Recovery" v={{}} showSeeAll={false} />);
 
       expect(getByText('Recovery')).toBeTruthy();
       expect(queryByText('See all')).toBeNull();
