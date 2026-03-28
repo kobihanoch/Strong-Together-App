@@ -8,7 +8,12 @@ import {
   SendChangePassEmailBody,
   SendVerifcationMailBody,
 } from '../types/api/auth/requests';
-import { CheckUserVerifyResponse, CreateUserResponse, LoginResponse } from '../types/api/auth/responses';
+import {
+  CheckUserVerifyResponse,
+  CreateUserResponse,
+  LoginResponse,
+  RefreshTokenResponse,
+} from '../types/api/auth/responses';
 import { getRefreshToken } from '../utils/tokenStore';
 
 // Rotate tokens
@@ -16,7 +21,7 @@ export const refreshAndRotateTokens = async () => {
   const rt = await getRefreshToken();
   if (!rt) throw new Error('No stored refresh token');
 
-  const { data } = await api.post(`/api/auth/refresh`, null, {
+  const { data } = await api.post<RefreshTokenResponse>(`/api/auth/refresh`, null, {
     headers: { 'x-refresh-token': `DPoP ${rt}` },
   });
   return data;
