@@ -1,0 +1,271 @@
+/* eslint-disable @typescript-eslint/no-require-imports */
+import { useNavigation } from '@react-navigation/native';
+import { StackNavigationProp } from '@react-navigation/stack';
+import { Image } from 'expo-image';
+import { LinearGradient } from 'expo-linear-gradient';
+import React from 'react';
+import { ActivityIndicator, Dimensions, Linking, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { RFValue } from 'react-native-responsive-fontsize';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import Column from '../components/Column';
+import Logo from '../components/Logo';
+import Row from '../components/Row';
+import { colors } from '../constants/colors';
+import { useAuth } from '../context/AuthContext';
+import { AuthRootParamList } from '../navigation/types/authStackTypes';
+
+const { width, height } = Dimensions.get('window');
+
+const Intro = () => {
+  const navigation = useNavigation<StackNavigationProp<AuthRootParamList>>();
+  const { appleLoading, googleLoading, handleAppleAuth, handleGoogleAuth } = useAuth();
+
+  const handleApplePress = async () => {
+    await handleAppleAuth();
+    /*if (missingFields) {
+      navigation.navigate("OAuthCompleteFields", {
+        missingFields,
+        provider: "apple",
+      });
+    }*/
+  };
+
+  const handleGooglePress = async () => {
+    await handleGoogleAuth();
+    /*if (missingFields) {
+      navigation.navigate("OAuthCompleteFields", {
+        missingFields,
+        provider: "google",
+      });
+    }*/
+  };
+
+  return (
+    <LinearGradient colors={[colors.primaryDark, colors.primary]} style={{ flex: 1 }}>
+      <Column
+        style={{
+          alignItems: 'center',
+          justifyContent: 'flex-end',
+          flex: 1,
+          paddingBottom: height * 0.05,
+        }}
+      >
+        <Column style={{ marginBottom: height * 0.09 }}>
+          <Logo />
+
+          <View style={{ alignItems: 'center', marginTop: height * 0.05 }}>
+            <Text style={styles.descriptionText}>
+              Welcome to Strong Together.{'\n'}Your goals - powered by your circle.
+            </Text>
+          </View>
+
+          <View style={styles.divider} />
+
+          <Column
+            style={{
+              alignItems: 'center',
+              gap: 15,
+            }}
+          >
+            <TouchableOpacity style={styles.buttonRegister} onPress={() => navigation.navigate('Register')}>
+              <View style={styles.buttonContent}>
+                <Text style={styles.buttonRegisterText}>Register</Text>
+              </View>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.buttonLogin}
+              onPress={() =>
+                navigation.navigate('Login', {
+                  needToVerify: false,
+                  email: null,
+                  password_: null,
+                  username_: null,
+                })
+              }
+            >
+              <View style={styles.buttonContent}>
+                <Text style={styles.buttonLoginText}>Log in</Text>
+              </View>
+            </TouchableOpacity>
+          </Column>
+        </Column>
+
+        <Column style={{ alignItems: 'center' }}>
+          <Text
+            style={{
+              marginBottom: height * 0.015,
+              fontSize: RFValue(12),
+              color: 'white',
+              fontFamily: 'Inter_400Regular',
+              opacity: 0.8,
+            }}
+          >
+            Or, continue with
+          </Text>
+
+          <Column
+            style={{
+              alignItems: 'center',
+              gap: 10,
+            }}
+          >
+            <TouchableOpacity
+              style={[
+                styles.buttonLogin,
+                {
+                  paddingHorizontal: 0,
+                  paddingVertical: 0,
+                  backgroundColor: 'black',
+                  borderColor: 'black',
+                  height: height * 0.06,
+                },
+              ]}
+              onPress={handleApplePress}
+              disabled={appleLoading}
+            >
+              {appleLoading ? (
+                <ActivityIndicator />
+              ) : (
+                <Row
+                  style={{
+                    width: '100%',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    height: height * 0.065,
+                    paddingHorizontal: width * 0.05,
+                  }}
+                >
+                  <MaterialCommunityIcons name={'apple'} size={24} color={'white'}></MaterialCommunityIcons>
+                  <Text style={[styles.buttonLoginText, { color: 'white', fontFamily: 'Inter_600SemiBold' }]}>
+                    Sign in with Apple
+                  </Text>
+                </Row>
+              )}
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[
+                styles.buttonLogin,
+                {
+                  paddingHorizontal: 0,
+                  paddingVertical: 0,
+                  backgroundColor: '#F2F2F2',
+                  borderColor: '#747775',
+                  borderWidth: 1,
+                  height: height * 0.06,
+                },
+              ]}
+              onPress={handleGooglePress}
+              disabled={googleLoading}
+            >
+              {googleLoading ? (
+                <ActivityIndicator />
+              ) : (
+                <Row
+                  style={{
+                    width: '100%',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    height: height * 0.065,
+                    paddingHorizontal: width * 0.05,
+                  }}
+                >
+                  <Image
+                    source={require('../assets/googleicon.png')}
+                    style={{ height: 28, aspectRatio: 1 }}
+                    contentFit="contain"
+                    cachePolicy="disk"
+                  />
+                  <Text style={[styles.buttonLoginText, { color: 'black', fontFamily: 'Inter_600SemiBold' }]}>
+                    Sign in with Google
+                  </Text>
+                </Row>
+              )}
+            </TouchableOpacity>
+          </Column>
+          <TouchableOpacity
+            style={styles.aboutUs}
+            onPress={() => Linking.openURL('https://strongtogether.kobihanoch.com/privacy')}
+          >
+            <View style={{ flexDirection: 'row', gap: 7, alignItems: 'center' }}>
+              <MaterialCommunityIcons name={'shield-lock'} size={RFValue(15)} color={'white'}></MaterialCommunityIcons>
+
+              <Text style={styles.aboutUsText}>Privacy Policy</Text>
+            </View>
+          </TouchableOpacity>
+        </Column>
+      </Column>
+    </LinearGradient>
+  );
+};
+
+export default Intro;
+
+const styles = StyleSheet.create({
+  descriptionText: {
+    textAlign: 'center',
+    color: 'white',
+    fontFamily: 'Inter_400Regular',
+    fontSize: RFValue(11),
+  },
+  divider: {
+    height: 0.5,
+    width: width * 0.7,
+    backgroundColor: 'white',
+    marginTop: height * 0.03,
+    marginBottom: height * 0.05,
+    opacity: 0.8,
+  },
+  buttonRegister: {
+    backgroundColor: '#f0f0f0',
+    height: height * 0.07,
+    paddingHorizontal: width * 0.05,
+    borderRadius: 18,
+    width: width * 0.6,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  buttonContent: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: '100%',
+    paddingVertical: height * 0.013,
+  },
+  buttonRegisterText: {
+    fontSize: width * 0.04,
+    color: '#007bff',
+    flex: 1,
+    textAlign: 'center',
+    fontFamily: 'Inter_700Bold',
+  },
+  buttonLogin: {
+    backgroundColor: 'transparent',
+    height: height * 0.07,
+    paddingHorizontal: width * 0.05,
+    borderRadius: 18,
+    alignSelf: 'center',
+    width: width * 0.6,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderColor: '#d5e4f5',
+    borderStyle: 'solid',
+    borderWidth: 1,
+  },
+  buttonLoginText: {
+    fontSize: width * 0.04,
+    color: 'white',
+    flex: 1,
+    textAlign: 'center',
+    fontFamily: 'Inter_400Regular',
+  },
+  aboutUs: {
+    marginTop: height * 0.03,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  aboutUsText: {
+    color: 'white',
+    marginRight: 10,
+    fontSize: width * 0.04,
+  },
+});
