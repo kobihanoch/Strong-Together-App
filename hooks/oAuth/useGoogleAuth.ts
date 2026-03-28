@@ -4,6 +4,7 @@ import * as Google from 'expo-auth-session/providers/google';
 import * as AuthSession from 'expo-auth-session';
 import { useCallback, useMemo } from 'react';
 import api from '../../api/api';
+import { OAuthLoginResponse } from '../../types/api/oAuth/responses';
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -76,7 +77,7 @@ export function useGoogleAuth() {
         throw { ok: false, error: 'Token exchange failed: missing id_token' };
       }
       // 4) Continue with your existing backend call (unchanged contract)
-      const { data } = await api.post('/api/oauth/google', { idToken });
+      const { data } = await api.post<OAuthLoginResponse>('/api/oauth/google', { idToken });
 
       return data;
     } catch (e) {

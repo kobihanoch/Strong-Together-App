@@ -3,13 +3,13 @@ export type GoogleOAuthBody = {
 };
 
 export type AppleOAuthBody = {
-  email: string;
-  idToken?: string | undefined;
-  rawNonce?: string | undefined;
-  name?:
+  email: string | null;
+  idToken: string | undefined;
+  rawNonce: string | undefined;
+  name:
     | {
-        givenName?: string | undefined;
-        familyName?: string | undefined;
+        givenName: string | null;
+        familyName: string | null;
       }
     | null
     | undefined;
