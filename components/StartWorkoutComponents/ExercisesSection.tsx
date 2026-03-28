@@ -177,7 +177,6 @@ const RenderItem = ({
           ) : (
             <Row>
               <NumberCounter numStart={0} numEnd={exProgress} duration={1000} style={styles.pctText} />
-              <Text style={styles.pctText}>%</Text>
             </Row>
           )}
         </PercantageCircle>
