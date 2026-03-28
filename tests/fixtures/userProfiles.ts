@@ -179,6 +179,12 @@ const baseExerciseTrackingMaps: AnalysisContextExerciseTrackingMaps = {
   },
 };
 
+const emptyExerciseTrackingMaps: AnalysisContextExerciseTrackingMaps = {
+  byDate: {},
+  byETSId: {},
+  bySplitName: {},
+};
+
 const baseAnalyzedExerciseTrackingData: AnalysisContextAnalyzedExerciseTrackingData = {
   pr: {
     maxReps: 10,
@@ -297,7 +303,9 @@ export const userWithoutWorkoutProfile: UserTestProfile = {
   user: cloneUser(),
   workout: null,
   workoutForEdit: null,
-  exerciseTrackingMaps: null,
+  exerciseTrackingMaps: {
+    ...emptyExerciseTrackingMaps,
+  },
   analyzedExerciseTrackingData: null,
 };
 
@@ -306,7 +314,9 @@ export const userWithWorkoutNoHistoryProfile: UserTestProfile = {
   user: cloneUser(),
   workout: cloneWorkout(),
   workoutForEdit: cloneWorkoutForEdit(),
-  exerciseTrackingMaps: null,
+  exerciseTrackingMaps: {
+    ...emptyExerciseTrackingMaps,
+  },
   analyzedExerciseTrackingData: null,
 };
 
