@@ -2,6 +2,7 @@ import type {
   AnalysisContextAnalyzedExerciseTrackingData,
   AnalysisContextExerciseTrackingMaps,
 } from '../../context/types/analysisContextTypes.dto';
+import type { CardioContextDailyMap, CardioContextWeeklyMap } from '../../context/types/cardioContextTypes.dto';
 import type { AppUser } from '../../context/types/authContextTypes.dto';
 import type { WholeUserWorkoutPlan, WorkoutSplitsMap } from '../../types/dto/workoutPlans.dto';
 
@@ -12,6 +13,8 @@ export interface UserTestProfile {
   workoutForEdit: WorkoutSplitsMap | null;
   exerciseTrackingMaps: AnalysisContextExerciseTrackingMaps | null;
   analyzedExerciseTrackingData: AnalysisContextAnalyzedExerciseTrackingData | null;
+  cardioDailyMap: CardioContextDailyMap | null;
+  cardioWeeklyMap: CardioContextWeeklyMap | null;
 }
 
 const baseUser: AppUser = {
@@ -203,6 +206,35 @@ const baseAnalyzedExerciseTrackingData: AnalysisContextAnalyzedExerciseTrackingD
   },
 };
 
+const emptyCardioDailyMap: CardioContextDailyMap = {};
+
+const baseCardioDailyMap: CardioContextDailyMap = {
+  '2026-03-27': [
+    {
+      type: 'Run',
+      duration_mins: 25,
+      duration_sec: 30,
+    },
+  ],
+};
+
+const emptyCardioWeeklyMap: CardioContextWeeklyMap = {};
+
+const baseCardioWeeklyMap: CardioContextWeeklyMap = {
+  '2026-03-23': {
+    records: [
+      {
+        type: 'Run',
+        duration_mins: 25,
+        duration_sec: 30,
+        workout_time_utc: '2026-03-27T06:00:00.000Z',
+      },
+    ],
+    total_duration_mins: 25,
+    total_duration_sec: 30,
+  },
+};
+
 const cloneUser = (): AppUser => ({
   ...baseUser,
 });
@@ -289,6 +321,21 @@ const cloneAnalyzedExerciseTrackingData = (): AnalysisContextAnalyzedExerciseTra
   },
 });
 
+const cloneCardioDailyMap = (): CardioContextDailyMap => ({
+  '2026-03-27': baseCardioDailyMap['2026-03-27'].map((record) => ({
+    ...record,
+  })),
+});
+
+const cloneCardioWeeklyMap = (): CardioContextWeeklyMap => ({
+  '2026-03-23': {
+    ...baseCardioWeeklyMap['2026-03-23'],
+    records: baseCardioWeeklyMap['2026-03-23'].records.map((record) => ({
+      ...record,
+    })),
+  },
+});
+
 export const guestProfile: UserTestProfile = {
   key: 'guest',
   user: null,
@@ -296,6 +343,8 @@ export const guestProfile: UserTestProfile = {
   workoutForEdit: null,
   exerciseTrackingMaps: null,
   analyzedExerciseTrackingData: null,
+  cardioDailyMap: null,
+  cardioWeeklyMap: null,
 };
 
 export const userWithoutWorkoutProfile: UserTestProfile = {
@@ -307,6 +356,12 @@ export const userWithoutWorkoutProfile: UserTestProfile = {
     ...emptyExerciseTrackingMaps,
   },
   analyzedExerciseTrackingData: null,
+  cardioDailyMap: {
+    ...emptyCardioDailyMap,
+  },
+  cardioWeeklyMap: {
+    ...emptyCardioWeeklyMap,
+  },
 };
 
 export const userWithWorkoutNoHistoryProfile: UserTestProfile = {
@@ -318,6 +373,12 @@ export const userWithWorkoutNoHistoryProfile: UserTestProfile = {
     ...emptyExerciseTrackingMaps,
   },
   analyzedExerciseTrackingData: null,
+  cardioDailyMap: {
+    ...emptyCardioDailyMap,
+  },
+  cardioWeeklyMap: {
+    ...emptyCardioWeeklyMap,
+  },
 };
 
 export const userWithWorkoutAndHistoryProfile: UserTestProfile = {
@@ -327,6 +388,8 @@ export const userWithWorkoutAndHistoryProfile: UserTestProfile = {
   workoutForEdit: cloneWorkoutForEdit(),
   exerciseTrackingMaps: cloneExerciseTrackingMaps(),
   analyzedExerciseTrackingData: cloneAnalyzedExerciseTrackingData(),
+  cardioDailyMap: cloneCardioDailyMap(),
+  cardioWeeklyMap: cloneCardioWeeklyMap(),
 };
 
 export const userProfiles = {
