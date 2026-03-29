@@ -16,6 +16,7 @@ import { WorkoutProvider } from './context/WorkoutContext';
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Constants from 'expo-constants';
+import { MaterialCommunityIcons as ExpoMaterialCommunityIcons } from '@expo/vector-icons';
 import { NotifierRoot } from 'react-native-notifier';
 import ensureDpopKeyPair from './api/DPoP/ensureDpopKeyPair';
 import { cacheHousekeepingOnBoot } from './cache/cacheUtils';
@@ -33,17 +34,24 @@ function useFontsReady() {
   const [ready, setReady] = useState(false);
   useEffect(() => {
     (async () => {
-      await Font.loadAsync({
-        PoppinsLight: require('./assets/fonts/Poppins-Light.ttf'),
-        Inter_400Regular,
-        Inter_700Bold,
-        Inter_500Medium,
-        Inter_600SemiBold,
-
-        // Add icon font
-        MaterialCommunityIcons: require('react-native-vector-icons/Fonts/MaterialCommunityIcons.ttf'),
-      });
-      setReady(true);
+      try {
+        console.log('[Fonts]: Loading app fonts');
+        await Font.loadAsync({
+          PoppinsLight: require('./assets/fonts/Poppins-Light.ttf'),
+          PoppinsRegular: require('./assets/fonts/Poppins-Regular.ttf'),
+          PoppinsBold: require('./assets/fonts/Poppins-Bold.ttf'),
+          Inter_400Regular,
+          Inter_700Bold,
+          Inter_500Medium,
+          Inter_600SemiBold,
+          ...ExpoMaterialCommunityIcons.font,
+        });
+        console.log('[Fonts]: Fonts ready');
+      } catch (error) {
+        console.error('[Fonts]: Failed to load fonts', error);
+      } finally {
+        setReady(true);
+      }
     })();
   }, []);
   return ready;
