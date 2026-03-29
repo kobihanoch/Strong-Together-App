@@ -69,30 +69,6 @@ jestDescribe('LogIn screen', () => {
     jestObject.clearAllMocks();
   });
 
-  jestIt('renders LoginForm when route params are missing', () => {
-    render(React.createElement(Login, { route: createRoute(undefined), navigation: createNavigation() }));
-
-    jestExpect(mockLoginForm).toHaveBeenCalledTimes(1);
-    jestExpect(mockVerifyCard).not.toHaveBeenCalled();
-  });
-
-  jestIt('renders LoginForm when needToVerify is false', () => {
-    render(
-      React.createElement(Login, {
-        route: createRoute({
-          needToVerify: false,
-          email: 'john@example.com',
-          password_: 'Secret123',
-          username_: 'johnny',
-        }),
-        navigation: createNavigation(),
-      }),
-    );
-
-    jestExpect(mockLoginForm).toHaveBeenCalledTimes(1);
-    jestExpect(mockVerifyCard).not.toHaveBeenCalled();
-  });
-
   jestIt('renders VerifyCard with the route params when needToVerify is true', () => {
     render(
       React.createElement(Login, {

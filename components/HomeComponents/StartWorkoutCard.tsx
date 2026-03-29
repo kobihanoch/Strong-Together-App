@@ -17,7 +17,6 @@ import { getBodyPartsForSplit } from '../../utils/homePageUtils';
 import Badge from '../Badge';
 import NumberCounter from '../NumberCounter';
 import PercantageCircle from '../PercentageCircle';
-import Row from '../Row';
 import SlideToStart from './SlideToStart';
 
 const { height } = Dimensions.get('window');
@@ -137,11 +136,9 @@ const StartWorkoutCard = ({ data }: StartWorkoutCardProps) => {
                     actualColor="white"
                     size={80}
                     duration={2000}
+                    style={{ overflow: 'visible' }}
                   >
-                    <Row>
-                      <NumberCounter numStart={0} numEnd={progress} duration={2000} style={styles.perText} />
-                      <Text style={styles.perText}>%</Text>
-                    </Row>
+                    <NumberCounter numStart={0} numEnd={progress} duration={2000} style={styles.perText} />
                   </PercantageCircle>
                 </Skeleton>
               ) : (

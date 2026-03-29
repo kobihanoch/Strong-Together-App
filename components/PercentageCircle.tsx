@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 import React, { ReactNode, useEffect, useRef } from 'react';
 import { View, StyleSheet, Dimensions, Animated, Easing, ViewStyle } from 'react-native';
 import Svg, { Circle, G } from 'react-native-svg';
@@ -31,25 +32,26 @@ const PercantageCircle = ({
   const c = 2 * Math.PI * r;
   const dashOffset = c * (1 - clamped / 100);
 
-  // Animate strokeDashoffset when percent/size/stroke change
-  const animatedOffset = useRef(new Animated.Value(dashOffset)).current;
+  const animatedOffset = useRef(new Animated.Value(c)).current;
+
   useEffect(() => {
     Animated.timing(animatedOffset, {
       toValue: dashOffset,
       duration: duration,
       easing: Easing.out(Easing.cubic),
-      useNativeDriver: false, // layout prop, must be false
+      useNativeDriver: true,
     }).start();
-  }, [dashOffset, animatedOffset]);
+
+    return () => {
+      animatedOffset.stopAnimation();
+    };
+  }, [dashOffset, duration, animatedOffset]);
 
   return (
     <View style={[{ width: size, height: size }, style]}>
       <Svg width={size} height={size}>
-        {/* Rotate -90 so progress starts at the top (12 o'clock) */}
         <G rotation="-90" origin={`${size / 2}, ${size / 2}`}>
-          {/* Track (full circle) */}
           <Circle cx={size / 2} cy={size / 2} r={r} stroke={fullColor} strokeWidth={stroke} fill="none" />
-          {/* Actual progress */}
           <AnimatedCircle
             cx={size / 2}
             cy={size / 2}
@@ -58,13 +60,13 @@ const PercantageCircle = ({
             strokeWidth={stroke}
             strokeLinecap="round"
             strokeDasharray={`${c} ${c}`}
+            // @ts-ignore
             strokeDashoffset={animatedOffset}
             fill="none"
           />
         </G>
       </Svg>
 
-      {/* Centered child overlay */}
       <View pointerEvents="none" style={styles.center}>
         {children}
       </View>
@@ -73,10 +75,12 @@ const PercantageCircle = ({
 };
 
 const styles = StyleSheet.create({
-  // Centers children inside the circle
   center: {
     position: 'absolute',
-    inset: 0,
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
     justifyContent: 'center',
     alignItems: 'center',
   },

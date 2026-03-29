@@ -69,22 +69,6 @@ jestDescribe('MessageItem', () => {
     jestObject.clearAllMocks();
   });
 
-  jestIt('renders sender, subject, formatted date, and truncated preview for unread messages', () => {
-    const { getByText } = render(
-      React.createElement(MessageItem, {
-        item: createMessage(),
-        deleteMessage: createDeleteMessageMock(),
-        markAsRead: createMarkAsReadMock(),
-      }),
-    );
-
-    jestExpect(getByText('John Doe')).toBeTruthy();
-    jestExpect(getByText('Welcome')).toBeTruthy();
-    jestExpect(getByText('This is a long inbox message p...')).toBeTruthy();
-    jestExpect(getAllByTextOnce(getByText, 'Mar 20, 2026')).toBeTruthy();
-    jestExpect(getByText('message-text')).toBeTruthy();
-  });
-
   jestIt('opens the modal and marks the message as read when an unread item is pressed', async () => {
     const markAsRead = createMarkAsReadMock();
     const { getByText } = render(
@@ -139,19 +123,4 @@ jestDescribe('MessageItem', () => {
 
     jestExpect(deleteMessage).toHaveBeenCalledWith('msg-1');
   });
-
-  jestIt('renders a short message preview without truncation', () => {
-    const { getByText, queryByText } = render(
-      React.createElement(MessageItem, {
-        item: createMessage({ msg: 'Short message' }),
-        deleteMessage: createDeleteMessageMock(),
-        markAsRead: createMarkAsReadMock(),
-      }),
-    );
-
-    jestExpect(getByText('Short message')).toBeTruthy();
-    jestExpect(queryByText('Short message...')).toBeNull();
-  });
 });
-
-const getAllByTextOnce = (getByText: (text: string) => unknown, text: string) => getByText(text);

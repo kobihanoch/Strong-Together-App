@@ -13,7 +13,6 @@ jest.mock('axios', () => ({
   AxiosError: class AxiosError extends Error {},
 }));
 
-const mockNavigate = jest.fn<(screen: string) => void>();
 const mockCacheGetJSON = jest.fn<(key: string) => Promise<unknown>>();
 const mockCacheSetJSON = jest.fn<(key: string, value: unknown, ttl: number) => Promise<void>>();
 const mockCacheDeleteAllCache = jest.fn<() => Promise<void>>();
@@ -21,17 +20,18 @@ const mockCacheDeleteAllCacheWithoutStartWorkout = jest.fn<() => Promise<void>>(
 const mockGetRefreshToken = jest.fn<() => Promise<string | null>>();
 const mockSaveRefreshToken = jest.fn<(token: string) => Promise<void>>();
 const mockClearRefreshToken = jest.fn<() => Promise<void>>();
-const mockRefreshAndRotateTokens =
-  jest.fn<() => Promise<{ accessToken: string; refreshToken: string; userId: string }>>();
+const mockRefreshAndRotateTokens = jest.fn<
+  () => Promise<{ accessToken: string; refreshToken: string; userId: string }>
+>();
 const mockFetchSelfUserData = jest.fn<() => Promise<typeof userWithWorkoutAndHistoryProfile.user>>();
 const mockGetUserWorkout = jest.fn<
-  () => Promise<{
-    workoutPlan: typeof userWithWorkoutAndHistoryProfile.workout;
-    workoutPlanForEditWorkout: typeof userWithWorkoutAndHistoryProfile.workoutForEdit;
-  }>
+  () =>
+    Promise<{
+      workoutPlan: typeof userWithWorkoutAndHistoryProfile.workout;
+      workoutPlanForEditWorkout: typeof userWithWorkoutAndHistoryProfile.workoutForEdit;
+    }>
 >();
-const mockAddWorkout = jest.fn<(payload: unknown) => Promise<any>>();
-const mockApiGet = jest.fn<(url: string) => Promise<{ data: unknown }>>();
+const mockGetUserExerciseTracking = jest.fn<() => Promise<ReturnType<typeof createPackedTrackingResponse>>>();
 const mockConnectSocket = jest.fn<(username: string) => Promise<void>>();
 const mockDisconnectSocket = jest.fn<() => void>();
 const mockUseNetworkStatus = jest.fn<() => boolean>();
@@ -39,24 +39,6 @@ const mockHasBootstrapPayload = jest.fn<() => boolean>();
 const mockResetBootstrap = jest.fn<() => void>();
 const mockSetAccessToken = jest.fn<(token: string | null) => void>();
 const mockSetUsernameInHeader = jest.fn<(username: string | null) => void>();
-const mockDialogShow = jest.fn<(payload: unknown) => void>();
-const mockDialogHide = jest.fn<() => void>();
-
-jest.mock('@react-navigation/native', () => ({
-  useNavigation: () => ({
-    navigate: (screen: string) => mockNavigate(screen),
-  }),
-}));
-
-jest.mock('react-native-alert-notification', () => ({
-  ALERT_TYPE: {
-    WARNING: 'WARNING',
-  },
-  Dialog: {
-    show: (payload: unknown) => mockDialogShow(payload),
-    hide: () => mockDialogHide(),
-  },
-}));
 
 jest.mock('@react-native-async-storage/async-storage', () => ({
   __esModule: true,
@@ -108,19 +90,7 @@ jest.mock('../../../services/UserService', () => ({
 
 jest.mock('../../../services/WorkoutService', () => ({
   getUserWorkout: () => mockGetUserWorkout(),
-  addWorkout: (payload: unknown) => mockAddWorkout(payload),
-}));
-
-jest.mock('../../../api/api', () => ({
-  __esModule: true,
-  default: {
-    get: (url: string) => mockApiGet(url),
-    defaults: {
-      headers: {
-        common: {},
-      },
-    },
-  },
+  getUserExerciseTracking: () => mockGetUserExerciseTracking(),
 }));
 
 jest.mock('../../../webSockets/socketConfig', () => ({
@@ -158,26 +128,26 @@ jest.mock('../../../utils/authUtils', () => ({
   },
 }));
 
-import { AuthProvider } from '../../../context/AuthContext';
+import { AnalysisProvider } from '../../../context/AnalysisContext';
+import { AuthProvider, useAuth } from '../../../context/AuthContext';
 import { GlobalAppLoadingProvider } from '../../../context/GlobalAppLoadingContext';
-import { WorkoutProvider, useWorkoutContext } from '../../../context/WorkoutContext';
-import useCreateWorkoutLogic from '../useCreateWorkoutLogic';
+import { WorkoutProvider } from '../../../context/WorkoutContext';
+import { useMyWorkoutPlanPageLogic } from '../useMyWorkoutPlanPageLogic';
 
 const wrapper = ({ children }: { children: React.ReactNode }) => (
   <GlobalAppLoadingProvider>
     <AuthProvider>
-      <WorkoutProvider>{children}</WorkoutProvider>
+      <WorkoutProvider>
+        <AnalysisProvider>{children}</AnalysisProvider>
+      </WorkoutProvider>
     </AuthProvider>
   </GlobalAppLoadingProvider>
 );
 
-const useIntegratedCreateWorkoutLogic = () => {
-  const workoutContext = useWorkoutContext();
-  const logic = useCreateWorkoutLogic();
-  return {
-    workoutContext,
-    logic,
-  };
+const useIntegratedMyWorkoutPlanLogic = () => {
+  const auth = useAuth();
+  const logic = useMyWorkoutPlanPageLogic();
+  return { auth, logic };
 };
 
 const createDeferred = <T,>() => {
@@ -196,47 +166,46 @@ const createNetworkAxiosError = (): AxiosError => {
   return err;
 };
 
-const createExercisesMapFromProfile = () => ({
-  Chest: [
-    {
-      id: userWithWorkoutNoHistoryProfile.workoutForEdit!.A[0].id,
-      name: userWithWorkoutNoHistoryProfile.workoutForEdit!.A[0].name,
-      specificTargetMuscle: userWithWorkoutNoHistoryProfile.workoutForEdit!.A[0].specifictargetmuscle,
+const createPackedTrackingResponse = () => ({
+  exerciseTrackingMaps: userWithWorkoutAndHistoryProfile.exerciseTrackingMaps!,
+  exerciseTrackingAnalysis: {
+    unique_days: userWithWorkoutAndHistoryProfile.analyzedExerciseTrackingData!.workoutCount,
+    most_frequent_split: userWithWorkoutAndHistoryProfile.analyzedExerciseTrackingData!.mostFrequentSplit.splitName,
+    most_frequent_split_days: userWithWorkoutAndHistoryProfile.analyzedExerciseTrackingData!.mostFrequentSplit.times,
+    lastWorkoutDate: userWithWorkoutAndHistoryProfile.analyzedExerciseTrackingData!.lastWorkoutDate,
+    splitDaysByName: userWithWorkoutAndHistoryProfile.analyzedExerciseTrackingData!.splitDaysByName,
+    prs: {
+      pr_max: {
+        exercise: userWithWorkoutAndHistoryProfile.analyzedExerciseTrackingData!.pr.maxExercise!,
+        weight: userWithWorkoutAndHistoryProfile.analyzedExerciseTrackingData!.pr.maxWeight,
+        reps: userWithWorkoutAndHistoryProfile.analyzedExerciseTrackingData!.pr.maxReps,
+        workout_time_utc: userWithWorkoutAndHistoryProfile.analyzedExerciseTrackingData!.pr.maxDate,
+      },
     },
-  ],
-  Back: [
-    {
-      id: userWithWorkoutNoHistoryProfile.workoutForEdit!.B[0].id,
-      name: userWithWorkoutNoHistoryProfile.workoutForEdit!.B[0].name,
-      specificTargetMuscle: userWithWorkoutNoHistoryProfile.workoutForEdit!.B[0].specifictargetmuscle,
-    },
-  ],
-});
-
-const createAddWorkoutResponseFromProfile = () => ({
-  message: 'Workout saved successfully',
-  workoutPlan: userWithWorkoutNoHistoryProfile.workout!,
-  workoutPlanForEditWorkout: userWithWorkoutNoHistoryProfile.workoutForEdit!,
+  },
 });
 
 const setupCacheForScenario = ({
   userId,
   auth,
   workout,
+  analysis,
 }: {
   userId: string | null;
   auth?: unknown;
   workout?: unknown;
+  analysis?: unknown;
 }) => {
   mockCacheGetJSON.mockImplementation(async (key: string) => {
     if (key === 'CACHE:USER_ID') return userId;
     if (key.startsWith('CACHE:AUTH:')) return auth ?? null;
     if (key.startsWith('CACHE:WORKOUTPLAN:')) return workout ?? null;
+    if (key.startsWith('CACHE:TRACKING:')) return analysis ?? null;
     return null;
   });
 };
 
-describe('useCreateWorkoutLogic integration', () => {
+describe('useMyWorkoutPlanPageLogic integration', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockUseNetworkStatus.mockReturnValue(true);
@@ -249,12 +218,9 @@ describe('useCreateWorkoutLogic integration', () => {
     mockCacheDeleteAllCacheWithoutStartWorkout.mockResolvedValue(undefined);
     mockConnectSocket.mockResolvedValue(undefined);
     mockDisconnectSocket.mockReturnValue(undefined);
-    mockApiGet.mockResolvedValue({
-      data: createExercisesMapFromProfile(),
-    });
   });
 
-  it('starts from the default empty builder state while auth is still hydrating', async () => {
+  it('starts empty while auth is still hydrating and the user is still null', async () => {
     setupCacheForScenario({ userId: 'user-1' });
     mockRefreshAndRotateTokens.mockResolvedValue({
       accessToken: 'access-token',
@@ -267,24 +233,72 @@ describe('useCreateWorkoutLogic integration', () => {
       workoutPlan: typeof userWithWorkoutAndHistoryProfile.workout;
       workoutPlanForEditWorkout: typeof userWithWorkoutAndHistoryProfile.workoutForEdit;
     }>();
+    const trackingDeferred = createDeferred<ReturnType<typeof createPackedTrackingResponse>>();
 
     mockFetchSelfUserData.mockReturnValue(userDeferred.promise);
     mockGetUserWorkout.mockReturnValue(workoutDeferred.promise);
+    mockGetUserExerciseTracking.mockReturnValue(trackingDeferred.promise);
 
-    const { result } = renderHook(() => useIntegratedCreateWorkoutLogic(), { wrapper });
+    const { result } = renderHook(() => useIntegratedMyWorkoutPlanLogic(), { wrapper });
 
     await waitFor(() => {
-      expect(result.current.logic.selectedSplit).toBe('A');
+      expect(result.current.auth.user).toBeNull();
     });
 
-    expect(result.current.logic.selectedExercises).toEqual({ A: [] });
     expect(result.current.logic.hasWorkout).toBe(false);
-    expect(result.current.logic.exForSplit).toEqual([]);
-    expect(result.current.logic.totalExercises).toBe(0);
-    expect(result.current.logic.exerciseCountMap).toEqual({ A: 0 });
+    expect(result.current.logic.selectedSplit).toBeNull();
+    expect(result.current.logic.filteredExercises).toBeUndefined();
+    expect(result.current.logic.exerciseCounter).toBeUndefined();
+    expect(result.current.logic.splitTrainedCount).toBeUndefined();
+    expect(result.current.logic.hasTrainedToday).toBe(false);
+
+    userDeferred.resolve(userWithWorkoutAndHistoryProfile.user);
+    workoutDeferred.resolve({
+      workoutPlan: userWithWorkoutAndHistoryProfile.workout,
+      workoutPlanForEditWorkout: userWithWorkoutAndHistoryProfile.workoutForEdit,
+    });
+    trackingDeferred.resolve(createPackedTrackingResponse());
+
+    await waitFor(() => {
+      expect(result.current.logic.hasWorkout).toBe(true);
+    });
+
+    expect(result.current.logic.selectedSplit?.name).toBe('A');
   });
 
-  it('hydrates edit mode from the workout context and uses the existing workoutForEdit profile data', async () => {
+  it('hydrates a signed-in user without a workout and keeps the hook in the empty plan state', async () => {
+    setupCacheForScenario({
+      userId: 'user-1',
+      auth: userWithoutWorkoutProfile.user,
+      workout: {
+        workoutPlan: userWithoutWorkoutProfile.workout,
+        workoutPlanForEditWorkout: userWithoutWorkoutProfile.workoutForEdit,
+      },
+      analysis: {
+        exerciseTrackingMaps: userWithoutWorkoutProfile.exerciseTrackingMaps,
+        exerciseTrackingAnalysisUnpacked: userWithoutWorkoutProfile.analyzedExerciseTrackingData,
+      },
+    });
+    mockRefreshAndRotateTokens.mockRejectedValue(createNetworkAxiosError());
+
+    const { result } = renderHook(() => useIntegratedMyWorkoutPlanLogic(), { wrapper });
+
+    await waitFor(() => {
+      expect(result.current.auth.user?.id).toBe('user-1');
+    });
+
+    expect(result.current.logic.workout).toBeNull();
+    expect(result.current.logic.hasWorkout).toBe(false);
+    expect(result.current.logic.workoutSplits).toEqual([]);
+    expect(result.current.logic.allExercises).toEqual({});
+    expect(result.current.logic.selectedSplit).toBeNull();
+    expect(result.current.logic.filteredExercises).toBeUndefined();
+    expect(result.current.logic.splitTrainedCount).toBeUndefined();
+    expect(result.current.logic.exerciseCounter).toBeUndefined();
+    expect(result.current.logic.hasTrainedToday).toBe(false);
+  });
+
+  it('hydrates a user with a workout and no history, selects the first split, and updates exercises when the split changes', async () => {
     setupCacheForScenario({
       userId: 'user-1',
       auth: userWithWorkoutNoHistoryProfile.user,
@@ -292,154 +306,90 @@ describe('useCreateWorkoutLogic integration', () => {
         workoutPlan: userWithWorkoutNoHistoryProfile.workout,
         workoutPlanForEditWorkout: userWithWorkoutNoHistoryProfile.workoutForEdit,
       },
+      analysis: {
+        exerciseTrackingMaps: userWithWorkoutNoHistoryProfile.exerciseTrackingMaps,
+        exerciseTrackingAnalysisUnpacked: userWithWorkoutNoHistoryProfile.analyzedExerciseTrackingData,
+      },
     });
     mockRefreshAndRotateTokens.mockRejectedValue(createNetworkAxiosError());
 
-    const { result } = renderHook(() => useIntegratedCreateWorkoutLogic(), { wrapper });
+    const { result } = renderHook(() => useIntegratedMyWorkoutPlanLogic(), { wrapper });
 
     await waitFor(() => {
       expect(result.current.logic.hasWorkout).toBe(true);
     });
 
-    expect(result.current.logic.selectedExercises).toEqual(userWithWorkoutNoHistoryProfile.workoutForEdit);
-    expect(result.current.logic.splitsList).toEqual(['A', 'B']);
-    expect(result.current.logic.exForSplit).toEqual(userWithWorkoutNoHistoryProfile.workoutForEdit?.A);
-    expect(result.current.logic.exerciseCountMap).toEqual({
+    expect(result.current.logic.selectedSplit).toEqual({
+      id: 11,
+      name: 'A',
+      muscleGroup: 'Chest(Major)',
+    });
+    expect(result.current.logic.filteredExercises).toEqual(
+      userWithWorkoutNoHistoryProfile.workout?.workoutsplits?.[0].exercisetoworkoutsplit,
+    );
+    expect(result.current.logic.exerciseCounter).toEqual({
       A: 1,
       B: 1,
     });
-    expect(result.current.logic.totalExercises).toBe(2);
-    expect(result.current.logic.muscles).toEqual(['All', 'Chest', 'Back']);
-  });
-
-  it('blocks save when the workout has an empty split and shows the validation dialog', async () => {
-    setupCacheForScenario({
-      userId: 'user-1',
-      auth: userWithoutWorkoutProfile.user,
-      workout: {
-        workoutPlan: userWithoutWorkoutProfile.workout,
-        workoutPlanForEditWorkout: userWithoutWorkoutProfile.workoutForEdit,
-      },
-    });
-    mockRefreshAndRotateTokens.mockRejectedValue(createNetworkAxiosError());
-
-    const { result } = renderHook(() => useIntegratedCreateWorkoutLogic(), { wrapper });
-
-    await waitFor(() => {
-      expect(result.current.logic.selectedExercises).toEqual({ A: [] });
-    });
+    expect(result.current.logic.splitTrainedCount).toBeUndefined();
+    expect(result.current.logic.hasTrainedToday).toBe(false);
 
     await act(async () => {
-      await result.current.logic.saveWorkout();
+      result.current.logic.handleWorkoutSplitPress({
+        id: 12,
+        name: 'B',
+        muscleGroup: 'Back(Lats)',
+      });
     });
 
-    expect(mockAddWorkout).not.toHaveBeenCalled();
-    expect(mockDialogShow).toHaveBeenCalledWith(
-      expect.objectContaining({
-        title: 'Workout is incomplete',
-      }),
+    expect(result.current.logic.selectedSplit).toEqual({
+      id: 12,
+      name: 'B',
+      muscleGroup: 'Back(Lats)',
+    });
+    expect(result.current.logic.filteredExercises).toEqual(
+      userWithWorkoutNoHistoryProfile.workout?.workoutsplits?.[1].exercisetoworkoutsplit,
     );
   });
 
-  it('adds exercises, saves a new workout, updates the workout context, and navigates to MyWorkoutPlan', async () => {
+  it('hydrates a user with workout history and derives the trained count for the selected split from analysis data', async () => {
     setupCacheForScenario({
       userId: 'user-1',
-      auth: userWithoutWorkoutProfile.user,
+      auth: userWithWorkoutAndHistoryProfile.user,
       workout: {
-        workoutPlan: userWithoutWorkoutProfile.workout,
-        workoutPlanForEditWorkout: userWithoutWorkoutProfile.workoutForEdit,
+        workoutPlan: userWithWorkoutAndHistoryProfile.workout,
+        workoutPlanForEditWorkout: userWithWorkoutAndHistoryProfile.workoutForEdit,
       },
-    });
-    mockRefreshAndRotateTokens.mockRejectedValue(createNetworkAxiosError());
-    mockAddWorkout.mockResolvedValue(createAddWorkoutResponseFromProfile());
-
-    const { result } = renderHook(() => useIntegratedCreateWorkoutLogic(), { wrapper });
-
-    await waitFor(() => {
-      expect(result.current.logic.availableExercises).toEqual(createExercisesMapFromProfile());
-    });
-
-    await act(async () => {
-      result.current.logic.controls.addExercise({
-        id: 1,
-        name: 'Bench Press',
-        targetmuscle: 'Chest',
-        specificTargetMuscle: 'Major',
-      });
-    });
-
-    expect(result.current.logic.selectedExercises).toEqual({
-      A: [
-        {
-          id: 1,
-          name: 'Bench Press',
-          targetmuscle: 'Chest',
-          specificTargetMuscle: 'Major',
-          sets: [10, 10, 10],
-          order_index: 0,
-        },
-      ],
-    });
-
-    await act(async () => {
-      await result.current.logic.saveWorkout();
-    });
-
-    await waitFor(() => {
-      expect(result.current.workoutContext.workout).toEqual(userWithWorkoutNoHistoryProfile.workout);
-    });
-
-    expect(result.current.workoutContext.workoutForEdit).toEqual(userWithWorkoutNoHistoryProfile.workoutForEdit);
-    expect(result.current.logic.hasWorkout).toBe(true);
-    expect(mockNavigate).toHaveBeenCalledWith('MyWorkoutPlan');
-  });
-
-  it('prevents duplicate save requests while a save is already in flight and resets isSaving after a failure', async () => {
-    setupCacheForScenario({
-      userId: 'user-1',
-      auth: userWithoutWorkoutProfile.user,
-      workout: {
-        workoutPlan: userWithoutWorkoutProfile.workout,
-        workoutPlanForEditWorkout: userWithoutWorkoutProfile.workoutForEdit,
+      analysis: {
+        exerciseTrackingMaps: userWithWorkoutAndHistoryProfile.exerciseTrackingMaps,
+        exerciseTrackingAnalysisUnpacked: userWithWorkoutAndHistoryProfile.analyzedExerciseTrackingData,
       },
     });
     mockRefreshAndRotateTokens.mockRejectedValue(createNetworkAxiosError());
 
-    const deferred = createDeferred<ReturnType<typeof createAddWorkoutResponseFromProfile>>();
-    mockAddWorkout.mockReturnValue(deferred.promise);
-
-    const { result } = renderHook(() => useIntegratedCreateWorkoutLogic(), { wrapper });
+    const { result } = renderHook(() => useIntegratedMyWorkoutPlanLogic(), { wrapper });
 
     await waitFor(() => {
-      expect(result.current.logic.availableExercises).toEqual(createExercisesMapFromProfile());
+      expect(result.current.logic.selectedSplit?.name).toBe('A');
     });
 
+    expect(result.current.logic.splitTrainedCount).toBe(1);
+    expect(result.current.logic.exerciseCounter).toEqual({
+      A: 1,
+      B: 1,
+    });
+    expect(result.current.logic.hasTrainedToday).toBe(false);
+
     await act(async () => {
-      result.current.logic.controls.addExercise({
-        id: 1,
-        name: 'Bench Press',
-        targetmuscle: 'Chest',
-        specificTargetMuscle: 'Major',
+      result.current.logic.setSelectedSplit({
+        id: 12,
+        name: 'B',
+        muscleGroup: 'Back(Lats)',
       });
     });
 
-    act(() => {
-      result.current.logic.saveWorkout();
-      result.current.logic.saveWorkout();
-    });
-
-    expect(mockAddWorkout).toHaveBeenCalledTimes(1);
-    expect(result.current.logic.loadings.isSaving).toBe(true);
-
-    await act(async () => {
-      deferred.reject(new Error('save failed'));
-      try {
-        await deferred.promise;
-      } catch {}
-    });
-
-    await waitFor(() => {
-      expect(result.current.logic.loadings.isSaving).toBe(false);
-    });
+    expect(result.current.logic.selectedSplit?.name).toBe('B');
+    expect(result.current.logic.splitTrainedCount).toBe(0);
+    expect(result.current.logic.filteredExercises?.[0].exercise).toBe('Lat Pulldown');
   });
 });

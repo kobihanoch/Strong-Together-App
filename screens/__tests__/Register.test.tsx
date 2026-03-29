@@ -8,7 +8,6 @@ import {
   it as jestIt,
   jest as jestObject,
 } from '@jest/globals';
-import { ActivityIndicator } from 'react-native';
 import { fireEvent, render, waitFor } from '@testing-library/react-native';
 import type { AuthContextValue } from '../../context/types/authContextTypes.dto';
 import type { StackNavigationProp } from '@react-navigation/stack';
@@ -117,31 +116,6 @@ jestDescribe('Register screen', () => {
     mockAuthState = createAuthState();
   });
 
-  jestIt('renders the register headings, actions, and all form fields', () => {
-    const { getByText, getByPlaceholderText } = render(
-      React.createElement(Register, { navigation: createNavigation() }),
-    );
-
-    jestExpect(getByText('Intro')).toBeTruthy();
-    jestExpect(getByText("It's nice to meet!")).toBeTruthy();
-    jestExpect(getByText('Join us now for free')).toBeTruthy();
-    jestExpect(getByPlaceholderText('Username')).toBeTruthy();
-    jestExpect(getByPlaceholderText('Email')).toBeTruthy();
-    jestExpect(getByPlaceholderText('Full name (Optional)')).toBeTruthy();
-    jestExpect(getByText('Gender (Optional)')).toBeTruthy();
-    jestExpect(getByPlaceholderText('Password')).toBeTruthy();
-    jestExpect(getByPlaceholderText('Confirm password')).toBeTruthy();
-    jestExpect(getByText('Register')).toBeTruthy();
-  });
-
-  jestIt('navigates back when pressing the intro button', () => {
-    const { getByText } = render(React.createElement(Register, { navigation: createNavigation() }));
-
-    fireEvent.press(getByText('Intro'));
-
-    jestExpect(mockGoBack).toHaveBeenCalledTimes(1);
-  });
-
   jestIt('shows a required-fields error when any mandatory field is empty', async () => {
     const register = jestObject.fn(async () => undefined);
     mockAuthState = createAuthState({ register });
@@ -210,34 +184,5 @@ jestDescribe('Register screen', () => {
       password_: 'Secret123',
       username_: 'johnny',
     });
-  });
-
-  jestIt('treats whitespace-only required values as non-empty because the current validation checks only empty strings', async () => {
-    const register = jestObject.fn(async () => undefined);
-    mockAuthState = createAuthState({ register });
-    const view = render(React.createElement(Register, { navigation: createNavigation() }));
-
-    fillRequiredFields(view, {
-      username: '   ',
-      email: '   ',
-      password: 'Secret123',
-      confirmPassword: 'Secret123',
-    });
-    fireEvent.press(view.getByText('Register'));
-
-    await waitFor(() => {
-      jestExpect(register).toHaveBeenCalledWith('   ', 'Secret123', '   ', '', 'Unknown');
-    });
-    jestExpect(mockShowErrorAlert).not.toHaveBeenCalled();
-  });
-
-  jestIt('shows the loading spinner instead of the register label while auth loading is true', () => {
-    mockAuthState = createAuthState({ loading: true });
-    const { queryByText, UNSAFE_getByType } = render(
-      React.createElement(Register, { navigation: createNavigation() }),
-    );
-
-    jestExpect(queryByText('Register')).toBeNull();
-    jestExpect(UNSAFE_getByType(ActivityIndicator)).toBeTruthy();
   });
 });

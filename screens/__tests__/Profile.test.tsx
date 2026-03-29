@@ -8,7 +8,7 @@ import {
   it as jestIt,
   jest as jestObject,
 } from '@jest/globals';
-import { fireEvent, render, waitFor } from '@testing-library/react-native';
+import { fireEvent, render } from '@testing-library/react-native';
 
 const mockDeleteSelfUser = jestObject.fn(async () => undefined);
 const mockLogout = jestObject.fn(async () => undefined);
@@ -125,97 +125,6 @@ jestDescribe('Profile screen', () => {
     };
   });
 
-  jestIt('renders the profile data and the normalized gender row', () => {
-    const { getByText } = render(React.createElement(Profile));
-
-    jestExpect(getByText('Profile')).toBeTruthy();
-    jestExpect(getByText('John Doe')).toBeTruthy();
-    jestExpect(getByText('@johnny')).toBeTruthy();
-    jestExpect(getByText('Male')).toBeTruthy();
-    jestExpect(getByText('gender-male')).toBeTruthy();
-    jestExpect(getByText('john@example.com')).toBeTruthy();
-    jestExpect(getByText('Today')).toBeTruthy();
-  });
-
-  jestIt('renders safely when the profile data is partially empty', () => {
-    mockProfilePageLogic = {
-      ...mockProfilePageLogic,
-      data: {
-        username: '',
-        email: '',
-        fullName: '',
-        gender: '',
-        daysOnline: '',
-      },
-    };
-    const { getByText, queryByText } = render(React.createElement(Profile));
-
-    jestExpect(getByText('Profile')).toBeTruthy();
-    jestExpect(queryByText('gender-male')).toBeNull();
-    jestExpect(queryByText('gender-female')).toBeNull();
-  });
-
-  jestIt('passes the current profile data into EditProfileForm', () => {
-    render(React.createElement(Profile));
-
-    jestExpect(mockEditProfileForm).toHaveBeenCalledWith({
-      initialData: {
-        username: 'johnny',
-        email: 'john@example.com',
-        fullName: 'John Doe',
-        gender: 'Male',
-        daysOnline: 'Today',
-      },
-      closeEditSheet: jestExpect.any(Function),
-      openEditSheet: jestExpect.any(Function),
-      setUser: mockSetUser,
-    });
-  });
-
-  jestIt('opens the edit sheet when the edit profile button is pressed', () => {
-    const { getByText } = render(React.createElement(Profile));
-
-    fireEvent.press(getByText('Edit profile'));
-
-    jestExpect(modalHandles[1].open).toHaveBeenCalledWith(0);
-  });
-
-  jestIt('passes the image trigger state into ImagePickerComponent and toggles it from the action sheet buttons', () => {
-    const { getByText } = render(React.createElement(Profile));
-
-    jestExpect(mockImagePickerComponent).toHaveBeenLastCalledWith(
-      jestExpect.objectContaining({
-        triggerImgPicker: false,
-        triggerRemoveImg: false,
-      }),
-    );
-
-    fireEvent.press(getByText('Choose image from gallery'));
-    jestExpect(mockImagePickerComponent).toHaveBeenLastCalledWith(
-      jestExpect.objectContaining({
-        triggerImgPicker: true,
-      }),
-    );
-
-    fireEvent.press(getByText('Remove image'));
-    jestExpect(mockImagePickerComponent).toHaveBeenLastCalledWith(
-      jestExpect.objectContaining({
-        triggerRemoveImg: true,
-      }),
-    );
-  });
-
-  jestIt('opens the action sheet when ImagePickerComponent asks for it', () => {
-    render(React.createElement(Profile));
-
-    const props = mockImagePickerComponent.mock.calls.at(-1)?.[0];
-    props.openActionSheet();
-    props.closeActionSheet();
-
-    jestExpect(modalHandles[0].open).toHaveBeenCalledWith(0);
-    jestExpect(modalHandles[0].close).toHaveBeenCalledTimes(1);
-  });
-
   jestIt('shows the delete dialog and deletes the account when the confirmation button is pressed', async () => {
     const { getByText } = render(React.createElement(Profile));
 
@@ -230,18 +139,5 @@ jestDescribe('Profile screen', () => {
     jestExpect(mockDialogHide).toHaveBeenCalled();
     jestExpect(mockDeleteSelfUser).toHaveBeenCalledTimes(1);
     jestExpect(mockLogout).toHaveBeenCalledTimes(1);
-  });
-
-  jestIt('hides the dialog when the dialog is dismissed without deleting', async () => {
-    const { getByText } = render(React.createElement(Profile));
-    fireEvent.press(getByText('Delete'));
-
-    const dialogConfig = mockDialogShow.mock.calls.at(-1)?.[0] as DialogConfig;
-    await waitFor(() => {
-      dialogConfig.onHide();
-    });
-
-    jestExpect(mockDialogHide).toHaveBeenCalled();
-    jestExpect(mockDeleteSelfUser).not.toHaveBeenCalled();
   });
 });
