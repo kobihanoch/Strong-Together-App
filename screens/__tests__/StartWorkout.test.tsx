@@ -246,9 +246,13 @@ jestDescribe('StartWorkout screen', () => {
     await waitFor(() => {
       jestExpect(mockModalRegistry.open).toHaveBeenCalledWith(0);
     });
-    jestExpect(mockAnalyzeExerciseSheet).toHaveBeenLastCalledWith({
-      selectedExercise: expect.objectContaining({ exercise: 'Bench Press' }),
-    });
+    jestExpect(mockAnalyzeExerciseSheet).toHaveBeenLastCalledWith(
+      expect.objectContaining({
+        selectedExercise: expect.objectContaining({ exercise: 'Bench Press' }),
+        analysisOverview: expect.objectContaining({ status: 'idle' }),
+        onAnalysisOverviewChange: expect.any(Function),
+      }),
+    );
   });
 
   jestIt('shows the finish confirmation and saves the workout only after confirmation', async () => {

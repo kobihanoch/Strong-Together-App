@@ -61,6 +61,7 @@ interface SlidingBottomModalProps {
   children?: ReactNode;
   enableBackDrop?: boolean;
   enablePanDownClose?: boolean;
+  onChange?: (index: number) => void;
 }
 
 const SlidingBottomModal = forwardRef<SlidingBottomModalRef, SlidingBottomModalProps>(function SlidingBottomModal(
@@ -75,6 +76,7 @@ const SlidingBottomModal = forwardRef<SlidingBottomModalRef, SlidingBottomModalP
     children,
     enableBackDrop = true,
     enablePanDownClose = true,
+    onChange,
   },
   ref,
 ) {
@@ -144,6 +146,7 @@ const SlidingBottomModal = forwardRef<SlidingBottomModalRef, SlidingBottomModalP
         enablePanDownToClose={enablePanDownClose}
         handleComponent={Handle}
         backgroundStyle={styles.sheetBg}
+        {...(onChange ? { onChange: (index: number) => onChange(index) } : {})}
       >
         {flatListUsage ? (
           <BottomSheetFlatList

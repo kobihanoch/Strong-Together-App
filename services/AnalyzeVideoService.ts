@@ -1,7 +1,13 @@
-import axios from 'axios';
 import api from '../api/api';
+import { backgroundUpload, UploadType, UploaderHttpMethod } from 'react-native-compressor';
 import { GetPresignedUrlFromS3Response, PublishVideoAnalysisJobResponse } from '../types/api/videoAnalysis/responses';
 import { GetPresignedUrlFromS3Body, PublishVideoAnalysisJobBody } from './../types/api/videoAnalysis/requests';
+
+type UploadVideoToS3Options = {
+  onProgress?: (progress: number) => void;
+  onRegisterCancellationId?: (cancellationId: string) => void;
+  abortSignal?: AbortSignal;
+};
 
 export const getPresignedUrlFromS3 = async (
   body: GetPresignedUrlFromS3Body,
@@ -10,18 +16,35 @@ export const getPresignedUrlFromS3 = async (
   return data;
 };
 
-export const uploadVideoToS3 = async (uploadUrl: string, blob: Blob, fileType: string): Promise<void> => {
-  await axios.put(uploadUrl, blob, {
+export const uploadVideoToS3 = async (
+  uploadUrl: string,
+  fileUri: string,
+  fileType: string,
+  options?: UploadVideoToS3Options,
+): Promise<void> => {
+  const uploadOptions = {
+    httpMethod: UploaderHttpMethod.PUT,
+    uploadType: UploadType.BINARY_CONTENT,
+    mimeType: fileType,
     headers: {
       'Content-Type': fileType,
     },
-    onUploadProgress: (progressEvent) => {
-      if (progressEvent.total) {
-        const progress = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+    ...(options?.onRegisterCancellationId ? { getCancellationId: options.onRegisterCancellationId } : {}),
+  };
+
+  await backgroundUpload(
+    uploadUrl,
+    fileUri,
+    uploadOptions,
+    (written, total) => {
+      if (total) {
+        const progress = Math.round((written * 100) / total);
         console.log(`Uploading to S3: ${progress}%`);
+        options?.onProgress?.(progress);
       }
     },
-  });
+    options?.abortSignal,
+  );
 };
 
 export const publishAnalyzeJobToServer = async (body: PublishVideoAnalysisJobBody) => {

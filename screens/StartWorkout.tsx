@@ -1,5 +1,5 @@
-import React, { useCallback, useRef, useState } from 'react';
-import { Dimensions, StyleSheet, View } from 'react-native';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { Dimensions, StyleSheet, View, Vibration } from 'react-native';
 import { ALERT_TYPE, Dialog } from 'react-native-alert-notification';
 import { RFValue } from 'react-native-responsive-fontsize';
 import SlidingBottomModal, { SlidingBottomModalRef } from '../components/SlidingBottomModal';
@@ -7,13 +7,27 @@ import AnalyzeExerciseSheet from '../components/StartWorkoutComponents/AnalyzeEx
 import ExercisesSection from '../components/StartWorkoutComponents/ExercisesSection';
 import LastWorkoutData from '../components/StartWorkoutComponents/LastWorkoutData';
 import TopBar from '../components/StartWorkoutComponents/TopBar';
+import { showErrorAlert } from '../errors/errorAlerts';
 import useStartWorkoutPageLogic from '../hooks/logic/useStartWorkoutPageLogic';
 import { RootParamList } from '../navigation/types/appStackTypes';
 import { StackScreenProps } from '@react-navigation/stack';
 import { TrackingMapItem } from '../types/dto/exerciseTracking.dto';
+import { AnalyzeVideoResultPayload, SquatRepetition } from '../types/dto/videoAnalysis.dto';
 import { ExerciseInPlan } from '../types/dto/workoutPlans.dto';
 
 const { width, height } = Dimensions.get('window');
+
+export type ExerciseAnalysisOverview = {
+  exerciseId: ExerciseInPlan['id'] | null;
+  exerciseName: ExerciseInPlan['exercise'] | null;
+  status: 'idle' | 'processing' | 'completed' | 'failed';
+  resultCount: number;
+};
+
+export type CachedExerciseAnalysis = {
+  overview: ExerciseAnalysisOverview;
+  result: AnalyzeVideoResultPayload<SquatRepetition> | null;
+};
 
 const StartWorkout = ({ route }: StackScreenProps<RootParamList, 'StartWorkout'>) => {
   const {
@@ -28,6 +42,16 @@ const StartWorkout = ({ route }: StackScreenProps<RootParamList, 'StartWorkout'>
     setIndex: number;
   } | null>(null);
   const [selectedExerciseForAnalysis, setSelectedExerciseForAnalysis] = useState<ExerciseInPlan | null>(null);
+  const [analyzeModalIndex, setAnalyzeModalIndex] = useState(-1);
+  const [analysisOverview, setAnalysisOverview] = useState<ExerciseAnalysisOverview>({
+    exerciseId: null,
+    exerciseName: null,
+    status: 'idle',
+    resultCount: 0,
+  });
+  const [lastAnalysis, setLastAnalysis] = useState<CachedExerciseAnalysis | null>(null);
+  const previousAnalysisStatusRef = useRef<ExerciseAnalysisOverview['status']>('idle');
+  const shouldAutoOpenCompletedAnalysisRef = useRef(false);
 
   const modalRef = useRef<SlidingBottomModalRef | null>(null);
   const analyzeModalRef = useRef<SlidingBottomModalRef | null>(null);
@@ -35,9 +59,83 @@ const StartWorkout = ({ route }: StackScreenProps<RootParamList, 'StartWorkout'>
     modalRef?.current?.open?.(0);
   }, []);
   const openAnalyzeModal = useCallback((exercise: ExerciseInPlan) => {
+    if (analysisOverview.status === 'processing' && analysisOverview.exerciseId !== exercise.id) {
+      showErrorAlert(
+        'Analysis in progress',
+        `Finish the current ${analysisOverview.exerciseName ?? 'exercise'} analysis before starting another video.`,
+      );
+      return;
+    }
+
     setSelectedExerciseForAnalysis(exercise);
     analyzeModalRef?.current?.open?.(0);
-  }, []);
+  }, [analysisOverview.exerciseId, analysisOverview.exerciseName, analysisOverview.status]);
+
+  useEffect(() => {
+    const previousStatus = previousAnalysisStatusRef.current;
+
+    if (analysisOverview.status === 'processing' && analyzeModalIndex === -1) {
+      shouldAutoOpenCompletedAnalysisRef.current = true;
+    }
+
+    if (
+      previousStatus === 'processing' &&
+      analysisOverview.status === 'completed' &&
+      analysisOverview.exerciseId &&
+      shouldAutoOpenCompletedAnalysisRef.current &&
+      analyzeModalIndex === -1
+    ) {
+      const matchingExercise =
+        workoutData?.exercisesForSelectedSplit?.find((exercise) => exercise.id === analysisOverview.exerciseId) ?? null;
+
+      if (matchingExercise) {
+        Vibration.vibrate([0, 160, 70, 160]);
+        setSelectedExerciseForAnalysis(matchingExercise);
+        analyzeModalRef.current?.open?.(0);
+      }
+
+      shouldAutoOpenCompletedAnalysisRef.current = false;
+    }
+
+    if (analysisOverview.status === 'idle' || analyzeModalIndex !== -1) {
+      shouldAutoOpenCompletedAnalysisRef.current = false;
+    }
+
+    previousAnalysisStatusRef.current = analysisOverview.status;
+  }, [analysisOverview, analyzeModalIndex, workoutData?.exercisesForSelectedSplit]);
+
+  const handleCacheAnalysis = useCallback(
+    (exerciseId: ExerciseInPlan['id'], result: AnalyzeVideoResultPayload<SquatRepetition> | null, overview: ExerciseAnalysisOverview) => {
+      setLastAnalysis((prev) => {
+        if (
+          prev?.result === result &&
+          prev?.overview.exerciseId === overview.exerciseId &&
+          prev?.overview.exerciseName === overview.exerciseName &&
+          prev?.overview.status === overview.status &&
+          prev?.overview.resultCount === overview.resultCount
+        ) {
+          return prev;
+        }
+
+        return {
+          result,
+          overview,
+        };
+      });
+    },
+    [],
+  );
+
+  const handleAnalyzeModalChange = useCallback(
+    (index: number) => {
+      setAnalyzeModalIndex(index);
+
+      if (index === -1 && analysisOverview.status === 'processing') {
+        shouldAutoOpenCompletedAnalysisRef.current = true;
+      }
+    },
+    [analysisOverview.status],
+  );
 
   const handlePressSave = useCallback(async () => {
     let pressedYes = false;
@@ -104,6 +202,8 @@ const StartWorkout = ({ route }: StackScreenProps<RootParamList, 'StartWorkout'>
           setLastWorkoutDataForModal={setLastWorkoutDataForModal}
           openModal={openModal}
           openAnalyzeModal={openAnalyzeModal}
+          analysisOverview={analysisOverview}
+          lastAnalysis={lastAnalysis}
         />
       </View>
 
@@ -119,10 +219,18 @@ const StartWorkout = ({ route }: StackScreenProps<RootParamList, 'StartWorkout'>
       <SlidingBottomModal
         title="AI Exercise Analysis"
         ref={analyzeModalRef}
-        snapPoints={['45%', '60%', '75%']}
+        snapPoints={['80%', '80%', '80%']}
         flatListUsage={false}
+        onChange={handleAnalyzeModalChange}
       >
-        <AnalyzeExerciseSheet selectedExercise={selectedExerciseForAnalysis} />
+        <AnalyzeExerciseSheet
+          key={selectedExerciseForAnalysis?.id ?? 'no-exercise-selected'}
+          selectedExercise={selectedExerciseForAnalysis}
+          analysisOverview={analysisOverview}
+          onAnalysisOverviewChange={setAnalysisOverview}
+          cachedAnalysis={selectedExerciseForAnalysis?.id === lastAnalysis?.overview.exerciseId ? lastAnalysis?.result ?? null : null}
+          onCacheAnalysis={handleCacheAnalysis}
+        />
       </SlidingBottomModal>
     </View>
   );

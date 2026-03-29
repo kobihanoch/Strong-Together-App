@@ -351,7 +351,7 @@ jestDescribe('StartWorkout components', () => {
 
         jestExpect(addWeightRecord).toHaveBeenCalledWith('Bench Press', 0, 99);
         jestExpect(addRepsRecord).toHaveBeenCalledWith('Bench Press', 0, 99);
-        jestExpect(openAnalyzeModal).toHaveBeenCalledWith(expect.objectContaining({ exercise: 'Bench Press' }));
+        jestExpect(openAnalyzeModal).toHaveBeenCalledWith(jestExpect.objectContaining({ exercise: 'Bench Press' }));
         jestExpect(addNotes).toHaveBeenCalledWith('Bench Press', 'Explosive reps');
         jestExpect(setLastWorkoutDataForModal).toHaveBeenCalledWith({
           lastWorkoutData: mockLastWorkoutData,

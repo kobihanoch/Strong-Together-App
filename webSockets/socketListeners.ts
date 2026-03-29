@@ -1,8 +1,8 @@
 import { Dispatch, SetStateAction } from 'react';
-import { getSocket } from './socketConfig';
 import { NotificationsContextAllReceivedMessages } from '../context/types/notificationsContextTypes.dto';
 import { MessageAfterSendResponse } from '../types/dto/messages.dto';
 import { AnalyzeVideoResultPayload, SquatRepetition } from '../types/dto/videoAnalysis.dto';
+import { getSocket } from './socketConfig';
 
 export const registerToMessagesListener = (
   setMsgs: Dispatch<SetStateAction<NotificationsContextAllReceivedMessages>>,
@@ -30,18 +30,25 @@ export const registerToMessagesListener = (
 };
 
 export const registerToVideoAnalysisResultsListener = (
-  jobId: string,
-  setAnalysisResults: React.Dispatch<React.SetStateAction<AnalyzeVideoResultPayload<SquatRepetition> | null>>,
+  onResults: (results: AnalyzeVideoResultPayload<SquatRepetition>) => void,
 ) => {
   const socket = getSocket();
+
+  console.log('[VideoAnalysis] register listener', {
+    hasSocket: !!socket,
+    connected: socket?.connected,
+    socketId: socket?.id,
+  });
+
   if (!socket) return;
 
-  // Registration
-  const handler = (results: AnalyzeVideoResultPayload<SquatRepetition>) => setAnalysisResults(results);
-  socket.on(`video_analysis_results:${jobId}`, handler);
+  const handler = (results: AnalyzeVideoResultPayload<SquatRepetition>) => {
+    onResults(results);
+  };
 
-  // Cleanup
+  socket.on('video_analysis_results', handler);
+
   return () => {
-    socket.off(`video_analysis_results:${jobId}`, handler);
+    socket.off('video_analysis_results', handler);
   };
 };
