@@ -3,6 +3,7 @@ import { Dimensions, StyleSheet, View } from 'react-native';
 import { ALERT_TYPE, Dialog } from 'react-native-alert-notification';
 import { RFValue } from 'react-native-responsive-fontsize';
 import SlidingBottomModal, { SlidingBottomModalRef } from '../components/SlidingBottomModal';
+import AnalyzeExerciseSheet from '../components/StartWorkoutComponents/AnalyzeExerciseSheet';
 import ExercisesSection from '../components/StartWorkoutComponents/ExercisesSection';
 import LastWorkoutData from '../components/StartWorkoutComponents/LastWorkoutData';
 import TopBar from '../components/StartWorkoutComponents/TopBar';
@@ -10,6 +11,7 @@ import useStartWorkoutPageLogic from '../hooks/logic/useStartWorkoutPageLogic';
 import { RootParamList } from '../navigation/types/appStackTypes';
 import { StackScreenProps } from '@react-navigation/stack';
 import { TrackingMapItem } from '../types/dto/exerciseTracking.dto';
+import { ExerciseInPlan } from '../types/dto/workoutPlans.dto';
 
 const { width, height } = Dimensions.get('window');
 
@@ -25,10 +27,16 @@ const StartWorkout = ({ route }: StackScreenProps<RootParamList, 'StartWorkout'>
     lastWorkoutData: TrackingMapItem | null;
     setIndex: number;
   } | null>(null);
+  const [selectedExerciseForAnalysis, setSelectedExerciseForAnalysis] = useState<ExerciseInPlan | null>(null);
 
   const modalRef = useRef<SlidingBottomModalRef | null>(null);
+  const analyzeModalRef = useRef<SlidingBottomModalRef | null>(null);
   const openModal = useCallback(() => {
     modalRef?.current?.open?.(0);
+  }, []);
+  const openAnalyzeModal = useCallback((exercise: ExerciseInPlan) => {
+    setSelectedExerciseForAnalysis(exercise);
+    analyzeModalRef?.current?.open?.(0);
   }, []);
 
   const handlePressSave = useCallback(async () => {
@@ -95,6 +103,7 @@ const StartWorkout = ({ route }: StackScreenProps<RootParamList, 'StartWorkout'>
           workoutProgressObj={workoutProgressObj}
           setLastWorkoutDataForModal={setLastWorkoutDataForModal}
           openModal={openModal}
+          openAnalyzeModal={openAnalyzeModal}
         />
       </View>
 
@@ -105,6 +114,15 @@ const StartWorkout = ({ route }: StackScreenProps<RootParamList, 'StartWorkout'>
         flatListUsage={false}
       >
         <LastWorkoutData lastWorkoutDataForModal={lastWorkoutDataForModal}></LastWorkoutData>
+      </SlidingBottomModal>
+
+      <SlidingBottomModal
+        title="AI Exercise Analysis"
+        ref={analyzeModalRef}
+        snapPoints={['45%', '60%', '75%']}
+        flatListUsage={false}
+      >
+        <AnalyzeExerciseSheet selectedExercise={selectedExerciseForAnalysis} />
       </SlidingBottomModal>
     </View>
   );

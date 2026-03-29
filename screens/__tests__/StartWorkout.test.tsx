@@ -20,6 +20,7 @@ const mockDialogShow = jestObject.fn();
 const mockDialogHide = jestObject.fn();
 const mockUseStartWorkoutPageLogic = jestObject.fn();
 const mockLastWorkoutData = jestObject.fn((_: any) => null);
+const mockAnalyzeExerciseSheet = jestObject.fn((_: any) => null);
 const mockExercisesSection = jestObject.fn((_: any) => null);
 const mockTopBar = jestObject.fn((_: any) => null);
 
@@ -51,6 +52,9 @@ jestObject.mock('../../components/StartWorkoutComponents/ExercisesSection', () =
 );
 jestObject.mock('../../components/StartWorkoutComponents/LastWorkoutData', () => (props: any) =>
   mockLastWorkoutData(props),
+);
+jestObject.mock('../../components/StartWorkoutComponents/AnalyzeExerciseSheet', () => (props: any) =>
+  mockAnalyzeExerciseSheet(props),
 );
 
 jestObject.mock('../../components/SlidingBottomModal', () => {
@@ -169,21 +173,42 @@ jestDescribe('StartWorkout screen', () => {
       );
     });
 
-    mockExercisesSection.mockImplementation(({ setLastWorkoutDataForModal, openModal }: any) => {
+    mockExercisesSection.mockImplementation(
+      ({ setLastWorkoutDataForModal, openModal, openAnalyzeModal }: any) => {
       const ReactLocal = require('react');
-      const { TouchableOpacity, Text } = require('react-native');
+      const { View, TouchableOpacity, Text } = require('react-native');
       return ReactLocal.createElement(
-        TouchableOpacity,
-        {
-          onPress: () => {
-            setLastWorkoutDataForModal({
-              lastWorkoutData: createTrackingMapItem(),
-              setIndex: 0,
-            });
-            openModal();
+        View,
+        null,
+        ReactLocal.createElement(
+          TouchableOpacity,
+          {
+            onPress: () => {
+              setLastWorkoutDataForModal({
+                lastWorkoutData: createTrackingMapItem(),
+                setIndex: 0,
+              });
+              openModal();
+            },
           },
-        },
-        ReactLocal.createElement(Text, null, 'Open history'),
+          ReactLocal.createElement(Text, null, 'Open history'),
+        ),
+        ReactLocal.createElement(
+          TouchableOpacity,
+          {
+            onPress: () =>
+              openAnalyzeModal({
+                id: 11,
+                sets: [10],
+                is_active: true,
+                targetmuscle: 'Chest',
+                specifictargetmuscle: 'Upper Chest',
+                exercise: 'Bench Press',
+                workoutsplit: 'Push',
+              }),
+          },
+          ReactLocal.createElement(Text, null, 'Open analysis'),
+        ),
       );
     });
   });
@@ -194,6 +219,7 @@ jestDescribe('StartWorkout screen', () => {
 
     jestExpect(mockUseStartWorkoutPageLogic).toHaveBeenCalledWith(route.params.workoutSplit, route.params.resumedWorkout);
     jestExpect(getByText('Last Performance')).toBeTruthy();
+    jestExpect(getByText('AI Exercise Analysis')).toBeTruthy();
   });
 
   jestIt('opens the history modal and passes the selected workout data into LastWorkoutData', async () => {
@@ -209,6 +235,19 @@ jestDescribe('StartWorkout screen', () => {
         lastWorkoutData: expect.objectContaining({ exercise: 'Bench Press' }),
         setIndex: 0,
       },
+    });
+  });
+
+  jestIt('opens the AI analysis modal and passes the selected exercise into the analysis sheet', async () => {
+    const { getByText } = render(<StartWorkout route={createRoute() as any} navigation={{} as any} />);
+
+    fireEvent.press(getByText('Open analysis'));
+
+    await waitFor(() => {
+      jestExpect(mockModalRegistry.open).toHaveBeenCalledWith(0);
+    });
+    jestExpect(mockAnalyzeExerciseSheet).toHaveBeenLastCalledWith({
+      selectedExercise: expect.objectContaining({ exercise: 'Bench Press' }),
     });
   });
 

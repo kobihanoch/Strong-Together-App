@@ -33,6 +33,7 @@ type RenderItemProps = {
     } | null>
   >;
   openModal: () => void;
+  openAnalyzeModal: (exercise: ExerciseInPlan) => void;
 };
 
 const RenderItem = ({
@@ -42,6 +43,7 @@ const RenderItem = ({
   workoutProgressObj,
   setLastWorkoutDataForModal,
   openModal,
+  openAnalyzeModal,
 }: RenderItemProps) => {
   // Recorded stats
   const { weight: recW = [], reps: recR = [], notes: recNotes } = workoutProgressObj[item?.exercise] || {};
@@ -227,6 +229,17 @@ const RenderItem = ({
         </Column>
       </Row>
 
+      <TouchableOpacity style={styles.analyzeBtn} onPress={() => openAnalyzeModal(item)}>
+        <View style={styles.analyzeIconWrap}>
+          <MaterialCommunityIcons name="brain" size={RFValue(14)} color={colors.primary} />
+        </View>
+        <Column style={{ gap: 2 }}>
+          <Text style={styles.analyzeBtnText}>Analyze movement</Text>
+          <Text style={styles.analyzeBtnSubText}>Open the AI motion analysis flow for this exercise</Text>
+        </Column>
+        <MaterialCommunityIcons name="chevron-right" size={RFValue(16)} color={colors.primary} style={{ marginLeft: 'auto' }} />
+      </TouchableOpacity>
+
       {renderedSets}
 
       <TextInput
@@ -261,6 +274,7 @@ type ExercisesSectionProps = {
     } | null>
   >;
   openModal: () => void;
+  openAnalyzeModal: (exercise: ExerciseInPlan) => void;
 };
 
 const ExercisesSection = ({
@@ -270,6 +284,7 @@ const ExercisesSection = ({
   workoutProgressObj,
   setLastWorkoutDataForModal,
   openModal,
+  openAnalyzeModal,
 }: ExercisesSectionProps) => {
   if (!exercises?.length) {
     return (
@@ -306,6 +321,7 @@ const ExercisesSection = ({
           workoutProgressObj={workoutProgressObj}
           setLastWorkoutDataForModal={setLastWorkoutDataForModal}
           openModal={openModal}
+          openAnalyzeModal={openAnalyzeModal}
         />
       )}
       keyExtractor={(it) => it.exercise}
@@ -342,6 +358,34 @@ const styles = StyleSheet.create({
   itemSetIndicatorText: {
     fontFamily: 'Inter_400Refular',
     fontSize: RFValue(12),
+    color: colors.textSecondary,
+  },
+  analyzeBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    backgroundColor: colors.primaryLight,
+    borderRadius: 16,
+    paddingVertical: 12,
+    paddingHorizontal: 12,
+    marginBottom: 18,
+  },
+  analyzeIconWrap: {
+    width: 32,
+    height: 32,
+    borderRadius: 12,
+    backgroundColor: 'rgba(255,255,255,0.65)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  analyzeBtnText: {
+    fontFamily: 'Inter_600SemiBold',
+    fontSize: RFValue(11),
+    color: colors.primary,
+  },
+  analyzeBtnSubText: {
+    fontFamily: 'Inter_400Regular',
+    fontSize: RFValue(9),
     color: colors.textSecondary,
   },
   pctText: {
