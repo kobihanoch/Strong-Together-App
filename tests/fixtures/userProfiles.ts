@@ -3,6 +3,7 @@ import type {
   AnalysisContextExerciseTrackingMaps,
 } from '../../context/types/analysisContextTypes.dto';
 import type { CardioContextDailyMap, CardioContextWeeklyMap } from '../../context/types/cardioContextTypes.dto';
+import type { NotificationsContextAllReceivedMessages } from '../../context/types/notificationsContextTypes.dto';
 import type { AppUser } from '../../context/types/authContextTypes.dto';
 import type { WholeUserWorkoutPlan, WorkoutSplitsMap } from '../../types/dto/workoutPlans.dto';
 
@@ -15,6 +16,7 @@ export interface UserTestProfile {
   analyzedExerciseTrackingData: AnalysisContextAnalyzedExerciseTrackingData | null;
   cardioDailyMap: CardioContextDailyMap | null;
   cardioWeeklyMap: CardioContextWeeklyMap | null;
+  notificationMessages: NotificationsContextAllReceivedMessages;
 }
 
 const baseUser: AppUser = {
@@ -235,6 +237,29 @@ const baseCardioWeeklyMap: CardioContextWeeklyMap = {
   },
 };
 
+const emptyNotificationMessages: NotificationsContextAllReceivedMessages = [];
+
+const baseNotificationMessages: NotificationsContextAllReceivedMessages = [
+  {
+    id: 'msg-1',
+    subject: 'Workout reminder',
+    msg: 'Time to train today.',
+    sent_at: '2026-03-27T08:00:00.000Z',
+    is_read: false,
+    sender_full_name: 'Coach Mike',
+    sender_profile_image_url: 'profiles/coach-mike.png',
+  },
+  {
+    id: 'msg-2',
+    subject: 'Great job',
+    msg: 'You hit a new PR this week.',
+    sent_at: '2026-03-26T12:00:00.000Z',
+    is_read: true,
+    sender_full_name: 'Coach Mike',
+    sender_profile_image_url: 'profiles/coach-mike.png',
+  },
+];
+
 const cloneUser = (): AppUser => ({
   ...baseUser,
 });
@@ -336,6 +361,11 @@ const cloneCardioWeeklyMap = (): CardioContextWeeklyMap => ({
   },
 });
 
+const cloneNotificationMessages = (): NotificationsContextAllReceivedMessages =>
+  baseNotificationMessages.map((message) => ({
+    ...message,
+  }));
+
 export const guestProfile: UserTestProfile = {
   key: 'guest',
   user: null,
@@ -345,6 +375,7 @@ export const guestProfile: UserTestProfile = {
   analyzedExerciseTrackingData: null,
   cardioDailyMap: null,
   cardioWeeklyMap: null,
+  notificationMessages: [],
 };
 
 export const userWithoutWorkoutProfile: UserTestProfile = {
@@ -362,6 +393,7 @@ export const userWithoutWorkoutProfile: UserTestProfile = {
   cardioWeeklyMap: {
     ...emptyCardioWeeklyMap,
   },
+  notificationMessages: [...emptyNotificationMessages],
 };
 
 export const userWithWorkoutNoHistoryProfile: UserTestProfile = {
@@ -379,6 +411,7 @@ export const userWithWorkoutNoHistoryProfile: UserTestProfile = {
   cardioWeeklyMap: {
     ...emptyCardioWeeklyMap,
   },
+  notificationMessages: [...emptyNotificationMessages],
 };
 
 export const userWithWorkoutAndHistoryProfile: UserTestProfile = {
@@ -390,6 +423,7 @@ export const userWithWorkoutAndHistoryProfile: UserTestProfile = {
   analyzedExerciseTrackingData: cloneAnalyzedExerciseTrackingData(),
   cardioDailyMap: cloneCardioDailyMap(),
   cardioWeeklyMap: cloneCardioWeeklyMap(),
+  notificationMessages: cloneNotificationMessages(),
 };
 
 export const userProfiles = {
