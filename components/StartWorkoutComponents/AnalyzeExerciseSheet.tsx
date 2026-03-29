@@ -294,10 +294,25 @@ const AnalyzeExerciseSheet = ({
 
     const cancelSubscription = VideoTrim.onCancel?.(() => {
       setIsAwaitingTrimResult(false);
+      resetProcessedVideoState();
+      setProcessingLabel('');
+
+      if (selectedExercise?.id) {
+        onCacheAnalysis(selectedExercise.id, null, {
+          exerciseId: null,
+          exerciseName: null,
+          status: 'idle',
+          resultCount: 0,
+        });
+      }
+
+      markAnalysisIdle();
     });
 
     const errorSubscription = VideoTrim.onError?.((event: TrimErrorEvent) => {
       setIsAwaitingTrimResult(false);
+      resetProcessedVideoState();
+      markAnalysisIdle();
       showErrorAlert('Trim failed', event.message || 'Unable to trim this video.');
     });
 
@@ -306,7 +321,16 @@ const AnalyzeExerciseSheet = ({
       cancelSubscription?.remove?.();
       errorSubscription?.remove?.();
     };
-  }, [handleCompressAndAnalyze, hydrateVideoDetails, openTrimEditor, selectedVideo?.uri]);
+  }, [
+    handleCompressAndAnalyze,
+    hydrateVideoDetails,
+    markAnalysisIdle,
+    onCacheAnalysis,
+    openTrimEditor,
+    resetProcessedVideoState,
+    selectedExercise?.id,
+    selectedVideo?.uri,
+  ]);
 
   useEffect(() => {
     return () => {
