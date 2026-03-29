@@ -5,6 +5,10 @@ import { act, renderHook, waitFor } from '@testing-library/react-native';
 import { AxiosError } from 'axios';
 import { guestProfile, userWithoutWorkoutProfile } from '../../tests/fixtures/userProfiles';
 
+jest.mock('axios', () => ({
+  AxiosError: class AxiosError extends Error {},
+}));
+
 type VoidPromiseFn = () => Promise<void>;
 type NullableStringPromiseFn = () => Promise<string | null>;
 type CacheGetFn = <T>(key: string) => Promise<T | null>;
@@ -388,6 +392,82 @@ describe('AuthContext', () => {
     expect(result.current.isValidatedWithServer).toBe(false);
     expect(mockClearRefreshToken).not.toHaveBeenCalled();
     expect(mockCacheDeleteAllCacheWithoutStartWorkout).not.toHaveBeenCalled();
+  });
+
+  it('does not retry server validation while the device is still offline after the first failure', async () => {
+    mockGetRefreshToken.mockResolvedValue('existing-refresh-token');
+    mockCacheGetJSON.mockResolvedValue(userWithoutWorkoutProfile.user!.id);
+
+    const isOnline = false;
+    mockUseNetworkStatus.mockImplementation(() => isOnline);
+
+    const networkError = new AxiosError('offline');
+    (networkError as AxiosError & { isNetworkError: boolean }).isNetworkError = true;
+    mockRefreshAndRotateTokens.mockRejectedValue(networkError);
+
+    const { result, rerender } = renderHook(() => useAuth(), { wrapper });
+
+    await waitFor(() => {
+      expect(result.current.authPhase).toBe('authed');
+    });
+
+    await waitFor(() => {
+      expect(mockRefreshAndRotateTokens).toHaveBeenCalledTimes(1);
+    });
+
+    act(() => {
+      rerender(undefined);
+    });
+
+    expect(result.current.isLoggedIn).toBe(true);
+    expect(result.current.userIdCache).toBe(userWithoutWorkoutProfile.user!.id);
+    expect(result.current.isValidatedWithServer).toBe(false);
+    expect(mockRefreshAndRotateTokens).toHaveBeenCalledTimes(1);
+  });
+
+  it('retries server validation once the device comes back online after an offline boot failure', async () => {
+    mockGetRefreshToken.mockResolvedValue('existing-refresh-token');
+    mockCacheGetJSON.mockResolvedValue(userWithoutWorkoutProfile.user!.id);
+
+    let isOnline = false;
+    mockUseNetworkStatus.mockImplementation(() => isOnline);
+
+    const networkError = new AxiosError('offline');
+    (networkError as AxiosError & { isNetworkError: boolean }).isNetworkError = true;
+    mockRefreshAndRotateTokens.mockRejectedValueOnce(networkError).mockResolvedValueOnce({
+      accessToken: 'access-token',
+      refreshToken: 'refresh-token',
+      userId: userWithoutWorkoutProfile.user!.id,
+    });
+
+    const { result, rerender } = renderHook(() => useAuth(), { wrapper });
+
+    await waitFor(() => {
+      expect(result.current.authPhase).toBe('authed');
+    });
+
+    await waitFor(() => {
+      expect(mockRefreshAndRotateTokens).toHaveBeenCalledTimes(1);
+    });
+
+    act(() => {
+      isOnline = true;
+      rerender(undefined);
+    });
+
+    await waitFor(() => {
+      expect(mockRefreshAndRotateTokens).toHaveBeenCalledTimes(2);
+    });
+
+    await waitFor(() => {
+      expect(result.current.isValidatedWithServer).toBe(true);
+    });
+
+    expect(result.current.isLoggedIn).toBe(true);
+    expect(result.current.userIdCache).toBe(userWithoutWorkoutProfile.user!.id);
+    expect(mockSaveRefreshToken).toHaveBeenCalledWith('refresh-token');
+    expect(mockSetAccessToken).toHaveBeenCalledWith('access-token');
+    expect(mockCacheSetJSON).toHaveBeenCalledWith('CACHE:USER_ID', userWithoutWorkoutProfile.user!.id, 172800);
   });
 
   it('does not logout when boot-time validation reports upgrade required', async () => {
