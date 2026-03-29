@@ -43,6 +43,7 @@ const config = ({ config }: ConfigContext): ExpoConfig => {
       'expo-font',
       'expo-secure-store',
       'expo-apple-authentication',
+      'react-native-compressor',
     ],
     extra: {
       eas: { projectId: 'c2039946-58ec-44b1-beb0-cb0a69f01873' },
