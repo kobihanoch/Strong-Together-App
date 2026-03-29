@@ -51,12 +51,8 @@ export const AnalyzeInfoSection = ({ selectedExercise }: { selectedExercise: Exe
       <Text style={styles.infoValue}>{selectedExercise.targetmuscle ?? 'Unknown'}</Text>
     </View>
     <View style={styles.infoCard}>
-      <Text style={styles.infoLabel}>Size limit</Text>
-      <Text style={styles.infoValue}>100 MB max</Text>
-    </View>
-    <View style={styles.infoCard}>
       <Text style={styles.infoLabel}>Clip limit</Text>
-      <Text style={styles.infoValue}>15 sec max</Text>
+      <Text style={styles.infoValue}>30 sec max</Text>
     </View>
   </View>
 );

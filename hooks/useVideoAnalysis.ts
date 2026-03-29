@@ -1,5 +1,5 @@
 /* eslint-disable prefer-const */
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { showErrorAlert } from '../errors/errorAlerts';
 import { getPresignedUrlFromS3, publishAnalyzeJobToServer, uploadVideoToS3 } from '../services/AnalyzeVideoService';
 import { GetPresignedUrlFromS3Body } from '../types/api/videoAnalysis/requests';
@@ -49,6 +49,16 @@ const useVideoAnalysis = () => {
     setAnalysisResults(null);
   }, [cancelAnalysis]);
 
+  useEffect(() => {
+    return () => {
+      abortControllerRef.current?.abort();
+      cleanupListenerRef.current?.();
+      cleanupListenerRef.current = null;
+      inFlightRef.current = false;
+      abortControllerRef.current = null;
+    };
+  }, []);
+
   const analyzeVideo = async ({
     fileName,
     fileType,
@@ -56,7 +66,6 @@ const useVideoAnalysis = () => {
     fileURI,
   }: useVideoAnalysisProps): Promise<(() => void) | void> => {
     if (inFlightRef.current) {
-      console.log('[VideoAnalysis] Analyze request ignored because another upload is already running');
       return;
     }
 
@@ -70,11 +79,12 @@ const useVideoAnalysis = () => {
       setAnalysisResults(null);
       cleanupListener();
       abortControllerRef.current = new AbortController();
-      setPhase('uploading');
 
-      console.log('[VideoAnalysis] Preparing upload', { fileName, fileType, exercise, fileURI });
+      // Get presigned S3 URL
+      setPhase('uploading');
       const { uploadUrl, fileKey } = await getPresignedUrlFromS3({ fileName, fileType });
 
+      // Upload to S3
       await uploadVideoToS3(uploadUrl, fileURI, fileType, {
         abortSignal: abortControllerRef.current.signal,
         onProgress: setUploadProgress,
@@ -85,30 +95,32 @@ const useVideoAnalysis = () => {
         return;
       }
 
+      // Publish job to server
       currentStage = 'publishing';
       setPhase('publishing');
+      const { jobId } = await publishAnalyzeJobToServer({ fileKey, exercise });
+
       const handleResults = (results: AnalyzeVideoResultPayload<SquatRepetition>) => {
-        //console.log('[VideoAnalysis] Results received', results);
         setAnalysisResults(results);
         setUploadProgress(100);
-        socketCleanup?.();
+        cleanupListenerRef.current?.();
         cleanupListenerRef.current = null;
         clearInFlightState();
       };
+
+      // Wait for results (register a listener)
+      cleanupListenerRef.current = registerToVideoAnalysisResultsListener(jobId, handleResults) ?? null;
       console.log('[VideoAnalysis] WebSocket listener is registered');
-      let socketCleanup = registerToVideoAnalysisResultsListener(handleResults);
-      await publishAnalyzeJobToServer({ fileKey, exercise });
+
       setPhase('waiting_results');
       waitingForServerResults = true;
 
-      cleanupListenerRef.current = socketCleanup ?? null;
       return () => {
-        socketCleanup?.();
+        cleanupListenerRef.current?.();
         cleanupListenerRef.current = null;
       };
     } catch (error) {
       if (abortControllerRef.current?.signal.aborted) {
-        console.log('[VideoAnalysis] Analyze flow canceled');
         return;
       }
 

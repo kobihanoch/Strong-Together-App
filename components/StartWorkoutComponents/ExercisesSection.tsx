@@ -4,6 +4,7 @@ import { ActivityIndicator, Dimensions, StyleSheet, Text, TextInput, TouchableOp
 import { KeyboardAwareFlatList } from 'react-native-keyboard-aware-scroll-view';
 import { RFValue } from 'react-native-responsive-fontsize';
 import { colors } from '../../constants/colors';
+import { isExerciseAnalysisSupported } from '../../constants/videoAnalysis';
 import { ExercisesDuringWorkout, SetCountByExercise } from '../../hooks/types/useStartWorkoutTypes.dto';
 import type { CachedExerciseAnalysis, ExerciseAnalysisOverview } from '../../screens/StartWorkout';
 import useLastWorkoutExerciseTrackingData from '../../hooks/useLastWorkoutExerciseTrackingData';
@@ -190,6 +191,8 @@ const RenderItem = ({
   const showInProgressBadge = isCurrentAnalysisExercise && effectiveOverview.status === 'processing';
   const showReadyBadge = isCurrentAnalysisExercise && effectiveOverview.status === 'completed';
   const showFailedBadge = isCurrentAnalysisExercise && effectiveOverview.status === 'failed';
+  const isAnalysisSupported = isExerciseAnalysisSupported(item.exercise);
+  const isAnalyzeDisabled = isAnotherExerciseLocked || !isAnalysisSupported;
 
   return (
     <Column style={styles.itemCard}>
@@ -253,11 +256,11 @@ const RenderItem = ({
       <TouchableOpacity
         style={[
           styles.analyzeBtn,
-          isAnotherExerciseLocked && styles.analyzeBtnDisabled,
+          isAnalyzeDisabled && styles.analyzeBtnDisabled,
           showReadyBadge && styles.analyzeBtnReady,
         ]}
         onPress={() => openAnalyzeModal(item)}
-        disabled={isAnotherExerciseLocked}
+        disabled={isAnalyzeDisabled}
       >
         <View style={styles.analyzeIconWrap}>
           <MaterialCommunityIcons name="brain" size={RFValue(14)} color={colors.primary} />
@@ -265,7 +268,9 @@ const RenderItem = ({
         <Column style={styles.analyzeTextWrap}>
           <Text style={styles.analyzeBtnText}>Analyze movement</Text>
           <Text style={styles.analyzeBtnSubText}>
-            {isAnotherExerciseLocked
+            {!isAnalysisSupported
+              ? 'Analysis is not available for this exercise yet'
+              : isAnotherExerciseLocked
               ? `Wait until ${analysisOverview.exerciseName ?? 'the current exercise'} finishes`
               : showInProgressBadge
                 ? 'AI is processing this clip right now'

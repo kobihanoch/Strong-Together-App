@@ -4,6 +4,7 @@ import { ScrollView, StyleSheet } from 'react-native';
 import VideoTrim, { showEditor } from 'react-native-video-trim';
 import { Video as VideoCompressor, getVideoMetaData } from 'react-native-compressor';
 import { colors } from '../../constants/colors';
+import { getSupportedAnalysisExerciseName } from '../../constants/videoAnalysis';
 import { showErrorAlert } from '../../errors/errorAlerts';
 import useVideoAnalysis from '../../hooks/useVideoAnalysis';
 import type { ExerciseAnalysisOverview } from '../../screens/StartWorkout';
@@ -54,7 +55,7 @@ type TrimErrorEvent = {
 };
 
 const MAX_VIDEO_BYTES = 100 * 1024 * 1024;
-const MAX_TRIM_DURATION_MS = 15_000;
+const MAX_TRIM_DURATION_MS = 30_000;
 const COMPRESSED_MAX_SIZE = 540;
 const COMPRESSED_MIN_SIZE_BYTES = 1 * 1024 * 1024;
 
@@ -77,7 +78,7 @@ const formatConfidence = (value: number | null | undefined): string => {
 };
 
 const getExerciseAnalysisCopy = (exerciseName: string | null | undefined): ExerciseAnalysisCopy => {
-  const normalized = exerciseName?.trim().toLowerCase() ?? '';
+  const normalized = getSupportedAnalysisExerciseName(exerciseName) ?? exerciseName?.trim().toLowerCase() ?? '';
 
   if (normalized.includes('squat')) {
     return {
@@ -188,7 +189,7 @@ const AnalyzeExerciseSheet = ({
     showEditor(videoUri, {
       maxDuration: MAX_TRIM_DURATION_MS,
       minDuration: 1_000,
-      headerText: 'Trim up to 15 seconds',
+      headerText: 'Trim up to 30 seconds',
       saveButtonText: 'Use clip',
       cancelButtonText: 'Cancel',
       trimmingText: 'Preparing clip...',
@@ -200,7 +201,14 @@ const AnalyzeExerciseSheet = ({
 
   const handleCompressAndAnalyze = useCallback(
     async (videoUri: string) => {
+      const supportedExercise = getSupportedAnalysisExerciseName(selectedExercise?.exercise);
+
       if (!videoUri || !selectedExercise?.exercise || analysisLoading) {
+        return;
+      }
+
+      if (!supportedExercise) {
+        showErrorAlert('Analysis unavailable', 'AI analysis is not available for this exercise yet.');
         return;
       }
 
@@ -233,7 +241,7 @@ const AnalyzeExerciseSheet = ({
           (await analyzeVideo({
             fileName: normalizedFileName,
             fileType: 'video/mp4',
-            exercise: selectedExercise.exercise.toLowerCase(),
+            exercise: supportedExercise,
             fileURI: compressedUri,
           })) ?? null;
       } catch {
@@ -271,7 +279,7 @@ const AnalyzeExerciseSheet = ({
       const trimmedDurationMs = Math.max(0, event.endTime - event.startTime);
 
       if (trimmedDurationMs > MAX_TRIM_DURATION_MS) {
-        showErrorAlert('Clip too long', 'Please trim the video to 15 seconds or less.');
+        showErrorAlert('Clip too long', 'Please trim the video to 30 seconds or less.');
         if (selectedVideo?.uri) {
           openTrimEditor(selectedVideo.uri);
         }
