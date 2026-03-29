@@ -10,6 +10,10 @@ import {
   userWithWorkoutNoHistoryProfile,
 } from '../../../tests/fixtures/userProfiles';
 
+jest.mock('axios', () => ({
+  AxiosError: class AxiosError extends Error {},
+}));
+
 const mockReplace = jest.fn<(screen: string) => void>();
 const mockCacheGetJSON = jest.fn<(key: string) => Promise<unknown>>();
 const mockCacheSetJSON = jest.fn<(key: string, value: unknown, ttl: number) => Promise<void>>();

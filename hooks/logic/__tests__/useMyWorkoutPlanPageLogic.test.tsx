@@ -9,6 +9,10 @@ import {
   userWithoutWorkoutProfile,
 } from '../../../tests/fixtures/userProfiles';
 
+jest.mock('axios', () => ({
+  AxiosError: class AxiosError extends Error {},
+}));
+
 const mockCacheGetJSON = jest.fn<(key: string) => Promise<unknown>>();
 const mockCacheSetJSON = jest.fn<(key: string, value: unknown, ttl: number) => Promise<void>>();
 const mockCacheDeleteAllCache = jest.fn<() => Promise<void>>();
