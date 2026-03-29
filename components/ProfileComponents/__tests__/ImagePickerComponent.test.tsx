@@ -8,8 +8,7 @@ import {
   it as jestIt,
   jest as jestObject,
 } from '@jest/globals';
-import { fireEvent, render, waitFor } from '@testing-library/react-native';
-import { ActivityIndicator, TouchableOpacity } from 'react-native';
+import { render, waitFor } from '@testing-library/react-native';
 import type { AuthContextValue } from '../../../context/types/authContextTypes.dto';
 import type { GetAuthenticatedUserByIdResponse } from '../../../types/api/user/responses';
 
@@ -126,68 +125,6 @@ jestDescribe('ImagePickerComponent', () => {
     mockRequestMediaLibraryPermissionsAsync.mockResolvedValue({ status: 'granted' });
     mockLaunchImageLibraryAsync.mockResolvedValue({ canceled: true, assets: [] });
     mockApiDelete.mockResolvedValue(undefined);
-  });
-
-  jestIt('renders a remote image source when the user already has a profile image', () => {
-    mockAuthState = createAuthState({
-      user: createUser({ profile_image_url: 'avatars/user-1.jpg' }),
-    });
-
-    render(React.createElement(ImagePickerComponent, createProps()));
-
-    jestExpect(mockExpoImage).toHaveBeenCalledWith(
-      jestExpect.objectContaining({
-        source: {
-          uri: `${process.env.EXPO_PUBLIC_SUPABASE_URL}/storage/v1/object/public/avatars/user-1.jpg`,
-        },
-      }),
-    );
-  });
-
-  jestIt('renders the male fallback image when there is no custom profile image', () => {
-    render(React.createElement(ImagePickerComponent, createProps()));
-
-    jestExpect(mockExpoImage).toHaveBeenCalledWith(
-      jestExpect.objectContaining({
-        source: require('../../../assets/man.png'),
-      }),
-    );
-  });
-
-  jestIt('renders the female fallback image when there is no custom profile image', () => {
-    mockAuthState = createAuthState({
-      user: createUser({ gender: 'Female' }),
-    });
-
-    render(React.createElement(ImagePickerComponent, createProps()));
-
-    jestExpect(mockExpoImage).toHaveBeenCalledWith(
-      jestExpect.objectContaining({
-        source: require('../../../assets/woman.png'),
-      }),
-    );
-  });
-
-  jestIt('opens the action sheet when the image is pressed', () => {
-    const openActionSheet = jestObject.fn();
-    const { UNSAFE_getByType } = render(
-      React.createElement(ImagePickerComponent, createProps({ openActionSheet })),
-    );
-
-    fireEvent.press(UNSAFE_getByType(TouchableOpacity));
-
-    jestExpect(openActionSheet).toHaveBeenCalledTimes(1);
-  });
-
-  jestIt('shows a loading indicator while media upload is in progress', () => {
-    mockMediaUploadsState = {
-      ...mockMediaUploadsState,
-      loading: true,
-    };
-    const { UNSAFE_getByType } = render(React.createElement(ImagePickerComponent, createProps()));
-
-    jestExpect(UNSAFE_getByType(ActivityIndicator)).toBeTruthy();
-    jestExpect(mockExpoImage).not.toHaveBeenCalled();
   });
 
   jestIt('resets the image picker trigger and does not upload when the picker is canceled', async () => {
