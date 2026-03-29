@@ -39,7 +39,7 @@ export const uploadVideoToS3 = async (
     (written, total) => {
       if (total) {
         const progress = Math.round((written * 100) / total);
-        console.log(`Uploading to S3: ${progress}%`);
+        //console.log(`Uploading to S3: ${progress}%`);
         options?.onProgress?.(progress);
       }
     },
