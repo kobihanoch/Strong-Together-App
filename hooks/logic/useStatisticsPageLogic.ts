@@ -29,10 +29,10 @@ const useStatisticsPageLogic = () => {
     return moment.tz(selectedDate, 'YYYY-MM-DD', timezone).startOf('week').format('YYYY-MM-DD');
   }, [formattedDate]);
 
-  const cardioForWeek = useMemo(() => weeklyCardioMap?.[startOfWeekDay], [startOfWeekDay]);
+  const cardioForWeek = useMemo(() => weeklyCardioMap?.[startOfWeekDay], [startOfWeekDay, weeklyCardioMap]);
 
   // Cardio by date
-  const cardioByDate = useMemo(() => dailyCardioMap?.[formattedDate], [formattedDate]);
+  const cardioByDate = useMemo(() => dailyCardioMap?.[formattedDate], [formattedDate, dailyCardioMap]);
 
   // Change records when a date selection is aplied
   const exerciseTrackingByDate = useMemo(() => {
