@@ -299,6 +299,7 @@ jestDescribe('StartWorkout components', () => {
           workoutProgressObj={{}}
           setLastWorkoutDataForModal={jestObject.fn()}
           openModal={jestObject.fn()}
+          openAnalyzeModal={jestObject.fn()}
         />,
       );
 
@@ -314,9 +315,10 @@ jestDescribe('StartWorkout components', () => {
         const addWeightRecord = jestObject.fn();
         const setLastWorkoutDataForModal = jestObject.fn();
         const openModal = jestObject.fn();
+        const openAnalyzeModal = jestObject.fn();
         mockLastWorkoutData = createTrackingMapItem();
 
-        const { getByPlaceholderText, getAllByText, UNSAFE_getAllByType } = render(
+        const { getByPlaceholderText, getAllByText, getByText, UNSAFE_getAllByType } = render(
           <ExercisesSection
             exercises={[createExercise()]}
             exercisesSetsDoneMap={{ 'Bench Press': { done: 0, planned: 2 } }}
@@ -324,6 +326,7 @@ jestDescribe('StartWorkout components', () => {
             workoutProgressObj={createWorkoutProgress()}
             setLastWorkoutDataForModal={setLastWorkoutDataForModal}
             openModal={openModal}
+            openAnalyzeModal={openAnalyzeModal}
           />,
         );
 
@@ -337,6 +340,7 @@ jestDescribe('StartWorkout components', () => {
 
         fireEvent.press(getAllByText('Numeric numeric 80 false false')[0]);
         fireEvent.press(getAllByText('Numeric number-pad 10 false false')[0]);
+        fireEvent.press(getByText('Analyze movement'));
         fireEvent(getByPlaceholderText('Add any notes...'), 'endEditing', {
           nativeEvent: { text: 'Explosive reps' },
         });
@@ -347,6 +351,7 @@ jestDescribe('StartWorkout components', () => {
 
         jestExpect(addWeightRecord).toHaveBeenCalledWith('Bench Press', 0, 99);
         jestExpect(addRepsRecord).toHaveBeenCalledWith('Bench Press', 0, 99);
+        jestExpect(openAnalyzeModal).toHaveBeenCalledWith(jestExpect.objectContaining({ exercise: 'Bench Press' }));
         jestExpect(addNotes).toHaveBeenCalledWith('Bench Press', 'Explosive reps');
         jestExpect(setLastWorkoutDataForModal).toHaveBeenCalledWith({
           lastWorkoutData: mockLastWorkoutData,
@@ -370,6 +375,7 @@ jestDescribe('StartWorkout components', () => {
           workoutProgressObj={createWorkoutProgress()}
           setLastWorkoutDataForModal={jestObject.fn()}
           openModal={jestObject.fn()}
+          openAnalyzeModal={jestObject.fn()}
         />,
       );
 
@@ -393,6 +399,7 @@ jestDescribe('StartWorkout components', () => {
           workoutProgressObj={createWorkoutProgress()}
           setLastWorkoutDataForModal={jestObject.fn()}
           openModal={jestObject.fn()}
+          openAnalyzeModal={jestObject.fn()}
         />,
       );
 

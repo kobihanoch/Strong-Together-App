@@ -4,7 +4,9 @@ import { ActivityIndicator, Dimensions, StyleSheet, Text, TextInput, TouchableOp
 import { KeyboardAwareFlatList } from 'react-native-keyboard-aware-scroll-view';
 import { RFValue } from 'react-native-responsive-fontsize';
 import { colors } from '../../constants/colors';
+import { isExerciseAnalysisSupported } from '../../constants/videoAnalysis';
 import { ExercisesDuringWorkout, SetCountByExercise } from '../../hooks/types/useStartWorkoutTypes.dto';
+import type { CachedExerciseAnalysis, ExerciseAnalysisOverview } from '../../screens/StartWorkout';
 import useLastWorkoutExerciseTrackingData from '../../hooks/useLastWorkoutExerciseTrackingData';
 import { TrackingMapItem } from '../../types/dto/exerciseTracking.dto';
 import { ExerciseInPlan } from '../../types/dto/workoutPlans.dto';
@@ -16,6 +18,12 @@ import Row from '../Row';
 import NumericInputWithRules from './NumericInputWithRules';
 
 const { height } = Dimensions.get('window');
+const defaultAnalysisOverview: ExerciseAnalysisOverview = {
+  exerciseId: null,
+  exerciseName: null,
+  status: 'idle',
+  resultCount: 0,
+};
 
 type RenderItemProps = {
   item: ExerciseInPlan;
@@ -33,6 +41,9 @@ type RenderItemProps = {
     } | null>
   >;
   openModal: () => void;
+  openAnalyzeModal: (exercise: ExerciseInPlan) => void;
+  analysisOverview?: ExerciseAnalysisOverview;
+  lastAnalysis?: CachedExerciseAnalysis | null | undefined;
 };
 
 const RenderItem = ({
@@ -42,6 +53,9 @@ const RenderItem = ({
   workoutProgressObj,
   setLastWorkoutDataForModal,
   openModal,
+  openAnalyzeModal,
+  analysisOverview = defaultAnalysisOverview,
+  lastAnalysis,
 }: RenderItemProps) => {
   // Recorded stats
   const { weight: recW = [], reps: recR = [], notes: recNotes } = workoutProgressObj[item?.exercise] || {};
@@ -167,6 +181,18 @@ const RenderItem = ({
   }
 
   const dotLength = plannedSets + extraSets; // or: const dotLength = totalSets;
+  const cachedExerciseOverview = lastAnalysis?.overview.exerciseId === item.id ? lastAnalysis.overview : null;
+  const effectiveOverview =
+    analysisOverview.status === 'processing' && analysisOverview.exerciseId === item.id
+      ? analysisOverview
+      : (cachedExerciseOverview ?? defaultAnalysisOverview);
+  const isCurrentAnalysisExercise = effectiveOverview.exerciseId === item.id;
+  const isAnotherExerciseLocked = analysisOverview.status === 'processing' && analysisOverview.exerciseId !== item.id;
+  const showInProgressBadge = isCurrentAnalysisExercise && effectiveOverview.status === 'processing';
+  const showReadyBadge = isCurrentAnalysisExercise && effectiveOverview.status === 'completed';
+  const showFailedBadge = isCurrentAnalysisExercise && effectiveOverview.status === 'failed';
+  const isAnalysisSupported = isExerciseAnalysisSupported(item.exercise);
+  const isAnalyzeDisabled = isAnotherExerciseLocked || !isAnalysisSupported;
 
   return (
     <Column style={styles.itemCard}>
@@ -227,6 +253,59 @@ const RenderItem = ({
         </Column>
       </Row>
 
+      <TouchableOpacity
+        style={[
+          styles.analyzeBtn,
+          isAnalyzeDisabled && styles.analyzeBtnDisabled,
+          showReadyBadge && styles.analyzeBtnReady,
+        ]}
+        onPress={() => openAnalyzeModal(item)}
+        disabled={isAnalyzeDisabled}
+      >
+        <View style={styles.analyzeIconWrap}>
+          <MaterialCommunityIcons name="brain" size={RFValue(14)} color={colors.primary} />
+        </View>
+        <Column style={styles.analyzeTextWrap}>
+          <Text style={styles.analyzeBtnText}>Analyze movement</Text>
+          <Text style={styles.analyzeBtnSubText}>
+            {!isAnalysisSupported
+              ? 'Analysis is not available for this exercise yet'
+              : isAnotherExerciseLocked
+              ? `Wait until ${analysisOverview.exerciseName ?? 'the current exercise'} finishes`
+              : showInProgressBadge
+                ? 'AI is processing this clip right now'
+                : showReadyBadge
+                  ? 'Results are ready to review'
+                  : showFailedBadge
+                    ? 'Last analysis failed. Tap to try again'
+                    : 'Open the AI motion analysis flow for this exercise'}
+          </Text>
+        </Column>
+        <View style={styles.analyzeTrailing}>
+          {showInProgressBadge ? (
+            <View style={styles.analysisStatusChip}>
+              <ActivityIndicator size="small" color={colors.primary} />
+              <Text style={styles.analysisStatusChipText}>In Progress</Text>
+            </View>
+          ) : null}
+          {showReadyBadge ? (
+            <View style={styles.analysisReadyChip}>
+              <MaterialCommunityIcons name="check-decagram" size={RFValue(13)} color={colors.completedDark} />
+              <Text style={styles.analysisReadyChipText}>
+                Ready{effectiveOverview.resultCount > 0 ? ` • ${effectiveOverview.resultCount}` : ''}
+              </Text>
+            </View>
+          ) : null}
+          {showFailedBadge ? (
+            <View style={styles.analysisFailedChip}>
+              <MaterialCommunityIcons name="alert-circle-outline" size={RFValue(13)} color={colors.error} />
+              <Text style={styles.analysisFailedChipText}>Retry</Text>
+            </View>
+          ) : null}
+          <MaterialCommunityIcons name="chevron-right" size={RFValue(16)} color={colors.primary} />
+        </View>
+      </TouchableOpacity>
+
       {renderedSets}
 
       <TextInput
@@ -261,6 +340,9 @@ type ExercisesSectionProps = {
     } | null>
   >;
   openModal: () => void;
+  openAnalyzeModal: (exercise: ExerciseInPlan) => void;
+  analysisOverview?: ExerciseAnalysisOverview;
+  lastAnalysis?: CachedExerciseAnalysis | null | undefined;
 };
 
 const ExercisesSection = ({
@@ -270,6 +352,9 @@ const ExercisesSection = ({
   workoutProgressObj,
   setLastWorkoutDataForModal,
   openModal,
+  openAnalyzeModal,
+  analysisOverview = defaultAnalysisOverview,
+  lastAnalysis,
 }: ExercisesSectionProps) => {
   if (!exercises?.length) {
     return (
@@ -306,6 +391,9 @@ const ExercisesSection = ({
           workoutProgressObj={workoutProgressObj}
           setLastWorkoutDataForModal={setLastWorkoutDataForModal}
           openModal={openModal}
+          openAnalyzeModal={openAnalyzeModal}
+          analysisOverview={analysisOverview}
+          lastAnalysis={lastAnalysis}
         />
       )}
       keyExtractor={(it) => it.exercise}
@@ -343,6 +431,96 @@ const styles = StyleSheet.create({
     fontFamily: 'Inter_400Refular',
     fontSize: RFValue(12),
     color: colors.textSecondary,
+  },
+  analyzeBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    backgroundColor: colors.primaryLight,
+    borderRadius: 16,
+    paddingVertical: 12,
+    paddingHorizontal: 12,
+    marginBottom: 18,
+  },
+  analyzeBtnDisabled: {
+    opacity: 0.55,
+  },
+  analyzeBtnReady: {
+    backgroundColor: '#eefbf4',
+  },
+  analyzeIconWrap: {
+    width: 32,
+    height: 32,
+    borderRadius: 12,
+    backgroundColor: 'rgba(255,255,255,0.65)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  analyzeBtnText: {
+    fontFamily: 'Inter_600SemiBold',
+    fontSize: RFValue(11),
+    color: colors.primary,
+  },
+  analyzeTextWrap: {
+    flex: 1,
+    gap: 2,
+  },
+  analyzeBtnSubText: {
+    fontFamily: 'Inter_400Regular',
+    fontSize: RFValue(9),
+    color: colors.textSecondary,
+  },
+  analyzeTrailing: {
+    alignItems: 'flex-end',
+    justifyContent: 'center',
+    gap: 6,
+    maxWidth: 110,
+    marginLeft: 8,
+  },
+  analysisStatusChip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    paddingHorizontal: 10,
+    paddingVertical: 7,
+    borderRadius: 999,
+    backgroundColor: 'rgba(255,255,255,0.72)',
+    marginLeft: 'auto',
+  },
+  analysisStatusChipText: {
+    fontFamily: 'Inter_600SemiBold',
+    fontSize: RFValue(9),
+    color: colors.primary,
+  },
+  analysisReadyChip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    paddingHorizontal: 10,
+    paddingVertical: 7,
+    borderRadius: 999,
+    backgroundColor: 'rgba(255,255,255,0.88)',
+    marginLeft: 'auto',
+  },
+  analysisReadyChipText: {
+    fontFamily: 'Inter_600SemiBold',
+    fontSize: RFValue(9),
+    color: colors.completedDark,
+  },
+  analysisFailedChip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    paddingHorizontal: 10,
+    paddingVertical: 7,
+    borderRadius: 999,
+    backgroundColor: 'rgba(255,255,255,0.88)',
+    marginLeft: 'auto',
+  },
+  analysisFailedChipText: {
+    fontFamily: 'Inter_600SemiBold',
+    fontSize: RFValue(9),
+    color: colors.error,
   },
   pctText: {
     fontFamily: 'Inter_400Regular',
