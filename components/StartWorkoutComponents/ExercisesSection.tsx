@@ -6,9 +6,10 @@ import { RFValue } from 'react-native-responsive-fontsize';
 import { colors } from '../../constants/colors';
 import { isExerciseAnalysisSupported } from '../../constants/videoAnalysis';
 import { ExercisesDuringWorkout, SetCountByExercise } from '../../hooks/types/useStartWorkoutTypes.dto';
-import type { CachedExerciseAnalysis, ExerciseAnalysisOverview } from '../../screens/StartWorkout';
 import useLastWorkoutExerciseTrackingData from '../../hooks/useLastWorkoutExerciseTrackingData';
+import type { CachedExerciseAnalysis, ExerciseAnalysisOverview } from '../../screens/StartWorkout';
 import { TrackingMapItem } from '../../types/dto/exerciseTracking.dto';
+import { SquatRepetition } from '../../types/dto/videoAnalysis.dto';
 import { ExerciseInPlan } from '../../types/dto/workoutPlans.dto';
 import Column from '../Column';
 import NumberCounter from '../NumberCounter';
@@ -16,7 +17,6 @@ import PageDots from '../PageDots';
 import PercantageCircle from '../PercentageCircle';
 import Row from '../Row';
 import NumericInputWithRules from './NumericInputWithRules';
-import { SquatRepetition } from '../../types/dto/videoAnalysis.dto';
 
 const { height } = Dimensions.get('window');
 const defaultAnalysisOverview: ExerciseAnalysisOverview = {
@@ -264,7 +264,7 @@ const RenderItem = ({
         disabled={isAnalyzeDisabled}
       >
         <View style={styles.analyzeIconWrap}>
-          <MaterialCommunityIcons name="brain" size={RFValue(14)} color={colors.primary} />
+          <MaterialCommunityIcons name="creation" size={RFValue(14)} color={colors.primary} />
         </View>
         <Column style={styles.analyzeTextWrap}>
           <Text style={styles.analyzeBtnText}>Analyze movement</Text>
