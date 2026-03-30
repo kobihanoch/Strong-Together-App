@@ -16,6 +16,7 @@ import PageDots from '../PageDots';
 import PercantageCircle from '../PercentageCircle';
 import Row from '../Row';
 import NumericInputWithRules from './NumericInputWithRules';
+import { SquatRepetition } from '../../types/dto/videoAnalysis.dto';
 
 const { height } = Dimensions.get('window');
 const defaultAnalysisOverview: ExerciseAnalysisOverview = {
@@ -25,7 +26,7 @@ const defaultAnalysisOverview: ExerciseAnalysisOverview = {
   resultCount: 0,
 };
 
-type RenderItemProps = {
+type RenderItemProps<T> = {
   item: ExerciseInPlan;
   exercisesSetsDoneMap: SetCountByExercise;
   controls: {
@@ -43,7 +44,7 @@ type RenderItemProps = {
   openModal: () => void;
   openAnalyzeModal: (exercise: ExerciseInPlan) => void;
   analysisOverview?: ExerciseAnalysisOverview;
-  lastAnalysis?: CachedExerciseAnalysis | null | undefined;
+  lastAnalysis?: CachedExerciseAnalysis<T> | null | undefined;
 };
 
 const RenderItem = ({
@@ -56,7 +57,7 @@ const RenderItem = ({
   openAnalyzeModal,
   analysisOverview = defaultAnalysisOverview,
   lastAnalysis,
-}: RenderItemProps) => {
+}: RenderItemProps<SquatRepetition>) => {
   // Recorded stats
   const { weight: recW = [], reps: recR = [], notes: recNotes } = workoutProgressObj[item?.exercise] || {};
   const exName = item?.exercise;
@@ -271,14 +272,14 @@ const RenderItem = ({
             {!isAnalysisSupported
               ? 'Analysis is not available for this exercise yet'
               : isAnotherExerciseLocked
-              ? `Wait until ${analysisOverview.exerciseName ?? 'the current exercise'} finishes`
-              : showInProgressBadge
-                ? 'AI is processing this clip right now'
-                : showReadyBadge
-                  ? 'Results are ready to review'
-                  : showFailedBadge
-                    ? 'Last analysis failed. Tap to try again'
-                    : 'Open the AI motion analysis flow for this exercise'}
+                ? `Wait until ${analysisOverview.exerciseName ?? 'the current exercise'} finishes`
+                : showInProgressBadge
+                  ? 'AI is processing this clip right now'
+                  : showReadyBadge
+                    ? 'Results are ready to review'
+                    : showFailedBadge
+                      ? 'Last analysis failed. Tap to try again'
+                      : 'Open the AI motion analysis flow for this exercise'}
           </Text>
         </Column>
         <View style={styles.analyzeTrailing}>
@@ -324,7 +325,7 @@ const RenderItem = ({
   );
 };
 
-type ExercisesSectionProps = {
+type ExercisesSectionProps<T> = {
   exercises: ExerciseInPlan[];
   exercisesSetsDoneMap: SetCountByExercise;
   controls: {
@@ -342,7 +343,7 @@ type ExercisesSectionProps = {
   openModal: () => void;
   openAnalyzeModal: (exercise: ExerciseInPlan) => void;
   analysisOverview?: ExerciseAnalysisOverview;
-  lastAnalysis?: CachedExerciseAnalysis | null | undefined;
+  lastAnalysis?: CachedExerciseAnalysis<T> | null | undefined;
 };
 
 const ExercisesSection = ({
@@ -355,7 +356,7 @@ const ExercisesSection = ({
   openAnalyzeModal,
   analysisOverview = defaultAnalysisOverview,
   lastAnalysis,
-}: ExercisesSectionProps) => {
+}: ExercisesSectionProps<SquatRepetition>) => {
   if (!exercises?.length) {
     return (
       <Column

@@ -1,5 +1,6 @@
+import { StackScreenProps } from '@react-navigation/stack';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { Dimensions, StyleSheet, View, Vibration } from 'react-native';
+import { Dimensions, StyleSheet, Vibration, View } from 'react-native';
 import { ALERT_TYPE, Dialog } from 'react-native-alert-notification';
 import { RFValue } from 'react-native-responsive-fontsize';
 import SlidingBottomModal, { SlidingBottomModalRef } from '../components/SlidingBottomModal';
@@ -10,7 +11,6 @@ import TopBar from '../components/StartWorkoutComponents/TopBar';
 import { showErrorAlert } from '../errors/errorAlerts';
 import useStartWorkoutPageLogic from '../hooks/logic/useStartWorkoutPageLogic';
 import { RootParamList } from '../navigation/types/appStackTypes';
-import { StackScreenProps } from '@react-navigation/stack';
 import { TrackingMapItem } from '../types/dto/exerciseTracking.dto';
 import { AnalyzeVideoResultPayload, SquatRepetition } from '../types/dto/videoAnalysis.dto';
 import { ExerciseInPlan } from '../types/dto/workoutPlans.dto';
@@ -24,9 +24,9 @@ export type ExerciseAnalysisOverview = {
   resultCount: number;
 };
 
-export type CachedExerciseAnalysis = {
+export type CachedExerciseAnalysis<T> = {
   overview: ExerciseAnalysisOverview;
-  result: AnalyzeVideoResultPayload<SquatRepetition> | null;
+  result: AnalyzeVideoResultPayload<T> | null;
 };
 
 const StartWorkout = ({ route }: StackScreenProps<RootParamList, 'StartWorkout'>) => {
@@ -42,39 +42,47 @@ const StartWorkout = ({ route }: StackScreenProps<RootParamList, 'StartWorkout'>
     setIndex: number;
   } | null>(null);
   const [selectedExerciseForAnalysis, setSelectedExerciseForAnalysis] = useState<ExerciseInPlan | null>(null);
-  const [analyzeModalIndex, setAnalyzeModalIndex] = useState(-1);
+  // For badge
   const [analysisOverview, setAnalysisOverview] = useState<ExerciseAnalysisOverview>({
     exerciseId: null,
     exerciseName: null,
     status: 'idle',
     resultCount: 0,
   });
-  const [lastAnalysis, setLastAnalysis] = useState<CachedExerciseAnalysis | null>(null);
+  // Save only last analysis (now only suppurts squat)
+  const [lastAnalysis, setLastAnalysis] = useState<CachedExerciseAnalysis<SquatRepetition> | null>(null);
   const previousAnalysisStatusRef = useRef<ExerciseAnalysisOverview['status']>('idle');
   const shouldAutoOpenCompletedAnalysisRef = useRef(false);
 
+  // Modals
   const modalRef = useRef<SlidingBottomModalRef | null>(null);
   const analyzeModalRef = useRef<SlidingBottomModalRef | null>(null);
   const openModal = useCallback(() => {
     modalRef?.current?.open?.(0);
   }, []);
-  const openAnalyzeModal = useCallback((exercise: ExerciseInPlan) => {
-    if (analysisOverview.status === 'processing' && analysisOverview.exerciseId !== exercise.id) {
-      showErrorAlert(
-        'Analysis in progress',
-        `Finish the current ${analysisOverview.exerciseName ?? 'exercise'} analysis before starting another video.`,
-      );
-      return;
-    }
 
-    setSelectedExerciseForAnalysis(exercise);
-    analyzeModalRef?.current?.open?.(0);
-  }, [analysisOverview.exerciseId, analysisOverview.exerciseName, analysisOverview.status]);
+  // Open analyze modal callback
+  const openAnalyzeModal = useCallback(
+    (exercise: ExerciseInPlan) => {
+      if (analysisOverview.status === 'processing' && analysisOverview.exerciseId !== exercise.id) {
+        showErrorAlert(
+          'Analysis in progress',
+          `Finish the current ${analysisOverview.exerciseName ?? 'exercise'} analysis before starting another video.`,
+        );
+        return;
+      }
 
+      setSelectedExerciseForAnalysis(exercise);
+      analyzeModalRef?.current?.open?.(0);
+    },
+    [analysisOverview.exerciseId, analysisOverview.exerciseName, analysisOverview.status],
+  );
+
+  // Auto open analysis sheet while analysis is done
   useEffect(() => {
     const previousStatus = previousAnalysisStatusRef.current;
 
-    if (analysisOverview.status === 'processing' && analyzeModalIndex === -1) {
+    if (analysisOverview.status === 'processing') {
       shouldAutoOpenCompletedAnalysisRef.current = true;
     }
 
@@ -82,8 +90,7 @@ const StartWorkout = ({ route }: StackScreenProps<RootParamList, 'StartWorkout'>
       previousStatus === 'processing' &&
       analysisOverview.status === 'completed' &&
       analysisOverview.exerciseId &&
-      shouldAutoOpenCompletedAnalysisRef.current &&
-      analyzeModalIndex === -1
+      shouldAutoOpenCompletedAnalysisRef.current
     ) {
       const matchingExercise =
         workoutData?.exercisesForSelectedSplit?.find((exercise) => exercise.id === analysisOverview.exerciseId) ?? null;
@@ -97,15 +104,20 @@ const StartWorkout = ({ route }: StackScreenProps<RootParamList, 'StartWorkout'>
       shouldAutoOpenCompletedAnalysisRef.current = false;
     }
 
-    if (analysisOverview.status === 'idle' || analyzeModalIndex !== -1) {
+    if (analysisOverview.status === 'idle') {
       shouldAutoOpenCompletedAnalysisRef.current = false;
     }
 
     previousAnalysisStatusRef.current = analysisOverview.status;
-  }, [analysisOverview, analyzeModalIndex, workoutData?.exercisesForSelectedSplit]);
+  }, [analysisOverview, workoutData?.exercisesForSelectedSplit]);
 
+  // Save last analysis in state
   const handleCacheAnalysis = useCallback(
-    (exerciseId: ExerciseInPlan['id'], result: AnalyzeVideoResultPayload<SquatRepetition> | null, overview: ExerciseAnalysisOverview) => {
+    (
+      exerciseId: ExerciseInPlan['id'],
+      result: AnalyzeVideoResultPayload<SquatRepetition> | null,
+      overview: ExerciseAnalysisOverview,
+    ) => {
       setLastAnalysis((prev) => {
         if (
           prev?.result === result &&
@@ -124,17 +136,6 @@ const StartWorkout = ({ route }: StackScreenProps<RootParamList, 'StartWorkout'>
       });
     },
     [],
-  );
-
-  const handleAnalyzeModalChange = useCallback(
-    (index: number) => {
-      setAnalyzeModalIndex(index);
-
-      if (index === -1 && analysisOverview.status === 'processing') {
-        shouldAutoOpenCompletedAnalysisRef.current = true;
-      }
-    },
-    [analysisOverview.status],
   );
 
   const handlePressSave = useCallback(async () => {
@@ -221,14 +222,17 @@ const StartWorkout = ({ route }: StackScreenProps<RootParamList, 'StartWorkout'>
         ref={analyzeModalRef}
         snapPoints={['80%', '80%', '80%']}
         flatListUsage={false}
-        onChange={handleAnalyzeModalChange}
       >
         <AnalyzeExerciseSheet
           key={selectedExerciseForAnalysis?.id ?? 'no-exercise-selected'}
           selectedExercise={selectedExerciseForAnalysis}
           analysisOverview={analysisOverview}
           onAnalysisOverviewChange={setAnalysisOverview}
-          cachedAnalysis={selectedExerciseForAnalysis?.id === lastAnalysis?.overview.exerciseId ? lastAnalysis?.result ?? null : null}
+          cachedAnalysis={
+            selectedExerciseForAnalysis?.id === lastAnalysis?.overview.exerciseId
+              ? (lastAnalysis?.result ?? null)
+              : null
+          }
           onCacheAnalysis={handleCacheAnalysis}
         />
       </SlidingBottomModal>

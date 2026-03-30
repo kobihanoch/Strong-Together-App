@@ -1,4 +1,3 @@
-/* eslint-disable prefer-const */
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { showErrorAlert } from '../errors/errorAlerts';
 import { getPresignedUrlFromS3, publishAnalyzeJobToServer, uploadVideoToS3 } from '../services/AnalyzeVideoService';
