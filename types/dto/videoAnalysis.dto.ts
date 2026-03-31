@@ -2,6 +2,9 @@ export type EnqueueAanalyzeVideoParams = {
   fileKey: string;
   exercise: string;
   userId: string;
+  requestId: string;
+  sentryTrace?: string;
+  baggage?: string;
 };
 
 export type AnalyzeVideoPayload = {
@@ -9,6 +12,9 @@ export type AnalyzeVideoPayload = {
   exercise: string;
   userId: string;
   expiresAt: number;
+  requestId: string;
+  sentryTrace?: string;
+  baggage?: string;
 };
 
 export interface SquatRepetition {
@@ -25,7 +31,7 @@ export interface SquatRepetition {
   audit: {
     frames_analyzed: number;
     valid_frames: number;
-    camera_angle: "SIDE_VIEW" | "FRONT_VIEW" | string;
+    camera_angle: 'SIDE_VIEW' | 'FRONT_VIEW' | string;
     raw_bottom_angle: number;
     sampling_rate: string;
   };
@@ -35,14 +41,15 @@ export type AnalyzeVideoResultPayload<T> = {
   jobId: string;
   userId: string;
   exercise: string;
+  requestId?: string;
 } & (
   | {
-      status: "completed";
+      status: 'completed';
       result: T[];
       error: null;
     }
   | {
-      status: "failed";
+      status: 'failed';
       result: null;
       error: string;
     }
