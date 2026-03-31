@@ -161,11 +161,12 @@ const createWeeklyData = (overrides: Partial<WeeklyData> = {}): WeeklyData => ({
 describe('Statistics components', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
     mockUseGenerateDays.mockReturnValue({
       datesList: [
-        moment.tz('2026-03-25', 'YYYY-MM-DD', 'Asia/Jerusalem'),
-        moment.tz('2026-03-26', 'YYYY-MM-DD', 'Asia/Jerusalem'),
-        moment.tz('2026-03-27', 'YYYY-MM-DD', 'Asia/Jerusalem'),
+        moment.tz('2026-03-25', 'YYYY-MM-DD', timezone),
+        moment.tz('2026-03-26', 'YYYY-MM-DD', timezone),
+        moment.tz('2026-03-27', 'YYYY-MM-DD', timezone),
       ],
     });
     mockScrollToIndex.mockReset();
