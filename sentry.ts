@@ -1,11 +1,12 @@
 import * as Sentry from '@sentry/react-native';
+import type { EventHint } from '@sentry/types';
 
 const dsn = process.env.EXPO_PUBLIC_SENTRY_DSN;
 const environment = process.env.EXPO_PUBLIC_ENVIRONMENT || 'development';
 
 export const isSentryEnabled = environment === 'production' && Boolean(dsn);
 
-function isUnauthorizedError(hint: Sentry.EventHint): boolean {
+function isUnauthorizedError(hint: EventHint): boolean {
   const originalException = hint.originalException;
 
   if (typeof originalException === 'object' && originalException !== null) {
