@@ -28,6 +28,7 @@ import { GlobalAppLoadingProvider } from './context/GlobalAppLoadingContext';
 import AppStack from './navigation/AppStack';
 import AuthStack from './navigation/AuthStack';
 import NotificationsSetup from './notifications/NotificationsSetup';
+import Sentry from './sentry';
 
 // ---------- Fonts Loader Hook ----------
 function useFontsReady() {
@@ -58,7 +59,7 @@ function useFontsReady() {
 }
 
 // ---------- App Root ----------
-export default function App() {
+function App() {
   const fontsReady = useFontsReady();
   const navigationRef = useNavigationContainerRef();
   const [keyPairReady, setKeyPairReady] = useState(false);
@@ -94,22 +95,26 @@ export default function App() {
 
   return (
     keyPairReady && (
-      <AlertNotificationRoot>
-        <GestureHandlerRootView style={{ flex: 1 }}>
-          <GlobalAppLoadingProvider>
-            <AuthProvider>
-              <NavigationContainer ref={navigationRef}>
-                <RootNavigator />
-                <NotifierRoot />
-                <UpdateAppModal />
-              </NavigationContainer>
-            </AuthProvider>
-          </GlobalAppLoadingProvider>
-        </GestureHandlerRootView>
-      </AlertNotificationRoot>
+      <Sentry.ErrorBoundary fallback={<AppCrashFallback />}>
+        <AlertNotificationRoot>
+          <GestureHandlerRootView style={{ flex: 1 }}>
+            <GlobalAppLoadingProvider>
+              <AuthProvider>
+                <NavigationContainer ref={navigationRef}>
+                  <RootNavigator />
+                  <NotifierRoot />
+                  <UpdateAppModal />
+                </NavigationContainer>
+              </AuthProvider>
+            </GlobalAppLoadingProvider>
+          </GestureHandlerRootView>
+        </AlertNotificationRoot>
+      </Sentry.ErrorBoundary>
     )
   );
 }
+
+export default Sentry.wrap(App);
 
 // ---------- Navigation Logic (auth-only here) ----------
 function RootNavigator() {
@@ -152,6 +157,15 @@ function MainApp() {
       </Theme1>
       <BottomTabBar />
     </>
+  );
+}
+
+function AppCrashFallback() {
+  return (
+    <View style={styles.loadingContainer}>
+      <Text>Something went wrong.</Text>
+      <Text>Please restart the app.</Text>
+    </View>
   );
 }
 
