@@ -38,6 +38,7 @@ const config = ({ config }: ConfigContext): ExpoConfig => {
     },
     web: { favicon: './assets/favicon.png' },
     plugins: [
+      '@sentry/react-native',
       ['expo-notifications', { mode: 'production' }],
       'expo-localization',
       'expo-font',
