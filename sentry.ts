@@ -3,7 +3,7 @@ import * as Sentry from '@sentry/react-native';
 const dsn = process.env.EXPO_PUBLIC_SENTRY_DSN;
 const environment = process.env.EXPO_PUBLIC_ENVIRONMENT || 'development';
 
-export const isSentryEnabled = Boolean(dsn);
+export const isSentryEnabled = environment === 'production' && Boolean(dsn);
 
 function isUnauthorizedError(hint: Sentry.EventHint): boolean {
   const originalException = hint.originalException;
@@ -35,7 +35,7 @@ Sentry.init({
   dsn,
   enabled: isSentryEnabled,
   environment,
-  debug: __DEV__,
+  debug: false,
   beforeSend(event, hint) {
     if (isUnauthorizedError(hint)) {
       return null;
