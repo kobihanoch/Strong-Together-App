@@ -5,18 +5,30 @@
   },
   "build": {
     "development": {
+      "environment": "development",
       "developmentClient": true,
       "distribution": "internal",
-      "env": { "APP_PROFILE": "development" }
+      "env": {
+        "APP_PROFILE": "development",
+        "SENTRY_DISABLE_AUTO_UPLOAD": "true"
+      }
     },
     "preview": {
+      "environment": "development",
       "distribution": "internal",
-      "env": { "APP_PROFILE": "development" }
+      "env": {
+        "APP_PROFILE": "development",
+        "SENTRY_DISABLE_AUTO_UPLOAD": "true"
+      }
     },
     "production": {
+      "environment": "production",
       "autoIncrement": true,
       "ios": { "image": "latest" },
-      "env": { "APP_PROFILE": "production" }
+      "env": {
+        "APP_PROFILE": "production",
+        "SENTRY_DISABLE_AUTO_UPLOAD": "true"
+      }
     }
   },
   "submit": {

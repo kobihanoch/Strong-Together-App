@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [5.0.0](https://github.com/kobihanoch/Strong-Together-App/compare/v4.5.0...v5.0.0) (2026-03-31)
+
+
+### Features
+
+* **Analze Video:** Added a feature to analyze exercise form by uploading a video (only squat for now) ([cf04d34](https://github.com/kobihanoch/Strong-Together-App/commit/cf04d34d4ea4815005907cfe319777d948ee2e8e))
+* **Sentry:** Added Sentry for error monitoring ([d762fa3](https://github.com/kobihanoch/Strong-Together-App/commit/d762fa3bddf5357ccfb026b30a5e9e79715d82cb))
+
 ## [4.5.0](https://github.com/kobihanoch/Strong-Together-App/compare/v4.4.0...v4.5.0) (2025-10-31)
 
 
