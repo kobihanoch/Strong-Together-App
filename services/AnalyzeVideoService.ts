@@ -1,7 +1,7 @@
+import { backgroundUpload, UploaderHttpMethod, UploadType } from 'react-native-compressor';
 import api from '../api/api';
-import { backgroundUpload, UploadType, UploaderHttpMethod } from 'react-native-compressor';
-import { GetPresignedUrlFromS3Response, PublishVideoAnalysisJobResponse } from '../types/api/videoAnalysis/responses';
-import { GetPresignedUrlFromS3Body, PublishVideoAnalysisJobBody } from './../types/api/videoAnalysis/requests';
+import { GetPresignedUrlFromS3Response } from '../types/api/videoAnalysis/responses';
+import { GetPresignedUrlFromS3Body } from './../types/api/videoAnalysis/requests';
 
 type UploadVideoToS3Options = {
   onProgress?: (progress: number) => void;
@@ -45,9 +45,4 @@ export const uploadVideoToS3 = async (
     },
     options?.abortSignal,
   );
-};
-
-export const publishAnalyzeJobToServer = async (body: PublishVideoAnalysisJobBody) => {
-  const { data } = await api.post<PublishVideoAnalysisJobResponse>('/api/videoanalysis/publishjob', body);
-  return data;
 };

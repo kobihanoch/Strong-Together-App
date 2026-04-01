@@ -1,13 +1,12 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { showErrorAlert } from '../errors/errorAlerts';
-import { getPresignedUrlFromS3, publishAnalyzeJobToServer, uploadVideoToS3 } from '../services/AnalyzeVideoService';
+import { getPresignedUrlFromS3, uploadVideoToS3 } from '../services/AnalyzeVideoService';
 import { GetPresignedUrlFromS3Body } from '../types/api/videoAnalysis/requests';
 import { AnalyzeVideoResultPayload, SquatRepetition } from '../types/dto/videoAnalysis.dto';
 import { ExerciseEntity } from '../types/entities/exercise.entity';
 import { registerToVideoAnalysisResultsListener } from '../webSockets/socketListeners';
 
 type useVideoAnalysisProps = {
-  fileName: GetPresignedUrlFromS3Body['fileName'];
   fileType: GetPresignedUrlFromS3Body['fileType'];
   exercise: ExerciseEntity['name'];
   fileURI: string;
@@ -58,18 +57,12 @@ const useVideoAnalysis = () => {
     };
   }, []);
 
-  const analyzeVideo = async ({
-    fileName,
-    fileType,
-    exercise,
-    fileURI,
-  }: useVideoAnalysisProps): Promise<(() => void) | void> => {
+  const analyzeVideo = async ({ exercise, fileType, fileURI }: useVideoAnalysisProps): Promise<(() => void) | void> => {
     if (inFlightRef.current) {
       return;
     }
 
     let waitingForServerResults = false;
-    let currentStage: Exclude<VideoAnalysisPhase, 'idle' | 'waiting_results'> = 'uploading';
 
     try {
       inFlightRef.current = true;
@@ -81,7 +74,7 @@ const useVideoAnalysis = () => {
 
       // Get presigned S3 URL
       setPhase('uploading');
-      const { uploadUrl, fileKey } = await getPresignedUrlFromS3({ fileName, fileType });
+      const { uploadUrl } = await getPresignedUrlFromS3({ exercise, fileType });
 
       // Upload to S3
       await uploadVideoToS3(uploadUrl, fileURI, fileType, {
@@ -94,11 +87,9 @@ const useVideoAnalysis = () => {
         return;
       }
 
-      // Publish job to server
-      currentStage = 'publishing';
-      setPhase('publishing');
-      const { jobId } = await publishAnalyzeJobToServer({ fileKey, exercise });
-
+      // Wait for results (register a listener)
+      setPhase('waiting_results');
+      waitingForServerResults = true;
       const handleResults = (results: AnalyzeVideoResultPayload<SquatRepetition>) => {
         setAnalysisResults(results);
         setUploadProgress(100);
@@ -107,12 +98,8 @@ const useVideoAnalysis = () => {
         clearInFlightState();
       };
 
-      // Wait for results (register a listener)
-      cleanupListenerRef.current = registerToVideoAnalysisResultsListener(jobId, handleResults) ?? null;
+      cleanupListenerRef.current = registerToVideoAnalysisResultsListener(handleResults) ?? null;
       console.log('[VideoAnalysis] WebSocket listener is registered');
-
-      setPhase('waiting_results');
-      waitingForServerResults = true;
 
       return () => {
         cleanupListenerRef.current?.();
@@ -123,7 +110,7 @@ const useVideoAnalysis = () => {
         return;
       }
 
-      if (currentStage === 'uploading') {
+      if (phase === 'uploading') {
         console.log('[VideoAnalysis] Upload failed', error);
         showErrorAlert('Error uploading file', 'Unable to upload the processed video file.');
         return;
