@@ -35,7 +35,7 @@ function isUnauthorizedError(hint: EventHint): boolean {
 
 Sentry.init({
   dsn,
-  enabled: isSentryEnabled,
+  enabled: true, //isSentryEnabled,
   environment,
   debug: false,
 
