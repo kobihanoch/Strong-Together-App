@@ -1,11 +1,11 @@
 import axios, { AxiosError, InternalAxiosRequestConfig } from 'axios';
 import Constants from 'expo-constants';
+import { showErrorAlert } from '../errors/errorAlerts';
 import { BootstrapResponse } from '../types/api/bootstrap/responses';
 import { openUpdateModal } from '../utils/imperativeUpdateModal';
 import { API_BASE_URL } from './apiConfig';
 import buildDpopProof from './DPoP/buildDpopProof';
-import { showErrorAlert } from '../errors/errorAlerts';
-import { randomUUID } from 'react-native-quick-crypto/lib/typescript/src/random';
+import { uuidv4 } from 'react-native-compressor';
 
 export type BootstrapPayload = BootstrapResponse;
 
@@ -20,7 +20,7 @@ bootstrapApi.interceptors.request.use(
     const url = config.url || '';
     // Adds a request id to each request (on retries - same request ID!)
     if (!config.headers['x-request-id']) {
-      config.headers.set('x-request-id', randomUUID());
+      config.headers.set('x-request-id', uuidv4());
     }
 
     console.log('[Bootstrap]:', url);

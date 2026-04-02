@@ -1,5 +1,6 @@
 import * as Sentry from '@sentry/react-native';
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { uuidv4 } from 'react-native-compressor';
 import { showErrorAlert } from '../errors/errorAlerts';
 import { getPresignedUrlFromS3, uploadVideoToS3 } from '../services/AnalyzeVideoService';
 import { GetPresignedUrlFromS3Body } from '../types/api/videoAnalysis/requests';
@@ -97,12 +98,17 @@ const useVideoAnalysis = () => {
         async (pipelineSpan) => {
           pipelineSpanRef.current = pipelineSpan;
 
+          // Create a jobID
+          const jobId = uuidv4();
+          pipelineSpan.setAttribute('video_analysis.job_id', jobId);
+
           // Mirror the phase in a ref so catch blocks always see the latest step.
           setCurrentPhase('uploading');
 
           const { uploadUrl } = await getPresignedUrlFromS3({
             exercise,
             fileType,
+            jobId,
           });
 
           await Sentry.startSpan(

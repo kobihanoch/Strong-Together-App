@@ -1,6 +1,6 @@
 import axios, { AxiosError, AxiosRequestConfig, AxiosResponse, InternalAxiosRequestConfig } from 'axios';
 import Constants from 'expo-constants';
-import { randomUUID } from 'react-native-quick-crypto/lib/typescript/src/random';
+import { uuidv4 } from 'react-native-compressor';
 import { showErrorAlert } from '../errors/errorAlerts';
 import { refreshAndRotateTokens } from '../services/AuthService';
 import GlobalAuth from '../utils/authUtils';
@@ -78,7 +78,7 @@ api.interceptors.request.use(
       const url = config.url || '';
       // Adds a request id to each request (on retries - same request ID!)
       if (!config.headers['x-request-id']) {
-        config.headers.set('x-request-id', randomUUID());
+        config.headers.set('x-request-id', uuidv4());
       }
 
       if (url.includes('login') || url.includes('oauth/google') || url.includes('oauth/apple')) {
