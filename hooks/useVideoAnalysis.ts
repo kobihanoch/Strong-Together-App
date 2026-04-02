@@ -1,4 +1,5 @@
 import * as Sentry from '@sentry/react-native';
+import { startNewTrace } from '@sentry/core';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { uuidv4 } from 'react-native-compressor';
 import { showErrorAlert } from '../errors/errorAlerts';
@@ -90,89 +91,91 @@ const useVideoAnalysis = () => {
       cleanupListener();
       abortControllerRef.current = new AbortController();
 
-      return await Sentry.startSpanManual(
-        {
-          name: 'video-analysis.pipeline',
-          op: 'ai.video.analysis',
-        },
-        async (pipelineSpan) => {
-          pipelineSpanRef.current = pipelineSpan;
+      return await startNewTrace(() =>
+        Sentry.startSpanManual(
+          {
+            name: 'video-analysis.pipeline',
+            op: 'ai.video.analysis',
+          },
+          async (pipelineSpan) => {
+            pipelineSpanRef.current = pipelineSpan;
 
-          // Create a jobID
-          const jobId = uuidv4();
-          pipelineSpan.setAttribute('video_analysis.job_id', jobId);
+            // Create a jobID
+            const jobId = uuidv4();
+            pipelineSpan.setAttribute('video_analysis.job_id', jobId);
 
-          // Mirror the phase in a ref so catch blocks always see the latest step.
-          setCurrentPhase('uploading');
+            // Mirror the phase in a ref so catch blocks always see the latest step.
+            setCurrentPhase('uploading');
 
-          const { uploadUrl } = await getPresignedUrlFromS3({
-            exercise,
-            fileType,
-            jobId,
-          });
-
-          await Sentry.startSpan(
-            {
-              name: 'video-analysis.upload-to-s3',
-              op: 'file.upload',
-            },
-            async () => {
-              await uploadVideoToS3(uploadUrl, fileURI, fileType, {
-                abortSignal: abortControllerRef.current!.signal,
-                onProgress: setUploadProgress,
-              });
-            },
-          );
-
-          if (abortControllerRef.current?.signal.aborted) {
-            console.log('[VideoAnalysis] Upload canceled');
-            finishPipelineSpan();
-            return;
-          }
-
-          // After the upload completes, the flow continues asynchronously via websocket.
-          setCurrentPhase('waiting_results');
-          waitingForServerResults = true;
-
-          const handleResults = (results: AnalyzeVideoResultPayload<SquatRepetition>) => {
-            // Re-activate the pipeline span so websocket work stays under the same trace.
-            Sentry.withActiveSpan(pipelineSpanRef.current, () => {
-              Sentry.startSpan(
-                {
-                  name: 'video-analysis.results-received',
-                  op: 'websocket.receive',
-                },
-                (resultsSpan) => {
-                  resultsSpan.setAttribute('video_analysis.status', results.status);
-                  if (results.requestId) {
-                    resultsSpan.setAttribute('video_analysis.request_id', results.requestId);
-                  }
-                  if (results.jobId) {
-                    resultsSpan.setAttribute('video_analysis.job_id', results.jobId);
-                  }
-
-                  // Surface backend analysis failures returned over the socket.
-                  if (results.error) {
-                    showErrorAlert('Error analyzing video', results.error);
-                  }
-
-                  setAnalysisResults(results);
-                  setUploadProgress(100);
-                  cleanupListener();
-                  finishPipelineSpan();
-                  clearInFlightState();
-                },
-              );
+            const { uploadUrl } = await getPresignedUrlFromS3({
+              exercise,
+              fileType,
+              jobId,
             });
-          };
 
-          cleanupListenerRef.current = registerToVideoAnalysisResultsListener(handleResults) ?? null;
-          console.log('[VideoAnalysis] WebSocket listener is registered');
+            await Sentry.startSpan(
+              {
+                name: 'video-analysis.upload-to-s3',
+                op: 'file.upload',
+              },
+              async () => {
+                await uploadVideoToS3(uploadUrl, fileURI, fileType, {
+                  abortSignal: abortControllerRef.current!.signal,
+                  onProgress: setUploadProgress,
+                });
+              },
+            );
 
-          return () => {
-            cleanupListener();
-          };
-        },
+            if (abortControllerRef.current?.signal.aborted) {
+              console.log('[VideoAnalysis] Upload canceled');
+              finishPipelineSpan();
+              return;
+            }
+
+            // After the upload completes, the flow continues asynchronously via websocket.
+            setCurrentPhase('waiting_results');
+            waitingForServerResults = true;
+
+            const handleResults = (results: AnalyzeVideoResultPayload<SquatRepetition>) => {
+              // Re-activate the pipeline span so websocket work stays under the same trace.
+              Sentry.withActiveSpan(pipelineSpanRef.current, () => {
+                Sentry.startSpan(
+                  {
+                    name: 'video-analysis.results-received',
+                    op: 'websocket.receive',
+                  },
+                  (resultsSpan) => {
+                    resultsSpan.setAttribute('video_analysis.status', results.status);
+                    if (results.requestId) {
+                      resultsSpan.setAttribute('video_analysis.request_id', results.requestId);
+                    }
+                    if (results.jobId) {
+                      resultsSpan.setAttribute('video_analysis.job_id', results.jobId);
+                    }
+
+                    // Surface backend analysis failures returned over the socket.
+                    if (results.error) {
+                      showErrorAlert('Error analyzing video', results.error);
+                    }
+
+                    setAnalysisResults(results);
+                    setUploadProgress(100);
+                    cleanupListener();
+                    finishPipelineSpan();
+                    clearInFlightState();
+                  },
+                );
+              });
+            };
+
+            cleanupListenerRef.current = registerToVideoAnalysisResultsListener(handleResults) ?? null;
+            console.log('[VideoAnalysis] WebSocket listener is registered');
+
+            return () => {
+              cleanupListener();
+            };
+          },
+        ),
       );
     } catch (error) {
       if (abortControllerRef.current?.signal.aborted) {
