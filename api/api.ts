@@ -1,5 +1,6 @@
 import axios, { AxiosError, AxiosRequestConfig, AxiosResponse, InternalAxiosRequestConfig } from 'axios';
 import Constants from 'expo-constants';
+import { randomUUID } from 'react-native-quick-crypto/lib/typescript/src/random';
 import { showErrorAlert } from '../errors/errorAlerts';
 import { refreshAndRotateTokens } from '../services/AuthService';
 import GlobalAuth from '../utils/authUtils';
@@ -75,6 +76,11 @@ api.interceptors.request.use(
     console.log('[API]:', config.url);
     try {
       const url = config.url || '';
+      // Adds a request id to each request (on retries - same request ID!)
+      if (!config.headers['x-request-id']) {
+        config.headers.set('x-request-id', randomUUID());
+      }
+
       if (url.includes('login') || url.includes('oauth/google') || url.includes('oauth/apple')) {
         // Build JKT for tokens signing (login)
         const res = await calculateJKT();

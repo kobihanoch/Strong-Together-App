@@ -5,6 +5,7 @@ import { openUpdateModal } from '../utils/imperativeUpdateModal';
 import { API_BASE_URL } from './apiConfig';
 import buildDpopProof from './DPoP/buildDpopProof';
 import { showErrorAlert } from '../errors/errorAlerts';
+import { randomUUID } from 'react-native-quick-crypto/lib/typescript/src/random';
 
 export type BootstrapPayload = BootstrapResponse;
 
@@ -17,6 +18,11 @@ export const bootstrapApi = axios.create({
 bootstrapApi.interceptors.request.use(
   async (config: InternalAxiosRequestConfig) => {
     const url = config.url || '';
+    // Adds a request id to each request (on retries - same request ID!)
+    if (!config.headers['x-request-id']) {
+      config.headers.set('x-request-id', randomUUID());
+    }
+
     console.log('[Bootstrap]:', url);
     config.headers.set('x-app-version', Constants.expoConfig!.version);
     try {
