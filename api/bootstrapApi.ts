@@ -6,8 +6,17 @@ import { openUpdateModal } from '../utils/imperativeUpdateModal';
 import { API_BASE_URL } from './apiConfig';
 import buildDpopProof from './DPoP/buildDpopProof';
 import { uuidv4 } from 'react-native-compressor';
+import { finishHttpErrorSpan, finishHttpResponseSpan, startHttpRequestSpan } from './sentryTracing';
+import type { Span } from '@sentry/core';
 
 export type BootstrapPayload = BootstrapResponse;
+
+declare module 'axios' {
+  export interface AxiosRequestConfig {
+    _sentrySpan?: Span;
+    sentryContinueTrace?: boolean;
+  }
+}
 
 // Use a separate axios instance to avoid circular import
 export const bootstrapApi = axios.create({
@@ -17,6 +26,7 @@ export const bootstrapApi = axios.create({
 
 bootstrapApi.interceptors.request.use(
   async (config: InternalAxiosRequestConfig) => {
+    config._sentrySpan = startHttpRequestSpan(config);
     const url = config.url || '';
     // Adds a request id to each request (on retries - same request ID!)
     if (!config.headers['x-request-id']) {
@@ -40,8 +50,9 @@ bootstrapApi.interceptors.request.use(
 );
 
 bootstrapApi.interceptors.response.use(
-  (res) => res,
+  (res) => finishHttpResponseSpan(res),
   (err: AxiosError<{ message?: string }>) => {
+    finishHttpErrorSpan(err);
     if (err.response?.status === 426) {
       console.log('426');
       openUpdateModal();

@@ -11,6 +11,8 @@ import { ensureBootstrap, isOpen, isTracked, responseMap } from './bootstrapApi'
 import buildDpopProof from './DPoP/buildDpopProof';
 import calculateJKT from './DPoP/calculateJKT';
 import { isDeviceOnline, notifyOffline, notifyServerDown } from './networkCheck';
+import { finishHttpErrorSpan, finishHttpResponseSpan, startHttpRequestSpan } from './sentryTracing';
+import type { Span } from '@sentry/core';
 
 declare module 'axios' {
   export interface AxiosRequestConfig {
@@ -18,6 +20,8 @@ declare module 'axios' {
     isUpgradeRequired?: boolean;
     isNetworkError?: boolean;
     isServerError?: boolean;
+    _sentrySpan?: Span;
+    sentryContinueTrace?: boolean;
   }
 
   export interface AxiosError {
@@ -75,6 +79,7 @@ api.interceptors.request.use(
   async (config: InternalAxiosRequestConfig) => {
     console.log('[API]:', config.url);
     try {
+      config._sentrySpan = startHttpRequestSpan(config);
       const url = config.url || '';
       // Adds a request id to each request (on retries - same request ID!)
       if (!config.headers['x-request-id']) {
@@ -117,8 +122,9 @@ api.interceptors.request.use(
 //                       Reject
 
 api.interceptors.response.use(
-  (res) => res,
+  (res) => finishHttpResponseSpan(res),
   async (error: AxiosError<{ message?: string }>) => {
+    finishHttpErrorSpan(error);
     const original = error.config;
     if (!original) return Promise.reject(error);
 
