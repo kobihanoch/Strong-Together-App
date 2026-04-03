@@ -1,4 +1,4 @@
-# Strong Together App - Frontend (v5.0.0)
+# Strong Together App - Frontend (v5.1.0)
 
 <p align="center">
   <img src="assets/icon.png" alt="Strong Together icon" width="140" />
@@ -23,7 +23,7 @@
   <img src="https://img.shields.io/badge/Tests-38%20files-16a34a" alt="Tests badge" />
 </p>
 
-Version 5.0.0 is a milestone release for the Strong Together client. It turns the app into a fully typed TypeScript codebase, expands automated test coverage across screens, hooks, contexts, and components, adds Sentry-based production monitoring, and introduces a new AI-powered exercise video analysis flow.
+Version 5.1.0 is a milestone release for the Strong Together client. It turns the app into a fully typed TypeScript codebase, expands automated test coverage across screens, hooks, contexts, and components, adds Sentry-based production monitoring, and introduces a new AI-powered exercise video analysis flow.
 
 The app helps users plan workouts, track sessions, review progress, receive reminders, and stay engaged through a polished mobile experience backed by a dedicated Node.js/Express API.
 
@@ -42,7 +42,7 @@ The app helps users plan workouts, track sessions, review progress, receive remi
 
 1. [TL;DR](#tldr)
 2. [Overview](#overview)
-3. [What is New in 5.0.0](#what-is-new-in-500)
+3. [What is New in 5.1.0](#what-is-new-in-510)
 4. [Core Product Features](#core-product-features)
 5. [Engineering Highlights](#engineering-highlights)
 6. [Architecture](#architecture)
@@ -78,7 +78,7 @@ This repository contains the **frontend client only**. The backend, business rul
 This release is based on everything added after `v4.5.0` and represents a major **technical upgrade** rather than a cosmetic refresh.
 
 - Full migration from **JavaScript** to **TypeScript** across screens, hooks, services, contexts, navigation, API layers, DTOs, and shared utilities
-- New **AI video analysis** feature for exercise form review, including upload flow, background transfer, server job publishing, and websocket-driven results
+- New **AI video analysis** feature for exercise form review, including the presigned upload flow, background transfer, SQS-based backend processing, and Python polling
 - Large automated **test expansion** with coverage for app boot, page logic hooks, contexts, and UI components
 - **CI pipeline** for running tests on pull requests
 - **Sentry** integration for production error monitoring
@@ -193,8 +193,8 @@ The new **analysis flow** turns a workout video into asynchronous coaching feedb
 2. The client selects and optionally trims/compresses the video.
 3. The app requests a **presigned upload URL** from the backend.
 4. The processed video is uploaded in the background.
-5. The client publishes an **analysis job** to the server.
-6. The app listens for the result through a **websocket event** tied to that job.
+5. The upload event continues into an **SQS-backed analysis pipeline** on the backend.
+6. A **Python polling worker** processes the analysis lifecycle until results are ready.
 7. Once the server finishes processing, the result is rendered back in the sheet.
 
 In the current version, the first supported exercise is **squat**, which keeps the UX focused while the pipeline is being proven end to end.
