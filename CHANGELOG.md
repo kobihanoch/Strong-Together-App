@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [5.1.0](https://github.com/kobihanoch/Strong-Together-App/compare/v5.0.0...v5.1.0) (2026-04-03)
+
+
+### Features
+
+* **Sentry:** Enabled Sentry tracing to all API calls and video analysis pipeline ([10544c4](https://github.com/kobihanoch/Strong-Together-App/commit/10544c480add0d6600e628b13ae6e5c96c150cb5))
+
 ## [5.0.0](https://github.com/kobihanoch/Strong-Together-App/compare/v4.5.0...v5.0.0) (2026-03-31)
 
 
