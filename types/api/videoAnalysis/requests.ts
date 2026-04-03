@@ -1,8 +1,5 @@
-export type PublishVideoAnalysisJobBody = {
-  fileKey: string;
-  exercise: string;
-};
 export type GetPresignedUrlFromS3Body = {
-  fileName: string;
+  exercise: string;
   fileType: string;
+  jobId: string;
 };

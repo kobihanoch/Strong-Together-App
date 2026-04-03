@@ -308,8 +308,11 @@ describe('useAnalysticsLogic integration', () => {
       expect(result.current.auth.user?.id).toBe('user-1');
     });
 
-    expect(result.current.analytics.hasData).toBe(false);
-    expect(result.current.analytics.loading).toBe(true);
+    await waitFor(() => {
+      expect(result.current.analytics.hasData).toBe(false);
+      expect(result.current.analytics.loading).toBe(false);
+    });
+
     expect(result.current.analytics.data.overview).toEqual({
       workoutCount: 0,
       splitsCounter: {},

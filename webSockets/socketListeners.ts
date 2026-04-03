@@ -30,7 +30,6 @@ export const registerToMessagesListener = (
 };
 
 export const registerToVideoAnalysisResultsListener = (
-  jobId: string,
   onResults: (results: AnalyzeVideoResultPayload<SquatRepetition>) => void,
 ) => {
   const socket = getSocket();
@@ -47,9 +46,9 @@ export const registerToVideoAnalysisResultsListener = (
     onResults(results);
   };
 
-  socket.on(`video_analysis_results${jobId}`, handler);
+  socket.on(`video_analysis_results`, handler);
 
   return () => {
-    socket.off(`video_analysis_results${jobId}`, handler);
+    socket.off(`video_analysis_results`, handler);
   };
 };

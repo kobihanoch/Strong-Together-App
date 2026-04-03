@@ -31,14 +31,14 @@ const CalendarStripCustom = ({ onDateSelect, selectedDate, userExerciseLogs }: C
   const initialScrollIndex = useMemo(() => {
     if (!datesList || !selectedDate) return undefined;
     const idx = datesList.findIndex((d) => d.isSame(selectedDate, 'day'));
-    return idx;
-  }, [datesList, selectedDateMoment]);
+    return idx >= 0 ? idx : undefined;
+  }, [datesList, selectedDate]);
 
   // Small memo to avoid moment() per-item for "today"
   const today = useMemo(() => moment.tz(timezone), []);
 
-  // Initae with current month of today's date
-  const [currentMonth, setCurrentMonth] = useState(moment().format('MMMM YYYY'));
+  // Initialize the header from the selected date so tests and UI stay in sync before scrolling callbacks fire.
+  const [currentMonth, setCurrentMonth] = useState(selectedDateMoment.format('MMMM YYYY'));
 
   const onViewableItemsChanged = useRef(({ viewableItems }: { viewableItems: ViewToken[] }) => {
     if (!viewableItems?.length) return;
@@ -54,9 +54,10 @@ const CalendarStripCustom = ({ onDateSelect, selectedDate, userExerciseLogs }: C
   const scrollToToday = useCallback(() => {
     if (!flatListRef?.current) return;
     const todayIndex = datesList!.findIndex((d) => d.isSame(today, 'day'));
+    if (todayIndex < 0) return;
     flatListRef.current.scrollToIndex({ index: todayIndex, animated: true });
     onDateSelect(today.format('YYYY-MM-DD'));
-  }, [initialScrollIndex, flatListRef]);
+  }, [datesList, onDateSelect, today]);
 
   const renderItem = useCallback(
     ({ item }: { item: moment.Moment }) => {

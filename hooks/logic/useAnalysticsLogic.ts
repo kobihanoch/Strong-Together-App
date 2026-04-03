@@ -61,7 +61,7 @@ const useAnalysticsLogic = () => {
         adh: adherence,
       },
     },
-    loading: loading,
+    loading: hasData ? loading : false,
     hasData,
   };
 };
