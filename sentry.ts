@@ -35,13 +35,13 @@ function isUnauthorizedError(hint: EventHint): boolean {
 
 Sentry.init({
   dsn,
-  enabled: true, //isSentryEnabled,
+  enabled: isSentryEnabled,
   environment,
   debug: false,
   enableAutoPerformanceTracing: false,
   enableAppStartTracking: false,
 
-  tracesSampleRate: isSentryEnabled ? 0.1 : 1.0, // use 1.0 only while testing
+  tracesSampleRate: 0.1, // use 1.0 only while testing
   tracePropagationTargets: [API_BASE_URL, /^\//],
   propagateTraceparent: true,
 
