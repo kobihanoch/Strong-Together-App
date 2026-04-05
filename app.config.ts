@@ -23,7 +23,7 @@ const config = ({ config }: ConfigContext): ExpoConfig => {
     name: isProd ? APP_NAME_BASE : `${APP_NAME_BASE} (Dev)`,
     scheme: 'strongtogether',
     slug: 'strong-together',
-    version: '5.1.0',
+    version: '5.1.1',
     orientation: 'portrait',
     icon: './assets/icon.png',
     userInterfaceStyle: 'light',

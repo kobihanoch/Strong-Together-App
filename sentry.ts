@@ -1,9 +1,12 @@
 import * as Sentry from '@sentry/react-native';
 import type { EventHint } from '@sentry/types';
+import Constants from 'expo-constants';
 import { API_BASE_URL } from './api/apiConfig';
 
 const dsn = process.env.EXPO_PUBLIC_SENTRY_DSN;
 const environment = process.env.EXPO_PUBLIC_ENVIRONMENT || 'development';
+const appVersion = Constants.expoConfig?.version ?? 'unknown';
+const release = `${appVersion}`;
 
 export const isSentryEnabled = environment === 'production' && Boolean(dsn);
 
@@ -37,6 +40,12 @@ Sentry.init({
   dsn,
   enabled: isSentryEnabled,
   environment,
+  release,
+  initialScope: {
+    tags: {
+      service: 'strong-together-client',
+    },
+  },
   debug: false,
   enableAutoPerformanceTracing: false,
   enableAppStartTracking: false,

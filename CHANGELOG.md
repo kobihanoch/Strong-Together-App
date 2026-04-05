@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [5.1.1](https://github.com/kobihanoch/Strong-Together-App/compare/v5.1.0...v5.1.1) (2026-04-05)
+
+
+### Bug Fixes
+
+* **Sentry:** initialization with app version and release tagging ([f5900ef](https://github.com/kobihanoch/Strong-Together-App/commit/f5900ef06957ee2b529170a554fccbde7102ad4e))
+
 ## [5.1.0](https://github.com/kobihanoch/Strong-Together-App/compare/v5.0.0...v5.1.0) (2026-04-03)
 
 
