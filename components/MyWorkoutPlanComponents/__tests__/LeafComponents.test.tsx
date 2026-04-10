@@ -10,7 +10,7 @@ import {
 import { fireEvent, render } from '@testing-library/react-native';
 import { TouchableOpacity } from 'react-native';
 import type { WorkoutContextWorkoutSplit } from '../../../context/types/workoutContextTypes.dto';
-import type { ExerciseInPlan } from '../../../types/dto/workoutPlans.dto';
+import type { ExerciseInPlan } from '@strong-together/shared';
 
 const mockNavigate = jestObject.fn();
 let mockCardioContext: { hasDoneCardioToday: boolean };

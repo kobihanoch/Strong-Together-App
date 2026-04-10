@@ -1,7 +1,7 @@
 import { useCallback, useState } from 'react';
 import { saveWorkoutData } from '../services/WorkoutService';
-import { ExerciseTrackingAndStats } from '../types/dto/exerciseTracking.dto';
-import { FinishUserWorkoutBody } from '../types/api/workouts/requests';
+import { ExerciseTrackingAndStats } from '@strong-together/shared';
+import { FinishUserWorkoutBody } from '@strong-together/shared';
 
 export const useUserWorkout = (): {
   saveWorkoutProcess: (

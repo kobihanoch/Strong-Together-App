@@ -5,8 +5,8 @@ import React, { useState } from 'react';
 import { Dimensions, Modal, Text, TouchableOpacity, View } from 'react-native';
 import { Swipeable } from 'react-native-gesture-handler';
 import { RFValue } from 'react-native-responsive-fontsize';
-import { AllUserMessages } from '../../types/dto/messages.dto';
-import { MessageEntity } from '../../types/entities/message.entity';
+import { AllUserMessages } from '@strong-together/shared';
+import { MessageEntity } from '@strong-together/shared';
 import { formatDate } from '../../utils/statisticsUtils';
 
 const { width, height } = Dimensions.get('window');

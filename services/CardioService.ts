@@ -1,6 +1,6 @@
 import api from '../api/api';
-import { AddUserAerobicsBody, GetUserAerobicsQuery } from '../types/api/aerobics/requests';
-import { UserAerobicsResponse } from '../types/api/aerobics/responses';
+import { AddUserAerobicsBody, GetUserAerobicsQuery } from '@strong-together/shared';
+import { UserAerobicsResponse } from '@strong-together/shared';
 
 export const getUserCardio = async (): Promise<UserAerobicsResponse> => {
   const { data } = await api.get<UserAerobicsResponse>('/api/aerobics/get', {

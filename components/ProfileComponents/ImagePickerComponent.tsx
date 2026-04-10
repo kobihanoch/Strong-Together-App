@@ -9,7 +9,7 @@ import api from '../../api/api';
 import { colors } from '../../constants/colors';
 import { useAuth } from '../../context/AuthContext';
 import useMediaUploads from '../../hooks/useMediaUploads';
-import { UserEntity } from '../../types/entities/user.entity';
+import { UserEntity } from '@strong-together/shared';
 
 const { width, height } = Dimensions.get('window');
 

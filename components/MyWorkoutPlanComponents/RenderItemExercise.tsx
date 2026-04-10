@@ -3,7 +3,7 @@ import { Dimensions, StyleSheet, Text, View } from 'react-native';
 import { RFValue } from 'react-native-responsive-fontsize';
 import { colors } from '../../constants/colors';
 import Column from '../Column';
-import { ExerciseInPlan } from '../../types/dto/workoutPlans.dto';
+import { ExerciseInPlan } from '@strong-together/shared';
 
 const { width, height } = Dimensions.get('window');
 

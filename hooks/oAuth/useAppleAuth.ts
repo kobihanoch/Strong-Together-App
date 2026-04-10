@@ -3,8 +3,8 @@ import * as Crypto from 'expo-crypto';
 import { Platform } from 'react-native';
 import { useCallback } from 'react';
 import api from '../../api/api'; // <-- call backend here for symmetry
-import { OAuthLoginResponse } from '../../types/api/oAuth/responses';
-import { AppleOAuthBody } from '../../types/api/oAuth/requests';
+import { OAuthLoginResponse } from '@strong-together/shared';
+import { AppleOAuthBody } from '@strong-together/shared';
 
 export function useAppleAuth() {
   const signInWithApple = useCallback(async () => {
@@ -35,7 +35,7 @@ export function useAppleAuth() {
         idToken: result.identityToken,
         rawNonce,
         email: result.email || null,
-        name: result.fullName,
+        name: { givenName: result.fullName?.givenName ?? null, familyName: result.fullName?.familyName ?? null },
       } satisfies AppleOAuthBody);
 
       return data;

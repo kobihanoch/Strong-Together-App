@@ -10,7 +10,7 @@ import {
 } from '@jest/globals';
 import { render, waitFor } from '@testing-library/react-native';
 import type { AuthContextValue } from '../../../context/types/authContextTypes.dto';
-import type { GetAuthenticatedUserByIdResponse } from '../../../types/api/user/responses';
+import type { GetAuthenticatedUserByIdResponse } from '@strong-together/shared';
 
 let mockAuthState: AuthContextValue;
 let mockMediaUploadsState: {

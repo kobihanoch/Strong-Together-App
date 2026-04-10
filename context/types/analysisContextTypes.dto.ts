@@ -1,5 +1,5 @@
-import { GetExerciseTrackingResponse } from '../../types/api/workouts/responses';
-import { ExerciseTrackingAndStats } from '../../types/dto/exerciseTracking.dto';
+import { GetExerciseTrackingResponse } from '@strong-together/shared';
+import { ExerciseTrackingAndStats } from '@strong-together/shared';
 
 export type AnalysisContextCachePayload = {
   exerciseTrackingMaps: ExerciseTrackingAndStats['exerciseTrackingMaps'] | null;

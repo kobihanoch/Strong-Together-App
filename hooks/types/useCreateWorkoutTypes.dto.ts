@@ -1,7 +1,7 @@
-import { ExercisesMapByMuscle } from '../../types/dto/exercises.dto';
-import { ExerciseEntity } from '../../types/entities/exercise.entity';
-import { ExerciseToWorkoutSplitEntity } from '../../types/entities/exerciseToWorkoutSplit.entity';
-import { WorkoutSplitEntity } from '../../types/entities/workoutSplit.entity';
+import { ExercisesMapByMuscle } from '@strong-together/shared';
+import { ExerciseEntity } from '@strong-together/shared';
+import { ExerciseToWorkoutSplitEntity } from '@strong-together/shared';
+import { WorkoutSplitEntity } from '@strong-together/shared';
 
 export interface ExerciseCandidate {
   id: ExerciseEntity['id'];

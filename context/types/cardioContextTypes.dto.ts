@@ -1,5 +1,5 @@
-import { UserAerobicsResponse } from '../../types/api/aerobics/responses';
-import { AerobicsDailyRecord } from '../../types/dto/aerobics.dto';
+import { UserAerobicsResponse } from '@strong-together/shared';
+import { AerobicsDailyRecord } from '@strong-together/shared';
 
 export type CardioContextCachePayload = {
   daily: CardioContextDailyMap | null;

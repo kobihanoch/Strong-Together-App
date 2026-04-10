@@ -5,7 +5,7 @@ import { splitsCounterToPieData } from '../../utils/analyticsUtils';
 import Card from './Card';
 import PieDiagramSplitsCounter from './PieDiagramSplitsCounter';
 import { AnalysisContextAnalyzedExerciseTrackingData } from '../../context/types/analysisContextTypes.dto';
-import { WholeUserWorkoutPlan } from '../../types/dto/workoutPlans.dto';
+import { WholeUserWorkoutPlan } from '@strong-together/shared';
 
 const { height } = Dimensions.get('window');
 

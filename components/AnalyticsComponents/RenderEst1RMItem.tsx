@@ -3,8 +3,8 @@ import { FontAwesome5 } from '@expo/vector-icons';
 import React from 'react';
 import { Dimensions, Text, View } from 'react-native';
 import { RFValue } from 'react-native-responsive-fontsize';
-import { ExerciseEntity } from '../../types/entities/exercise.entity';
-import { WorkoutRMRecord } from '../../types/dto/analytics.dto';
+import { ExerciseEntity } from '@strong-together/shared';
+import { WorkoutRMRecord } from '@strong-together/shared';
 
 const { width, height } = Dimensions.get('window');
 

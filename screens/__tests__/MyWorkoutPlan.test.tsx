@@ -10,8 +10,8 @@ import {
 } from '@jest/globals';
 import { fireEvent, render, waitFor } from '@testing-library/react-native';
 import { Keyboard, TouchableOpacity } from 'react-native';
-import type { ExerciseInPlan } from '../../types/dto/workoutPlans.dto';
-import type { AerobicsDailyRecord } from '../../types/dto/aerobics.dto';
+import type { ExerciseInPlan } from '@strong-together/shared';
+import type { AerobicsDailyRecord } from '@strong-together/shared';
 
 const mockNavigate = jestObject.fn();
 const mockReplace = jestObject.fn();

@@ -10,7 +10,7 @@ import {
 } from '@jest/globals';
 import { act, fireEvent, render, waitFor } from '@testing-library/react-native';
 import { ActivityIndicator, Keyboard, TouchableOpacity } from 'react-native';
-import type { UserEntity } from '../../../types/entities/user.entity';
+import type { UserEntity } from '@strong-together/shared';
 
 const mockUpdateSelfUser = jestObject.fn<(payload: { username?: string; fullName?: string; email?: string }) => Promise<any>>();
 const mockShowErrorAlert = jestObject.fn();

@@ -1,5 +1,5 @@
-import { CreateUserBody, LoginRequestBody } from '../../types/api/auth/requests';
-import { GetAuthenticatedUserByIdResponse } from '../../types/api/user/responses';
+import { CreateUserBody, LoginRequestBody } from '@strong-together/shared';
+import { GetAuthenticatedUserByIdResponse } from '@strong-together/shared';
 
 export type AppUser = GetAuthenticatedUserByIdResponse;
 export type UserCachePayload = AppUser | null;

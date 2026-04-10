@@ -5,7 +5,7 @@ import useUpdateGlobalLoading from '../hooks/useUpdateGlobalLoading';
 import { getUserWorkout } from '../services/WorkoutService';
 import { extractWorkoutSplits } from '../utils/workoutContextUtils';
 import { useAuth } from './AuthContext';
-import { GetWholeUserWorkoutPlanResponse } from '../types/api/workouts/responses';
+import { GetWholeUserWorkoutPlanResponse } from '@strong-together/shared';
 import {
   WorkoutContextCachePayload,
   WorkoutContextValue,

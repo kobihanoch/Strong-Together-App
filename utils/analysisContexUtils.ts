@@ -1,6 +1,6 @@
 import { DateTime } from 'luxon';
 import { AnalysisContextAnalyzedExerciseTrackingData } from '../context/types/analysisContextTypes.dto';
-import { GetExerciseTrackingResponse } from '../types/api/workouts/responses';
+import { GetExerciseTrackingResponse } from '@strong-together/shared';
 
 type ETUnpacked = AnalysisContextAnalyzedExerciseTrackingData;
 

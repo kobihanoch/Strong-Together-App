@@ -76,10 +76,10 @@
 };*/
 
 import { colors } from '../constants/colors';
-import { WeeklyData } from '../types/dto/aerobics.dto';
-import { TrackingMapItem } from '../types/dto/exerciseTracking.dto';
-import { ExerciseToWorkoutSplitEntity } from '../types/entities/exerciseToWorkoutSplit.entity';
-import { WorkoutSplitEntity } from '../types/entities/workoutSplit.entity';
+import { WeeklyData } from '@strong-together/shared';
+import { TrackingMapItem } from '@strong-together/shared';
+import { ExerciseToWorkoutSplitEntity } from '@strong-together/shared';
+import { WorkoutSplitEntity } from '@strong-together/shared';
 
 export const getLastWorkoutForEachExercise = (
   date: string,

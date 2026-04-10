@@ -1,4 +1,4 @@
-import { AerobicsDailyRecord } from '../types/dto/aerobics.dto';
+import { AerobicsDailyRecord } from '@strong-together/shared';
 import { createContext, ReactNode, useCallback, useContext, useMemo, useState } from 'react';
 import { useAuth } from './AuthContext';
 import { keyCardio } from '../cache/cacheUtils';
@@ -12,7 +12,7 @@ import {
   CardioContextValue,
   CardioContextWeeklyMap,
 } from './types/cardioContextTypes.dto';
-import { UserAerobicsResponse } from '../types/api/aerobics/responses';
+import { UserAerobicsResponse } from '@strong-together/shared';
 
 const CardioContext = createContext<CardioContextValue | null>(null);
 

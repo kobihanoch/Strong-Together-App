@@ -21,11 +21,11 @@ import {
   StartWorkoutPageLogicReturn,
 } from './../types/useStartWorkoutTypes.dto';
 import { WorkoutContextWorkoutSplit } from '../../context/types/workoutContextTypes.dto';
-import { ExerciseEntity } from '../../types/entities/exercise.entity';
-import { ExerciseTrackingEntity } from '../../types/entities/exerciseTracking.entity';
+import { ExerciseEntity } from '@strong-together/shared';
+import { ExerciseTrackingEntity } from '@strong-together/shared';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RootParamList } from '../../navigation/types/appStackTypes';
-import { FinishUserWorkoutBody } from '../../types/api/workouts/requests';
+import { FinishUserWorkoutBody } from '@strong-together/shared';
 
 const useStartWorkoutPageLogic = (
   selectedSplit: WorkoutContextWorkoutSplit,

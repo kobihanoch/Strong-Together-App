@@ -1,5 +1,5 @@
-import { ExerciseInPlan, WholeUserWorkoutPlan } from '../types/dto/workoutPlans.dto';
-import { WorkoutSplitEntity } from '../types/entities/workoutSplit.entity';
+import { ExerciseInPlan, WholeUserWorkoutPlan } from '@strong-together/shared';
+import { WorkoutSplitEntity } from '@strong-together/shared';
 
 type SplitName = WorkoutSplitEntity['name'];
 type SplitId = WorkoutSplitEntity['id'];

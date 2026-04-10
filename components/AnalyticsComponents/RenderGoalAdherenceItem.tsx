@@ -3,9 +3,9 @@ import { Dimensions, Text, View, TouchableOpacity } from 'react-native';
 import { RFValue } from 'react-native-responsive-fontsize';
 import { FontAwesome5 } from '@expo/vector-icons';
 import { AdherenceBar } from '../AdherenceBar';
-import { WorkoutSplitEntity } from '../../types/entities/workoutSplit.entity';
-import { ExerciseEntity } from '../../types/entities/exercise.entity';
-import { AdherenceExerciseStats } from '../../types/dto/analytics.dto';
+import { WorkoutSplitEntity } from '@strong-together/shared';
+import { ExerciseEntity } from '@strong-together/shared';
+import { AdherenceExerciseStats } from '@strong-together/shared';
 
 const { height } = Dimensions.get('window');
 

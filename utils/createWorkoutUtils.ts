@@ -1,7 +1,7 @@
 import { showErrorAlert } from '../errors/errorAlerts';
 import { ExerciseCandidate, SelectedExercise, SelectedExercises } from '../hooks/types/useCreateWorkoutTypes.dto';
-import { ExerciseToWorkoutSplitEntity } from '../types/entities/exerciseToWorkoutSplit.entity';
-import { WorkoutSplitEntity } from '../types/entities/workoutSplit.entity';
+import { ExerciseToWorkoutSplitEntity } from '@strong-together/shared';
+import { WorkoutSplitEntity } from '@strong-together/shared';
 
 type SplitName = WorkoutSplitEntity['name'];
 

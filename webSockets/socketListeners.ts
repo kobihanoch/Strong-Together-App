@@ -1,7 +1,7 @@
 import { Dispatch, SetStateAction } from 'react';
 import { NotificationsContextAllReceivedMessages } from '../context/types/notificationsContextTypes.dto';
-import { MessageAfterSendResponse } from '../types/dto/messages.dto';
-import { AnalyzeVideoResultPayload, SquatRepetition } from '../types/dto/videoAnalysis.dto';
+import { MessageAfterSendResponse } from '@strong-together/shared';
+import { AnalyzeVideoResultPayload, SquatRepetition } from '@strong-together/shared';
 import { getSocket } from './socketConfig';
 
 export const registerToMessagesListener = (

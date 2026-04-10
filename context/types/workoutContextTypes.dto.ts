@@ -1,5 +1,5 @@
-import { ExerciseInPlan, WholeUserWorkoutPlan, WorkoutSplitsMap } from '../../types/dto/workoutPlans.dto';
-import { WorkoutSplitEntity } from '../../types/entities/workoutSplit.entity';
+import { ExerciseInPlan, WholeUserWorkoutPlan, WorkoutSplitsMap } from '@strong-together/shared';
+import { WorkoutSplitEntity } from '@strong-together/shared';
 
 export type WorkoutContextCachePayload = {
   workoutPlan: WholeUserWorkoutPlan | null;

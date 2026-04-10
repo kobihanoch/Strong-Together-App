@@ -7,13 +7,8 @@ import {
   LoginRequestBody,
   SendChangePassEmailBody,
   SendVerifcationMailBody,
-} from '../types/api/auth/requests';
-import {
-  CheckUserVerifyResponse,
-  CreateUserResponse,
-  LoginResponse,
-  RefreshTokenResponse,
-} from '../types/api/auth/responses';
+} from '@strong-together/shared';
+import { CreateUserResponse, LoginResponse, RefreshTokenResponse } from '@strong-together/shared';
 import { getRefreshToken } from '../utils/tokenStore';
 
 // Rotate tokens
@@ -99,8 +94,8 @@ export const forgotPassword = async (identifier: SendChangePassEmailBody['identi
   await api.post('api/auth/forgotpassemail', { identifier } satisfies SendChangePassEmailBody);
 };
 
-export const checkUserVerify = async (username: CheckUserVerifyQuery['username']): Promise<CheckUserVerifyResponse> => {
-  const { data } = await api.get<CheckUserVerifyResponse>(`api/auth/checkuserverify`, {
+export const checkUserVerify = async (username: CheckUserVerifyQuery['username']): Promise<{ isVerified: boolean }> => {
+  const { data } = await api.get<{ isVerified: boolean }>(`api/auth/checkuserverify`, {
     params: {
       username,
     } satisfies CheckUserVerifyQuery,

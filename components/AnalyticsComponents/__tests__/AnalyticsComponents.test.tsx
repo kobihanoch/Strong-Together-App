@@ -9,8 +9,8 @@ import type {
   GoalAdherenceResponse,
   WorkoutRMRecord,
   WorkoutRMsResponse,
-} from '../../../types/dto/analytics.dto';
-import type { WholeUserWorkoutPlan } from '../../../types/dto/workoutPlans.dto';
+} from '@strong-together/shared';
+import type { WholeUserWorkoutPlan } from '@strong-together/shared';
 
 jest.mock('@expo/vector-icons', () => {
   const ReactLocal = require('react');

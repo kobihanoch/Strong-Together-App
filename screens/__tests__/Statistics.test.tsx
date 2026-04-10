@@ -4,8 +4,8 @@
 import React from 'react';
 import { beforeEach, describe, expect, it, jest } from '@jest/globals';
 import { render } from '@testing-library/react-native';
-import type { TrackingMapItem } from '../../types/dto/exerciseTracking.dto';
-import type { WeeklyData } from '../../types/dto/aerobics.dto';
+import type { TrackingMapItem } from '@strong-together/shared';
+import type { WeeklyData } from '@strong-together/shared';
 
 let mockStatisticsLogic: {
   selectedDate: string;

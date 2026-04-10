@@ -4,9 +4,9 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { uuidv4 } from 'react-native-compressor';
 import { showErrorAlert } from '../errors/errorAlerts';
 import { getPresignedUrlFromS3, uploadVideoToS3 } from '../services/AnalyzeVideoService';
-import { GetPresignedUrlFromS3Body } from '../types/api/videoAnalysis/requests';
-import { AnalyzeVideoResultPayload, SquatRepetition } from '../types/dto/videoAnalysis.dto';
-import { ExerciseEntity } from '../types/entities/exercise.entity';
+import { GetPresignedUrlFromS3Body } from '@strong-together/shared';
+import { AnalyzeVideoResultPayload, SquatRepetition } from '@strong-together/shared';
+import { ExerciseEntity } from '@strong-together/shared';
 import { registerToVideoAnalysisResultsListener } from '../webSockets/socketListeners';
 
 type useVideoAnalysisProps = {

@@ -8,8 +8,8 @@ import { getSupportedAnalysisExerciseName } from '../../constants/videoAnalysis'
 import { showErrorAlert } from '../../errors/errorAlerts';
 import useVideoAnalysis from '../../hooks/useVideoAnalysis';
 import type { ExerciseAnalysisOverview } from '../../screens/StartWorkout';
-import { AnalyzeVideoResultPayload, SquatRepetition } from '../../types/dto/videoAnalysis.dto';
-import { ExerciseInPlan } from '../../types/dto/workoutPlans.dto';
+import { AnalyzeVideoResultPayload, SquatRepetition } from '@strong-together/shared';
+import { ExerciseInPlan } from '@strong-together/shared';
 import {
   AnalyzeActionsSection,
   AnalyzeClipStatusCard,
@@ -124,8 +124,15 @@ const AnalyzeExerciseSheet = ({
   const cleanupAnalysisRef = useRef<(() => void) | null>(null);
   const lastCachedCompletedRef = useRef<AnalyzeVideoResultPayload<SquatRepetition> | null>(null);
 
-  const { loading: analysisLoading, analyzeVideo, analysisResults, uploadProgress, phase, cancelAnalysis, resetAnalysis } =
-    useVideoAnalysis();
+  const {
+    loading: analysisLoading,
+    analyzeVideo,
+    analysisResults,
+    uploadProgress,
+    phase,
+    cancelAnalysis,
+    resetAnalysis,
+  } = useVideoAnalysis();
 
   const resetProcessedVideoState = useCallback(() => {
     setTrimmedVideoUri(null);
@@ -239,7 +246,6 @@ const AnalyzeExerciseSheet = ({
         cleanupAnalysisRef.current?.();
         cleanupAnalysisRef.current =
           (await analyzeVideo({
-            fileName: normalizedFileName,
             fileType: 'video/mp4',
             exercise: supportedExercise,
             fileURI: compressedUri,
@@ -259,8 +265,11 @@ const AnalyzeExerciseSheet = ({
     setSelectedRepIndex(0);
 
     if (cachedAnalysis) {
-      lastCachedCompletedRef.current = cachedAnalysis.status === 'completed' ? cachedAnalysis : lastCachedCompletedRef.current;
-      setProcessingLabel(cachedAnalysis.status === 'completed' ? 'Analysis finished. Explore each repetition below.' : '');
+      lastCachedCompletedRef.current =
+        cachedAnalysis.status === 'completed' ? cachedAnalysis : lastCachedCompletedRef.current;
+      setProcessingLabel(
+        cachedAnalysis.status === 'completed' ? 'Analysis finished. Explore each repetition below.' : '',
+      );
       return;
     }
 

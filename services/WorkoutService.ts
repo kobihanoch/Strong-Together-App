@@ -1,12 +1,12 @@
-import { AddWorkoutBody, FinishUserWorkoutBody, GetExerciseTrackingQuery } from './../types/api/workouts/requests';
+import { AddWorkoutBody, FinishUserWorkoutBody, GetExerciseTrackingQuery } from '@strong-together/shared';
 import api from '../api/api';
-import { GetWholeUserWorkoutPlanQuery } from '../types/api/workouts/requests';
+import { GetWholeUserWorkoutPlanQuery } from '@strong-together/shared';
 import {
   AddWorkoutResponse,
   FinishUserWorkoutResponse,
   GetExerciseTrackingResponse,
   GetWholeUserWorkoutPlanResponse,
-} from '../types/api/workouts/responses';
+} from '@strong-together/shared';
 
 // Fetch self workout plan
 export const getUserWorkout = async (): Promise<GetWholeUserWorkoutPlanResponse> => {

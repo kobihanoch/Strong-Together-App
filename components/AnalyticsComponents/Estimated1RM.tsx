@@ -4,7 +4,7 @@ import { Dimensions, Text, TouchableOpacity, View } from 'react-native';
 import { RFValue } from 'react-native-responsive-fontsize';
 import Card from './Card';
 import RenderEst1RMItem from './RenderEst1RMItem';
-import { WorkoutRMsResponse } from '../../types/dto/analytics.dto';
+import { WorkoutRMsResponse } from '@strong-together/shared';
 
 const { height } = Dimensions.get('window');
 

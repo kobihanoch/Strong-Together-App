@@ -3,7 +3,7 @@ import { keyTracking } from '../cache/cacheUtils';
 import useCacheAndFetch from '../hooks/useCacheAndFetch';
 import useUpdateGlobalLoading from '../hooks/useUpdateGlobalLoading';
 import { getUserExerciseTracking } from '../services/WorkoutService';
-import { GetExerciseTrackingResponse } from '../types/api/workouts/responses';
+import { GetExerciseTrackingResponse } from '@strong-together/shared';
 import { checkHasTrainedToday, unpackFromExerciseTrackingData } from '../utils/analysisContexUtils';
 import { useAuth } from './AuthContext';
 import {

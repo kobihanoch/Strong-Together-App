@@ -11,9 +11,9 @@ import TopBar from '../components/StartWorkoutComponents/TopBar';
 import { showErrorAlert } from '../errors/errorAlerts';
 import useStartWorkoutPageLogic from '../hooks/logic/useStartWorkoutPageLogic';
 import { RootParamList } from '../navigation/types/appStackTypes';
-import { TrackingMapItem } from '../types/dto/exerciseTracking.dto';
-import { AnalyzeVideoResultPayload, SquatRepetition } from '../types/dto/videoAnalysis.dto';
-import { ExerciseInPlan } from '../types/dto/workoutPlans.dto';
+import { TrackingMapItem } from '@strong-together/shared';
+import { AnalyzeVideoResultPayload, SquatRepetition } from '@strong-together/shared';
+import { ExerciseInPlan } from '@strong-together/shared';
 
 const { width, height } = Dimensions.get('window');
 

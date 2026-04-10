@@ -2,7 +2,7 @@ import React, { useMemo } from 'react';
 import { View, Text, Dimensions } from 'react-native';
 import { BarChart } from 'react-native-gifted-charts';
 import { normalizeDataToWeeklyCardioGraph } from '../../utils/statisticsUtils';
-import { AerobicsWeeklyRecord } from '../../types/dto/aerobics.dto';
+import { AerobicsWeeklyRecord } from '@strong-together/shared';
 
 const { width, height } = Dimensions.get('window');
 

@@ -8,9 +8,9 @@ import RenderEst1RMItem from '../components/AnalyticsComponents/RenderEst1RMItem
 import RenderGoalAdherenceItem from '../components/AnalyticsComponents/RenderGoalAdherenceItem';
 import SlidingBottomModal, { SlidingBottomModalRef } from '../components/SlidingBottomModal';
 import useAnalysticsLogic from '../hooks/logic/useAnalysticsLogic';
-import { WorkoutSplitEntity } from '../types/entities/workoutSplit.entity';
-import { ExerciseEntity } from '../types/entities/exercise.entity';
-import { AdherenceExerciseStats } from '../types/dto/analytics.dto';
+import { WorkoutSplitEntity } from '@strong-together/shared';
+import { ExerciseEntity } from '@strong-together/shared';
+import { AdherenceExerciseStats } from '@strong-together/shared';
 
 const { height } = Dimensions.get('window');
 

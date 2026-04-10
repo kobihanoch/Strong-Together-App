@@ -1,10 +1,10 @@
 import { WorkoutContextWorkoutSplit } from '../../context/types/workoutContextTypes.dto';
-import { FinishUserWorkoutBody } from '../../types/api/workouts/requests';
-import { ExerciseInPlan } from '../../types/dto/workoutPlans.dto';
-import { ExerciseEntity } from '../../types/entities/exercise.entity';
-import { ExerciseToWorkoutSplitEntity } from '../../types/entities/exerciseToWorkoutSplit.entity';
-import { ExerciseTrackingEntity } from '../../types/entities/exerciseTracking.entity';
-import { WorkoutPlanEntity } from '../../types/entities/workoutPlan.entity';
+import { FinishUserWorkoutBody } from '@strong-together/shared';
+import { ExerciseInPlan } from '@strong-together/shared';
+import { ExerciseEntity } from '@strong-together/shared';
+import { ExerciseToWorkoutSplitEntity } from '@strong-together/shared';
+import { ExerciseTrackingEntity } from '@strong-together/shared';
+import { WorkoutPlanEntity } from '@strong-together/shared';
 
 export type ResumeWorkoutCachePayload = {
   selectedSplit: WorkoutContextWorkoutSplit;

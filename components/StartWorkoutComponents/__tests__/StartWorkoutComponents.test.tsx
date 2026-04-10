@@ -12,8 +12,8 @@ import { fireEvent, render } from '@testing-library/react-native';
 import React from 'react';
 import { ActivityIndicator, TouchableOpacity } from 'react-native';
 import type { ExercisesDuringWorkout } from '../../../hooks/types/useStartWorkoutTypes.dto';
-import type { TrackingMapItem } from '../../../types/dto/exerciseTracking.dto';
-import type { ExerciseInPlan } from '../../../types/dto/workoutPlans.dto';
+import type { TrackingMapItem } from '@strong-together/shared';
+import type { ExerciseInPlan } from '@strong-together/shared';
 
 let mockLastWorkoutData: TrackingMapItem | null = null;
 
