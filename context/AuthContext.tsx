@@ -21,9 +21,9 @@ import GlobalAuth from '../utils/authUtils';
 import { clearRefreshToken, getRefreshToken, saveRefreshToken } from '../utils/tokenStore';
 import { connectSocket, disconnectSocket } from '../webSockets/socketConfig';
 import { AppUser, AuthContextValue, UserCachePayload } from './types/authContextTypes.dto';
-import { GetAuthenticatedUserByIdResponse } from '../types/api/user/responses';
+import { GetAuthenticatedUserByIdResponse } from '@strong-together/shared';
 import { AxiosError } from 'axios';
-import { CreateUserBody, LoginRequestBody } from '../types/api/auth/requests';
+import { CreateUserBody, LoginRequestBody } from '@strong-together/shared';
 
 const AuthContext = createContext<AuthContextValue | null>(null);
 export const useAuth = () => {

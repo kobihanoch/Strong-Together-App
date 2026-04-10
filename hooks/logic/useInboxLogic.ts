@@ -2,7 +2,7 @@ import { useCallback } from 'react';
 import { ALERT_TYPE, Dialog } from 'react-native-alert-notification';
 import { useNotifications } from '../../context/NotificationsContext';
 import { deleteMessage, updateMsgReadStatus } from '../../services/MessagesService';
-import { MessageEntity } from '../../types/entities/message.entity';
+import { MessageEntity } from '@strong-together/shared';
 
 const useInboxLogic = () => {
   const { allReceivedMessages, setAllReceivedMessages, unreadMessages } = useNotifications();

@@ -6,7 +6,7 @@ import { ALERT_TYPE, Dialog } from 'react-native-alert-notification';
 import { useWorkoutContext } from '../../context/WorkoutContext';
 import { RootParamList } from '../../navigation/types/appStackTypes';
 import { addWorkout } from '../../services/WorkoutService';
-import { WorkoutSplitEntity } from '../../types/entities/workoutSplit.entity';
+import { WorkoutSplitEntity } from '@strong-together/shared';
 import {
   addExerciseLogic,
   addSplitLogic,
@@ -18,7 +18,7 @@ import {
 } from '../../utils/createWorkoutUtils';
 import { ExerciseCandidate, SelectedExercises } from '../types/useCreateWorkoutTypes.dto';
 import useExercises from '../useExercises';
-import { ExerciseToWorkoutSplitEntity } from '../../types/entities/exerciseToWorkoutSplit.entity';
+import { ExerciseToWorkoutSplitEntity } from '@strong-together/shared';
 
 const useCreateWorkoutLogic = () => {
   // ----------------------------Workout and Analysis contexes----------------------------

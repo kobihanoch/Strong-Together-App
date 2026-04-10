@@ -1,7 +1,7 @@
 import axios, { AxiosError, InternalAxiosRequestConfig } from 'axios';
 import Constants from 'expo-constants';
 import { showErrorAlert } from '../errors/errorAlerts';
-import { BootstrapResponse } from '../types/api/bootstrap/responses';
+import { BootstrapResponse } from '@strong-together/shared';
 import { openUpdateModal } from '../utils/imperativeUpdateModal';
 import { API_BASE_URL } from './apiConfig';
 import buildDpopProof from './DPoP/buildDpopProof';

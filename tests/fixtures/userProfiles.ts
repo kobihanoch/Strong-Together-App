@@ -5,7 +5,7 @@ import type {
 import type { CardioContextDailyMap, CardioContextWeeklyMap } from '../../context/types/cardioContextTypes.dto';
 import type { NotificationsContextAllReceivedMessages } from '../../context/types/notificationsContextTypes.dto';
 import type { AppUser } from '../../context/types/authContextTypes.dto';
-import type { WholeUserWorkoutPlan, WorkoutSplitsMap } from '../../types/dto/workoutPlans.dto';
+import type { WholeUserWorkoutPlan, WorkoutSplitsMap } from '@strong-together/shared';
 
 export interface UserTestProfile {
   key: 'guest' | 'userWithoutWorkout' | 'userWithWorkoutNoHistory' | 'userWithWorkoutAndHistory';

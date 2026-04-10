@@ -5,7 +5,7 @@ import Column from '../Column';
 import { RFValue } from 'react-native-responsive-fontsize';
 import { colors } from '../../constants/colors';
 import { formatDate } from '../../utils/statisticsUtils';
-import { TrackingMapItem } from '../../types/dto/exerciseTracking.dto';
+import { TrackingMapItem } from '@strong-together/shared';
 
 const { height } = Dimensions.get('window');
 

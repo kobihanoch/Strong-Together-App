@@ -8,7 +8,7 @@ import {
   Text,
   View,
 } from 'react-native';
-import { AdherenceExerciseStats, GoalAdherenceResponse } from '../../types/dto/analytics.dto';
+import { AdherenceExerciseStats, GoalAdherenceResponse } from '@strong-together/shared';
 import PageDots from '../PageDots';
 import Card from './Card';
 import RenderGoalAdherenceItem from './RenderGoalAdherenceItem';

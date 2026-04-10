@@ -1,7 +1,7 @@
 import { backgroundUpload, UploaderHttpMethod, UploadType } from 'react-native-compressor';
 import api from '../api/api';
-import { GetPresignedUrlFromS3Response } from '../types/api/videoAnalysis/responses';
-import { GetPresignedUrlFromS3Body } from './../types/api/videoAnalysis/requests';
+import { GetPresignedUrlFromS3Response } from '@strong-together/shared';
+import { GetPresignedUrlFromS3Body } from '@strong-together/shared';
 
 type UploadVideoToS3Options = {
   onProgress?: (progress: number) => void;

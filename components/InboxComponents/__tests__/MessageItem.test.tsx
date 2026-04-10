@@ -12,8 +12,8 @@ import {
 import { fireEvent, render, waitFor } from '@testing-library/react-native';
 
 import MessageItem from '../MessageItem';
-import { AllUserMessages } from '../../../types/dto/messages.dto';
-import { MessageEntity } from '../../../types/entities/message.entity';
+import { AllUserMessages } from '@strong-together/shared';
+import { MessageEntity } from '@strong-together/shared';
 
 type MarkAsReadFn = (msgId: MessageEntity['id']) => Promise<void>;
 type DeleteMessageFn = (msgId: MessageEntity['id']) => void;

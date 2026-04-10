@@ -3,8 +3,8 @@ import React from 'react';
 import { ActivityIndicator, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { RFValue } from 'react-native-responsive-fontsize';
 import { colors } from '../../constants/colors';
-import { AnalyzeVideoResultPayload, SquatRepetition } from '../../types/dto/videoAnalysis.dto';
-import { ExerciseInPlan } from '../../types/dto/workoutPlans.dto';
+import { AnalyzeVideoResultPayload, SquatRepetition } from '@strong-together/shared';
+import { ExerciseInPlan } from '@strong-together/shared';
 
 export type ExerciseAnalysisCopy = {
   heroTitle: string;

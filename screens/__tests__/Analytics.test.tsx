@@ -4,8 +4,8 @@ import React from 'react';
 import { beforeEach, describe, expect, it, jest } from '@jest/globals';
 import { Animated } from 'react-native';
 import { fireEvent, render } from '@testing-library/react-native';
-import type { GetAnalyticsResponse } from '../../types/api/analytics/responses';
-import type { WholeUserWorkoutPlan } from '../../types/dto/workoutPlans.dto';
+import type { GetAnalyticsResponse } from '@strong-together/shared';
+import type { WholeUserWorkoutPlan } from '@strong-together/shared';
 
 const mockModalRegistry = new Map<
   string,

@@ -21,9 +21,9 @@ import {
   ExerciseCandidate,
   SelectedExercise,
 } from '../../hooks/types/useCreateWorkoutTypes.dto';
-import { ExercisesMapByMuscle, GetAllExercisesExercise } from '../../types/dto/exercises.dto';
-import { ExerciseEntity } from '../../types/entities/exercise.entity';
-import { WorkoutSplitEntity } from '../../types/entities/workoutSplit.entity';
+import { ExercisesMapByMuscle, GetAllExercisesExercise } from '@strong-together/shared';
+import { ExerciseEntity } from '@strong-together/shared';
+import { WorkoutSplitEntity } from '@strong-together/shared';
 import Column from '../Column';
 import Row from '../Row';
 import SlidingBottomModal, { SlidingBottomModalRef } from '../SlidingBottomModal';

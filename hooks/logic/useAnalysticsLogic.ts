@@ -5,7 +5,7 @@ import { useAuth } from '../../context/AuthContext';
 import { useWorkoutContext } from '../../context/WorkoutContext';
 import { getTrackingAnalytics } from '../../services/AnalyticsService';
 import useCacheAndFetch from '../useCacheAndFetch';
-import { GetAnalyticsResponse } from '../../types/api/analytics/responses';
+import { GetAnalyticsResponse } from '@strong-together/shared';
 import { Analytics1RM, AnalyticsCachePayload, AnalyticsGoals } from '../types/useAnalyticsTypes.dto';
 
 const useAnalysticsLogic = () => {

@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { Dimensions, StyleSheet, Text, View } from 'react-native';
 import { RFValue } from 'react-native-responsive-fontsize';
 import { colors } from '../../constants/colors';
-import { AerobicsDailyRecord, WeeklyData } from '../../types/dto/aerobics.dto';
+import { AerobicsDailyRecord, WeeklyData } from '@strong-together/shared';
 import { formatTime } from '../../utils/statisticsUtils';
 import Column from '../Column';
 import Row from '../Row';

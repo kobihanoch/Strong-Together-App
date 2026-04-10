@@ -1,5 +1,5 @@
-import { GetAllUserMessagesResponse } from '../../types/api/messages/responses';
-import { AllUserMessages } from '../../types/dto/messages.dto';
+import { GetAllUserMessagesResponse } from '@strong-together/shared';
+import { AllUserMessages } from '@strong-together/shared';
 
 export type NotificationsContextAllReceivedMessages = GetAllUserMessagesResponse['messages'];
 

@@ -9,7 +9,7 @@ import {
 } from '@jest/globals';
 import { TextInput } from 'react-native';
 import { fireEvent, render } from '@testing-library/react-native';
-import type { CreateUserBody } from '../../types/api/auth/requests';
+import type { CreateUserBody } from '@strong-together/shared';
 
 jestObject.mock('react-native-vector-icons/MaterialCommunityIcons', () => {
   const mockReact = require('react');

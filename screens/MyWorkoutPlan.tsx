@@ -25,7 +25,7 @@ import { useNavigation } from '@react-navigation/native';
 import NoWorkoutPlan from '../components/MyWorkoutPlanComponents/NoWorkoutPlan';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RootParamList } from '../navigation/types/appStackTypes';
-import { ExerciseInPlan } from '../types/dto/workoutPlans.dto';
+import { ExerciseInPlan } from '@strong-together/shared';
 
 const { width, height } = Dimensions.get('window');
 

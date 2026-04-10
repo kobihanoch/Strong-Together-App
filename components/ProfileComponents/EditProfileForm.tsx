@@ -18,7 +18,7 @@ import { showErrorAlert } from '../../errors/errorAlerts';
 import { updateSelfUser } from '../../services/UserService';
 import Column from '../Column';
 import Row from '../Row';
-import { UserEntity } from '../../types/entities/user.entity';
+import { UserEntity } from '@strong-together/shared';
 
 type EditProfileFormProps = {
   initialData: {

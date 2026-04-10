@@ -4,7 +4,7 @@ import { act, renderHook, waitFor } from '@testing-library/react-native';
 import { afterEach, beforeEach, describe, expect, it, jest } from '@jest/globals';
 import { AxiosError } from 'axios';
 import { AppState } from 'react-native';
-import { GetExerciseTrackingResponse } from '../../../types/api/workouts/responses';
+import { GetExerciseTrackingResponse } from '@strong-together/shared';
 import {
   userWithWorkoutAndHistoryProfile,
   userWithWorkoutNoHistoryProfile,

@@ -10,7 +10,7 @@ import {
   userWithWorkoutNoHistoryProfile,
   userWithoutWorkoutProfile,
 } from '../../tests/fixtures/userProfiles';
-import type { GetExerciseTrackingResponse } from '../../types/api/workouts/responses';
+import type { GetExerciseTrackingResponse } from '@strong-together/shared';
 
 jest.mock('@react-native-async-storage/async-storage', () => ({
   __esModule: true,

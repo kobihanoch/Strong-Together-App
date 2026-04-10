@@ -6,7 +6,7 @@ import InputField from '../InputField';
 import { useAuth } from '../../context/AuthContext';
 import { showErrorAlert } from '../../errors/errorAlerts';
 import { changeEmail, checkUserVerify, sendVerificationMail } from '../../services/AuthService';
-import { UserEntity } from '../../types/entities/user.entity';
+import { UserEntity } from '@strong-together/shared';
 
 const { width, height } = Dimensions.get('window');
 

@@ -1,5 +1,5 @@
 import api from '../api/api';
-import { SetProfilePicAndUpdateDBResponse } from '../types/api/user/responses';
+import { SetProfilePicAndUpdateDBResponse } from '@strong-together/shared';
 
 export type UploadableFile = {
   uri: string;

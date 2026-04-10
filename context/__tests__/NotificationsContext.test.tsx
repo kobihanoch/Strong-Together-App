@@ -8,8 +8,8 @@ import {
   userWithWorkoutAndHistoryProfile,
   userWithoutWorkoutProfile,
 } from '../../tests/fixtures/userProfiles';
-import type { GetAllUserMessagesResponse } from '../../types/api/messages/responses';
-import type { MessageAfterSendResponse } from '../../types/dto/messages.dto';
+import type { GetAllUserMessagesResponse } from '@strong-together/shared';
+import type { MessageAfterSendResponse } from '@strong-together/shared';
 
 jest.mock('@react-native-async-storage/async-storage', () => ({
   __esModule: true,

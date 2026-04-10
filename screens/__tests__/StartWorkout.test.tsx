@@ -14,7 +14,7 @@ import { fireEvent, render, waitFor } from '@testing-library/react-native';
 import type { RootParamList } from '../../navigation/types/appStackTypes';
 import type { WorkoutContextWorkoutSplit } from '../../context/types/workoutContextTypes.dto';
 import type { ResumeWorkoutCachePayload, StartWorkoutPageLogicReturn } from '../../hooks/types/useStartWorkoutTypes.dto';
-import type { TrackingMapItem } from '../../types/dto/exerciseTracking.dto';
+import type { TrackingMapItem } from '@strong-together/shared';
 
 const mockDialogShow = jestObject.fn();
 const mockDialogHide = jestObject.fn();

@@ -1,6 +1,6 @@
 import api from '../api/api';
-import { UpdateUserBody } from '../types/api/user/requests';
-import { GetAuthenticatedUserByIdResponse, UpdateAuthenticatedUserResponse } from '../types/api/user/responses';
+import { UpdateUserBody } from '@strong-together/shared';
+import { GetAuthenticatedUserByIdResponse, UpdateAuthenticatedUserResponse } from '@strong-together/shared';
 
 // Fetch self data
 export const fetchSelfUserData = async (): Promise<GetAuthenticatedUserByIdResponse> => {

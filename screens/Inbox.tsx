@@ -5,7 +5,7 @@ import { RFValue } from 'react-native-responsive-fontsize';
 import MessageItem from '../components/InboxComponents/MessageItem';
 import useInboxLogic from '../hooks/logic/useInboxLogic';
 import { colors } from '../constants/colors';
-import { AllUserMessages } from '../types/dto/messages.dto';
+import { AllUserMessages } from '@strong-together/shared';
 const { width } = Dimensions.get('window');
 
 const Inbox = () => {

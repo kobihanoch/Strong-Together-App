@@ -8,7 +8,7 @@ import React, { useCallback, useMemo } from 'react';
 import { Dimensions, FlatList, StyleSheet, Text } from 'react-native';
 import { RFValue } from 'react-native-responsive-fontsize';
 import { colors } from '../../constants/colors';
-import { TrackingMapItem } from '../../types/dto/exerciseTracking.dto';
+import { TrackingMapItem } from '@strong-together/shared';
 import Column from '../Column';
 import Images from '../Images';
 import Row from '../Row';

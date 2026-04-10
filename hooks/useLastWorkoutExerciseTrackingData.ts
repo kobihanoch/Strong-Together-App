@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import { useAnalysisContext } from '../context/AnalysisContext';
-import { ExerciseToWorkoutSplitEntity } from '../types/entities/exerciseToWorkoutSplit.entity';
-import { TrackingMapItem } from '../types/dto/exerciseTracking.dto';
+import { ExerciseToWorkoutSplitEntity } from '@strong-together/shared';
+import { TrackingMapItem } from '@strong-together/shared';
 
 const useLastWorkoutExerciseTrackingData = (
   exerciseToSplitId: ExerciseToWorkoutSplitEntity['id'],

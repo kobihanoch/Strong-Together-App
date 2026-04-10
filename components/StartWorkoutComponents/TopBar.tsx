@@ -7,7 +7,7 @@ import { AdherenceBar } from '../AdherenceBar';
 import Column from '../Column';
 import Row from '../Row';
 import Timer from '../Timer';
-import { WorkoutPlanEntity } from '../../types/entities/workoutPlan.entity';
+import { WorkoutPlanEntity } from '@strong-together/shared';
 
 const { height } = Dimensions.get('window');
 

@@ -9,7 +9,7 @@ import {
   userWithWorkoutAndHistoryProfile,
   userWithoutWorkoutProfile,
 } from '../../tests/fixtures/userProfiles';
-import type { UserAerobicsResponse } from '../../types/api/aerobics/responses';
+import type { UserAerobicsResponse } from '@strong-together/shared';
 
 jest.mock('@react-native-async-storage/async-storage', () => ({
   __esModule: true,

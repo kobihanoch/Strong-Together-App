@@ -9,7 +9,7 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 import { colors } from '../../constants/colors';
 import Column from '../Column';
 import Row from '../Row';
-import { WorkoutSplitEntity } from '../../types/entities/workoutSplit.entity';
+import { WorkoutSplitEntity } from '@strong-together/shared';
 
 const { height } = Dimensions.get('window');
 

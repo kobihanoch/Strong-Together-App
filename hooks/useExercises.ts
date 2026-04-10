@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import api from '../api/api';
-import { ExercisesMapByMuscle } from '../types/dto/exercises.dto';
+import { ExercisesMapByMuscle } from '@strong-together/shared';
 
 const useExercises = (): { exercises: ExercisesMapByMuscle; error: Error | null; loading: boolean } => {
   const [exercises, setExercises] = useState<ExercisesMapByMuscle>({});

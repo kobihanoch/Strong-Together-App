@@ -12,8 +12,7 @@ import { act, fireEvent, render, waitFor } from '@testing-library/react-native';
 import React from 'react';
 import { AppState, TouchableOpacity } from 'react-native';
 import type { AuthContextValue } from '../../../context/types/authContextTypes.dto';
-import type { CheckUserVerifyResponse } from '../../../types/api/auth/responses';
-import type { UserEntity } from '../../../types/entities/user.entity';
+import type { UserEntity } from '@strong-together/shared';
 
 let mockAuthState: AuthContextValue;
 let mockNowMs = 0;
@@ -21,7 +20,7 @@ let mockNowMs = 0;
 const mockShowErrorAlert = jestObject.fn<(title: string, message: string) => void>();
 const mockForgotPassword = jestObject.fn<(identifier: string) => Promise<void>>();
 const mockChangeEmail = jestObject.fn<(username: string, password: string, newEmail: string) => Promise<void>>();
-const mockCheckUserVerify = jestObject.fn<(username: string) => Promise<CheckUserVerifyResponse>>();
+const mockCheckUserVerify = jestObject.fn<(username: string) => Promise<{ isVerified: boolean }>>();
 const mockSendVerificationMail = jestObject.fn<(email: string) => Promise<void>>();
 const appStateListeners: Array<(status: string) => void> = [];
 

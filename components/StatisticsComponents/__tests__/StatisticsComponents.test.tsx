@@ -5,8 +5,8 @@ import { beforeEach, describe, expect, it, jest } from '@jest/globals';
 import { act, fireEvent, render } from '@testing-library/react-native';
 import moment from 'moment-timezone';
 import React from 'react';
-import type { AerobicsDailyRecord, AerobicsWeeklyRecord, WeeklyData } from '../../../types/dto/aerobics.dto';
-import type { TrackingMapItem } from '../../../types/dto/exerciseTracking.dto';
+import type { AerobicsDailyRecord, AerobicsWeeklyRecord, WeeklyData } from '@strong-together/shared';
+import type { TrackingMapItem } from '@strong-together/shared';
 
 const mockNavigate = jest.fn();
 const mockScrollToIndex = jest.fn();
