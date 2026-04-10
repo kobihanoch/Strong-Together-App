@@ -1,8 +1,8 @@
 import { useMemo } from 'react';
-import { useAnalysisContext } from '../../context/AnalysisContext';
+import { useWorkoutHistoryContext } from '../../features/workouts/providers/WorkoutHistoryProvider';
 import { useAuth } from '../../context/AuthContext';
 import { useGlobalAppLoadingContext } from '../../context/GlobalAppLoadingContext';
-import { useWorkoutContext } from '../../context/WorkoutContext';
+import { useWorkoutPlanContext } from '../../features/workouts/providers/WorkoutPlanProvider';
 import { HomePageData } from '../types/useHomePageTypes.dto';
 
 const useHomePageLogic = (): { data: HomePageData } => {
@@ -14,10 +14,10 @@ const useHomePageLogic = (): { data: HomePageData } => {
   const {
     workout,
     workoutSplits, // [A,B,C...]
-  } = useWorkoutContext();
+  } = useWorkoutPlanContext();
 
   // Analysis state (tracking + derived analytics + loading)
-  const { analyzedExerciseTrackingData } = useAnalysisContext();
+  const { analyzedExerciseTrackingData } = useWorkoutHistoryContext();
   const hasTracking = useMemo(() => !!analyzedExerciseTrackingData, [analyzedExerciseTrackingData]);
 
   // Derive stable user fields

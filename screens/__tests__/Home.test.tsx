@@ -145,12 +145,12 @@ jestObject.mock('../../context/NotificationsContext', () => ({
   useNotifications: () => mockNotificationsState,
 }));
 
-jestObject.mock('../../context/WorkoutContext', () => ({
-  useWorkoutContext: () => mockWorkoutState,
+jestObject.mock('../../features/workouts/providers/WorkoutPlanProvider', () => ({
+  useWorkoutPlanContext: () => mockWorkoutState,
 }));
 
-jestObject.mock('../../context/AnalysisContext', () => ({
-  useAnalysisContext: () => mockAnalysisState,
+jestObject.mock('../../features/workouts/providers/WorkoutHistoryProvider', () => ({
+  useWorkoutHistoryContext: () => mockAnalysisState,
 }));
 
 jestObject.mock('../../hooks/logic/useHomePageLogic', () => ({
@@ -188,7 +188,7 @@ import Home from '../Home';
 import PRCard from '../../components/HomeComponents/PRCard';
 import QuickActions from '../../components/HomeComponents/QuickActions';
 import SlideToStart from '../../components/HomeComponents/SlideToStart';
-import StartWorkoutCard from '../../components/HomeComponents/StartWorkoutCard';
+import StartWorkoutCard from '../../features/workouts/plan/components/StartWorkoutCard';
 import TopComponent from '../../components/TopComponent';
 
 const resetMockState = () => {

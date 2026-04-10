@@ -1,4 +1,4 @@
-import { AnalysisContextAnalyzedExerciseTrackingData } from '../../context/types/analysisContextTypes.dto';
+import { WorkoutHistoryAnalyzedExerciseTrackingData } from '../../features/workouts/history/types/workout-history.types';
 import { AppUser } from './../../context/types/authContextTypes.dto';
 
 export type HomePageData = {
@@ -8,10 +8,11 @@ export type HomePageData = {
   hasTracking: boolean;
   profileImageUrl: AppUser['profile_image_url'];
   firstName: AppUser['name'];
-  lastWorkoutDate: AnalysisContextAnalyzedExerciseTrackingData['lastWorkoutDate'];
-  totalWorkoutNumber: AnalysisContextAnalyzedExerciseTrackingData['workoutCount'];
+  lastWorkoutDate: WorkoutHistoryAnalyzedExerciseTrackingData['lastWorkoutDate'];
+  totalWorkoutNumber: WorkoutHistoryAnalyzedExerciseTrackingData['workoutCount'];
   workoutSplitsNumber: number;
-  mostFrequentSplit: AnalysisContextAnalyzedExerciseTrackingData['mostFrequentSplit'] | null;
-  PR: AnalysisContextAnalyzedExerciseTrackingData['pr'] | null;
+  mostFrequentSplit: WorkoutHistoryAnalyzedExerciseTrackingData['mostFrequentSplit'] | null;
+  PR: WorkoutHistoryAnalyzedExerciseTrackingData['pr'] | null;
   isLoading: boolean;
 };
+

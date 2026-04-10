@@ -1,8 +1,11 @@
 import type {
-  AnalysisContextAnalyzedExerciseTrackingData,
-  AnalysisContextExerciseTrackingMaps,
-} from '../../context/types/analysisContextTypes.dto';
-import type { CardioContextDailyMap, CardioContextWeeklyMap } from '../../context/types/cardioContextTypes.dto';
+  WorkoutHistoryAnalyzedExerciseTrackingData,
+  WorkoutHistoryExerciseTrackingMaps,
+} from '../../features/workouts/history/types/workout-history.types';
+import type {
+  CardioDailyMap,
+  CardioWeeklyMap,
+} from '../../features/workouts/cardio/types/cardio.types';
 import type { NotificationsContextAllReceivedMessages } from '../../context/types/notificationsContextTypes.dto';
 import type { AppUser } from '../../context/types/authContextTypes.dto';
 import type { WholeUserWorkoutPlan, WorkoutSplitsMap } from '@strong-together/shared';
@@ -12,10 +15,10 @@ export interface UserTestProfile {
   user: AppUser | null;
   workout: WholeUserWorkoutPlan | null;
   workoutForEdit: WorkoutSplitsMap | null;
-  exerciseTrackingMaps: AnalysisContextExerciseTrackingMaps | null;
-  analyzedExerciseTrackingData: AnalysisContextAnalyzedExerciseTrackingData | null;
-  cardioDailyMap: CardioContextDailyMap | null;
-  cardioWeeklyMap: CardioContextWeeklyMap | null;
+  exerciseTrackingMaps: WorkoutHistoryExerciseTrackingMaps | null;
+  analyzedExerciseTrackingData: WorkoutHistoryAnalyzedExerciseTrackingData | null;
+  cardioDailyMap: CardioDailyMap | null;
+  cardioWeeklyMap: CardioWeeklyMap | null;
   notificationMessages: NotificationsContextAllReceivedMessages;
 }
 
@@ -111,7 +114,7 @@ const baseWorkoutForEdit: WorkoutSplitsMap = {
   ],
 };
 
-const baseExerciseTrackingMaps: AnalysisContextExerciseTrackingMaps = {
+const baseExerciseTrackingMaps: WorkoutHistoryExerciseTrackingMaps = {
   byDate: {
     '2026-03-27': [
       {
@@ -184,13 +187,13 @@ const baseExerciseTrackingMaps: AnalysisContextExerciseTrackingMaps = {
   },
 };
 
-const emptyExerciseTrackingMaps: AnalysisContextExerciseTrackingMaps = {
+const emptyExerciseTrackingMaps: WorkoutHistoryExerciseTrackingMaps = {
   byDate: {},
   byETSId: {},
   bySplitName: {},
 };
 
-const baseAnalyzedExerciseTrackingData: AnalysisContextAnalyzedExerciseTrackingData = {
+const baseAnalyzedExerciseTrackingData: WorkoutHistoryAnalyzedExerciseTrackingData = {
   pr: {
     maxReps: 10,
     maxWeight: 85,
@@ -208,9 +211,9 @@ const baseAnalyzedExerciseTrackingData: AnalysisContextAnalyzedExerciseTrackingD
   },
 };
 
-const emptyCardioDailyMap: CardioContextDailyMap = {};
+const emptyCardioDailyMap: CardioDailyMap = {};
 
-const baseCardioDailyMap: CardioContextDailyMap = {
+const baseCardioDailyMap: CardioDailyMap = {
   '2026-03-27': [
     {
       type: 'Run',
@@ -220,9 +223,9 @@ const baseCardioDailyMap: CardioContextDailyMap = {
   ],
 };
 
-const emptyCardioWeeklyMap: CardioContextWeeklyMap = {};
+const emptyCardioWeeklyMap: CardioWeeklyMap = {};
 
-const baseCardioWeeklyMap: CardioContextWeeklyMap = {
+const baseCardioWeeklyMap: CardioWeeklyMap = {
   '2026-03-23': {
     records: [
       {
@@ -287,7 +290,7 @@ const cloneWorkoutForEdit = (): WorkoutSplitsMap => ({
   })),
 });
 
-const cloneExerciseTrackingMaps = (): AnalysisContextExerciseTrackingMaps => ({
+const cloneExerciseTrackingMaps = (): WorkoutHistoryExerciseTrackingMaps => ({
   byDate: {
     '2026-03-27': baseExerciseTrackingMaps.byDate['2026-03-27'].map((entry) => ({
       ...entry,
@@ -332,7 +335,7 @@ const cloneExerciseTrackingMaps = (): AnalysisContextExerciseTrackingMaps => ({
   },
 });
 
-const cloneAnalyzedExerciseTrackingData = (): AnalysisContextAnalyzedExerciseTrackingData => ({
+const cloneAnalyzedExerciseTrackingData = (): WorkoutHistoryAnalyzedExerciseTrackingData => ({
   pr: {
     ...baseAnalyzedExerciseTrackingData.pr,
   },
@@ -346,13 +349,13 @@ const cloneAnalyzedExerciseTrackingData = (): AnalysisContextAnalyzedExerciseTra
   },
 });
 
-const cloneCardioDailyMap = (): CardioContextDailyMap => ({
+const cloneCardioDailyMap = (): CardioDailyMap => ({
   '2026-03-27': baseCardioDailyMap['2026-03-27'].map((record) => ({
     ...record,
   })),
 });
 
-const cloneCardioWeeklyMap = (): CardioContextWeeklyMap => ({
+const cloneCardioWeeklyMap = (): CardioWeeklyMap => ({
   '2026-03-23': {
     ...baseCardioWeeklyMap['2026-03-23'],
     records: baseCardioWeeklyMap['2026-03-23'].records.map((record) => ({
@@ -432,3 +435,4 @@ export const userProfiles = {
   userWithWorkoutNoHistory: userWithWorkoutNoHistoryProfile,
   userWithWorkoutAndHistory: userWithWorkoutAndHistoryProfile,
 } as const;
+

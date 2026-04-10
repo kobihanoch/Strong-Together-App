@@ -87,8 +87,11 @@ jest.mock('../../../services/UserService', () => ({
   fetchSelfUserData: () => mockFetchSelfUserData(),
 }));
 
-jest.mock('../../../services/WorkoutService', () => ({
+jest.mock('../../../features/workouts/plan/services/workout-plan.service', () => ({
   getUserWorkout: () => mockGetUserWorkout(),
+}));
+
+jest.mock('../../../features/workouts/history/services/workout-history.service', () => ({
   getUserExerciseTracking: () => mockGetUserExerciseTracking(),
 }));
 
@@ -127,18 +130,18 @@ jest.mock('../../../utils/authUtils', () => ({
   },
 }));
 
-import { AnalysisProvider } from '../../../context/AnalysisContext';
+import { WorkoutHistoryProvider } from '../../../features/workouts/providers/WorkoutHistoryProvider';
 import { AuthProvider, useAuth } from '../../../context/AuthContext';
 import { GlobalAppLoadingProvider } from '../../../context/GlobalAppLoadingContext';
-import { WorkoutProvider } from '../../../context/WorkoutContext';
+import { WorkoutPlanProvider } from '../../../features/workouts/providers/WorkoutPlanProvider';
 import useHomePageLogic from '../useHomePageLogic';
 
 const wrapper = ({ children }: { children: React.ReactNode }) => (
   <GlobalAppLoadingProvider>
     <AuthProvider>
-      <WorkoutProvider>
-        <AnalysisProvider>{children}</AnalysisProvider>
-      </WorkoutProvider>
+      <WorkoutPlanProvider>
+        <WorkoutHistoryProvider>{children}</WorkoutHistoryProvider>
+      </WorkoutPlanProvider>
     </AuthProvider>
   </GlobalAppLoadingProvider>
 );
@@ -356,3 +359,4 @@ describe('useHomePageLogic integration', () => {
     });
   });
 });
+

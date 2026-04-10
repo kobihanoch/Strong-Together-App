@@ -89,15 +89,15 @@ jest.mock('../context/NotificationsContext', () => ({
   NotificationsProvider: ({ children }: { children: React.ReactNode }) => children,
 }));
 
-jest.mock('../context/WorkoutContext', () => ({
-  WorkoutProvider: ({ children }: { children: React.ReactNode }) => children,
+jest.mock('../features/workouts/providers/WorkoutPlanProvider', () => ({
+  WorkoutPlanProvider: ({ children }: { children: React.ReactNode }) => children,
 }));
 
-jest.mock('../context/AnalysisContext', () => ({
-  AnalysisProvider: ({ children }: { children: React.ReactNode }) => children,
+jest.mock('../features/workouts/providers/WorkoutHistoryProvider', () => ({
+  WorkoutHistoryProvider: ({ children }: { children: React.ReactNode }) => children,
 }));
 
-jest.mock('../context/CardioContext', () => ({
+jest.mock('../features/workouts/providers/CardioProvider', () => ({
   CardioProvider: ({ children }: { children: React.ReactNode }) => children,
 }));
 

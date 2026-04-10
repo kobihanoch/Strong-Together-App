@@ -4,7 +4,7 @@ import { RFValue } from 'react-native-responsive-fontsize';
 import { splitsCounterToPieData } from '../../utils/analyticsUtils';
 import Card from './Card';
 import PieDiagramSplitsCounter from './PieDiagramSplitsCounter';
-import { AnalysisContextAnalyzedExerciseTrackingData } from '../../context/types/analysisContextTypes.dto';
+import { WorkoutHistoryAnalyzedExerciseTrackingData } from '../../features/workouts/history/types/workout-history.types';
 import { WholeUserWorkoutPlan } from '@strong-together/shared';
 
 const { height } = Dimensions.get('window');
@@ -12,7 +12,7 @@ const { height } = Dimensions.get('window');
 type OverviewProps = {
   overViewData: {
     workoutCount: number;
-    splitsCounter: AnalysisContextAnalyzedExerciseTrackingData['splitDaysByName'];
+    splitsCounter: WorkoutHistoryAnalyzedExerciseTrackingData['splitDaysByName'];
     workoutPlan: WholeUserWorkoutPlan | null;
   };
   hasData: boolean;
@@ -206,3 +206,4 @@ const Overview = ({ overViewData, hasData }: OverviewProps) => {
 };
 
 export default Overview;
+

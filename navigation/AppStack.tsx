@@ -4,16 +4,16 @@ import React, { useEffect } from 'react';
 import { cacheDeleteKey, cacheGetJSON, keyStartWorkout } from '../cache/cacheUtils';
 import { useAuth } from '../context/AuthContext';
 import Analytics from '../screens/Analytics';
-import CreateWorkout from '../screens/CreateWorkout';
+import CreateWorkout from '../features/workouts/screens/CreateWorkout';
 import Home from '../screens/Home';
 import Inbox from '../screens/Inbox';
-import MyWorkoutPlan from '../screens/MyWorkoutPlan';
+import MyWorkoutPlan from '../features/workouts/screens/MyWorkoutPlan';
 import Profile from '../screens/Profile';
 import Settings from '../screens/Settings';
-import StartWorkout from '../screens/StartWorkout';
-import Statistics from '../screens/Statistics';
+import StartWorkout from '../features/workouts/screens/StartWorkout';
+import Statistics from '../features/workouts/screens/Statistics';
 import { ymdInCurrentTZ } from '../utils/sharedUtils';
-import { ResumeWorkoutCachePayload } from '../hooks/types/useStartWorkoutTypes.dto';
+import { ResumeWorkoutCachePayload } from '../features/workouts/session/types/use-start-workout.types';
 import { RootParamList } from './types/appStackTypes';
 
 const Stack = createStackNavigator<RootParamList>();
@@ -74,3 +74,4 @@ const AppStack = () => {
 };
 
 export default AppStack;
+

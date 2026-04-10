@@ -9,10 +9,10 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 import { Inter_400Regular, Inter_500Medium, Inter_600SemiBold, Inter_700Bold } from '@expo-google-fonts/inter';
 
-import { AnalysisProvider } from './context/AnalysisContext';
+import { WorkoutHistoryProvider } from './features/workouts/providers/WorkoutHistoryProvider';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { NotificationsProvider } from './context/NotificationsContext';
-import { WorkoutProvider } from './context/WorkoutContext';
+import { WorkoutPlanProvider } from './features/workouts/providers/WorkoutPlanProvider';
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Constants from 'expo-constants';
@@ -23,7 +23,7 @@ import { cacheHousekeepingOnBoot } from './cache/cacheUtils';
 import BottomTabBar from './components/BottomTabBar';
 import Theme1 from './components/Theme1';
 import UpdateAppModal from './components/UpdateAppModal';
-import { CardioProvider } from './context/CardioContext';
+import { CardioProvider } from './features/workouts/providers/CardioProvider';
 import { GlobalAppLoadingProvider } from './context/GlobalAppLoadingContext';
 import AppStack from './navigation/AppStack';
 import AuthStack from './navigation/AuthStack';
@@ -135,13 +135,13 @@ function RootNavigator() {
 function AppWithProviders() {
   return (
     <NotificationsProvider>
-      <WorkoutProvider>
-        <AnalysisProvider>
+      <WorkoutPlanProvider>
+        <WorkoutHistoryProvider>
           <CardioProvider>
             <MainApp />
           </CardioProvider>
-        </AnalysisProvider>
-      </WorkoutProvider>
+        </WorkoutHistoryProvider>
+      </WorkoutPlanProvider>
     </NotificationsProvider>
   );
 }

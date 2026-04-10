@@ -34,7 +34,7 @@ export const registerToVideoAnalysisResultsListener = (
 ) => {
   const socket = getSocket();
 
-  console.log('[VideoAnalysis] register listener', {
+  console.log('[video-analysis] register listener', {
     hasSocket: !!socket,
     connected: socket?.connected,
     socketId: socket?.id,
@@ -52,3 +52,4 @@ export const registerToVideoAnalysisResultsListener = (
     socket.off(`video_analysis_results`, handler);
   };
 };
+

@@ -273,9 +273,9 @@ All notable changes to this project will be documented in this file. See [standa
 * **Statistics:** Builds an exercisetracking map by dates every time exercisetracking is changed, for better filtering O(1) instead of O(n) ([367e87b](https://github.com/kobihanoch/Strong-Together-App/commit/367e87b9f7eb149c9d9069fc5a1e5bbf012c55ff))
 * **Statistics:** Refactor filterExercisesByDate to improve readability and performance ([5b05b6c](https://github.com/kobihanoch/Strong-Together-App/commit/5b05b6cca28e0a8f351d7efa2a799057245537ed))
 * **Statistics:** Sort array with order index to show statistics ([2fe6d4d](https://github.com/kobihanoch/Strong-Together-App/commit/2fe6d4dee8024836545d59cc49fcdfc94ba7d42c))
-* **Statistics:** Update exerciseTracking prop to handle null values and improve date formatting in useStatisticsPageLogic ([6799dd3](https://github.com/kobihanoch/Strong-Together-App/commit/6799dd3318253a8db647a979e6ffbfbd942d2308))
+* **Statistics:** Update exerciseTracking prop to handle null values and improve date formatting in use-statistics-page-logic.hook ([6799dd3](https://github.com/kobihanoch/Strong-Together-App/commit/6799dd3318253a8db647a979e6ffbfbd942d2308))
 * **Statistics:** Use useMemo for better user experience ([4caf584](https://github.com/kobihanoch/Strong-Together-App/commit/4caf584b319fc6139cd8c36a2c9cb2c8122ac5e9))
-* **UseExercises:** New API call to fetch all exercises inDB ([6d6be05](https://github.com/kobihanoch/Strong-Together-App/commit/6d6be05591eef6132194dc5b525a0d16d8b70fec))
+* **use-exercises.hook:** New API call to fetch all exercises inDB ([6d6be05](https://github.com/kobihanoch/Strong-Together-App/commit/6d6be05591eef6132194dc5b525a0d16d8b70fec))
 * **Utils:** New util to extract workout splits from workout ([6941c5f](https://github.com/kobihanoch/Strong-Together-App/commit/6941c5f71ae20b135de122ab54b135d4ad964585))
 * **Workout:** In workout mode the progress for each exercise is comapred to last performence ([505ca81](https://github.com/kobihanoch/Strong-Together-App/commit/505ca812300f630685251ceec8de502c676f26e1))
 * **Workouts:** New fetching method for user's workout plan ([4aa7c18](https://github.com/kobihanoch/Strong-Together-App/commit/4aa7c1834cd51968b5154aabb1c06ddde080471c))
@@ -323,9 +323,9 @@ All notable changes to this project will be documented in this file. See [standa
 * **startworkout:** implement BottomModal component for displaying last workout data ([e7db59d](https://github.com/kobihanoch/Strong-Together-App/commit/e7db59dd5089a9e4da2854ef98c07f66b243e650))
 * **startworkout:** new workout mode is ensuring that user can't leave to inbox page in the middle of workout ([9748e5f](https://github.com/kobihanoch/Strong-Together-App/commit/9748e5f221137cdbc70f1b99f249501dfe367793))
 * **statistics:** getting user workout data from context ([e95f4ed](https://github.com/kobihanoch/Strong-Together-App/commit/e95f4ed1d0078d74034f786fe1b357ab52641ebf))
-* **useLastWorkoutExerciseTrackingData:** add custom hook for tracking last workout exercise data ([9788386](https://github.com/kobihanoch/Strong-Together-App/commit/97883864fc83f9122862729b16f2e48c33d6c54a))
-* **useStartWorkoutPageLogic:** update exercise tracking and cache on workout save ([e1580d8](https://github.com/kobihanoch/Strong-Together-App/commit/e1580d803f9dad2b18b6e00c8811be9e6c57a37b))
-* **useUserWorkout:** improve data fetching and state management ([440e8dd](https://github.com/kobihanoch/Strong-Together-App/commit/440e8dd93aa71e95cfe870770bc01e97b12a7087))
+* **use-last-workout-exercise-tracking-data.hook:** add custom hook for tracking last workout exercise data ([9788386](https://github.com/kobihanoch/Strong-Together-App/commit/97883864fc83f9122862729b16f2e48c33d6c54a))
+* **use-start-workout-page-logic.hook:** update exercise tracking and cache on workout save ([e1580d8](https://github.com/kobihanoch/Strong-Together-App/commit/e1580d803f9dad2b18b6e00c8811be9e6c57a37b))
+* **use-user-workout.hook:** improve data fetching and state management ([440e8dd](https://github.com/kobihanoch/Strong-Together-App/commit/440e8dd93aa71e95cfe870770bc01e97b12a7087))
 * **workout:** getting user workout data from context ([28d7cd3](https://github.com/kobihanoch/Strong-Together-App/commit/28d7cd36549bb442c011caa57ddb1e224772dd31))
 
 
@@ -547,7 +547,7 @@ All notable changes to this project will be documented in this file. See [standa
 
 ### Features
 
-* **hooks:** extend useUserWorkout to return full workout, splits and exercises ([e2042fb](https://github.com/kobihanoch/Strong-Together-App/commit/e2042fb13845b055eb64a334b750ea3808b9505e))
+* **hooks:** extend use-user-workout.hook to return full workout, splits and exercises ([e2042fb](https://github.com/kobihanoch/Strong-Together-App/commit/e2042fb13845b055eb64a334b750ea3808b9505e))
 * **profile:** add username, full name and email labels to profile page ([68c3f92](https://github.com/kobihanoch/Strong-Together-App/commit/68c3f92f065b428beb3c59bdb0d1e92d247aa6eb))
 * **profile:** changed profile page UI ([c16dc3e](https://github.com/kobihanoch/Strong-Together-App/commit/c16dc3ebb1330fc1b18874ebdc60a18c02f7b814))
 * **service:** WorkoutService.js added fetching from exercises also ([4980afd](https://github.com/kobihanoch/Strong-Together-App/commit/4980afd1479bf33f802a2ac6669ea7843c866016))
@@ -575,3 +575,4 @@ auth: created useAuthActions hook to manage login status and loading state (4bff
 
 - Merge dev into main
 - Profile page, homepage UI changes
+

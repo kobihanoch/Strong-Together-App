@@ -4,7 +4,7 @@ import { ScrollView } from 'react-native-gesture-handler';
 import { RFValue } from 'react-native-responsive-fontsize';
 import PRCard from '../components/HomeComponents/PRCard';
 import QuickActions from '../components/HomeComponents/QuickActions';
-import StartWorkoutCard from '../components/HomeComponents/StartWorkoutCard';
+import StartWorkoutCard from '../features/workouts/plan/components/StartWorkoutCard';
 import TopComponent from '../components/TopComponent';
 import useHomePageLogic from '../hooks/logic/useHomePageLogic';
 
