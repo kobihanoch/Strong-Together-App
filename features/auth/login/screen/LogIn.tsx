@@ -5,13 +5,13 @@ import { Dimensions, Image, StyleSheet, Text, TouchableOpacity, View } from 'rea
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { RFValue } from 'react-native-responsive-fontsize';
-import VerifyCard from '../components/LoginComponents/VerifyCard';
-import LoginForm from '../components/LoginComponents/LoginForm';
-import { colors } from '../constants/colors';
+import VerifyCard from '../components/VerifyCard';
+import LoginForm from '../components/LoginForm';
+import { colors } from '../../../../constants/colors';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { StackScreenProps } from '@react-navigation/stack';
-import { AuthRootParamList } from '../navigation/types/authStackTypes';
+import { AuthRootParamList } from '../../navigation/types/auth-stack.types';
 
 const { width, height } = Dimensions.get('window');
 
@@ -19,7 +19,6 @@ type LoginScreenProps = StackScreenProps<AuthRootParamList, 'Login'>;
 
 const Login = ({ route }: LoginScreenProps) => {
   const navigation = useNavigation<StackNavigationProp<AuthRootParamList>>();
-  // Decide which child to render based on route params
   const {
     needToVerify = false,
     email = null,
@@ -31,7 +30,6 @@ const Login = ({ route }: LoginScreenProps) => {
     <KeyboardAwareScrollView contentContainerStyle={{ flex: 1 }} resetScrollToCoords={{ x: 0, y: 0 }} scrollEnabled>
       <LinearGradient colors={[colors.primaryDark, colors.primary]} style={{ flex: 1 }}>
         <View style={{ flex: 1, marginTop: height * 0.08 }}>
-          {/* Top header */}
           <View style={styles.header}>
             <TouchableOpacity onPress={() => navigation.goBack()}>
               <View style={{ flexDirection: 'row' }}>
@@ -39,10 +37,8 @@ const Login = ({ route }: LoginScreenProps) => {
                 <Text style={styles.introText}>Intro</Text>
               </View>
             </TouchableOpacity>
-            <Image source={require('../assets/minilogoNew.png')} style={styles.logoImage} />
+            <Image source={require('../../../../assets/minilogoNew.png')} style={styles.logoImage} />
           </View>
-
-          {/* Body */}
           <View style={styles.body}>
             {needToVerify ? (
               <VerifyCard username={routeUsername} password={routePassword} initialEmail={email} />
@@ -58,7 +54,6 @@ const Login = ({ route }: LoginScreenProps) => {
 
 export default Login;
 
-/* ------------------------------ Parent styles ------------------------------ */
 const styles = StyleSheet.create({
   header: {
     marginLeft: width * 0.05,

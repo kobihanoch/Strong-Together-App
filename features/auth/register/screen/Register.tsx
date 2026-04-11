@@ -6,12 +6,12 @@ import { ActivityIndicator, Dimensions, Image, StyleSheet, Text, TouchableOpacit
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { RFValue } from 'react-native-responsive-fontsize';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import InputField from '../components/InputField';
-import SelectField from '../components/SelectField';
-import { useAuth } from '../context/AuthContext';
-import { showErrorAlert } from '../errors/errorAlerts';
-import { colors } from '../constants/colors';
-import { AuthRootParamList } from '../navigation/types/authStackTypes';
+import InputField from '../../../../components/InputField';
+import SelectField from '../../../../components/SelectField';
+import { useAuth } from '../../providers/AuthProvider';
+import { showErrorAlert } from '../../../../errors/errorAlerts';
+import { colors } from '../../../../constants/colors';
+import { AuthRootParamList } from '../../navigation/types/auth-stack.types';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { useNavigation } from '@react-navigation/native';
 
@@ -69,7 +69,7 @@ const Register = () => {
                 <Text style={styles.introText}>Intro</Text>
               </View>
             </TouchableOpacity>
-            <Image source={require('../assets/minilogoNew.png')} style={styles.logoImage} />
+            <Image source={require('../../../../assets/minilogoNew.png')} style={styles.logoImage} />
           </View>
 
           <View style={styles.body}>

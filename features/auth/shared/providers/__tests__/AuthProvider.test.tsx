@@ -3,7 +3,7 @@ import React from 'react';
 import { beforeEach, describe, expect, it, jest } from '@jest/globals';
 import { act, renderHook, waitFor } from '@testing-library/react-native';
 import { AxiosError } from 'axios';
-import { guestProfile, userWithoutWorkoutProfile } from '../../tests/fixtures/userProfiles';
+import { guestProfile, userWithoutWorkoutProfile } from '../../../../../tests/fixtures/userProfiles';
 
 jest.mock('axios', () => ({
   AxiosError: class AxiosError extends Error {},
@@ -98,12 +98,12 @@ jest.mock('react-native-notifier', () => ({
   },
 }));
 
-jest.mock('../../api/bootstrapApi', () => ({
+jest.mock('../../../../api/bootstrapApi', () => ({
   hasBootstrapPayload: () => mockHasBootstrapPayload(),
   resetBootstrap: () => mockResetBootstrap(),
 }));
 
-jest.mock('../../cache/cacheUtils', () => ({
+jest.mock('../../../../cache/cacheUtils', () => ({
   cacheDeleteAllCache: cacheDeleteAllCacheMock,
   cacheDeleteAllCacheWithoutStartWorkout: cacheDeleteAllCacheWithoutStartWorkoutMock,
   cacheGetJSON: cacheGetJSONMock,
@@ -112,55 +112,55 @@ jest.mock('../../cache/cacheUtils', () => ({
   TTL_48H: 172800,
 }));
 
-jest.mock('../../hooks/oAuth/useGoogleAuth', () => ({
+jest.mock('../../../../hooks/oAuth/useGoogleAuth', () => ({
   useGoogleAuth: () => mockUseGoogleAuth(),
 }));
 
-jest.mock('../../hooks/oAuth/useAppleAuth', () => ({
+jest.mock('../../../../hooks/oAuth/useAppleAuth', () => ({
   useAppleAuth: () => mockUseAppleAuth(),
 }));
 
-jest.mock('../../hooks/useCacheAndFetch', () => ({
+jest.mock('../../../../hooks/useCacheAndFetch', () => ({
   __esModule: true,
   default: useCacheAndFetchMock,
 }));
 
-jest.mock('../../hooks/useNetworkStatus', () => ({
+jest.mock('../../../../hooks/useNetworkStatus', () => ({
   useNetworkStatus: () => mockUseNetworkStatus(),
 }));
 
-jest.mock('../../hooks/useUpdateGlobalLoading', () => ({
+jest.mock('../../../../hooks/useUpdateGlobalLoading', () => ({
   __esModule: true,
   default: useUpdateGlobalLoadingMock,
 }));
 
-jest.mock('../../services/AuthService', () => ({
+jest.mock('../../services/auth.service', () => ({
   loginUser: loginUserMock,
   logoutUser: logoutUserMock,
   refreshAndRotateTokens: refreshAndRotateTokensMock,
   registerUser: registerUserMock,
 }));
 
-jest.mock('../../services/OAuthService', () => ({
+jest.mock('../../../../services/OAuthService', () => ({
   loginOAuthWithAccessToken: loginOAuthWithAccessTokenMock,
 }));
 
-jest.mock('../../services/UserService', () => ({
+jest.mock('../../../../services/UserService', () => ({
   fetchSelfUserData: fetchSelfUserDataMock,
 }));
 
-jest.mock('../../utils/tokenStore', () => ({
+jest.mock('../../../../utils/tokenStore', () => ({
   clearRefreshToken: clearRefreshTokenMock,
   getRefreshToken: getRefreshTokenMock,
   saveRefreshToken: saveRefreshTokenMock,
 }));
 
-jest.mock('../../webSockets/socketConfig', () => ({
+jest.mock('../../../../webSockets/socketConfig', () => ({
   connectSocket: connectSocketMock,
   disconnectSocket: disconnectSocketMock,
 }));
 
-jest.mock('../../utils/authUtils', () => ({
+jest.mock('../../../../utils/authUtils', () => ({
   __esModule: true,
   default: {
     setAccessToken: setAccessTokenMock,
@@ -169,12 +169,12 @@ jest.mock('../../utils/authUtils', () => ({
   },
 }));
 
-jest.mock('../../errors/errorAlerts', () => ({
+jest.mock('../../../../errors/errorAlerts', () => ({
   showErrorAlert: showErrorAlertMock,
 }));
 
-import { AuthProvider, useAuth } from '../AuthContext';
-import GlobalAuth from '../../utils/authUtils';
+import { AuthProvider, useAuth } from '../AuthProvider';
+import GlobalAuth from '../../../../../utils/authUtils';
 
 const wrapper = ({ children }: { children: React.ReactNode }) => <AuthProvider>{children}</AuthProvider>;
 

@@ -7,12 +7,12 @@ import React from 'react';
 import { ActivityIndicator, Dimensions, Linking, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { RFValue } from 'react-native-responsive-fontsize';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import Column from '../components/Column';
+import Column from '../../../../components/Column';
 import Logo from '../components/Logo';
-import Row from '../components/Row';
-import { colors } from '../constants/colors';
-import { useAuth } from '../context/AuthContext';
-import { AuthRootParamList } from '../navigation/types/authStackTypes';
+import Row from '../../../../components/Row';
+import { colors } from '../../../../constants/colors';
+import { useAuth } from '../../shared/providers/AuthProvider';
+import { AuthRootParamList } from '../../../../navigation/types/authStackTypes';
 
 const { width, height } = Dimensions.get('window');
 
@@ -20,25 +20,8 @@ const Intro = () => {
   const navigation = useNavigation<StackNavigationProp<AuthRootParamList>>();
   const { appleLoading, googleLoading, handleAppleAuth, handleGoogleAuth } = useAuth();
 
-  const handleApplePress = async () => {
-    await handleAppleAuth();
-    /*if (missingFields) {
-      navigation.navigate("OAuthCompleteFields", {
-        missingFields,
-        provider: "apple",
-      });
-    }*/
-  };
-
-  const handleGooglePress = async () => {
-    await handleGoogleAuth();
-    /*if (missingFields) {
-      navigation.navigate("OAuthCompleteFields", {
-        missingFields,
-        provider: "google",
-      });
-    }*/
-  };
+  const handleApplePress = async () => await handleAppleAuth();
+  const handleGooglePress = async () => await handleGoogleAuth();
 
   return (
     <LinearGradient colors={[colors.primaryDark, colors.primary]} style={{ flex: 1 }}>
@@ -170,7 +153,7 @@ const Intro = () => {
                   }}
                 >
                   <Image
-                    source={require('../assets/googleicon.png')}
+                    source={require('../../../assets/googleicon.png')}
                     style={{ height: 28, aspectRatio: 1 }}
                     contentFit="contain"
                     cachePolicy="disk"

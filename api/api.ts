@@ -2,7 +2,7 @@ import axios, { AxiosError, AxiosRequestConfig, AxiosResponse, InternalAxiosRequ
 import Constants from 'expo-constants';
 import { uuidv4 } from 'react-native-compressor';
 import { showErrorAlert } from '../errors/errorAlerts';
-import { refreshAndRotateTokens } from '../services/AuthService';
+import { refreshAndRotateTokens } from '../features/auth/shared/services/auth.service';
 import GlobalAuth from '../utils/authUtils';
 import { openUpdateModal } from '../utils/imperativeUpdateModal';
 import { saveRefreshToken } from '../utils/tokenStore';

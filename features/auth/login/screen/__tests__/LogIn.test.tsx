@@ -11,7 +11,7 @@ import {
 } from '@jest/globals';
 import { fireEvent, render } from '@testing-library/react-native';
 import type { RouteProp } from '@react-navigation/native';
-import type { AuthRootParamList } from '../../navigation/types/authStackTypes';
+import type { AuthRootParamList } from '../../../navigation/types/auth-stack.types';
 import type { StackNavigationProp } from '@react-navigation/stack';
 
 const mockGoBack = jestObject.fn();
@@ -46,9 +46,9 @@ jestObject.mock('react-native-vector-icons/MaterialCommunityIcons', () => {
   return ({ name }: { name: string }) => mockReact.createElement(Text, null, name);
 });
 
-jestObject.mock('../../components/LoginComponents/LoginForm', () => () => mockLoginForm());
+jestObject.mock('../../components/LoginForm', () => () => mockLoginForm());
 
-jestObject.mock('../../components/LoginComponents/VerifyCard', () => (props: any) => mockVerifyCard(props));
+jestObject.mock('../../components/VerifyCard', () => (props: any) => mockVerifyCard(props));
 
 import Login from '../LogIn';
 

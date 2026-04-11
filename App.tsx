@@ -10,7 +10,7 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { Inter_400Regular, Inter_500Medium, Inter_600SemiBold, Inter_700Bold } from '@expo-google-fonts/inter';
 
 import { WorkoutHistoryProvider } from './features/workouts/shared/providers/WorkoutHistoryProvider';
-import { AuthProvider, useAuth } from './context/AuthContext';
+import { AuthProvider, useAuth } from './features/auth/providers/AuthProvider';
 import { MessagesProvider } from './features/messages/providers/MessagesProvider';
 import { WorkoutPlanProvider } from './features/workouts/shared/providers/WorkoutPlanProvider';
 
@@ -26,8 +26,8 @@ import UpdateAppModal from './components/UpdateAppModal';
 import { CardioProvider } from './features/workouts/shared/providers/CardioProvider';
 import { GlobalAppLoadingProvider } from './context/GlobalAppLoadingContext';
 import AppStack from './navigation/AppStack';
-import AuthStack from './navigation/AuthStack';
-import NotificationsSetup from './features/settings/setup/notifications-setup.setup';
+import AuthStack from './features/auth/navigation/AuthStack';
+import NotificationsSetup from './features/settings/push-notifications-setup/notifications-setup.setup';
 import Sentry from './sentry';
 
 // ---------- Fonts Loader Hook ----------

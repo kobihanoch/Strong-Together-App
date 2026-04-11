@@ -234,7 +234,7 @@ describe('NotificationsContext', () => {
     });
 
     await act(async () => {
-      result.current.setAllReceivedMessages((prev) => [createSocketMessage(), ...prev]);
+      result.current.setAllReceivedMessages((prev: typeof result.current.allReceivedMessages) => [createSocketMessage(), ...prev]);
     });
 
     expect(result.current.allReceivedMessages[0]).toEqual(
@@ -266,7 +266,7 @@ describe('NotificationsContext', () => {
     });
 
     await act(async () => {
-      result.current.setAllReceivedMessages((prev) => [
+      result.current.setAllReceivedMessages((prev: typeof result.current.allReceivedMessages) => [
         createSocketMessage({ id: 'msg-4', is_read: true, subject: 'Read update' }),
         ...prev,
       ]);

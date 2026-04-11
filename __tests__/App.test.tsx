@@ -119,7 +119,7 @@ jest.mock('../navigation/AppStack', () => {
   };
 });
 
-jest.mock('../features/settings/setup/notifications-setup.setup', () => {
+jest.mock('../features/settings/push-notifications-setup/notifications-setup.setup', () => {
   const ReactLocal = require('react');
   const { Text: TextLocal } = require('react-native');
   return {

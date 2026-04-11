@@ -9,10 +9,10 @@ import {
   jest as jestObject,
 } from '@jest/globals';
 import { render, waitFor } from '@testing-library/react-native';
-import type { AuthContextValue } from '../../../../context/types/authContextTypes.dto';
+import type { AuthProviderValue } from '../../../../context/types/authContextTypes.dto';
 import type { GetAuthenticatedUserByIdResponse } from '@strong-together/shared';
 
-let mockAuthState: AuthContextValue;
+let mockAuthState: AuthProviderValue;
 let mockMediaUploadsState: {
   uploadToStorageAndReturnPath: ReturnType<typeof jestObject.fn>;
   loading: boolean;
@@ -78,7 +78,7 @@ const createUser = (overrides: Partial<GetAuthenticatedUserByIdResponse> = {}): 
   ...overrides,
 });
 
-const createAuthState = (overrides: Partial<AuthContextValue> = {}): AuthContextValue => ({
+const createAuthState = (overrides: Partial<AuthProviderValue> = {}): AuthProviderValue => ({
   authPhase: 'authed',
   isLoggedIn: true,
   user: createUser(),

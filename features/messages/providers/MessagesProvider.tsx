@@ -1,18 +1,14 @@
+import { GetAllUserMessagesResponse } from '@strong-together/shared';
 import { createContext, ReactNode, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { keyInbox } from '../../../cache/cacheUtils';
+import { useAuth } from '../../../context/AuthContext';
 import useCacheAndFetch from '../../../hooks/useCacheAndFetch';
 import useUpdateGlobalLoading from '../../../hooks/useUpdateGlobalLoading';
-import { getUserMessages } from '../services/messages.service';
-import { GetAllUserMessagesResponse } from '@strong-together/shared';
-import { AllUserMessages } from '@strong-together/shared';
-import { filterMessagesByUnread } from '../utils/messages-context-utils';
 import { registerToMessagesListener } from '../../../webSockets/socketListeners';
-import { useAuth } from '../../../context/AuthContext';
-import {
-  MessagesContextAllReceivedMessages,
-  MessagesContextCachePayload,
-  MessagesContextValue,
-} from '../types/messages-context.types';
+import { getUserMessages } from '../services/messages.service';
+import { UserMessages } from '../types/messages.types';
+import { filterMessagesByUnread } from '../utils/messages-context-utils';
+import { MessagesProviderCachePayload, MessagesProviderValue } from './types/messages-context.types';
 
 /**
  * Notifications Flow:
@@ -25,7 +21,7 @@ import {
  * 7. On logout → clear all state.
  */
 
-const MessagesContext = createContext<MessagesContextValue | null>(null);
+const MessagesContext = createContext<MessagesProviderValue | null>(null);
 
 export const useMessages = () => {
   const context = useContext(MessagesContext);
@@ -39,10 +35,10 @@ export const MessagesProvider = ({ children }: { children: ReactNode }) => {
   const { user, isValidatedWithServer } = useAuth();
 
   // All user's received messages
-  const [allReceivedMessages, setAllReceivedMessages] = useState<MessagesContextAllReceivedMessages>([]);
+  const [allReceivedMessages, setAllReceivedMessages] = useState<UserMessages>([]);
 
   // Filter messages to read/unread => Everytime all messages is updated (when receiving a new message), filter is executed
-  const unreadMessages = useMemo((): AllUserMessages[] => {
+  const unreadMessages = useMemo((): UserMessages => {
     return filterMessagesByUnread(allReceivedMessages);
   }, [allReceivedMessages]);
 
@@ -52,7 +48,7 @@ export const MessagesProvider = ({ children }: { children: ReactNode }) => {
   const fetchFn = useCallback(async () => await getUserMessages(), []);
 
   // On data function
-  const onDataFn = useCallback((data: GetAllUserMessagesResponse | MessagesContextCachePayload): void => {
+  const onDataFn = useCallback((data: GetAllUserMessagesResponse | MessagesProviderCachePayload): void => {
     if (!data) return;
     setAllReceivedMessages(data.messages);
   }, []);
@@ -61,7 +57,10 @@ export const MessagesProvider = ({ children }: { children: ReactNode }) => {
   const cachePayload = useMemo(() => ({ messages: allReceivedMessages }), [allReceivedMessages]);
 
   // Hook usage
-  const { loading: loadingMessages, cacheKnown } = useCacheAndFetch<MessagesContextCachePayload, GetAllUserMessagesResponse>(
+  const { loading: loadingMessages, cacheKnown } = useCacheAndFetch<
+    MessagesProviderCachePayload,
+    GetAllUserMessagesResponse
+  >(
     user, // user prop
     keyInbox, // key builder
     isValidatedWithServer, // flag from server
@@ -83,7 +82,7 @@ export const MessagesProvider = ({ children }: { children: ReactNode }) => {
     return;
   }, [user]);
 
-  const value = useMemo<MessagesContextValue>(
+  const value = useMemo<MessagesProviderValue>(
     () => ({
       unreadMessages,
       allReceivedMessages,

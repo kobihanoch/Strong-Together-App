@@ -2,7 +2,7 @@
 import { io, Socket } from 'socket.io-client';
 import api from '../api/api';
 import { API_BASE_URL } from '../api/apiConfig';
-import { AppUser } from '../context/types/authContextTypes.dto';
+import { AppUser } from '../features/auth/providers/types/auth-context.types';
 
 let socket: Socket | null = null;
 

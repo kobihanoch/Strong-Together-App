@@ -1,8 +1,8 @@
 import { createStackNavigator } from '@react-navigation/stack';
-import Intro from '../screens/Intro';
-import Login from '../screens/LogIn';
-import Register from '../screens/Register';
-import { AuthRootParamList } from './types/authStackTypes';
+import Intro from '../screen/Intro';
+import Login from '../login/screen/LogIn';
+import Register from '../register/screen/Register';
+import { AuthRootParamList } from './types/auth-stack.types';
 
 const Stack = createStackNavigator<AuthRootParamList>();
 

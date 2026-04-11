@@ -9,15 +9,15 @@ import {
   jest as jestObject,
 } from '@jest/globals';
 import { fireEvent, render, waitFor } from '@testing-library/react-native';
-import type { AuthContextValue } from '../../context/types/authContextTypes.dto';
+import type { AuthProviderValue } from '../../../shared/providers/types/auth-context.types';
 import type { StackNavigationProp } from '@react-navigation/stack';
-import type { AuthRootParamList } from '../../navigation/types/authStackTypes';
+import type { AuthRootParamList } from '../../../../../navigation/types/authStackTypes';
 
 const mockGoBack = jestObject.fn();
 const mockReplace = jestObject.fn();
 const mockShowErrorAlert = jestObject.fn<(title: string, description: string) => void>();
 
-let mockAuthState: AuthContextValue;
+let mockAuthState: AuthProviderValue;
 
 jestObject.mock('@react-navigation/native', () => ({
   useNavigation: () => ({
@@ -48,17 +48,17 @@ jestObject.mock('react-native-vector-icons/MaterialCommunityIcons', () => {
   return ({ name }: { name: string }) => mockReact.createElement(Text, null, name);
 });
 
-jestObject.mock('../../context/AuthContext', () => ({
+jestObject.mock('../../providers/AuthProvider', () => ({
   useAuth: () => mockAuthState,
 }));
 
-jestObject.mock('../../errors/errorAlerts', () => ({
+jestObject.mock('../../../../errors/errorAlerts', () => ({
   showErrorAlert: (...args: [string, string]) => mockShowErrorAlert(...args),
 }));
 
 import Register from '../Register';
 
-const createAuthState = (overrides: Partial<AuthContextValue> = {}): AuthContextValue => ({
+const createAuthState = (overrides: Partial<AuthProviderValue> = {}): AuthProviderValue => ({
   authPhase: 'guest',
   isLoggedIn: false,
   user: null,

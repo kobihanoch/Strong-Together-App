@@ -10,6 +10,7 @@ import { colors } from '../../../constants/colors';
 import { useAuth } from '../../../context/AuthContext';
 import useMediaUploads from '../hooks/use-media-uploads.hook';
 import { UserEntity } from '@strong-together/shared';
+import { AppUser } from '../../auth/shared/types/auth.types';
 
 const { width, height } = Dimensions.get('window');
 
@@ -59,7 +60,7 @@ function ImagePickerComponent({
       const { path } = await uploadToStorageAndReturnPath(file);
       // Update in auth context
       setUser(
-        (prev) =>
+        (prev: AppUser | null) =>
           ({
             ...prev,
             profile_image_url: path,
@@ -75,7 +76,7 @@ function ImagePickerComponent({
 
     // Update in auth context
     setUser(
-      (prev) =>
+        (prev: AppUser | null) =>
         ({
           ...prev,
           profile_image_url: null,
