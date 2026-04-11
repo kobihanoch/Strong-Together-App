@@ -5,7 +5,7 @@ import { showErrorAlert } from '../errors/errorAlerts';
 import { refreshAndRotateTokens } from '../features/auth/shared/services/auth.service';
 import GlobalAuth from '../utils/authUtils';
 import { openUpdateModal } from '../utils/imperativeUpdateModal';
-import { saveRefreshToken } from '../utils/tokenStore';
+import { saveRefreshToken } from '../features/auth/shared/utils/token-storage.utils';
 import { API_BASE_URL } from './apiConfig';
 import { ensureBootstrap, isOpen, isTracked, responseMap } from './bootstrapApi';
 import buildDpopProof from './DPoP/buildDpopProof';

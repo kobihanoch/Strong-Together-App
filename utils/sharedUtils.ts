@@ -43,35 +43,6 @@ export const ymdInCurrentTZ = (ms: number) => {
   }).format(new Date(ms)); // e.g., "2025-10-26"
 };
 
-// Mapping exercise tracking with keys:
-// {
-//   byDate: { [YYYY-MM-DD]: Record[] }, SORTED FROM NEW (FIRST) TO OLD(LAST)
-//   byETSId: { [exercisetosplit_id]: Record[] },
-//   bySplitName: { [splitname]: Record[] }.
-//   splitDatesDesc: { [splitName]: all dates DESC }
-// }
-/*// PR for the same exercise
-export const isSetPR = (
-  exId: ExerciseEntity['id'],
-  weight: ExerciseTrackingEntity['weight'],
-  reps: ExerciseTrackingEntity['reps'],
-  prsByExId,
-  workoutDate,
-) => {
-  const prForExercise = prsByExId[exId];
-  if (!prForExercise) return true;
-
-  const { weight: prW, reps: prR } = prForExercise;
-  if (weight >= prW && reps >= prR) {
-    if (prForExercise.workoutdate == workoutDate) {
-      return true;
-    } else if (weight > prW && reps > prR) {
-      return true;
-    }
-  }
-  return false;
-};*/
-
 // Format a date string (YYYY-MM-DD) into "Mon DD, YYYY"
 export const formatDate = (dateToFormat: string) => {
   const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
@@ -95,6 +66,7 @@ export const formatDate = (dateToFormat: string) => {
   return `${monthName} ${day}, ${year}`;
 };
 
+// Format time into HRS hrs MINUTES mins SECONDS secs
 export const formatTime = (min: number | null, sec: number | null) => {
   if (!min || !sec) return 'None';
   const hrs = Math.floor(min / 60);
