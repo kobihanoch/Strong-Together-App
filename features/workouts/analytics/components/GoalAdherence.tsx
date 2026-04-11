@@ -9,7 +9,7 @@ import {
   View,
 } from 'react-native';
 import { AdherenceExerciseStats, GoalAdherenceResponse } from '@strong-together/shared';
-import PageDots from '../PageDots';
+import PageDots from '../../../../components/PageDots';
 import Card from './Card';
 import RenderGoalAdherenceItem from './RenderGoalAdherenceItem';
 

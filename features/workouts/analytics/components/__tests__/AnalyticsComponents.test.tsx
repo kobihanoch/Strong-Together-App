@@ -48,7 +48,7 @@ jest.mock('react-native-gifted-charts', () => {
   };
 });
 
-jest.mock('../../PageDots', () => {
+jest.mock('../../../../../components/PageDots', () => {
   const ReactLocal = require('react');
   const { Text: TextLocal } = require('react-native');
   return ({ index = 0, length = 0 }: { index?: number; length?: number }) =>
@@ -60,7 +60,7 @@ import GoalAdherence from '../GoalAdherence';
 import RenderGoalAdherenceItem from '../RenderGoalAdherenceItem';
 import Estimated1RM from '../Estimated1RM';
 import RenderEst1RMItem from '../RenderEst1RMItem';
-import { AdherenceBar } from '../../AdherenceBar';
+import { AdherenceBar } from '../../../../../components/AdherenceBar';
 
 const createWorkoutPlan = (overrides: Partial<WholeUserWorkoutPlan> = {}): WholeUserWorkoutPlan => ({
   id: 3,

@@ -1,10 +1,10 @@
 import React, { useMemo } from 'react';
 import { Dimensions, Text, View } from 'react-native';
 import { RFValue } from 'react-native-responsive-fontsize';
-import { splitsCounterToPieData } from '../../utils/analyticsUtils';
+import { splitsCounterToPieData } from '../utils/analytics.utils';
 import Card from './Card';
 import PieDiagramSplitsCounter from './PieDiagramSplitsCounter';
-import { WorkoutHistoryAnalyzedExerciseTrackingData } from '../../features/workouts/history/types/workout-history.types';
+import { WorkoutHistoryAnalyzedExerciseTrackingData } from '../../history/types/workout-history.types';
 import { WholeUserWorkoutPlan } from '@strong-together/shared';
 
 const { height } = Dimensions.get('window');
@@ -206,4 +206,3 @@ const Overview = ({ overViewData, hasData }: OverviewProps) => {
 };
 
 export default Overview;
-

@@ -3,7 +3,7 @@ import { createStackNavigator, StackNavigationProp } from '@react-navigation/sta
 import React, { useEffect } from 'react';
 import { cacheDeleteKey, cacheGetJSON, keyStartWorkout } from '../cache/cacheUtils';
 import { useAuth } from '../context/AuthContext';
-import Analytics from '../screens/Analytics';
+import Analytics from '../features/workouts/screens/Analytics';
 import CreateWorkout from '../features/workouts/screens/CreateWorkout';
 import Home from '../screens/Home';
 import Inbox from '../screens/Inbox';
@@ -74,4 +74,3 @@ const AppStack = () => {
 };
 
 export default AppStack;
-

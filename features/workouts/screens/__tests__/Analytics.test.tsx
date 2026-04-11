@@ -72,19 +72,19 @@ jest.mock('react-native-gesture-handler', () => {
   };
 });
 
-jest.mock('../../components/PageDots', () => {
+jest.mock('../../../../components/PageDots', () => {
   const ReactLocal = require('react');
   const { Text: TextLocal } = require('react-native');
   return ({ index = 0, length = 0 }: { index?: number; length?: number }) =>
     ReactLocal.createElement(TextLocal, null, `Dots ${index}/${length}`);
 });
 
-jest.mock('../../hooks/logic/useAnalysticsLogic', () => ({
+jest.mock('../../analytics/hooks/use-analystics-logic.hook', () => ({
   __esModule: true,
   default: () => mockAnalyticsLogic,
 }));
 
-jest.mock('../../components/SlidingBottomModal', () => {
+jest.mock('../../../../components/SlidingBottomModal', () => {
   const ReactLocal = require('react');
   const { View: ViewLocal, Text: TextLocal } = require('react-native');
   return {

@@ -6,7 +6,7 @@ import { AxiosError } from 'axios';
 import {
   userWithWorkoutAndHistoryProfile,
   userWithoutWorkoutProfile,
-} from '../../../tests/fixtures/userProfiles';
+} from '../../../../../tests/fixtures/userProfiles';
 
 jest.mock('axios', () => ({
   AxiosError: class AxiosError extends Error {},
@@ -23,11 +23,10 @@ const mockRefreshAndRotateTokens =
   jest.fn<() => Promise<{ accessToken: string; refreshToken: string; userId: string }>>();
 const mockFetchSelfUserData = jest.fn<() => Promise<typeof userWithWorkoutAndHistoryProfile.user>>();
 const mockGetUserWorkout = jest.fn<
-  () =>
-    Promise<{
-      workoutPlan: typeof userWithWorkoutAndHistoryProfile.workout;
-      workoutPlanForEditWorkout: typeof userWithWorkoutAndHistoryProfile.workoutForEdit;
-    }>
+  () => Promise<{
+    workoutPlan: typeof userWithWorkoutAndHistoryProfile.workout;
+    workoutPlanForEditWorkout: typeof userWithWorkoutAndHistoryProfile.workoutForEdit;
+  }>
 >();
 const mockGetUserExerciseTracking = jest.fn<() => Promise<ReturnType<typeof createPackedTrackingResponse>>>();
 const mockGetTrackingAnalytics = jest.fn<() => Promise<ReturnType<typeof createAnalyticsResponseFromProfile>>>();
@@ -59,8 +58,8 @@ jest.mock('expo-constants', () => ({
   },
 }));
 
-jest.mock('../../../cache/cacheUtils', () => {
-  const actual = jest.requireActual('../../../cache/cacheUtils') as Record<string, unknown>;
+jest.mock('../../../../../cache/cacheUtils', () => {
+  const actual = jest.requireActual('../../../../../cache/cacheUtils') as Record<string, unknown>;
   return {
     ...actual,
     cacheGetJSON: (key: string) => mockCacheGetJSON(key),
@@ -70,62 +69,62 @@ jest.mock('../../../cache/cacheUtils', () => {
   };
 });
 
-jest.mock('../../../utils/tokenStore', () => ({
+jest.mock('../../../../../utils/tokenStore', () => ({
   getRefreshToken: () => mockGetRefreshToken(),
   saveRefreshToken: (token: string) => mockSaveRefreshToken(token),
   clearRefreshToken: () => mockClearRefreshToken(),
 }));
 
-jest.mock('../../../services/AuthService', () => ({
+jest.mock('../../../../../services/AuthService', () => ({
   refreshAndRotateTokens: () => mockRefreshAndRotateTokens(),
   loginUser: jest.fn(),
   logoutUser: jest.fn(),
   registerUser: jest.fn(),
 }));
 
-jest.mock('../../../services/UserService', () => ({
+jest.mock('../../../../../services/UserService', () => ({
   fetchSelfUserData: () => mockFetchSelfUserData(),
 }));
 
-jest.mock('../../../features/workouts/plan/services/workout-plan.service', () => ({
+jest.mock('../../../plan/services/workout-plan.service', () => ({
   getUserWorkout: () => mockGetUserWorkout(),
 }));
 
-jest.mock('../../../features/workouts/history/services/workout-history.service', () => ({
+jest.mock('../../../history/services/workout-history.service', () => ({
   getUserExerciseTracking: () => mockGetUserExerciseTracking(),
 }));
 
-jest.mock('../../../services/AnalyticsService', () => ({
+jest.mock('../../services/analytics.service', () => ({
   getTrackingAnalytics: () => mockGetTrackingAnalytics(),
 }));
 
-jest.mock('../../../webSockets/socketConfig', () => ({
+jest.mock('../../../../../webSockets/socketConfig', () => ({
   connectSocket: (username: string) => mockConnectSocket(username),
   disconnectSocket: () => mockDisconnectSocket(),
 }));
 
-jest.mock('../../../hooks/useNetworkStatus', () => ({
+jest.mock('../../../../../hooks/useNetworkStatus', () => ({
   useNetworkStatus: () => mockUseNetworkStatus(),
 }));
 
-jest.mock('../../../hooks/oAuth/useGoogleAuth', () => ({
+jest.mock('../../../../../hooks/oAuth/useGoogleAuth', () => ({
   useGoogleAuth: () => ({
     signInWithGoogle: jest.fn(),
   }),
 }));
 
-jest.mock('../../../hooks/oAuth/useAppleAuth', () => ({
+jest.mock('../../../../../hooks/oAuth/useAppleAuth', () => ({
   useAppleAuth: () => ({
     signInWithApple: jest.fn(),
   }),
 }));
 
-jest.mock('../../../api/bootstrapApi', () => ({
+jest.mock('../../../../../api/bootstrapApi', () => ({
   hasBootstrapPayload: () => mockHasBootstrapPayload(),
   resetBootstrap: () => mockResetBootstrap(),
 }));
 
-jest.mock('../../../utils/authUtils', () => ({
+jest.mock('../../../../../utils/authUtils', () => ({
   __esModule: true,
   default: {
     setAccessToken: (token: string | null) => mockSetAccessToken(token),
@@ -134,14 +133,11 @@ jest.mock('../../../utils/authUtils', () => ({
   },
 }));
 
-import {
-  WorkoutHistoryProvider,
-  useWorkoutHistoryContext,
-} from '../../../features/workouts/providers/WorkoutHistoryProvider';
-import { AuthProvider, useAuth } from '../../../context/AuthContext';
-import { GlobalAppLoadingProvider } from '../../../context/GlobalAppLoadingContext';
-import { WorkoutPlanProvider, useWorkoutPlanContext } from '../../../features/workouts/providers/WorkoutPlanProvider';
-import useAnalysticsLogic from '../useAnalysticsLogic';
+import { WorkoutHistoryProvider, useWorkoutHistoryContext } from '../../../providers/WorkoutHistoryProvider';
+import { AuthProvider, useAuth } from '../../../../../context/AuthContext';
+import { GlobalAppLoadingProvider } from '../../../../../context/GlobalAppLoadingContext';
+import { WorkoutPlanProvider, useWorkoutPlanContext } from '../../../providers/WorkoutPlanProvider';
+import useAnalysticsLogic from '../use-analystics-logic.hook';
 
 const wrapper = ({ children }: { children: React.ReactNode }) => (
   <GlobalAppLoadingProvider>
@@ -418,4 +414,3 @@ describe('useAnalysticsLogic integration', () => {
     expect(mockGetTrackingAnalytics).toHaveBeenCalledTimes(1);
   });
 });
-

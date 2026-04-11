@@ -1,12 +1,12 @@
 import { useCallback, useMemo, useState } from 'react';
-import { keyAnalytics } from '../../cache/cacheUtils';
-import { useWorkoutHistoryContext } from '../../features/workouts/providers/WorkoutHistoryProvider';
-import { useAuth } from '../../context/AuthContext';
-import { useWorkoutPlanContext } from '../../features/workouts/providers/WorkoutPlanProvider';
-import { getTrackingAnalytics } from '../../services/AnalyticsService';
-import useCacheAndFetch from '../useCacheAndFetch';
+import { keyAnalytics } from '../../../../cache/cacheUtils';
+import { useWorkoutHistoryContext } from '../../providers/WorkoutHistoryProvider';
+import { useAuth } from '../../../../context/AuthContext';
+import { useWorkoutPlanContext } from '../../providers/WorkoutPlanProvider';
+import { getTrackingAnalytics } from '../services/analytics.service';
+import useCacheAndFetch from '../../../../hooks/useCacheAndFetch';
 import { GetAnalyticsResponse } from '@strong-together/shared';
-import { Analytics1RM, AnalyticsCachePayload, AnalyticsGoals } from '../types/useAnalyticsTypes.dto';
+import { Analytics1RM, AnalyticsCachePayload, AnalyticsGoals } from '../types/use-analytics.types';
 
 const useAnalysticsLogic = () => {
   const { user, isValidatedWithServer } = useAuth();
