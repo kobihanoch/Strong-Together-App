@@ -18,8 +18,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import Constants from 'expo-constants';
 import { MaterialCommunityIcons as ExpoMaterialCommunityIcons } from '@expo/vector-icons';
 import { NotifierRoot } from 'react-native-notifier';
-import ensureDpopKeyPair from './api/DPoP/ensureDpopKeyPair';
-import { cacheHousekeepingOnBoot } from './cache/cacheUtils';
+import ensureDpopKeyPair from './api/dpop/ensureDpopKeyPair';
+import { cacheHousekeepingOnBoot } from './infrastructure/cache/cache.utils';
 import BottomTabBar from './components/BottomTabBar';
 import Theme1 from './components/Theme1';
 import UpdateAppModal from './components/UpdateAppModal';
@@ -28,7 +28,7 @@ import { GlobalAppLoadingProvider } from './context/GlobalAppLoadingContext';
 import AppStack from './navigation/AppStack';
 import AuthStack from './features/auth/navigation/AuthStack';
 import NotificationsSetup from './features/settings/push-notifications-setup/notifications-setup.setup';
-import Sentry from './sentry';
+import Sentry from './infrastructure/sentry';
 
 // ---------- Fonts Loader Hook ----------
 function useFontsReady() {

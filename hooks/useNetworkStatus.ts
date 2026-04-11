@@ -1,7 +1,7 @@
 import NetInfo from '@react-native-community/netinfo';
 import { useEffect, useRef, useState } from 'react';
 import { Notifier, NotifierComponents } from 'react-native-notifier';
-import { notifyOffline } from '../api/networkCheck';
+import { notifyOffline } from '../api/helpers/network-check';
 
 export const useNetworkStatus = (): boolean => {
   const [isOnline, setIsOnline] = useState<boolean>(true);

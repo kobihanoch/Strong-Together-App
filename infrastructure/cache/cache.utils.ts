@@ -9,18 +9,6 @@ export const CACHE_VERSION = Constants.expoConfig!.version;
 export const TTL_48H = 48 * 60 * 60; // seconds
 export const TTL_36H = 36 * 60 * 60; // seconds
 
-// ----- Simple key builders (uppercase "CACHE:*") -----
-
-export const keyWorkoutPlan = (userId: string): string => `CACHE:WORKOUTPLAN:${userId}:${CACHE_VERSION}`;
-export const keyAnalytics = (userId: string): string => `CACHE:ANALYTICS:${userId}:${CACHE_VERSION}`;
-export const keyTracking = (userId: string, days: number = 45): string =>
-  `CACHE:TRACKING:${userId}:${days}:${CACHE_VERSION}`;
-export const keyAuth = (userId: string): string => `CACHE:AUTH:${userId}:${CACHE_VERSION}`;
-export const keyInbox = (userId: string): string => `CACHE:INBOX:${userId}:${CACHE_VERSION}`;
-export const keyCardio = (userId: string): string => `CACHE:CARDIO:${userId}:${CACHE_VERSION}`;
-
-export const keyStartWorkout = (userId: string): string => `CACHE:STARTWORKOUT:${userId}:${CACHE_VERSION}`;
-
 /**
  * Save JSON value under a key with TTL (in seconds).
  * Overwrites any existing value for the same key.
@@ -45,12 +33,6 @@ export async function cacheGetJSON<T>(key: string): Promise<T | null> {
 
   try {
     const obj = JSON.parse(raw);
-    //if (!obj || typeof obj.exp !== "number") return null;
-    /*if (Date.now() > obj.exp) {
-      // Expired: remove and return null
-      await AsyncStorage.removeItem(key);
-      return null;
-    }*/
     return obj.data as T;
   } catch {
     // Corrupted value: remove and treat as miss

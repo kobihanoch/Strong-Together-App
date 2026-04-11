@@ -5,7 +5,7 @@ import React from 'react';
 import { Dimensions, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { RFValue } from 'react-native-responsive-fontsize';
 import { useAuth } from '../context/AuthContext';
-import { useGlobalAppLoadingContext } from '../context/GlobalAppLoadingContext';
+import { useGlobalAppLoadingContext } from '../context/GlobalAppLoadingProvidertsx';
 import { RootParamList } from '../navigation/types/appStackTypes';
 
 const { width, height } = Dimensions.get('window');

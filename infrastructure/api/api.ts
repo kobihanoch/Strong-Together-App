@@ -6,12 +6,12 @@ import { refreshAndRotateTokens } from '../features/auth/shared/services/auth.se
 import GlobalAuth from '../utils/authUtils';
 import { openUpdateModal } from '../utils/imperativeUpdateModal';
 import { saveRefreshToken } from '../features/auth/shared/utils/token-storage.utils';
-import { API_BASE_URL } from './apiConfig';
-import { ensureBootstrap, isOpen, isTracked, responseMap } from './bootstrapApi';
-import buildDpopProof from './DPoP/buildDpopProof';
-import calculateJKT from './DPoP/calculateJKT';
-import { isDeviceOnline, notifyOffline, notifyServerDown } from './networkCheck';
-import { finishHttpErrorSpan, finishHttpResponseSpan, startHttpRequestSpan } from './sentryTracing';
+import { API_BASE_URL } from './api-url.config';
+import { ensureBootstrap, isOpen, isTracked, responseMap } from './bootstrap-api';
+import buildDpopProof from './dpop/buildDpopProof';
+import calculateJKT from './dpop/calculateJKT';
+import { isDeviceOnline, notifyOffline, notifyServerDown } from './helpers/network-check';
+import { finishHttpErrorSpan, finishHttpResponseSpan, startHttpRequestSpan } from './tracing/sentry-tracing';
 import type { Span } from '@sentry/core';
 
 declare module 'axios' {

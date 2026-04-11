@@ -1,7 +1,7 @@
 import * as Sentry from '@sentry/react-native';
 import type { EventHint } from '@sentry/types';
 import Constants from 'expo-constants';
-import { API_BASE_URL } from './api/apiConfig';
+import { API_BASE_URL } from './api/api-url.config';
 
 const dsn = process.env.EXPO_PUBLIC_SENTRY_DSN;
 const environment = process.env.EXPO_PUBLIC_ENVIRONMENT || 'development';

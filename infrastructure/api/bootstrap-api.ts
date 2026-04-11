@@ -3,10 +3,10 @@ import Constants from 'expo-constants';
 import { showErrorAlert } from '../errors/errorAlerts';
 import { BootstrapResponse } from '@strong-together/shared';
 import { openUpdateModal } from '../utils/imperativeUpdateModal';
-import { API_BASE_URL } from './apiConfig';
-import buildDpopProof from './DPoP/buildDpopProof';
+import { API_BASE_URL } from './api-url.config';
+import buildDpopProof from './dpop/buildDpopProof';
 import { uuidv4 } from 'react-native-compressor';
-import { finishHttpErrorSpan, finishHttpResponseSpan, startHttpRequestSpan } from './sentryTracing';
+import { finishHttpErrorSpan, finishHttpResponseSpan, startHttpRequestSpan } from './tracing/sentry-tracing';
 import type { Span } from '@sentry/core';
 
 export type BootstrapPayload = BootstrapResponse;

@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { TTL_48H } from '../cache/cacheUtils';
+import { TTL_48H } from '../infrastructure/cache/cache.utils';
 import { AppUser } from '../context/types/authContextTypes.dto';
 import useGetCache from './useGetCache';
 import useUpdateCache from './useUpdateCache';
