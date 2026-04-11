@@ -2,7 +2,7 @@ import * as AppleAuthentication from 'expo-apple-authentication';
 import * as Crypto from 'expo-crypto';
 import { Platform } from 'react-native';
 import { useCallback } from 'react';
-import api from '../../../../../infrastructure/api/api'; // <-- call backend here for symmetry
+import api from '../../../../infrastructure/api/api'; // <-- call backend here for symmetry
 import { OAuthLoginResponse } from '@strong-together/shared';
 import { AppleOAuthBody } from '@strong-together/shared';
 

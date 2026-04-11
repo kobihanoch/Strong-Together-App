@@ -7,12 +7,12 @@ import React from 'react';
 import { ActivityIndicator, Dimensions, Linking, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { RFValue } from 'react-native-responsive-fontsize';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import Column from '../../../../../shared/components/Column';
+import Column from '../../../../shared/components/Column';
 import Logo from '../components/Logo';
-import Row from '../../../../../shared/components/Row';
-import { colors } from '../../../../../shared/constants/colors';
+import Row from '../../../../shared/components/Row';
+import { colors } from '../../../../shared/constants/colors';
 import { useAuth } from '../../shared/providers/AuthProvider';
-import { AuthRootParamList } from '../../../shared/navigation/types/auth-stack.types';
+import { AuthRootParamList } from '../../../../navigation/types/auth-stack.types';
 
 const { width, height } = Dimensions.get('window');
 
@@ -153,7 +153,7 @@ const Intro = () => {
                   }}
                 >
                   <Image
-                    source={require('../../../assets/googleicon.png')}
+                    source={require('../../../../assets/googleicon.png')}
                     style={{ height: 28, aspectRatio: 1 }}
                     contentFit="contain"
                     cachePolicy="disk"

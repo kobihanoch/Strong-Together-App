@@ -1,4 +1,4 @@
-import api from '../../../../../infrastructure/api/api';
+import api from '../../../../infrastructure/api/api';
 import { AddUserAerobicsBody, GetUserAerobicsQuery } from '@strong-together/shared';
 import { UserAerobicsResponse } from '@strong-together/shared';
 

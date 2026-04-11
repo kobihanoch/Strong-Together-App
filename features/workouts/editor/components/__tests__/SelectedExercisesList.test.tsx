@@ -68,13 +68,13 @@ jest.mock('../../../session/components/NumericInputWithRules', () => {
     );
 });
 
-jest.mock('../../../../../../shared/components/Column', () => {
+jest.mock('../../../../../shared/components/Column', () => {
   const ReactLocal = require('react');
   const { View } = require('react-native');
   return ({ children, ...props }: any) => ReactLocal.createElement(View, props, children);
 });
 
-jest.mock('../../../../../../shared/components/Row', () => {
+jest.mock('../../../../../shared/components/Row', () => {
   const ReactLocal = require('react');
   const { View } = require('react-native');
   return ({ children, ...props }: any) => ReactLocal.createElement(View, props, children);

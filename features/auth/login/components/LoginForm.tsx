@@ -1,9 +1,9 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { ActivityIndicator, TouchableOpacity, View, Text, StyleSheet, Dimensions } from 'react-native';
 import { RFValue } from 'react-native-responsive-fontsize';
-import InputField from '../../../../../shared/components/InputField';
+import InputField from '../../../../shared/components/InputField';
 import { useAuth } from '../../shared/providers/AuthProvider';
-import { showErrorAlert } from '../../../../../shared/errors/error-alerts';
+import { showErrorAlert } from '../../../../shared/errors/error-alerts';
 import { forgotPassword } from '../services/login.service';
 
 const { width, height } = Dimensions.get('window');

@@ -2,7 +2,7 @@ import React, { useMemo } from 'react';
 import { Dimensions, Text, View, TouchableOpacity } from 'react-native';
 import { RFValue } from 'react-native-responsive-fontsize';
 import { FontAwesome5 } from '@expo/vector-icons';
-import { AdherenceBar } from '../../../../../shared/components/AdherenceBar';
+import { AdherenceBar } from '../../../../shared/components/AdherenceBar';
 import { WorkoutSplitEntity } from '@strong-together/shared';
 import { ExerciseEntity } from '@strong-together/shared';
 import { AdherenceExerciseStats } from '@strong-together/shared';

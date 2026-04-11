@@ -7,11 +7,11 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 import { RFValue } from 'react-native-responsive-fontsize';
 import VerifyCard from '../components/VerifyCard';
 import LoginForm from '../components/LoginForm';
-import { colors } from '../../../../../shared/constants/colors';
+import { colors } from '../../../../shared/constants/colors';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { StackScreenProps } from '@react-navigation/stack';
-import { AuthRootParamList } from '../../../shared/navigation/types/auth-stack.types';
+import { AuthRootParamList } from '../../../../navigation/types/auth-stack.types';
 
 const { width, height } = Dimensions.get('window');
 

@@ -51,7 +51,7 @@ jestObject.mock('../../../cardio/services/cardio.service', () => ({
   logUserCardio: (...args: [number, number, string]) => mockLogUserCardio(...args),
 }));
 
-jestObject.mock('../../../../../../hooks/useLightStatusBar', () => ({
+jestObject.mock('../../../../../hooks/use-light-status-bar.hook', () => ({
   __esModule: true,
   default: jestObject.fn(),
 }));
@@ -64,13 +64,13 @@ jestObject.mock('../../../shared/providers/CardioProvider', () => ({
   useCardioContext: () => mockCardioContext,
 }));
 
-jestObject.mock('../../../../../../shared/components/Column', () => {
+jestObject.mock('../../../../../shared/components/Column', () => {
   const mockReact = require('react');
   const { View: RNView } = require('react-native');
   return ({ children, ...props }: any) => mockReact.createElement(RNView, props, children);
 });
 
-jestObject.mock('../../../../../../shared/components/Row', () => {
+jestObject.mock('../../../../../shared/components/Row', () => {
   const mockReact = require('react');
   const { View: RNView } = require('react-native');
   return ({ children, ...props }: any) => mockReact.createElement(RNView, props, children);
@@ -109,7 +109,7 @@ jestObject.mock('../../components/NoWorkoutPlan', () => {
     );
 });
 
-jestObject.mock('../../../../../../shared/components/SlidingBottomModal', () => {
+jestObject.mock('../../../../../shared/components/SlidingBottomModal', () => {
   const mockReact = require('react');
   const { Text: RNText, View: RNView } = require('react-native');
   return {

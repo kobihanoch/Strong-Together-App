@@ -3,9 +3,9 @@ import { useNavigation } from '@react-navigation/native';
 import React from 'react';
 import { Dimensions, Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { RFValue } from 'react-native-responsive-fontsize';
-import { colors } from '../../../../shared/constants/colors';
+import { colors } from '../../../shared/constants/colors';
 import { StackNavigationProp } from '@react-navigation/stack';
-import { RootParamList } from '../../shared/navigation/types/appStackTypes';
+import { RootParamList } from '../../../navigation/types/appStackTypes';
 
 const { width, height } = Dimensions.get('window');
 

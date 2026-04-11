@@ -1,6 +1,6 @@
 // notifications/NotificationsSetup.jsx
 import { useEffect } from "react";
-import { useAuth } from '../../../guest-user/auth/shared/providers/AuthProvider';
+import { useAuth } from '../../auth/shared/providers/AuthProvider';
 import { setupPush } from "./push-notifications.setup";
 
 const NotificationsSetup = () => {

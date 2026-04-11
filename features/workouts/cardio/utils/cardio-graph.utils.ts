@@ -1,4 +1,4 @@
-import { colors } from '../../../../../shared/constants/colors';
+import { colors } from '../../../../shared/constants/colors';
 import { WeeklyData } from '@strong-together/shared';
 
 export const getDayAbbreviation = (dateStr: string) => {

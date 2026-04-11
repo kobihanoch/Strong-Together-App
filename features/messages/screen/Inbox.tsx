@@ -4,7 +4,7 @@ import { FlatList } from 'react-native-gesture-handler';
 import { RFValue } from 'react-native-responsive-fontsize';
 import MessageItem from '../components/MessageItem';
 import useInboxLogic from '../hooks/use-inbox-logic.hook';
-import { colors } from '../../../../shared/constants/colors';
+import { colors } from '../../../shared/constants/colors';
 import { AllUserMessages } from '@strong-together/shared';
 const { width } = Dimensions.get('window');
 

@@ -1,10 +1,10 @@
 import React from 'react';
-import Row from '../../../../../shared/components/Row';
+import Row from '../../../../shared/components/Row';
 import { View, Text, StyleSheet, Dimensions } from 'react-native';
-import Column from '../../../../../shared/components/Column';
+import Column from '../../../../shared/components/Column';
 import { RFValue } from 'react-native-responsive-fontsize';
-import { colors } from '../../../../../shared/constants/colors';
-import { formatDate } from '../../../../../shared/utils/shared-utils';
+import { colors } from '../../../../shared/constants/colors';
+import { formatDate } from '../../../../shared/utils/shared-utils';
 import { TrackingMapItem } from '@strong-together/shared';
 
 const { height } = Dimensions.get('window');

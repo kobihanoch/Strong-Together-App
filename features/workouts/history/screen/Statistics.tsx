@@ -7,7 +7,7 @@ import CardioSection from '../../cardio/components/CardioSection';
 import ExercisesFlatList from '../components/ExercisesFlatList';
 import TabSelect, { TabSelectHandleRef } from '../components/TabSelect';
 import WorkoutHeader from '../components/WorkoutHeader';
-import { useGlobalAppLoadingContext } from '../../../../../shared/providers/GlobalAppLoadingProvider';
+import { useGlobalAppLoadingContext } from '../../../../shared/providers/GlobalAppLoadingProvider';
 import useStatisticsPageLogic from '../hooks/use-statistics-page-logic.hook';
 
 const { width, height } = Dimensions.get('window');

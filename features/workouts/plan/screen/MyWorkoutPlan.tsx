@@ -10,21 +10,21 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { RFValue } from 'react-native-responsive-fontsize';
-import Column from '../../../../../shared/components/Column';
+import Column from '../../../../shared/components/Column';
 import RenderItemExercise from '../components/RenderItemExercise';
 import SplitFlatList from '../components/SplitFlatList';
-import SlidingBottomModal, { SlidingBottomModalRef } from '../../../../../shared/components/SlidingBottomModal';
+import SlidingBottomModal, { SlidingBottomModalRef } from '../../../../shared/components/SlidingBottomModal';
 import { useCardioContext } from '../../shared/providers/CardioProvider';
 import { useMyWorkoutPlanPageLogic } from '../hooks/use-my-workout-plan-page-logic.hook';
-import useLightStatusBar from '../../../../../hooks/useLightStatusBar';
-import { formatTime } from '../../../../../shared/utils/shared-utils';
-import Row from '../../../../../shared/components/Row';
+import useLightStatusBar from '../../../../hooks/use-light-status-bar.hook';
+import { formatTime } from '../../../../shared/utils/shared-utils';
+import Row from '../../../../shared/components/Row';
 import { logUserCardio } from '../../cardio/services/cardio.service';
 import { Notifier, NotifierComponents } from 'react-native-notifier';
 import { useNavigation } from '@react-navigation/native';
 import NoWorkoutPlan from '../components/NoWorkoutPlan';
 import { StackNavigationProp } from '@react-navigation/stack';
-import { RootParamList } from '../../../shared/navigation/types/appStackTypes';
+import { RootParamList } from '../../../../navigation/types/appStackTypes';
 import { ExerciseInPlan } from '@strong-together/shared';
 
 const { width, height } = Dimensions.get('window');

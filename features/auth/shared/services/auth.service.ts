@@ -1,4 +1,4 @@
-import api from '../../../../../infrastructure/api/api';
+import api from '../../../../infrastructure/api/api';
 import { GetAuthenticatedUserByIdResponse, RefreshTokenResponse } from '@strong-together/shared';
 import { getRefreshToken } from '../utils/token-storage.utils';
 

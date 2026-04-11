@@ -1,5 +1,5 @@
 import { GetExerciseTrackingQuery } from '@strong-together/shared';
-import api from '../../../../../infrastructure/api/api';
+import api from '../../../../infrastructure/api/api';
 import { GetExerciseTrackingResponse } from '@strong-together/shared';
 
 // Gets user exercise tracking data - including home page ata PR most common etc...

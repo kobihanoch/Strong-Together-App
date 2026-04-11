@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { TextInput, TextInputProps, StyleProp, TextStyle } from 'react-native';
-import { safeParseFloat } from '../../../../../shared/utils/shared-utils';
+import { safeParseFloat } from '../../../../shared/utils/shared-utils';
 
 interface NumericInputWithRulesProps extends Omit<TextInputProps, 'style'> {
   initial?: number | string;

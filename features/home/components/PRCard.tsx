@@ -2,9 +2,9 @@ import React from 'react';
 import { Dimensions, Text, StyleSheet, View } from 'react-native';
 import { RFValue } from 'react-native-responsive-fontsize';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import { formatDate } from '../../../../shared/utils/shared-utils';
+import { formatDate } from '../../../shared/utils/shared-utils';
 import { Skeleton } from 'moti/skeleton';
-import { useGlobalAppLoadingContext } from '../../../../shared/providers/GlobalAppLoadingProvider';
+import { useGlobalAppLoadingContext } from '../../../shared/providers/GlobalAppLoadingProvider';
 
 const { width, height } = Dimensions.get('window');
 

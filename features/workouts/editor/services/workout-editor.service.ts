@@ -1,5 +1,5 @@
 import { AddWorkoutBody } from '@strong-together/shared';
-import api from '../../../../../infrastructure/api/api';
+import api from '../../../../infrastructure/api/api';
 import { AddWorkoutResponse } from '@strong-together/shared';
 
 // Add a new workout plan

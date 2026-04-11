@@ -6,12 +6,12 @@ import { ActivityIndicator, Dimensions, Image, StyleSheet, Text, TouchableOpacit
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { RFValue } from 'react-native-responsive-fontsize';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import InputField from '../../../../../shared/components/InputField';
-import SelectField from '../../../../../shared/components/SelectField';
+import InputField from '../../../../shared/components/InputField';
+import SelectField from '../../../../shared/components/SelectField';
 import { useAuth } from '../../shared/providers/AuthProvider';
-import { showErrorAlert } from '../../../../../shared/errors/error-alerts';
-import { colors } from '../../../../../shared/constants/colors';
-import { AuthRootParamList } from '../../../shared/navigation/types/auth-stack.types';
+import { showErrorAlert } from '../../../../shared/errors/error-alerts';
+import { colors } from '../../../../shared/constants/colors';
+import { AuthRootParamList } from '../../../../navigation/types/auth-stack.types';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { useNavigation } from '@react-navigation/native';
 

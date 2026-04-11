@@ -58,7 +58,7 @@ jestObject.mock('../../services/user-update.service', () => ({
   deleteSelfUser: () => mockDeleteSelfUser(),
 }));
 
-jestObject.mock('../../../../guest-user/auth/shared/providers/AuthProvider', () => ({
+jestObject.mock('../../../auth/shared/providers/AuthProvider', () => ({
   useAuth: () => ({
     logout: mockLogout,
   }),
@@ -69,13 +69,13 @@ jestObject.mock('../../hooks/use-profile-page-logic.hook', () => ({
   default: () => mockProfilePageLogic,
 }));
 
-jestObject.mock('../../../../../shared/components/Column', () => {
+jestObject.mock('../../../../shared/components/Column', () => {
   const mockReact = require('react');
   const { View } = require('react-native');
   return ({ children, ...props }: any) => mockReact.createElement(View, props, children);
 });
 
-jestObject.mock('../../../../../shared/components/Row', () => {
+jestObject.mock('../../../../shared/components/Row', () => {
   const mockReact = require('react');
   const { View } = require('react-native');
   return ({ children, ...props }: any) => mockReact.createElement(View, props, children);
@@ -87,7 +87,7 @@ jestObject.mock('../../components/ImagePickerComponent', () => (props: any) =>
 
 jestObject.mock('../../components/EditProfileForm', () => (props: any) => mockEditProfileForm(props));
 
-jestObject.mock('../../../../../shared/components/SlidingBottomModal', () => {
+jestObject.mock('../../../../shared/components/SlidingBottomModal', () => {
   const mockReact = require('react');
   const { View, Text } = require('react-native');
   return {

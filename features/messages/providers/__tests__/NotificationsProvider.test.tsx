@@ -7,7 +7,7 @@ import {
   guestProfile,
   userWithWorkoutAndHistoryProfile,
   userWithoutWorkoutProfile,
-} from '../../../../../tests/fixtures/userProfiles';
+} from '../../../../tests/fixtures/userProfiles';
 import type { GetAllUserMessagesResponse } from '@strong-together/shared';
 import type { MessageAfterSendResponse } from '@strong-together/shared';
 
@@ -67,16 +67,16 @@ const useCacheAndFetchMock = (
 const useUpdateGlobalLoadingMock = (key: string, value: boolean) => mockUseUpdateGlobalLoading(key, value);
 const getUserMessagesMock = () => mockGetUserMessages();
 
-jest.mock('../../../../guest-user/auth/shared/providers/AuthProvider', () => ({
+jest.mock('../../../auth/shared/providers/AuthProvider', () => ({
   useAuth: () => mockAuthState(),
 }));
 
-jest.mock('../../../../../hooks/useCacheAndFetch', () => ({
+jest.mock('../../../../hooks/use-cache-and-fetch.hook', () => ({
   __esModule: true,
   default: useCacheAndFetchMock,
 }));
 
-jest.mock('../../../../../hooks/useUpdateGlobalLoading', () => ({
+jest.mock('../../../../hooks/use-update-global-loading.hook', () => ({
   __esModule: true,
   default: useUpdateGlobalLoadingMock,
 }));

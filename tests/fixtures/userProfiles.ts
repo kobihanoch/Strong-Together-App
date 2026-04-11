@@ -1,13 +1,13 @@
 import type {
   WorkoutHistoryAnalyzedExerciseTrackingData,
   WorkoutHistoryExerciseTrackingMaps,
-} from '../../features/authenticated-user/workouts/history/types/workout-history.types';
+} from '../../features/workouts/history/types/workout-history.types';
 import type {
   CardioDailyMap,
   CardioWeeklyMap,
-} from '../../features/authenticated-user/workouts/cardio/types/cardio.types';
-import type { UserMessages } from '../../features/authenticated-user/messages/types/messages.types';
-import type { AppUser } from '../../features/guest-user/auth/shared/types/auth.types';
+} from '../../features/workouts/cardio/types/cardio.types';
+import type { UserMessages } from '../../features/messages/types/messages.types';
+import type { AppUser } from '../../features/auth/shared/types/auth.types';
 import type { WholeUserWorkoutPlan, WorkoutSplitsMap } from '@strong-together/shared';
 
 export interface UserTestProfile {

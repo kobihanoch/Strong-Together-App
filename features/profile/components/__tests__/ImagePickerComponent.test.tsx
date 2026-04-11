@@ -9,7 +9,7 @@ import {
   jest as jestObject,
 } from '@jest/globals';
 import { render, waitFor } from '@testing-library/react-native';
-import type { AuthProviderValue } from '../../../../guest-user/auth/shared/providers/types/auth-context.types';
+import type { AuthProviderValue } from '../../../auth/shared/providers/types/auth-context.types';
 import type { GetAuthenticatedUserByIdResponse } from '@strong-together/shared';
 
 let mockAuthState: AuthProviderValue;
@@ -43,14 +43,14 @@ jestObject.mock('expo-image-picker', () => ({
   },
 }));
 
-jestObject.mock('../../../../../infrastructure/api/api', () => ({
+jestObject.mock('../../../../infrastructure/api/api', () => ({
   __esModule: true,
   default: {
     delete: (...args: any[]) => mockApiDelete(...args),
   },
 }));
 
-jestObject.mock('../../../../guest-user/auth/shared/providers/AuthProvider', () => ({
+jestObject.mock('../../../auth/shared/providers/AuthProvider', () => ({
   useAuth: () => mockAuthState,
 }));
 

@@ -11,7 +11,7 @@ import {
 } from '@jest/globals';
 import { fireEvent, render } from '@testing-library/react-native';
 import type { RouteProp } from '@react-navigation/native';
-import type { AuthRootParamList } from '../../../../shared/navigation/types/auth-stack.types';
+import type { AuthRootParamList } from '../../../../../navigation/types/auth-stack.types';
 import type { StackNavigationProp } from '@react-navigation/stack';
 
 const mockGoBack = jestObject.fn();

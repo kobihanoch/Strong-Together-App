@@ -1,4 +1,4 @@
-import api from '../../../../../infrastructure/api/api';
+import api from '../../../../infrastructure/api/api';
 import { GetAnalyticsResponse } from '@strong-together/shared';
 
 export const getTrackingAnalytics = async (): Promise<GetAnalyticsResponse> => {

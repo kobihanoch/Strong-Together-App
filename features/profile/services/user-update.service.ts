@@ -1,5 +1,5 @@
 import { UpdateAuthenticatedUserResponse, UpdateUserBody } from '@strong-together/shared';
-import api from '../../../../infrastructure/api/api';
+import api from '../../../infrastructure/api/api';
 
 // Delete self user - procceed with CAUTION
 export const deleteSelfUser = async (): Promise<void> => {

@@ -8,11 +8,11 @@ import React, { useEffect, useState } from 'react';
 import { Animated, Dimensions, Easing, Modal, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { RFValue } from 'react-native-responsive-fontsize';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import { useAuth } from '../../../guest-user/auth/shared/providers/AuthProvider';
-import { useGlobalAppLoadingContext } from '../../../../shared/providers/GlobalAppLoadingProvider';
+import { useAuth } from '../../auth/shared/providers/AuthProvider';
+import { useGlobalAppLoadingContext } from '../../../shared/providers/GlobalAppLoadingProvider';
 import { useMessages } from '../../messages/providers/MessagesProvider';
-import { AppUser } from '../../../guest-user/auth/shared/types/auth.types';
-import { RootParamList } from '../../shared/navigation/types/appStackTypes';
+import { AppUser } from '../../auth/shared/types/auth.types';
+import { RootParamList } from '../../../navigation/types/appStackTypes';
 
 const { width, height } = Dimensions.get('window');
 
@@ -163,8 +163,8 @@ const TopComponent = () => {
                         uri: `${process.env.EXPO_PUBLIC_SUPABASE_URL}/storage/v1/object/public/${profileImageUrl}`,
                       }
                     : user?.gender == 'Male'
-                      ? require('../assets/man.png')
-                      : require('../assets/woman.png')
+                      ? require('../../../assets/man.png')
+                      : require('../../../assets/woman.png')
                 }
                 style={styles.profileImage}
                 cachePolicy={profileImageUrl ? 'disk' : 'none'}
@@ -185,8 +185,8 @@ const TopComponent = () => {
                         uri: `${process.env.EXPO_PUBLIC_SUPABASE_URL}/storage/v1/object/public/${profileImageUrl}`,
                       }
                     : user?.gender == 'Male'
-                      ? require('../assets/man.png')
-                      : require('../assets/woman.png')
+                      ? require('../../../assets/man.png')
+                      : require('../../../assets/woman.png')
                 }
                 style={styles.enlargedImage}
               />

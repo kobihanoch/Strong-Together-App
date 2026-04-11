@@ -2,10 +2,10 @@ import moment, { Moment } from 'moment-timezone';
 import React, { useCallback, useMemo, useRef, useState } from 'react';
 import { Dimensions, FlatList, StyleSheet, Text, TouchableOpacity, View, ViewToken } from 'react-native';
 import { RFValue } from 'react-native-responsive-fontsize';
-import { colors } from '../../../../../shared/constants/colors';
+import { colors } from '../../../../shared/constants/colors';
 import { WorkoutHistoryExerciseTrackingMaps } from '../types/workout-history.types';
-import useGenerateDays from '../../../../../hooks/useGenerateDays';
-import Row from '../../../../../shared/components/Row';
+import useGenerateDays from '../../../../hooks/use-generate-days.hook';
+import Row from '../../../../shared/components/Row';
 
 const { width, height } = Dimensions.get('window');
 // Use fixed item math so FlatList can jump directly to the right index

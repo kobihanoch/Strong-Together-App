@@ -1,5 +1,5 @@
 import { GetWholeUserWorkoutPlanQuery } from '@strong-together/shared';
-import api from '../../../../../infrastructure/api/api';
+import api from '../../../../infrastructure/api/api';
 import { GetWholeUserWorkoutPlanResponse } from '@strong-together/shared';
 
 // Fetch self workout plan

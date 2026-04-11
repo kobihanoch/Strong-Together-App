@@ -1,5 +1,5 @@
 import { WorkoutHistoryAnalyzedExerciseTrackingData } from '../../workouts/history/types/workout-history.types';
-import { AppUser } from '../../../guest-user/auth/shared/types/auth.types';
+import { AppUser } from '../../auth/shared/types/auth.types';
 
 export type HomePageData = {
   username: AppUser['username'];

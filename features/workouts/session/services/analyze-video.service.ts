@@ -1,5 +1,5 @@
 import { backgroundUpload, UploaderHttpMethod, UploadType } from 'react-native-compressor';
-import api from '../../../../../infrastructure/api/api';
+import api from '../../../../infrastructure/api/api';
 import { GetPresignedUrlFromS3Response } from '@strong-together/shared';
 import { GetPresignedUrlFromS3Body } from '@strong-together/shared';
 

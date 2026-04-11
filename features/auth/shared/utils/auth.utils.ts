@@ -1,5 +1,5 @@
-import api from '../../../../../infrastructure/api/api';
-import { bootstrapApi } from '../../../../../infrastructure/api/bootstrap-api';
+import api from '../../../../infrastructure/api/api';
+import { bootstrapApi } from '../../../../infrastructure/api/bootstrap-api';
 
 const GlobalAuth: {
   setAccessToken: (t: string | null) => void;

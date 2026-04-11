@@ -2,10 +2,10 @@ import axios, { AxiosError, AxiosRequestConfig, AxiosResponse, InternalAxiosRequ
 import Constants from 'expo-constants';
 import { uuidv4 } from 'react-native-compressor';
 import { showErrorAlert } from '../../shared/errors/error-alerts';
-import { refreshAndRotateTokens } from '../../features/guest-user/auth/shared/services/auth.service';
-import GlobalAuth from '../../features/guest-user/auth/shared/utils/auth.utils';
+import { refreshAndRotateTokens } from '../../features/auth/shared/services/auth.service';
+import GlobalAuth from '../../features/auth/shared/utils/auth.utils';
 import { openUpdateModal } from '../../shared/utils/imperative-update-modal';
-import { saveRefreshToken } from '../../features/guest-user/auth/shared/utils/token-storage.utils';
+import { saveRefreshToken } from '../../features/auth/shared/utils/token-storage.utils';
 import { API_BASE_URL } from './api-url.config';
 import { ensureBootstrap, isOpen, isTracked, responseMap } from './bootstrap-api';
 import buildDpopProof from './dpop/buildDpopProof';

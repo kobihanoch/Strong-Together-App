@@ -2,9 +2,9 @@ import React, { useEffect, useRef, useState } from 'react';
 import { ActivityIndicator, TouchableOpacity, View, Text, StyleSheet, Dimensions, AppState } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { RFValue } from 'react-native-responsive-fontsize';
-import InputField from '../../../../../shared/components/InputField';
+import InputField from '../../../../shared/components/InputField';
 import { useAuth } from '../../shared/providers/AuthProvider';
-import { showErrorAlert } from '../../../../../shared/errors/error-alerts';
+import { showErrorAlert } from '../../../../shared/errors/error-alerts';
 import { changeEmail, checkUserVerify, sendVerificationMail } from '../services/login.service';
 import { UserEntity } from '@strong-together/shared';
 

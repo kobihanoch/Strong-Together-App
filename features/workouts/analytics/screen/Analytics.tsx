@@ -6,7 +6,7 @@ import GoalAdherence from '../components/GoalAdherence';
 import Overview from '../components/Overview';
 import RenderEst1RMItem from '../components/RenderEst1RMItem';
 import RenderGoalAdherenceItem from '../components/RenderGoalAdherenceItem';
-import SlidingBottomModal, { SlidingBottomModalRef } from '../../../../../shared/components/SlidingBottomModal';
+import SlidingBottomModal, { SlidingBottomModalRef } from '../../../../shared/components/SlidingBottomModal';
 import useAnalysticsLogic from '../hooks/use-analystics-logic.hook';
 import { WorkoutSplitEntity } from '@strong-together/shared';
 import { ExerciseEntity } from '@strong-together/shared';

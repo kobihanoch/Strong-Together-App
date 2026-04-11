@@ -5,7 +5,7 @@ import { Dimensions, StyleSheet, Text, TouchableOpacity } from 'react-native';
 import { RFValue } from 'react-native-responsive-fontsize';
 import { WorkoutPlanSplit } from '../types/workout-plan.types';
 import { StackNavigationProp } from '@react-navigation/stack';
-import { RootParamList } from '../../../shared/navigation/types/appStackTypes';
+import { RootParamList } from '../../../../navigation/types/appStackTypes';
 
 const { height } = Dimensions.get('window');
 

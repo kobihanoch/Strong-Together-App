@@ -4,9 +4,9 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import React from 'react';
 import { Dimensions, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { RFValue } from 'react-native-responsive-fontsize';
-import { useAuth } from '../../features/guest-user/auth/shared/providers/AuthProvider.tsx';
+import { useAuth } from '../../features/auth/shared/providers/AuthProvider.tsx';
 import { useGlobalAppLoadingContext } from '../providers/GlobalAppLoadingProvider.tsx';
-import { RootParamList } from '../../features/authenticated-user/shared/navigation/types/appStackTypes.ts';
+import { RootParamList } from '../../navigation/types/appStackTypes';
 
 const { width, height } = Dimensions.get('window');
 

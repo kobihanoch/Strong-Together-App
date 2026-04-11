@@ -1,8 +1,8 @@
 import React from 'react';
 import { Dimensions, StyleSheet, Text, View } from 'react-native';
 import { RFValue } from 'react-native-responsive-fontsize';
-import { colors } from '../../../../../shared/constants/colors';
-import Column from '../../../../../shared/components/Column';
+import { colors } from '../../../../shared/constants/colors';
+import Column from '../../../../shared/components/Column';
 import { ExerciseInPlan } from '@strong-together/shared';
 
 const { width, height } = Dimensions.get('window');

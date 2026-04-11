@@ -1,4 +1,4 @@
-import { useAuth } from '../../../guest-user/auth/shared/providers/AuthProvider';
+import { useAuth } from '../../auth/shared/providers/AuthProvider';
 import { getDaysSince } from '../../home/utils/home-page.utils';
 
 const useProfilePageLogic = () => {

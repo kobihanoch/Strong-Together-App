@@ -30,7 +30,7 @@ jest.mock('react-native-gesture-handler', () => {
   return { ScrollView: ScrollViewLocal };
 });
 
-jest.mock('../../../../../../shared/providers/GlobalAppLoadingProvider', () => ({
+jest.mock('../../../../../shared/providers/GlobalAppLoadingProvider', () => ({
   useGlobalAppLoadingContext: () => mockLoadingState,
 }));
 

@@ -5,12 +5,12 @@ import * as ImagePicker from 'expo-image-picker';
 import React, { useEffect } from 'react';
 import { ActivityIndicator, Dimensions, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { RFValue } from 'react-native-responsive-fontsize';
-import api from '../../../../infrastructure/api/api';
-import { colors } from '../../../../shared/constants/colors';
-import { useAuth } from '../../../guest-user/auth/shared/providers/AuthProvider';
+import api from '../../../infrastructure/api/api';
+import { colors } from '../../../shared/constants/colors';
+import { useAuth } from '../../auth/shared/providers/AuthProvider';
 import useMediaUploads from '../hooks/use-media-uploads.hook';
 import { UserEntity } from '@strong-together/shared';
-import { AppUser } from '../../../guest-user/auth/shared/types/auth.types';
+import { AppUser } from '../../auth/shared/types/auth.types';
 
 const { width, height } = Dimensions.get('window');
 

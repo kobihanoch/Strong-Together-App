@@ -1,10 +1,10 @@
 import { AerobicsDailyRecord } from '@strong-together/shared';
 import { createContext, ReactNode, useCallback, useContext, useMemo, useState } from 'react';
-import { useAuth } from '../../../../guest-user/auth/shared/providers/AuthProvider';
-import { keyCardio } from '../../../../../infrastructure/cache/cache-keys.utils';
+import { useAuth } from '../../../auth/shared/providers/AuthProvider';
+import { keyCardio } from '../../../../infrastructure/cache/cache-keys.utils';
 import { getUserCardio } from '../../cardio/services/cardio.service';
-import useCacheAndFetch from '../../../../../hooks/useCacheAndFetch';
-import useUpdateGlobalLoading from '../../../../../hooks/useUpdateGlobalLoading';
+import useCacheAndFetch from '../../../../hooks/use-cache-and-fetch.hook';
+import useUpdateGlobalLoading from '../../../../hooks/use-update-global-loading.hook';
 import moment from 'moment';
 import {
   CardioProviderCachePayload,

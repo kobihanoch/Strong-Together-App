@@ -2,11 +2,11 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import React from 'react';
 import { ActivityIndicator, Dimensions, StyleSheet, Text, TouchableOpacity } from 'react-native';
 import { RFValue } from 'react-native-responsive-fontsize';
-import { colors } from '../../../../../shared/constants/colors';
-import { AdherenceBar } from '../../../../../shared/components/AdherenceBar';
-import Column from '../../../../../shared/components/Column';
-import Row from '../../../../../shared/components/Row';
-import Timer from '../../../../../shared/components/Timer';
+import { colors } from '../../../../shared/constants/colors';
+import { AdherenceBar } from '../../../../shared/components/AdherenceBar';
+import Column from '../../../../shared/components/Column';
+import Row from '../../../../shared/components/Row';
+import Timer from '../../../../shared/components/Timer';
 import { WorkoutPlanEntity } from '@strong-together/shared';
 
 const { height } = Dimensions.get('window');

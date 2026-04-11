@@ -3,7 +3,7 @@ import { Dimensions, StyleSheet, Text, TouchableOpacity, View } from 'react-nati
 import { RFValue } from 'react-native-responsive-fontsize';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import NotificationsToggle from '../components/NotificationsToggle';
-import { useAuth } from '../../../guest-user/auth/shared/providers/AuthProvider';
+import { useAuth } from '../../auth/shared/providers/AuthProvider';
 
 const { width, height } = Dimensions.get('window');
 

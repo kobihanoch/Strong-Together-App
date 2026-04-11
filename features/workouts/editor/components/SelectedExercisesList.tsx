@@ -4,12 +4,12 @@ import DraggableFlatList, { ScaleDecorator } from 'react-native-draggable-flatli
 import { Notifier, NotifierComponents } from 'react-native-notifier';
 import { RFValue } from 'react-native-responsive-fontsize';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import { colors } from '../../../../../shared/constants/colors';
+import { colors } from '../../../../shared/constants/colors';
 import { CreateWorkoutControls, SelectedExercise } from '../types/use-create-workout.types';
 import { ExerciseToWorkoutSplitEntity } from '@strong-together/shared';
 import { WorkoutSplitEntity } from '@strong-together/shared';
-import Column from '../../../../../shared/components/Column';
-import Row from '../../../../../shared/components/Row';
+import Column from '../../../../shared/components/Column';
+import Row from '../../../../shared/components/Row';
 import NumericInputWithRules from '../../session/components/NumericInputWithRules';
 
 type ExerciseDraggableItemProps = {

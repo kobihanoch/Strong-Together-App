@@ -17,8 +17,8 @@ jestObject.mock('react-native-vector-icons/MaterialCommunityIcons', () => {
   return ({ name }: { name: string }) => mockReact.createElement(Text, null, name);
 });
 
-import InputField from '../../../../../../shared/components/InputField';
-import SelectField from '../../../../../../shared/components/SelectField';
+import InputField from '../../../../../shared/components/InputField';
+import SelectField from '../../../../../shared/components/SelectField';
 
 type RegisterGenderValue = CreateUserBody['gender'] | '';
 

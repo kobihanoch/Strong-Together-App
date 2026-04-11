@@ -13,7 +13,7 @@ const Logo = () => {
         Strong. {'\n'}
         <Text style={styles.boldText}>Together.</Text>
       </Text>
-      <Image source={require('../assets/logo_512.png')} style={styles.logoImage} />
+      <Image source={require('../../../../assets/logo_512.png')} style={styles.logoImage} />
     </View>
   );
 };

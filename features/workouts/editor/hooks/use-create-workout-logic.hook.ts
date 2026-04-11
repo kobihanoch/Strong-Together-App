@@ -4,7 +4,7 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { ALERT_TYPE, Dialog } from 'react-native-alert-notification';
 import { useWorkoutPlanContext } from '../../shared/providers/WorkoutPlanProvider';
-import { RootParamList } from '../../../shared/navigation/types/appStackTypes';
+import { RootParamList } from '../../../../navigation/types/appStackTypes';
 import { addWorkout } from '../services/workout-editor.service';
 import { WorkoutSplitEntity } from '@strong-together/shared';
 import {

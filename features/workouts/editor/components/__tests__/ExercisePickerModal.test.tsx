@@ -52,7 +52,7 @@ jest.mock('@gorhom/bottom-sheet', () => {
   };
 });
 
-jest.mock('../../../../../../shared/components/SlidingBottomModal', () => {
+jest.mock('../../../../../shared/components/SlidingBottomModal', () => {
   const ReactLocal = require('react');
   const { View } = require('react-native');
   return ReactLocal.forwardRef(({ children }: any, ref: any) => {
@@ -65,13 +65,13 @@ jest.mock('../../../../../../shared/components/SlidingBottomModal', () => {
   });
 });
 
-jest.mock('../../../../../../shared/components/Column', () => {
+jest.mock('../../../../../shared/components/Column', () => {
   const ReactLocal = require('react');
   const { View } = require('react-native');
   return ({ children, ...props }: any) => ReactLocal.createElement(View, props, children);
 });
 
-jest.mock('../../../../../../shared/components/Row', () => {
+jest.mock('../../../../../shared/components/Row', () => {
   const ReactLocal = require('react');
   const { View } = require('react-native');
   return ({ children, ...props }: any) => ReactLocal.createElement(View, props, children);

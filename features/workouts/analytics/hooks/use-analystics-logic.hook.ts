@@ -1,10 +1,10 @@
 import { useCallback, useMemo, useState } from 'react';
-import { keyAnalytics } from '../../../../../infrastructure/cache/cache-keys.utils';
+import { keyAnalytics } from '../../../../infrastructure/cache/cache-keys.utils';
 import { useWorkoutHistoryContext } from '../../shared/providers/WorkoutHistoryProvider';
-import { useAuth } from '../../../../guest-user/auth/shared/providers/AuthProvider';
+import { useAuth } from '../../../auth/shared/providers/AuthProvider';
 import { useWorkoutPlanContext } from '../../shared/providers/WorkoutPlanProvider';
 import { getTrackingAnalytics } from '../services/analytics.service';
-import useCacheAndFetch from '../../../../../hooks/useCacheAndFetch';
+import useCacheAndFetch from '../../../../hooks/use-cache-and-fetch.hook';
 import { GetAnalyticsResponse } from '@strong-together/shared';
 import { Analytics1RM, AnalyticsCachePayload, AnalyticsGoals } from '../types/use-analytics.types';
 

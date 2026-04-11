@@ -11,7 +11,7 @@ import {
   jest as jestObject,
 } from '@jest/globals';
 import { fireEvent, render, waitFor } from '@testing-library/react-native';
-import type { RootParamList } from '../../../../shared/navigation/types/appStackTypes';
+import type { RootParamList } from '../../../../../navigation/types/appStackTypes';
 import type { WorkoutPlanSplit } from '../../../plan/types/workout-plan.types';
 import type {
   ResumeWorkoutCachePayload,
@@ -54,7 +54,7 @@ jestObject.mock('../../components/ExercisesSection', () => (props: any) => mockE
 jestObject.mock('../../components/LastWorkoutData', () => (props: any) => mockLastWorkoutData(props));
 jestObject.mock('../../components/AnalyzeExerciseSheet', () => (props: any) => mockAnalyzeExerciseSheet(props));
 
-jestObject.mock('../../../../../../shared/components/SlidingBottomModal', () => {
+jestObject.mock('../../../../../shared/components/SlidingBottomModal', () => {
   const mockReact = require('react');
   const { View, Text } = require('react-native');
   return {

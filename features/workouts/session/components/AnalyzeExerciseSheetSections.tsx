@@ -2,7 +2,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import React from 'react';
 import { ActivityIndicator, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { RFValue } from 'react-native-responsive-fontsize';
-import { colors } from '../../../../../shared/constants/colors';
+import { colors } from '../../../../shared/constants/colors';
 import { AnalyzeVideoResultPayload, SquatRepetition } from '@strong-together/shared';
 import { ExerciseInPlan } from '@strong-together/shared';
 

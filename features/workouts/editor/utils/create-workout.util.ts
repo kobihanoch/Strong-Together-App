@@ -1,4 +1,4 @@
-import { showErrorAlert } from '../../../../../shared/errors/error-alerts';
+import { showErrorAlert } from '../../../../shared/errors/error-alerts';
 import { ExerciseCandidate, SelectedExercise, SelectedExercises } from '../types/use-create-workout.types';
 import { ExerciseToWorkoutSplitEntity } from '@strong-together/shared';
 import { WorkoutSplitEntity } from '@strong-together/shared';

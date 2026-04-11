@@ -7,15 +7,15 @@ import { LinearGradient } from 'expo-linear-gradient';
 import React, { useCallback, useMemo } from 'react';
 import { Dimensions, FlatList, StyleSheet, Text } from 'react-native';
 import { RFValue } from 'react-native-responsive-fontsize';
-import { colors } from '../../../../../shared/constants/colors';
+import { colors } from '../../../../shared/constants/colors';
 import { TrackingMapItem } from '@strong-together/shared';
-import Column from '../../../../../shared/components/Column';
-import Images from '../../../../../shared/components/Images';
-import Row from '../../../../../shared/components/Row';
+import Column from '../../../../shared/components/Column';
+import Images from '../../../../shared/components/Images';
+import Row from '../../../../shared/components/Row';
 import RestDayCard from './RestDayCard';
 import StatsTable from './StatsTable';
 import { StackNavigationProp } from '@react-navigation/stack';
-import { RootParamList } from '../../../shared/navigation/types/appStackTypes';
+import { RootParamList } from '../../../../navigation/types/appStackTypes';
 
 const { width, height } = Dimensions.get('window');
 

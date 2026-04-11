@@ -4,8 +4,8 @@ import React, { forwardRef, useImperativeHandle, useState } from 'react';
 import { Dimensions, StyleSheet, Text, View } from 'react-native';
 import { RFValue } from 'react-native-responsive-fontsize';
 import SegmentedControl from 'react-native-segmented-control-2';
-import { colors } from '../../../../../shared/constants/colors';
-import Row from '../../../../../shared/components/Row';
+import { colors } from '../../../../shared/constants/colors';
+import Row from '../../../../shared/components/Row';
 
 const { height } = Dimensions.get('window');
 

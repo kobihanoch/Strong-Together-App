@@ -2,11 +2,11 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import React, { useState } from 'react';
 import { Dimensions, StyleSheet, Text, View } from 'react-native';
 import { RFValue } from 'react-native-responsive-fontsize';
-import { colors } from '../../../../../shared/constants/colors';
+import { colors } from '../../../../shared/constants/colors';
 import { AerobicsDailyRecord, WeeklyData } from '@strong-together/shared';
-import { formatTime } from '../../../../../shared/utils/shared-utils';
-import Column from '../../../../../shared/components/Column';
-import Row from '../../../../../shared/components/Row';
+import { formatTime } from '../../../../shared/utils/shared-utils';
+import Column from '../../../../shared/components/Column';
+import Row from '../../../../shared/components/Row';
 import CardioWeeklyGraph from './CardioWeeklyGraph';
 
 const { width, height } = Dimensions.get('window');

@@ -32,7 +32,7 @@ jestObject.mock('../../../../../shared/components/Timer', () => {
     mockReact.createElement(Text, null, `Timer ${startTime ?? 0}/${pausedTotal ?? 0}`);
 });
 
-jestObject.mock('../../AdherenceBar', () => ({
+jestObject.mock('../../../../../shared/components/AdherenceBar', () => ({
   AdherenceBar: ({ actual, planned }: { actual: number; planned: number }) => {
     const ReactLocal = require('react');
     const { Text } = require('react-native');
@@ -40,26 +40,26 @@ jestObject.mock('../../AdherenceBar', () => ({
   },
 }));
 
-jestObject.mock('../../PercentageCircle', () => {
+jestObject.mock('../../../../../shared/components/PercentageCircle', () => {
   const mockReact = require('react');
   const { View: ViewLocal } = require('react-native');
   return ({ children }: { children: React.ReactNode }) => mockReact.createElement(ViewLocal, null, children);
 });
 
-jestObject.mock('../../NumberCounter', () => {
+jestObject.mock('../../../../../shared/components/NumberCounter', () => {
   const mockReact = require('react');
   const { Text } = require('react-native');
   return ({ numEnd }: { numEnd: number }) => mockReact.createElement(Text, null, String(numEnd));
 });
 
-jestObject.mock('../../PageDots', () => {
+jestObject.mock('../../../../../shared/components/PageDots', () => {
   const mockReact = require('react');
   const { Text } = require('react-native');
   return ({ index = 0, length = 0 }: { index?: number; length?: number }) =>
     mockReact.createElement(Text, null, `Dots ${index}/${length}`);
 });
 
-jestObject.mock('../../../hooks/use-last-workout-exercise-tracking-data.hook', () => ({
+jestObject.mock('../../../history/hooks/use-last-workout-exercise-tracking-data.hook', () => ({
   __esModule: true,
   default: () => ({
     lastWorkoutData: mockLastWorkoutData,

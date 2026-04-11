@@ -2,23 +2,23 @@ import { CreateUserBody, GetAuthenticatedUserByIdResponse, LoginRequestBody } fr
 import { AxiosError } from 'axios';
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { Notifier, NotifierComponents } from 'react-native-notifier';
-import { hasBootstrapPayload, resetBootstrap } from '../../../../../infrastructure/api/bootstrap-api';
+import { hasBootstrapPayload, resetBootstrap } from '../../../../infrastructure/api/bootstrap-api';
 import {
   cacheDeleteAllCache,
   cacheDeleteAllCacheWithoutStartWorkout,
   cacheGetJSON,
   cacheSetJSON,
   TTL_48H,
-} from '../../../../../infrastructure/cache/cache.utils';
-import { keyAuth } from '../../../../../infrastructure/cache/cache-keys.utils';
-import { showErrorAlert } from '../../../../../shared/errors/error-alerts';
-import useCacheAndFetch from '../../../../../hooks/useCacheAndFetch';
-import { useNetworkStatus } from '../../../../../hooks/useNetworkStatus';
-import useUpdateGlobalLoading from '../../../../../hooks/useUpdateGlobalLoading';
+} from '../../../../infrastructure/cache/cache.utils';
+import { keyAuth } from '../../../../infrastructure/cache/cache-keys.utils';
+import { showErrorAlert } from '../../../../shared/errors/error-alerts';
+import useCacheAndFetch from '../../../../hooks/use-cache-and-fetch.hook';
+import { useNetworkStatus } from '../../../../hooks/use-network-status.hook';
+import useUpdateGlobalLoading from '../../../../hooks/use-update-global-loading.hook';
 import { fetchSelfUserData } from '../services/auth.service';
 import GlobalAuth from '../utils/auth.utils';
 import { clearRefreshToken, getRefreshToken, saveRefreshToken } from '../utils/token-storage.utils';
-import { connectSocket, disconnectSocket } from '../../../../../infrastructure/socket';
+import { connectSocket, disconnectSocket } from '../../../../infrastructure/socket';
 import { useAppleAuth } from '../hooks/use-apple-auth.hook';
 import { useGoogleAuth } from '../hooks/use-google-auth.hook';
 import { loginUser } from '../../login/services/login.service';

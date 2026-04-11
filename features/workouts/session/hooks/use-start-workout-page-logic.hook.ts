@@ -1,11 +1,11 @@
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { useCallback, useMemo, useRef, useState } from 'react';
-import { cacheDeleteKey } from '../../../../../infrastructure/cache/cache.utils';
-import { keyStartWorkout } from '../../../../../infrastructure/cache/cache-keys.utils';
+import { cacheDeleteKey } from '../../../../infrastructure/cache/cache.utils';
+import { keyStartWorkout } from '../../../../infrastructure/cache/cache-keys.utils';
 import { useWorkoutHistoryContext } from '../../shared/providers/WorkoutHistoryProvider';
-import { useAuth } from '../../../../guest-user/auth/shared/providers/AuthProvider';
+import { useAuth } from '../../../auth/shared/providers/AuthProvider';
 import { useWorkoutPlanContext } from '../../shared/providers/WorkoutPlanProvider';
-import { showErrorAlert } from '../../../../../shared/errors/error-alerts';
+import { showErrorAlert } from '../../../../shared/errors/error-alerts';
 import { unpackFromExerciseTrackingData } from '../../history/utils/workout-history-context.util';
 import { applyNotes, applyReps, applyWeight, countSetsDone, createArrayForDataBase } from '../utils/start-workout.util';
 import { useStartWorkoutCache } from './use-start-workout-cache.hook';
@@ -19,7 +19,7 @@ import { WorkoutPlanSplit } from '../../plan/types/workout-plan.types';
 import { ExerciseEntity } from '@strong-together/shared';
 import { ExerciseTrackingEntity } from '@strong-together/shared';
 import { StackNavigationProp } from '@react-navigation/stack';
-import { RootParamList } from '../../../shared/navigation/types/appStackTypes';
+import { RootParamList } from '../../../../navigation/types/appStackTypes';
 import { FinishUserWorkoutBody } from '@strong-together/shared';
 
 const useStartWorkoutPageLogic = (

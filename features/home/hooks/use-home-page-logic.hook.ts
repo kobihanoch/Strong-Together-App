@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import { useWorkoutHistoryContext } from '../../workouts/shared/providers/WorkoutHistoryProvider';
-import { useAuth } from '../../../guest-user/auth/shared/providers/AuthProvider';
-import { useGlobalAppLoadingContext } from '../../../../shared/providers/GlobalAppLoadingProvider';
+import { useAuth } from '../../auth/shared/providers/AuthProvider';
+import { useGlobalAppLoadingContext } from '../../../shared/providers/GlobalAppLoadingProvider';
 import { useWorkoutPlanContext } from '../../workouts/shared/providers/WorkoutPlanProvider';
 import { HomePageData } from '../types/use-home-page.types';
 

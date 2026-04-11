@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { cacheSetJSON, TTL_36H } from '../../../../../infrastructure/cache/cache.utils';
-import { keyStartWorkout } from '../../../../../infrastructure/cache/cache-keys.utils';
+import { cacheSetJSON, TTL_36H } from '../../../../infrastructure/cache/cache.utils';
+import { keyStartWorkout } from '../../../../infrastructure/cache/cache-keys.utils';
 import { AppState } from 'react-native';
-import { AppUser } from '../../../../guest-user/auth/shared/types/auth.types';
+import { AppUser } from '../../../auth/shared/types/auth.types';
 import { WorkoutPlanSplit } from '../../plan/types/workout-plan.types';
 import { ExercisesDuringWorkout, ResumeWorkoutCachePayload } from '../types/use-start-workout.types';
 

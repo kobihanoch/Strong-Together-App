@@ -86,7 +86,7 @@ const MainLoadingScreen: React.FC = () => {
       />
 
       <Animated.Image
-        source={require('../assets/logo_512.png')}
+        source={require('../../assets/logo_512.png')}
         style={[styles.logo, { transform: [{ scale }, { rotate: rotateDeg }] }]}
         resizeMode="contain"
       />

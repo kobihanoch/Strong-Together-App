@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { ActivityIndicator, Dimensions, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { KeyboardAwareFlatList } from 'react-native-keyboard-aware-scroll-view';
 import { RFValue } from 'react-native-responsive-fontsize';
-import { colors } from '../../../../../shared/constants/colors';
+import { colors } from '../../../../shared/constants/colors';
 import { isExerciseAnalysisSupported } from '../constants/video-analysis.constant';
 import { ExercisesDuringWorkout, SetCountByExercise } from '../types/use-start-workout.types';
 import useLastWorkoutExerciseTrackingData from '../../history/hooks/use-last-workout-exercise-tracking-data.hook';
@@ -11,11 +11,11 @@ import type { CachedExerciseAnalysis, ExerciseAnalysisOverview } from '../screen
 import { TrackingMapItem } from '@strong-together/shared';
 import { SquatRepetition } from '@strong-together/shared';
 import { ExerciseInPlan } from '@strong-together/shared';
-import Column from '../../../../../shared/components/Column';
-import NumberCounter from '../../../../../shared/components/NumberCounter';
-import PageDots from '../../../../../shared/components/PageDots';
-import PercantageCircle from '../../../../../shared/components/PercentageCircle';
-import Row from '../../../../../shared/components/Row';
+import Column from '../../../../shared/components/Column';
+import NumberCounter from '../../../../shared/components/NumberCounter';
+import PageDots from '../../../../shared/components/PageDots';
+import PercantageCircle from '../../../../shared/components/PercentageCircle';
+import Row from '../../../../shared/components/Row';
 import NumericInputWithRules from './NumericInputWithRules';
 
 const { height } = Dimensions.get('window');

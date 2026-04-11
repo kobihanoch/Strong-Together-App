@@ -133,11 +133,11 @@ jestObject.mock('react-native-reanimated', () => {
   };
 });
 
-jestObject.mock('../../../../guest-user/auth/shared/providers/AuthProvider', () => ({
+jestObject.mock('../../../auth/shared/providers/AuthProvider', () => ({
   useAuth: () => mockAuthState,
 }));
 
-jestObject.mock('../../../../../shared/providers/GlobalAppLoadingProvider', () => ({
+jestObject.mock('../../../../shared/providers/GlobalAppLoadingProvider', () => ({
   useGlobalAppLoadingContext: () => mockLoadingState,
 }));
 
@@ -160,25 +160,25 @@ jestObject.mock('../../hooks/use-home-page-logic.hook', () => ({
   }),
 }));
 
-jestObject.mock('../../../../../shared/components/Badge', () => {
+jestObject.mock('../../../../shared/components/Badge', () => {
   const mockReact = require('react');
   const { Text } = require('react-native');
   return ({ label }: { label: string }) => mockReact.createElement(Text, null, label);
 });
 
-jestObject.mock('../../../../../shared/components/NumberCounter', () => {
+jestObject.mock('../../../../shared/components/NumberCounter', () => {
   const mockReact = require('react');
   const { Text } = require('react-native');
   return ({ numEnd }: { numEnd: number }) => mockReact.createElement(Text, null, numEnd);
 });
 
-jestObject.mock('../../../../../shared/components/PercentageCircle', () => {
+jestObject.mock('../../../../shared/components/PercentageCircle', () => {
   const mockReact = require('react');
   const { View } = require('react-native');
   return ({ children }: any) => mockReact.createElement(View, null, children);
 });
 
-jestObject.mock('../../../../../shared/components/Row', () => {
+jestObject.mock('../../../../shared/components/Row', () => {
   const mockReact = require('react');
   const { View } = require('react-native');
   return ({ children }: any) => mockReact.createElement(View, null, children);

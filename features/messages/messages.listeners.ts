@@ -1,5 +1,5 @@
 import { Dispatch, SetStateAction } from 'react';
-import { getSocket } from '../../../infrastructure/socket';
+import { getSocket } from '../../infrastructure/socket';
 import { UserMessages } from './types/messages.types';
 import { MessageAfterSendResponse } from '@strong-together/shared';
 

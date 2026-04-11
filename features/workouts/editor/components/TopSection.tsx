@@ -6,9 +6,9 @@ import { ALERT_TYPE, Dialog } from 'react-native-alert-notification';
 import { ScrollView } from 'react-native-gesture-handler';
 import { RFValue } from 'react-native-responsive-fontsize';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import { colors } from '../../../../../shared/constants/colors';
-import Column from '../../../../../shared/components/Column';
-import Row from '../../../../../shared/components/Row';
+import { colors } from '../../../../shared/constants/colors';
+import Column from '../../../../shared/components/Column';
+import Row from '../../../../shared/components/Row';
 import { WorkoutSplitEntity } from '@strong-together/shared';
 
 const { height } = Dimensions.get('window');

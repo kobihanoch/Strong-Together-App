@@ -54,25 +54,25 @@ jestObject.mock('../../../shared/providers/WorkoutHistoryProvider', () => ({
   useWorkoutHistoryContext: () => mockAnalysisState,
 }));
 
-jestObject.mock('../../../../../../shared/components/Badge', () => {
+jestObject.mock('../../../../../shared/components/Badge', () => {
   const mockReact = require('react');
   const { Text: RNText } = require('react-native');
   return ({ label }: { label: string }) => mockReact.createElement(RNText, null, label);
 });
 
-jestObject.mock('../../../../../../shared/components/Column', () => {
+jestObject.mock('../../../../../shared/components/Column', () => {
   const mockReact = require('react');
   const { View: RNView } = require('react-native');
   return ({ children, ...props }: any) => mockReact.createElement(RNView, props, children);
 });
 
-jestObject.mock('../../../../../../shared/components/Row', () => {
+jestObject.mock('../../../../../shared/components/Row', () => {
   const mockReact = require('react');
   const { View: RNView } = require('react-native');
   return ({ children, ...props }: any) => mockReact.createElement(RNView, props, children);
 });
 
-jestObject.mock('../../../../../../shared/components/PageDots', () => (props: any) => mockPageDots(props));
+jestObject.mock('../../../../../shared/components/PageDots', () => (props: any) => mockPageDots(props));
 
 jestObject.mock('../StartWorkoutButton', () => (props: any) => mockStartWorkoutButton(props));
 

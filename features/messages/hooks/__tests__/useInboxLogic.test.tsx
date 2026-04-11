@@ -5,6 +5,20 @@ import { beforeEach, describe, expect, it, jest } from '@jest/globals';
 import { AxiosError } from 'axios';
 
 jest.mock('axios', () => ({
+  __esModule: true,
+  default: {
+    create: () => ({
+      get: jest.fn(),
+      post: jest.fn(),
+      put: jest.fn(),
+      patch: jest.fn(),
+      delete: jest.fn(),
+      interceptors: {
+        request: { use: jest.fn() },
+        response: { use: jest.fn() },
+      },
+    }),
+  },
   AxiosError: class AxiosError extends Error {},
 }));
 
@@ -64,8 +78,8 @@ jest.mock('expo-constants', () => ({
   },
 }));
 
-jest.mock('../../../../../infrastructure/cache/cache.utils', () => {
-  const actual = jest.requireActual('../../../../../infrastructure/cache/cache.utils') as Record<string, unknown>;
+jest.mock('../../../../infrastructure/cache/cache.utils', () => {
+  const actual = jest.requireActual('../../../../infrastructure/cache/cache.utils') as Record<string, unknown>;
   return {
     ...actual,
     cacheGetJSON: (key: string) => mockCacheGetJSON(key),
@@ -75,21 +89,18 @@ jest.mock('../../../../../infrastructure/cache/cache.utils', () => {
   };
 });
 
-jest.mock('../../../../guest-user/auth/shared/utils/token-storage.utils', () => ({
+jest.mock('../../../auth/shared/utils/token-storage.utils', () => ({
   getRefreshToken: () => mockGetRefreshToken(),
   saveRefreshToken: (token: string) => mockSaveRefreshToken(token),
   clearRefreshToken: () => mockClearRefreshToken(),
 }));
 
-jest.mock('../../../../guest-user/auth/shared/services/auth.service', () => ({
+jest.mock('../../../auth/shared/services/auth.service', () => ({
   refreshAndRotateTokens: () => mockRefreshAndRotateTokens(),
+  fetchSelfUserData: () => mockFetchSelfUserData(),
   loginUser: jest.fn(),
   logoutUser: jest.fn(),
   registerUser: jest.fn(),
-}));
-
-jest.mock('../../../profile/services/user-update.service', () => ({
-  fetchSelfUserData: () => mockFetchSelfUserData(),
 }));
 
 jest.mock('../../services/messages.service', () => ({
@@ -98,7 +109,7 @@ jest.mock('../../services/messages.service', () => ({
   deleteMessage: (msgId: string) => mockDeleteMessage(msgId),
 }));
 
-jest.mock('../../../../../infrastructure/socket', () => ({
+jest.mock('../../../../infrastructure/socket', () => ({
   connectSocket: (username: string) => mockConnectSocket(username),
   disconnectSocket: () => mockDisconnectSocket(),
 }));
@@ -107,28 +118,28 @@ jest.mock('../../messages.listeners', () => ({
   registerToMessagesListener: (setter: unknown) => mockRegisterToMessagesListener(setter),
 }));
 
-jest.mock('../../../../../hooks/useNetworkStatus', () => ({
+jest.mock('../../../../hooks/use-network-status.hook', () => ({
   useNetworkStatus: () => mockUseNetworkStatus(),
 }));
 
-jest.mock('../../../../guest-user/auth/shared/hooks/use-google-auth.hook', () => ({
+jest.mock('../../../auth/shared/hooks/use-google-auth.hook', () => ({
   useGoogleAuth: () => ({
     signInWithGoogle: jest.fn(),
   }),
 }));
 
-jest.mock('../../../../guest-user/auth/shared/hooks/use-apple-auth.hook', () => ({
+jest.mock('../../../auth/shared/hooks/use-apple-auth.hook', () => ({
   useAppleAuth: () => ({
     signInWithApple: jest.fn(),
   }),
 }));
 
-jest.mock('../../../../../infrastructure/api/bootstrap-api', () => ({
+jest.mock('../../../../infrastructure/api/bootstrap-api', () => ({
   hasBootstrapPayload: () => mockHasBootstrapPayload(),
   resetBootstrap: () => mockResetBootstrap(),
 }));
 
-jest.mock('../../../../guest-user/auth/shared/utils/auth.utils', () => ({
+jest.mock('../../../auth/shared/utils/auth.utils', () => ({
   __esModule: true,
   default: {
     setAccessToken: (token: string | null) => mockSetAccessToken(token),
@@ -142,9 +153,9 @@ import useInboxLogic from '../use-inbox-logic.hook';
 import {
   userWithoutWorkoutProfile,
   userWithWorkoutAndHistoryProfile,
-} from '../../../../../tests/fixtures/userProfiles';
-import { GlobalAppLoadingProvider } from '../../../../../shared/providers/GlobalAppLoadingProvider';
-import { AuthProvider, useAuth } from '../../../../guest-user/auth/shared/providers/AuthProvider';
+} from '../../../../tests/fixtures/userProfiles';
+import { GlobalAppLoadingProvider } from '../../../../shared/providers/GlobalAppLoadingProvider';
+import { AuthProvider, useAuth } from '../../../auth/shared/providers/AuthProvider';
 
 const wrapper = ({ children }: { children: React.ReactNode }) => (
   <GlobalAppLoadingProvider>

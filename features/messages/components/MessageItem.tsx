@@ -7,7 +7,7 @@ import { Swipeable } from 'react-native-gesture-handler';
 import { RFValue } from 'react-native-responsive-fontsize';
 import { AllUserMessages } from '@strong-together/shared';
 import { MessageEntity } from '@strong-together/shared';
-import { formatDate } from '../../../../shared/utils/shared-utils';
+import { formatDate } from '../../../shared/utils/shared-utils';
 
 const { width, height } = Dimensions.get('window');
 

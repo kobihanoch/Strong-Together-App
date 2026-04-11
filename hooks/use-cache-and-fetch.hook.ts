@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useState } from 'react';
 import { TTL_48H } from '../infrastructure/cache/cache.utils';
-import { AppUser } from '../features/guest-user/auth/shared/types/auth.types';
-import useGetCache from './useGetCache';
-import useUpdateCache from './useUpdateCache';
+import { AppUser } from '../features/auth/shared/types/auth.types';
+import useGetCache from './use-get-cache.hook';
+import useUpdateCache from './use-update-cache.hook';
 
 const useCacheAndFetch = <CachePaylodType, APIDataType>(
   user: AppUser | { id: AppUser['id'] | null } | null, // {id} only for auth context

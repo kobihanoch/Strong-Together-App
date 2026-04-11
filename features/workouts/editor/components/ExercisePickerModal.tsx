@@ -15,7 +15,7 @@ import {
 import { Notifier, NotifierComponents } from 'react-native-notifier';
 import { RFValue } from 'react-native-responsive-fontsize';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import { colors } from '../../../../../shared/constants/colors';
+import { colors } from '../../../../shared/constants/colors';
 import {
   CreateWorkoutControls,
   ExerciseCandidate,
@@ -24,9 +24,9 @@ import {
 import { ExercisesMapByMuscle, GetAllExercisesExercise } from '@strong-together/shared';
 import { ExerciseEntity } from '@strong-together/shared';
 import { WorkoutSplitEntity } from '@strong-together/shared';
-import Column from '../../../../../shared/components/Column';
-import Row from '../../../../../shared/components/Row';
-import SlidingBottomModal, { SlidingBottomModalRef } from '../../../../../shared/components/SlidingBottomModal';
+import Column from '../../../../shared/components/Column';
+import Row from '../../../../shared/components/Row';
+import SlidingBottomModal, { SlidingBottomModalRef } from '../../../../shared/components/SlidingBottomModal';
 
 const { height } = Dimensions.get('window');
 

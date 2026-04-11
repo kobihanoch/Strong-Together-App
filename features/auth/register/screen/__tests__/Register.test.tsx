@@ -11,7 +11,7 @@ import {
 import { fireEvent, render, waitFor } from '@testing-library/react-native';
 import type { AuthProviderValue } from '../../../shared/providers/types/auth-context.types';
 import type { StackNavigationProp } from '@react-navigation/stack';
-import type { AuthRootParamList } from '../../../../shared/navigation/types/auth-stack.types';
+import type { AuthRootParamList } from '../../../../../navigation/types/auth-stack.types';
 
 const mockGoBack = jestObject.fn();
 const mockReplace = jestObject.fn();
@@ -52,7 +52,7 @@ jestObject.mock('../../../shared/providers/AuthProvider', () => ({
   useAuth: () => mockAuthState,
 }));
 
-jestObject.mock('../../../../../../shared/errors/error-alerts', () => ({
+jestObject.mock('../../../../../shared/errors/error-alerts', () => ({
   showErrorAlert: (...args: [string, string]) => mockShowErrorAlert(...args),
 }));
 

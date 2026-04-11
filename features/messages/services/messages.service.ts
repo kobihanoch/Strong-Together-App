@@ -1,4 +1,4 @@
-import api from '../../../../infrastructure/api/api';
+import api from '../../../infrastructure/api/api';
 import { DeleteMessageParams, GetAllUserMessagesQuery, MarkMessageAsReadParams } from '@strong-together/shared';
 import { DeleteMessageResponse, GetAllUserMessagesResponse, MarkMessageAsReadResponse } from '@strong-together/shared';
 

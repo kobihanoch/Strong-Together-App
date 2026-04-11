@@ -1,5 +1,5 @@
 import { AnalyzeVideoResultPayload, SquatRepetition } from '@strong-together/shared';
-import { getSocket } from '../../../../infrastructure/socket';
+import { getSocket } from '../../../infrastructure/socket';
 
 export const registerToVideoAnalysisResultsListener = (
   onResults: (results: AnalyzeVideoResultPayload<SquatRepetition>) => void,
