@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { View, Switch, Linking, AppState, AppStateStatus } from 'react-native';
 import { Dialog, ALERT_TYPE } from 'react-native-alert-notification';
-import useSettingsLogic from '../hooks/logic/useSettingsLogic';
+import useSettingsLogic from '../hooks/use-settings-logic.hook';
 import { Notifier, NotifierComponents } from 'react-native-notifier';
 import * as Notifications from 'expo-notifications';
 

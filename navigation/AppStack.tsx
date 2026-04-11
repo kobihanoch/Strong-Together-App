@@ -9,7 +9,7 @@ import Home from '../screens/Home';
 import Inbox from '../features/messages/screen/Inbox';
 import MyWorkoutPlan from '../features/workouts/plan/screen/MyWorkoutPlan';
 import Profile from '../features/profile/screen/Profile';
-import Settings from '../screens/Settings';
+import Settings from '../features/settings/screen/Settings';
 import StartWorkout from '../features/workouts/session/screen/StartWorkout';
 import Statistics from '../features/workouts/history/screen/Statistics';
 import { ymdInCurrentTZ } from '../utils/sharedUtils';
