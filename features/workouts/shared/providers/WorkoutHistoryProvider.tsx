@@ -1,7 +1,7 @@
 import { createContext, useCallback, useContext, useMemo, useState } from 'react';
 import { keyTracking } from '../../../../infrastructure/cache/cache-keys.utils';
-import useCacheAndFetch from '../../../../hooks/use-cache-and-fetch.hook';
-import useUpdateGlobalLoading from '../../../../hooks/use-update-global-loading.hook';
+import useCacheAndFetch from '../../../../shared/hooks/use-cache-and-fetch.hook';
+import useUpdateGlobalLoading from '../../../../shared/hooks/use-update-global-loading.hook';
 import { getUserExerciseTracking } from '../../history/services/workout-history.service';
 import { GetExerciseTrackingResponse } from '@strong-together/shared';
 import { checkHasTrainedToday, unpackFromExerciseTrackingData } from '../../history/utils/workout-history-context.util';

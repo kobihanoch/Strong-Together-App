@@ -94,7 +94,7 @@ jest.mock('react-native-segmented-control-2', () => {
     );
 });
 
-jest.mock('../../../../../hooks/use-generate-days.hook', () => ({
+jest.mock('../../../../../shared/hooks/use-generate-days.hook', () => ({
   __esModule: true,
   default: (...args: unknown[]) => mockUseGenerateDays(...args),
 }));

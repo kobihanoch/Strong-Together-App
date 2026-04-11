@@ -137,16 +137,16 @@ jest.mock('../../hooks/use-apple-auth.hook', () => ({
   useAppleAuth: () => mockUseAppleAuth(),
 }));
 
-jest.mock('../../../../../hooks/use-cache-and-fetch.hook', () => ({
+jest.mock('../../../../../shared/hooks/use-cache-and-fetch.hook', () => ({
   __esModule: true,
   default: useCacheAndFetchMock,
 }));
 
-jest.mock('../../../../../hooks/use-network-status.hook', () => ({
+jest.mock('../../../../../shared/hooks/use-network-status.hook', () => ({
   useNetworkStatus: () => mockUseNetworkStatus(),
 }));
 
-jest.mock('../../../../../hooks/use-update-global-loading.hook', () => ({
+jest.mock('../../../../../shared/hooks/use-update-global-loading.hook', () => ({
   __esModule: true,
   default: useUpdateGlobalLoadingMock,
 }));

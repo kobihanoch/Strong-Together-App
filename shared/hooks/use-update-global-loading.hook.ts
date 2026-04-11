@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { useGlobalAppLoadingContext } from '../shared/providers/GlobalAppLoadingProvider';
+import { useGlobalAppLoadingContext } from '../providers/GlobalAppLoadingProvider';
 
 const useUpdateGlobalLoading = (key: string, loadingState: boolean): void => {
   const { setLoading: setGlobalLoading } = useGlobalAppLoadingContext();

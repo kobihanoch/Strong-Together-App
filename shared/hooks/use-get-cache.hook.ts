@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { cacheGetJSON } from '../infrastructure/cache/cache.utils';
+import { cacheGetJSON } from '../../infrastructure/cache/cache.utils';
 
 const useGetCache = <T>(key: string | null): { cached: T | null; hydrated: boolean } => {
   const [cached, setCached] = useState<T | null>(null);

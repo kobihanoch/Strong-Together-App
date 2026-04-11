@@ -71,12 +71,12 @@ jest.mock('../../../auth/shared/providers/AuthProvider', () => ({
   useAuth: () => mockAuthState(),
 }));
 
-jest.mock('../../../../hooks/use-cache-and-fetch.hook', () => ({
+jest.mock('../../../../shared/hooks/use-cache-and-fetch.hook', () => ({
   __esModule: true,
   default: useCacheAndFetchMock,
 }));
 
-jest.mock('../../../../hooks/use-update-global-loading.hook', () => ({
+jest.mock('../../../../shared/hooks/use-update-global-loading.hook', () => ({
   __esModule: true,
   default: useUpdateGlobalLoadingMock,
 }));

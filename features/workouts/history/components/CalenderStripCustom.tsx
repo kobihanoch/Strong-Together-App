@@ -4,7 +4,7 @@ import { Dimensions, FlatList, StyleSheet, Text, TouchableOpacity, View, ViewTok
 import { RFValue } from 'react-native-responsive-fontsize';
 import { colors } from '../../../../shared/constants/colors';
 import { WorkoutHistoryExerciseTrackingMaps } from '../types/workout-history.types';
-import useGenerateDays from '../../../../hooks/use-generate-days.hook';
+import useGenerateDays from '../../../../shared/hooks/use-generate-days.hook';
 import Row from '../../../../shared/components/Row';
 
 const { width, height } = Dimensions.get('window');

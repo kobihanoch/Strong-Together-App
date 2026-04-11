@@ -3,8 +3,8 @@ import { createContext, ReactNode, useCallback, useContext, useMemo, useState } 
 import { useAuth } from '../../../auth/shared/providers/AuthProvider';
 import { keyCardio } from '../../../../infrastructure/cache/cache-keys.utils';
 import { getUserCardio } from '../../cardio/services/cardio.service';
-import useCacheAndFetch from '../../../../hooks/use-cache-and-fetch.hook';
-import useUpdateGlobalLoading from '../../../../hooks/use-update-global-loading.hook';
+import useCacheAndFetch from '../../../../shared/hooks/use-cache-and-fetch.hook';
+import useUpdateGlobalLoading from '../../../../shared/hooks/use-update-global-loading.hook';
 import moment from 'moment';
 import {
   CardioProviderCachePayload,

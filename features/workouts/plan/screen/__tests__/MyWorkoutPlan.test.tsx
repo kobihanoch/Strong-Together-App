@@ -51,7 +51,7 @@ jestObject.mock('../../../cardio/services/cardio.service', () => ({
   logUserCardio: (...args: [number, number, string]) => mockLogUserCardio(...args),
 }));
 
-jestObject.mock('../../../../../hooks/use-light-status-bar.hook', () => ({
+jestObject.mock('../../../../../shared/hooks/use-light-status-bar.hook', () => ({
   __esModule: true,
   default: jestObject.fn(),
 }));

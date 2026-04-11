@@ -12,9 +12,9 @@ import {
 } from '../../../../infrastructure/cache/cache.utils';
 import { keyAuth } from '../../../../infrastructure/cache/cache-keys.utils';
 import { showErrorAlert } from '../../../../shared/errors/error-alerts';
-import useCacheAndFetch from '../../../../hooks/use-cache-and-fetch.hook';
-import { useNetworkStatus } from '../../../../hooks/use-network-status.hook';
-import useUpdateGlobalLoading from '../../../../hooks/use-update-global-loading.hook';
+import useCacheAndFetch from '../../../../shared/hooks/use-cache-and-fetch.hook';
+import { useNetworkStatus } from '../../../../shared/hooks/use-network-status.hook';
+import useUpdateGlobalLoading from '../../../../shared/hooks/use-update-global-loading.hook';
 import { fetchSelfUserData } from '../services/auth.service';
 import GlobalAuth from '../utils/auth.utils';
 import { clearRefreshToken, getRefreshToken, saveRefreshToken } from '../utils/token-storage.utils';

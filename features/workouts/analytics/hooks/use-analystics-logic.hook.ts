@@ -4,7 +4,7 @@ import { useWorkoutHistoryContext } from '../../shared/providers/WorkoutHistoryP
 import { useAuth } from '../../../auth/shared/providers/AuthProvider';
 import { useWorkoutPlanContext } from '../../shared/providers/WorkoutPlanProvider';
 import { getTrackingAnalytics } from '../services/analytics.service';
-import useCacheAndFetch from '../../../../hooks/use-cache-and-fetch.hook';
+import useCacheAndFetch from '../../../../shared/hooks/use-cache-and-fetch.hook';
 import { GetAnalyticsResponse } from '@strong-together/shared';
 import { Analytics1RM, AnalyticsCachePayload, AnalyticsGoals } from '../types/use-analytics.types';
 

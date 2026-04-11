@@ -112,7 +112,7 @@ jest.mock('../../../../../infrastructure/socket', () => ({
   disconnectSocket: () => mockDisconnectSocket(),
 }));
 
-jest.mock('../../../../../hooks/use-network-status.hook', () => ({
+jest.mock('../../../../../shared/hooks/use-network-status.hook', () => ({
   useNetworkStatus: () => mockUseNetworkStatus(),
 }));
 

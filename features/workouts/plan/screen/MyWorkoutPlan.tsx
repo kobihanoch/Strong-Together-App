@@ -16,7 +16,7 @@ import SplitFlatList from '../components/SplitFlatList';
 import SlidingBottomModal, { SlidingBottomModalRef } from '../../../../shared/components/SlidingBottomModal';
 import { useCardioContext } from '../../shared/providers/CardioProvider';
 import { useMyWorkoutPlanPageLogic } from '../hooks/use-my-workout-plan-page-logic.hook';
-import useLightStatusBar from '../../../../hooks/use-light-status-bar.hook';
+import useLightStatusBar from '../../../../shared/hooks/use-light-status-bar.hook';
 import { formatTime } from '../../../../shared/utils/shared-utils';
 import Row from '../../../../shared/components/Row';
 import { logUserCardio } from '../../cardio/services/cardio.service';

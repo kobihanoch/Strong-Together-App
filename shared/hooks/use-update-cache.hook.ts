@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { cacheSetJSON } from '../infrastructure/cache/cache.utils';
+import { cacheSetJSON } from '../../infrastructure/cache/cache.utils';
 
 const useUpdateCache = <CachePayloadType>(
   logLabel: string,

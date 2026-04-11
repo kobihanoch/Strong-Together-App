@@ -1,7 +1,7 @@
 import React, { createContext, useCallback, useContext, useMemo, useState } from 'react';
 import { keyWorkoutPlan } from '../../../../infrastructure/cache/cache-keys.utils';
-import useCacheAndFetch from '../../../../hooks/use-cache-and-fetch.hook';
-import useUpdateGlobalLoading from '../../../../hooks/use-update-global-loading.hook';
+import useCacheAndFetch from '../../../../shared/hooks/use-cache-and-fetch.hook';
+import useUpdateGlobalLoading from '../../../../shared/hooks/use-update-global-loading.hook';
 import { getUserWorkout } from '../../plan/services/workout-plan.service';
 import { extractWorkoutSplits } from '../../plan/utils/workout-plan.util';
 import { useAuth } from '../../../auth/shared/providers/AuthProvider';
