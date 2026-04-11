@@ -38,21 +38,21 @@ jestObject.mock('react-native-notifier', () => ({
   },
 }));
 
-jestObject.mock('../../../errors/errorAlerts', () => ({
+jestObject.mock('../../../../errors/errorAlerts', () => ({
   showErrorAlert: (...args: any[]) => mockShowErrorAlert(...args),
 }));
 
-jestObject.mock('../../../services/UserService', () => ({
+jestObject.mock('../../../../services/UserService', () => ({
   updateSelfUser: (...args: [any]) => mockUpdateSelfUser(...args),
 }));
 
-jestObject.mock('../../Column', () => {
+jestObject.mock('../../../../components/Column', () => {
   const mockReact = require('react');
   const { View } = require('react-native');
   return ({ children, ...props }: any) => mockReact.createElement(View, props, children);
 });
 
-jestObject.mock('../../Row', () => {
+jestObject.mock('../../../../components/Row', () => {
   const mockReact = require('react');
   const { View } = require('react-native');
   return ({ children, ...props }: any) => mockReact.createElement(View, props, children);

@@ -54,40 +54,40 @@ jestObject.mock('react-native-alert-notification', () => ({
   },
 }));
 
-jestObject.mock('../../services/UserService', () => ({
+jestObject.mock('../../../../services/UserService', () => ({
   deleteSelfUser: () => mockDeleteSelfUser(),
 }));
 
-jestObject.mock('../../context/AuthContext', () => ({
+jestObject.mock('../../../../context/AuthContext', () => ({
   useAuth: () => ({
     logout: mockLogout,
   }),
 }));
 
-jestObject.mock('../../hooks/logic/useProfilePageLogic', () => ({
+jestObject.mock('../../hooks/use-profile-page-logic.hook', () => ({
   __esModule: true,
   default: () => mockProfilePageLogic,
 }));
 
-jestObject.mock('../../components/Column', () => {
+jestObject.mock('../../../../components/Column', () => {
   const mockReact = require('react');
   const { View } = require('react-native');
   return ({ children, ...props }: any) => mockReact.createElement(View, props, children);
 });
 
-jestObject.mock('../../components/Row', () => {
+jestObject.mock('../../../../components/Row', () => {
   const mockReact = require('react');
   const { View } = require('react-native');
   return ({ children, ...props }: any) => mockReact.createElement(View, props, children);
 });
 
-jestObject.mock('../../components/ProfileComponents/ImagePickerComponent', () => (props: any) =>
+jestObject.mock('../../components/ImagePickerComponent', () => (props: any) =>
   mockImagePickerComponent(props),
 );
 
-jestObject.mock('../../components/ProfileComponents/EditProfileForm', () => (props: any) => mockEditProfileForm(props));
+jestObject.mock('../../components/EditProfileForm', () => (props: any) => mockEditProfileForm(props));
 
-jestObject.mock('../../components/SlidingBottomModal', () => {
+jestObject.mock('../../../../components/SlidingBottomModal', () => {
   const mockReact = require('react');
   const { View, Text } = require('react-native');
   return {

@@ -13,11 +13,11 @@ import {
 import { TextInput } from 'react-native-gesture-handler';
 import { Notifier, NotifierComponents } from 'react-native-notifier';
 import { RFValue } from 'react-native-responsive-fontsize';
-import { colors } from '../../constants/colors';
-import { showErrorAlert } from '../../errors/errorAlerts';
-import { updateSelfUser } from '../../services/UserService';
-import Column from '../Column';
-import Row from '../Row';
+import { colors } from '../../../constants/colors';
+import { showErrorAlert } from '../../../errors/errorAlerts';
+import { updateSelfUser } from '../../../services/UserService';
+import Column from '../../../components/Column';
+import Row from '../../../components/Row';
 import { UserEntity } from '@strong-together/shared';
 
 type EditProfileFormProps = {

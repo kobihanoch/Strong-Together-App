@@ -8,7 +8,7 @@ import CreateWorkout from '../features/workouts/editor/screen/CreateWorkout';
 import Home from '../screens/Home';
 import Inbox from '../screens/Inbox';
 import MyWorkoutPlan from '../features/workouts/plan/screen/MyWorkoutPlan';
-import Profile from '../screens/Profile';
+import Profile from '../features/profile/screen/Profile';
 import Settings from '../screens/Settings';
 import StartWorkout from '../features/workouts/session/screen/StartWorkout';
 import Statistics from '../features/workouts/history/screen/Statistics';

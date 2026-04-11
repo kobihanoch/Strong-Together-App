@@ -5,10 +5,10 @@ import * as ImagePicker from 'expo-image-picker';
 import React, { useEffect } from 'react';
 import { ActivityIndicator, Dimensions, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { RFValue } from 'react-native-responsive-fontsize';
-import api from '../../api/api';
-import { colors } from '../../constants/colors';
-import { useAuth } from '../../context/AuthContext';
-import useMediaUploads from '../../hooks/useMediaUploads';
+import api from '../../../api/api';
+import { colors } from '../../../constants/colors';
+import { useAuth } from '../../../context/AuthContext';
+import useMediaUploads from '../hooks/use-media-uploads.hook';
 import { UserEntity } from '@strong-together/shared';
 
 const { width, height } = Dimensions.get('window');
@@ -114,8 +114,8 @@ function ImagePickerComponent({
                     uri: `${process.env.EXPO_PUBLIC_SUPABASE_URL}/storage/v1/object/public/${profileimagePath}`,
                   }
                 : user?.gender == 'Male'
-                  ? require('../../assets/man.png')
-                  : require('../../assets/woman.png')
+                  ? require('../../../assets/man.png')
+                  : require('../../../assets/woman.png')
             }
             cachePolicy={'disk'}
             style={[styles.image, style]}

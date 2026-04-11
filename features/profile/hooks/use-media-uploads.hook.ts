@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { UploadableFile, uploadProfilePictureToStorageAndGetPath } from '../services/MediaService';
+import { UploadableFile, uploadProfilePictureToStorageAndGetPath } from '../services/media.service';
 
 export const useMediaUploads = (): {
   uploadToStorageAndReturnPath: (file: UploadableFile) => Promise<{ path: string; url: string }>;

@@ -2,16 +2,16 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import React, { ComponentProps, useRef, useState } from 'react';
 import { Dimensions, StyleSheet, Text, TouchableOpacity } from 'react-native';
 import { RFValue } from 'react-native-responsive-fontsize';
-import Column from '../components/Column';
-import ImagePickerComponent from '../components/ProfileComponents/ImagePickerComponent';
-import Row from '../components/Row';
-import SlidingBottomModal, { SlidingBottomModalRef } from '../components/SlidingBottomModal';
-import { colors } from '../constants/colors';
-import useProfilePageLogic from '../hooks/logic/useProfilePageLogic';
-import EditProfileForm from '../components/ProfileComponents/EditProfileForm';
-import { useAuth } from '../context/AuthContext';
+import Column from '../../../components/Column';
+import ImagePickerComponent from '../components/ImagePickerComponent';
+import Row from '../../../components/Row';
+import SlidingBottomModal, { SlidingBottomModalRef } from '../../../components/SlidingBottomModal';
+import { colors } from '../../../constants/colors';
+import useProfilePageLogic from '../hooks/use-profile-page-logic.hook';
+import EditProfileForm from '../components/EditProfileForm';
+import { useAuth } from '../../../context/AuthContext';
 import { ALERT_TYPE, Dialog } from 'react-native-alert-notification';
-import { deleteSelfUser } from '../services/UserService';
+import { deleteSelfUser } from '../../../services/UserService';
 
 const { height } = Dimensions.get('window');
 

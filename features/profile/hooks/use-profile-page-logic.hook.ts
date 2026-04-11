@@ -1,5 +1,5 @@
-import { useAuth } from '../../context/AuthContext';
-import { getDaysSince } from '../../utils/homePageUtils';
+import { useAuth } from '../../../context/AuthContext';
+import { getDaysSince } from '../../../utils/homePageUtils';
 
 const useProfilePageLogic = () => {
   const { user, setUser } = useAuth();

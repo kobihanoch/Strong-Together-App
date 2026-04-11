@@ -9,7 +9,7 @@ import {
   jest as jestObject,
 } from '@jest/globals';
 import { render, waitFor } from '@testing-library/react-native';
-import type { AuthContextValue } from '../../../context/types/authContextTypes.dto';
+import type { AuthContextValue } from '../../../../context/types/authContextTypes.dto';
 import type { GetAuthenticatedUserByIdResponse } from '@strong-together/shared';
 
 let mockAuthState: AuthContextValue;
@@ -43,18 +43,18 @@ jestObject.mock('expo-image-picker', () => ({
   },
 }));
 
-jestObject.mock('../../../api/api', () => ({
+jestObject.mock('../../../../api/api', () => ({
   __esModule: true,
   default: {
     delete: (...args: any[]) => mockApiDelete(...args),
   },
 }));
 
-jestObject.mock('../../../context/AuthContext', () => ({
+jestObject.mock('../../../../context/AuthContext', () => ({
   useAuth: () => mockAuthState,
 }));
 
-jestObject.mock('../../../hooks/useMediaUploads', () => ({
+jestObject.mock('../../hooks/use-media-uploads.hook', () => ({
   __esModule: true,
   default: () => mockMediaUploadsState,
 }));
