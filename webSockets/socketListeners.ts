@@ -1,11 +1,11 @@
 import { Dispatch, SetStateAction } from 'react';
-import { NotificationsContextAllReceivedMessages } from '../context/types/notificationsContextTypes.dto';
+import { MessagesContextAllReceivedMessages } from '../features/messages/types/messages-context.types';
 import { MessageAfterSendResponse } from '@strong-together/shared';
 import { AnalyzeVideoResultPayload, SquatRepetition } from '@strong-together/shared';
 import { getSocket } from './socketConfig';
 
 export const registerToMessagesListener = (
-  setMsgs: Dispatch<SetStateAction<NotificationsContextAllReceivedMessages>>,
+  setMsgs: Dispatch<SetStateAction<MessagesContextAllReceivedMessages>>,
 ) => {
   const socket = getSocket();
   if (!socket) return;
@@ -14,7 +14,7 @@ export const registerToMessagesListener = (
   const handler = (msg: MessageAfterSendResponse) => {
     // Set all recieved messages at context.
     // Checks for duplications before
-    setMsgs((prev: NotificationsContextAllReceivedMessages) => {
+    setMsgs((prev: MessagesContextAllReceivedMessages) => {
       if (prev.some((m) => m.id === msg.id)) return prev;
       return [msg, ...prev];
     });
@@ -52,4 +52,3 @@ export const registerToVideoAnalysisResultsListener = (
     socket.off(`video_analysis_results`, handler);
   };
 };
-

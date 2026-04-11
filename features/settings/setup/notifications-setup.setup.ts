@@ -1,7 +1,7 @@
 // notifications/NotificationsSetup.jsx
 import { useEffect } from "react";
-import { useAuth } from "../context/AuthContext";
-import { setupPush } from "./setup";
+import { useAuth } from "../../../context/AuthContext";
+import { setupPush } from "./push-notifications.setup";
 
 const NotificationsSetup = () => {
   const { user, isValidatedWithServer } = useAuth();

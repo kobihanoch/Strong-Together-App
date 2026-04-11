@@ -2,9 +2,9 @@ import React, { useCallback } from 'react';
 import { Dimensions, ListRenderItem, Text, View } from 'react-native';
 import { FlatList } from 'react-native-gesture-handler';
 import { RFValue } from 'react-native-responsive-fontsize';
-import MessageItem from '../components/InboxComponents/MessageItem';
-import useInboxLogic from '../hooks/logic/useInboxLogic';
-import { colors } from '../constants/colors';
+import MessageItem from '../components/MessageItem';
+import useInboxLogic from '../hooks/use-inbox-logic.hook';
+import { colors } from '../../../constants/colors';
 import { AllUserMessages } from '@strong-together/shared';
 const { width } = Dimensions.get('window');
 

@@ -2,11 +2,8 @@ import type {
   WorkoutHistoryAnalyzedExerciseTrackingData,
   WorkoutHistoryExerciseTrackingMaps,
 } from '../../features/workouts/history/types/workout-history.types';
-import type {
-  CardioDailyMap,
-  CardioWeeklyMap,
-} from '../../features/workouts/cardio/types/cardio.types';
-import type { NotificationsContextAllReceivedMessages } from '../../context/types/notificationsContextTypes.dto';
+import type { CardioDailyMap, CardioWeeklyMap } from '../../features/workouts/cardio/types/cardio.types';
+import type { MessagesContextAllReceivedMessages } from '../../features/messages/types/messages-context.types';
 import type { AppUser } from '../../context/types/authContextTypes.dto';
 import type { WholeUserWorkoutPlan, WorkoutSplitsMap } from '@strong-together/shared';
 
@@ -19,7 +16,7 @@ export interface UserTestProfile {
   analyzedExerciseTrackingData: WorkoutHistoryAnalyzedExerciseTrackingData | null;
   cardioDailyMap: CardioDailyMap | null;
   cardioWeeklyMap: CardioWeeklyMap | null;
-  notificationMessages: NotificationsContextAllReceivedMessages;
+  notificationMessages: MessagesContextAllReceivedMessages;
 }
 
 const baseUser: AppUser = {
@@ -240,9 +237,9 @@ const baseCardioWeeklyMap: CardioWeeklyMap = {
   },
 };
 
-const emptyNotificationMessages: NotificationsContextAllReceivedMessages = [];
+const emptyNotificationMessages: MessagesContextAllReceivedMessages = [];
 
-const baseNotificationMessages: NotificationsContextAllReceivedMessages = [
+const baseNotificationMessages: MessagesContextAllReceivedMessages = [
   {
     id: 'msg-1',
     subject: 'Workout reminder',
@@ -364,7 +361,7 @@ const cloneCardioWeeklyMap = (): CardioWeeklyMap => ({
   },
 });
 
-const cloneNotificationMessages = (): NotificationsContextAllReceivedMessages =>
+const cloneNotificationMessages = (): MessagesContextAllReceivedMessages =>
   baseNotificationMessages.map((message) => ({
     ...message,
   }));
@@ -435,4 +432,3 @@ export const userProfiles = {
   userWithWorkoutNoHistory: userWithWorkoutNoHistoryProfile,
   userWithWorkoutAndHistory: userWithWorkoutAndHistoryProfile,
 } as const;
-

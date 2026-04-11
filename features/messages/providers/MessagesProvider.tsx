@@ -1,18 +1,18 @@
 import { createContext, ReactNode, useCallback, useContext, useEffect, useMemo, useState } from 'react';
-import { keyInbox } from '../cache/cacheUtils';
-import useCacheAndFetch from '../hooks/useCacheAndFetch';
-import useUpdateGlobalLoading from '../hooks/useUpdateGlobalLoading';
-import { getUserMessages } from '../services/MessagesService';
+import { keyInbox } from '../../../cache/cacheUtils';
+import useCacheAndFetch from '../../../hooks/useCacheAndFetch';
+import useUpdateGlobalLoading from '../../../hooks/useUpdateGlobalLoading';
+import { getUserMessages } from '../services/messages.service';
 import { GetAllUserMessagesResponse } from '@strong-together/shared';
 import { AllUserMessages } from '@strong-together/shared';
-import { filterMessagesByUnread } from '../utils/notificationsContextUtils';
-import { registerToMessagesListener } from '../webSockets/socketListeners';
-import { useAuth } from './AuthContext';
+import { filterMessagesByUnread } from '../utils/messages-context-utils';
+import { registerToMessagesListener } from '../../../webSockets/socketListeners';
+import { useAuth } from '../../../context/AuthContext';
 import {
-  NotificationsContextAllReceivedMessages,
-  NotificationsContextCachePayload,
-  NotificationsContextValue,
-} from './types/notificationsContextTypes.dto';
+  MessagesContextAllReceivedMessages,
+  MessagesContextCachePayload,
+  MessagesContextValue,
+} from '../types/messages-context.types';
 
 /**
  * Notifications Flow:
@@ -25,21 +25,21 @@ import {
  * 7. On logout → clear all state.
  */
 
-const NotificationsContext = createContext<NotificationsContextValue | null>(null);
+const MessagesContext = createContext<MessagesContextValue | null>(null);
 
-export const useNotifications = () => {
-  const context = useContext(NotificationsContext);
+export const useMessages = () => {
+  const context = useContext(MessagesContext);
   if (!context) {
-    throw new Error('useNotificationsContext must be used within a NotificationsProvider');
+    throw new Error('useMessages must be used within a MessagesProvider');
   }
   return context;
 };
 
-export const NotificationsProvider = ({ children }: { children: ReactNode }) => {
+export const MessagesProvider = ({ children }: { children: ReactNode }) => {
   const { user, isValidatedWithServer } = useAuth();
 
   // All user's received messages
-  const [allReceivedMessages, setAllReceivedMessages] = useState<NotificationsContextAllReceivedMessages>([]);
+  const [allReceivedMessages, setAllReceivedMessages] = useState<MessagesContextAllReceivedMessages>([]);
 
   // Filter messages to read/unread => Everytime all messages is updated (when receiving a new message), filter is executed
   const unreadMessages = useMemo((): AllUserMessages[] => {
@@ -52,7 +52,7 @@ export const NotificationsProvider = ({ children }: { children: ReactNode }) => 
   const fetchFn = useCallback(async () => await getUserMessages(), []);
 
   // On data function
-  const onDataFn = useCallback((data: GetAllUserMessagesResponse | NotificationsContextCachePayload): void => {
+  const onDataFn = useCallback((data: GetAllUserMessagesResponse | MessagesContextCachePayload): void => {
     if (!data) return;
     setAllReceivedMessages(data.messages);
   }, []);
@@ -61,21 +61,18 @@ export const NotificationsProvider = ({ children }: { children: ReactNode }) => 
   const cachePayload = useMemo(() => ({ messages: allReceivedMessages }), [allReceivedMessages]);
 
   // Hook usage
-  const { loading: loadingMessages, cacheKnown } = useCacheAndFetch<
-    NotificationsContextCachePayload,
-    GetAllUserMessagesResponse
-  >(
+  const { loading: loadingMessages, cacheKnown } = useCacheAndFetch<MessagesContextCachePayload, GetAllUserMessagesResponse>(
     user, // user prop
     keyInbox, // key builder
     isValidatedWithServer, // flag from server
     fetchFn, // fetch cb
     onDataFn, // on data cb
     cachePayload, // cache payload
-    'Notifications Context', // log
+    'Messages Context', // log
   );
 
   // Report inbox loading to global loading
-  useUpdateGlobalLoading('Notifications', cacheKnown ? loadingMessages : true);
+  useUpdateGlobalLoading('Messages', cacheKnown ? loadingMessages : true);
 
   // Load listener
   useEffect(() => {
@@ -86,7 +83,7 @@ export const NotificationsProvider = ({ children }: { children: ReactNode }) => 
     return;
   }, [user]);
 
-  const value = useMemo<NotificationsContextValue>(
+  const value = useMemo<MessagesContextValue>(
     () => ({
       unreadMessages,
       allReceivedMessages,
@@ -96,5 +93,5 @@ export const NotificationsProvider = ({ children }: { children: ReactNode }) => 
     [unreadMessages, allReceivedMessages, loadingMessages],
   );
 
-  return <NotificationsContext.Provider value={value}>{children}</NotificationsContext.Provider>;
+  return <MessagesContext.Provider value={value}>{children}</MessagesContext.Provider>;
 };

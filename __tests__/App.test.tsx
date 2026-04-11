@@ -85,8 +85,8 @@ jest.mock('../context/GlobalAppLoadingContext', () => ({
   GlobalAppLoadingProvider: ({ children }: { children: React.ReactNode }) => children,
 }));
 
-jest.mock('../context/NotificationsContext', () => ({
-  NotificationsProvider: ({ children }: { children: React.ReactNode }) => children,
+jest.mock('../features/messages/providers/MessagesProvider', () => ({
+  MessagesProvider: ({ children }: { children: React.ReactNode }) => children,
 }));
 
 jest.mock('../features/workouts/shared/providers/WorkoutPlanProvider', () => ({
@@ -119,7 +119,7 @@ jest.mock('../navigation/AppStack', () => {
   };
 });
 
-jest.mock('../notifications/NotificationsSetup', () => {
+jest.mock('../features/settings/setup/notifications-setup.setup', () => {
   const ReactLocal = require('react');
   const { Text: TextLocal } = require('react-native');
   return {

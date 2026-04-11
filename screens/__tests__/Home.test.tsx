@@ -141,8 +141,8 @@ jestObject.mock('../../context/GlobalAppLoadingContext', () => ({
   useGlobalAppLoadingContext: () => mockLoadingState,
 }));
 
-jestObject.mock('../../context/NotificationsContext', () => ({
-  useNotifications: () => mockNotificationsState,
+jestObject.mock('../../features/messages/providers/MessagesProvider', () => ({
+  useMessages: () => mockNotificationsState,
 }));
 
 jestObject.mock('../../features/workouts/shared/providers/WorkoutPlanProvider', () => ({

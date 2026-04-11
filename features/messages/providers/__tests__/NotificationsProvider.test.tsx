@@ -7,7 +7,7 @@ import {
   guestProfile,
   userWithWorkoutAndHistoryProfile,
   userWithoutWorkoutProfile,
-} from '../../tests/fixtures/userProfiles';
+} from '../../../../tests/fixtures/userProfiles';
 import type { GetAllUserMessagesResponse } from '@strong-together/shared';
 import type { MessageAfterSendResponse } from '@strong-together/shared';
 
@@ -67,32 +67,32 @@ const useCacheAndFetchMock = (
 const useUpdateGlobalLoadingMock = (key: string, value: boolean) => mockUseUpdateGlobalLoading(key, value);
 const getUserMessagesMock = () => mockGetUserMessages();
 
-jest.mock('../../context/AuthContext', () => ({
+jest.mock('../../../../context/AuthContext', () => ({
   useAuth: () => mockAuthState(),
 }));
 
-jest.mock('../../hooks/useCacheAndFetch', () => ({
+jest.mock('../../../../hooks/useCacheAndFetch', () => ({
   __esModule: true,
   default: useCacheAndFetchMock,
 }));
 
-jest.mock('../../hooks/useUpdateGlobalLoading', () => ({
+jest.mock('../../../../hooks/useUpdateGlobalLoading', () => ({
   __esModule: true,
   default: useUpdateGlobalLoadingMock,
 }));
 
-jest.mock('../../services/MessagesService', () => ({
+jest.mock('../../services/messages.service', () => ({
   getUserMessages: getUserMessagesMock,
 }));
 
-jest.mock('../../webSockets/socketListeners', () => ({
+jest.mock('../../../../webSockets/socketListeners', () => ({
   registerToMessagesListener: (...args: any[]) => mockRegisterToMessagesListener(...args),
 }));
 
-import { NotificationsProvider, useNotifications } from '../NotificationsContext';
+import { MessagesProvider, useMessages } from '../MessagesProvider';
 
 const wrapper = ({ children }: { children: React.ReactNode }) => (
-  <NotificationsProvider>{children}</NotificationsProvider>
+  <MessagesProvider>{children}</MessagesProvider>
 );
 
 const createHydratingUseCacheAndFetchMock = (payload: GetAllUserMessagesResponse | any) => {
@@ -150,7 +150,7 @@ describe('NotificationsContext', () => {
   });
 
   it('keeps all notifications state empty for the guest profile and skips socket registration', () => {
-    const { result } = renderHook(() => useNotifications(), { wrapper });
+    const { result } = renderHook(() => useMessages(), { wrapper });
 
     expect(result.current.allReceivedMessages).toEqual(guestProfile.notificationMessages);
     expect(result.current.unreadMessages).toEqual([]);
@@ -164,7 +164,7 @@ describe('NotificationsContext', () => {
       {
         messages: [],
       },
-      'Notifications Context',
+      'Messages Context',
     );
     expect(mockRegisterToMessagesListener).not.toHaveBeenCalled();
   });
@@ -180,7 +180,7 @@ describe('NotificationsContext', () => {
       }),
     );
 
-    const { result, unmount } = renderHook(() => useNotifications(), { wrapper });
+    const { result, unmount } = renderHook(() => useMessages(), { wrapper });
 
     await waitFor(() => {
       expect(result.current.allReceivedMessages).toEqual([]);
@@ -206,7 +206,7 @@ describe('NotificationsContext', () => {
       }),
     );
 
-    const { result } = renderHook(() => useNotifications(), { wrapper });
+    const { result } = renderHook(() => useMessages(), { wrapper });
 
     await waitFor(() => {
       expect(result.current.allReceivedMessages).toEqual(userWithWorkoutAndHistoryProfile.notificationMessages);
@@ -227,7 +227,7 @@ describe('NotificationsContext', () => {
       }),
     );
 
-    const { result } = renderHook(() => useNotifications(), { wrapper });
+    const { result } = renderHook(() => useMessages(), { wrapper });
 
     await waitFor(() => {
       expect(result.current.allReceivedMessages).toEqual([]);
@@ -259,7 +259,7 @@ describe('NotificationsContext', () => {
       }),
     );
 
-    const { result } = renderHook(() => useNotifications(), { wrapper });
+    const { result } = renderHook(() => useMessages(), { wrapper });
 
     await waitFor(() => {
       expect(result.current.unreadMessages).toHaveLength(1);

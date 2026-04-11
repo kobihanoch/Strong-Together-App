@@ -3,10 +3,7 @@ import React from 'react';
 import { act, renderHook, waitFor } from '@testing-library/react-native';
 import { beforeEach, describe, expect, it, jest } from '@jest/globals';
 import { AxiosError } from 'axios';
-import {
-  userWithWorkoutAndHistoryProfile,
-  userWithoutWorkoutProfile,
-} from '../../../tests/fixtures/userProfiles';
+import { userWithWorkoutAndHistoryProfile, userWithoutWorkoutProfile } from '../../../../tests/fixtures/userProfiles';
 
 jest.mock('axios', () => ({
   AxiosError: class AxiosError extends Error {},
@@ -22,9 +19,8 @@ const mockClearRefreshToken = jest.fn<() => Promise<void>>();
 const mockRefreshAndRotateTokens =
   jest.fn<() => Promise<{ accessToken: string; refreshToken: string; userId: string }>>();
 const mockFetchSelfUserData = jest.fn<() => Promise<typeof userWithWorkoutAndHistoryProfile.user>>();
-const mockGetUserMessages = jest.fn<
-  () => Promise<{ messages: typeof userWithWorkoutAndHistoryProfile.notificationMessages }>
->();
+const mockGetUserMessages =
+  jest.fn<() => Promise<{ messages: typeof userWithWorkoutAndHistoryProfile.notificationMessages }>>();
 const mockUpdateMsgReadStatus = jest.fn<(msgId: string) => Promise<string>>();
 const mockDeleteMessage = jest.fn<(msgId: string) => Promise<void>>();
 const mockRegisterToMessagesListener = jest.fn<(setter: unknown) => () => void>();
@@ -69,8 +65,8 @@ jest.mock('expo-constants', () => ({
   },
 }));
 
-jest.mock('../../../cache/cacheUtils', () => {
-  const actual = jest.requireActual('../../../cache/cacheUtils') as Record<string, unknown>;
+jest.mock('../../../../cache/cacheUtils', () => {
+  const actual = jest.requireActual('../../../../cache/cacheUtils') as Record<string, unknown>;
   return {
     ...actual,
     cacheGetJSON: (key: string) => mockCacheGetJSON(key),
@@ -80,60 +76,60 @@ jest.mock('../../../cache/cacheUtils', () => {
   };
 });
 
-jest.mock('../../../utils/tokenStore', () => ({
+jest.mock('../../../../utils/tokenStore', () => ({
   getRefreshToken: () => mockGetRefreshToken(),
   saveRefreshToken: (token: string) => mockSaveRefreshToken(token),
   clearRefreshToken: () => mockClearRefreshToken(),
 }));
 
-jest.mock('../../../services/AuthService', () => ({
+jest.mock('../../../../services/AuthService', () => ({
   refreshAndRotateTokens: () => mockRefreshAndRotateTokens(),
   loginUser: jest.fn(),
   logoutUser: jest.fn(),
   registerUser: jest.fn(),
 }));
 
-jest.mock('../../../services/UserService', () => ({
+jest.mock('../../../../services/UserService', () => ({
   fetchSelfUserData: () => mockFetchSelfUserData(),
 }));
 
-jest.mock('../../../services/MessagesService', () => ({
+jest.mock('../../services/messages.service', () => ({
   getUserMessages: () => mockGetUserMessages(),
   updateMsgReadStatus: (msgId: string) => mockUpdateMsgReadStatus(msgId),
   deleteMessage: (msgId: string) => mockDeleteMessage(msgId),
 }));
 
-jest.mock('../../../webSockets/socketConfig', () => ({
+jest.mock('../../../../webSockets/socketConfig', () => ({
   connectSocket: (username: string) => mockConnectSocket(username),
   disconnectSocket: () => mockDisconnectSocket(),
 }));
 
-jest.mock('../../../webSockets/socketListeners', () => ({
+jest.mock('../../../../webSockets/socketListeners', () => ({
   registerToMessagesListener: (setter: unknown) => mockRegisterToMessagesListener(setter),
 }));
 
-jest.mock('../../../hooks/useNetworkStatus', () => ({
+jest.mock('../../../../hooks/useNetworkStatus', () => ({
   useNetworkStatus: () => mockUseNetworkStatus(),
 }));
 
-jest.mock('../../../hooks/oAuth/useGoogleAuth', () => ({
+jest.mock('../../../../hooks/oAuth/useGoogleAuth', () => ({
   useGoogleAuth: () => ({
     signInWithGoogle: jest.fn(),
   }),
 }));
 
-jest.mock('../../../hooks/oAuth/useAppleAuth', () => ({
+jest.mock('../../../../hooks/oAuth/useAppleAuth', () => ({
   useAppleAuth: () => ({
     signInWithApple: jest.fn(),
   }),
 }));
 
-jest.mock('../../../api/bootstrapApi', () => ({
+jest.mock('../../../../api/bootstrapApi', () => ({
   hasBootstrapPayload: () => mockHasBootstrapPayload(),
   resetBootstrap: () => mockResetBootstrap(),
 }));
 
-jest.mock('../../../utils/authUtils', () => ({
+jest.mock('../../../../utils/authUtils', () => ({
   __esModule: true,
   default: {
     setAccessToken: (token: string | null) => mockSetAccessToken(token),
@@ -142,24 +138,24 @@ jest.mock('../../../utils/authUtils', () => ({
   },
 }));
 
-import { AuthProvider, useAuth } from '../../../context/AuthContext';
-import { GlobalAppLoadingProvider } from '../../../context/GlobalAppLoadingContext';
-import { NotificationsProvider, useNotifications } from '../../../context/NotificationsContext';
-import useInboxLogic from '../useInboxLogic';
+import { AuthProvider, useAuth } from '../../../../context/AuthContext';
+import { GlobalAppLoadingProvider } from '../../../../context/GlobalAppLoadingContext';
+import { MessagesProvider, useMessages } from '../../providers/MessagesProvider';
+import useInboxLogic from '../use-inbox-logic.hook';
 
 const wrapper = ({ children }: { children: React.ReactNode }) => (
   <GlobalAppLoadingProvider>
     <AuthProvider>
-      <NotificationsProvider>{children}</NotificationsProvider>
+      <MessagesProvider>{children}</MessagesProvider>
     </AuthProvider>
   </GlobalAppLoadingProvider>
 );
 
 const useIntegratedInboxLogic = () => {
   const auth = useAuth();
-  const notifications = useNotifications();
+  const messages = useMessages();
   const inbox = useInboxLogic();
-  return { auth, notifications, inbox };
+  return { auth, messages, inbox };
 };
 
 const createDeferred = <T,>() => {
@@ -222,7 +218,9 @@ describe('useInboxLogic integration', () => {
     });
 
     const userDeferred = createDeferred<typeof userWithWorkoutAndHistoryProfile.user>();
-    const messagesDeferred = createDeferred<{ messages: typeof userWithWorkoutAndHistoryProfile.notificationMessages }>();
+    const messagesDeferred = createDeferred<{
+      messages: typeof userWithWorkoutAndHistoryProfile.notificationMessages;
+    }>();
 
     mockFetchSelfUserData.mockReturnValue(userDeferred.promise);
     mockGetUserMessages.mockReturnValue(messagesDeferred.promise);
@@ -256,7 +254,7 @@ describe('useInboxLogic integration', () => {
 
     expect(result.current.inbox.allReceivedMessages).toEqual(userWithoutWorkoutProfile.notificationMessages);
     expect(result.current.inbox.unreadMessagesCount).toBe(0);
-    expect(result.current.notifications.loadingMessages).toBe(false);
+    expect(result.current.messages.loadingMessages).toBe(false);
     expect(mockRegisterToMessagesListener).toHaveBeenCalledTimes(1);
 
     unmount();
@@ -281,7 +279,9 @@ describe('useInboxLogic integration', () => {
     });
 
     expect(result.current.inbox.unreadMessagesCount).toBe(1);
-    expect(result.current.notifications.unreadMessages).toEqual([userWithWorkoutAndHistoryProfile.notificationMessages[0]]);
+    expect(result.current.messages.unreadMessages).toEqual([
+      userWithWorkoutAndHistoryProfile.notificationMessages[0],
+    ]);
   });
 
   it('marks a message as read through the service and updates unreadMessages locally', async () => {
@@ -347,7 +347,9 @@ describe('useInboxLogic integration', () => {
 
     expect(mockDialogHide).toHaveBeenCalled();
     expect(mockDeleteMessage).toHaveBeenCalledWith(userWithWorkoutAndHistoryProfile.notificationMessages[0].id);
-    expect(result.current.inbox.allReceivedMessages).toEqual([userWithWorkoutAndHistoryProfile.notificationMessages[1]]);
+    expect(result.current.inbox.allReceivedMessages).toEqual([
+      userWithWorkoutAndHistoryProfile.notificationMessages[1],
+    ]);
     expect(result.current.inbox.unreadMessagesCount).toBe(0);
   });
 });

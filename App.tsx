@@ -11,7 +11,7 @@ import { Inter_400Regular, Inter_500Medium, Inter_600SemiBold, Inter_700Bold } f
 
 import { WorkoutHistoryProvider } from './features/workouts/shared/providers/WorkoutHistoryProvider';
 import { AuthProvider, useAuth } from './context/AuthContext';
-import { NotificationsProvider } from './context/NotificationsContext';
+import { MessagesProvider } from './features/messages/providers/MessagesProvider';
 import { WorkoutPlanProvider } from './features/workouts/shared/providers/WorkoutPlanProvider';
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -27,7 +27,7 @@ import { CardioProvider } from './features/workouts/shared/providers/CardioProvi
 import { GlobalAppLoadingProvider } from './context/GlobalAppLoadingContext';
 import AppStack from './navigation/AppStack';
 import AuthStack from './navigation/AuthStack';
-import NotificationsSetup from './notifications/NotificationsSetup';
+import NotificationsSetup from './features/settings/setup/notifications-setup.setup';
 import Sentry from './sentry';
 
 // ---------- Fonts Loader Hook ----------
@@ -134,7 +134,7 @@ function RootNavigator() {
 // ---------- App branch wrapped with app-scoped providers ----------
 function AppWithProviders() {
   return (
-    <NotificationsProvider>
+    <MessagesProvider>
       <WorkoutPlanProvider>
         <WorkoutHistoryProvider>
           <CardioProvider>
@@ -142,7 +142,7 @@ function AppWithProviders() {
           </CardioProvider>
         </WorkoutHistoryProvider>
       </WorkoutPlanProvider>
-    </NotificationsProvider>
+    </MessagesProvider>
   );
 }
 

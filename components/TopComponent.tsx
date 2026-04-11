@@ -10,7 +10,7 @@ import { RFValue } from 'react-native-responsive-fontsize';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useAuth } from '../context/AuthContext';
 import { useGlobalAppLoadingContext } from '../context/GlobalAppLoadingContext';
-import { useNotifications } from '../context/NotificationsContext';
+import { useMessages } from '../features/messages/providers/MessagesProvider';
 import { AppUser } from '../context/types/authContextTypes.dto';
 import { RootParamList } from '../navigation/types/appStackTypes';
 
@@ -19,7 +19,7 @@ const { width, height } = Dimensions.get('window');
 const TopComponent = () => {
   // Context
   const { user, isWorkoutMode } = useAuth();
-  const { unreadMessages } = useNotifications();
+  const { unreadMessages } = useMessages();
   const { isLoading } = useGlobalAppLoadingContext();
 
   // Navigation

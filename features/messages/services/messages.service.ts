@@ -1,10 +1,6 @@
-import api from '../api/api';
+import api from '../../../api/api';
 import { DeleteMessageParams, GetAllUserMessagesQuery, MarkMessageAsReadParams } from '@strong-together/shared';
-import {
-  DeleteMessageResponse,
-  GetAllUserMessagesResponse,
-  MarkMessageAsReadResponse,
-} from '@strong-together/shared';
+import { DeleteMessageResponse, GetAllUserMessagesResponse, MarkMessageAsReadResponse } from '@strong-together/shared';
 
 export const updateMsgReadStatus = async (
   msgId: MarkMessageAsReadParams['id'],

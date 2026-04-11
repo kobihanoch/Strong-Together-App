@@ -6,7 +6,7 @@ import { useAuth } from '../context/AuthContext';
 import Analytics from '../features/workouts/analytics/screen/Analytics';
 import CreateWorkout from '../features/workouts/editor/screen/CreateWorkout';
 import Home from '../screens/Home';
-import Inbox from '../screens/Inbox';
+import Inbox from '../features/messages/screen/Inbox';
 import MyWorkoutPlan from '../features/workouts/plan/screen/MyWorkoutPlan';
 import Profile from '../features/profile/screen/Profile';
 import Settings from '../screens/Settings';
