@@ -1,16 +1,16 @@
 import { AerobicsDailyRecord } from '@strong-together/shared';
 import { createContext, ReactNode, useCallback, useContext, useMemo, useState } from 'react';
-import { useAuth } from '../../../context/AuthContext';
-import { keyCardio } from '../../../cache/cacheUtils';
-import { getUserCardio } from '../cardio/services/cardio.service';
-import useCacheAndFetch from '../../../hooks/useCacheAndFetch';
-import useUpdateGlobalLoading from '../../../hooks/useUpdateGlobalLoading';
+import { useAuth } from '../../../../context/AuthContext';
+import { keyCardio } from '../../../../cache/cacheUtils';
+import { getUserCardio } from '../../cardio/services/cardio.service';
+import useCacheAndFetch from '../../../../hooks/useCacheAndFetch';
+import useUpdateGlobalLoading from '../../../../hooks/useUpdateGlobalLoading';
 import moment from 'moment';
 import {
   CardioProviderCachePayload,
   CardioProviderValue,
 } from './types/cardio-provider.types';
-import { CardioDailyMap, CardioWeeklyMap } from '../cardio/types/cardio.types';
+import { CardioDailyMap, CardioWeeklyMap } from '../../cardio/types/cardio.types';
 import { UserAerobicsResponse } from '@strong-together/shared';
 
 const CardioContext = createContext<CardioProviderValue | null>(null);

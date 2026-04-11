@@ -1,8 +1,8 @@
 import { useMemo } from 'react';
-import { useWorkoutHistoryContext } from '../../features/workouts/providers/WorkoutHistoryProvider';
+import { useWorkoutHistoryContext } from '../../features/workouts/shared/providers/WorkoutHistoryProvider';
 import { useAuth } from '../../context/AuthContext';
 import { useGlobalAppLoadingContext } from '../../context/GlobalAppLoadingContext';
-import { useWorkoutPlanContext } from '../../features/workouts/providers/WorkoutPlanProvider';
+import { useWorkoutPlanContext } from '../../features/workouts/shared/providers/WorkoutPlanProvider';
 import { HomePageData } from '../types/useHomePageTypes.dto';
 
 const useHomePageLogic = (): { data: HomePageData } => {

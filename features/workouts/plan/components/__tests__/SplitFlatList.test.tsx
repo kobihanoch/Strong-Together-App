@@ -50,7 +50,7 @@ jestObject.mock('../../hooks/use-my-workout-plan-page-logic.hook', () => ({
   useMyWorkoutPlanPageLogic: () => mockMyWorkoutPlanLogic,
 }));
 
-jestObject.mock('../../../providers/WorkoutHistoryProvider', () => ({
+jestObject.mock('../../../shared/providers/WorkoutHistoryProvider', () => ({
   useWorkoutHistoryContext: () => mockAnalysisState,
 }));
 

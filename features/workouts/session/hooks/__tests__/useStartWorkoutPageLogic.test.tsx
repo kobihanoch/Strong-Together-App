@@ -155,10 +155,10 @@ jest.mock('../../../../../errors/errorAlerts', () => ({
 }));
 
 import { keyStartWorkout, TTL_36H } from '../../../../../cache/cacheUtils';
-import { WorkoutHistoryProvider, useWorkoutHistoryContext } from '../../../providers/WorkoutHistoryProvider';
+import { WorkoutHistoryProvider, useWorkoutHistoryContext } from '../../../shared/providers/WorkoutHistoryProvider';
 import { AuthProvider, useAuth } from '../../../../../context/AuthContext';
 import { GlobalAppLoadingProvider } from '../../../../../context/GlobalAppLoadingContext';
-import { WorkoutPlanProvider, useWorkoutPlanContext } from '../../../providers/WorkoutPlanProvider';
+import { WorkoutPlanProvider, useWorkoutPlanContext } from '../../../shared/providers/WorkoutPlanProvider';
 import useStartWorkoutPageLogic from '../use-start-workout-page-logic.hook';
 
 const baseWrapper = ({ children }: { children: React.ReactNode }) => (

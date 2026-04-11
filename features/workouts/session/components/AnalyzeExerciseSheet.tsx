@@ -7,7 +7,7 @@ import { colors } from '../../../../constants/colors';
 import { getSupportedAnalysisExerciseName } from '../constants/video-analysis.constant';
 import { showErrorAlert } from '../../../../errors/errorAlerts';
 import useVideoAnalysis from '../hooks/use-video-analysis.hook';
-import type { ExerciseAnalysisOverview } from '../../screens/StartWorkout';
+import type { ExerciseAnalysisOverview } from '../screen/StartWorkout';
 import { AnalyzeVideoResultPayload, SquatRepetition } from '@strong-together/shared';
 import { ExerciseInPlan } from '@strong-together/shared';
 import {

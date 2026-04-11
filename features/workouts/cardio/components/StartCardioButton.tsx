@@ -1,7 +1,7 @@
 import React from 'react';
 import { Dimensions, StyleSheet, Text, TouchableOpacity } from 'react-native';
 import { RFValue } from 'react-native-responsive-fontsize';
-import { useCardioContext } from '../../providers/CardioProvider';
+import { useCardioContext } from '../../shared/providers/CardioProvider';
 
 const { height } = Dimensions.get('window');
 

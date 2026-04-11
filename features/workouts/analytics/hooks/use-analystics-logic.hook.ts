@@ -1,8 +1,8 @@
 import { useCallback, useMemo, useState } from 'react';
 import { keyAnalytics } from '../../../../cache/cacheUtils';
-import { useWorkoutHistoryContext } from '../../providers/WorkoutHistoryProvider';
+import { useWorkoutHistoryContext } from '../../shared/providers/WorkoutHistoryProvider';
 import { useAuth } from '../../../../context/AuthContext';
-import { useWorkoutPlanContext } from '../../providers/WorkoutPlanProvider';
+import { useWorkoutPlanContext } from '../../shared/providers/WorkoutPlanProvider';
 import { getTrackingAnalytics } from '../services/analytics.service';
 import useCacheAndFetch from '../../../../hooks/useCacheAndFetch';
 import { GetAnalyticsResponse } from '@strong-together/shared';

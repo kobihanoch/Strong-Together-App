@@ -1,12 +1,12 @@
 import React, { useCallback, useRef } from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { RFValue } from 'react-native-responsive-fontsize';
-import ExercisePickerModal from '../editor/components/ExercisePickerModal';
-import SelectedExercisesList from '../editor/components/SelectedExercisesList';
-import TopSection from '../editor/components/TopSection';
-import { colors } from '../../../constants/colors';
-import useCreateWorkoutLogic from '../editor/hooks/use-create-workout-logic.hook';
-import { SlidingBottomModalRef } from '../../../components/SlidingBottomModal';
+import ExercisePickerModal from '../components/ExercisePickerModal';
+import SelectedExercisesList from '../components/SelectedExercisesList';
+import TopSection from '../components/TopSection';
+import { colors } from '../../../../constants/colors';
+import useCreateWorkoutLogic from '../hooks/use-create-workout-logic.hook';
+import { SlidingBottomModalRef } from '../../../../components/SlidingBottomModal';
 
 //const { width, height } = Dimensions.get('window');
 

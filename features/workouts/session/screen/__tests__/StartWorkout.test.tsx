@@ -11,12 +11,12 @@ import {
   jest as jestObject,
 } from '@jest/globals';
 import { fireEvent, render, waitFor } from '@testing-library/react-native';
-import type { RootParamList } from '../../../../navigation/types/appStackTypes';
-import type { WorkoutPlanSplit } from '../../plan/types/workout-plan.types';
+import type { RootParamList } from '../../../../../navigation/types/appStackTypes';
+import type { WorkoutPlanSplit } from '../../../plan/types/workout-plan.types';
 import type {
   ResumeWorkoutCachePayload,
   StartWorkoutPageLogicReturn,
-} from '../../session/types/use-start-workout.types';
+} from '../../types/use-start-workout.types';
 import type { TrackingMapItem } from '@strong-together/shared';
 
 const mockDialogShow = jestObject.fn();
@@ -44,15 +44,15 @@ jestObject.mock('react-native-alert-notification', () => ({
   },
 }));
 
-jestObject.mock('../../session/hooks/use-start-workout-page-logic.hook', () => ({
+jestObject.mock('../../hooks/use-start-workout-page-logic.hook', () => ({
   __esModule: true,
   default: (...args: any[]) => mockUseStartWorkoutPageLogic(...args),
 }));
 
-jestObject.mock('../../session/components/TopBar', () => (props: any) => mockTopBar(props));
-jestObject.mock('../../session/components/ExercisesSection', () => (props: any) => mockExercisesSection(props));
-jestObject.mock('../../session/components/LastWorkoutData', () => (props: any) => mockLastWorkoutData(props));
-jestObject.mock('../../session/components/AnalyzeExerciseSheet', () => (props: any) => mockAnalyzeExerciseSheet(props));
+jestObject.mock('../../components/TopBar', () => (props: any) => mockTopBar(props));
+jestObject.mock('../../components/ExercisesSection', () => (props: any) => mockExercisesSection(props));
+jestObject.mock('../../components/LastWorkoutData', () => (props: any) => mockLastWorkoutData(props));
+jestObject.mock('../../components/AnalyzeExerciseSheet', () => (props: any) => mockAnalyzeExerciseSheet(props));
 
 jestObject.mock('../../../../../components/SlidingBottomModal', () => {
   const mockReact = require('react');

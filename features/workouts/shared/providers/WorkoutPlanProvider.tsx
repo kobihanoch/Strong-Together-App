@@ -1,10 +1,10 @@
 import React, { createContext, useCallback, useContext, useMemo, useState } from 'react';
-import { keyWorkoutPlan } from '../../../cache/cacheUtils';
-import useCacheAndFetch from '../../../hooks/useCacheAndFetch';
-import useUpdateGlobalLoading from '../../../hooks/useUpdateGlobalLoading';
-import { getUserWorkout } from '../plan/services/workout-plan.service';
-import { extractWorkoutSplits } from '../plan/utils/workout-plan.util';
-import { useAuth } from '../../../context/AuthContext';
+import { keyWorkoutPlan } from '../../../../cache/cacheUtils';
+import useCacheAndFetch from '../../../../hooks/useCacheAndFetch';
+import useUpdateGlobalLoading from '../../../../hooks/useUpdateGlobalLoading';
+import { getUserWorkout } from '../../plan/services/workout-plan.service';
+import { extractWorkoutSplits } from '../../plan/utils/workout-plan.util';
+import { useAuth } from '../../../../context/AuthContext';
 import { GetWholeUserWorkoutPlanResponse } from '@strong-together/shared';
 import {
   WorkoutPlanProviderCachePayload,
@@ -13,7 +13,7 @@ import {
 import {
   WorkoutPlan,
   WorkoutPlanForEdit,
-} from '../plan/types/workout-plan.types';
+} from '../../plan/types/workout-plan.types';
 
 const WorkoutPlanContext = createContext<WorkoutPlanProviderValue | null>(null);
 export const useWorkoutPlanContext = () => {

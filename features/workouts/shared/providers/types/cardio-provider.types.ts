@@ -1,5 +1,5 @@
 import { AerobicsDailyRecord } from '@strong-together/shared';
-import { CardioDailyMap, CardioWeeklyMap } from '../../cardio/types/cardio.types';
+import { CardioDailyMap, CardioWeeklyMap } from '../../../cardio/types/cardio.types';
 
 export type CardioProviderCachePayload = {
   daily: CardioDailyMap | null;

@@ -9,7 +9,7 @@ import {
   userWithWorkoutAndHistoryProfile,
   userWithWorkoutNoHistoryProfile,
   userWithoutWorkoutProfile,
-} from '../../../../tests/fixtures/userProfiles';
+} from '../../../../../tests/fixtures/userProfiles';
 import type { GetExerciseTrackingResponse } from '@strong-together/shared';
 
 jest.mock('@react-native-async-storage/async-storage', () => ({
@@ -66,21 +66,21 @@ const useCacheAndFetchMock = (
 const useUpdateGlobalLoadingMock = (key: string, value: boolean) => mockUseUpdateGlobalLoading(key, value);
 const getUserExerciseTrackingMock = () => mockGetUserExerciseTracking();
 
-jest.mock('../../../../context/AuthContext', () => ({
+jest.mock('../../../../../context/AuthContext', () => ({
   useAuth: () => mockAuthState(),
 }));
 
-jest.mock('../../../../hooks/useCacheAndFetch', () => ({
+jest.mock('../../../../../hooks/useCacheAndFetch', () => ({
   __esModule: true,
   default: useCacheAndFetchMock,
 }));
 
-jest.mock('../../../../hooks/useUpdateGlobalLoading', () => ({
+jest.mock('../../../../../hooks/useUpdateGlobalLoading', () => ({
   __esModule: true,
   default: useUpdateGlobalLoadingMock,
 }));
 
-jest.mock('../../history/services/workout-history.service', () => ({
+jest.mock('../../../history/services/workout-history.service', () => ({
   getUserExerciseTracking: getUserExerciseTrackingMock,
 }));
 

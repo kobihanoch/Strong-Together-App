@@ -2,13 +2,13 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Dimensions, StyleSheet } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 import { RFValue } from 'react-native-responsive-fontsize';
-import CalendarStripCustom from '../history/components/CalenderStripCustom';
-import CardioSection from '../cardio/components/CardioSection';
-import ExercisesFlatList from '../history/components/ExercisesFlatList';
-import TabSelect, { TabSelectHandleRef } from '../history/components/TabSelect';
-import WorkoutHeader from '../history/components/WorkoutHeader';
-import { useGlobalAppLoadingContext } from '../../../context/GlobalAppLoadingContext';
-import useStatisticsPageLogic from '../history/hooks/use-statistics-page-logic.hook';
+import CalendarStripCustom from '../components/CalenderStripCustom';
+import CardioSection from '../../cardio/components/CardioSection';
+import ExercisesFlatList from '../components/ExercisesFlatList';
+import TabSelect, { TabSelectHandleRef } from '../components/TabSelect';
+import WorkoutHeader from '../components/WorkoutHeader';
+import { useGlobalAppLoadingContext } from '../../../../context/GlobalAppLoadingContext';
+import useStatisticsPageLogic from '../hooks/use-statistics-page-logic.hook';
 
 const { width, height } = Dimensions.get('window');
 

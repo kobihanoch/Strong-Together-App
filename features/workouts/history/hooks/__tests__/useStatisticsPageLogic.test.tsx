@@ -122,9 +122,9 @@ jest.mock('../../../../../utils/authUtils', () => ({
   },
 }));
 
-import { WorkoutHistoryProvider, useWorkoutHistoryContext } from '../../../providers/WorkoutHistoryProvider';
+import { WorkoutHistoryProvider, useWorkoutHistoryContext } from '../../../shared/providers/WorkoutHistoryProvider';
 import { AuthProvider, useAuth } from '../../../../../context/AuthContext';
-import { CardioProvider, useCardioContext } from '../../../providers/CardioProvider';
+import { CardioProvider, useCardioContext } from '../../../shared/providers/CardioProvider';
 import { GlobalAppLoadingProvider } from '../../../../../context/GlobalAppLoadingContext';
 import useStatisticsPageLogic from '../use-statistics-page-logic.hook';
 

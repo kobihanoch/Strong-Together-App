@@ -35,7 +35,7 @@ jestObject.mock('react-native-vector-icons/MaterialCommunityIcons', () => {
   return ({ name }: { name: string }) => mockReact.createElement(Text, null, name);
 });
 
-jestObject.mock('../../../providers/CardioProvider', () => ({
+jestObject.mock('../../../shared/providers/CardioProvider', () => ({
   useCardioContext: () => mockCardioContext,
 }));
 

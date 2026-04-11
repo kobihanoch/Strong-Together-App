@@ -1,5 +1,5 @@
 import { ExerciseInPlan } from '@strong-together/shared';
-import { WorkoutPlan, WorkoutPlanForEdit, WorkoutPlanSplit } from '../../plan/types/workout-plan.types';
+import { WorkoutPlan, WorkoutPlanForEdit, WorkoutPlanSplit } from '../../../plan/types/workout-plan.types';
 
 export type WorkoutPlanProviderCachePayload = {
   workoutPlan: WorkoutPlan | null;

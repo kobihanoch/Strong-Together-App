@@ -1,9 +1,9 @@
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { useCallback, useMemo, useRef, useState } from 'react';
 import { cacheDeleteKey, keyStartWorkout } from '../../../../cache/cacheUtils';
-import { useWorkoutHistoryContext } from '../../providers/WorkoutHistoryProvider';
+import { useWorkoutHistoryContext } from '../../shared/providers/WorkoutHistoryProvider';
 import { useAuth } from '../../../../context/AuthContext';
-import { useWorkoutPlanContext } from '../../providers/WorkoutPlanProvider';
+import { useWorkoutPlanContext } from '../../shared/providers/WorkoutPlanProvider';
 import { showErrorAlert } from '../../../../errors/errorAlerts';
 import { unpackFromExerciseTrackingData } from '../../history/utils/workout-history-context.util';
 import { applyNotes, applyReps, applyWeight, countSetsDone, createArrayForDataBase } from '../utils/start-workout.util';

@@ -34,19 +34,19 @@ jest.mock('../../../../../context/GlobalAppLoadingContext', () => ({
   useGlobalAppLoadingContext: () => mockLoadingState,
 }));
 
-jest.mock('../../history/hooks/use-statistics-page-logic.hook', () => ({
+jest.mock('../../hooks/use-statistics-page-logic.hook', () => ({
   __esModule: true,
   default: () => mockStatisticsLogic,
 }));
 
-jest.mock('../../history/components/CalenderStripCustom', () => {
+jest.mock('../../components/CalenderStripCustom', () => {
   const ReactLocal = require('react');
   const { Text: TextLocal } = require('react-native');
   return ({ selectedDate }: { selectedDate: string }) =>
     ReactLocal.createElement(TextLocal, null, `Calendar ${selectedDate}`);
 });
 
-jest.mock('../../history/components/TabSelect', () => {
+jest.mock('../../components/TabSelect', () => {
   const ReactLocal = require('react');
   const { Text: TextLocal } = require('react-native');
   return ReactLocal.forwardRef(
@@ -61,21 +61,21 @@ jest.mock('../../history/components/TabSelect', () => {
   );
 });
 
-jest.mock('../../history/components/WorkoutHeader', () => (props: any) => {
+jest.mock('../../components/WorkoutHeader', () => (props: any) => {
   const ReactLocal = require('react');
   const { Text: TextLocal } = require('react-native');
   mockWorkoutHeader(props);
   return ReactLocal.createElement(TextLocal, null, `WorkoutHeader ${props.selectedDate}`);
 });
 
-jest.mock('../../history/components/ExercisesFlatList', () => (props: any) => {
+jest.mock('../../components/ExercisesFlatList', () => (props: any) => {
   const ReactLocal = require('react');
   const { Text: TextLocal } = require('react-native');
   mockExercisesFlatList(props);
   return ReactLocal.createElement(TextLocal, null, `Exercises ${props.data?.length ?? 0}`);
 });
 
-jest.mock('../../cardio/components/CardioSection', () => (props: any) => {
+jest.mock('../../../cardio/components/CardioSection', () => (props: any) => {
   const ReactLocal = require('react');
   const { Text: TextLocal } = require('react-native');
   mockCardioSection(props);

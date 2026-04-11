@@ -10,21 +10,21 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { RFValue } from 'react-native-responsive-fontsize';
-import Column from '../../../components/Column';
-import RenderItemExercise from '../plan/components/RenderItemExercise';
-import SplitFlatList from '../plan/components/SplitFlatList';
-import SlidingBottomModal, { SlidingBottomModalRef } from '../../../components/SlidingBottomModal';
-import { useCardioContext } from '../providers/CardioProvider';
-import { useMyWorkoutPlanPageLogic } from '../plan/hooks/use-my-workout-plan-page-logic.hook';
-import useLightStatusBar from '../../../hooks/useLightStatusBar';
-import { formatTime } from '../../../utils/statisticsUtils';
-import Row from '../../../components/Row';
-import { logUserCardio } from '../cardio/services/cardio.service';
+import Column from '../../../../components/Column';
+import RenderItemExercise from '../components/RenderItemExercise';
+import SplitFlatList from '../components/SplitFlatList';
+import SlidingBottomModal, { SlidingBottomModalRef } from '../../../../components/SlidingBottomModal';
+import { useCardioContext } from '../../shared/providers/CardioProvider';
+import { useMyWorkoutPlanPageLogic } from '../hooks/use-my-workout-plan-page-logic.hook';
+import useLightStatusBar from '../../../../hooks/useLightStatusBar';
+import { formatTime } from '../../../../utils/statisticsUtils';
+import Row from '../../../../components/Row';
+import { logUserCardio } from '../../cardio/services/cardio.service';
 import { Notifier, NotifierComponents } from 'react-native-notifier';
 import { useNavigation } from '@react-navigation/native';
-import NoWorkoutPlan from '../plan/components/NoWorkoutPlan';
+import NoWorkoutPlan from '../components/NoWorkoutPlan';
 import { StackNavigationProp } from '@react-navigation/stack';
-import { RootParamList } from '../../../navigation/types/appStackTypes';
+import { RootParamList } from '../../../../navigation/types/appStackTypes';
 import { ExerciseInPlan } from '@strong-together/shared';
 
 const { width, height } = Dimensions.get('window');

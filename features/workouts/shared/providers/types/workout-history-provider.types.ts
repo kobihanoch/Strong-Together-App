@@ -1,7 +1,7 @@
 import {
   WorkoutHistoryAnalyzedExerciseTrackingData,
   WorkoutHistoryExerciseTrackingMaps,
-} from '../../history/types/workout-history.types';
+} from '../../../history/types/workout-history.types';
 
 export type WorkoutHistoryProviderCachePayload = {
   exerciseTrackingMaps: WorkoutHistoryExerciseTrackingMaps | null;

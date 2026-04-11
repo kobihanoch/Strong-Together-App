@@ -130,10 +130,10 @@ jest.mock('../../../utils/authUtils', () => ({
   },
 }));
 
-import { WorkoutHistoryProvider } from '../../../features/workouts/providers/WorkoutHistoryProvider';
+import { WorkoutHistoryProvider } from '../../../features/workouts/shared/providers/WorkoutHistoryProvider';
 import { AuthProvider, useAuth } from '../../../context/AuthContext';
 import { GlobalAppLoadingProvider } from '../../../context/GlobalAppLoadingContext';
-import { WorkoutPlanProvider } from '../../../features/workouts/providers/WorkoutPlanProvider';
+import { WorkoutPlanProvider } from '../../../features/workouts/shared/providers/WorkoutPlanProvider';
 import useHomePageLogic from '../useHomePageLogic';
 
 const wrapper = ({ children }: { children: React.ReactNode }) => (

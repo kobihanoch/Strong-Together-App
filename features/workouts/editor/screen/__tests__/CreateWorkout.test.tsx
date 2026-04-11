@@ -4,19 +4,19 @@
 import { beforeEach, describe, expect, it, jest } from '@jest/globals';
 import { fireEvent, render } from '@testing-library/react-native';
 import React from 'react';
-import { UseCreateWorkoutLogicReturn } from '../../editor/types/use-create-workout.types';
+import { UseCreateWorkoutLogicReturn } from '../../types/use-create-workout.types';
 
 const mockOpen = jest.fn();
 const mockLogic = jest.fn();
 
 jest.mock('../CreateWorkout', () => jest.requireActual('../CreateWorkout'));
 
-jest.mock('../../editor/hooks/use-create-workout-logic.hook', () => ({
+jest.mock('../../hooks/use-create-workout-logic.hook', () => ({
   __esModule: true,
   default: () => mockLogic(),
 }));
 
-jest.mock('../../editor/components/TopSection', () => {
+jest.mock('../../components/TopSection', () => {
   const ReactLocal = require('react');
   const { Text, TouchableOpacity, View } = require('react-native');
   return function MockTopSection(props: any) {
@@ -50,7 +50,7 @@ jest.mock('../../editor/components/TopSection', () => {
   };
 });
 
-jest.mock('../../editor/components/SelectedExercisesList', () => {
+jest.mock('../../components/SelectedExercisesList', () => {
   const ReactLocal = require('react');
   const { Text, View } = require('react-native');
   return function MockSelectedExercisesList(props: any) {
@@ -62,7 +62,7 @@ jest.mock('../../editor/components/SelectedExercisesList', () => {
   };
 });
 
-jest.mock('../../editor/components/ExercisePickerModal', () => {
+jest.mock('../../components/ExercisePickerModal', () => {
   const ReactLocal = require('react');
   const { Text, View } = require('react-native');
   return ReactLocal.forwardRef((props: any, ref: any) => {

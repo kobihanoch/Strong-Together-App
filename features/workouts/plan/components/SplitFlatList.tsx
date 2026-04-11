@@ -4,7 +4,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import React, { Dispatch, SetStateAction, useCallback, useMemo, useState } from 'react';
 import { Dimensions, FlatList, NativeScrollEvent, NativeSyntheticEvent, StyleSheet, Text, View } from 'react-native';
 import { RFValue } from 'react-native-responsive-fontsize';
-import { useWorkoutHistoryContext } from '../../providers/WorkoutHistoryProvider';
+import { useWorkoutHistoryContext } from '../../shared/providers/WorkoutHistoryProvider';
 import { useMyWorkoutPlanPageLogic } from '../hooks/use-my-workout-plan-page-logic.hook';
 import { getBodyPartsForSplit } from '../utils/workout-plan.util';
 import Badge from '../../../../components/Badge';

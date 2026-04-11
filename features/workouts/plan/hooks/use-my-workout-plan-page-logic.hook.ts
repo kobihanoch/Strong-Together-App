@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { useWorkoutHistoryContext } from '../../providers/WorkoutHistoryProvider';
+import { useWorkoutHistoryContext } from '../../shared/providers/WorkoutHistoryProvider';
 import { WorkoutPlanSplit } from '../types/workout-plan.types';
-import { useWorkoutPlanContext } from '../../providers/WorkoutPlanProvider';
+import { useWorkoutPlanContext } from '../../shared/providers/WorkoutPlanProvider';
 import { ExerciseCounter } from '../types/use-my-workout-plan.types';
 
 export const useMyWorkoutPlanPageLogic = () => {

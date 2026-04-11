@@ -47,7 +47,7 @@ jestObject.mock('react-native-notifier', () => ({
   },
 }));
 
-jestObject.mock('../../cardio/services/cardio.service', () => ({
+jestObject.mock('../../../cardio/services/cardio.service', () => ({
   logUserCardio: (...args: [number, number, string]) => mockLogUserCardio(...args),
 }));
 
@@ -56,11 +56,11 @@ jestObject.mock('../../../../../hooks/useLightStatusBar', () => ({
   default: jestObject.fn(),
 }));
 
-jestObject.mock('../../plan/hooks/use-my-workout-plan-page-logic.hook', () => ({
+jestObject.mock('../../hooks/use-my-workout-plan-page-logic.hook', () => ({
   useMyWorkoutPlanPageLogic: () => mockWorkoutPlanLogic,
 }));
 
-jestObject.mock('../../providers/CardioProvider', () => ({
+jestObject.mock('../../../shared/providers/CardioProvider', () => ({
   useCardioContext: () => mockCardioContext,
 }));
 
@@ -76,7 +76,7 @@ jestObject.mock('../../../../../components/Row', () => {
   return ({ children, ...props }: any) => mockReact.createElement(RNView, props, children);
 });
 
-jestObject.mock('../../plan/components/SplitFlatList', () => {
+jestObject.mock('../../components/SplitFlatList', () => {
   const mockReact = require('react');
   const { Text: RNText, TouchableOpacity: RNTouchableOpacity, View: RNView } = require('react-native');
   return ({ openCardioModal }: { openCardioModal: (i?: number) => void }) =>
@@ -92,13 +92,13 @@ jestObject.mock('../../plan/components/SplitFlatList', () => {
     );
 });
 
-jestObject.mock('../../plan/components/RenderItemExercise', () => {
+jestObject.mock('../../components/RenderItemExercise', () => {
   const mockReact = require('react');
   const { Text: RNText } = require('react-native');
   return ({ item }: { item: ExerciseInPlan }) => mockReact.createElement(RNText, null, item.exercise);
 });
 
-jestObject.mock('../../plan/components/NoWorkoutPlan', () => {
+jestObject.mock('../../components/NoWorkoutPlan', () => {
   const mockReact = require('react');
   const { Text: RNText, TouchableOpacity: RNTouchableOpacity } = require('react-native');
   return ({ onCreatePress }: { onCreatePress: () => void }) =>

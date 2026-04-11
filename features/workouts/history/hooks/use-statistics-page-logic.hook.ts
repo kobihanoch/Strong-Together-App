@@ -1,7 +1,7 @@
 import moment from 'moment-timezone';
 import { useMemo, useState } from 'react';
-import { useWorkoutHistoryContext } from '../../providers/WorkoutHistoryProvider';
-import { useCardioContext } from '../../providers/CardioProvider';
+import { useWorkoutHistoryContext } from '../../shared/providers/WorkoutHistoryProvider';
+import { useCardioContext } from '../../shared/providers/CardioProvider';
 import { getLastWorkoutForEachExercise } from '../utils/statistics-page.utils';
 
 const useStatisticsPageLogic = () => {

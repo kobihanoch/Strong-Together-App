@@ -1,11 +1,11 @@
 import { createContext, useCallback, useContext, useMemo, useState } from 'react';
-import { keyTracking } from '../../../cache/cacheUtils';
-import useCacheAndFetch from '../../../hooks/useCacheAndFetch';
-import useUpdateGlobalLoading from '../../../hooks/useUpdateGlobalLoading';
-import { getUserExerciseTracking } from '../history/services/workout-history.service';
+import { keyTracking } from '../../../../cache/cacheUtils';
+import useCacheAndFetch from '../../../../hooks/useCacheAndFetch';
+import useUpdateGlobalLoading from '../../../../hooks/useUpdateGlobalLoading';
+import { getUserExerciseTracking } from '../../history/services/workout-history.service';
 import { GetExerciseTrackingResponse } from '@strong-together/shared';
-import { checkHasTrainedToday, unpackFromExerciseTrackingData } from '../history/utils/workout-history-context.util';
-import { useAuth } from '../../../context/AuthContext';
+import { checkHasTrainedToday, unpackFromExerciseTrackingData } from '../../history/utils/workout-history-context.util';
+import { useAuth } from '../../../../context/AuthContext';
 import {
   WorkoutHistoryProviderCachePayload,
   WorkoutHistoryProviderValue,
@@ -13,7 +13,7 @@ import {
 import {
   WorkoutHistoryAnalyzedExerciseTrackingData,
   WorkoutHistoryExerciseTrackingMaps,
-} from '../history/types/workout-history.types';
+} from '../../history/types/workout-history.types';
 
 const WorkoutHistoryContext = createContext<WorkoutHistoryProviderValue | null>(null);
 export const useWorkoutHistoryContext = () => {

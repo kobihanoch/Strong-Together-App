@@ -7,7 +7,7 @@ import { colors } from '../../../../constants/colors';
 import { isExerciseAnalysisSupported } from '../constants/video-analysis.constant';
 import { ExercisesDuringWorkout, SetCountByExercise } from '../types/use-start-workout.types';
 import useLastWorkoutExerciseTrackingData from '../../history/hooks/use-last-workout-exercise-tracking-data.hook';
-import type { CachedExerciseAnalysis, ExerciseAnalysisOverview } from '../../screens/StartWorkout';
+import type { CachedExerciseAnalysis, ExerciseAnalysisOverview } from '../screen/StartWorkout';
 import { TrackingMapItem } from '@strong-together/shared';
 import { SquatRepetition } from '@strong-together/shared';
 import { ExerciseInPlan } from '@strong-together/shared';

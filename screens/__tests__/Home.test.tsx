@@ -145,11 +145,11 @@ jestObject.mock('../../context/NotificationsContext', () => ({
   useNotifications: () => mockNotificationsState,
 }));
 
-jestObject.mock('../../features/workouts/providers/WorkoutPlanProvider', () => ({
+jestObject.mock('../../features/workouts/shared/providers/WorkoutPlanProvider', () => ({
   useWorkoutPlanContext: () => mockWorkoutState,
 }));
 
-jestObject.mock('../../features/workouts/providers/WorkoutHistoryProvider', () => ({
+jestObject.mock('../../features/workouts/shared/providers/WorkoutHistoryProvider', () => ({
   useWorkoutHistoryContext: () => mockAnalysisState,
 }));
 

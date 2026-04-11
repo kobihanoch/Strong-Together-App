@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { useWorkoutHistoryContext } from '../../providers/WorkoutHistoryProvider';
+import { useWorkoutHistoryContext } from '../../shared/providers/WorkoutHistoryProvider';
 import { ExerciseToWorkoutSplitEntity } from '@strong-together/shared';
 import { TrackingMapItem } from '@strong-together/shared';
 
