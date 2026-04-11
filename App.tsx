@@ -9,26 +9,26 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 import { Inter_400Regular, Inter_500Medium, Inter_600SemiBold, Inter_700Bold } from '@expo-google-fonts/inter';
 
-import { WorkoutHistoryProvider } from './features/workouts/shared/providers/WorkoutHistoryProvider';
-import { AuthProvider, useAuth } from './features/auth/providers/AuthProvider';
-import { MessagesProvider } from './features/messages/providers/MessagesProvider';
-import { WorkoutPlanProvider } from './features/workouts/shared/providers/WorkoutPlanProvider';
+import { WorkoutHistoryProvider } from './features/authenticated-user/workouts/shared/providers/WorkoutHistoryProvider';
+import { MessagesProvider } from './features/authenticated-user/messages/providers/MessagesProvider';
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Constants from 'expo-constants';
 import { MaterialCommunityIcons as ExpoMaterialCommunityIcons } from '@expo/vector-icons';
 import { NotifierRoot } from 'react-native-notifier';
-import ensureDpopKeyPair from './api/dpop/ensureDpopKeyPair';
+import ensureDpopKeyPair from './infrastructure/api/dpop/ensureDpopKeyPair';
 import { cacheHousekeepingOnBoot } from './infrastructure/cache/cache.utils';
-import BottomTabBar from './components/BottomTabBar';
-import Theme1 from './components/Theme1';
-import UpdateAppModal from './components/UpdateAppModal';
-import { CardioProvider } from './features/workouts/shared/providers/CardioProvider';
-import { GlobalAppLoadingProvider } from './context/GlobalAppLoadingContext';
-import AppStack from './navigation/AppStack';
-import AuthStack from './features/auth/navigation/AuthStack';
-import NotificationsSetup from './features/settings/push-notifications-setup/notifications-setup.setup';
+import BottomTabBar from './shared/components/BottomTabBar';
+import Theme1 from './shared/components/Theme1';
+import UpdateAppModal from './shared/components/UpdateAppModal';
+import { CardioProvider } from './features/authenticated-user/workouts/shared/providers/CardioProvider';
+import AppStack from './features/authenticated-user/shared/navigation/AppStack';
+import AuthStack from './features/shared/navigation/AuthStack';
+import NotificationsSetup from './features/authenticated-user/settings/push-notifications-setup/notifications-setup.setup';
 import Sentry from './infrastructure/sentry';
+import { GlobalAppLoadingProvider } from './shared/providers/GlobalAppLoadingProvider';
+import { AuthProvider, useAuth } from './features/guest-user/auth/shared/providers/AuthProvider';
+import { WorkoutPlanProvider } from './features/authenticated-user/workouts/shared/providers/WorkoutPlanProvider';
 
 // ---------- Fonts Loader Hook ----------
 function useFontsReady() {

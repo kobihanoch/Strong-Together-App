@@ -1,0 +1,98 @@
+import React, { useCallback, useRef } from 'react';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { RFValue } from 'react-native-responsive-fontsize';
+import ExercisePickerModal from '../components/ExercisePickerModal';
+import SelectedExercisesList from '../components/SelectedExercisesList';
+import TopSection from '../components/TopSection';
+import { colors } from '../../../../../shared/constants/colors';
+import useCreateWorkoutLogic from '../hooks/use-create-workout-logic.hook';
+import { SlidingBottomModalRef } from '../../../../../shared/components/SlidingBottomModal';
+
+//const { width, height } = Dimensions.get('window');
+
+const CreateWorkout = () => {
+  // Pull flags and actions from context
+  const {
+    splitsList,
+    availableExercises,
+    allExercises,
+    muscles,
+    saveWorkout,
+    controls,
+    hasWorkout,
+    setSelectedSplit,
+    selectedSplit,
+    exerciseCountMap,
+    totalExercises,
+    exForSplit,
+  } = useCreateWorkoutLogic();
+
+  const pickerRef = useRef<SlidingBottomModalRef | null>(null);
+  const openPicker = useCallback(() => {
+    pickerRef.current?.open?.(1);
+  }, [pickerRef]);
+
+  return (
+    <View style={styles.container}>
+      {/*Top section */}
+      <TopSection
+        hasWorkout={hasWorkout}
+        splitsList={splitsList}
+        setSelectedSplit={setSelectedSplit}
+        selectedSplit={selectedSplit}
+        exerciseCountMap={exerciseCountMap}
+        totalExercises={totalExercises}
+        addSplit={controls.addSplit}
+        removeSplit={controls.removeSplit}
+        saveWorkout={saveWorkout}
+      />
+      {/* Exercises list */}
+      <SelectedExercisesList exForSplit={exForSplit} controls={controls} selectedSplit={selectedSplit} />
+
+      {/* Sliding bottom-sheet modal */}
+      <TouchableOpacity style={styles.openExercisesModalBtn} onPress={openPicker}>
+        <Text style={styles.plusText}>+</Text>
+      </TouchableOpacity>
+      <ExercisePickerModal
+        ref={pickerRef}
+        selectedSplit={selectedSplit}
+        controls={controls}
+        availableExercises={availableExercises} // Mao
+        allExercises={allExercises} // Flat
+        muscles={muscles}
+        exForSplit={exForSplit}
+      />
+    </View>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+  openExercisesModalBtn: {
+    backgroundColor: colors.primary,
+    height: 60,
+    aspectRatio: 1,
+    borderRadius: 80,
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: colors.primary,
+    shadowOpacity: 0.4,
+    shadowRadius: 5,
+    shadowOffset: { width: 0, height: 0 },
+    // Android shadow
+    elevation: 6,
+    position: 'absolute',
+    bottom: 20,
+    right: 20,
+  },
+  plusText: {
+    color: 'white',
+    fontSize: RFValue(25),
+  },
+});
+
+export default CreateWorkout;
+
+

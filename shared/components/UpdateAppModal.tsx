@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Modal, Text, View, TouchableOpacity, Linking } from 'react-native';
 import { RFValue } from 'react-native-responsive-fontsize';
-import { registerUpdateModal, unregisterUpdateModal } from '../utils/imperativeUpdateModal';
+import { registerUpdateModal, unregisterUpdateModal } from '../utils/imperative-update-modal';
 
 export default function UpdateAppModal() {
   const [open, setOpen] = useState<boolean>(false);

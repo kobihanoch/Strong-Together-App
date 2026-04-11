@@ -1,8 +1,8 @@
 // English-only comments inside code
 import { io, Socket } from 'socket.io-client';
-import api from '../api/api';
-import { API_BASE_URL } from '../api/api-url.config';
-import { AppUser } from '../features/auth/providers/types/auth-context.types';
+import api from '../infrastructure/api/api';
+import { API_BASE_URL } from '../infrastructure/api/api-url.config';
+import { AppUser } from '../features/guest-user/auth/shared/types/auth.types';
 
 let socket: Socket | null = null;
 

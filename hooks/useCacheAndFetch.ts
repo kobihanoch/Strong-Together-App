@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { TTL_48H } from '../infrastructure/cache/cache.utils';
-import { AppUser } from '../context/types/authContextTypes.dto';
+import { AppUser } from '../features/guest-user/auth/shared/types/auth.types';
 import useGetCache from './useGetCache';
 import useUpdateCache from './useUpdateCache';
 

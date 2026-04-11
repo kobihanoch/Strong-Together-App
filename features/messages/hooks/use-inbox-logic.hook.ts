@@ -1,0 +1,57 @@
+import { useCallback } from 'react';
+import { ALERT_TYPE, Dialog } from 'react-native-alert-notification';
+import { useMessages } from '../providers/MessagesProvider';
+import { deleteMessage, updateMsgReadStatus } from '../services/messages.service';
+import { MessageEntity } from '@strong-together/shared';
+import { UserMessages } from '../types/messages.types';
+
+const useInboxLogic = () => {
+  const { allReceivedMessages, setAllReceivedMessages, unreadMessages } = useMessages();
+
+  const unreadMessagesCount = unreadMessages?.length;
+
+  const markAsRead = useCallback(async (msgId: MessageEntity['id']): Promise<void> => {
+    await updateMsgReadStatus(msgId);
+    // Update state
+    setAllReceivedMessages((prev: UserMessages) =>
+      prev.map((m: UserMessages[number]) => (m.id === msgId ? { ...m, is_read: true } : m)),
+    );
+  }, []);
+
+  const confirmAndDeleteMessage = useCallback((msgId: MessageEntity['id']): void => {
+    let pressedYes = false;
+
+    Dialog.show({
+      type: ALERT_TYPE.WARNING,
+      title: 'Delete Message',
+      textBody: 'Are you sure you want to delete this message?',
+      button: 'Yes',
+      closeOnOverlayTap: true,
+      onPressButton: async () => {
+        pressedYes = true;
+        Dialog.hide();
+        try {
+          await deleteMessage(msgId);
+          setAllReceivedMessages((prev: UserMessages) =>
+            prev.filter((m: UserMessages[number]) => m.id !== msgId),
+          );
+        } catch (err) {
+          console.log('Delete failed:', err);
+        }
+      },
+      onHide: () => {
+        if (!pressedYes) {
+        }
+      },
+    });
+  }, []);
+
+  return {
+    allReceivedMessages,
+    unreadMessagesCount,
+    confirmAndDeleteMessage,
+    markAsRead,
+  };
+};
+
+export default useInboxLogic;

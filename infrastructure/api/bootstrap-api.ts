@@ -1,8 +1,8 @@
 import axios, { AxiosError, InternalAxiosRequestConfig } from 'axios';
 import Constants from 'expo-constants';
-import { showErrorAlert } from '../errors/errorAlerts';
+import { showErrorAlert } from '../../shared/errors/error-alerts';
 import { BootstrapResponse } from '@strong-together/shared';
-import { openUpdateModal } from '../utils/imperativeUpdateModal';
+import { openUpdateModal } from '../../shared/utils/imperative-update-modal';
 import { API_BASE_URL } from './api-url.config';
 import buildDpopProof from './dpop/buildDpopProof';
 import { uuidv4 } from 'react-native-compressor';

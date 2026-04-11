@@ -67,41 +67,41 @@ jest.mock('react-native-notifier', () => ({
   NotifierRoot: () => null,
 }));
 
-jest.mock('../api/DPoP/ensureDpopKeyPair', () => ({
+jest.mock('../infrastructure/api/dpop/ensureDpopKeyPair', () => ({
   __esModule: true,
   default: () => mockEnsureDpopKeyPair(),
 }));
 
-jest.mock('../cache/cacheUtils', () => ({
+jest.mock('../infrastructure/cache/cache.utils', () => ({
   cacheHousekeepingOnBoot: () => mockCacheHousekeepingOnBoot(),
 }));
 
-jest.mock('../context/AuthContext', () => ({
+jest.mock('../features/guest-user/auth/shared/providers/AuthProvider', () => ({
   AuthProvider: ({ children }: { children: React.ReactNode }) => children,
   useAuth: () => mockAuthState(),
 }));
 
-jest.mock('../context/GlobalAppLoadingContext', () => ({
+jest.mock('../shared/providers/GlobalAppLoadingProvider', () => ({
   GlobalAppLoadingProvider: ({ children }: { children: React.ReactNode }) => children,
 }));
 
-jest.mock('../features/messages/providers/MessagesProvider', () => ({
+jest.mock('../features/authenticated-user/messages/providers/MessagesProvider', () => ({
   MessagesProvider: ({ children }: { children: React.ReactNode }) => children,
 }));
 
-jest.mock('../features/workouts/shared/providers/WorkoutPlanProvider', () => ({
+jest.mock('../features/authenticated-user/workouts/shared/providers/WorkoutPlanProvider', () => ({
   WorkoutPlanProvider: ({ children }: { children: React.ReactNode }) => children,
 }));
 
-jest.mock('../features/workouts/shared/providers/WorkoutHistoryProvider', () => ({
+jest.mock('../features/authenticated-user/workouts/shared/providers/WorkoutHistoryProvider', () => ({
   WorkoutHistoryProvider: ({ children }: { children: React.ReactNode }) => children,
 }));
 
-jest.mock('../features/workouts/shared/providers/CardioProvider', () => ({
+jest.mock('../features/authenticated-user/workouts/shared/providers/CardioProvider', () => ({
   CardioProvider: ({ children }: { children: React.ReactNode }) => children,
 }));
 
-jest.mock('../navigation/AuthStack', () => {
+jest.mock('../features/guest-user/shared/navigation/AuthStack', () => {
   const ReactLocal = require('react');
   const { Text: TextLocal } = require('react-native');
   return {
@@ -110,7 +110,7 @@ jest.mock('../navigation/AuthStack', () => {
   };
 });
 
-jest.mock('../navigation/AppStack', () => {
+jest.mock('../features/authenticated-user/shared/navigation/AppStack', () => {
   const ReactLocal = require('react');
   const { Text: TextLocal } = require('react-native');
   return {
@@ -119,7 +119,7 @@ jest.mock('../navigation/AppStack', () => {
   };
 });
 
-jest.mock('../features/settings/push-notifications-setup/notifications-setup.setup', () => {
+jest.mock('../features/authenticated-user/settings/push-notifications-setup/notifications-setup.setup', () => {
   const ReactLocal = require('react');
   const { Text: TextLocal } = require('react-native');
   return {
@@ -128,7 +128,7 @@ jest.mock('../features/settings/push-notifications-setup/notifications-setup.set
   };
 });
 
-jest.mock('../components/BottomTabBar', () => {
+jest.mock('../shared/components/BottomTabBar', () => {
   const ReactLocal = require('react');
   const { Text: TextLocal } = require('react-native');
   return {
@@ -137,12 +137,12 @@ jest.mock('../components/BottomTabBar', () => {
   };
 });
 
-jest.mock('../components/Theme1', () => ({
+jest.mock('../shared/components/Theme1', () => ({
   __esModule: true,
   default: ({ children }: { children: React.ReactNode }) => children,
 }));
 
-jest.mock('../components/UpdateAppModal', () => {
+jest.mock('../shared/components/UpdateAppModal', () => {
   const ReactLocal = require('react');
   const { Text: TextLocal } = require('react-native');
   return {

@@ -1,10 +1,13 @@
 import type {
   WorkoutHistoryAnalyzedExerciseTrackingData,
   WorkoutHistoryExerciseTrackingMaps,
-} from '../../features/workouts/history/types/workout-history.types';
-import type { CardioDailyMap, CardioWeeklyMap } from '../../features/workouts/cardio/types/cardio.types';
-import type { MessagesAllReceivedMessages } from '../../features/messages/types/messages.types';
-import type { AppUser } from '../../context/types/authContextTypes.dto';
+} from '../../features/authenticated-user/workouts/history/types/workout-history.types';
+import type {
+  CardioDailyMap,
+  CardioWeeklyMap,
+} from '../../features/authenticated-user/workouts/cardio/types/cardio.types';
+import type { UserMessages } from '../../features/authenticated-user/messages/types/messages.types';
+import type { AppUser } from '../../features/guest-user/auth/shared/types/auth.types';
 import type { WholeUserWorkoutPlan, WorkoutSplitsMap } from '@strong-together/shared';
 
 export interface UserTestProfile {
@@ -16,7 +19,7 @@ export interface UserTestProfile {
   analyzedExerciseTrackingData: WorkoutHistoryAnalyzedExerciseTrackingData | null;
   cardioDailyMap: CardioDailyMap | null;
   cardioWeeklyMap: CardioWeeklyMap | null;
-  notificationMessages: MessagesAllReceivedMessages;
+  notificationMessages: UserMessages;
 }
 
 const baseUser: AppUser = {
@@ -237,9 +240,9 @@ const baseCardioWeeklyMap: CardioWeeklyMap = {
   },
 };
 
-const emptyNotificationMessages: MessagesAllReceivedMessages = [];
+const emptyNotificationMessages: UserMessages = [];
 
-const baseNotificationMessages: MessagesAllReceivedMessages = [
+const baseNotificationMessages: UserMessages = [
   {
     id: 'msg-1',
     subject: 'Workout reminder',
@@ -361,8 +364,8 @@ const cloneCardioWeeklyMap = (): CardioWeeklyMap => ({
   },
 });
 
-const cloneNotificationMessages = (): MessagesAllReceivedMessages =>
-  baseNotificationMessages.map((message) => ({
+const cloneNotificationMessages = (): UserMessages =>
+  baseNotificationMessages.map((message: UserMessages[number]) => ({
     ...message,
   }));
 

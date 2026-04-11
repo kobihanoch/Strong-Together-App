@@ -1,0 +1,200 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { Accordion } from '@animatereactnative/accordion';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native';
+import { Image } from 'expo-image';
+import { LinearGradient } from 'expo-linear-gradient';
+import React, { useCallback, useMemo } from 'react';
+import { Dimensions, FlatList, StyleSheet, Text } from 'react-native';
+import { RFValue } from 'react-native-responsive-fontsize';
+import { colors } from '../../../../../shared/constants/colors';
+import { TrackingMapItem } from '@strong-together/shared';
+import Column from '../../../../../shared/components/Column';
+import Images from '../../../../../shared/components/Images';
+import Row from '../../../../../shared/components/Row';
+import RestDayCard from './RestDayCard';
+import StatsTable from './StatsTable';
+import { StackNavigationProp } from '@react-navigation/stack';
+import { RootParamList } from '../../../shared/navigation/types/appStackTypes';
+
+const { width, height } = Dimensions.get('window');
+
+type ExerciseDataProps = {
+  exData: Omit<TrackingMapItem, 'workoutdate'>;
+  lastPerformanceData: (TrackingMapItem & {
+    isLastWorkout: boolean;
+  })[];
+};
+
+const ExerciseItem = ({ exData, lastPerformanceData }: ExerciseDataProps) => {
+  const mainMuscle = exData?.exercisetoworkoutsplit.exercises.targetmuscle as keyof typeof Images;
+  const specificMuscle = exData?.exercisetoworkoutsplit?.exercises?.specifictargetmuscle;
+  const imagePath = mainMuscle && specificMuscle ? (Images[mainMuscle] as Record<string, any>)[specificMuscle] : null;
+  const lastLogOfEx = useMemo(() => {
+    if (lastPerformanceData) {
+      const [last] = lastPerformanceData.filter((ex) => ex.exercisetosplit_id === exData.exercisetosplit_id);
+      if (last) return { lastReps: last.reps, lastWeight: last.weight };
+    }
+    return { lastReps: [], lastWeight: [] };
+  }, [lastPerformanceData]);
+
+  const { lastReps, lastWeight } = lastLogOfEx;
+
+  const curReps = exData?.reps;
+  const curWeight = exData?.weight;
+
+  const rows = curWeight.map((_, i) => {
+    const reps = curReps[i];
+    const weight = curWeight[i];
+    const prevR = lastReps[i];
+    const prevW = lastWeight[i];
+    return {
+      setNo: i + 1,
+      // Show empty string when missing, not 0
+      reps: reps,
+      repsDelta: reps - prevR, // null â†’ pill not rendered
+      weight: weight,
+      weightDelta: weight - prevW, // null â†’ pill not rendered
+    };
+  });
+
+  return (
+    <Accordion.Accordion style={styles.itemContainer}>
+      <Accordion.Header>
+        {/* Header */}
+        <Row style={{ width: '100%', alignItems: 'center' }}>
+          {/* Left group: image + text */}
+          <Row style={{ flex: 1, alignItems: 'center', gap: 12 }}>
+            <LinearGradient
+              colors={['#fafafaff', '#f1f8ffff']}
+              start={[0, 0]}
+              end={[1, 1]}
+              style={styles.imageContainer}
+            >
+              <Image
+                source={imagePath}
+                cachePolicy="disk"
+                contentFit="contain" // keep proportions, no stretching
+                style={{ width: '100%', height: '100%' }} // let the container size it
+              />
+            </LinearGradient>
+
+            <Column style={{ flex: 1, gap: 6 }}>
+              <Text style={styles.exerciseTitle} numberOfLines={1}>
+                {exData.exercise}
+              </Text>
+              <Text style={styles.pressableText}>Tap to toggle information</Text>
+            </Column>
+          </Row>
+
+          {/* Right: chevron */}
+          <Accordion.HeaderIcon>
+            <MaterialCommunityIcons name="chevron-down" size={RFValue(20)} color="black" />
+          </Accordion.HeaderIcon>
+        </Row>
+      </Accordion.Header>
+
+      {/* Expanded content inside the tab */}
+      <Accordion.Expanded style={{ marginTop: 20 }}>
+        {/* Stats table */}
+        <StatsTable rows={rows}></StatsTable>
+        <Row
+          style={{
+            marginTop: 10,
+            marginLeft: 5,
+            alignItems: 'flex-start',
+            gap: 10,
+          }}
+        >
+          <Text style={styles.notesHeader}>Notes:</Text>
+          <Text style={styles.notes}>{exData?.notes}</Text>
+        </Row>
+      </Accordion.Expanded>
+    </Accordion.Accordion>
+  );
+};
+
+type ExercisesFlatListProps = {
+  data: Omit<TrackingMapItem, 'workoutdate'>[] | undefined;
+  dataToCompare: (TrackingMapItem & {
+    isLastWorkout: boolean;
+  })[];
+};
+
+const ExercisesFlatList = ({ data, dataToCompare }: ExercisesFlatListProps) => {
+  const nav = useNavigation<StackNavigationProp<RootParamList>>();
+
+  const renderItem = useCallback(
+    ({ item }: { item: Omit<TrackingMapItem, 'workoutdate'> }) => {
+      return <ExerciseItem exData={item} lastPerformanceData={dataToCompare}></ExerciseItem>;
+    },
+    [dataToCompare],
+  );
+
+  return data && data.length ? (
+    <Column>
+      <FlatList
+        data={data}
+        keyExtractor={(item) => item.exercisetosplit_id.toString()}
+        renderItem={renderItem}
+        contentContainerStyle={{ padding: 10 }}
+        initialNumToRender={4}
+        windowSize={5}
+        removeClippedSubviews
+        showsHorizontalScrollIndicator={false}
+        scrollEnabled={false}
+        ItemSeparatorComponent={() => <Column style={{ height: 10 }} />}
+      />
+    </Column>
+  ) : (
+    <RestDayCard
+      onPlanPress={() => {
+        nav.navigate('MyWorkoutPlan');
+      }}
+    />
+  );
+};
+
+const styles = StyleSheet.create({
+  itemContainer: {
+    width: '95%',
+    alignSelf: 'center',
+    borderRadius: 15,
+    borderWidth: 1,
+    borderColor: 'rgba(17,24,39,0.06)',
+    paddingVertical: height * 0.02,
+    paddingHorizontal: width * 0.04,
+    backgroundColor: '#fff',
+  },
+  imageContainer: {
+    height: height * 0.1, // square
+    aspectRatio: 1,
+    backgroundColor: colors.lightCardBg,
+    padding: 12, // was 20; gives the image room
+    borderRadius: 16,
+    overflow: 'hidden', // ensure rounded corners actually clip the image
+  },
+  exerciseTitle: {
+    fontFamily: 'Inter_500Medium',
+    fontSize: RFValue(14),
+    // optional: improve vertical rhythm
+    lineHeight: RFValue(17),
+  },
+  pressableText: {
+    fontFamily: 'Inter_500Medium',
+    fontSize: RFValue(10),
+    color: colors.textSecondary,
+  },
+  notesHeader: {
+    fontFamily: 'Inter_600SemiBold',
+    color: 'black',
+    fontSize: RFValue(13),
+  },
+  notes: {
+    fontFamily: 'Inter_400Regular',
+    color: 'black',
+    fontSize: RFValue(13),
+  },
+});
+
+export default ExercisesFlatList;
