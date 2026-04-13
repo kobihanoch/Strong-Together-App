@@ -5,7 +5,7 @@ import * as ImagePicker from 'expo-image-picker';
 import React, { useEffect } from 'react';
 import { ActivityIndicator, Dimensions, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { RFValue } from 'react-native-responsive-fontsize';
-import api from '../../../infrastructure/api/api';
+import api from '../../../infrastructure/api/api-config/api';
 import { colors } from '../../../shared/constants/colors';
 import { useAuth } from '../../auth/shared/providers/AuthProvider';
 import useMediaUploads from '../hooks/use-media-uploads.hook';
@@ -76,7 +76,7 @@ function ImagePickerComponent({
 
     // Update in auth context
     setUser(
-        (prev: AppUser | null) =>
+      (prev: AppUser | null) =>
         ({
           ...prev,
           profile_image_url: null,

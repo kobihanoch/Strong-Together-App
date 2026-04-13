@@ -2,7 +2,7 @@ import { CreateUserBody, GetAuthenticatedUserByIdResponse, LoginRequestBody } fr
 import { AxiosError } from 'axios';
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { Notifier, NotifierComponents } from 'react-native-notifier';
-import { hasBootstrapPayload, resetBootstrap } from '../../../../infrastructure/api/bootstrap-api';
+import { hasBootstrapPayload, resetBootstrap } from '../../../../infrastructure/api/api-config/bootstrap';
 import {
   cacheDeleteAllCache,
   cacheDeleteAllCacheWithoutStartWorkout,

@@ -1,5 +1,5 @@
 import { FinishUserWorkoutBody } from '@strong-together/shared';
-import api from '../../../../infrastructure/api/api';
+import api from '../../../../infrastructure/api/api-config/api';
 import { FinishUserWorkoutResponse } from '@strong-together/shared';
 
 // Saves a workout after working out - startworkout.js

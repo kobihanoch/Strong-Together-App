@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import api from '../../../../infrastructure/api/api';
+import api from '../../../../infrastructure/api/api-config/api';
 import { ExercisesMapByMuscle } from '@strong-together/shared';
 
 const useExercises = (): { exercises: ExercisesMapByMuscle; error: Error | null; loading: boolean } => {
@@ -27,5 +27,3 @@ const useExercises = (): { exercises: ExercisesMapByMuscle; error: Error | null;
 };
 
 export default useExercises;
-
-

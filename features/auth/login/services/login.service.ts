@@ -1,4 +1,4 @@
-import api from '../../../../infrastructure/api/api';
+import api from '../../../../infrastructure/api/api-config/api';
 import {
   ChangeEmailAndVerifyBody,
   CheckUserVerifyQuery,
@@ -13,10 +13,14 @@ export const loginUser = async (
   password: LoginRequestBody['password'],
 ): Promise<LoginResponse> => {
   try {
-    const { data } = await api.post<LoginResponse>('/api/auth/login', {
-      identifier,
-      password,
-    } satisfies LoginRequestBody);
+    const { data } = await api.post<LoginResponse>(
+      '/api/auth/login',
+      {
+        identifier,
+        password,
+      } satisfies LoginRequestBody,
+      { apiMode: 'guest' },
+    );
     return data;
   } catch (error) {
     throw error;
@@ -28,15 +32,19 @@ export const changeEmail = async (
   password: ChangeEmailAndVerifyBody['password'],
   newEmail: ChangeEmailAndVerifyBody['newEmail'],
 ): Promise<void> => {
-  await api.put('api/auth/changeemailverify', {
-    username,
-    password,
-    newEmail,
-  } satisfies ChangeEmailAndVerifyBody);
+  await api.put(
+    'api/auth/changeemailverify',
+    {
+      username,
+      password,
+      newEmail,
+    } satisfies ChangeEmailAndVerifyBody,
+    { apiMode: 'guest' },
+  );
 };
 
 export const forgotPassword = async (identifier: SendChangePassEmailBody['identifier']): Promise<void> => {
-  await api.post('api/auth/forgotpassemail', { identifier } satisfies SendChangePassEmailBody);
+  await api.post('api/auth/forgotpassemail', { identifier } satisfies SendChangePassEmailBody, { apiMode: 'guest' });
 };
 
 export const checkUserVerify = async (username: CheckUserVerifyQuery['username']): Promise<{ isVerified: boolean }> => {
@@ -44,10 +52,11 @@ export const checkUserVerify = async (username: CheckUserVerifyQuery['username']
     params: {
       username,
     } satisfies CheckUserVerifyQuery,
+    apiMode: 'guest',
   });
   return data;
 };
 
 export const sendVerificationMail = async (email: SendVerifcationMailBody['email']) => {
-  await api.post('api/auth/sendverificationemail', { email } satisfies SendVerifcationMailBody);
+  await api.post('api/auth/sendverificationemail', { email } satisfies SendVerifcationMailBody, { apiMode: 'guest' });
 };

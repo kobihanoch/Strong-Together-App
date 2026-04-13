@@ -1,5 +1,4 @@
-import api from '../../../../infrastructure/api/api';
-import { bootstrapApi } from '../../../../infrastructure/api/bootstrap-api';
+import api from '../../../../infrastructure/api/api-config/api';
 
 const GlobalAuth: {
   setAccessToken: (t: string | null) => void;
@@ -8,12 +7,10 @@ const GlobalAuth: {
 } = {
   setAccessToken: (t) => {
     api.defaults.headers.common.Authorization = `DPoP ${t}`;
-    bootstrapApi.defaults.headers.common.Authorization = `DPoP ${t}`;
   },
   logout: null,
   setUsernameInHeader: (username) => {
     api.defaults.headers.common['x-username'] = username;
-    bootstrapApi.defaults.headers.common['x-username'] = username;
   },
 };
 

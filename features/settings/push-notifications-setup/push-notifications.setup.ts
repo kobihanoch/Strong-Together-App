@@ -3,7 +3,7 @@ import * as Notifications from 'expo-notifications';
 import * as Device from 'expo-device';
 import Constants from 'expo-constants';
 import { Platform } from 'react-native';
-import api from '../../../infrastructure/api/api';
+import api from '../../../infrastructure/api/api-config/api';
 import { AppUser } from '../../auth/shared/types/auth.types';
 
 export async function setupPush(userId: AppUser['id']) {

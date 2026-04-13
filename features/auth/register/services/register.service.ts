@@ -1,4 +1,4 @@
-import api from '../../../../infrastructure/api/api';
+import api from '../../../../infrastructure/api/api-config/api';
 import { CreateUserBody } from '@strong-together/shared';
 import { CreateUserResponse } from '@strong-together/shared';
 
