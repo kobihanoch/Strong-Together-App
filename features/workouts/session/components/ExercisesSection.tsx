@@ -212,7 +212,6 @@ const RenderItem = ({
           <Text style={styles.itemExerciseName}>{item.exercise}</Text>
           {/* If you want to show progress vs total including extras: */}
           <Text style={styles.itemSetIndicatorText}>{`${setsDone} of ${totalSets} completed`}</Text>
-          {/* If you prefer â€œplanned onlyâ€, keep your original line instead */}
         </Column>
 
         <Column
@@ -293,7 +292,7 @@ const RenderItem = ({
             <View style={styles.analysisReadyChip}>
               <MaterialCommunityIcons name="check-decagram" size={RFValue(13)} color={colors.completedDark} />
               <Text style={styles.analysisReadyChipText}>
-                Ready{effectiveOverview.resultCount > 0 ? ` â€¢ ${effectiveOverview.resultCount}` : ''}
+                Ready{effectiveOverview.resultCount > 0 ? ` • ${effectiveOverview.resultCount}` : ''}
               </Text>
             </View>
           ) : null}
@@ -601,5 +600,3 @@ const styles = StyleSheet.create({
 });
 
 export default ExercisesSection;
-
-

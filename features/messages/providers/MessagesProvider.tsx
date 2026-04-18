@@ -12,13 +12,13 @@ import { MessagesProviderCachePayload, MessagesProviderValue } from './types/mes
 
 /**
  * Notifications Flow:
- * 1. On mount (if user exists) Ã¢â€ â€™ fetch messages + senders in one API call.
+ * 1. On mount (if user exists) -> fetch messages + senders in one API call.
  * 2. Store messages in allReceivedMessages, senders in allSendersUsersArr.
  * 3. Derive unreadMessages via useMemo(filterMessagesByUnread).
- * 4. Prefetch profile images on senders change Ã¢â€ â€™ build profileImagesCache.
- * 5. Listen to "new_message" socket events Ã¢â€ â€™ append message/sender if new.
- * 6. markAsRead Ã¢â€ â€™ API call + local state update.
- * 7. On logout Ã¢â€ â€™ clear all state.
+ * 4. Prefetch profile images on senders change -> build profileImagesCache.
+ * 5. Listen to "new_message" socket events -> append message/sender if new.
+ * 6. markAsRead -> API call + local state update.
+ * 7. On logout -> clear all state.
  */
 
 const MessagesContext = createContext<MessagesProviderValue | null>(null);

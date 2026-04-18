@@ -144,7 +144,7 @@ const StartWorkout = ({ route }: StackScreenProps<RootParamList, 'StartWorkout'>
     Dialog.show({
       type: ALERT_TYPE.SUCCESS,
       title: 'Finish Workout?',
-      textBody: 'Are you sure youâ€™ve completed your workout?',
+      textBody: 'Are you sure you have completed your workout?',
       button: 'Yes, Finish',
       closeOnOverlayTap: true,
       onPressButton: async () => {
@@ -301,5 +301,3 @@ const styles = StyleSheet.create({
 });
 
 export default StartWorkout;
-
-
