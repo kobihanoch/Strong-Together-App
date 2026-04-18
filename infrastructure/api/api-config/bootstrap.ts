@@ -1,5 +1,5 @@
 import { BootstrapResponse } from '@strong-together/shared';
-import api from './api';
+import { AxiosInstance } from 'axios';
 
 export type BootstrapPayload = BootstrapResponse;
 
@@ -26,7 +26,7 @@ export const isOpen = (): boolean => !closed;
 export const hasBootstrapPayload = (): boolean => !!payload;
 
 // Single-flight bootstrap fetch
-export async function ensureBootstrap(): Promise<BootstrapPayload> {
+export async function ensureBootstrap(api: AxiosInstance): Promise<BootstrapPayload> {
   if (payload) return payload;
   if (inflight) {
     return inflight;

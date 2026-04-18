@@ -89,7 +89,7 @@ const SplitFlatList = ({ setSelectedSplit, selectedSplit, openCardioModal }: Spl
                 <MaterialCommunityIcons name="check-circle-outline" size={RFValue(14)} color="#FFFFFF" />
                 <Text style={styles.statLabel}>Completions</Text>
               </Row>
-              <Text style={styles.statValue}>Ã— {completions}</Text>
+              <Text style={styles.statValue}>x {completions}</Text>
             </Column>
           </Row>
         </View>
@@ -274,4 +274,3 @@ const styles = StyleSheet.create({
 });
 
 export default SplitFlatList;
-

@@ -1,10 +1,9 @@
-import { AxiosError } from 'axios';
+import { AxiosError, AxiosInstance } from 'axios';
 import { refreshAndRotateTokens } from '../../../../features/auth/shared/services/auth.service';
 import GlobalAuth from '../../../../features/auth/shared/utils/auth.utils';
 import { saveRefreshToken } from '../../../../features/auth/shared/utils/token-storage.utils';
 import { showErrorAlert } from '../../../../shared/errors/error-alerts';
 import { openUpdateModal } from '../../../../shared/utils/imperative-update-modal';
-import api from '../api';
 import { notifyOffline, notifyServerDown } from './network-check';
 
 export const handleUpdateRequired = (error: AxiosError) => {
@@ -28,7 +27,7 @@ export const handleNetworkProblems = async (error: AxiosError, online: boolean) 
   }
 };
 
-export const handle401 = async (error: AxiosError<{ message?: string }>) => {
+export const handle401 = async (api: AxiosInstance, error: AxiosError<{ message?: string }>) => {
   const firstRequest = error.config!;
   const data = error.response?.data;
 

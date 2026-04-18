@@ -1,14 +1,13 @@
-import { AxiosError, InternalAxiosRequestConfig } from 'axios';
+import { AxiosError, AxiosInstance, AxiosResponse, InternalAxiosRequestConfig } from 'axios';
 import { showErrorAlert } from '../../../shared/errors/error-alerts';
 import { handle401, handleNetworkProblems, handleUpdateRequired } from './helpers/error-handlers';
 import { finishHttpErrorSpan, finishHttpResponseSpan } from '../tracing/sentry-tracing';
-import api from './api';
 import { ensureBootstrap, isOpen, isTracked, responseMap } from './bootstrap';
 import { isDeviceOnline } from './helpers/network-check';
 import { addAppVersionHeader, addDpopHeader, addTracingHeader } from './helpers/header-injections';
 
 // Initalize interceptors
-export const initializeRequestInterceptor = () =>
+export const initializeRequestInterceptor = (api: AxiosInstance) =>
   // Request interceptor
   api.interceptors.request.use(
     async (config: InternalAxiosRequestConfig) => {
@@ -27,12 +26,12 @@ export const initializeRequestInterceptor = () =>
 
       return config;
     },
-    (error) => {
+    (error: unknown) => {
       return Promise.reject(error);
     },
   );
 
-export const initializeResponseInterceptor = () =>
+export const initializeResponseInterceptor = (api: AxiosInstance) =>
   // Flow:
   // Client -> Request -> Server
   // CLient <- Response <- Server
@@ -46,7 +45,7 @@ export const initializeResponseInterceptor = () =>
   //                       Reject
 
   api.interceptors.response.use(
-    (res) => finishHttpResponseSpan(res),
+    (res: AxiosResponse) => finishHttpResponseSpan(res),
     async (error: AxiosError<{ message?: string }>) => {
       finishHttpErrorSpan(error);
 
@@ -81,7 +80,7 @@ export const initializeResponseInterceptor = () =>
 
       // If got 401
       if (status === 401) {
-        return await handle401(error);
+        return await handle401(api, error);
       }
 
       // Fallback
@@ -92,10 +91,10 @@ export const initializeResponseInterceptor = () =>
   );
 
 // Bootstrap inteceptor
-export const initializeBootstrapInterceptor = () =>
+export const initializeBootstrapInterceptor = (api: AxiosInstance) =>
   api.interceptors.request.use(async (config: InternalAxiosRequestConfig) => {
     if (isOpen() && isTracked(config.url!)) {
-      const data = await ensureBootstrap();
+      const data = await ensureBootstrap(api);
       const key = responseMap[config.url!];
       const slice = data?.[key];
 
@@ -112,3 +111,9 @@ export const initializeBootstrapInterceptor = () =>
     }
     return config;
   });
+
+export const initializeInterceptors = (api: AxiosInstance) => {
+  initializeBootstrapInterceptor(api);
+  initializeRequestInterceptor(api);
+  initializeResponseInterceptor(api);
+};
