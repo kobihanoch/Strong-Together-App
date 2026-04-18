@@ -12,7 +12,7 @@ type UploadVideoToS3Options = {
 export const getPresignedUrlFromS3 = async (
   body: GetPresignedUrlFromS3Body,
 ): Promise<GetPresignedUrlFromS3Response> => {
-  const { data } = await api.post<GetPresignedUrlFromS3Response>('/api/video-analysis/getpresignedurl', body, {
+  const { data } = await api.post<GetPresignedUrlFromS3Response>('/api/videoanalysis/getpresignedurl', body, {
     sentryContinueTrace: true,
   });
   return data;
