@@ -68,7 +68,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: width * 0.055,
     marginTop: height * 0.035,
     overflow: 'hidden',
-    height: height * 0.4,
+    minHeight: height * 0.4,
     // subtle elevation/shadow
     elevation: 4,
     shadowColor: '#000',
@@ -158,7 +158,7 @@ const styles = StyleSheet.create({
   btnRow: {
     flexDirection: 'row',
     gap: 10,
-    marginTop: height * 0.06,
+    marginTop: 20,
     justifyContent: 'center',
   },
   btnGhost: {
@@ -176,10 +176,13 @@ const styles = StyleSheet.create({
   },
   btnFilled: {
     backgroundColor: '#2E6EF7',
-    paddingVertical: 20,
+    minHeight: 56,
+    paddingVertical: 14,
     paddingHorizontal: 40,
     borderRadius: 16,
     width: '100%',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   btnFilledText: {
     fontFamily: 'Inter_700Bold',
