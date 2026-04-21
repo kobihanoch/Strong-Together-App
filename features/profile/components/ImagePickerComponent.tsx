@@ -112,7 +112,10 @@ function ImagePickerComponent({
             source={
               profileimagePath
                 ? {
-                    uri: `${process.env.EXPO_PUBLIC_SUPABASE_URL}/storage/v1/object/public/${profileimagePath}`,
+                    uri:
+                      process.env.EXPO_PUBLIC_ENVIRONMENT === 'production'
+                        ? `${process.env.EXPO_PUBLIC_SUPABASE_URL}/storage/v1/object/public/${profileimagePath}`
+                        : `${process.env.EXPO_PUBLIC_DEV_IMAGE_BUCKET}/${profileimagePath}`,
                   }
                 : user?.gender == 'Male'
                   ? require('../../../assets/man.png')

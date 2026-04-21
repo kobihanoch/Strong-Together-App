@@ -29,7 +29,7 @@ const TopComponent = () => {
   const msgCount = unreadMessages?.length;
   const fullname = user?.name;
   const username = user?.username;
-  const profileImageUrl = user?.profile_image_url;
+  const profileImagePath = user?.profile_image_url;
 
   // Animations
   const scaleAnim = useState(new Animated.Value(1))[0];
@@ -158,16 +158,19 @@ const TopComponent = () => {
             <TouchableOpacity onPress={handleImagePress}>
               <Image
                 source={
-                  profileImageUrl
+                  profileImagePath
                     ? {
-                        uri: `${process.env.EXPO_PUBLIC_SUPABASE_URL}/storage/v1/object/public/${profileImageUrl}`,
+                        uri:
+                          process.env.EXPO_PUBLIC_ENVIRONMENT === 'production'
+                            ? `${process.env.EXPO_PUBLIC_SUPABASE_URL}/storage/v1/object/public/${profileImagePath}`
+                            : `${process.env.EXPO_PUBLIC_DEV_IMAGE_BUCKET}/${profileImagePath}`,
                       }
                     : user?.gender == 'Male'
                       ? require('../../../assets/man.png')
                       : require('../../../assets/woman.png')
                 }
                 style={styles.profileImage}
-                cachePolicy={profileImageUrl ? 'disk' : 'none'}
+                cachePolicy={profileImagePath ? 'disk' : 'none'}
                 transition={150}
               />
             </TouchableOpacity>
@@ -180,9 +183,12 @@ const TopComponent = () => {
             <TouchableOpacity style={styles.modalBackground} onPress={closeModal}>
               <Image
                 source={
-                  profileImageUrl
+                  profileImagePath
                     ? {
-                        uri: `${process.env.EXPO_PUBLIC_SUPABASE_URL}/storage/v1/object/public/${profileImageUrl}`,
+                        uri:
+                          process.env.EXPO_PUBLIC_ENVIRONMENT === 'production'
+                            ? `${process.env.EXPO_PUBLIC_SUPABASE_URL}/storage/v1/object/public/${profileImagePath}`
+                            : `${process.env.EXPO_PUBLIC_DEV_IMAGE_BUCKET}/${profileImagePath}`,
                       }
                     : user?.gender == 'Male'
                       ? require('../../../assets/man.png')
