@@ -122,7 +122,7 @@ export const removeSplitLogic = (
 
   delete copy[splitName];
 
-  // If nothing left â†’ reset to default
+  // If nothing left → reset to default
   if (Object.keys(copy).length === 0) {
     return {
       next: { A: [] },
@@ -140,7 +140,7 @@ export const removeSplitLogic = (
     // There is a right neighbor at the same index (after deletion)
     nextSelected = newKeys[indexToRemove];
   } else {
-    // Removed the last â†’ fallback to last available
+    // Removed the last → fallback to last available
     nextSelected = newKeys[newKeys.length - 1];
   }
 

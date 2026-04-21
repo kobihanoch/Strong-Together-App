@@ -34,7 +34,7 @@ const AppStack = () => {
           const today = ymdInCurrentTZ(Date.now());
           const isStale = startDay !== today;
           if (isStale) {
-            // English-only comments: If from a previous day â†’ delete and stop (no resume)
+            // English-only comments: If from a previous day → delete and stop (no resume)
             await cacheDeleteKey(keyStartWorkout(userIdCache));
             return;
           }

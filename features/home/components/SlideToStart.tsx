@@ -44,7 +44,7 @@ const SlideToStart: React.FC<SlideToStartProps> = ({ onUnlock }) => {
         <View style={styles.track}>
           <Text style={styles.trackText}>Slide to start</Text>
           <Animated.View style={[styles.thumb, thumbStyle]}>
-            <Text style={styles.arrow}>âž¤</Text>
+            <Text style={styles.arrow}>➤</Text>
           </Animated.View>
         </View>
       </GestureDetector>

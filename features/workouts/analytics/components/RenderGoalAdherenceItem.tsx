@@ -64,7 +64,7 @@ export default function RenderGoalAdherenceItem({
 
       {showSeeAll && (
         <TouchableOpacity
-          onPress={() => onSeeAll?.(name, v)} // â† pass selected entry
+          onPress={() => onSeeAll?.(name, v)} // ← pass selected entry
           activeOpacity={0.7}
           style={{
             alignSelf: 'flex-end',

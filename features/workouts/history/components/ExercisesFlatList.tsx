@@ -52,9 +52,9 @@ const ExerciseItem = ({ exData, lastPerformanceData }: ExerciseDataProps) => {
       setNo: i + 1,
       // Show empty string when missing, not 0
       reps: reps,
-      repsDelta: reps - prevR, // null â†’ pill not rendered
+      repsDelta: reps - prevR, // null → pill not rendered
       weight: weight,
-      weightDelta: weight - prevW, // null â†’ pill not rendered
+      weightDelta: weight - prevW, // null → pill not rendered
     };
   });
 
