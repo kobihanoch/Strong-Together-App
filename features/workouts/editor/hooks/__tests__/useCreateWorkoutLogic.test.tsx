@@ -108,7 +108,7 @@ jest.mock('../../services/workout-editor.service', () => ({
   addWorkout: (payload: unknown) => mockAddWorkout(payload),
 }));
 
-jest.mock('../../../../../infrastructure/api/api', () => ({
+jest.mock('../../../../../infrastructure/api/api-config/api', () => ({
   __esModule: true,
   default: {
     get: (url: string) => mockApiGet(url),
@@ -141,7 +141,7 @@ jest.mock('../../../../auth/shared/hooks/use-apple-auth.hook', () => ({
   }),
 }));
 
-jest.mock('../../../../../infrastructure/api/bootstrap-api', () => ({
+jest.mock('../../../../../infrastructure/api/api-config/bootstrap', () => ({
   hasBootstrapPayload: () => mockHasBootstrapPayload(),
   resetBootstrap: () => mockResetBootstrap(),
 }));

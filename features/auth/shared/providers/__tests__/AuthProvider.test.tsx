@@ -112,7 +112,7 @@ jest.mock('react-native-notifier', () => ({
   },
 }));
 
-jest.mock('../../../../../infrastructure/api/bootstrap-api', () => ({
+jest.mock('../../../../../infrastructure/api/api-config/bootstrap', () => ({
   hasBootstrapPayload: () => mockHasBootstrapPayload(),
   resetBootstrap: () => mockResetBootstrap(),
 }));

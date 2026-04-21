@@ -121,7 +121,7 @@ jest.mock('../../../auth/shared/hooks/use-apple-auth.hook', () => ({
   }),
 }));
 
-jest.mock('../../../../infrastructure/api/bootstrap-api', () => ({
+jest.mock('../../../../infrastructure/api/api-config/bootstrap', () => ({
   hasBootstrapPayload: () => mockHasBootstrapPayload(),
   resetBootstrap: () => mockResetBootstrap(),
 }));

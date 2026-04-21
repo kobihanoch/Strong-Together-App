@@ -43,7 +43,7 @@ jestObject.mock('expo-image-picker', () => ({
   },
 }));
 
-jestObject.mock('../../../../infrastructure/api/api', () => ({
+jestObject.mock('../../../../infrastructure/api/api-config/api', () => ({
   __esModule: true,
   default: {
     delete: (...args: any[]) => mockApiDelete(...args),
