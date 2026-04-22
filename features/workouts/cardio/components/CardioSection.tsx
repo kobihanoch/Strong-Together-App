@@ -18,7 +18,7 @@ const CardioSection = ({
   daily: AerobicsDailyRecord[] | undefined;
   weekly: WeeklyData | undefined;
 }) => {
-  const { duration_mins: minutes = null, duration_sec: seconds = null, type = null } = daily?.[0] || {};
+  const { duration_mins: minutes = 0, duration_sec: seconds = 0, type = null } = daily?.[0] || {};
   const hasDailyCardio = !!minutes;
   const durationText = formatTime(minutes, seconds);
   const typeText = hasDailyCardio && type ? String(type) : 'None';
@@ -49,7 +49,11 @@ const CardioSection = ({
         </Column>
       </View>
 
-      <View testID="weekly-card" style={[styles.card, { gap: 20 }]} onLayout={(e) => setWeeklyCardioW(e.nativeEvent.layout.width)}>
+      <View
+        testID="weekly-card"
+        style={[styles.card, { gap: 20 }]}
+        onLayout={(e) => setWeeklyCardioW(e.nativeEvent.layout.width)}
+      >
         <Row style={{ gap: 10 }}>
           <Text style={styles.dailyTitle}>Weekly Cardio</Text>
         </Row>
