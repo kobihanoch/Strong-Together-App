@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [5.2.0](https://github.com/kobihanoch/Strong-Together-App/compare/v5.1.1...v5.2.0) (2026-04-22)
+
+
+### Bug Fixes
+
+* **Time Labels:** Fixed format time utils bug ([9c17b57](https://github.com/kobihanoch/Strong-Together-App/commit/9c17b573108530abdfbe469cd732d84123392b8c))
+* **UI:** Fixed rest day card button corruption ([ed4149b](https://github.com/kobihanoch/Strong-Together-App/commit/ed4149b263b8f9b69a48299f40b550a7b21c630e))
+
 ### [5.1.1](https://github.com/kobihanoch/Strong-Together-App/compare/v5.1.0...v5.1.1) (2026-04-05)
 
 
