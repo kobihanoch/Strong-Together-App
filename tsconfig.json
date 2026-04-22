@@ -22,13 +22,7 @@
     "exactOptionalPropertyTypes": true,
     "noImplicitOverride": true,
     "useUnknownInCatchVariables": true,
-    "types": [
-      "jest",
-      "react-native"
-    ]
+    "types": ["jest", "react-native"]
   },
-  "include": [
-    "**/*.ts",
-    "**/*.tsx"
-  ]
+  "include": ["**/*.ts", "**/*.tsx", "shared/providers/GlobalAppLoadingProvider.tsx"]
 }

@@ -1,0 +1,39 @@
+import React from 'react';
+import { Dimensions, StyleSheet, Text, TouchableOpacity } from 'react-native';
+import { RFValue } from 'react-native-responsive-fontsize';
+import { useCardioContext } from '../../shared/providers/CardioProvider';
+
+const { height } = Dimensions.get('window');
+
+const StartCardioButton = ({ openCardioModal }: { openCardioModal: (i?: number | undefined) => void }) => {
+  const { hasDoneCardioToday = false } = useCardioContext() || {};
+  return (
+    <TouchableOpacity style={styles.cta} onPress={() => openCardioModal(hasDoneCardioToday ? 0 : 1)}>
+      <Text style={styles.ctaText}>{'Log daily cardio'}</Text>
+    </TouchableOpacity>
+  );
+};
+
+const styles = StyleSheet.create({
+  // CTA
+  cta: {
+    backgroundColor: 'transparent',
+    height: height * 0.065,
+    borderRadius: height * 0.02,
+    borderColor: 'white',
+    borderWidth: 0.2,
+    alignSelf: 'stretch',
+    alignItems: 'center',
+    justifyContent: 'center',
+    flexDirection: 'row',
+    gap: 8,
+  },
+  ctaText: {
+    fontFamily: 'Inter_600SemiBold',
+    fontSize: RFValue(14.5),
+    color: '#FFFFFF',
+    letterSpacing: 0.2,
+  },
+});
+
+export default StartCardioButton;

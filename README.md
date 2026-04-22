@@ -1,4 +1,4 @@
-# Strong Together App - Frontend (v5.1.1)
+# Strong Together App - Frontend (v5.2.0)
 
 <p align="center">
   <img src="assets/icon.png" alt="Strong Together icon" width="140" />
@@ -7,7 +7,7 @@
 [![CI](https://github.com/kobihanoch/Strong-Together-App/actions/workflows/ci.yml/badge.svg)](https://github.com/kobihanoch/Strong-Together-App/actions)
 
 <p align="center">
-  <strong>A production-minded fitness app built with React Native, Expo, TypeScript, secure mobile auth, realtime events, offline-first caching, and AI-assisted workout analysis.</strong>
+  <strong>A fitness app published on the App Store, built with React Native, Expo, TypeScript, secure mobile auth, realtime events, offline-first caching, and AI-assisted workout analysis.</strong>
 </p>
 
 <p align="center">
@@ -20,184 +20,102 @@
   <img src="https://img.shields.io/badge/React%20Native-0.81-20232A?logo=react" alt="React Native badge" />
   <img src="https://img.shields.io/badge/Expo-54-111827?logo=expo" alt="Expo badge" />
   <img src="https://img.shields.io/badge/TypeScript-5.9-3178C6?logo=typescript&logoColor=white" alt="TypeScript badge" />
-  <img src="https://img.shields.io/badge/Tests-38%20files-16a34a" alt="Tests badge" />
+  <img src="https://img.shields.io/badge/Tests-36%20files-16a34a" alt="Tests badge" />
 </p>
 
-Version 5.1.0 is a milestone release for the Strong Together client. It turns the app into a fully typed TypeScript codebase, expands automated test coverage across screens, hooks, contexts, and components, adds Sentry-based production monitoring, and introduces a new AI-powered exercise video analysis flow.
+Strong Together is a fitness app **published on the App Store** for planning workouts, tracking live sessions, reviewing progress, receiving reminders, and analyzing workout videos through an **AI-assisted pipeline**.
 
-The app helps users plan workouts, track sessions, review progress, receive reminders, and stay engaged through a polished mobile experience backed by a dedicated Node.js/Express API.
+The client is shaped around the details that make mobile software feel dependable: typed feature modules, secure token handling, **DPoP-bound requests**, app-version-aware cache cleanup, realtime event handling, Sentry monitoring, CI, and a focused Jest test suite behind a polished training experience.
 
 > Backend repository: [Strong-Together-Backend](https://github.com/kobihanoch/Strong-Together-Backend)
 
-## 🚀 TL;DR
+## TL;DR
 
-- **React Native + Expo** fitness app shipped to the **App Store**
-- Adds a new **AI video analysis** flow for supported exercises
-- Fully migrated from **JavaScript** to **TypeScript** in **v5.0.0**
-- Uses a custom **SWR-inspired cache layer** for **offline-first UX**
-- Includes **OAuth**, **DPoP**, **realtime websocket events**, and **Sentry monitoring**
-- Backed by a separate **Node.js / Express** backend and dedicated database layer
+- **Live on the App Store**: Strong Together is a released mobile app, with production build configuration and real distribution.
+- **End-to-end fitness product**: workout planning, live set tracking, cardio, analytics, reminders, messages, profile flows, and AI-assisted video analysis.
+- **Mobile architecture with depth**: feature-sliced code, typed API services, domain providers, custom cache hydration, and auth-gated rendering.
+- **Security beyond basic JWTs**: OAuth, secure refresh-token storage, in-memory access tokens, **DPoP key binding**, and signed per-request proofs.
+- **Production feedback loops**: Sentry tracing, error boundaries, update-required handling, offline/server-down alerts, CI, and broad unit coverage.
 
 ## Table of Contents
 
 1. [TL;DR](#tldr)
-2. [Overview](#overview)
-3. [What is New in 5.1.0](#what-is-new-in-510)
-4. [Core Product Features](#core-product-features)
-5. [Engineering Highlights](#engineering-highlights)
-6. [Architecture](#architecture)
-7. [SWR-Inspired Cache Layer](#swr-inspired-cache-layer)
-8. [Database Schemas](#database-schemas)
-9. [Backend Flows in Short](#backend-flows-in-short)
-10. [AI Analysis Flow](#ai-analysis-flow)
-11. [Screenshots](#screenshots)
-12. [Tech Stack](#tech-stack)
-13. [Local Setup](#local-setup)
-14. [Environment Variables](#environment-variables)
-15. [Scripts](#scripts)
-16. [Roadmap](#roadmap)
-17. [License](#license)
+2. [Why This Project Stands Out](#why-this-project-stands-out)
+3. [Product Features](#product-features)
+4. [Engineering Highlights](#engineering-highlights)
+5. [Architecture](#architecture)
+6. [Documentation](#documentation)
+7. [Screenshots](#screenshots)
+8. [Tech Stack](#tech-stack)
+9. [Local Setup](#local-setup)
+10. [Environment Variables](#environment-variables)
+11. [Scripts](#scripts)
+12. [Roadmap](#roadmap)
+13. [License](#license)
 
-## Overview
+## Why This Project Stands Out
 
-Strong Together is a cross-platform mobile fitness app focused on **consistency**, **training structure**, and **long-term progress tracking**.
+- **Published mobile product**: available on the **App Store**, with release configuration that separates production and development builds.
+- **Production frontend architecture**: feature-based modules, typed services, domain providers, shared infrastructure, and reusable UI primitives.
+- **Secure auth flow**: email/password, **Google**, **Apple**, refresh-token rotation, secure token storage, and **DPoP** proof support.
+- **Offline-first experience**: custom **SWR-inspired cache layer** hydrates core screens before fresh API data arrives.
+- **Realtime UX**: authenticated Socket.IO flow for in-app messages and asynchronous AI analysis results.
+- **AI workout analysis**: video selection, trimming/compression guardrails, presigned upload, upload progress, Sentry tracing, and websocket result delivery.
+- **Quality practices**: **TypeScript**, **Jest**, Testing Library, CI on pull requests, Sentry error boundaries, and app-version-aware cache cleanup.
 
-Users can:
+## Product Features
 
-- build and manage **workout plans** with custom splits and exercises
-- start **live workout sessions** and log sets, reps, and weight
-- review **post-workout analytics** and adherence trends
-- receive **reminders** and **in-app system messages**
-- authenticate with **email/password** or **OAuth providers**
-- analyze supported exercise videos through a new **AI-assisted workflow**
-
-This repository contains the **frontend client only**. The backend, business rules, database definitions, scheduled jobs, and API implementation live in the dedicated backend repository.
-
-## What is New in 5.0.0
-
-This release is based on everything added after `v4.5.0` and represents a major **technical upgrade** rather than a cosmetic refresh.
-
-- Full migration from **JavaScript** to **TypeScript** across screens, hooks, services, contexts, navigation, API layers, DTOs, and shared utilities
-- New **AI video analysis** feature for exercise form review, including the presigned upload flow, background transfer, SQS-based backend processing, and Python polling
-- Large automated **test expansion** with coverage for app boot, page logic hooks, contexts, and UI components
-- **CI pipeline** for running tests on pull requests
-- **Sentry** integration for production error monitoring
-- Continued support for the performance-focused architecture introduced in version 4.x: **bootstrap hydration**, **offline-aware cache usage**, and **realtime messaging**
-
-## Core Product Features
-
-- **Custom workout planning** with user-defined splits and exercise selection
-- **Live workout tracking** with set-by-set logging for reps and weight
-- **Analytics** and workout summaries for progress visibility
-- **Cardio logging** and statistics support
-- **In-app messaging** and reminder-oriented engagement flows
-- Secure authentication with **email/password**, **Google**, and **Apple**
-- **Offline-friendly behavior** backed by cache hydration and fallback fetch patterns
-- **Realtime messaging/events** through authenticated websocket connections
-- **Account management**, including profile updates and account deletion
-- **AI video analysis** for supported exercises, currently focused on **squat analysis** in the first iteration
+- Create and edit **custom workout plans** with splits and exercises.
+- Start **live workout sessions** and log sets, reps, and weights.
+- Compare current training with **previous workout data**.
+- Review **statistics**, summaries, adherence trends, and estimated strength insights.
+- Track **cardio** activity with daily and weekly views.
+- Receive **system messages**, reminders, and push notification settings.
+- Manage profile details, profile images, account state, and authentication.
+- Run **AI-assisted squat analysis** from a workout video.
 
 ## Engineering Highlights
 
-- Full **TypeScript** client migration
-  The app now uses typed API contracts, DTOs, entities, hook props, context values, and navigation definitions.
-- Test suite growth
-  The repository now includes 38 test files covering screens, hooks, contexts, and components.
-- CI enforcement
-  GitHub Actions runs the automated test suite on pull requests.
-- **Sentry** monitoring
-  Production errors can now be tracked centrally, with noisy unauthorized events filtered out.
-- **Offline-first UX**
-  The client hydrates key domains from cache and falls back to API fetches when needed.
-- **Bootstrap loading strategy**
-  Core user data is fetched through a bootstrap path to reduce app startup chatter.
-- Secure API communication
-  The app includes **DPoP** proof support for bound requests and short-lived websocket ticket flows.
+| Area              | What was built                                                                                                                                                  |
+| ----------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **App shell**     | Font loading, DPoP key bootstrap, versioned cache housekeeping, auth-gated navigation, global loading, Sentry boundary, update modal, and app-scoped providers. |
+| **Data layer**    | Typed Axios services, request/response interceptors, bootstrap response slicing, cache TTLs, retry-on-401 refresh flow, and app version headers.                |
+| **State model**   | Focused contexts for **auth**, **messages**, **workout plan**, **workout history**, and **cardio** instead of one oversized global store.                       |
+| **Security**      | Secure refresh token storage, access token in memory, OAuth providers, short-lived websocket tickets, DPoP key binding, and DPoP request proofs.                |
+| **Resilience**    | Offline detection, cached startup data, cache invalidation by app version, network/server-down alerts, and best-effort logout cleanup.                          |
+| **Observability** | Sentry setup, error boundary fallback, request tracing headers, HTTP spans, and traced video-analysis lifecycle spans.                                          |
+| **Testing**       | 36 test files covering screens, hooks, providers, contexts, components, and app boot behavior.                                                                  |
 
 ## Architecture
 
-The project follows a clear client-server split:
-
 ```text
 +-----------------------------+        HTTPS / WebSocket        +-----------------------------+
-| React Native / Expo Client  | -----------------------------> | Node.js / Express Backend   |
+| React Native / Expo Client  | -----------------------------> | Dedicated Backend API       |
 | Strong Together Frontend    |                                | API, auth, jobs, DB access  |
 +-----------------------------+                                +-----------------------------+
 ```
 
-On the frontend side, the app is organized around:
+The frontend is organized by **feature domains**:
 
-- screens for top-level user flows
-- components for reusable UI building blocks
-- hooks for page logic and shared behavior
-- contexts for authenticated app state
-- services and typed API layers for backend communication
-- websocket listeners for realtime updates
-- cache utilities for hydration, recovery, and offline resilience
+- `features/auth` - login, register, OAuth, token lifecycle, and session context
+- `features/workouts` - planning, live session tracking, history, analytics, cardio, and AI analysis
+- `features/messages` - inbox state, unread derivation, and realtime updates
+- `features/profile` - media upload and profile editing
+- `infrastructure` - API client, interceptors, cache, DPoP, sockets, and Sentry
+- `shared` - reusable components, hooks, providers, constants, and alert utilities
 
-The backend is intentionally separated into its own repository to keep deployment, API evolution, and database ownership isolated from the mobile client.
+The backend owns database schemas, scheduled jobs, API implementation, and server-side business rules. This client keeps its responsibility focused on mobile UX, state, rendering, networking, and device integrations.
 
-## SWR-Inspired Cache Layer
+## Documentation
 
-One of the central ideas in the app is a custom **SWR-inspired** data flow built around [`hooks/useCacheAndFetch.ts`](C:/Development/Mobile%20Projects/Strong%20Together/Client/hooks/useCacheAndFetch.ts).
+The README stays recruiter-friendly and compact. Deeper technical notes live here:
 
-It works like this:
-
-- build a stable **cache key** per user and domain
-- hydrate data from **local cache first**
-- render cached data immediately when available
-- fetch fresh data from the **API** once server validation is complete
-- write the updated payload back into cache for future launches
-
-In practice, this gives the app a very mobile-friendly version of **stale-while-revalidate** behavior:
-
-- **fast first paint** when cached data exists
-- better **offline resilience**
-- less perceived loading during navigation
-- shared behavior across contexts such as **auth**, **workout**, **analysis**, **notifications**, and **cardio**
-
-The hook is intentionally lightweight and app-specific rather than library-driven, which made it easier to adapt to your bootstrap flow, token validation timing, and cache persistence rules.
-
-## Database Schemas
-
-All database schemas belong to the backend repository, not this frontend client.
-
-If you want to inspect the relational model, migrations, or server-side data structure, use:
-
-- [Strong-Together-Backend](https://github.com/kobihanoch/Strong-Together-Backend)
-
-This README no longer duplicates schema details here, so the source of truth stays in one place and does not drift.
-
-## Backend Flows in Short
-
-Even though the full schema lives in the backend repo, the main data flows are straightforward:
-
-- **Workout flow**
-  A user creates a workout plan, splits are attached to it, and exercises are assigned to each split.
-- **Tracking flow**
-  When a workout starts, the app logs performed sets and sends them back for persistence and later analytics.
-- **Messages flow**
-  System-generated messages are fetched, marked as read, and updated in realtime through the websocket layer.
-- **Auth flow**
-  Users sign in with credentials or OAuth, receive token-based access, and the client refreshes/validates sessions against the backend.
-- **Reminder flow**
-  The backend computes reminder timing and pushes notifications based on each user's workout schedule and settings.
-
-For the exact relational structure, scheduled jobs, and DB ownership, the backend repository remains the single source of truth.
-
-## AI Analysis Flow
-
-The new **analysis flow** turns a workout video into asynchronous coaching feedback:
-
-1. The user opens the analysis sheet from the workout screen.
-2. The client selects and optionally trims/compresses the video.
-3. The app requests a **presigned upload URL** from the backend.
-4. The processed video is uploaded in the background.
-5. The upload event continues into an **SQS-backed analysis pipeline** on the backend.
-6. A **Python polling worker** processes the analysis lifecycle until results are ready.
-7. Once the server finishes processing, the result is rendered back in the sheet.
-
-In the current version, the first supported exercise is **squat**, which keeps the UX focused while the pipeline is being proven end to end.
+- [App rendering flow](docs/app-rendering-flow.md) - startup, auth gating, provider order, and logged-in rendering.
+- [Auth context flow](docs/auth-context-flow.md) - login/register/OAuth, cached sessions, refresh validation, logout, and socket setup.
+- [DPoP security flow](docs/dpop-security-flow.md) - key generation, token binding, signed request proofs, and access-token hashing.
+- [Custom SWR cache flow](docs/custom-swr-cache-flow.md) - cache keys, hydration, revalidation, TTLs, bootstrap, and provider usage.
+- [API, realtime, and AI analysis flow](docs/api-realtime-ai-flow.md) - Axios interceptors, DPoP, websocket tickets, messages, and video analysis.
+- [Error alerts and UX feedback](docs/error-alerts.md) - shared error alerts, network alerts, update-required handling, and success notifications.
 
 ## Screenshots
 
@@ -261,19 +179,19 @@ In the current version, the first supported exercise is **squat**, which keeps t
 
 ## Tech Stack
 
-| Layer            | Technology                                                       |
-| ---------------- | ---------------------------------------------------------------- |
-| Mobile framework | React Native 0.81 + Expo 54                                      |
-| Language         | TypeScript                                                       |
-| Navigation       | React Navigation                                                 |
-| State management | React Context + custom hooks                                     |
-| Networking       | Axios                                                            |
-| Realtime         | Socket.IO client                                                 |
-| Monitoring       | Sentry                                                           |
-| Testing          | Jest + Testing Library                                           |
-| Auth             | JWT-based auth, OAuth, DPoP client proofs                        |
-| Media flow       | Expo image/file tools, video trim/compression, presigned uploads |
-| Backend          | Node.js + Express (separate repository)                          |
+| Layer            | Technology                                                  |
+| ---------------- | ----------------------------------------------------------- |
+| Mobile framework | React Native 0.81 + Expo 54                                 |
+| Language         | TypeScript 5.9                                              |
+| Navigation       | React Navigation                                            |
+| State            | React Context + custom hooks                                |
+| Networking       | Axios with typed services                                   |
+| Realtime         | Socket.IO client                                            |
+| Monitoring       | Sentry                                                      |
+| Testing          | Jest + Testing Library                                      |
+| Auth             | JWT, OAuth, SecureStore, DPoP                               |
+| Media            | Expo media tools, video trim/compression, presigned uploads |
+| Backend          | Dedicated API in a separate repository                      |
 
 ## Local Setup
 
@@ -298,37 +216,38 @@ npm install
 npm run start
 ```
 
-You can then open the app in an iOS simulator, Android emulator, or on a physical device through Expo.
+Open the app in an iOS simulator, Android emulator, or physical device through Expo.
 
 ## Environment Variables
 
-Create a `.env` file in the project root and define the values needed for your environment.
+Create a `.env` file in the project root.
 
-| Variable                   | Purpose                                                          |
-| -------------------------- | ---------------------------------------------------------------- |
-| `EXPO_PUBLIC_ENVIRONMENT`  | Selects environment behavior such as `development` or production |
-| `EXPO_PUBLIC_DEV_API`      | Backend base URL used in development mode                        |
-| `EXPO_PUBLIC_API_URL`      | Backend base URL used outside development mode                   |
-| `EXPO_PUBLIC_SUPABASE_URL` | Public storage base URL used for media/profile image access      |
-| `EXPO_PUBLIC_SENTRY_DSN`   | Sentry DSN for production monitoring                             |
+| Variable                   | Purpose                                                           |
+| -------------------------- | ----------------------------------------------------------------- |
+| `EXPO_PUBLIC_ENVIRONMENT`  | Selects environment behavior such as `development` or production. |
+| `EXPO_PUBLIC_DEV_API`      | Backend base URL used in development mode.                        |
+| `EXPO_PUBLIC_API_URL`      | Backend base URL used outside development mode.                   |
+| `EXPO_PUBLIC_SUPABASE_URL` | Public storage base URL used for media/profile image access.      |
+| `EXPO_PUBLIC_SENTRY_DSN`   | Sentry DSN for production monitoring.                             |
 
 ## Scripts
 
-| Command             | Description                       |
-| ------------------- | --------------------------------- |
-| `npm run start`     | Start the Expo development server |
-| `npm run android`   | Open the app in Android flow      |
-| `npm run ios`       | Open the app in iOS flow          |
-| `npm run test`      | Run the Jest test suite           |
-| `npm run lint`      | Run ESLint                        |
-| `npm run typecheck` | Run TypeScript type checking      |
+| Command             | Description                        |
+| ------------------- | ---------------------------------- |
+| `npm run start`     | Start the Expo development server. |
+| `npm run android`   | Open the app in Android flow.      |
+| `npm run ios`       | Open the app in iOS flow.          |
+| `npm run web`       | Start Expo web mode.               |
+| `npm run test`      | Run the Jest test suite.           |
+| `npm run lint`      | Run ESLint.                        |
+| `npm run typecheck` | Run TypeScript type checking.      |
 
 ## Roadmap
 
-- Expand AI analysis beyond squat to more exercises and richer feedback
-- Deepen analytics and workout trend insights
-- Continue improving reminder and habit-building flows
-- Expand platform hardening around observability, release safety, and performance
+- Expand **AI analysis** beyond squat to more exercises and richer feedback.
+- Deepen **analytics** around strength trends, adherence, and recovery.
+- Improve reminders and habit-building flows.
+- Continue hardening observability, release safety, and performance.
 
 ## License
 

@@ -9,26 +9,26 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 import { Inter_400Regular, Inter_500Medium, Inter_600SemiBold, Inter_700Bold } from '@expo-google-fonts/inter';
 
-import { AnalysisProvider } from './context/AnalysisContext';
-import { AuthProvider, useAuth } from './context/AuthContext';
-import { NotificationsProvider } from './context/NotificationsContext';
-import { WorkoutProvider } from './context/WorkoutContext';
+import { WorkoutHistoryProvider } from './features/workouts/shared/providers/WorkoutHistoryProvider';
+import { MessagesProvider } from './features/messages/providers/MessagesProvider';
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Constants from 'expo-constants';
 import { MaterialCommunityIcons as ExpoMaterialCommunityIcons } from '@expo/vector-icons';
 import { NotifierRoot } from 'react-native-notifier';
-import ensureDpopKeyPair from './api/DPoP/ensureDpopKeyPair';
-import { cacheHousekeepingOnBoot } from './cache/cacheUtils';
-import BottomTabBar from './components/BottomTabBar';
-import Theme1 from './components/Theme1';
-import UpdateAppModal from './components/UpdateAppModal';
-import { CardioProvider } from './context/CardioContext';
-import { GlobalAppLoadingProvider } from './context/GlobalAppLoadingContext';
+import ensureDpopKeyPair from './infrastructure/api/dpop/ensureDpopKeyPair';
+import { cacheHousekeepingOnBoot } from './infrastructure/cache/cache.utils';
+import BottomTabBar from './shared/components/BottomTabBar';
+import Theme1 from './shared/components/Theme1';
+import UpdateAppModal from './shared/components/UpdateAppModal';
+import { CardioProvider } from './features/workouts/shared/providers/CardioProvider';
 import AppStack from './navigation/AppStack';
 import AuthStack from './navigation/AuthStack';
-import NotificationsSetup from './notifications/NotificationsSetup';
-import Sentry from './sentry';
+import NotificationsSetup from './features/settings/push-notifications-setup/notifications-setup.setup';
+import Sentry from './infrastructure/sentry';
+import { GlobalAppLoadingProvider } from './shared/providers/GlobalAppLoadingProvider';
+import { AuthProvider, useAuth } from './features/auth/shared/providers/AuthProvider';
+import { WorkoutPlanProvider } from './features/workouts/shared/providers/WorkoutPlanProvider';
 
 // ---------- Fonts Loader Hook ----------
 function useFontsReady() {
@@ -134,15 +134,15 @@ function RootNavigator() {
 // ---------- App branch wrapped with app-scoped providers ----------
 function AppWithProviders() {
   return (
-    <NotificationsProvider>
-      <WorkoutProvider>
-        <AnalysisProvider>
+    <MessagesProvider>
+      <WorkoutPlanProvider>
+        <WorkoutHistoryProvider>
           <CardioProvider>
             <MainApp />
           </CardioProvider>
-        </AnalysisProvider>
-      </WorkoutProvider>
-    </NotificationsProvider>
+        </WorkoutHistoryProvider>
+      </WorkoutPlanProvider>
+    </MessagesProvider>
   );
 }
 
