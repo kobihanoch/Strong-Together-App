@@ -1,6 +1,6 @@
 {
   "name": "newreactnativeapp",
-  "version": "5.2.1-rc.0",
+  "version": "5.2.1",
   "main": "expo/AppEntry.js",
   "scripts": {
     "start": "expo start",
