@@ -1,4 +1,4 @@
-# Strong Together App - Frontend (v5.2.0)
+# Strong Together App - Frontend (v5.2.1)
 
 <p align="center">
   <img src="assets/icon.png" alt="Strong Together icon" width="140" />
