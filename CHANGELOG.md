@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [5.2.1](https://github.com/kobihanoch/Strong-Together-App/compare/v5.2.1-rc.0...v5.2.1) (2026-04-25)
+
+### [5.2.1-rc.0](https://github.com/kobihanoch/Strong-Together-App/compare/v5.2.0...v5.2.1-rc.0) (2026-04-25)
+
+
+### Bug Fixes
+
+* **Statistics page:** FIxed crash on images that doesn't exist ([324c4f4](https://github.com/kobihanoch/Strong-Together-App/commit/324c4f41814f5df15ee04d9696f8aba704d6cddd))
+
 ## [5.2.0](https://github.com/kobihanoch/Strong-Together-App/compare/v5.1.1...v5.2.0) (2026-04-22)
 
 

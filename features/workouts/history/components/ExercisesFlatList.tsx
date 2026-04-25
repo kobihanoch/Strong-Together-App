@@ -29,7 +29,7 @@ type ExerciseDataProps = {
 const ExerciseItem = ({ exData, lastPerformanceData }: ExerciseDataProps) => {
   const mainMuscle = exData?.exercisetoworkoutsplit.exercises.targetmuscle as keyof typeof Images;
   const specificMuscle = exData?.exercisetoworkoutsplit?.exercises?.specifictargetmuscle;
-  const imagePath = mainMuscle && specificMuscle ? (Images[mainMuscle] as Record<string, any>)[specificMuscle] : null;
+  const imagePath = mainMuscle && specificMuscle ? (Images[mainMuscle] as Record<string, any>)?.[specificMuscle] : null;
   const lastLogOfEx = useMemo(() => {
     if (lastPerformanceData) {
       const [last] = lastPerformanceData.filter((ex) => ex.exercisetosplit_id === exData.exercisetosplit_id);
@@ -71,12 +71,16 @@ const ExerciseItem = ({ exData, lastPerformanceData }: ExerciseDataProps) => {
               end={[1, 1]}
               style={styles.imageContainer}
             >
-              <Image
-                source={imagePath}
-                cachePolicy="disk"
-                contentFit="contain" // keep proportions, no stretching
-                style={{ width: '100%', height: '100%' }} // let the container size it
-              />
+              {imagePath ? (
+                <Image
+                  source={imagePath}
+                  cachePolicy="disk"
+                  contentFit="contain" // keep proportions, no stretching
+                  style={{ width: '100%', height: '100%' }} // let the container size it
+                />
+              ) : (
+                <Text style={{ alignSelf: 'center' }}>{exData.exercisetoworkoutsplit.exercises.targetmuscle}</Text>
+              )}
             </LinearGradient>
 
             <Column style={{ flex: 1, gap: 6 }}>
@@ -173,6 +177,8 @@ const styles = StyleSheet.create({
     padding: 12, // was 20; gives the image room
     borderRadius: 16,
     overflow: 'hidden', // ensure rounded corners actually clip the image
+    justifyContent: 'center',
+    fontFamily: 'Inter_500Medium',
   },
   exerciseTitle: {
     fontFamily: 'Inter_500Medium',
