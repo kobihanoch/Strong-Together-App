@@ -23,70 +23,48 @@
   <img src="https://img.shields.io/badge/Tests-36%20files-16a34a" alt="Tests badge" />
 </p>
 
-Strong Together is a fitness app **published on the App Store** for planning workouts, tracking live sessions, reviewing progress, receiving reminders, and analyzing workout videos through an **AI-assisted pipeline**.
+Strong Together is a **published React Native fitness app** for workout planning, live session tracking, cardio, analytics, reminders, messages, profile management, and **AI-assisted squat analysis**.
 
-The client is shaped around the details that make mobile software feel dependable: typed feature modules, secure token handling, **DPoP-bound requests**, app-version-aware cache cleanup, realtime event handling, Sentry monitoring, CI, and a focused Jest test suite behind a polished training experience.
+This is a production-level mobile frontend with **secure auth**, **DPoP-bound API requests**, **session restoration**, **custom SWR-style caching**, **realtime Socket.IO events**, **Sentry monitoring**, and a typed feature-based architecture.
 
 > Backend repository: [Strong-Together-Backend](https://github.com/kobihanoch/Strong-Together-Backend)
 
-## TL;DR
+## Key Highlights
 
-- **Live on the App Store**: Strong Together is a released mobile app, with production build configuration and real distribution.
-- **End-to-end fitness product**: workout planning, live set tracking, cardio, analytics, reminders, messages, profile flows, and AI-assisted video analysis.
-- **Mobile architecture with depth**: feature-sliced code, typed API services, domain providers, custom cache hydration, and auth-gated rendering.
-- **Security beyond basic JWTs**: OAuth, secure refresh-token storage, in-memory access tokens, **DPoP key binding**, and signed per-request proofs.
-- **Production feedback loops**: Sentry tracing, error boundaries, update-required handling, offline/server-down alerts, CI, and broad unit coverage.
+- **Authentication flow**: email/password, **Google**, and **Apple** auth with SecureStore refresh-token persistence, in-memory access tokens, server validation, logout cleanup, and DPoP request proofs.
+- **State management architecture**: focused **React Context** providers, custom hooks, domain-specific state boundaries, and cache-backed hydration for core logged-in data.
+- **API integration**: real dedicated backend, typed Axios services, request/response interceptors, `401` refresh handling, update-required responses, network alerts, and shared error handling.
+- **Performance optimizations**: memoized derived data, cache-first startup, versioned cache invalidation, bootstrap response slicing, and global loading coordination.
+- **Async / realtime behavior**: authenticated Socket.IO flow for messages and AI analysis results, presigned video upload, upload progress, cancellation cleanup, and websocket result delivery.
+- **Separation of concerns**: screens compose hooks and components; hooks own workflow logic; services own backend calls; infrastructure owns cache, API, sockets, Sentry, and DPoP.
+- **Reusable component architecture**: shared components, feature-local UI components, typed navigation, alert utilities, and app-scoped providers mounted only in the authenticated app branch.
 
 ## Table of Contents
 
-1. [TL;DR](#tldr)
-2. [Why This Project Stands Out](#why-this-project-stands-out)
-3. [Product Features](#product-features)
-4. [Engineering Highlights](#engineering-highlights)
-5. [Architecture](#architecture)
-6. [Documentation](#documentation)
-7. [Screenshots](#screenshots)
-8. [Tech Stack](#tech-stack)
-9. [Local Setup](#local-setup)
-10. [Environment Variables](#environment-variables)
-11. [Scripts](#scripts)
-12. [Roadmap](#roadmap)
-13. [License](#license)
+1. [Product Scope](#product-scope)
+2. [App Architecture](#app-architecture)
+3. [Frontend Engineering Decisions & Tradeoffs](#frontend-engineering-decisions--tradeoffs)
+4. [Auth Flow](#auth-flow)
+5. [Data, Cache, and API Flow](#data-cache-and-api-flow)
+6. [Engineering Highlights](#engineering-highlights)
+7. [Documentation](#documentation)
+8. [Screenshots](#screenshots)
+9. [Tech Stack](#tech-stack)
+10. [Local Setup](#local-setup)
+11. [Environment Variables](#environment-variables)
+12. [Scripts](#scripts)
+13. [Roadmap](#roadmap)
+14. [License](#license)
 
-## Why This Project Stands Out
+## Product Scope
 
-- **Published mobile product**: available on the **App Store**, with release configuration that separates production and development builds.
-- **Production frontend architecture**: feature-based modules, typed services, domain providers, shared infrastructure, and reusable UI primitives.
-- **Secure auth flow**: email/password, **Google**, **Apple**, refresh-token rotation, secure token storage, and **DPoP** proof support.
-- **Offline-first experience**: custom **SWR-inspired cache layer** hydrates core screens before fresh API data arrives.
-- **Realtime UX**: authenticated Socket.IO flow for in-app messages and asynchronous AI analysis results.
-- **AI workout analysis**: video selection, trimming/compression guardrails, presigned upload, upload progress, Sentry tracing, and websocket result delivery.
-- **Quality practices**: **TypeScript**, **Jest**, Testing Library, CI on pull requests, Sentry error boundaries, and app-version-aware cache cleanup.
+- Build and edit **custom workout plans** with splits and exercises.
+- Track **live workouts** with sets, reps, weights, notes, and previous workout comparison.
+- Review **statistics**, adherence trends, cardio history, and estimated strength insights.
+- Manage **messages**, reminders, push notification settings, profile details, and profile images.
+- Run **AI-assisted squat analysis** from selected workout videos.
 
-## Product Features
-
-- Create and edit **custom workout plans** with splits and exercises.
-- Start **live workout sessions** and log sets, reps, and weights.
-- Compare current training with **previous workout data**.
-- Review **statistics**, summaries, adherence trends, and estimated strength insights.
-- Track **cardio** activity with daily and weekly views.
-- Receive **system messages**, reminders, and push notification settings.
-- Manage profile details, profile images, account state, and authentication.
-- Run **AI-assisted squat analysis** from a workout video.
-
-## Engineering Highlights
-
-| Area              | What was built                                                                                                                                                  |
-| ----------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **App shell**     | Font loading, DPoP key bootstrap, versioned cache housekeeping, auth-gated navigation, coordinated global loading, Sentry boundary, update modal, and app-scoped providers. |
-| **Data layer**    | Typed Axios services, request/response interceptors, bootstrap response slicing, versioned cache keys, retry-on-401 refresh flow, and app version headers.      |
-| **State model**   | Focused contexts for **auth**, **messages**, **workout plan**, **workout history**, and **cardio**, with auth side effects split into small hooks.             |
-| **Security**      | Secure refresh token storage, access token in memory, OAuth providers, short-lived websocket tickets, DPoP key binding, and DPoP request proofs.                |
-| **Resilience**    | Offline detection, cached startup data, cache invalidation by app version, network/server-down alerts, and best-effort logout cleanup.                          |
-| **Observability** | Sentry setup, error boundary fallback, request tracing headers, HTTP spans, and traced video-analysis lifecycle spans.                                          |
-| **Testing**       | 36 test files covering screens, hooks, providers, contexts, components, and app boot behavior.                                                                  |
-
-## Architecture
+## App Architecture
 
 ```text
 +-----------------------------+        HTTPS / WebSocket        +-----------------------------+
@@ -95,20 +73,151 @@ The client is shaped around the details that make mobile software feel dependabl
 +-----------------------------+                                +-----------------------------+
 ```
 
-The frontend is organized by **feature domains**:
+### Feature Structure
 
-- `features/auth` - login, register, OAuth, token lifecycle, and session context
-- `features/workouts` - planning, live session tracking, history, analytics, cardio, and AI analysis
-- `features/messages` - inbox state, unread derivation, and realtime updates
-- `features/profile` - media upload and profile editing
-- `infrastructure` - API client, interceptors, cache, DPoP, sockets, and Sentry
-- `shared` - reusable components, hooks, providers, constants, and alert utilities
+- `features/auth` - login, register, OAuth, token lifecycle, session validation, and auth context.
+- `features/workouts` - workout planning, live sessions, history, analytics, cardio, and AI analysis.
+- `features/messages` - inbox state, unread derivation, message actions, and realtime updates.
+- `features/profile` - profile editing, profile image selection, and media upload services.
+- `features/settings` - push notification permission flow and settings UI.
+- `infrastructure` - Axios, interceptors, cache utilities, DPoP helpers, sockets, and Sentry.
+- `navigation` - authenticated and unauthenticated stacks with typed route params.
+- `shared` - reusable components, hooks, providers, alerts, constants, and utilities.
 
-The backend owns database schemas, scheduled jobs, API implementation, and server-side business rules. This client keeps its responsibility focused on mobile UX, state, rendering, networking, and device integrations.
+### Screen / Navigation Structure
+
+- `App.tsx` loads fonts, bootstraps DPoP keys, runs cache housekeeping, mounts Sentry/alert roots, and gates rendering through `AuthProvider`.
+- `AuthStack` renders onboarding, login, register, and verification screens.
+- `AppStack` renders Home, Settings, Profile, Workout Plan, Start Workout, Create Workout, Statistics, Inbox, and Analytics.
+- Logged-in screens are wrapped with app-scoped providers for **messages**, **workout plan**, **workout history**, and **cardio**.
+
+Detailed reference: [App rendering flow](docs/app-rendering-flow.md).
+
+### State Flow
+
+State is kept in focused domain providers:
+
+- **Auth/session**: `AuthProvider`
+- **Workout plan**: `WorkoutPlanProvider`
+- **Workout history / analytics source data**: `WorkoutHistoryProvider`
+- **Cardio**: `CardioProvider`
+- **Messages**: `MessagesProvider`
+- **Screen-only UI state**: feature hooks and local component state
+
+```text
+Provider state -> feature hook -> screen composition -> presentational components
+```
+
+Detailed references: [Auth context flow](docs/auth-context-flow.md), [Custom SWR cache flow](docs/custom-swr-cache-flow.md).
+
+### Data Flow
+
+```text
+Backend API -> typed service -> provider / feature hook -> derived state -> UI
+```
+
+- **Services** own backend requests.
+- **Hooks** coordinate async workflows, navigation decisions, form behavior, and derived view models.
+- **Components** render reusable or feature-local UI.
+- **Infrastructure** centralizes API interception, cache, DPoP, sockets, and Sentry.
+
+Detailed reference: [API, realtime, and AI analysis flow](docs/api-realtime-ai-flow.md).
+
+## Frontend Engineering Decisions & Tradeoffs
+
+- **Custom hooks** keep screens thin and move workflows like auth startup, cache hydration, workout creation, media upload, and AI analysis into testable units.
+- **React Context** fits the app because shared state is domain-based and mostly server-backed; it avoids heavier global state tooling while keeping cross-screen data accessible.
+- **Feature-sliced structure** keeps components, hooks, services, types, and utils close to their domain, which improves maintainability as the product grows.
+- **Cache-first hydration** improves mobile startup speed and offline resilience, with the tradeoff of needing careful server validation and app-version cache cleanup.
+- **Centralized interceptors** reduce duplicated API code, with the tradeoff that auth, DPoP, tracing, and error handling must be documented clearly.
+- **Reusable shared UI** is used for common primitives, while feature-specific components stay near the screens that own their behavior.
+
+Deeper documentation:
+
+- [App rendering flow](docs/app-rendering-flow.md)
+- [Custom SWR cache flow](docs/custom-swr-cache-flow.md)
+- [API, realtime, and AI analysis flow](docs/api-realtime-ai-flow.md)
+- [Error alerts and UX feedback](docs/error-alerts.md)
+
+## Auth Flow
+
+Authentication is handled as an app-level flow, not just a login screen.
+
+### Login
+
+- Users authenticate with **email/password**, **Google**, or **Apple**.
+- Auth actions call typed service functions and update `AuthProvider`.
+- Refresh tokens are persisted securely; access-token behavior is kept short-lived/in-memory.
+
+### Session Restore
+
+- On startup, `AuthProvider` runs an initial session check.
+- Cached user/session identifiers allow fast hydration of known user data.
+- Server validation controls when API-backed providers can revalidate fresh data.
+
+### Auth State Maintenance
+
+- `AuthProvider` owns `isLoggedIn`, user data, auth phase, validation state, and auth actions.
+- Auth-gated rendering prevents the wrong navigation tree from flashing.
+- Socket setup happens only after the session is validated and user data is available.
+
+### Invalid Sessions
+
+- Axios interceptors handle `401` responses and refresh attempts.
+- Failed validation or invalid refresh state clears auth-sensitive context and cache state.
+- Offline/server-down cases are handled separately so cached data can remain useful when appropriate.
+
+Detailed references:
+
+- [Auth context flow](docs/auth-context-flow.md)
+- [DPoP security flow](docs/dpop-security-flow.md)
+- [App rendering flow](docs/app-rendering-flow.md)
+
+## Data, Cache, and API Flow
+
+The app uses a custom **SWR-inspired cache pattern**:
+
+```text
+Known user id -> cache key -> cached payload -> UI hydration -> server revalidation -> cache update
+```
+
+Used for:
+
+- Auth/user data
+- Workout plan
+- Workout history
+- Messages
+- Cardio-related state
+
+API behavior is centralized:
+
+- Request interceptors inject **tracing**, **app-version**, and **DPoP** headers.
+- Bootstrap response slicing can serve tracked startup data without repeated network calls.
+- Response interceptors handle **update-required**, **offline/server-down**, **401 refresh**, and fallback errors.
+- Sentry traces HTTP spans and video-analysis lifecycle spans.
+
+Detailed references:
+
+- [Custom SWR cache flow](docs/custom-swr-cache-flow.md)
+- [API, realtime, and AI analysis flow](docs/api-realtime-ai-flow.md)
+- [Error alerts and UX feedback](docs/error-alerts.md)
+
+## Engineering Highlights
+
+| Area              | What was built                                                                                                                                                         |
+| ----------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **App shell**     | Font loading, DPoP key bootstrap, versioned cache housekeeping, auth-gated navigation, global loading, Sentry boundary, update modal, and app-scoped providers.         |
+| **Data layer**    | Typed Axios services, interceptors, bootstrap response slicing, versioned cache keys, retry-on-401 refresh flow, and app-version headers.                              |
+| **State model**   | Focused contexts for auth, messages, workout plan, workout history, and cardio, with side effects split into dedicated hooks.                                          |
+| **Security**      | Secure refresh-token storage, in-memory access-token handling, OAuth providers, short-lived websocket tickets, DPoP key binding, and signed request proofs.            |
+| **Resilience**    | Offline detection, cached startup data, cache invalidation by app version, network/server-down alerts, and best-effort logout cleanup.                                 |
+| **Realtime / AI** | Socket.IO messages, websocket-delivered AI analysis results, video selection, trimming/compression guardrails, presigned upload, progress tracking, and cancellation.   |
+| **Observability** | Sentry setup, error boundary fallback, request tracing headers, HTTP spans, and video-analysis lifecycle spans.                                                        |
+| **Testing**       | 36 test files covering screens, hooks, providers, contexts, components, and app boot behavior.                                                                         |
 
 ## Documentation
 
-The README stays recruiter-friendly and compact. Deeper technical notes live here:
+High-level README sections link into deeper technical notes:
 
 - [App rendering flow](docs/app-rendering-flow.md) - startup, auth gating, provider order, and logged-in rendering.
 - [Auth context flow](docs/auth-context-flow.md) - provider responsibilities, startup hooks, login/register/OAuth, cached sessions, refresh validation, logout, and socket setup.
