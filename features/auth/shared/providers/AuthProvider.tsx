@@ -1,28 +1,18 @@
-import { CreateUserBody, GetAuthenticatedUserByIdResponse, LoginRequestBody } from '@strong-together/shared';
-import { AxiosError } from 'axios';
-import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
-import { resetBootstrap } from '../../../../infrastructure/api/api-config/bootstrap';
+import { GetAuthenticatedUserByIdResponse } from '@strong-together/shared';
+import React, { createContext, useCallback, useContext, useMemo, useRef, useState } from 'react';
 import { keyAuth } from '../../../../infrastructure/cache/cache-keys.utils';
-import {
-  cacheDeleteAllCache,
-  cacheDeleteAllCacheWithoutStartWorkout,
-  cacheGetJSON,
-  cacheSetJSON,
-} from '../../../../infrastructure/cache/cache.utils';
-import { connectSocket, disconnectSocket } from '../../../../infrastructure/socket';
-import { showErrorAlert } from '../../../../shared/alerts/error-alerts';
-import { showSuccessAlert } from '../../../../shared/alerts/success-alerts';
 import useCacheAndFetch from '../../../../shared/hooks/use-cache-and-fetch.hook';
-import { useNetworkStatus } from '../../../../shared/hooks/use-network-status.hook';
 import useUpdateGlobalLoading from '../../../../shared/hooks/use-update-global-loading.hook';
-import { loginUser } from '../../login/services/login.service';
-import { registerUser } from '../../register/services/register.service';
-import { useAppleAuth } from '../hooks/use-apple-auth.hook';
-import { useGoogleAuth } from '../hooks/use-google-auth.hook';
-import { fetchSelfUserData, logoutUser, refreshAndRotateTokens } from '../services/auth.service';
+import useAuthActions from '../hooks/use-auth-actions.hook';
+import useAuthSocketInitialization from '../hooks/use-auth-socket-initialization';
+import useClearContext from '../hooks/use-clear-context.hook';
+import useInitialCheck from '../hooks/use-initial-check.hook';
+import usePersistUserIdCache from '../hooks/use-persist-user-id-cache.hook';
+import useRetryServerValidationWhenOnline from '../hooks/use-retry-server-validation-when-online.hook';
+import useServerValidation from '../hooks/use-server-validation.hook';
+import useSyncUsernameHeader from '../hooks/use-sync-username-header.hook';
+import { fetchSelfUserData } from '../services/auth.service';
 import { AppUser } from '../types/auth.types';
-import GlobalAuth from '../utils/auth.utils';
-import { clearRefreshToken, getRefreshToken, saveRefreshToken } from '../utils/token-storage.utils';
 import { AuthProviderValue, UserCachePayload } from './types/auth-context.types';
 
 const AuthContext = createContext<AuthProviderValue | null>(null);
@@ -40,16 +30,13 @@ export const useAuth = () => {
  * Responsibilities:
  * - Hold authentication & session state (user, isLoggedIn, loading flags)
  * - Expose auth actions (register, login, logout)
- * - Handle session bootstrap (checkIfUserSession, initializeUserSession)
- * - DO NOT hold workout/analysis state here (separate contexts handle them)
+ * - Orchestrate session bootstrap, server validation, auth cache hydration, and socket setup
  */
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
-  // --- Caching state - if stored so start load cached user data ---
+  // --- Cached session identifier ---
   const [userIdCache, setUserIdCache] = useState<AppUser['id'] | null | undefined>(undefined);
-  useEffect(() => {
-    if (userIdCache !== undefined) cacheSetJSON<AppUser['id'] | null>('CACHE:USER_ID', userIdCache);
-  }, [userIdCache]);
+  usePersistUserIdCache(userIdCache);
 
   // --- Auth & session state ---
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
@@ -59,292 +46,83 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<AppUser | null | undefined>(undefined);
   const [isWorkoutMode, setIsWorkoutMode] = useState<boolean>(false); // For start workout
 
-  // --- For fluint loading at startup with no blinks ---
+  // --- Startup phase for smooth auth-stack/app-stack routing ---
   const [authPhase, setAuthPhase] = useState<'checking' | 'authed' | 'guest'>('checking');
 
-  // --- Offline mode supportings ---
-  const isOnline = useNetworkStatus();
-  const attemptedServerValidationRef = useRef<boolean>(false);
-  const serverValidatingLockRef = useRef<boolean>(false);
-
-  // --- OAuth ---
-  const { signInWithGoogle } = useGoogleAuth();
-  const { signInWithApple } = useAppleAuth();
-
-  // --- Flag for below contexes for fetching with API ---
+  // --- Unlocks API revalidation for cache-backed providers ---
   const [isValidatedWithServer, setIsValidatedWithServer] = useState(false);
 
-  // -------------------------- useCacheHandler props ------------------------------
+  // --- Guards server validation attempts ---
+  const serverValidatingLockRef = useRef<boolean>(false);
+  const attemptedServerValidationRef = useRef<boolean>(false);
 
-  // Fetch function
+  // --- Auth user cache + revalidation ---
   const fetchFn = useCallback(async () => await fetchSelfUserData(), []);
 
-  // On data function
   const onDataFn = useCallback((u: UserCachePayload | GetAuthenticatedUserByIdResponse) => {
     setUser(u);
   }, []);
 
-  // Hook usage
   const { loading: userDataLoading } = useCacheAndFetch<UserCachePayload, GetAuthenticatedUserByIdResponse>(
-    { id: userIdCache }, // user prop
-    keyAuth, // key builder
-    isValidatedWithServer, // flag from server
-    fetchFn, // fetch cb
-    onDataFn, // on data cb
-    user, // cache payload
-    'Auth Context', // log
+    { id: userIdCache },
+    keyAuth,
+    isValidatedWithServer,
+    fetchFn,
+    onDataFn,
+    user,
+    'Auth Context',
   );
 
-  // Report auth session loading to global loading
+  // Report auth startup/user-data loading to the global loading coordinator
   useUpdateGlobalLoading('Auth', authPhase === 'checking' || userDataLoading);
 
-  useEffect(() => {
-    if (user?.username) GlobalAuth.setUsernameInHeader(user?.username);
-  }, [user]);
+  // Clear context method
+  const { clearContext } = useClearContext({
+    setIsLoggedIn,
+    setLoading,
+    setAppleLoading,
+    setGoogleLoading,
+    setUser,
+    setIsWorkoutMode,
+    setUserIdCache,
+    setIsValidatedWithServer,
+    setAuthPhase,
+    serverValidatingLockRef,
+    attemptedServerValidationRef,
+  });
 
-  const clearContext = useCallback(async () => {
-    await clearRefreshToken();
-    await cacheDeleteAllCacheWithoutStartWorkout();
-    GlobalAuth.setAccessToken(null);
-    GlobalAuth.setUsernameInHeader(null);
-    resetBootstrap();
-    setIsLoggedIn(false);
-    setLoading(false);
-    setAppleLoading(false);
-    setGoogleLoading(false);
-    setUser(undefined);
-    setIsWorkoutMode(false);
-    setUserIdCache(undefined);
-    setIsValidatedWithServer(false);
-    setAuthPhase('guest');
-    attemptedServerValidationRef.current = false;
-    serverValidatingLockRef.current = false;
-  }, []);
+  // Attempt server validation method
+  const { attemptServerValidation } = useServerValidation({
+    clearContext,
+    setIsValidatedWithServer,
+    setUserIdCache,
+    serverValidatingLockRef,
+    attemptedServerValidationRef,
+  });
 
-  /**
-   * initializeUserSession
-   * - Called after we have a valid user + tokens.
-   * - Responsible for one-time side effects (e.g., socket connect).
-   */
-  const initializeUserSession = useCallback(async (username: AppUser['username']): Promise<void> => {
-    await connectSocket(username);
-  }, []);
+  // Restore cached session on app start, then validate it in the background
+  useInitialCheck({ clearContext, attemptServerValidation, setUserIdCache, setIsLoggedIn, setAuthPhase });
 
-  // Attempting server validation fuction
-  const attemptServerValidation = useCallback(async (): Promise<void> => {
-    try {
-      // Check if user is cached
-      // Initialize session tokens
-      // Avoid multiple calls on unstable network
-      if (serverValidatingLockRef.current) return;
-      serverValidatingLockRef.current = true;
-      //await new Promise((res) => setTimeout(res, 3000)); // wait 3 seconds
-      const { accessToken: at, refreshToken: rt, userId } = await refreshAndRotateTokens();
-      await saveRefreshToken(rt);
-      GlobalAuth.setAccessToken(at);
-      // For other contexes to start fetching from API after cache
-      setIsValidatedWithServer(true);
-      console.log('\x1b[32m[Auth Context]: Validation with server completed => Fetching data from API\x1b[0m');
-      setUserIdCache(userId);
-    } catch (e) {
-      if (e instanceof AxiosError) {
-        if (e.isUpgradeRequired) {
-          console.log('\x1b[31m[Auth Context]: Upgrade required. Modal is up.\x1b[0m');
-          setIsValidatedWithServer(false);
-          return;
-        }
-        if (e.isNetworkError) {
-          console.log(
-            '\x1b[33m[Auth Context]: Server validation skipped (offline). Staying logged-in with cached data.\x1b[0m',
-          );
-          setIsValidatedWithServer(false);
-          return;
-        }
-        if (e.isServerError) {
-          console.log(
-            '\x1b[33m[Auth Context]: Server validation skipped (offline). Staying logged-in with cached data.\x1b[0m',
-          );
-          setIsValidatedWithServer(false);
-          return;
-        }
-      }
-      console.log('\x1b[31m[Auth Context]: Validation with server failed => Logging out\x1b[0m');
-      await clearContext();
-    } finally {
-      attemptedServerValidationRef.current = true;
-      serverValidatingLockRef.current = false;
-    }
-  }, [clearContext]);
+  // Connect socket only after the session is server-validated and user data is known
+  useAuthSocketInitialization(user?.username, isValidatedWithServer);
 
-  // Inital check
-  useEffect(() => {
-    (async () => {
-      // If a prev session => get user id and store it in state
-      // At this point an auth key is building and automatically trying to fetch user data from cache
-      // Auto start belows useEffect
-      setAuthPhase('checking');
-      const cacheUserId = await cacheGetJSON<AppUser['id']>('CACHE:USER_ID');
-      const existingRt = await getRefreshToken();
-      if (!existingRt || !cacheUserId) {
-        // No refresh token -> no session => stay logged out and auto renavifate to auth stack
-        console.log('\x1b[31m[Auth Context]: No latest user => Login is required\x1b[0m');
-        await clearContext();
-        return;
-      }
-      // Triggers SWR hook logic chain
-      setUserIdCache(cacheUserId);
-      setIsLoggedIn(true);
-      setAuthPhase('authed');
+  // Retry server validation when a boot-time offline/server failure recovers
+  useRetryServerValidationWhenOnline(isValidatedWithServer, attemptServerValidation, attemptedServerValidationRef);
 
-      // Try to validate with server
-      // Silent background validation with server (if there was a previuos session)
-      await attemptServerValidation();
-    })();
-  }, [clearContext]);
+  // Keep username header aligned with current auth user
+  useSyncUsernameHeader(user);
 
-  // If starting in offline mode - fetch later
-  useEffect(() => {
-    (async (): Promise<void> => {
-      if (!isValidatedWithServer && attemptedServerValidationRef.current && isOnline) {
-        await attemptServerValidation();
-      }
-    })();
-  }, [isValidatedWithServer, isOnline]);
-
-  // Connect socket only after server validates
-  useEffect(() => {
-    if (isValidatedWithServer && user?.username) {
-      initializeUserSession(user.username);
-    }
-  }, [isValidatedWithServer, initializeUserSession, user?.username]);
-
-  /**
-   * login
-   * - Logs in with username/password.
-   * - Saves refresh token, sets access token, sets user, runs initializeUserSession.
-   */
-  const login = useCallback(
-    async (identifier: LoginRequestBody['identifier'], password: LoginRequestBody['password']): Promise<void> => {
-      try {
-        setLoading(true);
-        const { accessToken: at, refreshToken: rt, user: u } = await loginUser(identifier, password);
-        await saveRefreshToken(rt);
-        GlobalAuth.setAccessToken(at);
-
-        // Start cache hook logic
-        // User is fetched from server by cache hook
-        console.log('Redirecting to app stack => is logged in true and data is being fetched');
-        setUserIdCache(u);
-        setIsLoggedIn(true);
-
-        console.log('\x1b[32m[Auth Context]: Login succeeded!\x1b[0m');
-        setIsValidatedWithServer(true);
-        setAuthPhase('authed');
-      } catch {
-      } finally {
-        setLoading(false);
-      }
-    },
-    [],
-  );
-
-  /**
-   * register
-   * - Registers a new user, then logs in.
-   */
-  const register = useCallback(
-    async (
-      email: CreateUserBody['email'],
-      password: CreateUserBody['password'],
-      username: CreateUserBody['username'],
-      fullName: CreateUserBody['fullName'],
-      gender: CreateUserBody['gender'],
-    ): Promise<void> => {
-      try {
-        setLoading(true);
-        await registerUser(email, password, username, fullName, gender);
-        //await login(username, password);
-        showSuccessAlert('Please verify your account', `An email has been sent to ${email}`);
-      } catch {
-      } finally {
-        setLoading(false);
-      }
-    },
-    [],
-  );
-
-  /**
-   * logout
-   * - Server-side logout attempt (best-effort)
-   * - Always clears local session (tokens, user, sockets)
-   * - Workout/Analysis providers will observe user=null and reset themselves
-   */
-  const logout = useCallback(async (): Promise<void> => {
-    try {
-      await logoutUser();
-      setIsLoggedIn(false);
-      setUser(null);
-      await cacheDeleteAllCache();
-    } catch (err) {
-      // Log but do not block local cleanup
-      if (err instanceof AxiosError) console.log(err?.response?.data || err.message);
-    } finally {
-      try {
-        disconnectSocket();
-      } catch {}
-      await clearContext();
-    }
-  }, []);
-
-  const handleGoogleAuth = useCallback(async (): Promise<void> => {
-    // Login with AT is deprecated
-    setGoogleLoading(true);
-    try {
-      const { accessToken: at, refreshToken: rt, user: u } = await signInWithGoogle();
-
-      await saveRefreshToken(rt);
-      GlobalAuth.setAccessToken(at);
-
-      setIsLoggedIn(true);
-      setUserIdCache(u);
-      console.log('\x1b[32m[Auth Context]: Login succeeded!\x1b[0m');
-      setIsValidatedWithServer(true);
-      setAuthPhase('authed');
-    } catch (e) {
-      if (e instanceof Error) showErrorAlert('Error signing in with Google', e.message);
-    } finally {
-      setGoogleLoading(false);
-    }
-  }, [signInWithGoogle]);
-
-  const handleAppleAuth = useCallback(async () => {
-    // Login with at is deprecated
-    setAppleLoading(true);
-    try {
-      const { accessToken: at, refreshToken: rt, user: u } = await signInWithApple();
-
-      await saveRefreshToken(rt);
-      GlobalAuth.setAccessToken(at);
-
-      setIsLoggedIn(true);
-      setUserIdCache(u);
-      console.log('\x1b[32m[Auth Context]: Login succeeded!\x1b[0m');
-      setIsValidatedWithServer(true);
-      setAuthPhase('authed');
-    } catch (e) {
-      if (e instanceof Error) showErrorAlert('Error signing in with Apple', e.message);
-    } finally {
-      setAppleLoading(false);
-    }
-  }, [signInWithApple]);
-
-  // Expose the real logout to axios interceptors via GlobalAuth.logout
-  useEffect(() => {
-    GlobalAuth.logout = logout;
-    return () => {
-      GlobalAuth.logout = null;
-    };
-  }, [logout]);
+  const { register, login, handleAppleAuth, handleGoogleAuth, logout } = useAuthActions({
+    setLoading,
+    setAppleLoading,
+    setGoogleLoading,
+    setUserIdCache,
+    setIsLoggedIn,
+    setUser,
+    setIsValidatedWithServer,
+    setAuthPhase,
+    clearContext,
+  });
 
   // Memoized context value
   const value = useMemo<AuthProviderValue>(
@@ -365,10 +143,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       handleAppleAuth,
       handleGoogleAuth,
       logout,
-      // init fns (exposed for bootstrappers if needed)
-      initial: {
-        initializeUserSession,
-      },
       isWorkoutMode,
       setIsWorkoutMode,
       isValidatedWithServer,
@@ -387,7 +161,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       handleAppleAuth,
       handleGoogleAuth,
       logout,
-      initializeUserSession,
       isWorkoutMode,
       setIsWorkoutMode,
       isValidatedWithServer,

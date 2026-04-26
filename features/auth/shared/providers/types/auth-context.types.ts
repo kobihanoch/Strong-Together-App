@@ -27,7 +27,4 @@ export interface AuthProviderValue {
   handleAppleAuth: () => Promise<void>;
   handleGoogleAuth: () => Promise<void>;
   logout: () => Promise<void>;
-  initial: {
-    initializeUserSession: (username: AppUser['username']) => Promise<void>;
-  };
 }
