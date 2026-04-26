@@ -30,7 +30,7 @@ jest.mock('axios', () => ({
 
 const mockReplace = jest.fn<(screen: string) => void>();
 const mockCacheGetJSON = jest.fn<(key: string) => Promise<unknown>>();
-const mockCacheSetJSON = jest.fn<(key: string, value: unknown, ttl: number) => Promise<void>>();
+const mockCacheSetJSON = jest.fn<(key: string, value: unknown, ttl?: number) => Promise<void>>();
 const mockCacheDeleteKey = jest.fn<(key: string) => Promise<void>>();
 const mockCacheDeleteAllCache = jest.fn<() => Promise<void>>();
 const mockCacheDeleteAllCacheWithoutStartWorkout = jest.fn<() => Promise<void>>();
@@ -98,7 +98,7 @@ jest.mock('../../../../../infrastructure/cache/cache.utils', () => {
   return {
     ...actual,
     cacheGetJSON: (key: string) => mockCacheGetJSON(key),
-    cacheSetJSON: (key: string, value: unknown, ttl: number) => mockCacheSetJSON(key, value, ttl),
+    cacheSetJSON: (key: string, value: unknown, ttl?: number) => mockCacheSetJSON(key, value, ttl),
     cacheDeleteKey: (key: string) => mockCacheDeleteKey(key),
     cacheDeleteAllCache: () => mockCacheDeleteAllCache(),
     cacheDeleteAllCacheWithoutStartWorkout: () => mockCacheDeleteAllCacheWithoutStartWorkout(),
@@ -169,11 +169,10 @@ jest.mock('../../../../auth/shared/utils/auth.utils', () => ({
   },
 }));
 
-jest.mock('../../../../../shared/errors/error-alerts', () => ({
+jest.mock('../../../../../shared/alerts/error-alerts', () => ({
   showErrorAlert: (title: string, msg: string) => mockShowErrorAlert(title, msg),
 }));
 
-import { TTL_36H } from '../../../../../infrastructure/cache/cache.utils';
 import { keyStartWorkout } from '../../../../../infrastructure/cache/cache-keys.utils';
 import { WorkoutHistoryProvider, useWorkoutHistoryContext } from '../../../shared/providers/WorkoutHistoryProvider';
 import { AuthProvider, useAuth } from '../../../../auth/shared/providers/AuthProvider';
@@ -349,10 +348,7 @@ describe('use-start-workout-page-logic.hook integration', () => {
         workoutPlan: userWithWorkoutNoHistoryProfile.workout,
         workoutPlanForEditWorkout: userWithWorkoutNoHistoryProfile.workoutForEdit,
       },
-      analysis: {
-        exerciseTrackingMaps: userWithWorkoutNoHistoryProfile.exerciseTrackingMaps,
-        exerciseTrackingAnalysisUnpacked: userWithWorkoutNoHistoryProfile.analyzedExerciseTrackingData,
-      },
+      analysis: createEmptyTrackingResponse(),
     });
     mockRefreshAndRotateTokens.mockRejectedValue(createNetworkAxiosError());
 
@@ -409,7 +405,7 @@ describe('use-start-workout-page-logic.hook integration', () => {
           },
           pausedTotal: 0,
         }),
-        TTL_36H,
+        undefined,
       );
     });
   });
@@ -422,10 +418,7 @@ describe('use-start-workout-page-logic.hook integration', () => {
         workoutPlan: userWithWorkoutNoHistoryProfile.workout,
         workoutPlanForEditWorkout: userWithWorkoutNoHistoryProfile.workoutForEdit,
       },
-      analysis: {
-        exerciseTrackingMaps: userWithWorkoutNoHistoryProfile.exerciseTrackingMaps,
-        exerciseTrackingAnalysisUnpacked: userWithWorkoutNoHistoryProfile.analyzedExerciseTrackingData,
-      },
+      analysis: createEmptyTrackingResponse(),
     });
     mockRefreshAndRotateTokens.mockRejectedValue(createNetworkAxiosError());
 
@@ -460,7 +453,7 @@ describe('use-start-workout-page-logic.hook integration', () => {
           startTime: resumedWorkout.startTime,
           pausedTotal: 0,
         }),
-        TTL_36H,
+        undefined,
       );
     });
   });
@@ -473,10 +466,7 @@ describe('use-start-workout-page-logic.hook integration', () => {
         workoutPlan: userWithWorkoutNoHistoryProfile.workout,
         workoutPlanForEditWorkout: userWithWorkoutNoHistoryProfile.workoutForEdit,
       },
-      analysis: {
-        exerciseTrackingMaps: userWithWorkoutNoHistoryProfile.exerciseTrackingMaps,
-        exerciseTrackingAnalysisUnpacked: userWithWorkoutNoHistoryProfile.analyzedExerciseTrackingData,
-      },
+      analysis: createEmptyTrackingResponse(),
     });
     mockRefreshAndRotateTokens.mockRejectedValue(createNetworkAxiosError());
     mockSaveWorkoutData.mockResolvedValue(createPackedTrackingResponse());
@@ -532,10 +522,7 @@ describe('use-start-workout-page-logic.hook integration', () => {
         workoutPlan: userWithWorkoutNoHistoryProfile.workout,
         workoutPlanForEditWorkout: userWithWorkoutNoHistoryProfile.workoutForEdit,
       },
-      analysis: {
-        exerciseTrackingMaps: userWithWorkoutNoHistoryProfile.exerciseTrackingMaps,
-        exerciseTrackingAnalysisUnpacked: userWithWorkoutNoHistoryProfile.analyzedExerciseTrackingData,
-      },
+      analysis: createEmptyTrackingResponse(),
     });
     mockRefreshAndRotateTokens.mockRejectedValue(createNetworkAxiosError());
 
@@ -563,10 +550,7 @@ describe('use-start-workout-page-logic.hook integration', () => {
         workoutPlan: userWithWorkoutNoHistoryProfile.workout,
         workoutPlanForEditWorkout: userWithWorkoutNoHistoryProfile.workoutForEdit,
       },
-      analysis: {
-        exerciseTrackingMaps: userWithWorkoutNoHistoryProfile.exerciseTrackingMaps,
-        exerciseTrackingAnalysisUnpacked: userWithWorkoutNoHistoryProfile.analyzedExerciseTrackingData,
-      },
+      analysis: createEmptyTrackingResponse(),
     });
     mockRefreshAndRotateTokens.mockRejectedValue(createNetworkAxiosError());
 

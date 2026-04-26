@@ -192,6 +192,20 @@ const createPackedTrackingResponse = () => ({
   },
 });
 
+const createEmptyTrackingResponse = () => ({
+  exerciseTrackingMaps: userWithoutWorkoutProfile.exerciseTrackingMaps!,
+  exerciseTrackingAnalysis: {
+    unique_days: 0,
+    most_frequent_split: null,
+    most_frequent_split_days: null,
+    lastWorkoutDate: null,
+    splitDaysByName: {},
+    prs: {
+      pr_max: null,
+    },
+  },
+});
+
 const createCardioCachePayload = (selectedDate: string) => {
   const baseDailyRecord = userWithWorkoutAndHistoryProfile.cardioDailyMap?.['2026-03-27']?.[0];
   const baseWeeklyRecord = userWithWorkoutAndHistoryProfile.cardioWeeklyMap?.['2026-03-23']?.records?.[0];
@@ -296,10 +310,7 @@ describe('use-statistics-page-logic.hook integration', () => {
     setupCacheForScenario({
       userId: 'user-1',
       auth: userWithoutWorkoutProfile.user,
-      analysis: {
-        exerciseTrackingMaps: userWithoutWorkoutProfile.exerciseTrackingMaps,
-        exerciseTrackingAnalysisUnpacked: userWithoutWorkoutProfile.analyzedExerciseTrackingData,
-      },
+      analysis: createEmptyTrackingResponse(),
       cardio: {
         daily: userWithoutWorkoutProfile.cardioDailyMap,
         weekly: userWithoutWorkoutProfile.cardioWeeklyMap,
@@ -326,10 +337,7 @@ describe('use-statistics-page-logic.hook integration', () => {
     setupCacheForScenario({
       userId: 'user-1',
       auth: userWithoutWorkoutProfile.user,
-      analysis: {
-        exerciseTrackingMaps: userWithoutWorkoutProfile.exerciseTrackingMaps,
-        exerciseTrackingAnalysisUnpacked: userWithoutWorkoutProfile.analyzedExerciseTrackingData,
-      },
+      analysis: createEmptyTrackingResponse(),
       cardio: {
         daily: userWithoutWorkoutProfile.cardioDailyMap,
         weekly: userWithoutWorkoutProfile.cardioWeeklyMap,
@@ -348,7 +356,7 @@ describe('use-statistics-page-logic.hook integration', () => {
     });
 
     await act(async () => {
-      result.current.analysis.setExerciseTrackingMaps(userWithWorkoutAndHistoryProfile.exerciseTrackingMaps);
+      result.current.analysis.setExerciseTrackingMaps(userWithWorkoutAndHistoryProfile.exerciseTrackingMaps!);
     });
 
     expect(result.current.statistics.selectedDate).toBe(today);
@@ -371,10 +379,7 @@ describe('use-statistics-page-logic.hook integration', () => {
     setupCacheForScenario({
       userId: 'user-1',
       auth: userWithoutWorkoutProfile.user,
-      analysis: {
-        exerciseTrackingMaps: userWithoutWorkoutProfile.exerciseTrackingMaps,
-        exerciseTrackingAnalysisUnpacked: userWithoutWorkoutProfile.analyzedExerciseTrackingData,
-      },
+      analysis: createEmptyTrackingResponse(),
       cardio: cardioPayload,
     });
     mockRefreshAndRotateTokens.mockRejectedValue(createNetworkAxiosError());

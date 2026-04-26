@@ -30,7 +30,7 @@ jest.mock('expo-constants', () => ({
   },
 }));
 
-type UseCacheAndFetchReturn = { loading: boolean; cacheKnown: boolean };
+type UseCacheAndFetchReturn = { loading: boolean };
 type UseCacheAndFetchMockFn = (
   user: unknown,
   keyBuilderFn: unknown,
@@ -108,7 +108,6 @@ const createHydratingUseCacheAndFetchMock = (payload: {
     }
     return {
       loading: false,
-      cacheKnown: true,
     };
   };
 };
@@ -122,7 +121,6 @@ describe('WorkoutPlanContext', () => {
     });
     mockUseCacheAndFetch.mockReturnValue({
       loading: false,
-      cacheKnown: true,
     });
     mockGetUserWorkout.mockResolvedValue({
       workoutPlan: null,
@@ -134,7 +132,7 @@ describe('WorkoutPlanContext', () => {
     const { result } = renderHook(() => useWorkoutPlanContext(), { wrapper });
 
     expect(result.current.workout).toBe(guestProfile.workout);
-    expect(result.current.workoutForEdit).toBe(guestProfile.workoutForEdit);
+    expect(result.current.workoutForEdit).toBeUndefined();
     expect(result.current.workoutSplits).toEqual([]);
     expect(result.current.exercises).toEqual({});
     expect(result.current.loading).toBe(false);
@@ -144,10 +142,7 @@ describe('WorkoutPlanContext', () => {
       false,
       expect.any(Function),
       expect.any(Function),
-      {
-        workoutPlan: null,
-        workoutPlanForEditWorkout: null,
-      },
+      undefined,
       'Workout Context',
     );
   });

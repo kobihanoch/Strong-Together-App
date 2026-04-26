@@ -31,7 +31,7 @@ jest.mock('expo-constants', () => ({
   },
 }));
 
-type UseCacheAndFetchReturn = { loading: boolean; cacheKnown: boolean };
+type UseCacheAndFetchReturn = { loading: boolean };
 type UseCacheAndFetchMockFn = (
   user: unknown,
   keyBuilderFn: unknown,
@@ -104,7 +104,6 @@ const createHydratingUseCacheAndFetchMock = (payload: UserAerobicsResponse | any
     }
     return {
       loading: false,
-      cacheKnown: true,
     };
   };
 };
@@ -136,7 +135,6 @@ describe('CardioContext', () => {
     });
     mockUseCacheAndFetch.mockReturnValue({
       loading: false,
-      cacheKnown: true,
     });
     mockGetUserCardio.mockResolvedValue({
       daily: {},
@@ -158,10 +156,7 @@ describe('CardioContext', () => {
       false,
       expect.any(Function),
       expect.any(Function),
-      {
-        daily: null,
-        weekly: null,
-      },
+      undefined,
       'Cardio Context',
     );
   });

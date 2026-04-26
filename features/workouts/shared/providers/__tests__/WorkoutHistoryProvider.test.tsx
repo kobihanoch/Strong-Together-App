@@ -32,7 +32,7 @@ jest.mock('expo-constants', () => ({
   },
 }));
 
-type UseCacheAndFetchReturn = { loading: boolean; cacheKnown: boolean };
+type UseCacheAndFetchReturn = { loading: boolean };
 type UseCacheAndFetchMockFn = (
   user: unknown,
   keyBuilderFn: unknown,
@@ -107,10 +107,23 @@ const createHydratingUseCacheAndFetchMock = (payload: GetExerciseTrackingRespons
     }
     return {
       loading: false,
-      cacheKnown: true,
     };
   };
 };
+
+const createEmptyTrackingResponse = (): GetExerciseTrackingResponse => ({
+  exerciseTrackingMaps: userWithoutWorkoutProfile.exerciseTrackingMaps!,
+  exerciseTrackingAnalysis: {
+    unique_days: 0,
+    most_frequent_split: null,
+    most_frequent_split_days: null,
+    lastWorkoutDate: null,
+    splitDaysByName: {},
+    prs: {
+      pr_max: null,
+    },
+  },
+});
 
 const createPackedTrackingResponse = (): GetExerciseTrackingResponse => ({
   exerciseTrackingMaps: userWithWorkoutAndHistoryProfile.exerciseTrackingMaps!,
@@ -140,7 +153,6 @@ describe('WorkoutHistoryContext', () => {
     });
     mockUseCacheAndFetch.mockReturnValue({
       loading: false,
-      cacheKnown: true,
     });
     mockGetUserExerciseTracking.mockResolvedValue(createPackedTrackingResponse());
   });
@@ -158,10 +170,7 @@ describe('WorkoutHistoryContext', () => {
       false,
       expect.any(Function),
       expect.any(Function),
-      {
-        exerciseTrackingMaps: null,
-        exerciseTrackingAnalysisUnpacked: null,
-      },
+      undefined,
       'Analysis Context',
     );
   });
@@ -172,10 +181,7 @@ describe('WorkoutHistoryContext', () => {
       isValidatedWithServer: true,
     });
     mockUseCacheAndFetch.mockImplementation(
-      createHydratingUseCacheAndFetchMock({
-        exerciseTrackingMaps: userWithoutWorkoutProfile.exerciseTrackingMaps,
-        exerciseTrackingAnalysisUnpacked: userWithoutWorkoutProfile.analyzedExerciseTrackingData,
-      }),
+      createHydratingUseCacheAndFetchMock(createEmptyTrackingResponse()),
     );
 
     const { result } = renderHook(() => useWorkoutHistoryContext(), { wrapper });
@@ -184,7 +190,21 @@ describe('WorkoutHistoryContext', () => {
       expect(result.current.exerciseTrackingMaps).toEqual(userWithoutWorkoutProfile.exerciseTrackingMaps);
     });
 
-    expect(result.current.analyzedExerciseTrackingData).toBeNull();
+    expect(result.current.analyzedExerciseTrackingData).toEqual({
+      pr: {
+        maxReps: 0,
+        maxWeight: 0,
+        maxExercise: null,
+        maxDate: '',
+      },
+      workoutCount: 0,
+      mostFrequentSplit: {
+        splitName: null,
+        times: null,
+      },
+      lastWorkoutDate: null,
+      splitDaysByName: {},
+    });
     expect(result.current.hasTrainedToday).toBe(false);
   });
 
@@ -195,8 +215,8 @@ describe('WorkoutHistoryContext', () => {
     });
     mockUseCacheAndFetch.mockImplementation(
       createHydratingUseCacheAndFetchMock({
-        exerciseTrackingMaps: userWithWorkoutNoHistoryProfile.exerciseTrackingMaps,
-        exerciseTrackingAnalysisUnpacked: userWithWorkoutNoHistoryProfile.analyzedExerciseTrackingData,
+        ...createEmptyTrackingResponse(),
+        exerciseTrackingMaps: userWithWorkoutNoHistoryProfile.exerciseTrackingMaps!,
       }),
     );
 
@@ -206,21 +226,30 @@ describe('WorkoutHistoryContext', () => {
       expect(result.current.exerciseTrackingMaps).toEqual(userWithWorkoutNoHistoryProfile.exerciseTrackingMaps);
     });
 
-    expect(result.current.analyzedExerciseTrackingData).toBeNull();
+    expect(result.current.analyzedExerciseTrackingData).toEqual({
+      pr: {
+        maxReps: 0,
+        maxWeight: 0,
+        maxExercise: null,
+        maxDate: '',
+      },
+      workoutCount: 0,
+      mostFrequentSplit: {
+        splitName: null,
+        times: null,
+      },
+      lastWorkoutDate: null,
+      splitDaysByName: {},
+    });
     expect(result.current.hasTrainedToday).toBe(false);
   });
 
-  it('hydrates cached unpacked analysis data for a user with workout and history', async () => {
+  it('hydrates packed analysis data for a user with workout and history', async () => {
     mockAuthState.mockReturnValue({
       user: userWithWorkoutAndHistoryProfile.user,
       isValidatedWithServer: true,
     });
-    mockUseCacheAndFetch.mockImplementation(
-      createHydratingUseCacheAndFetchMock({
-        exerciseTrackingMaps: userWithWorkoutAndHistoryProfile.exerciseTrackingMaps,
-        exerciseTrackingAnalysisUnpacked: userWithWorkoutAndHistoryProfile.analyzedExerciseTrackingData,
-      }),
-    );
+    mockUseCacheAndFetch.mockImplementation(createHydratingUseCacheAndFetchMock(createPackedTrackingResponse()));
 
     const { result } = renderHook(() => useWorkoutHistoryContext(), { wrapper });
 
@@ -266,10 +295,7 @@ describe('WorkoutHistoryContext', () => {
       isValidatedWithServer: true,
     });
     mockUseCacheAndFetch.mockImplementation(
-      createHydratingUseCacheAndFetchMock({
-        exerciseTrackingMaps: userWithWorkoutAndHistoryProfile.exerciseTrackingMaps,
-        exerciseTrackingAnalysisUnpacked: userWithWorkoutAndHistoryProfile.analyzedExerciseTrackingData,
-      }),
+      createHydratingUseCacheAndFetchMock(createPackedTrackingResponse()),
     );
 
     const { result } = renderHook(() => useWorkoutHistoryContext(), { wrapper });
@@ -279,7 +305,7 @@ describe('WorkoutHistoryContext', () => {
     });
 
     await act(async () => {
-      result.current.setAnalyzedExerciseTrackingData((prev) =>
+      result.current.setExerciseTrackingAnalysis((prev) =>
         prev
           ? {
               ...prev,

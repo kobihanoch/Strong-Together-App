@@ -199,6 +199,20 @@ const createPackedTrackingResponse = () => ({
   },
 });
 
+const createEmptyTrackingResponse = () => ({
+  exerciseTrackingMaps: userWithoutWorkoutProfile.exerciseTrackingMaps!,
+  exerciseTrackingAnalysis: {
+    unique_days: 0,
+    most_frequent_split: null,
+    most_frequent_split_days: null,
+    lastWorkoutDate: null,
+    splitDaysByName: {},
+    prs: {
+      pr_max: null,
+    },
+  },
+});
+
 const setupCacheForScenario = ({
   userId,
   auth,
@@ -288,10 +302,7 @@ describe('useMyWorkoutPlanPageLogic integration', () => {
         workoutPlan: userWithoutWorkoutProfile.workout,
         workoutPlanForEditWorkout: userWithoutWorkoutProfile.workoutForEdit,
       },
-      analysis: {
-        exerciseTrackingMaps: userWithoutWorkoutProfile.exerciseTrackingMaps,
-        exerciseTrackingAnalysisUnpacked: userWithoutWorkoutProfile.analyzedExerciseTrackingData,
-      },
+      analysis: createEmptyTrackingResponse(),
     });
     mockRefreshAndRotateTokens.mockRejectedValue(createNetworkAxiosError());
 
@@ -321,8 +332,8 @@ describe('useMyWorkoutPlanPageLogic integration', () => {
         workoutPlanForEditWorkout: userWithWorkoutNoHistoryProfile.workoutForEdit,
       },
       analysis: {
-        exerciseTrackingMaps: userWithWorkoutNoHistoryProfile.exerciseTrackingMaps,
-        exerciseTrackingAnalysisUnpacked: userWithWorkoutNoHistoryProfile.analyzedExerciseTrackingData,
+        ...createEmptyTrackingResponse(),
+        exerciseTrackingMaps: userWithWorkoutNoHistoryProfile.exerciseTrackingMaps!,
       },
     });
     mockRefreshAndRotateTokens.mockRejectedValue(createNetworkAxiosError());
@@ -345,7 +356,7 @@ describe('useMyWorkoutPlanPageLogic integration', () => {
       A: 1,
       B: 1,
     });
-    expect(result.current.logic.splitTrainedCount).toBeUndefined();
+    expect(result.current.logic.splitTrainedCount).toBe(0);
     expect(result.current.logic.hasTrainedToday).toBe(false);
 
     await act(async () => {
@@ -374,10 +385,7 @@ describe('useMyWorkoutPlanPageLogic integration', () => {
         workoutPlan: userWithWorkoutAndHistoryProfile.workout,
         workoutPlanForEditWorkout: userWithWorkoutAndHistoryProfile.workoutForEdit,
       },
-      analysis: {
-        exerciseTrackingMaps: userWithWorkoutAndHistoryProfile.exerciseTrackingMaps,
-        exerciseTrackingAnalysisUnpacked: userWithWorkoutAndHistoryProfile.analyzedExerciseTrackingData,
-      },
+      analysis: createPackedTrackingResponse(),
     });
     mockRefreshAndRotateTokens.mockRejectedValue(createNetworkAxiosError());
 
