@@ -78,9 +78,9 @@ The client is shaped around the details that make mobile software feel dependabl
 
 | Area              | What was built                                                                                                                                                  |
 | ----------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **App shell**     | Font loading, DPoP key bootstrap, versioned cache housekeeping, auth-gated navigation, global loading, Sentry boundary, update modal, and app-scoped providers. |
-| **Data layer**    | Typed Axios services, request/response interceptors, bootstrap response slicing, cache TTLs, retry-on-401 refresh flow, and app version headers.                |
-| **State model**   | Focused contexts for **auth**, **messages**, **workout plan**, **workout history**, and **cardio** instead of one oversized global store.                       |
+| **App shell**     | Font loading, DPoP key bootstrap, versioned cache housekeeping, auth-gated navigation, coordinated global loading, Sentry boundary, update modal, and app-scoped providers. |
+| **Data layer**    | Typed Axios services, request/response interceptors, bootstrap response slicing, versioned cache keys, retry-on-401 refresh flow, and app version headers.      |
+| **State model**   | Focused contexts for **auth**, **messages**, **workout plan**, **workout history**, and **cardio**, with auth side effects split into small hooks.             |
 | **Security**      | Secure refresh token storage, access token in memory, OAuth providers, short-lived websocket tickets, DPoP key binding, and DPoP request proofs.                |
 | **Resilience**    | Offline detection, cached startup data, cache invalidation by app version, network/server-down alerts, and best-effort logout cleanup.                          |
 | **Observability** | Sentry setup, error boundary fallback, request tracing headers, HTTP spans, and traced video-analysis lifecycle spans.                                          |
@@ -111,9 +111,9 @@ The backend owns database schemas, scheduled jobs, API implementation, and serve
 The README stays recruiter-friendly and compact. Deeper technical notes live here:
 
 - [App rendering flow](docs/app-rendering-flow.md) - startup, auth gating, provider order, and logged-in rendering.
-- [Auth context flow](docs/auth-context-flow.md) - login/register/OAuth, cached sessions, refresh validation, logout, and socket setup.
+- [Auth context flow](docs/auth-context-flow.md) - provider responsibilities, startup hooks, login/register/OAuth, cached sessions, refresh validation, logout, and socket setup.
 - [DPoP security flow](docs/dpop-security-flow.md) - key generation, token binding, signed request proofs, and access-token hashing.
-- [Custom SWR cache flow](docs/custom-swr-cache-flow.md) - cache keys, hydration, revalidation, TTLs, bootstrap, and provider usage.
+- [Custom SWR cache flow](docs/custom-swr-cache-flow.md) - cache keys, hydration, revalidation, bootstrap, and provider usage.
 - [API, realtime, and AI analysis flow](docs/api-realtime-ai-flow.md) - Axios interceptors, DPoP, websocket tickets, messages, and video analysis.
 - [Error alerts and UX feedback](docs/error-alerts.md) - shared error alerts, network alerts, update-required handling, and success notifications.
 

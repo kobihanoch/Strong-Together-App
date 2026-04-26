@@ -3,16 +3,38 @@
 ## Table of Contents
 
 1. [Purpose](#purpose)
-2. [Key Pair Lifecycle](#key-pair-lifecycle)
-3. [Token Binding](#token-binding)
-4. [Request Proofs](#request-proofs)
-5. [Access Token Hash](#access-token-hash)
-6. [Why This Matters](#why-this-matters)
-7. [Related Files](#related-files)
+2. [Flow Sketch](#flow-sketch)
+3. [Key Pair Lifecycle](#key-pair-lifecycle)
+4. [Token Binding](#token-binding)
+5. [Request Proofs](#request-proofs)
+6. [Access Token Hash](#access-token-hash)
+7. [Why This Matters](#why-this-matters)
+8. [Related Files](#related-files)
 
 ## Purpose
 
 Strong Together uses **DPoP** to add proof-of-possession behavior to mobile API calls. Instead of treating a bearer token as the only proof, the client signs requests with a persisted device key pair so the backend can bind tokens to the client that received them.
+
+## Flow Sketch
+
+```text
+App startup
+  |
+  v
+ensureDpopKeyPair()
+  |
+  +-- SecureStore has keys -> load keys into memory
+  |
+  +-- keys missing --------> generate ES256 pair -> save JWKs
+  |
+  v
+Guest auth request -> dpop-key-binding: public key thumbprint
+  |
+  v
+Authenticated request -> dpop: signed proof JWT
+                          |
+                          +-- method + URL + timestamp + token hash
+```
 
 ## Key Pair Lifecycle
 
