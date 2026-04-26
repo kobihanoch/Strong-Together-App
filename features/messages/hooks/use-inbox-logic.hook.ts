@@ -1,8 +1,8 @@
+import { MessageEntity } from '@strong-together/shared';
 import { useCallback } from 'react';
 import { ALERT_TYPE, Dialog } from 'react-native-alert-notification';
 import { useMessages } from '../providers/MessagesProvider';
 import { deleteMessage, updateMsgReadStatus } from '../services/messages.service';
-import { MessageEntity } from '@strong-together/shared';
 import { UserMessages } from '../types/messages.types';
 
 const useInboxLogic = () => {
@@ -13,8 +13,8 @@ const useInboxLogic = () => {
   const markAsRead = useCallback(async (msgId: MessageEntity['id']): Promise<void> => {
     await updateMsgReadStatus(msgId);
     // Update state
-    setAllReceivedMessages((prev: UserMessages) =>
-      prev.map((m: UserMessages[number]) => (m.id === msgId ? { ...m, is_read: true } : m)),
+    setAllReceivedMessages((prev: UserMessages | undefined) =>
+      prev ? prev.map((m: UserMessages[number]) => (m.id === msgId ? { ...m, is_read: true } : m)) : prev,
     );
   }, []);
 
@@ -32,8 +32,8 @@ const useInboxLogic = () => {
         Dialog.hide();
         try {
           await deleteMessage(msgId);
-          setAllReceivedMessages((prev: UserMessages) =>
-            prev.filter((m: UserMessages[number]) => m.id !== msgId),
+          setAllReceivedMessages((prev: UserMessages | undefined) =>
+            prev ? prev.filter((m: UserMessages[number]) => m.id !== msgId) : prev,
           );
         } catch (err) {
           console.log('Delete failed:', err);

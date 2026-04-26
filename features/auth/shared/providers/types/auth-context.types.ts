@@ -1,8 +1,6 @@
 import { CreateUserBody, LoginRequestBody } from '@strong-together/shared';
 import { AppUser } from '../../types/auth.types';
 
-export type UserCachePayload = AppUser | null;
-
 export interface AuthProviderValue {
   authPhase: 'checking' | 'authed' | 'guest';
   isLoggedIn: boolean;

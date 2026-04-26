@@ -1,14 +1,14 @@
 import { GetAllUserMessagesResponse } from '@strong-together/shared';
 import { createContext, ReactNode, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { keyInbox } from '../../../infrastructure/cache/cache-keys.utils';
-import { useAuth } from '../../auth/shared/providers/AuthProvider';
 import useCacheAndFetch from '../../../shared/hooks/use-cache-and-fetch.hook';
 import useUpdateGlobalLoading from '../../../shared/hooks/use-update-global-loading.hook';
+import { useAuth } from '../../auth/shared/providers/AuthProvider';
 import { registerToMessagesListener } from '../messages.listeners';
 import { getUserMessages } from '../services/messages.service';
 import { UserMessages } from '../types/messages.types';
 import { filterMessagesByUnread } from '../utils/messages-context-utils';
-import { MessagesProviderCachePayload, MessagesProviderValue } from './types/messages-context.types';
+import { MessagesProviderValue } from './types/messages-context.types';
 
 /**
  * Notifications Flow:
@@ -48,8 +48,7 @@ export const MessagesProvider = ({ children }: { children: ReactNode }) => {
   const fetchFn = useCallback(async () => await getUserMessages(), []);
 
   // On data function
-  const onDataFn = useCallback((data: GetAllUserMessagesResponse | MessagesProviderCachePayload): void => {
-    if (!data) return;
+  const onDataFn = useCallback((data: GetAllUserMessagesResponse): void => {
     setAllReceivedMessages(data.messages);
   }, []);
 
@@ -60,7 +59,7 @@ export const MessagesProvider = ({ children }: { children: ReactNode }) => {
   );
 
   // Hook usage
-  const { loading: loadingMessages } = useCacheAndFetch<MessagesProviderCachePayload, GetAllUserMessagesResponse>(
+  const { loading: loadingMessages } = useCacheAndFetch<GetAllUserMessagesResponse>(
     user, // user prop
     keyInbox, // key builder
     isValidatedWithServer, // flag from server
@@ -84,8 +83,8 @@ export const MessagesProvider = ({ children }: { children: ReactNode }) => {
 
   const value = useMemo<MessagesProviderValue>(
     () => ({
-      unreadMessages,
-      allReceivedMessages,
+      unreadMessages: unreadMessages === undefined ? [] : unreadMessages,
+      allReceivedMessages: allReceivedMessages === undefined ? [] : allReceivedMessages,
       setAllReceivedMessages,
       loadingMessages,
     }),

@@ -1,19 +1,13 @@
+import { GetExerciseTrackingResponse } from '@strong-together/shared';
 import { createContext, useCallback, useContext, useMemo, useState } from 'react';
 import { keyTracking } from '../../../../infrastructure/cache/cache-keys.utils';
 import useCacheAndFetch from '../../../../shared/hooks/use-cache-and-fetch.hook';
 import useUpdateGlobalLoading from '../../../../shared/hooks/use-update-global-loading.hook';
-import { getUserExerciseTracking } from '../../history/services/workout-history.service';
-import { GetExerciseTrackingResponse } from '@strong-together/shared';
-import { checkHasTrainedToday, unpackFromExerciseTrackingData } from '../../history/utils/workout-history-context.util';
 import { useAuth } from '../../../auth/shared/providers/AuthProvider';
-import {
-  WorkoutHistoryProviderCachePayload,
-  WorkoutHistoryProviderValue,
-} from './types/workout-history-provider.types';
-import {
-  WorkoutHistoryAnalyzedExerciseTrackingData,
-  WorkoutHistoryExerciseTrackingMaps,
-} from '../../history/types/workout-history.types';
+import { getUserExerciseTracking } from '../../history/services/workout-history.service';
+import { WorkoutHistoryAnalyzedExerciseTrackingData, WorkoutHistoryExerciseTrackingMaps } from '../../history/types/workout-history.types';
+import { checkHasTrainedToday, unpackFromExerciseTrackingData } from '../../history/utils/workout-history-context.util';
+import { WorkoutHistoryProviderValue } from './types/workout-history-provider.types';
 
 const WorkoutHistoryContext = createContext<WorkoutHistoryProviderValue | null>(null);
 export const useWorkoutHistoryContext = () => {
@@ -38,18 +32,21 @@ export const useWorkoutHistoryContext = () => {
 export const WorkoutHistoryProvider = ({ children }: { children: React.ReactNode }) => {
   const { user, isValidatedWithServer } = useAuth();
 
-  // Raw and derived analysis state
-  const [exerciseTrackingMaps, setExerciseTrackingMaps] = useState<WorkoutHistoryExerciseTrackingMaps | null>(null);
+  // Raw
+  const [exerciseTrackingMaps, setExerciseTrackingMaps] = useState<WorkoutHistoryExerciseTrackingMaps | undefined>(undefined);
+  // Raw - not for useage
+  const [exerciseTrackingAnalysis, setExerciseTrackingAnalysis] = useState<
+    GetExerciseTrackingResponse['exerciseTrackingAnalysis'] | undefined
+  >(undefined);
 
-  const [analyzedExerciseTrackingData, setAnalyzedExerciseTrackingData] =
-    useState<WorkoutHistoryAnalyzedExerciseTrackingData | null>(null);
+  // Unpacked - derived from raw
+  const analyzedExerciseTrackingData: WorkoutHistoryAnalyzedExerciseTrackingData | undefined = useMemo(
+    () => unpackFromExerciseTrackingData(exerciseTrackingAnalysis),
+    [exerciseTrackingAnalysis],
+  );
 
   const hasTrainedToday = useMemo(
-    (): boolean =>
-      checkHasTrainedToday(
-        analyzedExerciseTrackingData?.lastWorkoutDate,
-        Intl.DateTimeFormat().resolvedOptions().timeZone,
-      ),
+    (): boolean => checkHasTrainedToday(analyzedExerciseTrackingData?.lastWorkoutDate, Intl.DateTimeFormat().resolvedOptions().timeZone),
     [analyzedExerciseTrackingData?.lastWorkoutDate],
   );
 
@@ -59,32 +56,25 @@ export const WorkoutHistoryProvider = ({ children }: { children: React.ReactNode
   const fetchFn = useCallback(async (): Promise<GetExerciseTrackingResponse> => await getUserExerciseTracking(), []);
 
   // On data function
-  const onDataFn = useCallback((data: GetExerciseTrackingResponse | WorkoutHistoryProviderCachePayload): void => {
-    if (!data) return;
-    // Raw data from server - unpack
-    // Data from cache - already unpacked
+  const onDataFn = useCallback((data: GetExerciseTrackingResponse): void => {
     setExerciseTrackingMaps(data.exerciseTrackingMaps); // Empty maps if doen;t exist
-    // API data (packed)
-    if ('exerciseTrackingAnalysis' in data) {
-      setAnalyzedExerciseTrackingData(unpackFromExerciseTrackingData(data.exerciseTrackingAnalysis));
-    }
-    // Cached data (unpacked)
-    else if ('exerciseTrackingAnalysisUnpacked' in data) {
-      setAnalyzedExerciseTrackingData(data.exerciseTrackingAnalysisUnpacked);
-    }
+    setExerciseTrackingAnalysis(data.exerciseTrackingAnalysis);
   }, []);
 
   // Cache payload
-  const cachePayload: WorkoutHistoryProviderCachePayload = useMemo(
-    () => ({
-      exerciseTrackingMaps: exerciseTrackingMaps,
-      exerciseTrackingAnalysisUnpacked: analyzedExerciseTrackingData,
-    }),
-    [exerciseTrackingMaps, analyzedExerciseTrackingData],
+  const cachePayload: GetExerciseTrackingResponse | undefined = useMemo(
+    () =>
+      exerciseTrackingMaps === undefined || exerciseTrackingAnalysis === undefined
+        ? undefined
+        : {
+            exerciseTrackingMaps,
+            exerciseTrackingAnalysis,
+          },
+    [exerciseTrackingMaps, exerciseTrackingAnalysis],
   );
 
   // Hook usage
-  const { loading, cacheKnown } = useCacheAndFetch<WorkoutHistoryProviderCachePayload, GetExerciseTrackingResponse>(
+  const { loading } = useCacheAndFetch<GetExerciseTrackingResponse>(
     user, // user prop
     keyTracking, // key builder
     isValidatedWithServer, // flag from server
@@ -95,15 +85,15 @@ export const WorkoutHistoryProvider = ({ children }: { children: React.ReactNode
   );
 
   // Report analysis loading to global loading
-  useUpdateGlobalLoading('Analysis', cacheKnown ? loading : true);
+  useUpdateGlobalLoading('Analysis', loading);
 
   // Memoized context value
   const value = useMemo<WorkoutHistoryProviderValue>(
     () => ({
-      exerciseTrackingMaps,
+      exerciseTrackingMaps: exerciseTrackingMaps === undefined ? null : exerciseTrackingMaps,
       setExerciseTrackingMaps,
-      analyzedExerciseTrackingData,
-      setAnalyzedExerciseTrackingData,
+      analyzedExerciseTrackingData: analyzedExerciseTrackingData === undefined ? null : analyzedExerciseTrackingData,
+      setExerciseTrackingAnalysis,
       hasTrainedToday,
       loading,
     }),

@@ -20,10 +20,10 @@ type ExtractWorkoutSplitsReturnType = {
   exercises: Record<SplitName, ExerciseInPlan[]>;
 };
 
-export const extractWorkoutSplits = (workout: WholeUserWorkoutPlan | null): ExtractWorkoutSplitsReturnType => {
-  if (!workout || !workout?.workoutsplits)
+export const extractWorkoutSplits = (workout: WholeUserWorkoutPlan | null | undefined): ExtractWorkoutSplitsReturnType | undefined => {
+  if (workout === null || workout?.workoutsplits === null)
     return { workoutSplits: [], exercises: {} as Record<SplitName, ExerciseInPlan[]> };
-
+  if (workout === undefined) return undefined;
   const map = workout.workoutsplits.reduce((acc: Record<SplitName, ExerciseInPlan[]>, split) => {
     const splitName = split.name;
     const splitExFields = split.exercisetoworkoutsplit || [];
@@ -68,4 +68,3 @@ export const getBodyPartsForSplit = (split: WorkoutPlanSplit | null): string => 
   if (hasLegs) return 'Full Body';
   return 'Upper Body';
 };
-

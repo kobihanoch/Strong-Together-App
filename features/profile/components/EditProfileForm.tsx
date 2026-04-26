@@ -30,7 +30,7 @@ type EditProfileFormProps = {
   };
   closeEditSheet: () => void;
   openEditSheet: (i?: number) => void;
-  setUser: React.Dispatch<React.SetStateAction<Omit<UserEntity, 'password'> | null>>;
+  setUser: React.Dispatch<React.SetStateAction<Omit<UserEntity, 'password'> | null | undefined>>;
 };
 
 const EditProfileForm = ({ initialData, closeEditSheet, openEditSheet, setUser }: EditProfileFormProps) => {

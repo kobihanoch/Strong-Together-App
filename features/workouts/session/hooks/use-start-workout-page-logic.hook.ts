@@ -1,26 +1,19 @@
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
+import { StackNavigationProp } from '@react-navigation/stack';
+import { ExerciseEntity, ExerciseTrackingEntity, FinishUserWorkoutBody } from '@strong-together/shared';
 import { useCallback, useMemo, useRef, useState } from 'react';
-import { cacheDeleteKey } from '../../../../infrastructure/cache/cache.utils';
 import { keyStartWorkout } from '../../../../infrastructure/cache/cache-keys.utils';
-import { useWorkoutHistoryContext } from '../../shared/providers/WorkoutHistoryProvider';
-import { useAuth } from '../../../auth/shared/providers/AuthProvider';
-import { useWorkoutPlanContext } from '../../shared/providers/WorkoutPlanProvider';
+import { cacheDeleteKey } from '../../../../infrastructure/cache/cache.utils';
+import { RootParamList } from '../../../../navigation/types/appStackTypes';
 import { showErrorAlert } from '../../../../shared/alerts/error-alerts';
-import { unpackFromExerciseTrackingData } from '../../history/utils/workout-history-context.util';
+import { useAuth } from '../../../auth/shared/providers/AuthProvider';
+import { WorkoutPlanSplit } from '../../plan/types/workout-plan.types';
+import { useWorkoutHistoryContext } from '../../shared/providers/WorkoutHistoryProvider';
+import { useWorkoutPlanContext } from '../../shared/providers/WorkoutPlanProvider';
+import { ExercisesDuringWorkout, ResumeWorkoutCachePayload, StartWorkoutPageLogicReturn } from '../types/use-start-workout.types';
 import { applyNotes, applyReps, applyWeight, countSetsDone, createArrayForDataBase } from '../utils/start-workout.util';
 import { useStartWorkoutCache } from './use-start-workout-cache.hook';
 import { useUserWorkout } from './use-user-workout.hook';
-import {
-  ExercisesDuringWorkout,
-  ResumeWorkoutCachePayload,
-  StartWorkoutPageLogicReturn,
-} from '../types/use-start-workout.types';
-import { WorkoutPlanSplit } from '../../plan/types/workout-plan.types';
-import { ExerciseEntity } from '@strong-together/shared';
-import { ExerciseTrackingEntity } from '@strong-together/shared';
-import { StackNavigationProp } from '@react-navigation/stack';
-import { RootParamList } from '../../../../navigation/types/appStackTypes';
-import { FinishUserWorkoutBody } from '@strong-together/shared';
 
 const useStartWorkoutPageLogic = (
   selectedSplit: WorkoutPlanSplit,
@@ -31,7 +24,7 @@ const useStartWorkoutPageLogic = (
   // --------------------[ Context ]--------------------------------------
   const { setIsWorkoutMode, userIdCache } = useAuth();
   const { exercises = {} } = useWorkoutPlanContext() || {};
-  const { setExerciseTrackingMaps, setAnalyzedExerciseTrackingData } = useWorkoutHistoryContext();
+  const { setExerciseTrackingMaps, setExerciseTrackingAnalysis } = useWorkoutHistoryContext();
 
   // --------------------[ Set workout mode ]--------------------------------------
   useFocusEffect(
@@ -87,12 +80,9 @@ const useStartWorkoutPageLogic = (
   );
 
   // --------------------[ Add progress ]-----------------------------------------
-  const addWeightRecord = useCallback(
-    (exerciseName: ExerciseEntity['name'], setIndex: number, weight: number): void => {
-      setWorkoutProgressObj((prev) => applyWeight(prev, exerciseName, setIndex, weight));
-    },
-    [],
-  );
+  const addWeightRecord = useCallback((exerciseName: ExerciseEntity['name'], setIndex: number, weight: number): void => {
+    setWorkoutProgressObj((prev) => applyWeight(prev, exerciseName, setIndex, weight));
+  }, []);
 
   const addRepsRecord = useCallback((exerciseName: ExerciseEntity['name'], setIndex: number, reps: number) => {
     setWorkoutProgressObj((prev) => applyReps(prev, exerciseName, setIndex, reps));
@@ -135,7 +125,7 @@ const useStartWorkoutPageLogic = (
 
       // Update context
       setExerciseTrackingMaps(exerciseTrackingMaps);
-      setAnalyzedExerciseTrackingData(unpackFromExerciseTrackingData(exerciseTrackingAnalysis));
+      setExerciseTrackingAnalysis(exerciseTrackingAnalysis);
       setIsWorkoutMode(false);
       disableCache();
       await clearCache();

@@ -2,13 +2,13 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { AppUser } from '../../features/auth/shared/types/auth.types';
 import { cacheGetJSON, cacheSetJSON } from '../../infrastructure/cache/cache.utils';
 
-const useCacheAndFetch = <CachePaylodType, APIDataType>(
+const useCacheAndFetch = <APIDataType>(
   user: AppUser | { id: AppUser['id'] | null | undefined } | null, // {id} only for auth context
   keyBuilderFn: (id: string, days?: number) => string,
   isValidatedByServerFlag: boolean,
   fetchFn: () => Promise<APIDataType>, // Async function
-  onDataFn: (data: APIDataType | CachePaylodType) => void,
-  payloadToCache: CachePaylodType | null | undefined,
+  onDataFn: (data: APIDataType) => void,
+  payloadToCache: APIDataType | null | undefined,
   logLabel: string,
 ) => {
   // Stable cache key
@@ -16,12 +16,12 @@ const useCacheAndFetch = <CachePaylodType, APIDataType>(
   const cacheKey = useMemo(() => (user?.id ? keyBuilderFn(user.id) : null), [user?.id]);
 
   const [loading, setLoading] = useState<boolean>(false);
-  const [cachedPayload, setCachedPayload] = useState<CachePaylodType | null | undefined>(undefined);
+  const [cachedPayload, setCachedPayload] = useState<APIDataType | null | undefined>(undefined);
   const [isPayloadFromAPI, setIsPayloadFromAPI] = useState<boolean>(false);
 
   const getCache = useCallback(async () => {
     if (!cacheKey) return;
-    return await cacheGetJSON<CachePaylodType>(cacheKey);
+    return await cacheGetJSON<APIDataType>(cacheKey);
   }, [cacheKey]);
 
   // --------------------- UPDATE CACHE ---------------------------------------------
@@ -31,7 +31,7 @@ const useCacheAndFetch = <CachePaylodType, APIDataType>(
       // Allow updating only when cache payload is known (not undefiened - may be null)
       if (!cacheKey || payloadToCache === undefined || !isPayloadFromAPI) return;
       // Update cache only when fresh data from API arrives
-      await cacheSetJSON<CachePaylodType | null>(cacheKey, payloadToCache);
+      await cacheSetJSON<APIDataType | null>(cacheKey, payloadToCache);
 
       // Reset API flag state
       setIsPayloadFromAPI(false);
