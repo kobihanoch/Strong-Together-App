@@ -35,10 +35,10 @@ export const MessagesProvider = ({ children }: { children: ReactNode }) => {
   const { user, isValidatedWithServer } = useAuth();
 
   // All user's received messages
-  const [allReceivedMessages, setAllReceivedMessages] = useState<UserMessages>([]);
+  const [allReceivedMessages, setAllReceivedMessages] = useState<UserMessages | undefined>(undefined);
 
   // Filter messages to read/unread => Everytime all messages is updated (when receiving a new message), filter is executed
-  const unreadMessages = useMemo((): UserMessages => {
+  const unreadMessages = useMemo((): UserMessages | undefined => {
     return filterMessagesByUnread(allReceivedMessages);
   }, [allReceivedMessages]);
 
@@ -54,13 +54,13 @@ export const MessagesProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   // Cache payload
-  const cachePayload = useMemo(() => ({ messages: allReceivedMessages }), [allReceivedMessages]);
+  const cachePayload = useMemo(
+    () => (allReceivedMessages === undefined ? undefined : { messages: allReceivedMessages }),
+    [allReceivedMessages],
+  );
 
   // Hook usage
-  const { loading: loadingMessages, cacheKnown } = useCacheAndFetch<
-    MessagesProviderCachePayload,
-    GetAllUserMessagesResponse
-  >(
+  const { loading: loadingMessages } = useCacheAndFetch<MessagesProviderCachePayload, GetAllUserMessagesResponse>(
     user, // user prop
     keyInbox, // key builder
     isValidatedWithServer, // flag from server
@@ -71,7 +71,7 @@ export const MessagesProvider = ({ children }: { children: ReactNode }) => {
   );
 
   // Report inbox loading to global loading
-  useUpdateGlobalLoading('Messages', cacheKnown ? loadingMessages : true);
+  useUpdateGlobalLoading('Messages', loadingMessages);
 
   // Load listener
   useEffect(() => {
