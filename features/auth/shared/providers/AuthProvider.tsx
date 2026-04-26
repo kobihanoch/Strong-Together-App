@@ -1,31 +1,29 @@
 import { CreateUserBody, GetAuthenticatedUserByIdResponse, LoginRequestBody } from '@strong-together/shared';
 import { AxiosError } from 'axios';
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
-import { Notifier, NotifierComponents } from 'react-native-notifier';
-import { hasBootstrapPayload, resetBootstrap } from '../../../../infrastructure/api/api-config/bootstrap';
+import { resetBootstrap } from '../../../../infrastructure/api/api-config/bootstrap';
+import { keyAuth } from '../../../../infrastructure/cache/cache-keys.utils';
 import {
   cacheDeleteAllCache,
   cacheDeleteAllCacheWithoutStartWorkout,
   cacheGetJSON,
   cacheSetJSON,
-  TTL_48H,
 } from '../../../../infrastructure/cache/cache.utils';
-import { keyAuth } from '../../../../infrastructure/cache/cache-keys.utils';
-import { showErrorAlert } from '../../../../shared/errors/error-alerts';
+import { connectSocket, disconnectSocket } from '../../../../infrastructure/socket';
+import { showErrorAlert } from '../../../../shared/alerts/error-alerts';
+import { showSuccessAlert } from '../../../../shared/alerts/success-alerts';
 import useCacheAndFetch from '../../../../shared/hooks/use-cache-and-fetch.hook';
 import { useNetworkStatus } from '../../../../shared/hooks/use-network-status.hook';
 import useUpdateGlobalLoading from '../../../../shared/hooks/use-update-global-loading.hook';
-import { fetchSelfUserData } from '../services/auth.service';
-import GlobalAuth from '../utils/auth.utils';
-import { clearRefreshToken, getRefreshToken, saveRefreshToken } from '../utils/token-storage.utils';
-import { connectSocket, disconnectSocket } from '../../../../infrastructure/socket';
-import { useAppleAuth } from '../hooks/use-apple-auth.hook';
-import { useGoogleAuth } from '../hooks/use-google-auth.hook';
 import { loginUser } from '../../login/services/login.service';
 import { registerUser } from '../../register/services/register.service';
-import { AuthProviderValue, UserCachePayload } from './types/auth-context.types';
+import { useAppleAuth } from '../hooks/use-apple-auth.hook';
+import { useGoogleAuth } from '../hooks/use-google-auth.hook';
+import { fetchSelfUserData, logoutUser, refreshAndRotateTokens } from '../services/auth.service';
 import { AppUser } from '../types/auth.types';
-import { logoutUser, refreshAndRotateTokens } from '../services/auth.service';
+import GlobalAuth from '../utils/auth.utils';
+import { clearRefreshToken, getRefreshToken, saveRefreshToken } from '../utils/token-storage.utils';
+import { AuthProviderValue, UserCachePayload } from './types/auth-context.types';
 
 const AuthContext = createContext<AuthProviderValue | null>(null);
 export const useAuth = () => {
@@ -48,14 +46,17 @@ export const useAuth = () => {
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   // --- Caching state - if stored so start load cached user data ---
-  const [userIdCache, setUserIdCache] = useState<AppUser['id'] | null>(null);
+  const [userIdCache, setUserIdCache] = useState<AppUser['id'] | null | undefined>(undefined);
+  useEffect(() => {
+    if (userIdCache !== undefined) cacheSetJSON<AppUser['id'] | null>('CACHE:USER_ID', userIdCache);
+  }, [userIdCache]);
 
   // --- Auth & session state ---
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false); // UI loading for login/register
   const [appleLoading, setAppleLoading] = useState<boolean>(false);
   const [googleLoading, setGoogleLoading] = useState<boolean>(false);
-  const [user, setUser] = useState<AppUser | null>(null);
+  const [user, setUser] = useState<AppUser | null | undefined>(undefined);
   const [isWorkoutMode, setIsWorkoutMode] = useState<boolean>(false); // For start workout
 
   // --- For fluint loading at startup with no blinks ---
@@ -84,7 +85,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   }, []);
 
   // Hook usage
-  const { loading: userDataLoading, cacheKnown } = useCacheAndFetch<UserCachePayload, GetAuthenticatedUserByIdResponse>(
+  const { loading: userDataLoading } = useCacheAndFetch<UserCachePayload, GetAuthenticatedUserByIdResponse>(
     { id: userIdCache }, // user prop
     keyAuth, // key builder
     isValidatedWithServer, // flag from server
@@ -95,7 +96,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   );
 
   // Report auth session loading to global loading
-  useUpdateGlobalLoading('Auth', cacheKnown ? userDataLoading : hasBootstrapPayload());
+  useUpdateGlobalLoading('Auth', authPhase === 'checking' || userDataLoading);
 
   useEffect(() => {
     if (user?.username) GlobalAuth.setUsernameInHeader(user?.username);
@@ -111,9 +112,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     setLoading(false);
     setAppleLoading(false);
     setGoogleLoading(false);
-    setUser(null);
+    setUser(undefined);
     setIsWorkoutMode(false);
-    setUserIdCache(null);
+    setUserIdCache(undefined);
     setIsValidatedWithServer(false);
     setAuthPhase('guest');
     attemptedServerValidationRef.current = false;
@@ -144,11 +145,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       // For other contexes to start fetching from API after cache
       setIsValidatedWithServer(true);
       console.log('\x1b[32m[Auth Context]: Validation with server completed => Fetching data from API\x1b[0m');
-
-      // Save for later use
-      await cacheSetJSON('CACHE:USER_ID', userId, TTL_48H);
-      //Alert.alert("Validation completed!");
-      // Store in cache (auto)
+      setUserIdCache(userId);
     } catch (e) {
       if (e instanceof AxiosError) {
         if (e.isUpgradeRequired) {
@@ -228,8 +225,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
    */
   const login = useCallback(
     async (identifier: LoginRequestBody['identifier'], password: LoginRequestBody['password']): Promise<void> => {
-      setLoading(true);
       try {
+        setLoading(true);
         const { accessToken: at, refreshToken: rt, user: u } = await loginUser(identifier, password);
         await saveRefreshToken(rt);
         GlobalAuth.setAccessToken(at);
@@ -243,12 +240,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         console.log('\x1b[32m[Auth Context]: Login succeeded!\x1b[0m');
         setIsValidatedWithServer(true);
         setAuthPhase('authed');
-
-        // Save for later entrance
-        await cacheSetJSON('CACHE:USER_ID', u, TTL_48H);
-        // For other contexes to start fetching from API after cache
-
-        // Cache stores auto
+      } catch {
       } finally {
         setLoading(false);
       }
@@ -268,23 +260,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       fullName: CreateUserBody['fullName'],
       gender: CreateUserBody['gender'],
     ): Promise<void> => {
-      setLoading(true);
       try {
+        setLoading(true);
         await registerUser(email, password, username, fullName, gender);
         //await login(username, password);
-        Notifier.showNotification({
-          title: 'Please verify your account',
-          description: `An email has been sent to ${email}`,
-          duration: 5000,
-          showAnimationDuration: 250,
-          hideOnPress: true,
-          Component: NotifierComponents.Alert,
-          componentProps: {
-            alertType: 'success', // "success" | "warn" | "error"
-            titleStyle: { fontSize: 16 },
-            descriptionStyle: { fontSize: 14 },
-          },
-        });
+        showSuccessAlert('Please verify your account', `An email has been sent to ${email}`);
+      } catch {
       } finally {
         setLoading(false);
       }
@@ -319,24 +300,16 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     // Login with AT is deprecated
     setGoogleLoading(true);
     try {
-      const { accessToken: at, refreshToken: rt, user: u, missingFields } = await signInWithGoogle();
+      const { accessToken: at, refreshToken: rt, user: u } = await signInWithGoogle();
 
-      // If logged in (no missing fields)
-      if (!missingFields) {
-        await saveRefreshToken(rt);
-        GlobalAuth.setAccessToken(at);
+      await saveRefreshToken(rt);
+      GlobalAuth.setAccessToken(at);
 
-        setIsLoggedIn(true);
-        setUserIdCache(u);
-        console.log('\x1b[32m[Auth Context]: Login succeeded!\x1b[0m');
-        setIsValidatedWithServer(true);
-        setAuthPhase('authed');
-        await cacheSetJSON('CACHE:USER_ID', u, TTL_48H);
-      } else {
-        // Missing fields
-        //GlobalAuth.setAccessToken(at); // To be able to update user fields
-        //return { missingFields };
-      }
+      setIsLoggedIn(true);
+      setUserIdCache(u);
+      console.log('\x1b[32m[Auth Context]: Login succeeded!\x1b[0m');
+      setIsValidatedWithServer(true);
+      setAuthPhase('authed');
     } catch (e) {
       if (e instanceof Error) showErrorAlert('Error signing in with Google', e.message);
     } finally {
@@ -348,24 +321,16 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     // Login with at is deprecated
     setAppleLoading(true);
     try {
-      const { accessToken: at, refreshToken: rt, user: u, missingFields } = await signInWithApple();
+      const { accessToken: at, refreshToken: rt, user: u } = await signInWithApple();
 
-      // If logged in (no missing fields)
-      if (!missingFields) {
-        await saveRefreshToken(rt);
-        GlobalAuth.setAccessToken(at);
+      await saveRefreshToken(rt);
+      GlobalAuth.setAccessToken(at);
 
-        setIsLoggedIn(true);
-        setUserIdCache(u);
-        console.log('\x1b[32m[Auth Context]: Login succeeded!\x1b[0m');
-        setIsValidatedWithServer(true);
-        setAuthPhase('authed');
-        await cacheSetJSON('CACHE:USER_ID', u, TTL_48H);
-      } else {
-        // Missing fields
-        //GlobalAuth.setAccessToken(at); // To be able to update user fields
-        //return { missingFields };
-      }
+      setIsLoggedIn(true);
+      setUserIdCache(u);
+      console.log('\x1b[32m[Auth Context]: Login succeeded!\x1b[0m');
+      setIsValidatedWithServer(true);
+      setAuthPhase('authed');
     } catch (e) {
       if (e instanceof Error) showErrorAlert('Error signing in with Apple', e.message);
     } finally {
@@ -387,9 +352,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       // state
       authPhase,
       isLoggedIn,
-      user,
+      user: user ?? null,
       setUser,
-      userIdCache,
+      userIdCache: userIdCache ?? null,
       loading,
       userDataLoading,
       // actions

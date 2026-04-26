@@ -2,7 +2,7 @@ import { AxiosError, AxiosInstance } from 'axios';
 import { refreshAndRotateTokens } from '../../../../features/auth/shared/services/auth.service';
 import GlobalAuth from '../../../../features/auth/shared/utils/auth.utils';
 import { saveRefreshToken } from '../../../../features/auth/shared/utils/token-storage.utils';
-import { showErrorAlert } from '../../../../shared/errors/error-alerts';
+import { showErrorAlert } from '../../../../shared/alerts/error-alerts';
 import { openUpdateModal } from '../../../../shared/utils/imperative-update-modal';
 import { notifyOffline, notifyServerDown } from './network-check';
 

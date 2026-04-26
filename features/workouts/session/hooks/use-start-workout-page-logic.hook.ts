@@ -5,7 +5,7 @@ import { keyStartWorkout } from '../../../../infrastructure/cache/cache-keys.uti
 import { useWorkoutHistoryContext } from '../../shared/providers/WorkoutHistoryProvider';
 import { useAuth } from '../../../auth/shared/providers/AuthProvider';
 import { useWorkoutPlanContext } from '../../shared/providers/WorkoutPlanProvider';
-import { showErrorAlert } from '../../../../shared/errors/error-alerts';
+import { showErrorAlert } from '../../../../shared/alerts/error-alerts';
 import { unpackFromExerciseTrackingData } from '../../history/utils/workout-history-context.util';
 import { applyNotes, applyReps, applyWeight, countSetsDone, createArrayForDataBase } from '../utils/start-workout.util';
 import { useStartWorkoutCache } from './use-start-workout-cache.hook';

@@ -14,7 +14,7 @@ import { TextInput } from 'react-native-gesture-handler';
 import { Notifier, NotifierComponents } from 'react-native-notifier';
 import { RFValue } from 'react-native-responsive-fontsize';
 import { colors } from '../../../shared/constants/colors';
-import { showErrorAlert } from '../../../shared/errors/error-alerts';
+import { showErrorAlert } from '../../../shared/alerts/error-alerts';
 import { updateSelfUser } from '../services/user-update.service';
 import Column from '../../../shared/components/Column';
 import Row from '../../../shared/components/Row';

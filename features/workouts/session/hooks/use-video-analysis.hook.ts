@@ -2,7 +2,7 @@ import * as Sentry from '@sentry/react-native';
 import { startNewTrace } from '@sentry/core';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { uuidv4 } from 'react-native-compressor';
-import { showErrorAlert } from '../../../../shared/errors/error-alerts';
+import { showErrorAlert } from '../../../../shared/alerts/error-alerts';
 import { getPresignedUrlFromS3, uploadVideoToS3 } from '../services/analyze-video.service';
 import { GetPresignedUrlFromS3Body } from '@strong-together/shared';
 import { AnalyzeVideoResultPayload, SquatRepetition } from '@strong-together/shared';
@@ -207,5 +207,3 @@ const useVideoAnalysis = () => {
 };
 
 export default useVideoAnalysis;
-
-

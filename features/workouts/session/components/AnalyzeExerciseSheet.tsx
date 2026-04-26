@@ -5,7 +5,7 @@ import VideoTrim, { showEditor } from 'react-native-video-trim';
 import { Video as VideoCompressor, getVideoMetaData } from 'react-native-compressor';
 import { colors } from '../../../../shared/constants/colors';
 import { getSupportedAnalysisExerciseName } from '../constants/video-analysis.constant';
-import { showErrorAlert } from '../../../../shared/errors/error-alerts';
+import { showErrorAlert } from '../../../../shared/alerts/error-alerts';
 import useVideoAnalysis from '../hooks/use-video-analysis.hook';
 import type { ExerciseAnalysisOverview } from '../screen/StartWorkout';
 import { AnalyzeVideoResultPayload, SquatRepetition } from '@strong-together/shared';
@@ -611,5 +611,3 @@ const styles = StyleSheet.create({
 });
 
 export default AnalyzeExerciseSheet;
-
-

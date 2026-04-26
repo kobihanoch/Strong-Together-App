@@ -1,5 +1,5 @@
 import { AxiosError, AxiosInstance, AxiosResponse, InternalAxiosRequestConfig } from 'axios';
-import { showErrorAlert } from '../../../shared/errors/error-alerts';
+import { showErrorAlert } from '../../../shared/alerts/error-alerts';
 import { handle401, handleNetworkProblems, handleUpdateRequired } from './helpers/error-handlers';
 import { finishHttpErrorSpan, finishHttpResponseSpan } from '../tracing/sentry-tracing';
 import { ensureBootstrap, isOpen, isTracked, responseMap } from './bootstrap';

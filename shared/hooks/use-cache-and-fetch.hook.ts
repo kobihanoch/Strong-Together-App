@@ -3,7 +3,7 @@ import { AppUser } from '../../features/auth/shared/types/auth.types';
 import { cacheGetJSON, cacheSetJSON } from '../../infrastructure/cache/cache.utils';
 
 const useCacheAndFetch = <CachePaylodType, APIDataType>(
-  user: AppUser | { id: AppUser['id'] | null } | null, // {id} only for auth context
+  user: AppUser | { id: AppUser['id'] | null | undefined } | null, // {id} only for auth context
   keyBuilderFn: (id: string, days?: number) => string,
   isValidatedByServerFlag: boolean,
   fetchFn: () => Promise<APIDataType>, // Async function

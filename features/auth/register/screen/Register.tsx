@@ -9,7 +9,7 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 import InputField from '../../../../shared/components/InputField';
 import SelectField from '../../../../shared/components/SelectField';
 import { useAuth } from '../../shared/providers/AuthProvider';
-import { showErrorAlert } from '../../../../shared/errors/error-alerts';
+import { showErrorAlert } from '../../../../shared/alerts/error-alerts';
 import { colors } from '../../../../shared/constants/colors';
 import { AuthRootParamList } from '../../../../navigation/types/auth-stack.types';
 import { StackNavigationProp } from '@react-navigation/stack';
