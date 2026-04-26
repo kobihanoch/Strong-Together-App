@@ -49,12 +49,16 @@ export default defineConfig([
       'react-hooks': reactHooks,
     },
     rules: {
-      ...reactHooks.configs.recommended.rules,
+      'react-hooks/rules-of-hooks': 'error',
+      'react-hooks/exhaustive-deps': 'warn',
     },
   },
 
   {
     files: ['**/*.{js,mjs,cjs,jsx,ts,tsx}'],
+    plugins: {
+      '@typescript-eslint': tseslint.plugin,
+    },
     settings: {
       react: {
         version: 'detect',
@@ -63,6 +67,14 @@ export default defineConfig([
     rules: {
       'react/prop-types': 'off',
       'react/react-in-jsx-scope': 'off',
+      '@typescript-eslint/no-unused-vars': [
+        'error',
+        {
+          argsIgnorePattern: '^_',
+          varsIgnorePattern: '^_',
+          caughtErrorsIgnorePattern: '^_',
+        },
+      ],
     },
   },
 ]);
