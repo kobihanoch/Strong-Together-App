@@ -1,8 +1,6 @@
-import { useEffect, useMemo, useState } from 'react';
-import { TTL_48H } from '../../infrastructure/cache/cache.utils';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { AppUser } from '../../features/auth/shared/types/auth.types';
-import useGetCache from './use-get-cache.hook';
-import useUpdateCache from './use-update-cache.hook';
+import { cacheGetJSON, cacheSetJSON } from '../../infrastructure/cache/cache.utils';
 
 const useCacheAndFetch = <CachePaylodType, APIDataType>(
   user: AppUser | { id: AppUser['id'] | null } | null, // {id} only for auth context
@@ -10,31 +8,40 @@ const useCacheAndFetch = <CachePaylodType, APIDataType>(
   isValidatedByServerFlag: boolean,
   fetchFn: () => Promise<APIDataType>, // Async function
   onDataFn: (data: APIDataType | CachePaylodType) => void,
-  cachedPayload: CachePaylodType | null,
+  payloadToCache: CachePaylodType | null | undefined,
   logLabel: string,
 ) => {
   // Stable cache key
+  // Whenever a user id is passed cache key is triggered
   const cacheKey = useMemo(() => (user?.id ? keyBuilderFn(user.id) : null), [user?.id]);
 
-  // Get cache
-  // Triggers on key builded
-  const { cached, hydrated: isCacheHydrated } = useGetCache<CachePaylodType>(cacheKey);
-
-  // Flag for API data hydration to enable cache writing
-  // Flag stays true until context is unmounting on logout (guard against initial refrence building)
-  const [dataHydrated, setDataHydrated] = useState<boolean>(false);
-
-  // Data fetched from cache / API
-  const [data, setData] = useState<APIDataType | CachePaylodType | null>(null);
-
-  // Loading state
   const [loading, setLoading] = useState<boolean>(false);
+  const [cachedPayload, setCachedPayload] = useState<CachePaylodType | null | undefined>(undefined);
+  const [isPayloadFromAPI, setIsPayloadFromAPI] = useState<boolean>(false);
 
-  const [cacheKnown, setCacheKnown] = useState<boolean>(false);
+  const getCache = useCallback(async () => {
+    if (!cacheKey) return;
+    return await cacheGetJSON<CachePaylodType>(cacheKey);
+  }, [cacheKey]);
 
+  // --------------------- UPDATE CACHE ---------------------------------------------
   // Updates cache auto when cached payload refrence is builded again (on data change)
-  useUpdateCache<CachePaylodType>(logLabel, cacheKey, cachedPayload, TTL_48H, dataHydrated);
+  useEffect(() => {
+    (async () => {
+      // Allow updating only when cache payload is known (not undefiened - may be null)
+      if (!cacheKey || payloadToCache === undefined || !isPayloadFromAPI) return;
+      // Update cache only when fresh data from API arrives
+      await cacheSetJSON<CachePaylodType | null>(cacheKey, payloadToCache);
 
+      // Reset API flag state
+      setIsPayloadFromAPI(false);
+
+      // Printing to indicate
+      console.log(`[${logLabel}]: Cache updated`);
+    })();
+  }, [cacheKey, payloadToCache, isPayloadFromAPI]);
+
+  // --------------------- SWR LOGIC ---------------------------------------------
   // Flow:
   // Load -> has cache? -> If yes procceed with cache | If no notify cache known (bacuse we already know cache stste - false) and now fetch
 
@@ -42,55 +49,51 @@ const useCacheAndFetch = <CachePaylodType, APIDataType>(
   // Functional only when there is a cache key and cache is hydrated (skip mounting phase)
   useEffect(() => {
     (async () => {
-      if (isCacheHydrated && cacheKey) {
-        try {
-          // Check if cached
-          if (cached) {
-            // Printing to indicate
-            console.log(`[${logLabel}]: Cached`);
+      // Only if cache key exists (user session is already initlized) and cached payload has already been through check (not undefined)
+      if (cacheKey) {
+        // Check if cached
+        // Update cached state
+        const cached = await getCache();
+        setCachedPayload(cached);
+        // Use cached payload only if not null (known and exists)
+        if (cached) {
+          // Printing to indicate
+          console.log(`[${logLabel}]: Cached`);
 
-            // Set data from cache
-            setData(cached);
-
-            // Setters
-            onDataFn(cached);
-            setLoading(false);
-          } else {
-            // If not cached => show loading incdication until data is fully fetched from API
-            // Indicators: skelaton, loading spinner etc...
-            setLoading(true);
-          }
-        } finally {
-          setCacheKnown(true);
+          // Setters
+          onDataFn(cached);
+          setLoading(false);
+        } else {
+          // If not cached => show loading incdication until data is fully fetched from API
+          // Indicators: skelaton, loading spinner etc...
+          setLoading(true);
         }
       }
     })();
-  }, [isCacheHydrated, cacheKey]);
+  }, [cacheKey]);
 
   // Fetch from API => Triggers when server validates tokens (after refresh tokens endpoint completed with no errors)
   // Fire only after cache is known
   useEffect(() => {
     (async () => {
-      if (isValidatedByServerFlag && cacheKnown) {
+      if (isValidatedByServerFlag && cachedPayload !== undefined) {
         if (!cacheKey) return;
-        try {
-          // Call API
-          const dataFromAPI = await fetchFn();
-          setData(dataFromAPI);
+        // Call API
+        const dataFromAPI = await fetchFn();
 
-          // Setters
-          onDataFn(dataFromAPI);
-          setDataHydrated(true);
-          // Store in cache (auto)
-        } finally {
-          setCacheKnown(true);
-          setLoading(false);
-        }
+        // Setters
+        onDataFn(dataFromAPI);
+
+        // Update API flag state
+        setIsPayloadFromAPI(true);
+
+        // Store in cache (auto after setters update)
+        setLoading(false);
       }
     })();
-  }, [isValidatedByServerFlag, cacheKey, cacheKnown]);
+  }, [isValidatedByServerFlag, cacheKey, cachedPayload]);
 
-  return { data, loading, cacheKnown };
+  return { loading };
 };
 
 export default useCacheAndFetch;
