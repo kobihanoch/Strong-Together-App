@@ -83,6 +83,7 @@ const useHomePageLogic = (): { data: HomePageData } => {
       mostFrequentSplit,
       PR,
       isLoading,
+      hasTracking,
     ],
   );
 
