@@ -13,7 +13,7 @@ const useCacheAndFetch = <APIDataType>(
 ) => {
   // Stable cache key
   // Whenever a user id is passed cache key is triggered
-  const cacheKey = useMemo(() => (user?.id ? keyBuilderFn(user.id) : null), [user?.id]);
+  const cacheKey = useMemo(() => (user?.id ? keyBuilderFn(user.id) : null), [user?.id, keyBuilderFn]);
 
   const [loading, setLoading] = useState<boolean>(false);
   const [cachedPayload, setCachedPayload] = useState<APIDataType | null | undefined>(undefined);
