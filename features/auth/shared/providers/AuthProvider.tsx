@@ -1,9 +1,7 @@
-import { GetAuthenticatedUserByIdResponse } from '@strong-together/shared';
-import React, { createContext, useCallback, useContext, useMemo, useRef, useState } from 'react';
-import { keyAuth } from '../../../../infrastructure/cache/cache-keys.utils';
-import useCacheAndFetch from '../../../../shared/hooks/use-cache-and-fetch.hook';
+import React, { createContext, useContext, useMemo, useRef, useState } from 'react';
 import useUpdateGlobalLoading from '../../../../shared/hooks/use-update-global-loading.hook';
 import useAuthActions from '../hooks/use-auth-actions.hook';
+import useAuthCacheHandler from '../hooks/use-auth-cache-handler.hook';
 import useAuthSocketInitialization from '../hooks/use-auth-socket-initialization';
 import useClearContext from '../hooks/use-clear-context.hook';
 import useInitialCheck from '../hooks/use-initial-check.hook';
@@ -11,7 +9,6 @@ import usePersistUserIdCache from '../hooks/use-persist-user-id-cache.hook';
 import useRetryServerValidationWhenOnline from '../hooks/use-retry-server-validation-when-online.hook';
 import useServerValidation from '../hooks/use-server-validation.hook';
 import useSyncUsernameHeader from '../hooks/use-sync-username-header.hook';
-import { fetchSelfUserData } from '../services/auth.service';
 import { AppUser } from '../types/auth.types';
 import { AuthProviderValue } from './types/auth-context.types';
 
@@ -56,22 +53,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const serverValidatingLockRef = useRef<boolean>(false);
   const attemptedServerValidationRef = useRef<boolean>(false);
 
-  // --- Auth user cache + revalidation ---
-  const fetchFn = useCallback(async () => await fetchSelfUserData(), []);
-
-  const onDataFn = useCallback((u: GetAuthenticatedUserByIdResponse) => {
-    setUser(u);
-  }, []);
-
-  const { loading: userDataLoading } = useCacheAndFetch<GetAuthenticatedUserByIdResponse>(
-    { id: userIdCache },
-    keyAuth,
-    isValidatedWithServer,
-    fetchFn,
-    onDataFn,
-    user,
-    'Auth Context',
-  );
+  const { userDataLoading } = useAuthCacheHandler({ userIdCache, isValidatedWithServer, user, setUser });
 
   // Report auth startup/user-data loading to the global loading coordinator
   useUpdateGlobalLoading('Auth', authPhase === 'checking' || userDataLoading);

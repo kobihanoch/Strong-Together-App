@@ -1,12 +1,9 @@
-import { GetExerciseTrackingResponse } from '@strong-together/shared';
-import { createContext, useCallback, useContext, useMemo, useState } from 'react';
-import { keyTracking } from '../../../../infrastructure/cache/cache-keys.utils';
-import useCacheAndFetch from '../../../../shared/hooks/use-cache-and-fetch.hook';
+import { createContext, useContext, useMemo } from 'react';
 import useUpdateGlobalLoading from '../../../../shared/hooks/use-update-global-loading.hook';
 import { useAuth } from '../../../auth/shared/providers/AuthProvider';
-import { getUserExerciseTracking } from '../../history/services/workout-history.service';
-import { WorkoutHistoryAnalyzedExerciseTrackingData, WorkoutHistoryExerciseTrackingMaps } from '../../history/types/workout-history.types';
+import { WorkoutHistoryAnalyzedExerciseTrackingData } from '../../history/types/workout-history.types';
 import { checkHasTrainedToday, unpackFromExerciseTrackingData } from '../../history/utils/workout-history-context.util';
+import useWorkoutHistoryCacheHandler from './hooks/use-workout-history-cache-handler.hook';
 import { WorkoutHistoryProviderValue } from './types/workout-history-provider.types';
 
 const WorkoutHistoryContext = createContext<WorkoutHistoryProviderValue | null>(null);
@@ -32,12 +29,8 @@ export const useWorkoutHistoryContext = () => {
 export const WorkoutHistoryProvider = ({ children }: { children: React.ReactNode }) => {
   const { user, isValidatedWithServer } = useAuth();
 
-  // Raw
-  const [exerciseTrackingMaps, setExerciseTrackingMaps] = useState<WorkoutHistoryExerciseTrackingMaps | undefined>(undefined);
-  // Raw - not for useage
-  const [exerciseTrackingAnalysis, setExerciseTrackingAnalysis] = useState<
-    GetExerciseTrackingResponse['exerciseTrackingAnalysis'] | undefined
-  >(undefined);
+  const { exerciseTrackingMaps, setExerciseTrackingMaps, exerciseTrackingAnalysis, setExerciseTrackingAnalysis, loading } =
+    useWorkoutHistoryCacheHandler({ user, isValidatedWithServer });
 
   // Unpacked - derived from raw
   const analyzedExerciseTrackingData: WorkoutHistoryAnalyzedExerciseTrackingData | undefined = useMemo(
@@ -48,40 +41,6 @@ export const WorkoutHistoryProvider = ({ children }: { children: React.ReactNode
   const hasTrainedToday = useMemo(
     (): boolean => checkHasTrainedToday(analyzedExerciseTrackingData?.lastWorkoutDate, Intl.DateTimeFormat().resolvedOptions().timeZone),
     [analyzedExerciseTrackingData?.lastWorkoutDate],
-  );
-
-  // -------------------------- useCacheHandler props ------------------------------
-
-  // Fetch function
-  const fetchFn = useCallback(async (): Promise<GetExerciseTrackingResponse> => await getUserExerciseTracking(), []);
-
-  // On data function
-  const onDataFn = useCallback((data: GetExerciseTrackingResponse): void => {
-    setExerciseTrackingMaps(data.exerciseTrackingMaps); // Empty maps if doen;t exist
-    setExerciseTrackingAnalysis(data.exerciseTrackingAnalysis);
-  }, []);
-
-  // Cache payload
-  const cachePayload: GetExerciseTrackingResponse | undefined = useMemo(
-    () =>
-      exerciseTrackingMaps === undefined || exerciseTrackingAnalysis === undefined
-        ? undefined
-        : {
-            exerciseTrackingMaps,
-            exerciseTrackingAnalysis,
-          },
-    [exerciseTrackingMaps, exerciseTrackingAnalysis],
-  );
-
-  // Hook usage
-  const { loading } = useCacheAndFetch<GetExerciseTrackingResponse>(
-    user, // user prop
-    keyTracking, // key builder
-    isValidatedWithServer, // flag from server
-    fetchFn, // fetch cb
-    onDataFn, // on data cb
-    cachePayload, // cache payload
-    'Analysis Context', // log
   );
 
   // Report analysis loading to global loading
@@ -97,7 +56,14 @@ export const WorkoutHistoryProvider = ({ children }: { children: React.ReactNode
       hasTrainedToday,
       loading,
     }),
-    [exerciseTrackingMaps, analyzedExerciseTrackingData, hasTrainedToday, loading],
+    [
+      exerciseTrackingMaps,
+      setExerciseTrackingMaps,
+      analyzedExerciseTrackingData,
+      setExerciseTrackingAnalysis,
+      hasTrainedToday,
+      loading,
+    ],
   );
 
   return <WorkoutHistoryContext.Provider value={value}>{children}</WorkoutHistoryContext.Provider>;

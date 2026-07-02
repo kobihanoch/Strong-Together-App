@@ -1,12 +1,8 @@
-import { GetWholeUserWorkoutPlanResponse } from '@strong-together/shared';
-import React, { createContext, useCallback, useContext, useMemo, useState } from 'react';
-import { keyWorkoutPlan } from '../../../../infrastructure/cache/cache-keys.utils';
-import useCacheAndFetch from '../../../../shared/hooks/use-cache-and-fetch.hook';
+import React, { createContext, useContext, useMemo } from 'react';
 import useUpdateGlobalLoading from '../../../../shared/hooks/use-update-global-loading.hook';
 import { useAuth } from '../../../auth/shared/providers/AuthProvider';
-import { getUserWorkout } from '../../plan/services/workout-plan.service';
-import { WorkoutPlan, WorkoutPlanForEdit } from '../../plan/types/workout-plan.types';
 import { extractWorkoutSplits } from '../../plan/utils/workout-plan.util';
+import useWorkoutPlanCacheHandler from './hooks/use-workout-plan-cache-handler.hook';
 import { WorkoutPlanProviderValue } from './types/workout-plan-provider.types';
 
 const WorkoutPlanContext = createContext<WorkoutPlanProviderValue | null>(null);
@@ -28,8 +24,10 @@ export const useWorkoutPlanContext = () => {
 export const WorkoutPlanProvider = ({ children }: { children: React.ReactNode }) => {
   const { user, isValidatedWithServer } = useAuth();
 
-  // Raw workout plan from API
-  const [workout, setWorkout] = useState<WorkoutPlan | undefined | null>(undefined);
+  const { workout, setWorkout, workoutForEdit, setWorkoutForEdit, loading } = useWorkoutPlanCacheHandler({
+    user,
+    isValidatedWithServer,
+  });
 
   // Derived data from workout
   const { workoutSplits, exercises } = useMemo(() => {
@@ -37,40 +35,6 @@ export const WorkoutPlanProvider = ({ children }: { children: React.ReactNode })
     if (extracted === undefined) return { workoutSplits: undefined, exercises: undefined };
     return extracted;
   }, [workout]);
-
-  // Editable version for edit workout
-  const [workoutForEdit, setWorkoutForEdit] = useState<WorkoutPlanForEdit | undefined | null>(undefined);
-
-  // -------------------------- useCacheHandler props ------------------------------
-
-  // Fetch function
-  const fetchFn = useCallback(async () => await getUserWorkout(), []);
-
-  // On data function
-  const onDataFn = useCallback((data: GetWholeUserWorkoutPlanResponse): void => {
-    setWorkout(data.workoutPlan); // Null if doesnt exist
-    setWorkoutForEdit(data.workoutPlanForEditWorkout); // Null if doesnt exist
-  }, []);
-
-  // Cache payload
-  const cachePayload = useMemo(
-    () =>
-      workout === undefined || workoutForEdit === undefined
-        ? undefined
-        : { workoutPlan: workout, workoutPlanForEditWorkout: workoutForEdit },
-    [workout, workoutForEdit],
-  );
-
-  // Hook usage
-  const { loading } = useCacheAndFetch<GetWholeUserWorkoutPlanResponse>(
-    user, // user prop
-    keyWorkoutPlan, // key builder
-    isValidatedWithServer, // flag from server
-    fetchFn, // fetch cb
-    onDataFn, // on data cb
-    cachePayload, // cache payload
-    'Workout Context', // log
-  );
 
   // Report workout plan loading to global loading
   useUpdateGlobalLoading('WorkoutPlan', loading);
@@ -86,7 +50,7 @@ export const WorkoutPlanProvider = ({ children }: { children: React.ReactNode })
       setWorkoutForEdit,
       loading,
     }),
-    [workout, workoutSplits, exercises, workoutForEdit, loading],
+    [workout, setWorkout, workoutSplits, exercises, workoutForEdit, setWorkoutForEdit, loading],
   );
 
   return <WorkoutPlanContext.Provider value={value}>{children}</WorkoutPlanContext.Provider>;
