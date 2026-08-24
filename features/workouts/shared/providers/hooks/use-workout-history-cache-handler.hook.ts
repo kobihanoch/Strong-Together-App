@@ -1,4 +1,4 @@
-import { GetExerciseTrackingResponse } from '@strong-together/shared';
+import type { GetExerciseTrackingResponse } from '@strong-together/shared';
 import { useCallback, useMemo, useState } from 'react';
 import { keyTracking } from '../../../../../infrastructure/cache/cache-keys.utils';
 import useCacheAndFetch from '../../../../../shared/hooks/use-cache-and-fetch.hook';

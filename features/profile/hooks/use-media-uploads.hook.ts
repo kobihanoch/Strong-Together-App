@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { UploadableFile, uploadProfilePictureToStorageAndGetPath } from '../services/media.service';
 
 export const useMediaUploads = (): {
-  uploadToStorageAndReturnPath: (file: UploadableFile) => Promise<{ path: string; url: string }>;
+  uploadToStorageAndReturnPath: (file: UploadableFile) => Promise<{ profilePicPath: string; url: string }>;
   loading: boolean;
   error: Error | null;
 } => {
@@ -13,8 +13,8 @@ export const useMediaUploads = (): {
   const uploadToStorageAndReturnPath = async (file: UploadableFile) => {
     try {
       setLoading(true);
-      const { path, url } = await uploadProfilePictureToStorageAndGetPath(file);
-      return { path: path, url: url };
+      const { profilePicPath, url } = await uploadProfilePictureToStorageAndGetPath(file);
+      return { profilePicPath, url };
     } catch (err) {
       setError(err as Error);
       console.log('Hook error uploading profile picture to storage: ' + err);

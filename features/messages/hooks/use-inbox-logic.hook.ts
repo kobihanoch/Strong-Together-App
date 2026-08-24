@@ -1,4 +1,4 @@
-import { MessageEntity } from '@strong-together/shared';
+import type { UserMessage } from '../types/messages.types';
 import { useCallback } from 'react';
 import { ALERT_TYPE, Dialog } from 'react-native-alert-notification';
 import { useMessages } from '../providers/MessagesProvider';
@@ -10,15 +10,15 @@ const useInboxLogic = () => {
 
   const unreadMessagesCount = unreadMessages?.length;
 
-  const markAsRead = useCallback(async (msgId: MessageEntity['id']): Promise<void> => {
+  const markAsRead = useCallback(async (msgId: UserMessage['id']): Promise<void> => {
     await updateMsgReadStatus(msgId);
     // Update state
     setAllReceivedMessages((prev: UserMessages | undefined) =>
-      prev ? prev.map((m: UserMessages[number]) => (m.id === msgId ? { ...m, is_read: true } : m)) : prev,
+      prev ? prev.map((m: UserMessages[number]) => (m.id === msgId ? { ...m, isRead: true } : m)) : prev,
     );
   }, []);
 
-  const confirmAndDeleteMessage = useCallback((msgId: MessageEntity['id']): void => {
+  const confirmAndDeleteMessage = useCallback((msgId: UserMessage['id']): void => {
     let pressedYes = false;
 
     Dialog.show({

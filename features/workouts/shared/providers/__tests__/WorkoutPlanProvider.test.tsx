@@ -214,8 +214,8 @@ describe('WorkoutPlanContext', () => {
       },
     ]);
     expect(result.current.exercises).toEqual({
-      A: userWithWorkoutNoHistoryProfile.workout!.workoutsplits![0].exercisetoworkoutsplit,
-      B: userWithWorkoutNoHistoryProfile.workout!.workoutsplits![1].exercisetoworkoutsplit,
+      A: userWithWorkoutNoHistoryProfile.workout!.workoutSplits![0].exerciseToWorkoutSplit,
+      B: userWithWorkoutNoHistoryProfile.workout!.workoutSplits![1].exerciseToWorkoutSplit,
     });
   });
 

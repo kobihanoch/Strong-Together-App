@@ -3,7 +3,8 @@ import React, { useState } from 'react';
 import { Dimensions, StyleSheet, Text, View } from 'react-native';
 import { RFValue } from 'react-native-responsive-fontsize';
 import { colors } from '../../../../shared/constants/colors';
-import { AerobicsDailyRecord, WeeklyData } from '@strong-together/shared';
+import { CardioDailyRecord } from '../types/cardio.types';
+import type { CardioWeeklyData } from '../types/cardio.types';
 import { formatTime } from '../../../../shared/utils/shared-utils';
 import Column from '../../../../shared/components/Column';
 import Row from '../../../../shared/components/Row';
@@ -15,15 +16,15 @@ const CardioSection = ({
   daily,
   weekly,
 }: {
-  daily: AerobicsDailyRecord[] | undefined;
-  weekly: WeeklyData | undefined;
+  daily: CardioDailyRecord[] | undefined;
+  weekly: CardioWeeklyData | undefined;
 }) => {
-  const { duration_mins: minutes = 0, duration_sec: seconds = 0, type = null } = daily?.[0] || {};
+  const { durationMins: minutes = 0, durationSec: seconds = 0, type = null } = daily?.[0] || {};
   const hasDailyCardio = !!minutes;
   const durationText = formatTime(minutes, seconds);
   const typeText = hasDailyCardio && type ? String(type) : 'None';
 
-  const { records = null, total_duration_mins: totalMins = null } = weekly || {};
+  const { records = null, totalDurationMins: totalMins = null } = weekly || {};
 
   const [weeklyCardioCardW, setWeeklyCardioW] = useState(0);
 

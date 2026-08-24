@@ -11,9 +11,10 @@ import TopBar from '../components/TopBar';
 import { showErrorAlert } from '../../../../shared/alerts/error-alerts';
 import useStartWorkoutPageLogic from '../hooks/use-start-workout-page-logic.hook';
 import { RootParamList } from '../../../../navigation/types/appStackTypes';
-import { TrackingMapItem } from '@strong-together/shared';
-import { AnalyzeVideoResultPayload, SquatRepetition } from '@strong-together/shared';
-import { ExerciseInPlan } from '@strong-together/shared';
+import { TrackingMapItem } from '../../shared/types/workout.types';
+import type { AnalyzeVideoResultPayloadDto } from '@strong-together/shared';
+import type { SquatRepetition } from '../types/video-analysis.types';
+import type { ExerciseInPlan } from '../../shared/types/workout.types';
 
 const { width, height } = Dimensions.get('window');
 
@@ -26,7 +27,7 @@ export type ExerciseAnalysisOverview = {
 
 export type CachedExerciseAnalysis<T> = {
   overview: ExerciseAnalysisOverview;
-  result: AnalyzeVideoResultPayload<T> | null;
+  result: AnalyzeVideoResultPayloadDto<T> | null;
 };
 
 const StartWorkout = ({ route }: StackScreenProps<RootParamList, 'StartWorkout'>) => {
@@ -115,7 +116,7 @@ const StartWorkout = ({ route }: StackScreenProps<RootParamList, 'StartWorkout'>
   const handleCacheAnalysis = useCallback(
     (
       exerciseId: ExerciseInPlan['id'],
-      result: AnalyzeVideoResultPayload<SquatRepetition> | null,
+      result: AnalyzeVideoResultPayloadDto<SquatRepetition> | null,
       overview: ExerciseAnalysisOverview,
     ) => {
       setLastAnalysis((prev) => {

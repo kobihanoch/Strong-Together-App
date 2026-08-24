@@ -4,14 +4,14 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { uuidv4 } from 'react-native-compressor';
 import { showErrorAlert } from '../../../../shared/alerts/error-alerts';
 import { getPresignedUrlFromS3, uploadVideoToS3 } from '../services/analyze-video.service';
-import { GetPresignedUrlFromS3Body } from '@strong-together/shared';
-import { AnalyzeVideoResultPayload, SquatRepetition } from '@strong-together/shared';
-import { ExerciseEntity } from '@strong-together/shared';
+import type { AnalyzeVideoResultPayloadDto } from '@strong-together/shared';
+import type { SquatRepetition, VideoUploadRequest } from '../types/video-analysis.types';
+import type { Exercise } from '../../shared/types/workout.types';
 import { registerToVideoAnalysisResultsListener } from '../video-analysis.listeners';
 
 type UseVideoAnalysisProps = {
-  fileType: GetPresignedUrlFromS3Body['fileType'];
-  exercise: ExerciseEntity['name'];
+  fileType: VideoUploadRequest['fileType'];
+  exercise: Exercise['name'];
   fileURI: string;
 };
 
@@ -21,7 +21,7 @@ const useVideoAnalysis = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [uploadProgress, setUploadProgress] = useState<number>(0);
   const [phase, setPhase] = useState<VideoAnalysisPhase>('idle');
-  const [analysisResults, setAnalysisResults] = useState<AnalyzeVideoResultPayload<SquatRepetition> | null>(null);
+  const [analysisResults, setAnalysisResults] = useState<AnalyzeVideoResultPayloadDto<SquatRepetition> | null>(null);
 
   const inFlightRef = useRef(false);
   const cleanupListenerRef = useRef<(() => void) | null>(null);
@@ -136,7 +136,7 @@ const useVideoAnalysis = () => {
             setCurrentPhase('waiting_results');
             waitingForServerResults = true;
 
-            const handleResults = (results: AnalyzeVideoResultPayload<SquatRepetition>) => {
+            const handleResults = (results: AnalyzeVideoResultPayloadDto<SquatRepetition>) => {
               // Re-activate the pipeline span so websocket work stays under the same trace.
               Sentry.withActiveSpan(pipelineSpanRef.current, () => {
                 Sentry.startSpan(

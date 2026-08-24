@@ -1,6 +1,6 @@
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
-import { ExerciseEntity, ExerciseTrackingEntity, FinishUserWorkoutBody } from '@strong-together/shared';
+import type { Exercise } from '../../shared/types/workout.types';
 import { useCallback, useMemo, useRef, useState } from 'react';
 import { keyStartWorkout } from '../../../../infrastructure/cache/cache-keys.utils';
 import { cacheDeleteKey } from '../../../../infrastructure/cache/cache.utils';
@@ -80,15 +80,15 @@ const useStartWorkoutPageLogic = (
   );
 
   // --------------------[ Add progress ]-----------------------------------------
-  const addWeightRecord = useCallback((exerciseName: ExerciseEntity['name'], setIndex: number, weight: number): void => {
+  const addWeightRecord = useCallback((exerciseName: Exercise['name'], setIndex: number, weight: number): void => {
     setWorkoutProgressObj((prev) => applyWeight(prev, exerciseName, setIndex, weight));
   }, []);
 
-  const addRepsRecord = useCallback((exerciseName: ExerciseEntity['name'], setIndex: number, reps: number) => {
+  const addRepsRecord = useCallback((exerciseName: Exercise['name'], setIndex: number, reps: number) => {
     setWorkoutProgressObj((prev) => applyReps(prev, exerciseName, setIndex, reps));
   }, []);
 
-  const addNotes = useCallback((exerciseName: ExerciseEntity['name'], notes: ExerciseTrackingEntity['notes']) => {
+  const addNotes = useCallback((exerciseName: Exercise['name'], notes: string | null) => {
     setWorkoutProgressObj((prev) => applyNotes(prev, exerciseName, notes));
   }, []);
 
@@ -114,7 +114,7 @@ const useStartWorkoutPageLogic = (
     console.log('Saving started!');
     try {
       // Trims zeros in array and creates an array of rows object as database requires
-      const arr: FinishUserWorkoutBody['workout'] = createArrayForDataBase(workoutProgressObj);
+      const arr = createArrayForDataBase(workoutProgressObj);
       if (!arr.length) {
         showErrorAlert('Saving Error', 'Please perform at least one set');
         return;

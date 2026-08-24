@@ -25,14 +25,14 @@ const useHomePageLogic = (): { data: HomePageData } => {
     username = '',
     userId = '',
     firstName = '',
-    profileImageUrl = '',
+    profilePicPath = '',
   } = useMemo(() => {
     const u = user;
     return {
       username: u?.username ?? '',
       userId: u?.id ?? '',
       firstName: u?.name!.trim().split(' ')[0],
-      profileImageUrl: u?.profile_image_url ?? '',
+      profilePicPath: u?.profilePicPath ?? '',
     };
   }, [user]);
 
@@ -62,7 +62,7 @@ const useHomePageLogic = (): { data: HomePageData } => {
       userId,
       hasAssignedWorkout,
       hasTracking,
-      profileImageUrl,
+      profilePicPath,
       firstName,
       lastWorkoutDate,
       totalWorkoutNumber,
@@ -75,7 +75,7 @@ const useHomePageLogic = (): { data: HomePageData } => {
       username,
       userId,
       hasAssignedWorkout,
-      profileImageUrl,
+      profilePicPath,
       firstName,
       lastWorkoutDate,
       totalWorkoutNumber,

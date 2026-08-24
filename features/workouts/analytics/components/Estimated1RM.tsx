@@ -4,13 +4,13 @@ import { Dimensions, Text, TouchableOpacity, View } from 'react-native';
 import { RFValue } from 'react-native-responsive-fontsize';
 import Card from './Card';
 import RenderEst1RMItem from './RenderEst1RMItem';
-import { WorkoutRMsResponse } from '@strong-together/shared';
+import { Analytics1RM } from '../types/use-analytics.types';
 
 const { height } = Dimensions.get('window');
 
 type Estimated1RMProps = {
   rmData: {
-    rm: WorkoutRMsResponse;
+    rm: Analytics1RM;
   };
   hasData: boolean;
   onSeeAll: () => void;

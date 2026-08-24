@@ -2,22 +2,13 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-require-imports */
 import React from 'react';
-import {
-  expect,
-  beforeEach as jestBeforeEach,
-  describe as jestDescribe,
-  expect as jestExpect,
-  it as jestIt,
-  jest as jestObject,
-} from '@jest/globals';
+import { expect, beforeEach as jestBeforeEach, describe as jestDescribe, expect as jestExpect, it as jestIt, jest as jestObject, } from '@jest/globals';
 import { fireEvent, render, waitFor } from '@testing-library/react-native';
 import type { RootParamList } from '../../../../../navigation/types/appStackTypes';
 import type { WorkoutPlanSplit } from '../../../plan/types/workout-plan.types';
 import type {
-  ResumeWorkoutCachePayload,
-  StartWorkoutPageLogicReturn,
-} from '../../types/use-start-workout.types';
-import type { TrackingMapItem } from '@strong-together/shared';
+  ResumeWorkoutCachePayload, StartWorkoutPageLogicReturn, } from '../../types/use-start-workout.types';
+import type { TrackingMapItem } from '../../../shared/types/workout.types';
 
 const mockDialogShow = jestObject.fn();
 const mockDialogHide = jestObject.fn();
@@ -96,21 +87,21 @@ const createResumedWorkout = (
 
 const createTrackingMapItem = (overrides: Partial<TrackingMapItem> = {}): TrackingMapItem => ({
   id: 90,
-  exercisetosplit_id: 11,
-  exercise_id: 1,
-  workoutsplit_id: 5,
-  splitname: 'Push',
+  exerciseToSplitId: 11,
+  exerciseId: 1,
+  workoutSplitId: 5,
+  splitName: 'Push',
   exercise: 'Bench Press',
-  workoutdate: '2026-03-26T10:00:00.000Z',
-  order_index: 0,
+  workoutDate: '2026-03-26T10:00:00.000Z',
+  orderIndex: 0,
   weight: [80],
   reps: [10],
   notes: 'Strong',
-  exercisetoworkoutsplit: {
+  exerciseToWorkoutSplit: {
     sets: [10],
     exercises: {
-      targetmuscle: 'Chest',
-      specifictargetmuscle: 'Upper Chest',
+      targetMuscle: 'Chest',
+      specificTargetMuscle: 'Upper Chest',
     },
   },
   ...overrides,
@@ -195,11 +186,11 @@ jestDescribe('StartWorkout screen', () => {
               openAnalyzeModal({
                 id: 11,
                 sets: [10],
-                is_active: true,
-                targetmuscle: 'Chest',
-                specifictargetmuscle: 'Upper Chest',
+                isActive: true,
+                targetMuscle: 'Chest',
+                specificTargetMuscle: 'Upper Chest',
                 exercise: 'Bench Press',
-                workoutsplit: 'Push',
+                workoutSplit: 'Push',
               }),
           },
           ReactLocal.createElement(Text, null, 'Open analysis'),

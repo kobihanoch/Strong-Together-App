@@ -1,4 +1,5 @@
-import { AdherenceExerciseStats, ExerciseEntity, WorkoutSplitEntity } from '@strong-together/shared';
+import type { AnalyticsAdherenceStats } from '../types/use-analytics.types';
+import type { Exercise, WorkoutSplit } from '../../shared/types/workout.types';
 import React, { useCallback, useRef, useState } from 'react';
 import { Dimensions, View } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
@@ -20,8 +21,8 @@ const Analytics = () => {
   const goalAdherenceModalRef = useRef<SlidingBottomModalRef | null>(null);
 
   const [selectedAdh, setSelectedAdh] = useState<{
-    name: WorkoutSplitEntity['name'];
-    v: Record<ExerciseEntity['name'], AdherenceExerciseStats>;
+    name: WorkoutSplit['name'];
+    v: Record<Exercise['name'], AnalyticsAdherenceStats>;
   } | null>(null); // { name, v }
 
   const openRMSModal = useCallback(() => {
@@ -30,7 +31,7 @@ const Analytics = () => {
   }, []);
 
   const openGoalAdherenceModal = useCallback(
-    (name: WorkoutSplitEntity['name'], v: Record<ExerciseEntity['name'], AdherenceExerciseStats>) => {
+    (name: WorkoutSplit['name'], v: Record<Exercise['name'], AnalyticsAdherenceStats>) => {
       setSelectedAdh({ name, v });
       RMSModalRef.current?.close();
       goalAdherenceModalRef.current?.open?.(1);
@@ -68,7 +69,7 @@ const Analytics = () => {
         title={'Goal Adherence'}
         ref={goalAdherenceModalRef}
         data={selectedAdh ? [[selectedAdh.name, selectedAdh.v]] : []} // only one entry
-        renderItem={({ item }: { item: [WorkoutSplitEntity['name'], Record<ExerciseEntity['name'], AdherenceExerciseStats>] }) => {
+        renderItem={({ item }: { item: [WorkoutSplit['name'], Record<Exercise['name'], AnalyticsAdherenceStats>] }) => {
           const [name, v] = item;
           return (
             <RenderGoalAdherenceItem

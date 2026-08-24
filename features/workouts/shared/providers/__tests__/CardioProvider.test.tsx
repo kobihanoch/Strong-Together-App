@@ -5,10 +5,7 @@ import { beforeEach, describe, expect, it, jest } from '@jest/globals';
 import { act, renderHook, waitFor } from '@testing-library/react-native';
 import moment from 'moment';
 import {
-  guestProfile,
-  userWithWorkoutAndHistoryProfile,
-  userWithoutWorkoutProfile,
-} from '../../../../../tests/fixtures/userProfiles';
+  guestProfile, userWithWorkoutAndHistoryProfile, userWithoutWorkoutProfile, } from '../../../../../tests/fixtures/userProfiles';
 import type { UserAerobicsResponse } from '@strong-together/shared';
 
 jest.mock('@react-native-async-storage/async-storage', () => ({
@@ -196,8 +193,8 @@ describe('CardioContext', () => {
     await waitFor(() => {
       expect(result.current.cardioForToday).toEqual({
         type: 'Run',
-        duration_mins: 25,
-        duration_sec: 30,
+        durationMins: 25,
+        durationSec: 30,
       });
     });
 
@@ -206,8 +203,8 @@ describe('CardioContext', () => {
         [moment().format('YYYY-MM-DD')]: [
           {
             type: 'Run',
-            duration_mins: 25,
-            duration_sec: 30,
+            durationMins: 25,
+            durationSec: 30,
           },
         ],
       }),
@@ -239,8 +236,8 @@ describe('CardioContext', () => {
         [moment().format('YYYY-MM-DD')]: [
           {
             type: 'Bike',
-            duration_mins: 18,
-            duration_sec: 45,
+            durationMins: 18,
+            durationSec: 45,
           },
         ],
       });
@@ -248,8 +245,8 @@ describe('CardioContext', () => {
 
     expect(result.current.cardioForToday).toEqual({
       type: 'Bike',
-      duration_mins: 18,
-      duration_sec: 45,
+      durationMins: 18,
+      durationSec: 45,
     });
     expect(result.current.hasDoneCardioToday).toBe(true);
   });

@@ -4,7 +4,7 @@ import * as Google from 'expo-auth-session/providers/google';
 import * as AuthSession from 'expo-auth-session';
 import { useCallback, useMemo } from 'react';
 import api from '../../../../infrastructure/api/api-config/api';
-import { OAuthLoginResponse } from '@strong-together/shared';
+import type { OAuthLoginResponse } from '@strong-together/shared';
 
 WebBrowser.maybeCompleteAuthSession();
 

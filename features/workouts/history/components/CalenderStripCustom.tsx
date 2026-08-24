@@ -71,7 +71,7 @@ const CalendarStripCustom = ({ onDateSelect, selectedDate, userExerciseLogs }: C
 
       workoutLogForDate = userExerciseLogs?.[dateKey];
 
-      const splitName = workoutLogForDate?.[0].splitname;
+      const splitName = workoutLogForDate?.[0].splitName;
 
       return (
         <TouchableOpacity

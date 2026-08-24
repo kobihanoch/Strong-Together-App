@@ -1,4 +1,4 @@
-import { AerobicsDailyRecord } from '@strong-together/shared';
+import type { CardioDailyRecord } from '../../../cardio/types/cardio.types';
 import { CardioDailyMap, CardioWeeklyMap } from '../../../cardio/types/cardio.types';
 
 export interface CardioProviderValue {
@@ -7,6 +7,6 @@ export interface CardioProviderValue {
   setDailyCardioMap: React.Dispatch<React.SetStateAction<CardioDailyMap | undefined>>;
   setWeeklyCardioMap: React.Dispatch<React.SetStateAction<CardioWeeklyMap | undefined>>;
   hasDoneCardioToday: boolean;
-  cardioForToday: AerobicsDailyRecord | null;
+  cardioForToday: CardioDailyRecord | null;
   loading: boolean;
 }

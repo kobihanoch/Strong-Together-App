@@ -1,15 +1,9 @@
 /* eslint-disable @typescript-eslint/no-require-imports */
 import React, { useState } from 'react';
-import {
-  beforeEach as jestBeforeEach,
-  describe as jestDescribe,
-  expect as jestExpect,
-  it as jestIt,
-  jest as jestObject,
-} from '@jest/globals';
+import { beforeEach as jestBeforeEach, describe as jestDescribe, expect as jestExpect, it as jestIt, jest as jestObject, } from '@jest/globals';
 import { TextInput } from 'react-native';
 import { fireEvent, render } from '@testing-library/react-native';
-import type { CreateUserBody } from '@strong-together/shared';
+import type { RegistrationInput } from '../../../shared/types/auth.types';
 
 jestObject.mock('react-native-vector-icons/MaterialCommunityIcons', () => {
   const mockReact = require('react');
@@ -20,7 +14,7 @@ jestObject.mock('react-native-vector-icons/MaterialCommunityIcons', () => {
 import InputField from '../../../../../shared/components/InputField';
 import SelectField from '../../../../../shared/components/SelectField';
 
-type RegisterGenderValue = CreateUserBody['gender'] | '';
+type RegisterGenderValue = RegistrationInput['gender'] | '';
 
 const SelectFieldHarness = ({
   initialValue = '',

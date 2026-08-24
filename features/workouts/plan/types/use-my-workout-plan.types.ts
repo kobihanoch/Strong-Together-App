@@ -1,3 +1,3 @@
-import { WorkoutSplitEntity } from '@strong-together/shared';
+import type { WorkoutSplit } from '../../shared/types/workout.types';
 
-export type ExerciseCounter = Record<WorkoutSplitEntity['name'], number>;
+export type ExerciseCounter = Record<WorkoutSplit['name'], number>;

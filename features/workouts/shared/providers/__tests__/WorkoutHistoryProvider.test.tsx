@@ -5,11 +5,7 @@ import { beforeEach, describe, expect, it, jest } from '@jest/globals';
 import { act, renderHook, waitFor } from '@testing-library/react-native';
 import { DateTime } from 'luxon';
 import {
-  guestProfile,
-  userWithWorkoutAndHistoryProfile,
-  userWithWorkoutNoHistoryProfile,
-  userWithoutWorkoutProfile,
-} from '../../../../../tests/fixtures/userProfiles';
+  guestProfile, userWithWorkoutAndHistoryProfile, userWithWorkoutNoHistoryProfile, userWithoutWorkoutProfile, } from '../../../../../tests/fixtures/userProfiles';
 import type { GetExerciseTrackingResponse } from '@strong-together/shared';
 
 jest.mock('@react-native-async-storage/async-storage', () => ({
@@ -114,13 +110,13 @@ const createHydratingUseCacheAndFetchMock = (payload: GetExerciseTrackingRespons
 const createEmptyTrackingResponse = (): GetExerciseTrackingResponse => ({
   exerciseTrackingMaps: userWithoutWorkoutProfile.exerciseTrackingMaps!,
   exerciseTrackingAnalysis: {
-    unique_days: 0,
-    most_frequent_split: null,
-    most_frequent_split_days: null,
+    uniqueDays: 0,
+    mostFrequentSplit: null,
+    mostFrequentSplitDays: null,
     lastWorkoutDate: null,
     splitDaysByName: {},
     prs: {
-      pr_max: null,
+      prMax: null,
     },
   },
 });
@@ -128,17 +124,17 @@ const createEmptyTrackingResponse = (): GetExerciseTrackingResponse => ({
 const createPackedTrackingResponse = (): GetExerciseTrackingResponse => ({
   exerciseTrackingMaps: userWithWorkoutAndHistoryProfile.exerciseTrackingMaps!,
   exerciseTrackingAnalysis: {
-    unique_days: userWithWorkoutAndHistoryProfile.analyzedExerciseTrackingData!.workoutCount,
-    most_frequent_split: userWithWorkoutAndHistoryProfile.analyzedExerciseTrackingData!.mostFrequentSplit.splitName,
-    most_frequent_split_days: userWithWorkoutAndHistoryProfile.analyzedExerciseTrackingData!.mostFrequentSplit.times,
+    uniqueDays: userWithWorkoutAndHistoryProfile.analyzedExerciseTrackingData!.workoutCount,
+    mostFrequentSplit: userWithWorkoutAndHistoryProfile.analyzedExerciseTrackingData!.mostFrequentSplit.splitName,
+    mostFrequentSplitDays: userWithWorkoutAndHistoryProfile.analyzedExerciseTrackingData!.mostFrequentSplit.times,
     lastWorkoutDate: userWithWorkoutAndHistoryProfile.analyzedExerciseTrackingData!.lastWorkoutDate,
     splitDaysByName: userWithWorkoutAndHistoryProfile.analyzedExerciseTrackingData!.splitDaysByName,
     prs: {
-      pr_max: {
+      prMax: {
         exercise: userWithWorkoutAndHistoryProfile.analyzedExerciseTrackingData!.pr.maxExercise!,
         weight: userWithWorkoutAndHistoryProfile.analyzedExerciseTrackingData!.pr.maxWeight,
         reps: userWithWorkoutAndHistoryProfile.analyzedExerciseTrackingData!.pr.maxReps,
-        workout_time_utc: userWithWorkoutAndHistoryProfile.analyzedExerciseTrackingData!.pr.maxDate,
+        workoutTimeUtc: userWithWorkoutAndHistoryProfile.analyzedExerciseTrackingData!.pr.maxDate,
       },
     },
   },

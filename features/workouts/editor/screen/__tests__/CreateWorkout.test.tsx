@@ -92,9 +92,9 @@ const createLogicState = (): UseCreateWorkoutLogicReturn => ({
       {
         id: 1,
         name: 'Bench Press',
-        targetmuscle: 'Chest',
+        targetMuscle: 'Chest',
         specificTargetMuscle: 'Upper Chest',
-        order_index: 0,
+        orderIndex: 0,
         sets: [10, 10, 10],
       },
     ],
@@ -104,7 +104,7 @@ const createLogicState = (): UseCreateWorkoutLogicReturn => ({
   availableExercises: {
     Chest: [{ id: 1, name: 'Bench Press', specificTargetMuscle: 'Upper Chest' }],
   },
-  allExercises: [{ id: 1, name: 'Bench Press', specificTargetMuscle: 'Upper Chest', targetmuscle: 'Chest' }],
+  allExercises: [{ id: 1, name: 'Bench Press', specificTargetMuscle: 'Upper Chest', targetMuscle: 'Chest' }],
   muscles: ['All', 'Chest'],
   saveWorkout: async () => {},
   controls: {
@@ -128,9 +128,9 @@ const createLogicState = (): UseCreateWorkoutLogicReturn => ({
     {
       id: 1,
       name: 'Bench Press',
-      targetmuscle: 'Chest',
+      targetMuscle: 'Chest',
       specificTargetMuscle: 'Upper Chest',
-      order_index: 0,
+      orderIndex: 0,
       sets: [10, 10, 10],
     },
   ],
@@ -202,9 +202,9 @@ describe('CreateWorkout screen', () => {
           {
             id: 1,
             name: 'Bench Press',
-            targetmuscle: 'Chest',
+            targetMuscle: 'Chest',
             specificTargetMuscle: 'Upper Chest',
-            order_index: 0,
+            orderIndex: 0,
             sets: [10, 10, 10],
           },
         ],
@@ -212,17 +212,17 @@ describe('CreateWorkout screen', () => {
           {
             id: 2,
             name: 'Barbell Row',
-            targetmuscle: 'Back',
+            targetMuscle: 'Back',
             specificTargetMuscle: 'Lats',
-            order_index: 0,
+            orderIndex: 0,
             sets: [12, 12, 12],
           },
           {
             id: 3,
             name: 'Lat Pulldown',
-            targetmuscle: 'Back',
+            targetMuscle: 'Back',
             specificTargetMuscle: 'Lats',
-            order_index: 1,
+            orderIndex: 1,
             sets: [10, 10, 10],
           },
         ],
@@ -262,9 +262,9 @@ describe('CreateWorkout screen', () => {
         {
           id: 1,
           name: 'Bench Press',
-          targetmuscle: 'Chest',
+          targetMuscle: 'Chest',
           specificTargetMuscle: 'Upper Chest',
-          order_index: 0,
+          orderIndex: 0,
           sets: [10, 10, 10],
         },
       ],
@@ -273,8 +273,8 @@ describe('CreateWorkout screen', () => {
     state.exForSplit = [];
     state.muscles = ['All', 'Chest', 'Back'];
     state.allExercises = [
-      { id: 1, name: 'Bench Press', specificTargetMuscle: 'Upper Chest', targetmuscle: 'Chest' },
-      { id: 2, name: 'Row', specificTargetMuscle: 'Lats', targetmuscle: 'Back' },
+      { id: 1, name: 'Bench Press', specificTargetMuscle: 'Upper Chest', targetMuscle: 'Chest' },
+      { id: 2, name: 'Row', specificTargetMuscle: 'Lats', targetMuscle: 'Back' },
     ];
     mockLogic.mockReturnValue(state);
 

@@ -5,7 +5,7 @@ import Column from '../../../../shared/components/Column';
 import { RFValue } from 'react-native-responsive-fontsize';
 import { colors } from '../../../../shared/constants/colors';
 import { formatDate } from '../../../../shared/utils/shared-utils';
-import { TrackingMapItem } from '@strong-together/shared';
+import { TrackingMapItem } from '../../shared/types/workout.types';
 
 const { height } = Dimensions.get('window');
 
@@ -13,7 +13,7 @@ const WorkoutHeader = ({
   data,
   selectedDate,
 }: {
-  data: Omit<TrackingMapItem, 'workoutdate'>[] | undefined;
+  data: Omit<TrackingMapItem, 'workoutDate'>[] | undefined;
   selectedDate: string;
 }) => {
   const workoutForDate = data?.length ? data[0] : null;
@@ -21,10 +21,10 @@ const WorkoutHeader = ({
   return (
     <Row style={{ alignItems: 'center', marginTop: 20, marginHorizontal: 10 }}>
       <View style={styles.capitalContainer}>
-        <Text style={styles.capitalText}>{workoutForDate ? workoutForDate.splitname : 'R'}</Text>
+        <Text style={styles.capitalText}>{workoutForDate ? workoutForDate.splitName : 'R'}</Text>
       </View>
       <Column>
-        <Text style={styles.workoutTitle}>{workoutForDate ? 'Workout ' + workoutForDate.splitname : 'Rest day'}</Text>
+        <Text style={styles.workoutTitle}>{workoutForDate ? 'Workout ' + workoutForDate.splitName : 'Rest day'}</Text>
         <Text style={styles.dateText}>{formatDate(selectedDate)}</Text>
       </Column>
     </Row>

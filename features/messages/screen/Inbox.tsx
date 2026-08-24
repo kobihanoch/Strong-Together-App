@@ -5,20 +5,20 @@ import { RFValue } from 'react-native-responsive-fontsize';
 import MessageItem from '../components/MessageItem';
 import useInboxLogic from '../hooks/use-inbox-logic.hook';
 import { colors } from '../../../shared/constants/colors';
-import { AllUserMessages } from '@strong-together/shared';
+import type { UserMessage } from '../types/messages.types';
 const { width } = Dimensions.get('window');
 
 const Inbox = () => {
   const { allReceivedMessages, confirmAndDeleteMessage, markAsRead, unreadMessagesCount } = useInboxLogic();
 
-  const renderItem: ListRenderItem<AllUserMessages> = useCallback(
+  const renderItem: ListRenderItem<UserMessage> = useCallback(
     ({ item }) => {
       return <MessageItem item={item} deleteMessage={confirmAndDeleteMessage} markAsRead={markAsRead} />;
     },
     [confirmAndDeleteMessage],
   );
 
-  const keyExtractor = useCallback((item: AllUserMessages) => item.id, []);
+  const keyExtractor = useCallback((item: UserMessage) => item.id, []);
   return (
     <View style={{ flex: 1, flexDirection: 'column' }}>
       <View

@@ -9,19 +9,19 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 import { colors } from '../../../../shared/constants/colors';
 import Column from '../../../../shared/components/Column';
 import Row from '../../../../shared/components/Row';
-import { WorkoutSplitEntity } from '@strong-together/shared';
+import { WorkoutSplit } from '../../shared/types/workout.types';
 
 const { height } = Dimensions.get('window');
 
 type TopSectionProps = {
   hasWorkout: boolean;
-  splitsList: WorkoutSplitEntity['name'][];
-  setSelectedSplit: Dispatch<SetStateAction<WorkoutSplitEntity['name']>>;
-  selectedSplit: WorkoutSplitEntity['name'];
-  exerciseCountMap: Record<WorkoutSplitEntity['name'], number>;
+  splitsList: WorkoutSplit['name'][];
+  setSelectedSplit: Dispatch<SetStateAction<WorkoutSplit['name']>>;
+  selectedSplit: WorkoutSplit['name'];
+  exerciseCountMap: Record<WorkoutSplit['name'], number>;
   totalExercises: number;
   addSplit: () => void;
-  removeSplit: (splitName: WorkoutSplitEntity['name']) => void;
+  removeSplit: (splitName: WorkoutSplit['name']) => void;
   saveWorkout: () => Promise<void>;
 };
 

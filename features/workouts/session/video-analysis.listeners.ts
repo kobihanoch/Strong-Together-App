@@ -1,8 +1,9 @@
-import { AnalyzeVideoResultPayload, SquatRepetition } from '@strong-together/shared';
+import type { AnalyzeVideoResultPayloadDto } from '@strong-together/shared';
+import type { SquatRepetition } from './types/video-analysis.types';
 import { getSocket } from '../../../infrastructure/socket';
 
 export const registerToVideoAnalysisResultsListener = (
-  onResults: (results: AnalyzeVideoResultPayload<SquatRepetition>) => void,
+  onResults: (results: AnalyzeVideoResultPayloadDto<SquatRepetition>) => void,
 ) => {
   const socket = getSocket();
 
@@ -14,7 +15,7 @@ export const registerToVideoAnalysisResultsListener = (
 
   if (!socket) return;
 
-  const handler = (results: AnalyzeVideoResultPayload<SquatRepetition>) => {
+  const handler = (results: AnalyzeVideoResultPayloadDto<SquatRepetition>) => {
     onResults(results);
   };
 

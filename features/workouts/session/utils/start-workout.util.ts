@@ -1,23 +1,15 @@
-import {
-  ExerciseName,
-  ExercisesDuringWorkout,
-  SetCountByExercise,
-  SetValue,
-  WorkoutPayloadRow,
-} from '../types/use-start-workout.types';
-import { FinishUserWorkoutBody } from '@strong-together/shared';
-import { ExerciseInPlan } from '@strong-together/shared';
-import { ExerciseEntity } from '@strong-together/shared';
-import { ExerciseTrackingEntity } from '@strong-together/shared';
+import type { ExerciseName, ExercisesDuringWorkout, SetCountByExercise, SetValue, WorkoutPayloadRow, } from '../types/use-start-workout.types';
+import type { ExerciseInPlan } from '../../shared/types/workout.types';
+import type { Exercise } from '../../shared/types/workout.types';
 
 /*
 [
-  {"exercisetosplit_id": 1251, "notes": "Was easy!", "reps": [12], "user_id": NULL, "weight": [20.5]},
+  {"exerciseToSplitId": 1251, "notes": "Was easy!", "reps": [12], "userId": NULL, "weight": [20.5]},
   ...
 ]
 Passing null to server to avoid injections
 */
-export const createArrayForDataBase = (workoutObj: ExercisesDuringWorkout): FinishUserWorkoutBody['workout'] => {
+export const createArrayForDataBase = (workoutObj: ExercisesDuringWorkout): WorkoutPayloadRow[] => {
   if (!Object.keys(workoutObj).length) return [];
   const arr = Object.entries(workoutObj).map(([, records]): WorkoutPayloadRow | null => {
     const wArr = records.weight;
@@ -28,7 +20,7 @@ export const createArrayForDataBase = (workoutObj: ExercisesDuringWorkout): Fini
 
     if (weight.length && reps.length && etsid) {
       return {
-        exercisetosplit_id: etsid,
+        exerciseToSplitId: etsid,
         weight,
         reps,
         notes,
@@ -42,9 +34,9 @@ export const createArrayForDataBase = (workoutObj: ExercisesDuringWorkout): Fini
 };
 
 const dropInvalidPairs = (
-  weights: ExerciseTrackingEntity['weight'] = [],
-  reps: ExerciseTrackingEntity['reps'] = [],
-): { weight: ExerciseTrackingEntity['weight']; reps: ExerciseTrackingEntity['reps'] } => {
+  weights: number[] = [],
+  reps: number[] = [],
+): { weight: number[]; reps: number[] } => {
   const isValid = (v: SetValue): boolean => Number.isFinite(+v) && +v !== 0;
 
   const maxLen = Math.min(weights.length, reps.length);
@@ -91,7 +83,7 @@ export const countSetsDone = (
 
 export const applyWeight = (
   state: ExercisesDuringWorkout,
-  exerciseName: ExerciseEntity['name'],
+  exerciseName: Exercise['name'],
   setIndex: number,
   weight: SetValue,
 ): ExercisesDuringWorkout => {
@@ -113,7 +105,7 @@ export const applyWeight = (
 
 export const applyReps = (
   state: ExercisesDuringWorkout,
-  exerciseName: ExerciseEntity['name'],
+  exerciseName: Exercise['name'],
   setIndex: number,
   reps: SetValue,
 ): ExercisesDuringWorkout => {
@@ -135,8 +127,8 @@ export const applyReps = (
 
 export const applyNotes = (
   state: ExercisesDuringWorkout,
-  exerciseName: ExerciseEntity['name'],
-  notes: ExerciseTrackingEntity['notes'],
+  exerciseName: Exercise['name'],
+  notes: string | null,
 ): ExercisesDuringWorkout => {
   if (!state || !exerciseName || !state[exerciseName]) return state;
 

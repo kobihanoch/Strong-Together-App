@@ -7,9 +7,10 @@ import { colors } from '../../../../shared/constants/colors';
 import { getSupportedAnalysisExerciseName } from '../constants/video-analysis.constant';
 import { showErrorAlert } from '../../../../shared/alerts/error-alerts';
 import useVideoAnalysis from '../hooks/use-video-analysis.hook';
-import type { ExerciseAnalysisOverview } from '../screen/StartWorkout';
-import { AnalyzeVideoResultPayload, SquatRepetition } from '@strong-together/shared';
-import { ExerciseInPlan } from '@strong-together/shared';
+import { ExerciseAnalysisOverview } from '../screen/StartWorkout';
+import type { AnalyzeVideoResultPayloadDto } from '@strong-together/shared';
+import type { SquatRepetition } from '../types/video-analysis.types';
+import type { ExerciseInPlan } from '../../shared/types/workout.types';
 import {
   AnalyzeActionsSection,
   AnalyzeClipStatusCard,
@@ -26,10 +27,10 @@ type AnalyzeExerciseSheetProps = {
   selectedExercise: ExerciseInPlan | null;
   analysisOverview: ExerciseAnalysisOverview;
   onAnalysisOverviewChange: React.Dispatch<React.SetStateAction<ExerciseAnalysisOverview>>;
-  cachedAnalysis: AnalyzeVideoResultPayload<SquatRepetition> | null;
+  cachedAnalysis: AnalyzeVideoResultPayloadDto<SquatRepetition> | null;
   onCacheAnalysis: (
     exerciseId: ExerciseInPlan['id'],
-    result: AnalyzeVideoResultPayload<SquatRepetition> | null,
+    result: AnalyzeVideoResultPayloadDto<SquatRepetition> | null,
     overview: ExerciseAnalysisOverview,
   ) => void;
 };
@@ -122,7 +123,7 @@ const AnalyzeExerciseSheet = ({
   const [processingLabel, setProcessingLabel] = useState<string>('');
   const [selectedRepIndex, setSelectedRepIndex] = useState(0);
   const cleanupAnalysisRef = useRef<(() => void) | null>(null);
-  const lastCachedCompletedRef = useRef<AnalyzeVideoResultPayload<SquatRepetition> | null>(null);
+  const lastCachedCompletedRef = useRef<AnalyzeVideoResultPayloadDto<SquatRepetition> | null>(null);
 
   const {
     loading: analysisLoading,
@@ -527,7 +528,7 @@ const AnalyzeExerciseSheet = ({
   }, [visibleAnalysis]);
   const selectedRep: SquatRepetition | null = completedResults[selectedRepIndex] ?? null;
   const repsNeedingTorsoFix = useMemo(
-    () => completedResults.filter((rep) => rep.back_lean.excessive).length,
+    () => completedResults.filter((rep) => rep.backLean.excessive).length,
     [completedResults],
   );
   const repsWithGoodDepth = useMemo(

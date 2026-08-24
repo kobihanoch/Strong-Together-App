@@ -9,7 +9,6 @@ import api from '../../../infrastructure/api/api-config/api';
 import { colors } from '../../../shared/constants/colors';
 import { useAuth } from '../../auth/shared/providers/AuthProvider';
 import useMediaUploads from '../hooks/use-media-uploads.hook';
-import { UserEntity } from '@strong-together/shared';
 import { AppUser } from '../../auth/shared/types/auth.types';
 
 const { width, height } = Dimensions.get('window');
@@ -37,7 +36,7 @@ function ImagePickerComponent({
   const { setUser, user } = useAuth();
   const { uploadToStorageAndReturnPath, loading: mediaLoading } = useMediaUploads();
 
-  const profileimagePath = user?.profile_image_url;
+  const profileimagePath = user?.profilePicPath;
 
   const pickAndUploadImage = async () => {
     await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -57,14 +56,14 @@ function ImagePickerComponent({
         type: 'image/jpeg',
       };
 
-      const { path } = await uploadToStorageAndReturnPath(file);
+      const { profilePicPath } = await uploadToStorageAndReturnPath(file);
       // Update in auth context
       setUser(
         (prev: AppUser | null | undefined) =>
           ({
             ...prev,
-            profile_image_url: path,
-          }) as UserEntity,
+            profilePicPath,
+          }) as AppUser,
       );
     }
   };
@@ -79,8 +78,8 @@ function ImagePickerComponent({
       (prev: AppUser | null | undefined) =>
         ({
           ...prev,
-          profile_image_url: null,
-        }) as UserEntity,
+          profilePicPath: null,
+        }) as AppUser,
     );
   };
 

@@ -8,7 +8,7 @@ import React, { useCallback, useMemo } from 'react';
 import { Dimensions, FlatList, StyleSheet, Text } from 'react-native';
 import { RFValue } from 'react-native-responsive-fontsize';
 import { colors } from '../../../../shared/constants/colors';
-import { TrackingMapItem } from '@strong-together/shared';
+import { TrackingMapItem } from '../../shared/types/workout.types';
 import Column from '../../../../shared/components/Column';
 import Images from '../../../../shared/components/Images';
 import Row from '../../../../shared/components/Row';
@@ -20,19 +20,19 @@ import { RootParamList } from '../../../../navigation/types/appStackTypes';
 const { width, height } = Dimensions.get('window');
 
 type ExerciseDataProps = {
-  exData: Omit<TrackingMapItem, 'workoutdate'>;
+  exData: Omit<TrackingMapItem, 'workoutDate'>;
   lastPerformanceData: (TrackingMapItem & {
     isLastWorkout: boolean;
   })[];
 };
 
 const ExerciseItem = ({ exData, lastPerformanceData }: ExerciseDataProps) => {
-  const mainMuscle = exData?.exercisetoworkoutsplit.exercises.targetmuscle as keyof typeof Images;
-  const specificMuscle = exData?.exercisetoworkoutsplit?.exercises?.specifictargetmuscle;
+  const mainMuscle = exData?.exerciseToWorkoutSplit.exercises.targetMuscle as keyof typeof Images;
+  const specificMuscle = exData?.exerciseToWorkoutSplit?.exercises?.specificTargetMuscle;
   const imagePath = mainMuscle && specificMuscle ? (Images[mainMuscle] as Record<string, any>)?.[specificMuscle] : null;
   const lastLogOfEx = useMemo(() => {
     if (lastPerformanceData) {
-      const [last] = lastPerformanceData.filter((ex) => ex.exercisetosplit_id === exData.exercisetosplit_id);
+      const [last] = lastPerformanceData.filter((ex) => ex.exerciseToSplitId === exData.exerciseToSplitId);
       if (last) return { lastReps: last.reps, lastWeight: last.weight };
     }
     return { lastReps: [], lastWeight: [] };
@@ -79,7 +79,7 @@ const ExerciseItem = ({ exData, lastPerformanceData }: ExerciseDataProps) => {
                   style={{ width: '100%', height: '100%' }} // let the container size it
                 />
               ) : (
-                <Text style={{ alignSelf: 'center' }}>{exData.exercisetoworkoutsplit.exercises.targetmuscle}</Text>
+                <Text style={{ alignSelf: 'center' }}>{exData.exerciseToWorkoutSplit.exercises.targetMuscle}</Text>
               )}
             </LinearGradient>
 
@@ -119,7 +119,7 @@ const ExerciseItem = ({ exData, lastPerformanceData }: ExerciseDataProps) => {
 };
 
 type ExercisesFlatListProps = {
-  data: Omit<TrackingMapItem, 'workoutdate'>[] | undefined;
+  data: Omit<TrackingMapItem, 'workoutDate'>[] | undefined;
   dataToCompare: (TrackingMapItem & {
     isLastWorkout: boolean;
   })[];
@@ -129,7 +129,7 @@ const ExercisesFlatList = ({ data, dataToCompare }: ExercisesFlatListProps) => {
   const nav = useNavigation<StackNavigationProp<RootParamList>>();
 
   const renderItem = useCallback(
-    ({ item }: { item: Omit<TrackingMapItem, 'workoutdate'> }) => {
+    ({ item }: { item: Omit<TrackingMapItem, 'workoutDate'> }) => {
       return <ExerciseItem exData={item} lastPerformanceData={dataToCompare}></ExerciseItem>;
     },
     [dataToCompare],
@@ -139,7 +139,7 @@ const ExercisesFlatList = ({ data, dataToCompare }: ExercisesFlatListProps) => {
     <Column>
       <FlatList
         data={data}
-        keyExtractor={(item) => item.exercisetosplit_id.toString()}
+        keyExtractor={(item) => item.exerciseToSplitId.toString()}
         renderItem={renderItem}
         contentContainerStyle={{ padding: 10 }}
         initialNumToRender={4}

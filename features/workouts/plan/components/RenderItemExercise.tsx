@@ -3,7 +3,7 @@ import { Dimensions, StyleSheet, Text, View } from 'react-native';
 import { RFValue } from 'react-native-responsive-fontsize';
 import { colors } from '../../../../shared/constants/colors';
 import Column from '../../../../shared/components/Column';
-import { ExerciseInPlan } from '@strong-together/shared';
+import { ExerciseInPlan } from '../../shared/types/workout.types';
 
 const { width, height } = Dimensions.get('window');
 
@@ -13,8 +13,8 @@ const BRAND_BLUE = '#2979FF';
 const RenderItemExercise = ({ item }: { item: ExerciseInPlan }) => {
   // Guard against missing fields
   const exerciseName = item.exercise;
-  const main = item.targetmuscle;
-  const specific = item.specifictargetmuscle;
+  const main = item.targetMuscle;
+  const specific = item.specificTargetMuscle;
   const setsLabel = item.sets.join(' / ');
 
   return (

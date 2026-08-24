@@ -29,7 +29,7 @@ const TopComponent = () => {
   const msgCount = unreadMessages?.length;
   const fullname = user?.name;
   const username = user?.username;
-  const profileImagePath = user?.profile_image_url;
+  const profileImagePath = user?.profilePicPath;
 
   // Animations
   const scaleAnim = useState(new Animated.Value(1))[0];

@@ -1,4 +1,4 @@
-import { AerobicsDailyRecord } from '@strong-together/shared';
+import type { CardioDailyRecord } from '../../cardio/types/cardio.types';
 import moment from 'moment';
 import { createContext, ReactNode, useContext, useMemo } from 'react';
 import useUpdateGlobalLoading from '../../../../shared/hooks/use-update-global-loading.hook';
@@ -17,7 +17,7 @@ export const CardioProvider = ({ children }: { children: ReactNode }) => {
   });
 
   const cardioForToday = useMemo(
-    (): AerobicsDailyRecord | null | undefined =>
+    (): CardioDailyRecord | null | undefined =>
       dailyCardioMap === undefined ? undefined : dailyCardioMap?.[moment().format('YYYY-MM-DD')]?.[0] || null,
     [dailyCardioMap],
   );

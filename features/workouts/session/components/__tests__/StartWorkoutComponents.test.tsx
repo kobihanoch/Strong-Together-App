@@ -1,19 +1,13 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-require-imports */
-import {
-  beforeEach as jestBeforeEach,
-  describe as jestDescribe,
-  expect as jestExpect,
-  it as jestIt,
-  jest as jestObject,
-} from '@jest/globals';
+import { beforeEach as jestBeforeEach, describe as jestDescribe, expect as jestExpect, it as jestIt, jest as jestObject, } from '@jest/globals';
 import { fireEvent, render } from '@testing-library/react-native';
 import React from 'react';
 import { ActivityIndicator, TouchableOpacity } from 'react-native';
 import type { ExercisesDuringWorkout } from '../../types/use-start-workout.types';
-import type { TrackingMapItem } from '@strong-together/shared';
-import type { ExerciseInPlan } from '@strong-together/shared';
+import type { TrackingMapItem } from '../../../shared/types/workout.types';
+import type { ExerciseInPlan } from '../../../shared/types/workout.types';
 
 let mockLastWorkoutData: TrackingMapItem | null = null;
 
@@ -111,31 +105,31 @@ import TopBar from '../TopBar';
 const createExercise = (overrides: Partial<ExerciseInPlan> = {}): ExerciseInPlan => ({
   id: 11,
   sets: [10, 12],
-  is_active: true,
-  targetmuscle: 'Chest',
-  specifictargetmuscle: 'Upper Chest',
+  isActive: true,
+  targetMuscle: 'Chest',
+  specificTargetMuscle: 'Upper Chest',
   exercise: 'Bench Press',
-  workoutsplit: 'Push',
+  workoutSplit: 'Push',
   ...overrides,
 });
 
 const createTrackingMapItem = (overrides: Partial<TrackingMapItem> = {}): TrackingMapItem => ({
   id: 90,
-  exercisetosplit_id: 11,
-  exercise_id: 1,
-  workoutsplit_id: 5,
-  splitname: 'Push',
+  exerciseToSplitId: 11,
+  exerciseId: 1,
+  workoutSplitId: 5,
+  splitName: 'Push',
   exercise: 'Bench Press',
-  workoutdate: '2026-03-26T10:00:00.000Z',
-  order_index: 0,
+  workoutDate: '2026-03-26T10:00:00.000Z',
+  orderIndex: 0,
   weight: [80, 85],
   reps: [10, 8],
   notes: 'Controlled reps',
-  exercisetoworkoutsplit: {
+  exerciseToWorkoutSplit: {
     sets: [10, 12],
     exercises: {
-      targetmuscle: 'Chest',
-      specifictargetmuscle: 'Upper Chest',
+      targetMuscle: 'Chest',
+      specificTargetMuscle: 'Upper Chest',
     },
   },
   ...overrides,

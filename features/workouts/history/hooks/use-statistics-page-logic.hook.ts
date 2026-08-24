@@ -10,7 +10,7 @@ const useStatisticsPageLogic = () => {
   // Map with date keys: Date, ETSId, splitName
   const {
     byDate: exerciseTrackingWithDateKey = null,
-    byETSId: exerciseTrackingWithETSIdKey = null,
+    byExerciseToSplitId: exerciseTrackingWithETSIdKey = null,
     bySplitName: exerciseTrackingWithSplitNameKey = null,
   } = exerciseTrackingMaps || {};
 

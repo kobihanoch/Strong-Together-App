@@ -6,8 +6,7 @@ import { RFValue } from 'react-native-responsive-fontsize';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { colors } from '../../../../shared/constants/colors';
 import { CreateWorkoutControls, SelectedExercise } from '../types/use-create-workout.types';
-import { ExerciseToWorkoutSplitEntity } from '@strong-together/shared';
-import { WorkoutSplitEntity } from '@strong-together/shared';
+import { WorkoutSplit } from '../../shared/types/workout.types';
 import Column from '../../../../shared/components/Column';
 import Row from '../../../../shared/components/Row';
 import NumericInputWithRules from '../../session/components/NumericInputWithRules';
@@ -16,13 +15,13 @@ type ExerciseDraggableItemProps = {
   item: SelectedExercise;
   drag: () => void;
   removeExercise: (exercise: SelectedExercise) => void;
-  updateSets: (exercise: SelectedExercise, updatedSetsArr: ExerciseToWorkoutSplitEntity['sets']) => void;
-  selectedSplit: WorkoutSplitEntity['name'];
+  updateSets: (exercise: SelectedExercise, updatedSetsArr: number[]) => void;
+  selectedSplit: WorkoutSplit['name'];
 };
 
 const ExerciseDraggableItem = React.memo(
   ({ item, drag, removeExercise, updateSets, selectedSplit }: ExerciseDraggableItemProps) => {
-    const exNumber = item.order_index + 1;
+    const exNumber = item.orderIndex + 1;
     const [setsChose, setSetsChose] = useState(3);
     const [setsArr, setSetsArr] = useState(item?.sets);
 
@@ -111,7 +110,7 @@ const ExerciseDraggableItem = React.memo(
                     opacity: 0.7,
                   }}
                 >
-                  {item?.targetmuscle}
+                  {item?.targetMuscle}
                 </Text>
               </Text>
               <Text style={styles.exerciseCount}>Exercise {exNumber}</Text>
@@ -168,7 +167,7 @@ ExerciseDraggableItem.displayName = 'ExerciseDraggableItem';
 type SelectedExercisesList = {
   exForSplit: SelectedExercise[];
   controls: CreateWorkoutControls;
-  selectedSplit: WorkoutSplitEntity['name'];
+  selectedSplit: WorkoutSplit['name'];
 };
 
 const SelectedExercisesList = ({ exForSplit, controls, selectedSplit }: SelectedExercisesList) => {

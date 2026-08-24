@@ -2,11 +2,11 @@ import React, { useMemo } from 'react';
 import { View, Text, Dimensions } from 'react-native';
 import { BarChart } from 'react-native-gifted-charts';
 import { normalizeDataToWeeklyCardioGraph } from '../utils/cardio-graph.utils';
-import { AerobicsWeeklyRecord } from '@strong-together/shared';
+import { CardioWeeklyRecord } from '../types/cardio.types';
 
 const { width, height } = Dimensions.get('window');
 
-const CardioWeeklyGraph = ({ data, cardWidth }: { data: AerobicsWeeklyRecord[]; cardWidth: number }) => {
+const CardioWeeklyGraph = ({ data, cardWidth }: { data: CardioWeeklyRecord[]; cardWidth: number }) => {
   const formattedData = useMemo(() => normalizeDataToWeeklyCardioGraph(data), [data]);
 
   if (!cardWidth) return null;

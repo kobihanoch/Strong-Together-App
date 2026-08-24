@@ -5,7 +5,7 @@ import { splitsCounterToPieData } from '../utils/analytics.utils';
 import Card from './Card';
 import PieDiagramSplitsCounter from './PieDiagramSplitsCounter';
 import { WorkoutHistoryAnalyzedExerciseTrackingData } from '../../history/types/workout-history.types';
-import { WholeUserWorkoutPlan } from '@strong-together/shared';
+import { WorkoutPlan } from '../../shared/types/workout.types';
 
 const { height } = Dimensions.get('window');
 
@@ -13,7 +13,7 @@ type OverviewProps = {
   overViewData: {
     workoutCount: number;
     splitsCounter: WorkoutHistoryAnalyzedExerciseTrackingData['splitDaysByName'];
-    workoutPlan: WholeUserWorkoutPlan | null;
+    workoutPlan: WorkoutPlan | null;
   };
   hasData: boolean;
 };
@@ -120,7 +120,7 @@ const Overview = ({ overViewData, hasData }: OverviewProps) => {
                     fontSize: RFValue(14),
                   }}
                 >
-                  {workoutPlan.name}
+                  Workout Plan
                 </Text>
                 <Text
                   style={{
@@ -149,7 +149,7 @@ const Overview = ({ overViewData, hasData }: OverviewProps) => {
                     fontSize: RFValue(14),
                   }}
                 >
-                  {workoutPlan.numberofsplits}
+                  {workoutPlan.numberOfSplits}
                 </Text>
                 <Text
                   style={{
@@ -177,7 +177,7 @@ const Overview = ({ overViewData, hasData }: OverviewProps) => {
                     fontSize: RFValue(14),
                   }}
                 >
-                  {workoutPlan.updated_at.split('T')[0].split('-').reverse().join('/')}
+                  {workoutPlan.updatedAt.split('T')[0].split('-').reverse().join('/')}
                 </Text>
                 <Text
                   style={{

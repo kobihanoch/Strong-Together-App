@@ -7,12 +7,11 @@ import { AdherenceBar } from '../../../../shared/components/AdherenceBar';
 import Column from '../../../../shared/components/Column';
 import Row from '../../../../shared/components/Row';
 import Timer from '../../../../shared/components/Timer';
-import { WorkoutPlanEntity } from '@strong-together/shared';
 
 const { height } = Dimensions.get('window');
 
 type TopBarProps = {
-  workoutName: WorkoutPlanEntity['name'];
+  workoutName: string;
   totalSets: number;
   setsDone: number;
   timerProps: {

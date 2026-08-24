@@ -1,31 +1,28 @@
-import { ExercisesMapByMuscle } from '@strong-together/shared';
-import { ExerciseEntity } from '@strong-together/shared';
-import { ExerciseToWorkoutSplitEntity } from '@strong-together/shared';
-import { WorkoutSplitEntity } from '@strong-together/shared';
+import type { Exercise, ExercisesByMuscle, WorkoutSplit } from '../../shared/types/workout.types';
 
 export interface ExerciseCandidate {
-  id: ExerciseEntity['id'];
-  name: ExerciseEntity['name'];
-  targetmuscle: ExerciseEntity['targetmuscle'];
-  specificTargetMuscle: ExerciseEntity['specifictargetmuscle'];
+  id: Exercise['id'];
+  name: Exercise['name'];
+  targetMuscle: Exercise['targetMuscle'];
+  specificTargetMuscle: Exercise['specificTargetMuscle'];
 }
 
 export interface SelectedExercise extends ExerciseCandidate {
   // Chosen exercise
-  sets: ExerciseToWorkoutSplitEntity['sets'];
-  order_index: ExerciseToWorkoutSplitEntity['order_index'];
+  sets: number[];
+  orderIndex: number;
 }
 
-export type SelectedExercises = Record<WorkoutSplitEntity['name'], SelectedExercise[]>; // ALl workout plan
+export type SelectedExercises = Record<WorkoutSplit['name'], SelectedExercise[]>; // ALl workout plan
 
 // Return types ----------------------------------------------------------------------------------------
 
 export interface CreateWorkoutControls {
   addExercise: (exercise: ExerciseCandidate) => void;
   addSplit: () => void;
-  updateSets: (exercise: SelectedExercise, updatedSetsArr: ExerciseToWorkoutSplitEntity['sets']) => void;
+  updateSets: (exercise: SelectedExercise, updatedSetsArr: number[]) => void;
   removeExercise: (exercise: SelectedExercise) => void;
-  removeSplit: (splitName: WorkoutSplitEntity['name']) => void;
+  removeSplit: (splitName: WorkoutSplit['name']) => void;
   onDragEnd: (params: { data: SelectedExercise[] }) => void;
 }
 
@@ -37,17 +34,17 @@ export interface CreateWorkoutLoadings {
 export interface UseCreateWorkoutLogicReturn {
   selectedExercises: SelectedExercises;
   splitsList: string[];
-  availableExercises: ExercisesMapByMuscle;
+  availableExercises: ExercisesByMuscle;
   allExercises: ExerciseCandidate[];
   muscles: string[];
   saveWorkout: () => Promise<void>;
   controls: CreateWorkoutControls;
   loadings: CreateWorkoutLoadings;
   hasWorkout: boolean;
-  setSelectedSplit: React.Dispatch<React.SetStateAction<WorkoutSplitEntity['name']>>;
-  exerciseCountMap: Record<WorkoutSplitEntity['name'], number>;
+  setSelectedSplit: React.Dispatch<React.SetStateAction<WorkoutSplit['name']>>;
+  exerciseCountMap: Record<WorkoutSplit['name'], number>;
   totalExercises: number;
-  selectedSplit: WorkoutSplitEntity['name'];
+  selectedSplit: WorkoutSplit['name'];
   exForSplit: SelectedExercise[];
 }
 

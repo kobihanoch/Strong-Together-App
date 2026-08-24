@@ -6,7 +6,7 @@ export type HomePageData = {
   userId: AppUser['id'];
   hasAssignedWorkout: boolean;
   hasTracking: boolean;
-  profileImageUrl: AppUser['profile_image_url'];
+  profilePicPath: AppUser['profilePicPath'];
   firstName: AppUser['name'];
   lastWorkoutDate: WorkoutHistoryAnalyzedExerciseTrackingData['lastWorkoutDate'];
   totalWorkoutNumber: WorkoutHistoryAnalyzedExerciseTrackingData['workoutCount'];

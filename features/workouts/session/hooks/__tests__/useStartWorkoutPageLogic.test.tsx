@@ -4,7 +4,7 @@ import { act, renderHook, waitFor } from '@testing-library/react-native';
 import { afterEach, beforeEach, describe, expect, it, jest } from '@jest/globals';
 import { AxiosError } from 'axios';
 import { AppState } from 'react-native';
-import { GetExerciseTrackingResponse } from '@strong-together/shared';
+import type { GetExerciseTrackingResponse } from '@strong-together/shared';
 import {
   userWithWorkoutAndHistoryProfile,
   userWithWorkoutNoHistoryProfile,
@@ -230,17 +230,17 @@ const createNetworkAxiosError = (): AxiosError => {
 const createPackedTrackingResponse = () => ({
   exerciseTrackingMaps: userWithWorkoutAndHistoryProfile.exerciseTrackingMaps!,
   exerciseTrackingAnalysis: {
-    unique_days: userWithWorkoutAndHistoryProfile.analyzedExerciseTrackingData!.workoutCount,
-    most_frequent_split: userWithWorkoutAndHistoryProfile.analyzedExerciseTrackingData!.mostFrequentSplit.splitName,
-    most_frequent_split_days: userWithWorkoutAndHistoryProfile.analyzedExerciseTrackingData!.mostFrequentSplit.times,
+    uniqueDays: userWithWorkoutAndHistoryProfile.analyzedExerciseTrackingData!.workoutCount,
+    mostFrequentSplit: userWithWorkoutAndHistoryProfile.analyzedExerciseTrackingData!.mostFrequentSplit.splitName,
+    mostFrequentSplitDays: userWithWorkoutAndHistoryProfile.analyzedExerciseTrackingData!.mostFrequentSplit.times,
     lastWorkoutDate: userWithWorkoutAndHistoryProfile.analyzedExerciseTrackingData!.lastWorkoutDate,
     splitDaysByName: userWithWorkoutAndHistoryProfile.analyzedExerciseTrackingData!.splitDaysByName,
     prs: {
-      pr_max: {
+      prMax: {
         exercise: userWithWorkoutAndHistoryProfile.analyzedExerciseTrackingData!.pr.maxExercise!,
         weight: userWithWorkoutAndHistoryProfile.analyzedExerciseTrackingData!.pr.maxWeight,
         reps: userWithWorkoutAndHistoryProfile.analyzedExerciseTrackingData!.pr.maxReps,
-        workout_time_utc: userWithWorkoutAndHistoryProfile.analyzedExerciseTrackingData!.pr.maxDate,
+        workoutTimeUtc: userWithWorkoutAndHistoryProfile.analyzedExerciseTrackingData!.pr.maxDate,
       },
     },
   },
@@ -249,13 +249,13 @@ const createPackedTrackingResponse = () => ({
 const createEmptyTrackingResponse = (): GetExerciseTrackingResponse => ({
   exerciseTrackingMaps: userWithWorkoutNoHistoryProfile.exerciseTrackingMaps!,
   exerciseTrackingAnalysis: {
-    unique_days: 0,
-    most_frequent_split: null,
-    most_frequent_split_days: null,
+    uniqueDays: 0,
+    mostFrequentSplit: null,
+    mostFrequentSplitDays: null,
     lastWorkoutDate: null,
     splitDaysByName: {},
     prs: {
-      pr_max: null,
+      prMax: null,
     },
   },
 });
@@ -281,15 +281,15 @@ const setupCacheForScenario = ({
 };
 
 const createSelectedSplitFromProfile = () => ({
-  id: userWithWorkoutNoHistoryProfile.workout!.workoutsplits![0].id,
-  name: userWithWorkoutNoHistoryProfile.workout!.workoutsplits![0].name,
-  muscleGroup: userWithWorkoutNoHistoryProfile.workout!.workoutsplits![0].muscle_group,
+  id: userWithWorkoutNoHistoryProfile.workout!.workoutSplits![0].id,
+  name: userWithWorkoutNoHistoryProfile.workout!.workoutSplits![0].name,
+  muscleGroup: userWithWorkoutNoHistoryProfile.workout!.workoutSplits![0].muscleGroup,
 });
 
 const createResumedWorkoutFromProfile = () => ({
   workout: {
-    [userWithWorkoutNoHistoryProfile.workout!.workoutsplits![0].exercisetoworkoutsplit[0].exercise!]: {
-      etsid: userWithWorkoutNoHistoryProfile.workout!.workoutsplits![0].exercisetoworkoutsplit[0].id,
+    [userWithWorkoutNoHistoryProfile.workout!.workoutSplits![0].exerciseToWorkoutSplit[0].exercise!]: {
+      etsid: userWithWorkoutNoHistoryProfile.workout!.workoutSplits![0].exerciseToWorkoutSplit[0].id,
       weight: [82.5],
       reps: [10],
       notes: 'Felt strong',
@@ -362,12 +362,12 @@ describe('use-start-workout-page-logic.hook integration', () => {
       jest.runOnlyPendingTimers();
     });
 
-    const selectedExercise = userWithWorkoutNoHistoryProfile.workout!.workoutsplits![0].exercisetoworkoutsplit[0];
+    const selectedExercise = userWithWorkoutNoHistoryProfile.workout!.workoutSplits![0].exerciseToWorkoutSplit[0];
 
     expect(result.current.auth.isWorkoutMode).toBe(true);
     expect(result.current.logic.data.workoutName).toBe('A');
     expect(result.current.logic.data.exercisesForSelectedSplit).toEqual(
-      userWithWorkoutNoHistoryProfile.workout!.workoutsplits![0].exercisetoworkoutsplit,
+      userWithWorkoutNoHistoryProfile.workout!.workoutSplits![0].exerciseToWorkoutSplit,
     );
     expect(result.current.logic.data.totalSets).toBe(selectedExercise.sets.length);
     expect(result.current.logic.data.setsDone).toBe(0);
@@ -433,7 +433,7 @@ describe('use-start-workout-page-logic.hook integration', () => {
       jest.runOnlyPendingTimers();
     });
 
-    const exerciseName = userWithWorkoutNoHistoryProfile.workout!.workoutsplits![0].exercisetoworkoutsplit[0].exercise!;
+    const exerciseName = userWithWorkoutNoHistoryProfile.workout!.workoutSplits![0].exerciseToWorkoutSplit[0].exercise!;
 
     expect(result.current.logic.workoutProgressObj).toEqual(resumedWorkout.workout);
     expect(result.current.logic.data.pausedTotal).toBe(0);
@@ -477,7 +477,7 @@ describe('use-start-workout-page-logic.hook integration', () => {
       expect(result.current.logic.data.workoutName).toBe('A');
     });
 
-    const selectedExercise = userWithWorkoutNoHistoryProfile.workout!.workoutsplits![0].exercisetoworkoutsplit[0];
+    const selectedExercise = userWithWorkoutNoHistoryProfile.workout!.workoutSplits![0].exerciseToWorkoutSplit[0];
 
     await act(async () => {
       result.current.logic.controls.addWeightRecord(selectedExercise.exercise!, 0, 80);
@@ -496,7 +496,7 @@ describe('use-start-workout-page-logic.hook integration', () => {
     expect(mockSaveWorkoutData).toHaveBeenCalledWith(
       [
         {
-          exercisetosplit_id: selectedExercise.id,
+          exerciseToSplitId: selectedExercise.id,
           weight: [80],
           reps: [10],
           notes: 'Solid top set',

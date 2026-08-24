@@ -5,23 +5,22 @@ import React, { useState } from 'react';
 import { Dimensions, Modal, Text, TouchableOpacity, View } from 'react-native';
 import { Swipeable } from 'react-native-gesture-handler';
 import { RFValue } from 'react-native-responsive-fontsize';
-import { AllUserMessages } from '@strong-together/shared';
-import { MessageEntity } from '@strong-together/shared';
+import type { UserMessage } from '../types/messages.types';
 import { formatDate } from '../../../shared/utils/shared-utils';
 
 const { width, height } = Dimensions.get('window');
 
 type MessageItemProps = {
-  item: AllUserMessages;
-  deleteMessage: (msgId: MessageEntity['id']) => void;
-  markAsRead: (msgId: MessageEntity['id']) => Promise<void>;
+  item: UserMessage;
+  deleteMessage: (msgId: UserMessage['id']) => void;
+  markAsRead: (msgId: UserMessage['id']) => Promise<void>;
 };
 
 const MessageItem = React.memo(({ item, deleteMessage, markAsRead }: MessageItemProps) => {
   // Modal of message
   const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
-  const senderName = item?.sender_full_name;
-  const imageSource = `${process.env.EXPO_PUBLIC_SUPABASE_URL}/storage/v1/object/public/${item?.sender_profile_image_url}`;
+  const senderName = item?.senderFullName;
+  const imageSource = `${process.env.EXPO_PUBLIC_SUPABASE_URL}/storage/v1/object/public/${item?.senderProfilePicPath}`;
 
   // UI when swiping right
   const renderRightActions = () => (
@@ -58,7 +57,7 @@ const MessageItem = React.memo(({ item, deleteMessage, markAsRead }: MessageItem
         }}
         onPress={async () => {
           setIsModalVisible(true);
-          if (!item.is_read) await markAsRead(item.id);
+          if (!item.isRead) await markAsRead(item.id);
         }}
       >
         <View
@@ -99,7 +98,7 @@ const MessageItem = React.memo(({ item, deleteMessage, markAsRead }: MessageItem
           </View>
           <Text
             style={{
-              fontFamily: item.is_read ? 'Inter_400Regular' : 'Inter_700Bold',
+              fontFamily: item.isRead ? 'Inter_400Regular' : 'Inter_700Bold',
               fontSize: RFValue(15),
             }}
           >
@@ -107,7 +106,7 @@ const MessageItem = React.memo(({ item, deleteMessage, markAsRead }: MessageItem
           </Text>
           <Text
             style={{
-              fontFamily: item.is_read ? 'Inter_400Regular' : 'Inter_700Bold',
+              fontFamily: item.isRead ? 'Inter_400Regular' : 'Inter_700Bold',
               fontSize: RFValue(12),
             }}
           >
@@ -115,16 +114,16 @@ const MessageItem = React.memo(({ item, deleteMessage, markAsRead }: MessageItem
           </Text>
           <Text
             style={{
-              fontFamily: item.is_read ? 'Inter_400Regular' : 'Inter_700Bold',
+              fontFamily: item.isRead ? 'Inter_400Regular' : 'Inter_700Bold',
               fontSize: RFValue(12),
             }}
           >
-            {formatDate(item.sent_at.split('T')[0])}
+            {formatDate(item.sentAt.split('T')[0])}
           </Text>
         </View>
         <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
           <MaterialCommunityIcons
-            name={item.is_read ? 'message-text-outline' : 'message-text'}
+            name={item.isRead ? 'message-text-outline' : 'message-text'}
             size={RFValue(15)}
           ></MaterialCommunityIcons>
         </View>
@@ -219,7 +218,7 @@ const MessageItem = React.memo(({ item, deleteMessage, markAsRead }: MessageItem
                       marginTop: 2,
                     }}
                   >
-                    {formatDate(item.sent_at.split('T')[0])}
+                    {formatDate(item.sentAt.split('T')[0])}
                   </Text>
                 </View>
               </View>

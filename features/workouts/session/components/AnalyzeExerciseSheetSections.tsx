@@ -3,8 +3,9 @@ import React from 'react';
 import { ActivityIndicator, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { RFValue } from 'react-native-responsive-fontsize';
 import { colors } from '../../../../shared/constants/colors';
-import { AnalyzeVideoResultPayload, SquatRepetition } from '@strong-together/shared';
-import { ExerciseInPlan } from '@strong-together/shared';
+import type { AnalyzeVideoResultPayloadDto } from '@strong-together/shared';
+import type { SquatRepetition } from '../types/video-analysis.types';
+import type { ExerciseInPlan } from '../../shared/types/workout.types';
 
 export type ExerciseAnalysisCopy = {
   heroTitle: string;
@@ -48,7 +49,7 @@ export const AnalyzeInfoSection = ({ selectedExercise }: { selectedExercise: Exe
   <View style={styles.infoRow}>
     <View style={styles.infoCard}>
       <Text style={styles.infoLabel}>Target muscle</Text>
-      <Text style={styles.infoValue}>{selectedExercise.targetmuscle ?? 'Unknown'}</Text>
+      <Text style={styles.infoValue}>{selectedExercise.targetMuscle ?? 'Unknown'}</Text>
     </View>
     <View style={styles.infoCard}>
       <Text style={styles.infoLabel}>Clip limit</Text>
@@ -189,7 +190,7 @@ export const AnalyzeResultsSection = ({
   onSelectRep,
   formatConfidence,
 }: {
-  visibleAnalysis: AnalyzeVideoResultPayload<SquatRepetition>;
+  visibleAnalysis: AnalyzeVideoResultPayloadDto<SquatRepetition>;
   resultSummary: string;
   selectedExercise: ExerciseInPlan;
   exerciseCopy: ExerciseAnalysisCopy;
@@ -259,8 +260,8 @@ export const AnalyzeResultsSection = ({
                 <MaterialCommunityIcons name="human-male-height" size={RFValue(18)} color={colors.completedDark} />
               </View>
               <Text style={styles.metricLabel}>{exerciseCopy.secondaryMetricLabel}</Text>
-              <Text style={styles.metricValue}>{selectedRep.back_lean.excessive ? 'Excessive' : 'Controlled'}</Text>
-              <Text style={styles.metricSubValue}>{selectedRep.back_lean.value.toFixed(1)} deg</Text>
+              <Text style={styles.metricValue}>{selectedRep.backLean.excessive ? 'Excessive' : 'Controlled'}</Text>
+              <Text style={styles.metricSubValue}>{selectedRep.backLean.value.toFixed(1)} deg</Text>
             </View>
           </View>
           <View style={styles.confidenceCard}>
@@ -273,7 +274,7 @@ export const AnalyzeResultsSection = ({
             </View>
             <View style={styles.confidenceRow}>
               <Text style={styles.confidencePill}>Depth confidence {formatConfidence(selectedRep.depth.confidence)}</Text>
-              <Text style={styles.confidencePill}>Torso confidence {formatConfidence(selectedRep.back_lean.confidence)}</Text>
+              <Text style={styles.confidencePill}>Torso confidence {formatConfidence(selectedRep.backLean.confidence)}</Text>
             </View>
           </View>
         </>

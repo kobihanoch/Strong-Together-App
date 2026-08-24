@@ -1,16 +1,10 @@
 /* eslint-disable @typescript-eslint/no-require-imports */
 import React from 'react';
-import {
-  beforeEach as jestBeforeEach,
-  describe as jestDescribe,
-  expect as jestExpect,
-  it as jestIt,
-  jest as jestObject,
-} from '@jest/globals';
+import { beforeEach as jestBeforeEach, describe as jestDescribe, expect as jestExpect, it as jestIt, jest as jestObject, } from '@jest/globals';
 import { fireEvent, render } from '@testing-library/react-native';
 import { TouchableOpacity } from 'react-native';
 import type { WorkoutPlanSplit } from '../../types/workout-plan.types';
-import type { ExerciseInPlan } from '@strong-together/shared';
+import type { ExerciseInPlan } from '../../../shared/types/workout.types';
 
 const mockNavigate = jestObject.fn();
 let mockCardioContext: { hasDoneCardioToday: boolean };
@@ -56,11 +50,11 @@ const createSplit = (
 const createExercise = (overrides: Partial<ExerciseInPlan> = {}): ExerciseInPlan => ({
   id: 11,
   sets: [8, 10, 12],
-  is_active: true,
-  targetmuscle: 'Chest',
-  specifictargetmuscle: 'Upper Chest',
+  isActive: true,
+  targetMuscle: 'Chest',
+  specificTargetMuscle: 'Upper Chest',
   exercise: 'Incline Bench Press',
-  workoutsplit: 'Push',
+  workoutSplit: 'Push',
   ...overrides,
 });
 
@@ -145,7 +139,7 @@ jestDescribe('MyWorkoutPlan leaf components', () => {
     jestIt('renders safely when the specific muscle is an empty string', () => {
       const { getByText, queryByText } = render(
         React.createElement(RenderItemExercise, {
-          item: createExercise({ specifictargetmuscle: '' }),
+          item: createExercise({ specificTargetMuscle: '' }),
         }),
       );
 

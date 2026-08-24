@@ -5,7 +5,7 @@ import { beforeEach, describe, expect, it, jest } from '@jest/globals';
 import { Animated } from 'react-native';
 import { fireEvent, render } from '@testing-library/react-native';
 import type { GetAnalyticsResponse } from '@strong-together/shared';
-import type { WholeUserWorkoutPlan } from '@strong-together/shared';
+import type { WorkoutPlan } from '../../../shared/types/workout.types';
 
 const mockModalRegistry = new Map<
   string,
@@ -22,10 +22,10 @@ let mockAnalyticsLogic: {
     overview: {
       workoutCount: number;
       splitsCounter: Record<string, number>;
-      workoutPlan: WholeUserWorkoutPlan | null;
+      workoutPlan: WorkoutPlan | null;
     };
     _1rms: {
-      rm: GetAnalyticsResponse['_1RM'];
+      rm: GetAnalyticsResponse['oneRepMaxes'];
     };
     adherence: {
       adh: GetAnalyticsResponse['goals'];
@@ -126,18 +126,14 @@ jest.mock('../../../../../shared/components/SlidingBottomModal', () => {
 
 import Analytics from '../Analytics';
 
-const createWorkoutPlan = (overrides: Partial<WholeUserWorkoutPlan> = {}): WholeUserWorkoutPlan => ({
+const createWorkoutPlan = (overrides: Partial<WorkoutPlan> = {}): WorkoutPlan => ({
   id: 7,
-  name: 'Performance',
-  numberofsplits: 2,
-  created_at: '2026-03-01T08:00:00.000Z',
-  is_deleted: false,
-  level: 'Intermediate',
-  user_id: 'user-1',
-  trainer_id: 'trainer-1',
-  is_active: true,
-  updated_at: '2026-03-26T08:00:00.000Z',
-  workoutsplits: [],
+  numberOfSplits: 2,
+  createdAt: '2026-03-01T08:00:00.000Z',
+  userId: 'user-1',
+  isActive: true,
+  updatedAt: '2026-03-26T08:00:00.000Z',
+  workoutSplits: [],
   ...overrides,
 });
 
@@ -152,15 +148,15 @@ const createLogicState = () => ({
       rm: {
         1: {
           exercise: 'Bench Press',
-          pr_weight: 100,
-          pr_reps: 8,
-          max_1rm: 126,
+          prWeight: 100,
+          prReps: 8,
+          max1Rm: 126,
         },
         2: {
           exercise: 'Squat',
-          pr_weight: 140,
-          pr_reps: 5,
-          max_1rm: 157,
+          prWeight: 140,
+          prReps: 5,
+          max1Rm: 157,
         },
       },
     },
@@ -170,19 +166,19 @@ const createLogicState = () => ({
           'Bench Press': {
             planned: 12,
             actual: 11,
-            adherence_pct: 92,
+            adherencePct: 92,
           },
           'Incline Press': {
             planned: 10,
             actual: 8,
-            adherence_pct: 80,
+            adherencePct: 80,
           },
         },
         Legs: {
           Squat: {
             planned: 12,
             actual: 10,
-            adherence_pct: 83,
+            adherencePct: 83,
           },
         },
       },

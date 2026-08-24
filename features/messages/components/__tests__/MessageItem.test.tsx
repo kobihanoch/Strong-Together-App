@@ -2,21 +2,14 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-require-imports */
 import React from 'react';
-import {
-  beforeEach as jestBeforeEach,
-  describe as jestDescribe,
-  expect as jestExpect,
-  it as jestIt,
-  jest as jestObject,
-} from '@jest/globals';
+import { beforeEach as jestBeforeEach, describe as jestDescribe, expect as jestExpect, it as jestIt, jest as jestObject, } from '@jest/globals';
 import { fireEvent, render, waitFor } from '@testing-library/react-native';
 
 import MessageItem from '../MessageItem';
-import { AllUserMessages } from '@strong-together/shared';
-import { MessageEntity } from '@strong-together/shared';
+import type { UserMessage } from '../../types/messages.types';
 
-type MarkAsReadFn = (msgId: MessageEntity['id']) => Promise<void>;
-type DeleteMessageFn = (msgId: MessageEntity['id']) => void;
+type MarkAsReadFn = (msgId: UserMessage['id']) => Promise<void>;
+type DeleteMessageFn = (msgId: UserMessage['id']) => void;
 
 jestObject.mock('@expo/vector-icons', () => {
   const mockReact = require('react');
@@ -47,22 +40,22 @@ jestObject.mock('react-native-gesture-handler', () => {
   };
 });
 
-const createMessage = (overrides: Partial<AllUserMessages> = {}): AllUserMessages => ({
+const createMessage = (overrides: Partial<UserMessage> = {}): UserMessage => ({
   id: 'msg-1',
   subject: 'Welcome',
   msg: 'This is a long inbox message preview that should be truncated in the list item.',
-  sent_at: '2026-03-20T10:00:00.000Z',
-  is_read: false,
-  sender_full_name: 'John Doe',
-  sender_profile_image_url: 'profiles/john.png',
+  sentAt: '2026-03-20T10:00:00.000Z',
+  isRead: false,
+  senderFullName: 'John Doe',
+  senderProfilePicPath: 'profiles/john.png',
   ...overrides,
 });
 
 const createMarkAsReadMock = (): MarkAsReadFn =>
-  jestObject.fn(async (_msgId: MessageEntity['id']) => undefined) as unknown as MarkAsReadFn;
+  jestObject.fn(async (_msgId: UserMessage['id']) => undefined) as unknown as MarkAsReadFn;
 
 const createDeleteMessageMock = (): DeleteMessageFn =>
-  jestObject.fn((_msgId: MessageEntity['id']) => undefined) as unknown as DeleteMessageFn;
+  jestObject.fn((_msgId: UserMessage['id']) => undefined) as unknown as DeleteMessageFn;
 
 jestDescribe('MessageItem', () => {
   jestBeforeEach(() => {
@@ -94,7 +87,7 @@ jestDescribe('MessageItem', () => {
     const markAsRead = createMarkAsReadMock();
     const { getAllByText, getByText } = render(
       React.createElement(MessageItem, {
-        item: createMessage({ is_read: true, msg: 'Short message' }),
+        item: createMessage({ isRead: true, msg: 'Short message' }),
         deleteMessage: createDeleteMessageMock(),
         markAsRead,
       }),

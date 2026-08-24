@@ -1,4 +1,4 @@
-import { SelectedExercise } from './../types/use-create-workout.types';
+import type { SelectedExercise } from './../types/use-create-workout.types';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -6,7 +6,7 @@ import { ALERT_TYPE, Dialog } from 'react-native-alert-notification';
 import { useWorkoutPlanContext } from '../../shared/providers/WorkoutPlanProvider';
 import { RootParamList } from '../../../../navigation/types/appStackTypes';
 import { addWorkout } from '../services/workout-editor.service';
-import { WorkoutSplitEntity } from '@strong-together/shared';
+import { WorkoutSplit } from '../../shared/types/workout.types';
 import {
   addExerciseLogic,
   addSplitLogic,
@@ -18,7 +18,6 @@ import {
 } from '../utils/create-workout.util';
 import { ExerciseCandidate, SelectedExercises } from '../types/use-create-workout.types';
 import useExercises from './use-exercises.hook';
-import { ExerciseToWorkoutSplitEntity } from '@strong-together/shared';
 
 const useCreateWorkoutLogic = () => {
   // ----------------------------Workout and Analysis contexes----------------------------
@@ -32,7 +31,7 @@ const useCreateWorkoutLogic = () => {
   const [isSaving, setIsSaving] = useState<boolean>(false);
 
   // ----------------------------Editing----------------------------
-  const [selectedSplit, setSelectedSplit] = useState<WorkoutSplitEntity['name']>('A');
+  const [selectedSplit, setSelectedSplit] = useState<WorkoutSplit['name']>('A');
   // Keep a map: { splitName: [...Exercises] }
   const [selectedExercises, setSelectedExercises] = useState<SelectedExercises>({ A: [] });
   const exForSplit = selectedExercises[selectedSplit] || [];
@@ -50,7 +49,7 @@ const useCreateWorkoutLogic = () => {
       Object.entries(availableExercises)
         .map(([muscle, exercises]) => {
           return exercises.map((ex) => {
-            return { ...ex, targetmuscle: muscle };
+            return { ...ex, targetMuscle: muscle };
           });
         })
         .flat(),
@@ -78,7 +77,7 @@ const useCreateWorkoutLogic = () => {
   );
 
   const updateSets = useCallback(
-    (exercise: SelectedExercise, updatedSetsArr: ExerciseToWorkoutSplitEntity['sets']) => {
+    (exercise: SelectedExercise, updatedSetsArr: number[]) => {
       setSelectedExercises((prev) => updateSetsLogic(prev, selectedSplit, exercise, updatedSetsArr));
     },
     [selectedSplit],
@@ -91,7 +90,7 @@ const useCreateWorkoutLogic = () => {
     [selectedSplit],
   );
 
-  const removeSplit = useCallback((splitName: WorkoutSplitEntity['name']) => {
+  const removeSplit = useCallback((splitName: WorkoutSplit['name']) => {
     setSelectedExercises((prev) => {
       const { next, nextSelected } = removeSplitLogic(prev, splitName);
       setSelectedSplit(nextSelected);

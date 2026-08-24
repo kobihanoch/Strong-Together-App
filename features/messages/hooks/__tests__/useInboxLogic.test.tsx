@@ -321,7 +321,7 @@ describe('useInboxLogic integration', () => {
     expect(result.current.inbox.allReceivedMessages[0]).toEqual(
       expect.objectContaining({
         id: 'msg-1',
-        is_read: true,
+        isRead: true,
       }),
     );
   });

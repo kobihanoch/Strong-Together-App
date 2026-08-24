@@ -1,7 +1,7 @@
 import React from 'react';
 import { Text, View, StyleSheet, ScrollView } from 'react-native';
 import { RFValue } from 'react-native-responsive-fontsize';
-import { TrackingMapItem } from '@strong-together/shared';
+import { TrackingMapItem } from '../../shared/types/workout.types';
 
 const LastWorkoutData = ({
   lastWorkoutDataForModal,
@@ -25,7 +25,7 @@ const LastWorkoutData = ({
     );
   }
 
-  const dateStr = lastWorkoutData?.workoutdate ? new Date(lastWorkoutData.workoutdate).toLocaleDateString() : '—';
+  const dateStr = lastWorkoutData?.workoutDate ? new Date(lastWorkoutData.workoutDate).toLocaleDateString() : '—';
 
   return (
     <View style={styles.card}>

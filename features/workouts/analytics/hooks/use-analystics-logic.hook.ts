@@ -5,7 +5,7 @@ import { useAuth } from '../../../auth/shared/providers/AuthProvider';
 import { useWorkoutPlanContext } from '../../shared/providers/WorkoutPlanProvider';
 import { getTrackingAnalytics } from '../services/analytics.service';
 import useCacheAndFetch from '../../../../shared/hooks/use-cache-and-fetch.hook';
-import { GetAnalyticsResponse } from '@strong-together/shared';
+import type { GetAnalyticsResponse } from '@strong-together/shared';
 import { Analytics1RM, AnalyticsGoals } from '../types/use-analytics.types';
 
 const useAnalysticsLogic = () => {
@@ -13,7 +13,7 @@ const useAnalysticsLogic = () => {
   const { analyzedExerciseTrackingData } = useWorkoutHistoryContext();
   const { workoutCount = 0, splitDaysByName: splitsCounter = {} } = analyzedExerciseTrackingData ?? {};
   const { workout } = useWorkoutPlanContext();
-  const [_1RM, set1RM] = useState<Analytics1RM | undefined>(undefined);
+  const [oneRepMaxes, set1RM] = useState<Analytics1RM | undefined>(undefined);
   const [adherence, setAdherence] = useState<AnalyticsGoals | undefined>(undefined);
   const hasData = useMemo(() => !!analyzedExerciseTrackingData, [analyzedExerciseTrackingData]);
 
@@ -24,14 +24,14 @@ const useAnalysticsLogic = () => {
 
   // On data function
   const onDataFn = useCallback((data: GetAnalyticsResponse) => {
-    set1RM(data._1RM);
+    set1RM(data.oneRepMaxes);
     setAdherence(data.goals);
   }, []);
 
   // Cache payload
   const cachePayload: GetAnalyticsResponse | undefined = useMemo(
-    () => (_1RM === undefined || adherence === undefined ? undefined : { _1RM: _1RM, goals: adherence }),
-    [_1RM, adherence],
+    () => (oneRepMaxes === undefined || adherence === undefined ? undefined : { oneRepMaxes: oneRepMaxes, goals: adherence }),
+    [oneRepMaxes, adherence],
   );
 
   const validateFlag = useMemo(() => {
@@ -57,7 +57,7 @@ const useAnalysticsLogic = () => {
         workoutPlan: workout,
       },
       _1rms: {
-        rm: _1RM === undefined ? {} : _1RM,
+        rm: oneRepMaxes === undefined ? {} : oneRepMaxes,
       },
       adherence: {
         adh: adherence === undefined ? {} : adherence,

@@ -1,17 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-require-imports */
 import React from 'react';
-import {
-  beforeEach as jestBeforeEach,
-  describe as jestDescribe,
-  expect as jestExpect,
-  it as jestIt,
-  jest as jestObject,
-} from '@jest/globals';
+import { beforeEach as jestBeforeEach, describe as jestDescribe, expect as jestExpect, it as jestIt, jest as jestObject, } from '@jest/globals';
 import { fireEvent, render, waitFor } from '@testing-library/react-native';
 import { Keyboard, TouchableOpacity } from 'react-native';
-import type { ExerciseInPlan } from '@strong-together/shared';
-import type { AerobicsDailyRecord } from '@strong-together/shared';
+import type { ExerciseInPlan } from '../../../shared/types/workout.types';
+import type { CardioDailyRecord } from '../../../cardio/types/cardio.types';
 
 const mockNavigate = jestObject.fn();
 const mockReplace = jestObject.fn();
@@ -26,7 +20,7 @@ let mockWorkoutPlanLogic: {
   selectedSplit: { id: number; name: string; muscleGroup: string | null } | null;
 };
 let mockCardioContext: {
-  cardioForToday: AerobicsDailyRecord | null;
+  cardioForToday: CardioDailyRecord | null;
   setDailyCardioMap: ReturnType<typeof jestObject.fn>;
   setWeeklyCardioMap: ReturnType<typeof jestObject.fn>;
 };
@@ -141,18 +135,18 @@ import MyWorkoutPlan from '../MyWorkoutPlan';
 const createExercise = (overrides: Partial<ExerciseInPlan> = {}): ExerciseInPlan => ({
   id: 11,
   sets: [8, 10, 12],
-  is_active: true,
-  targetmuscle: 'Chest',
-  specifictargetmuscle: 'Upper Chest',
+  isActive: true,
+  targetMuscle: 'Chest',
+  specificTargetMuscle: 'Upper Chest',
   exercise: 'Incline Bench Press',
-  workoutsplit: 'Push',
+  workoutSplit: 'Push',
   ...overrides,
 });
 
-const createCardioRecord = (overrides: Partial<AerobicsDailyRecord> = {}): AerobicsDailyRecord => ({
+const createCardioRecord = (overrides: Partial<CardioDailyRecord> = {}): CardioDailyRecord => ({
   type: 'Walk',
-  duration_mins: 12,
-  duration_sec: 30,
+  durationMins: 12,
+  durationSec: 30,
   ...overrides,
 });
 
@@ -181,8 +175,8 @@ jestDescribe('MyWorkoutPlan screen', () => {
       weekly: {
         '2026-W13': {
           records: [],
-          total_duration_mins: 12,
-          total_duration_sec: 30,
+          totalDurationMins: 12,
+          totalDurationSec: 30,
         },
       },
     });
@@ -205,7 +199,7 @@ jestDescribe('MyWorkoutPlan screen', () => {
   jestIt('renders the cardio summary when cardioForToday exists', () => {
     mockCardioContext = {
       ...mockCardioContext,
-      cardioForToday: createCardioRecord({ type: 'Run', duration_mins: 61, duration_sec: 5 }),
+      cardioForToday: createCardioRecord({ type: 'Run', durationMins: 61, durationSec: 5 }),
     };
 
     const { getByText } = render(React.createElement(MyWorkoutPlan));

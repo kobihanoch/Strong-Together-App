@@ -1,9 +1,8 @@
 import { showErrorAlert } from '../../../../shared/alerts/error-alerts';
 import { ExerciseCandidate, SelectedExercise, SelectedExercises } from '../types/use-create-workout.types';
-import { ExerciseToWorkoutSplitEntity } from '@strong-together/shared';
-import { WorkoutSplitEntity } from '@strong-together/shared';
+import { WorkoutSplit } from '../../shared/types/workout.types';
 
-type SplitName = WorkoutSplitEntity['name'];
+type SplitName = WorkoutSplit['name'];
 
 export const addExerciseLogic = (
   prev: SelectedExercises,
@@ -15,7 +14,7 @@ export const addExerciseLogic = (
   const exWithOrderIndex = {
     ...exercise,
     sets: [10, 10, 10],
-    order_index: splitExercises.length,
+    orderIndex: splitExercises.length,
   };
   const isExExists = splitExercises.some((ex) => ex.id === exercise.id);
   if (!isExExists) {
@@ -46,7 +45,7 @@ export const updateSetsLogic = (
   prev: SelectedExercises,
   splitName: SplitName,
   exercise: ExerciseCandidate,
-  updatedSetsArr: ExerciseToWorkoutSplitEntity['sets'],
+  updatedSetsArr: number[],
 ): SelectedExercises => {
   const splitExercises = prev[splitName] ?? [];
   const isExExists = splitExercises.some((ex) => ex.id === exercise.id);
@@ -96,10 +95,10 @@ const getNextSplitNameFromObj = (obj: SelectedExercises): string => {
 
 export const reindexExercises = (arr: SelectedExercise[]): SelectedExercise[] => {
   return arr.map((ex, i) => {
-    // If order_index is already correct, keep the same object reference
-    if (ex.order_index === i) return ex;
+    // If orderIndex is already correct, keep the same object reference
+    if (ex.orderIndex === i) return ex;
     // Otherwise create a new object only for the changed one
-    return { ...ex, order_index: i };
+    return { ...ex, orderIndex: i };
   });
 };
 

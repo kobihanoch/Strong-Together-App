@@ -1,26 +1,25 @@
 import { GetExerciseTrackingResponse } from '@strong-together/shared';
-import { ExerciseTrackingAndStats } from '@strong-together/shared';
 
 export interface WorkoutHistoryAnalyzedExerciseTrackingData {
   // Unpacked
   pr: {
-    maxReps: Exclude<GetExerciseTrackingResponse['exerciseTrackingAnalysis']['prs']['pr_max'], null>['reps'];
-    maxWeight: Exclude<GetExerciseTrackingResponse['exerciseTrackingAnalysis']['prs']['pr_max'], null>['weight'];
+    maxReps: Exclude<GetExerciseTrackingResponse['exerciseTrackingAnalysis']['prs']['prMax'], null>['reps'];
+    maxWeight: Exclude<GetExerciseTrackingResponse['exerciseTrackingAnalysis']['prs']['prMax'], null>['weight'];
     maxExercise:
-      | Exclude<GetExerciseTrackingResponse['exerciseTrackingAnalysis']['prs']['pr_max'], null>['exercise']
+      | Exclude<GetExerciseTrackingResponse['exerciseTrackingAnalysis']['prs']['prMax'], null>['exercise']
       | null;
     maxDate: Exclude<
-      GetExerciseTrackingResponse['exerciseTrackingAnalysis']['prs']['pr_max'],
+      GetExerciseTrackingResponse['exerciseTrackingAnalysis']['prs']['prMax'],
       null
-    >['workout_time_utc'];
+    >['workoutTimeUtc'];
   };
-  workoutCount: GetExerciseTrackingResponse['exerciseTrackingAnalysis']['unique_days'];
+  workoutCount: GetExerciseTrackingResponse['exerciseTrackingAnalysis']['uniqueDays'];
   mostFrequentSplit: {
-    splitName: GetExerciseTrackingResponse['exerciseTrackingAnalysis']['most_frequent_split'];
-    times: GetExerciseTrackingResponse['exerciseTrackingAnalysis']['most_frequent_split_days'];
+    splitName: GetExerciseTrackingResponse['exerciseTrackingAnalysis']['mostFrequentSplit'];
+    times: GetExerciseTrackingResponse['exerciseTrackingAnalysis']['mostFrequentSplitDays'];
   };
   lastWorkoutDate: GetExerciseTrackingResponse['exerciseTrackingAnalysis']['lastWorkoutDate'];
   splitDaysByName: GetExerciseTrackingResponse['exerciseTrackingAnalysis']['splitDaysByName'];
 }
 
-export type WorkoutHistoryExerciseTrackingMaps = ExerciseTrackingAndStats['exerciseTrackingMaps'];
+export type WorkoutHistoryExerciseTrackingMaps = GetExerciseTrackingResponse['exerciseTrackingMaps'];

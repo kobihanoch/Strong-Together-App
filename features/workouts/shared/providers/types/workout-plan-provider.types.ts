@@ -1,5 +1,4 @@
-import { ExerciseInPlan } from '@strong-together/shared';
-import { WorkoutPlan, WorkoutPlanForEdit, WorkoutPlanSplit } from '../../../plan/types/workout-plan.types';
+import { ExerciseInPlan, WorkoutPlan, WorkoutPlanForEdit, WorkoutPlanSplit } from '../../../plan/types/workout-plan.types';
 
 export interface WorkoutPlanProviderValue {
   workout: WorkoutPlan | null;

@@ -1,42 +1,31 @@
+import type { ExercisePickerItem } from '../../shared/types/workout.types';
 import { FontAwesome5 } from '@expo/vector-icons';
 import { BottomSheetFlatList } from '@gorhom/bottom-sheet';
 import React, { forwardRef, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
-  Dimensions,
-  Keyboard,
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
-} from 'react-native';
+  Dimensions, Keyboard, Pressable, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View, } from 'react-native';
 import { Notifier, NotifierComponents } from 'react-native-notifier';
 import { RFValue } from 'react-native-responsive-fontsize';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { colors } from '../../../../shared/constants/colors';
 import {
-  CreateWorkoutControls,
-  ExerciseCandidate,
-  SelectedExercise,
-} from '../types/use-create-workout.types';
-import { ExercisesMapByMuscle, GetAllExercisesExercise } from '@strong-together/shared';
-import { ExerciseEntity } from '@strong-together/shared';
-import { WorkoutSplitEntity } from '@strong-together/shared';
+  CreateWorkoutControls, ExerciseCandidate, SelectedExercise, } from '../types/use-create-workout.types';
+import { ExercisesByMuscle } from '../../shared/types/workout.types';
+import type { Exercise } from '../../shared/types/workout.types';
+import type { WorkoutSplit } from '../../shared/types/workout.types';
 import Column from '../../../../shared/components/Column';
 import Row from '../../../../shared/components/Row';
 import SlidingBottomModal, { SlidingBottomModalRef } from '../../../../shared/components/SlidingBottomModal';
 
 const { height } = Dimensions.get('window');
 
-type ExerciseRowProps = {
-  item: GetAllExercisesExercise & { targetmuscle: ExerciseEntity['targetmuscle'] };
+type ExerciseProps = {
+  item: ExercisePickerItem & { targetMuscle: Exercise['targetMuscle'] };
   selectedMuscle: string;
   handleExPress: (ex: ExerciseCandidate) => void;
 };
 
-const ExerciseRow = React.memo(({ item, selectedMuscle, handleExPress }: ExerciseRowProps) => {
+const Exercise = React.memo(({ item, selectedMuscle, handleExPress }: ExerciseProps) => {
   //console.log(item.name, "renderd");
   return (
     <TouchableOpacity style={styles.exContainer} onPress={() => handleExPress(item)}>
@@ -48,19 +37,19 @@ const ExerciseRow = React.memo(({ item, selectedMuscle, handleExPress }: Exercis
         <Column>
           <Text style={styles.exName}>{item?.name}</Text>
           <Text style={styles.exMuscles}>
-            {selectedMuscle === 'All' ? item?.targetmuscle : selectedMuscle}, {item?.specificTargetMuscle}
+            {selectedMuscle === 'All' ? item?.targetMuscle : selectedMuscle}, {item?.specificTargetMuscle}
           </Text>
         </Column>
       </Row>
     </TouchableOpacity>
   );
 });
-ExerciseRow.displayName = 'ExerciseRow';
+Exercise.displayName = 'Exercise';
 
 type ExercisePicketModalProps = {
-  selectedSplit: WorkoutSplitEntity['name'];
+  selectedSplit: WorkoutSplit['name'];
   controls: CreateWorkoutControls;
-  availableExercises: ExercisesMapByMuscle;
+  availableExercises: ExercisesByMuscle;
   allExercises: ExerciseCandidate[];
   muscles: string[];
   exForSplit: SelectedExercise[];
@@ -73,7 +62,7 @@ const ExercisePickerModal = forwardRef<SlidingBottomModalRef, ExercisePicketModa
   const { addExercise } = controls;
 
   // Refs for better optimzation
-  const selectedSplitRef = useRef<WorkoutSplitEntity['name'] | null>(null);
+  const selectedSplitRef = useRef<WorkoutSplit['name'] | null>(null);
   useEffect(() => {
     selectedSplitRef.current = selectedSplit;
   }, [selectedSplit]);
@@ -154,14 +143,14 @@ const ExercisePickerModal = forwardRef<SlidingBottomModalRef, ExercisePicketModa
   const hasNoSearchResults = !isLibraryEmpty && filteredExToShow.length === 0;
 
   const renderItem = useCallback(
-    ({ item }: { item: GetAllExercisesExercise & { targetmuscle: ExerciseEntity['targetmuscle'] } }) => (
-      <ExerciseRow item={item} selectedMuscle={selectedMuscle} handleExPress={handleExPress} />
+    ({ item }: { item: ExercisePickerItem & { targetMuscle: Exercise['targetMuscle'] } }) => (
+      <Exercise item={item} selectedMuscle={selectedMuscle} handleExPress={handleExPress} />
     ),
     [selectedMuscle, handleExPress],
   );
 
   const keyExtractor = useCallback(
-    (item: GetAllExercisesExercise & { targetmuscle: ExerciseEntity['targetmuscle'] }) => item.id,
+    (item: ExercisePickerItem & { targetMuscle: Exercise['targetMuscle'] }) => item.id,
     [],
   );
 

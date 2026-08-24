@@ -3,19 +3,19 @@ import { Dimensions, Text, View, TouchableOpacity } from 'react-native';
 import { RFValue } from 'react-native-responsive-fontsize';
 import { FontAwesome5 } from '@expo/vector-icons';
 import { AdherenceBar } from '../../../../shared/components/AdherenceBar';
-import { WorkoutSplitEntity } from '@strong-together/shared';
-import { ExerciseEntity } from '@strong-together/shared';
-import { AdherenceExerciseStats } from '@strong-together/shared';
+import { WorkoutSplit } from '../../shared/types/workout.types';
+import type { Exercise } from '../../shared/types/workout.types';
+import type { AnalyticsAdherenceStats } from '../types/use-analytics.types';
 
 const { height } = Dimensions.get('window');
 
 type RenderGoalAdherenceItemProps = {
-  name: WorkoutSplitEntity['name'];
-  v: Record<ExerciseEntity['name'], AdherenceExerciseStats>;
+  name: WorkoutSplit['name'];
+  v: Record<Exercise['name'], AnalyticsAdherenceStats>;
   showSeeAll: boolean;
   pageWidth?: number;
   limit?: number;
-  onSeeAll?: (name: string, v: Record<string, AdherenceExerciseStats>) => void;
+  onSeeAll?: (name: string, v: Record<string, AnalyticsAdherenceStats>) => void;
 };
 
 export default function RenderGoalAdherenceItem({

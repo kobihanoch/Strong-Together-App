@@ -89,9 +89,9 @@ const createControls = () => ({
 });
 
 const createAllExercises = () => [
-  { id: 1, name: 'Bench Press', specificTargetMuscle: 'Upper Chest', targetmuscle: 'Chest' },
-  { id: 2, name: 'Incline Press', specificTargetMuscle: 'Upper Chest', targetmuscle: 'Chest' },
-  { id: 3, name: 'Barbell Row', specificTargetMuscle: 'Lats', targetmuscle: 'Back' },
+  { id: 1, name: 'Bench Press', specificTargetMuscle: 'Upper Chest', targetMuscle: 'Chest' },
+  { id: 2, name: 'Incline Press', specificTargetMuscle: 'Upper Chest', targetMuscle: 'Chest' },
+  { id: 3, name: 'Barbell Row', specificTargetMuscle: 'Lats', targetMuscle: 'Back' },
 ];
 
 const createProps = (overrides: Partial<React.ComponentProps<typeof ExercisePickerModal>> = {}) => ({
@@ -192,9 +192,9 @@ describe('ExercisePickerModal', () => {
         {
           id: 1,
           name: 'Bench Press',
-          targetmuscle: 'Chest',
+          targetMuscle: 'Chest',
           specificTargetMuscle: 'Upper Chest',
-          order_index: 0,
+          orderIndex: 0,
           sets: [10, 10, 10],
         },
       ],
@@ -221,9 +221,9 @@ describe('ExercisePickerModal', () => {
       exForSplit: Array.from({ length: 10 }, (_, index) => ({
         id: 100 + index,
         name: `Exercise ${index + 1}`,
-        targetmuscle: 'Chest',
+        targetMuscle: 'Chest',
         specificTargetMuscle: 'Upper Chest',
-        order_index: index,
+        orderIndex: index,
         sets: [10, 10, 10],
       })),
     });
@@ -257,7 +257,7 @@ describe('ExercisePickerModal', () => {
         id: 1,
         name: 'Bench Press',
         specificTargetMuscle: 'Upper Chest',
-        targetmuscle: 'Chest',
+        targetMuscle: 'Chest',
       });
       expect(mockClose).toHaveBeenCalled();
       expect(mockShowNotification).toHaveBeenCalledWith(

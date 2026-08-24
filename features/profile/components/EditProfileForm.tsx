@@ -18,7 +18,7 @@ import { showErrorAlert } from '../../../shared/alerts/error-alerts';
 import { updateSelfUser } from '../services/user-update.service';
 import Column from '../../../shared/components/Column';
 import Row from '../../../shared/components/Row';
-import { UserEntity } from '@strong-together/shared';
+import type { AppUser } from '../../auth/shared/types/auth.types';
 
 type EditProfileFormProps = {
   initialData: {
@@ -30,7 +30,7 @@ type EditProfileFormProps = {
   };
   closeEditSheet: () => void;
   openEditSheet: (i?: number) => void;
-  setUser: React.Dispatch<React.SetStateAction<Omit<UserEntity, 'password'> | null | undefined>>;
+  setUser: React.Dispatch<React.SetStateAction<AppUser | null | undefined>>;
 };
 
 const EditProfileForm = ({ initialData, closeEditSheet, openEditSheet, setUser }: EditProfileFormProps) => {

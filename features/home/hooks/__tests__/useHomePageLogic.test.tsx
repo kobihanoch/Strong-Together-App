@@ -183,17 +183,17 @@ const createNetworkAxiosError = (): AxiosError => {
 const createPackedTrackingResponse = () => ({
   exerciseTrackingMaps: userWithWorkoutAndHistoryProfile.exerciseTrackingMaps!,
   exerciseTrackingAnalysis: {
-    unique_days: userWithWorkoutAndHistoryProfile.analyzedExerciseTrackingData!.workoutCount,
-    most_frequent_split: userWithWorkoutAndHistoryProfile.analyzedExerciseTrackingData!.mostFrequentSplit.splitName,
-    most_frequent_split_days: userWithWorkoutAndHistoryProfile.analyzedExerciseTrackingData!.mostFrequentSplit.times,
+    uniqueDays: userWithWorkoutAndHistoryProfile.analyzedExerciseTrackingData!.workoutCount,
+    mostFrequentSplit: userWithWorkoutAndHistoryProfile.analyzedExerciseTrackingData!.mostFrequentSplit.splitName,
+    mostFrequentSplitDays: userWithWorkoutAndHistoryProfile.analyzedExerciseTrackingData!.mostFrequentSplit.times,
     lastWorkoutDate: userWithWorkoutAndHistoryProfile.analyzedExerciseTrackingData!.lastWorkoutDate,
     splitDaysByName: userWithWorkoutAndHistoryProfile.analyzedExerciseTrackingData!.splitDaysByName,
     prs: {
-      pr_max: {
+      prMax: {
         exercise: userWithWorkoutAndHistoryProfile.analyzedExerciseTrackingData!.pr.maxExercise!,
         weight: userWithWorkoutAndHistoryProfile.analyzedExerciseTrackingData!.pr.maxWeight,
         reps: userWithWorkoutAndHistoryProfile.analyzedExerciseTrackingData!.pr.maxReps,
-        workout_time_utc: userWithWorkoutAndHistoryProfile.analyzedExerciseTrackingData!.pr.maxDate,
+        workoutTimeUtc: userWithWorkoutAndHistoryProfile.analyzedExerciseTrackingData!.pr.maxDate,
       },
     },
   },
@@ -202,13 +202,13 @@ const createPackedTrackingResponse = () => ({
 const createEmptyTrackingResponse = () => ({
   exerciseTrackingMaps: userWithoutWorkoutProfile.exerciseTrackingMaps!,
   exerciseTrackingAnalysis: {
-    unique_days: 0,
-    most_frequent_split: null,
-    most_frequent_split_days: null,
+    uniqueDays: 0,
+    mostFrequentSplit: null,
+    mostFrequentSplitDays: null,
     lastWorkoutDate: null,
     splitDaysByName: {},
     prs: {
-      pr_max: null,
+      prMax: null,
     },
   },
 });
@@ -316,7 +316,7 @@ describe('useHomePageLogic integration', () => {
       userId: 'user-1',
       hasAssignedWorkout: false,
       hasTracking: true,
-      profileImageUrl: '',
+      profilePicPath: '',
       firstName: 'John',
       lastWorkoutDate: 'none',
       totalWorkoutNumber: 0,
@@ -362,7 +362,7 @@ describe('useHomePageLogic integration', () => {
       userId: 'user-1',
       hasAssignedWorkout: true,
       hasTracking: true,
-      profileImageUrl: '',
+      profilePicPath: '',
       firstName: 'John',
       lastWorkoutDate: '2026-03-27',
       totalWorkoutNumber: 1,

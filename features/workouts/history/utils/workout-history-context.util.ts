@@ -1,6 +1,6 @@
 import { DateTime } from 'luxon';
 import { WorkoutHistoryAnalyzedExerciseTrackingData } from '../types/workout-history.types';
-import { GetExerciseTrackingResponse } from '@strong-together/shared';
+import type { GetExerciseTrackingResponse } from '@strong-together/shared';
 
 type ETUnpacked = WorkoutHistoryAnalyzedExerciseTrackingData;
 
@@ -8,20 +8,20 @@ export const unpackFromExerciseTrackingData = (
   exerciseTrackingData: GetExerciseTrackingResponse['exerciseTrackingAnalysis'] | undefined,
 ): ETUnpacked | undefined => {
   if (exerciseTrackingData === undefined) return undefined;
-  const pr = exerciseTrackingData.prs.pr_max;
+  const pr = exerciseTrackingData.prs.prMax;
   return {
-    //prMapExId: exerciseTrackingData.prs.pr_map_exercise_id,
+    //prMapExId: exerciseTrackingData.prs.pr_map_exerciseId,
     pr: {
       maxReps: pr?.reps || 0,
       maxWeight: pr?.weight || 0,
       maxExercise: pr?.exercise || null,
-      maxDate: pr?.workout_time_utc || '',
+      maxDate: pr?.workoutTimeUtc || '',
     },
-    workoutCount: exerciseTrackingData.unique_days,
+    workoutCount: exerciseTrackingData.uniqueDays,
     mostFrequentSplit: {
-      splitName: exerciseTrackingData.most_frequent_split,
-      times: exerciseTrackingData.most_frequent_split_days,
-      //id: exerciseTrackingData.most_frequent_split_id,
+      splitName: exerciseTrackingData.mostFrequentSplit,
+      times: exerciseTrackingData.mostFrequentSplitDays,
+      //id: exerciseTrackingData.mostFrequentSplit_id,
     },
     lastWorkoutDate: exerciseTrackingData.lastWorkoutDate,
     splitDaysByName: exerciseTrackingData.splitDaysByName,

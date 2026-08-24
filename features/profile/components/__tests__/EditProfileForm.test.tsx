@@ -10,7 +10,7 @@ import {
 } from '@jest/globals';
 import { act, fireEvent, render, waitFor } from '@testing-library/react-native';
 import { ActivityIndicator, Keyboard, TouchableOpacity } from 'react-native';
-import type { UserEntity } from '@strong-together/shared';
+import type { AppUser } from '../../../auth/shared/types/auth.types';
 
 const mockUpdateSelfUser = jestObject.fn<(payload: { username?: string; fullName?: string; email?: string }) => Promise<any>>();
 const mockShowErrorAlert = jestObject.fn();
@@ -60,20 +60,22 @@ jestObject.mock('../../../../shared/components/Row', () => {
 
 import EditProfileForm from '../EditProfileForm';
 
-const createUser = (overrides: Partial<Omit<UserEntity, 'password'>> = {}): Omit<UserEntity, 'password'> => ({
+const createUser = (overrides: Partial<AppUser> = {}): AppUser => ({
   id: 'user-1',
   username: 'johnny',
   email: 'john@example.com',
   name: 'John Doe',
   gender: 'Male',
-  created_at: '2026-03-25T10:00:00.000Z',
-  profile_image_url: null,
-  push_token: null,
+  createdAt: '2026-03-25T10:00:00.000Z',
+  updatedAt: '2026-03-25T10:00:00.000Z',
+  profilePicPath: null,
+  pushToken: null,
   role: 'user',
-  is_first_login: false,
-  token_version: 1,
-  is_verified: true,
-  auth_provider: 'email',
+  isFirstLogin: false,
+  tokenVersion: 1,
+  isVerified: true,
+  authProvider: 'email',
+  lastLogin: null,
   ...overrides,
 });
 

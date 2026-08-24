@@ -4,12 +4,9 @@ import React from 'react';
 import { beforeEach, describe, expect, it, jest } from '@jest/globals';
 import { act, renderHook, waitFor } from '@testing-library/react-native';
 import {
-  guestProfile,
-  userWithWorkoutAndHistoryProfile,
-  userWithoutWorkoutProfile,
-} from '../../../../tests/fixtures/userProfiles';
+  guestProfile, userWithWorkoutAndHistoryProfile, userWithoutWorkoutProfile, } from '../../../../tests/fixtures/userProfiles';
 import type { GetAllUserMessagesResponse } from '@strong-together/shared';
-import type { MessageAfterSendResponse } from '@strong-together/shared';
+import type { IncomingMessage } from '../../types/messages.types';
 
 jest.mock('@react-native-async-storage/async-storage', () => ({
   __esModule: true,
@@ -116,18 +113,18 @@ const createHydratingUseCacheAndFetchMock = (payload: GetAllUserMessagesResponse
   };
 };
 
-const createSocketMessage = (overrides: Partial<MessageAfterSendResponse> = {}): MessageAfterSendResponse => ({
+const createSocketMessage = (overrides: Partial<IncomingMessage> = {}): IncomingMessage => ({
   id: 'msg-3',
-  sender_id: 'coach-1',
-  receiver_id: 'user-1',
+  senderId: 'coach-1',
+  receiverId: 'user-1',
   subject: 'New plan',
   msg: 'Your updated workout is ready.',
-  sent_at: '2026-03-28T09:00:00.000Z',
-  is_read: false,
-  sender_username: 'coachmike',
-  sender_full_name: 'Coach Mike',
-  sender_profile_image_url: 'profiles/coach-mike.png',
-  sender_gender: 'Male',
+  sentAt: '2026-03-28T09:00:00.000Z',
+  isRead: false,
+  senderUsername: 'coachmike',
+  senderFullName: 'Coach Mike',
+  senderProfilePicPath: 'profiles/coach-mike.png',
+  senderGender: 'Male',
   ...overrides,
 });
 
@@ -236,7 +233,7 @@ describe('NotificationsContext', () => {
     expect(result.current.allReceivedMessages[0]).toEqual(
       expect.objectContaining({
         id: 'msg-3',
-        is_read: false,
+        isRead: false,
         subject: 'New plan',
       }),
     );
@@ -263,7 +260,7 @@ describe('NotificationsContext', () => {
 
     await act(async () => {
       result.current.setAllReceivedMessages((prev) => [
-        createSocketMessage({ id: 'msg-4', is_read: true, subject: 'Read update' }),
+        createSocketMessage({ id: 'msg-4', isRead: true, subject: 'Read update' }),
         ...(prev ?? []),
       ]);
     });

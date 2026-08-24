@@ -1,14 +1,7 @@
 import React, { useCallback, useMemo, useState } from 'react';
-import {
-  Dimensions,
-  FlatList,
-  LayoutChangeEvent,
-  NativeScrollEvent,
-  NativeSyntheticEvent,
-  Text,
-  View,
-} from 'react-native';
-import { AdherenceExerciseStats, GoalAdherenceResponse } from '@strong-together/shared';
+import type { AnalyticsGoals } from '../types/use-analytics.types';
+import { Dimensions, FlatList, LayoutChangeEvent, NativeScrollEvent, NativeSyntheticEvent, Text, View, } from 'react-native';
+import { AnalyticsAdherenceStats } from '../types/use-analytics.types';
 import PageDots from '../../../../shared/components/PageDots';
 import Card from './Card';
 import RenderGoalAdherenceItem from './RenderGoalAdherenceItem';
@@ -17,9 +10,9 @@ const { height } = Dimensions.get('window');
 
 type GoalAdherenceProps = {
   adherenceData: {
-    adh: GoalAdherenceResponse;
+    adh: AnalyticsGoals;
   };
-  onSeeAll: (name: string, v: Record<string, AdherenceExerciseStats>) => void;
+  onSeeAll: (name: string, v: Record<string, AnalyticsAdherenceStats>) => void;
   hasData: boolean;
 };
 

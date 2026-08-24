@@ -6,14 +6,14 @@ import InputField from '../../../../shared/components/InputField';
 import { useAuth } from '../../shared/providers/AuthProvider';
 import { showErrorAlert } from '../../../../shared/alerts/error-alerts';
 import { changeEmail, checkUserVerify, sendVerificationMail } from '../services/login.service';
-import { UserEntity } from '@strong-together/shared';
+import type { LoginCredentials } from '../../shared/types/auth.types';
 
 const { width, height } = Dimensions.get('window');
 
 type VerifyCardProps = {
-  username: UserEntity['username'] | null;
-  password: UserEntity['password'] | null;
-  initialEmail: UserEntity['email'] | null;
+  username: string | null;
+  password: LoginCredentials['password'] | null;
+  initialEmail: string | null;
 };
 
 export default function VerifyCard({ username, password, initialEmail }: VerifyCardProps) {

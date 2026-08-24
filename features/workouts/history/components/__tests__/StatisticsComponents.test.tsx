@@ -5,8 +5,9 @@ import { beforeEach, describe, expect, it, jest } from '@jest/globals';
 import { act, fireEvent, render } from '@testing-library/react-native';
 import moment from 'moment-timezone';
 import React from 'react';
-import type { AerobicsDailyRecord, AerobicsWeeklyRecord, WeeklyData } from '@strong-together/shared';
-import type { TrackingMapItem } from '@strong-together/shared';
+import type { CardioDailyRecord } from '../../../cardio/types/cardio.types';
+import type { CardioWeeklyRecord, CardioWeeklyData } from '../../../cardio/types/cardio.types';
+import type { TrackingMapItem } from '../../../shared/types/workout.types';
 
 const mockNavigate = jest.fn();
 const mockScrollToIndex = jest.fn();
@@ -116,45 +117,45 @@ import WorkoutHeader from '../WorkoutHeader';
 
 const createTrackingItem = (overrides: Partial<TrackingMapItem> = {}): TrackingMapItem => ({
   id: 1,
-  exercisetosplit_id: 10,
-  exercise_id: 15,
-  workoutsplit_id: 3,
-  splitname: 'Push',
+  exerciseToSplitId: 10,
+  exerciseId: 15,
+  workoutSplitId: 3,
+  splitName: 'Push',
   exercise: 'Bench Press',
-  workoutdate: '2026-03-26',
-  order_index: 1,
+  workoutDate: '2026-03-26',
+  orderIndex: 1,
   weight: [100, 90],
   reps: [8, 10],
   notes: 'Drive through the chest.',
-  exercisetoworkoutsplit: {
+  exerciseToWorkoutSplit: {
     sets: [8, 10],
     exercises: {
-      targetmuscle: 'Chest',
-      specifictargetmuscle: 'Upper',
+      targetMuscle: 'Chest',
+      specificTargetMuscle: 'Upper',
     },
   },
   ...overrides,
 });
 
-const createDailyCardio = (overrides: Partial<AerobicsDailyRecord> = {}): AerobicsDailyRecord => ({
-  duration_mins: 25,
-  duration_sec: 30,
+const createDailyCardio = (overrides: Partial<CardioDailyRecord> = {}): CardioDailyRecord => ({
+  durationMins: 25,
+  durationSec: 30,
   type: 'Run',
   ...overrides,
 });
 
-const createWeeklyRecord = (overrides: Partial<AerobicsWeeklyRecord> = {}): AerobicsWeeklyRecord => ({
-  duration_mins: 20,
-  duration_sec: 0,
+const createWeeklyRecord = (overrides: Partial<CardioWeeklyRecord> = {}): CardioWeeklyRecord => ({
+  durationMins: 20,
+  durationSec: 0,
   type: 'Run',
-  workout_time_utc: '2026-03-23',
+  workoutTimeUtc: '2026-03-23',
   ...overrides,
 });
 
-const createWeeklyData = (overrides: Partial<WeeklyData> = {}): WeeklyData => ({
-  records: [createWeeklyRecord(), createWeeklyRecord({ workout_time_utc: '2026-03-25', duration_mins: 35 })],
-  total_duration_mins: 55,
-  total_duration_sec: 3300,
+const createCardioWeeklyData = (overrides: Partial<CardioWeeklyData> = {}): CardioWeeklyData => ({
+  records: [createWeeklyRecord(), createWeeklyRecord({ workoutTimeUtc: '2026-03-25', durationMins: 35 })],
+  totalDurationMins: 55,
+  totalDurationSec: 3300,
   ...overrides,
 });
 
@@ -176,7 +177,7 @@ describe('Statistics components', () => {
     it('renders workout split labels and notifies when a date is pressed', () => {
       const onDateSelect = jest.fn();
       const logs = {
-        '2026-03-26': [createTrackingItem({ splitname: 'Push', workoutdate: '2026-03-26' })],
+        '2026-03-26': [createTrackingItem({ splitName: 'Push', workoutDate: '2026-03-26' })],
       };
 
       const { getByText } = render(
@@ -243,7 +244,7 @@ describe('Statistics components', () => {
   describe('WorkoutHeader', () => {
     it('renders workout metadata when the selected day has logs', () => {
       const { getByText } = render(
-        <WorkoutHeader data={[createTrackingItem({ splitname: 'Pull' })]} selectedDate="2026-03-26" />,
+        <WorkoutHeader data={[createTrackingItem({ splitName: 'Pull' })]} selectedDate="2026-03-26" />,
       );
 
       expect(getByText('Pull')).toBeTruthy();
@@ -286,7 +287,7 @@ describe('Statistics components', () => {
       const previous = {
         ...createTrackingItem({
           id: 2,
-          workoutdate: '2026-03-20',
+          workoutDate: '2026-03-20',
           weight: [95, 85],
           reps: [7, 10],
         }),
@@ -328,7 +329,7 @@ describe('Statistics components', () => {
   describe('CardioSection', () => {
     it('renders daily and weekly cardio data when available', () => {
       const { getByText, getByTestId } = render(
-        <CardioSection daily={[createDailyCardio()]} weekly={createWeeklyData()} />,
+        <CardioSection daily={[createDailyCardio()]} weekly={createCardioWeeklyData()} />,
       );
 
       fireEvent(getByTestId('weekly-card'), 'layout', { nativeEvent: { layout: { width: 320 } } });
@@ -351,7 +352,7 @@ describe('Statistics components', () => {
     it('treats a daily zero-minute cardio entry as no recorded cardio for the UI copy', () => {
       const { getAllByText } = render(
         <CardioSection
-          daily={[createDailyCardio({ duration_mins: 0, duration_sec: 30, type: 'Bike' })]}
+          daily={[createDailyCardio({ durationMins: 0, durationSec: 30, type: 'Bike' })]}
           weekly={undefined}
         />,
       );
@@ -362,13 +363,13 @@ describe('Statistics components', () => {
 
   describe('CardioWeeklyGraph', () => {
     it('returns null until the card width is measured', () => {
-      const { queryByText } = render(<CardioWeeklyGraph data={createWeeklyData().records} cardWidth={0} />);
+      const { queryByText } = render(<CardioWeeklyGraph data={createCardioWeeklyData().records} cardWidth={0} />);
 
       expect(queryByText('Bars 7')).toBeNull();
     });
 
     it('normalizes weekly data into seven bars once width is available', () => {
-      const { getByText } = render(<CardioWeeklyGraph data={createWeeklyData().records} cardWidth={320} />);
+      const { getByText } = render(<CardioWeeklyGraph data={createCardioWeeklyData().records} cardWidth={320} />);
 
       expect(getByText('Bars 7')).toBeTruthy();
       expect(mockBarChart).toHaveBeenCalledWith(

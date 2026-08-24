@@ -1,4 +1,4 @@
-import { CreateUserBody, LoginRequestBody } from '@strong-together/shared';
+import type { LoginCredentials, RegistrationInput } from '../types/auth.types';
 import React, { SetStateAction, useCallback, useEffect } from 'react';
 import { showErrorAlert } from '../../../../shared/alerts/error-alerts';
 import { showSuccessAlert } from '../../../../shared/alerts/success-alerts';
@@ -52,11 +52,11 @@ const useAuthActions = ({
 
   const register = useCallback(
     async (
-      email: CreateUserBody['email'],
-      password: CreateUserBody['password'],
-      username: CreateUserBody['username'],
-      fullName: CreateUserBody['fullName'],
-      gender: CreateUserBody['gender'],
+      email: RegistrationInput['email'],
+      password: RegistrationInput['password'],
+      username: RegistrationInput['username'],
+      fullName: RegistrationInput['fullName'],
+      gender: RegistrationInput['gender'],
     ): Promise<void> => {
       try {
         setLoading(true);
@@ -70,7 +70,7 @@ const useAuthActions = ({
   );
 
   const login = useCallback(
-    async (identifier: LoginRequestBody['identifier'], password: LoginRequestBody['password']): Promise<void> => {
+    async (identifier: LoginCredentials['identifier'], password: LoginCredentials['password']): Promise<void> => {
       try {
         setLoading(true);
         const { accessToken: at, refreshToken: rt, user: u } = await loginUser(identifier, password);

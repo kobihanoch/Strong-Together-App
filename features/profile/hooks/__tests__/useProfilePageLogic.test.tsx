@@ -230,7 +230,7 @@ describe('useProfilePageLogic integration', () => {
       email: userWithWorkoutAndHistoryProfile.user!.email,
       fullName: userWithWorkoutAndHistoryProfile.user!.name,
       gender: userWithWorkoutAndHistoryProfile.user!.gender,
-      daysOnline: getDaysSince(userWithWorkoutAndHistoryProfile.user!.created_at.split('T')[0]),
+      daysOnline: getDaysSince(userWithWorkoutAndHistoryProfile.user!.createdAt.split('T')[0]),
     });
   });
 
@@ -266,7 +266,7 @@ describe('useProfilePageLogic integration', () => {
       email: 'jane@example.com',
       fullName: 'Jane Smith',
       gender: 'Female',
-      daysOnline: getDaysSince(userWithoutWorkoutProfile.user!.created_at.split('T')[0]),
+      daysOnline: getDaysSince(userWithoutWorkoutProfile.user!.createdAt.split('T')[0]),
     });
   });
 });

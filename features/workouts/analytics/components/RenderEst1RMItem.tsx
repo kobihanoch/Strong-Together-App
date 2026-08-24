@@ -3,12 +3,12 @@ import { FontAwesome5 } from '@expo/vector-icons';
 import React from 'react';
 import { Dimensions, Text, View } from 'react-native';
 import { RFValue } from 'react-native-responsive-fontsize';
-import { ExerciseEntity } from '@strong-together/shared';
-import { WorkoutRMRecord } from '@strong-together/shared';
+import { Exercise } from '../../shared/types/workout.types';
+import type { AnalyticsRmRecord } from '../types/use-analytics.types';
 
 const { width, height } = Dimensions.get('window');
 
-const RenderEst1RMItem = ({ k, v }: { k: ExerciseEntity['id']; v: WorkoutRMRecord }) => {
+const RenderEst1RMItem = ({ k, v }: { k: Exercise['id']; v: AnalyticsRmRecord }) => {
   return (
     <View
       style={{
@@ -56,7 +56,7 @@ const RenderEst1RMItem = ({ k, v }: { k: ExerciseEntity['id']; v: WorkoutRMRecor
             marginTop: 3,
           }}
         >
-          {v.pr_weight} x {v.pr_reps}
+          {v.prWeight} x {v.prReps}
         </Text>
       </View>
 
@@ -69,7 +69,7 @@ const RenderEst1RMItem = ({ k, v }: { k: ExerciseEntity['id']; v: WorkoutRMRecor
             textAlign: 'right',
           }}
         >
-          {v.max_1rm} kg
+          {v.max1Rm} kg
         </Text>
         <Text
           style={{

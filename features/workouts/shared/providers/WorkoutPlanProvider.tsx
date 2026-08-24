@@ -44,7 +44,7 @@ export const WorkoutPlanProvider = ({ children }: { children: React.ReactNode })
     () => ({
       workout: workout === undefined ? null : workout,
       setWorkout,
-      workoutSplits: workoutSplits === undefined ? [] : workoutSplits, // [{name: A, id: 1, muscle_group:...}, {name: B, id: 2. muscle_group:...},....], exercises = {A: [exercises...], B: [exercises...]}}
+      workoutSplits: workoutSplits === undefined ? [] : workoutSplits, // [{name: A, id: 1, muscleGroup:...}, {name: B, id: 2. muscleGroup:...},....], exercises = {A: [exercises...], B: [exercises...]}}
       exercises: exercises === undefined ? {} : exercises, // { A: [...], B: [...], ... }
       workoutForEdit,
       setWorkoutForEdit,

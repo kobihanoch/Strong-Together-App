@@ -1,16 +1,13 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-require-imports */
 import React from 'react';
+import type { AnalyticsGoals, AnalyticsRmRecord, Analytics1RM } from '../../types/use-analytics.types';
 import { beforeEach, describe, expect, it, jest } from '@jest/globals';
 import { Animated, FlatList } from 'react-native';
 import { fireEvent, render } from '@testing-library/react-native';
 import type {
-  AdherenceExerciseStats,
-  GoalAdherenceResponse,
-  WorkoutRMRecord,
-  WorkoutRMsResponse,
-} from '@strong-together/shared';
-import type { WholeUserWorkoutPlan } from '@strong-together/shared';
+  AnalyticsAdherenceStats } from '../../types/use-analytics.types';
+import type { WorkoutPlan } from '../../../shared/types/workout.types';
 
 jest.mock('@expo/vector-icons', () => {
   const ReactLocal = require('react');
@@ -62,54 +59,50 @@ import Estimated1RM from '../Estimated1RM';
 import RenderEst1RMItem from '../RenderEst1RMItem';
 import { AdherenceBar } from '../../../../../shared/components/AdherenceBar';
 
-const createWorkoutPlan = (overrides: Partial<WholeUserWorkoutPlan> = {}): WholeUserWorkoutPlan => ({
+const createWorkoutPlan = (overrides: Partial<WorkoutPlan> = {}): WorkoutPlan => ({
   id: 3,
-  name: 'Summer Shred',
-  numberofsplits: 3,
-  created_at: '2026-03-01T08:00:00.000Z',
-  is_deleted: false,
-  level: 'Intermediate',
-  user_id: 'user-1',
-  trainer_id: 'trainer-1',
-  is_active: true,
-  updated_at: '2026-03-26T08:00:00.000Z',
-  workoutsplits: [],
+  numberOfSplits: 3,
+  createdAt: '2026-03-01T08:00:00.000Z',
+  userId: 'user-1',
+  isActive: true,
+  updatedAt: '2026-03-26T08:00:00.000Z',
+  workoutSplits: [],
   ...overrides,
 });
 
-const createRMRecord = (overrides: Partial<WorkoutRMRecord> = {}): WorkoutRMRecord => ({
+const createRMRecord = (overrides: Partial<AnalyticsRmRecord> = {}): AnalyticsRmRecord => ({
   exercise: 'Bench Press',
-  pr_weight: 100,
-  pr_reps: 8,
-  max_1rm: 126,
+  prWeight: 100,
+  prReps: 8,
+  max1Rm: 126,
   ...overrides,
 });
 
-const createRMResponse = (): WorkoutRMsResponse => ({
-  1: createRMRecord({ exercise: 'Bench Press', pr_weight: 100, pr_reps: 8, max_1rm: 126 }),
-  2: createRMRecord({ exercise: 'Squat', pr_weight: 140, pr_reps: 5, max_1rm: 157 }),
-  3: createRMRecord({ exercise: 'Deadlift', pr_weight: 180, pr_reps: 3, max_1rm: 198 }),
-  4: createRMRecord({ exercise: 'Overhead Press', pr_weight: 60, pr_reps: 6, max_1rm: 72 }),
-  5: createRMRecord({ exercise: 'Barbell Row', pr_weight: 90, pr_reps: 10, max_1rm: 120 }),
+const createRMResponse = (): Analytics1RM => ({
+  1: createRMRecord({ exercise: 'Bench Press', prWeight: 100, prReps: 8, max1Rm: 126 }),
+  2: createRMRecord({ exercise: 'Squat', prWeight: 140, prReps: 5, max1Rm: 157 }),
+  3: createRMRecord({ exercise: 'Deadlift', prWeight: 180, prReps: 3, max1Rm: 198 }),
+  4: createRMRecord({ exercise: 'Overhead Press', prWeight: 60, prReps: 6, max1Rm: 72 }),
+  5: createRMRecord({ exercise: 'Barbell Row', prWeight: 90, prReps: 10, max1Rm: 120 }),
 });
 
-const createAdherenceStats = (overrides: Partial<AdherenceExerciseStats> = {}): AdherenceExerciseStats => ({
+const createAdherenceStats = (overrides: Partial<AnalyticsAdherenceStats> = {}): AnalyticsAdherenceStats => ({
   planned: 12,
   actual: 10,
-  adherence_pct: 83,
+  adherencePct: 83,
   ...overrides,
 });
 
-const createGoalAdherenceResponse = (): GoalAdherenceResponse => ({
+const createAnalyticsGoals = (): AnalyticsGoals => ({
   Push: {
-    'Bench Press': createAdherenceStats({ planned: 12, actual: 12, adherence_pct: 100 }),
-    'Incline Press': createAdherenceStats({ planned: 10, actual: 8, adherence_pct: 80 }),
-    'Shoulder Press': createAdherenceStats({ planned: 9, actual: 6, adherence_pct: 67 }),
-    'Cable Fly': createAdherenceStats({ planned: 15, actual: 10, adherence_pct: 67 }),
-    'Triceps Pushdown': createAdherenceStats({ planned: 15, actual: 15, adherence_pct: 100 }),
+    'Bench Press': createAdherenceStats({ planned: 12, actual: 12, adherencePct: 100 }),
+    'Incline Press': createAdherenceStats({ planned: 10, actual: 8, adherencePct: 80 }),
+    'Shoulder Press': createAdherenceStats({ planned: 9, actual: 6, adherencePct: 67 }),
+    'Cable Fly': createAdherenceStats({ planned: 15, actual: 10, adherencePct: 67 }),
+    'Triceps Pushdown': createAdherenceStats({ planned: 15, actual: 15, adherencePct: 100 }),
   },
   Legs: {
-    Squat: createAdherenceStats({ planned: 12, actual: 11, adherence_pct: 92 }),
+    Squat: createAdherenceStats({ planned: 12, actual: 11, adherencePct: 92 }),
   },
 });
 
@@ -146,7 +139,7 @@ describe('Analytics components', () => {
       expect(getByText('Total workouts')).toBeTruthy();
       expect(getByText('Push: 4')).toBeTruthy();
       expect(getByText('Legs: 2')).toBeTruthy();
-      expect(getByText('Summer Shred')).toBeTruthy();
+      expect(getByText('Workout Plan')).toBeTruthy();
       expect(getByText('3')).toBeTruthy();
       expect(getByText('26/03/2026')).toBeTruthy();
     });
@@ -174,14 +167,14 @@ describe('Analytics components', () => {
           overViewData={{
             workoutCount: 0,
             splitsCounter: {},
-            workoutPlan: createWorkoutPlan({ name: 'Rebuild', numberofsplits: 0 }),
+            workoutPlan: createWorkoutPlan({ numberOfSplits: 0 }),
           }}
         />,
       );
 
       expect(getByText('PieChart slices: 0')).toBeTruthy();
       expect(getByText('Total workouts')).toBeTruthy();
-      expect(getByText('Rebuild')).toBeTruthy();
+      expect(getByText('Workout Plan')).toBeTruthy();
       expect(queryByText('Push: 4')).toBeNull();
     });
   });
@@ -189,7 +182,7 @@ describe('Analytics components', () => {
   describe('GoalAdherence', () => {
     it('renders the empty state when tracking data is not available yet', () => {
       const { getByText } = render(
-        <GoalAdherence adherenceData={{ adh: createGoalAdherenceResponse() }} hasData={false} onSeeAll={jest.fn()} />,
+        <GoalAdherence adherenceData={{ adh: createAnalyticsGoals() }} hasData={false} onSeeAll={jest.fn()} />,
       );
 
       expect(getByText('No data')).toBeTruthy();
@@ -206,7 +199,7 @@ describe('Analytics components', () => {
 
     it('renders paged split cards, limits the preview to four exercises, and updates the current page', () => {
       const onSeeAll = jest.fn();
-      const adherence = createGoalAdherenceResponse();
+      const adherence = createAnalyticsGoals();
       const { getByText, getAllByText, queryByText, UNSAFE_getByType } = render(
         <GoalAdherence adherenceData={{ adh: adherence }} hasData={true} onSeeAll={onSeeAll} />,
       );
@@ -234,7 +227,7 @@ describe('Analytics components', () => {
   describe('RenderGoalAdherenceItem', () => {
     it('renders only the requested number of exercises and sends the full selected split on See all', () => {
       const onSeeAll = jest.fn();
-      const split = createGoalAdherenceResponse().Push;
+      const split = createAnalyticsGoals().Push;
       const { getByText, queryByText } = render(
         <RenderGoalAdherenceItem name="Push" v={split} showSeeAll={true} limit={2} onSeeAll={onSeeAll} />,
       );
@@ -305,7 +298,7 @@ describe('Analytics components', () => {
       const { getByText } = render(
         <RenderEst1RMItem
           k={99}
-          v={createRMRecord({ exercise: 'Lat Pulldown', pr_weight: null, pr_reps: null, max_1rm: 0 })}
+          v={createRMRecord({ exercise: 'Lat Pulldown', prWeight: null, prReps: null, max1Rm: 0 })}
         />,
       );
 

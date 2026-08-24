@@ -198,14 +198,14 @@ const createExercisesMapFromProfile = () => ({
     {
       id: userWithWorkoutNoHistoryProfile.workoutForEdit!.A[0].id,
       name: userWithWorkoutNoHistoryProfile.workoutForEdit!.A[0].name,
-      specificTargetMuscle: userWithWorkoutNoHistoryProfile.workoutForEdit!.A[0].specifictargetmuscle,
+      specificTargetMuscle: userWithWorkoutNoHistoryProfile.workoutForEdit!.A[0].specificTargetMuscle,
     },
   ],
   Back: [
     {
       id: userWithWorkoutNoHistoryProfile.workoutForEdit!.B[0].id,
       name: userWithWorkoutNoHistoryProfile.workoutForEdit!.B[0].name,
-      specificTargetMuscle: userWithWorkoutNoHistoryProfile.workoutForEdit!.B[0].specifictargetmuscle,
+      specificTargetMuscle: userWithWorkoutNoHistoryProfile.workoutForEdit!.B[0].specificTargetMuscle,
     },
   ],
 });
@@ -360,7 +360,7 @@ describe('use-create-workout-logic.hook integration', () => {
       result.current.logic.controls.addExercise({
         id: 1,
         name: 'Bench Press',
-        targetmuscle: 'Chest',
+        targetMuscle: 'Chest',
         specificTargetMuscle: 'Major',
       });
     });
@@ -370,10 +370,10 @@ describe('use-create-workout-logic.hook integration', () => {
         {
           id: 1,
           name: 'Bench Press',
-          targetmuscle: 'Chest',
+          targetMuscle: 'Chest',
           specificTargetMuscle: 'Major',
           sets: [10, 10, 10],
-          order_index: 0,
+          orderIndex: 0,
         },
       ],
     });
@@ -415,7 +415,7 @@ describe('use-create-workout-logic.hook integration', () => {
       result.current.logic.controls.addExercise({
         id: 1,
         name: 'Bench Press',
-        targetmuscle: 'Chest',
+        targetMuscle: 'Chest',
         specificTargetMuscle: 'Major',
       });
     });

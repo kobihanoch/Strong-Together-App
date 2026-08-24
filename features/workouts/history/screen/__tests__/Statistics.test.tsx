@@ -4,17 +4,17 @@
 import React from 'react';
 import { beforeEach, describe, expect, it, jest } from '@jest/globals';
 import { render } from '@testing-library/react-native';
-import type { TrackingMapItem } from '@strong-together/shared';
-import type { WeeklyData } from '@strong-together/shared';
+import type { TrackingMapItem } from '../../../shared/types/workout.types';
+import type { CardioWeeklyData } from '../../../cardio/types/cardio.types';
 
 let mockStatisticsLogic: {
   selectedDate: string;
   setSelectedDate: ReturnType<typeof jest.fn>;
-  exerciseTrackingByDate: Array<Omit<TrackingMapItem, 'workoutdate'>> | undefined;
+  exerciseTrackingByDate: Array<Omit<TrackingMapItem, 'workoutDate'>> | undefined;
   exerciseTrackingByDatePrev: (TrackingMapItem & { isLastWorkout: boolean })[];
-  exerciseTrackingWithDateKey: Record<string, Array<Omit<TrackingMapItem, 'workoutdate'>>> | null;
-  cardioByDate: WeeklyData['records'] | undefined;
-  cardioForWeek: WeeklyData | undefined;
+  exerciseTrackingWithDateKey: Record<string, Array<Omit<TrackingMapItem, 'workoutDate'>>> | null;
+  cardioByDate: CardioWeeklyData['records'] | undefined;
+  cardioForWeek: CardioWeeklyData | undefined;
 };
 
 let mockLoadingState: { isLoading: boolean };
@@ -86,33 +86,33 @@ import Statistics from '../Statistics';
 
 const createTrackingItem = (overrides: Partial<TrackingMapItem> = {}): TrackingMapItem => ({
   id: 1,
-  exercisetosplit_id: 10,
-  exercise_id: 15,
-  workoutsplit_id: 3,
-  splitname: 'Push',
+  exerciseToSplitId: 10,
+  exerciseId: 15,
+  workoutSplitId: 3,
+  splitName: 'Push',
   exercise: 'Bench Press',
-  workoutdate: '2026-03-26',
-  order_index: 1,
+  workoutDate: '2026-03-26',
+  orderIndex: 1,
   weight: [100],
   reps: [8],
   notes: 'Strong set',
-  exercisetoworkoutsplit: {
+  exerciseToWorkoutSplit: {
     sets: [8],
     exercises: {
-      targetmuscle: 'Chest',
-      specifictargetmuscle: 'Upper',
+      targetMuscle: 'Chest',
+      specificTargetMuscle: 'Upper',
     },
   },
   ...overrides,
 });
 
-const createWeeklyData = (): WeeklyData => ({
+const createCardioWeeklyData = (): CardioWeeklyData => ({
   records: [
-    { duration_mins: 20, duration_sec: 0, type: 'Run', workout_time_utc: '2026-03-23' },
-    { duration_mins: 10, duration_sec: 0, type: 'Bike', workout_time_utc: '2026-03-25' },
+    { durationMins: 20, durationSec: 0, type: 'Run', workoutTimeUtc: '2026-03-23' },
+    { durationMins: 10, durationSec: 0, type: 'Bike', workoutTimeUtc: '2026-03-25' },
   ],
-  total_duration_mins: 30,
-  total_duration_sec: 1800,
+  totalDurationMins: 30,
+  totalDurationSec: 1800,
 });
 
 describe('Statistics screen', () => {
@@ -123,7 +123,7 @@ describe('Statistics screen', () => {
       selectedDate: '2026-03-26',
       setSelectedDate: jest.fn(),
       exerciseTrackingByDate: [createTrackingItem()],
-      exerciseTrackingByDatePrev: [{ ...createTrackingItem({ workoutdate: '2026-03-20' }), isLastWorkout: true }],
+      exerciseTrackingByDatePrev: [{ ...createTrackingItem({ workoutDate: '2026-03-20' }), isLastWorkout: true }],
       exerciseTrackingWithDateKey: {
         '2026-03-26': [createTrackingItem()],
       },
@@ -167,8 +167,8 @@ describe('Statistics screen', () => {
     mockStatisticsLogic = {
       ...mockStatisticsLogic,
       exerciseTrackingByDate: [],
-      cardioByDate: createWeeklyData().records,
-      cardioForWeek: createWeeklyData(),
+      cardioByDate: createCardioWeeklyData().records,
+      cardioForWeek: createCardioWeeklyData(),
     };
 
     const { getByText, queryByText } = render(<Statistics />);

@@ -1,14 +1,5 @@
 import React, { useRef, useState } from 'react';
-import {
-  Dimensions,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-  TextInput,
-  Keyboard,
-  ActivityIndicator,
-} from 'react-native';
+import { Dimensions, StyleSheet, Text, TouchableOpacity, View, TextInput, Keyboard, ActivityIndicator, } from 'react-native';
 import { RFValue } from 'react-native-responsive-fontsize';
 import Column from '../../../../shared/components/Column';
 import RenderItemExercise from '../components/RenderItemExercise';
@@ -25,7 +16,7 @@ import { useNavigation } from '@react-navigation/native';
 import NoWorkoutPlan from '../components/NoWorkoutPlan';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RootParamList } from '../../../../navigation/types/appStackTypes';
-import { ExerciseInPlan } from '@strong-together/shared';
+import { ExerciseInPlan } from '../../shared/types/workout.types';
 
 const { width, height } = Dimensions.get('window');
 
@@ -141,7 +132,7 @@ const MyWorkoutPlan = () => {
                 </Text>{' '}
                 for{' '}
                 <Text style={styles.cardioTextStrong}>
-                  {formatTime(cardioForToday.duration_mins, cardioForToday.duration_sec)}
+                  {formatTime(cardioForToday.durationMins, cardioForToday.durationSec)}
                 </Text>{' '}
                 today, good job!
               </Text>

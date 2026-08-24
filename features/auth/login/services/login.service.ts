@@ -4,7 +4,7 @@ import {
   CheckUserVerifyQuery,
   LoginRequestBody,
   SendChangePassEmailBody,
-  SendVerifcationMailBody,
+  SendVerificationMailBody,
 } from '@strong-together/shared';
 import { LoginResponse } from '@strong-together/shared';
 
@@ -57,6 +57,6 @@ export const checkUserVerify = async (username: CheckUserVerifyQuery['username']
   return data;
 };
 
-export const sendVerificationMail = async (email: SendVerifcationMailBody['email']) => {
-  await api.post('api/auth/sendverificationemail', { email } satisfies SendVerifcationMailBody, { apiMode: 'guest' });
+export const sendVerificationMail = async (email: SendVerificationMailBody['email']) => {
+  await api.post('api/auth/sendverificationemail', { email } satisfies SendVerificationMailBody, { apiMode: 'guest' });
 };

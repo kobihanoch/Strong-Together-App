@@ -1,20 +1,20 @@
 import { useCallback, useState } from 'react';
 import { saveWorkoutData } from '../services/workout-session.service';
-import { ExerciseTrackingAndStats } from '@strong-together/shared';
-import { FinishUserWorkoutBody } from '@strong-together/shared';
+import type { GetExerciseTrackingResponse } from '@strong-together/shared';
+import type { WorkoutPayloadRow } from '../types/use-start-workout.types';
 
 export const useUserWorkout = (): {
   saveWorkoutProcess: (
-    workoutData: FinishUserWorkoutBody['workout'],
+    workoutData: WorkoutPayloadRow[],
     startTime: number,
     endTime: number,
-  ) => Promise<ExerciseTrackingAndStats>;
+  ) => Promise<GetExerciseTrackingResponse>;
   saving: boolean;
 } => {
   const [saving, setSaving] = useState<boolean>(false);
 
   const saveWorkoutProcess = useCallback(
-    async (workoutData: FinishUserWorkoutBody['workout'], startTime: number, endTime: number) => {
+    async (workoutData: WorkoutPayloadRow[], startTime: number, endTime: number) => {
       setSaving(true);
       try {
         const data = await saveWorkoutData(workoutData, startTime, endTime);

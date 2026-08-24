@@ -176,17 +176,17 @@ const createNetworkAxiosError = (): AxiosError => {
 const createPackedTrackingResponse = () => ({
   exerciseTrackingMaps: userWithWorkoutAndHistoryProfile.exerciseTrackingMaps!,
   exerciseTrackingAnalysis: {
-    unique_days: userWithWorkoutAndHistoryProfile.analyzedExerciseTrackingData!.workoutCount,
-    most_frequent_split: userWithWorkoutAndHistoryProfile.analyzedExerciseTrackingData!.mostFrequentSplit.splitName,
-    most_frequent_split_days: userWithWorkoutAndHistoryProfile.analyzedExerciseTrackingData!.mostFrequentSplit.times,
+    uniqueDays: userWithWorkoutAndHistoryProfile.analyzedExerciseTrackingData!.workoutCount,
+    mostFrequentSplit: userWithWorkoutAndHistoryProfile.analyzedExerciseTrackingData!.mostFrequentSplit.splitName,
+    mostFrequentSplitDays: userWithWorkoutAndHistoryProfile.analyzedExerciseTrackingData!.mostFrequentSplit.times,
     lastWorkoutDate: userWithWorkoutAndHistoryProfile.analyzedExerciseTrackingData!.lastWorkoutDate,
     splitDaysByName: userWithWorkoutAndHistoryProfile.analyzedExerciseTrackingData!.splitDaysByName,
     prs: {
-      pr_max: {
+      prMax: {
         exercise: userWithWorkoutAndHistoryProfile.analyzedExerciseTrackingData!.pr.maxExercise!,
         weight: userWithWorkoutAndHistoryProfile.analyzedExerciseTrackingData!.pr.maxWeight,
         reps: userWithWorkoutAndHistoryProfile.analyzedExerciseTrackingData!.pr.maxReps,
-        workout_time_utc: userWithWorkoutAndHistoryProfile.analyzedExerciseTrackingData!.pr.maxDate,
+        workoutTimeUtc: userWithWorkoutAndHistoryProfile.analyzedExerciseTrackingData!.pr.maxDate,
       },
     },
   },
@@ -195,13 +195,13 @@ const createPackedTrackingResponse = () => ({
 const createEmptyTrackingResponse = () => ({
   exerciseTrackingMaps: userWithoutWorkoutProfile.exerciseTrackingMaps!,
   exerciseTrackingAnalysis: {
-    unique_days: 0,
-    most_frequent_split: null,
-    most_frequent_split_days: null,
+    uniqueDays: 0,
+    mostFrequentSplit: null,
+    mostFrequentSplitDays: null,
     lastWorkoutDate: null,
     splitDaysByName: {},
     prs: {
-      pr_max: null,
+      prMax: null,
     },
   },
 });
@@ -220,12 +220,12 @@ const createCardioCachePayload = (selectedDate: string) => {
           ? [
               {
                 ...baseWeeklyRecord,
-                workout_time_utc: `${selectedDate}T06:00:00.000Z`,
+                workoutTimeUtc: `${selectedDate}T06:00:00.000Z`,
               },
             ]
           : [],
-        total_duration_mins: baseDailyRecord?.duration_mins ?? 0,
-        total_duration_sec: baseDailyRecord?.duration_sec ?? 0,
+        totalDurationMins: baseDailyRecord?.durationMins ?? 0,
+        totalDurationSec: baseDailyRecord?.durationSec ?? 0,
       },
     },
   };
@@ -364,7 +364,7 @@ describe('use-statistics-page-logic.hook integration', () => {
       userWithWorkoutAndHistoryProfile.exerciseTrackingMaps?.byDate,
     );
     expect(result.current.statistics.exerciseTrackingWithETSIdKey).toEqual(
-      userWithWorkoutAndHistoryProfile.exerciseTrackingMaps?.byETSId,
+      userWithWorkoutAndHistoryProfile.exerciseTrackingMaps?.byExerciseToSplitId,
     );
     expect(result.current.statistics.exerciseTrackingByDate).toEqual(
       today === '2026-03-27' ? userWithWorkoutAndHistoryProfile.exerciseTrackingMaps?.byDate['2026-03-27'] : undefined,

@@ -1,16 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-require-imports */
 import React from 'react';
-import {
-  beforeEach as jestBeforeEach,
-  describe as jestDescribe,
-  expect as jestExpect,
-  it as jestIt,
-  jest as jestObject,
-} from '@jest/globals';
+import { beforeEach as jestBeforeEach, describe as jestDescribe, expect as jestExpect, it as jestIt, jest as jestObject, } from '@jest/globals';
 import { render, waitFor } from '@testing-library/react-native';
 import type { AuthProviderValue } from '../../../auth/shared/providers/types/auth-context.types';
-import type { GetAuthenticatedUserByIdResponse } from '@strong-together/shared';
+import type { AppUser } from '../../../auth/shared/types/auth.types';
 
 let mockAuthState: AuthProviderValue;
 let mockMediaUploadsState: {
@@ -61,20 +55,22 @@ jestObject.mock('../../hooks/use-media-uploads.hook', () => ({
 
 import ImagePickerComponent from '../ImagePickerComponent';
 
-const createUser = (overrides: Partial<GetAuthenticatedUserByIdResponse> = {}): GetAuthenticatedUserByIdResponse => ({
+const createUser = (overrides: Partial<AppUser> = {}): AppUser => ({
   id: 'user-1',
   username: 'johnny',
   name: 'John Doe',
   email: 'john@example.com',
   gender: 'Male',
-  created_at: '2026-03-25T10:00:00.000Z',
-  profile_image_url: null,
-  push_token: null,
+  createdAt: '2026-03-25T10:00:00.000Z',
+  updatedAt: '2026-03-25T10:00:00.000Z',
+  profilePicPath: null,
+  pushToken: null,
   role: 'user',
-  is_first_login: false,
-  token_version: 1,
-  is_verified: true,
-  auth_provider: 'email',
+  isFirstLogin: false,
+  tokenVersion: 1,
+  isVerified: true,
+  authProvider: 'email',
+  lastLogin: null,
   ...overrides,
 });
 
@@ -115,7 +111,10 @@ jestDescribe('ImagePickerComponent', () => {
     jestObject.clearAllMocks();
     mockAuthState = createAuthState();
     mockMediaUploadsState = {
-      uploadToStorageAndReturnPath: jestObject.fn(async () => ({ path: 'avatars/user-1.jpg', url: 'https://cdn/u1' })),
+      uploadToStorageAndReturnPath: jestObject.fn(async () => ({
+        profilePicPath: 'avatars/user-1.jpg',
+        url: 'https://cdn/u1',
+      })),
       loading: false,
       error: null,
     };
@@ -173,15 +172,15 @@ jestDescribe('ImagePickerComponent', () => {
     });
 
     const updater = setUser.mock.calls[0][0] as (
-      prev: GetAuthenticatedUserByIdResponse | null | undefined
-    ) => GetAuthenticatedUserByIdResponse;
-    jestExpect(updater(createUser()).profile_image_url).toBe('avatars/user-1.jpg');
+      prev: AppUser | null | undefined
+    ) => AppUser;
+    jestExpect(updater(createUser()).profilePicPath).toBe('avatars/user-1.jpg');
   });
 
   jestIt('deletes the current profile image and updates the auth user path to null', async () => {
     const setUser = jestObject.fn();
     mockAuthState = createAuthState({
-      user: createUser({ profile_image_url: 'avatars/user-1.jpg' }),
+      user: createUser({ profilePicPath: 'avatars/user-1.jpg' }),
       setUser,
     });
     const setTriggerRemoveImg = jestObject.fn();
@@ -202,9 +201,9 @@ jestDescribe('ImagePickerComponent', () => {
       });
     });
     const updater = setUser.mock.calls[0][0] as (
-      prev: GetAuthenticatedUserByIdResponse | null | undefined
-    ) => GetAuthenticatedUserByIdResponse;
-    jestExpect(updater(createUser({ profile_image_url: 'avatars/user-1.jpg' })).profile_image_url).toBeNull();
+      prev: AppUser | null | undefined
+    ) => AppUser;
+    jestExpect(updater(createUser({ profilePicPath: 'avatars/user-1.jpg' })).profilePicPath).toBeNull();
     jestExpect(setTriggerRemoveImg).toHaveBeenCalledWith(false);
   });
 });

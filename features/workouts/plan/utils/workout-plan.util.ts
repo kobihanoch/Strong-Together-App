@@ -1,14 +1,13 @@
-import { ExerciseInPlan, WholeUserWorkoutPlan } from '@strong-together/shared';
-import { WorkoutSplitEntity } from '@strong-together/shared';
-import { WorkoutPlanSplit } from '../types/workout-plan.types';
+import type { ExerciseInPlan, WorkoutPlan } from '../../shared/types/workout.types';
+import type { WorkoutPlanSplit } from '../types/workout-plan.types';
 
-type SplitName = WorkoutSplitEntity['name'];
-type SplitId = WorkoutSplitEntity['id'];
-type MuscleGroup = WorkoutSplitEntity['muscle_group'];
+type SplitName = WorkoutPlanSplit['name'];
+type SplitId = WorkoutPlanSplit['id'];
+type MuscleGroup = WorkoutPlanSplit['muscleGroup'];
 
 // Returns an obj
 // {
-//  workoutSplits = [{name: A, id: 1, muscle_group:...}, {name: B, id: 2. muscle_group:...},....]
+//  workoutSplits = [{name: A, id: 1, muscleGroup:...}, {name: B, id: 2. muscleGroup:...},....]
 //  exercises = {A: [exercises...], B: [exercises...]}
 // }
 type ExtractWorkoutSplitsReturnType = {
@@ -20,23 +19,23 @@ type ExtractWorkoutSplitsReturnType = {
   exercises: Record<SplitName, ExerciseInPlan[]>;
 };
 
-export const extractWorkoutSplits = (workout: WholeUserWorkoutPlan | null | undefined): ExtractWorkoutSplitsReturnType | undefined => {
-  if (workout === null || workout?.workoutsplits === null)
+export const extractWorkoutSplits = (workout: WorkoutPlan | null | undefined): ExtractWorkoutSplitsReturnType | undefined => {
+  if (workout === null || workout?.workoutSplits === null)
     return { workoutSplits: [], exercises: {} as Record<SplitName, ExerciseInPlan[]> };
   if (workout === undefined) return undefined;
-  const map = workout.workoutsplits.reduce((acc: Record<SplitName, ExerciseInPlan[]>, split) => {
+  const map = workout.workoutSplits.reduce((acc: Record<SplitName, ExerciseInPlan[]>, split) => {
     const splitName = split.name;
-    const splitExFields = split.exercisetoworkoutsplit || [];
+    const splitExFields = split.exerciseToWorkoutSplit || [];
     acc[splitName!] = [...splitExFields];
     return acc;
   }, {});
 
-  const arr = workout.workoutsplits.reduce(
+  const arr = workout.workoutSplits.reduce(
     (acc: { arr: { name: SplitName; id: SplitId; muscleGroup: MuscleGroup }[] }, split) => {
       acc.arr.push({
         name: split.name!,
         id: split.id,
-        muscleGroup: split.muscle_group!,
+        muscleGroup: split.muscleGroup!,
       });
       return acc;
     },

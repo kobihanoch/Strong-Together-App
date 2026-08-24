@@ -1,10 +1,6 @@
 import { WorkoutPlanSplit } from '../../plan/types/workout-plan.types';
 import { FinishUserWorkoutBody } from '@strong-together/shared';
-import { ExerciseInPlan } from '@strong-together/shared';
-import { ExerciseEntity } from '@strong-together/shared';
-import { ExerciseToWorkoutSplitEntity } from '@strong-together/shared';
-import { ExerciseTrackingEntity } from '@strong-together/shared';
-import { WorkoutPlanEntity } from '@strong-together/shared';
+import type { Exercise, ExerciseInPlan } from '../../shared/types/workout.types';
 
 export type ResumeWorkoutCachePayload = {
   selectedSplit: WorkoutPlanSplit;
@@ -15,12 +11,12 @@ export type ResumeWorkoutCachePayload = {
 };
 
 export type ExercisesDuringWorkout = Record<
-  ExerciseEntity['name'],
+  Exercise['name'],
   {
-    etsid: ExerciseToWorkoutSplitEntity['id'];
-    weight: ExerciseTrackingEntity['weight'];
-    reps: ExerciseTrackingEntity['reps'];
-    notes: ExerciseTrackingEntity['notes'];
+    etsid: number;
+    weight: number[];
+    reps: number[];
+    notes: string | null;
   }
 >;
 
@@ -30,14 +26,14 @@ export interface StartWorkoutPageLogicReturn {
     startTime: number;
     pausedTotal: number;
     totalSets: number;
-    workoutName: WorkoutPlanEntity['name'];
+    workoutName: string;
     setsDone: number;
     setsDoneWithExerciseNameKey: SetCountByExercise;
   };
   controls: {
-    addNotes: (exerciseName: ExerciseEntity['name'], notes: ExerciseTrackingEntity['notes']) => void;
-    addRepsRecord: (exerciseName: ExerciseEntity['name'], setIndex: number, reps: number) => void;
-    addWeightRecord: (exerciseName: ExerciseEntity['name'], setIndex: number, weight: number) => void;
+    addNotes: (exerciseName: Exercise['name'], notes: string | null) => void;
+    addRepsRecord: (exerciseName: Exercise['name'], setIndex: number, reps: number) => void;
+    addWeightRecord: (exerciseName: Exercise['name'], setIndex: number, weight: number) => void;
   };
   saving: {
     saveStarted: boolean;
@@ -49,6 +45,6 @@ export interface StartWorkoutPageLogicReturn {
 
 export type SetCountByExercise = Record<ExerciseName, { done: number; planned: number }>;
 export type WorkoutPayloadRow = FinishUserWorkoutBody['workout'][number];
-export type ExerciseName = ExerciseEntity['name'];
-export type SetValue = ExerciseTrackingEntity['weight'][number];
+export type ExerciseName = Exercise['name'];
+export type SetValue = number;
 

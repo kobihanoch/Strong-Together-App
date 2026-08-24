@@ -187,17 +187,17 @@ const createNetworkAxiosError = (): AxiosError => {
 const createPackedTrackingResponse = () => ({
   exerciseTrackingMaps: userWithWorkoutAndHistoryProfile.exerciseTrackingMaps!,
   exerciseTrackingAnalysis: {
-    unique_days: userWithWorkoutAndHistoryProfile.analyzedExerciseTrackingData!.workoutCount,
-    most_frequent_split: userWithWorkoutAndHistoryProfile.analyzedExerciseTrackingData!.mostFrequentSplit.splitName,
-    most_frequent_split_days: userWithWorkoutAndHistoryProfile.analyzedExerciseTrackingData!.mostFrequentSplit.times,
+    uniqueDays: userWithWorkoutAndHistoryProfile.analyzedExerciseTrackingData!.workoutCount,
+    mostFrequentSplit: userWithWorkoutAndHistoryProfile.analyzedExerciseTrackingData!.mostFrequentSplit.splitName,
+    mostFrequentSplitDays: userWithWorkoutAndHistoryProfile.analyzedExerciseTrackingData!.mostFrequentSplit.times,
     lastWorkoutDate: userWithWorkoutAndHistoryProfile.analyzedExerciseTrackingData!.lastWorkoutDate,
     splitDaysByName: userWithWorkoutAndHistoryProfile.analyzedExerciseTrackingData!.splitDaysByName,
     prs: {
-      pr_max: {
+      prMax: {
         exercise: userWithWorkoutAndHistoryProfile.analyzedExerciseTrackingData!.pr.maxExercise!,
         weight: userWithWorkoutAndHistoryProfile.analyzedExerciseTrackingData!.pr.maxWeight,
         reps: userWithWorkoutAndHistoryProfile.analyzedExerciseTrackingData!.pr.maxReps,
-        workout_time_utc: userWithWorkoutAndHistoryProfile.analyzedExerciseTrackingData!.pr.maxDate,
+        workoutTimeUtc: userWithWorkoutAndHistoryProfile.analyzedExerciseTrackingData!.pr.maxDate,
       },
     },
   },
@@ -206,32 +206,32 @@ const createPackedTrackingResponse = () => ({
 const createEmptyTrackingResponse = () => ({
   exerciseTrackingMaps: userWithoutWorkoutProfile.exerciseTrackingMaps!,
   exerciseTrackingAnalysis: {
-    unique_days: 0,
-    most_frequent_split: null,
-    most_frequent_split_days: null,
+    uniqueDays: 0,
+    mostFrequentSplit: null,
+    mostFrequentSplitDays: null,
     lastWorkoutDate: null,
     splitDaysByName: {},
     prs: {
-      pr_max: null,
+      prMax: null,
     },
   },
 });
 
 const createAnalyticsResponseFromProfile = () => ({
-  _1RM: {
+  oneRepMaxes: {
     1: {
-      exercise: userWithWorkoutAndHistoryProfile.exerciseTrackingMaps!.byETSId[101][0].exercise,
-      pr_weight: userWithWorkoutAndHistoryProfile.analyzedExerciseTrackingData!.pr.maxWeight,
-      pr_reps: userWithWorkoutAndHistoryProfile.analyzedExerciseTrackingData!.pr.maxReps,
-      max_1rm: 113.3,
+      exercise: userWithWorkoutAndHistoryProfile.exerciseTrackingMaps!.byExerciseToSplitId[101][0].exercise,
+      prWeight: userWithWorkoutAndHistoryProfile.analyzedExerciseTrackingData!.pr.maxWeight,
+      prReps: userWithWorkoutAndHistoryProfile.analyzedExerciseTrackingData!.pr.maxReps,
+      max1Rm: 113.3,
     },
   },
   goals: {
     A: {
-      [userWithWorkoutAndHistoryProfile.exerciseTrackingMaps!.byETSId[101][0].exercise]: {
+      [userWithWorkoutAndHistoryProfile.exerciseTrackingMaps!.byExerciseToSplitId[101][0].exercise]: {
         planned: 1,
         actual: 1,
-        adherence_pct: 100,
+        adherencePct: 100,
       },
     },
   },
@@ -347,7 +347,7 @@ describe('useAnalysticsLogic integration', () => {
     expect(mockGetTrackingAnalytics).not.toHaveBeenCalled();
   });
 
-  it('hydrates overview from workout and analysis contexts and reads _1RM plus adherence from analytics cache', async () => {
+  it('hydrates overview from workout and analysis contexts and reads oneRepMaxes plus adherence from analytics cache', async () => {
     const analyticsPayload = createAnalyticsResponseFromProfile();
     setupCacheForScenario({
       userId: 'user-1',
@@ -373,7 +373,7 @@ describe('useAnalysticsLogic integration', () => {
       splitsCounter: userWithWorkoutAndHistoryProfile.analyzedExerciseTrackingData!.splitDaysByName,
       workoutPlan: userWithWorkoutAndHistoryProfile.workout,
     });
-    expect(result.current.analytics.data._1rms.rm).toEqual(analyticsPayload._1RM);
+    expect(result.current.analytics.data._1rms.rm).toEqual(analyticsPayload.oneRepMaxes);
     expect(result.current.analytics.data.adherence.adh).toEqual(analyticsPayload.goals);
     expect(mockGetTrackingAnalytics).not.toHaveBeenCalled();
   });
@@ -425,7 +425,7 @@ describe('useAnalysticsLogic integration', () => {
     analyticsDeferred.resolve(createAnalyticsResponseFromProfile());
 
     await waitFor(() => {
-      expect(result.current.analytics.data._1rms.rm).toEqual(createAnalyticsResponseFromProfile()._1RM);
+      expect(result.current.analytics.data._1rms.rm).toEqual(createAnalyticsResponseFromProfile().oneRepMaxes);
     });
 
     expect(result.current.analytics.data.adherence.adh).toEqual(createAnalyticsResponseFromProfile().goals);
