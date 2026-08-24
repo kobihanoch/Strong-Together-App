@@ -1,76 +1,42 @@
 import { AerobicsDailyRecord } from '@strong-together/shared';
-import { createContext, ReactNode, useCallback, useContext, useMemo, useState } from 'react';
-import { useAuth } from '../../../auth/shared/providers/AuthProvider';
-import { keyCardio } from '../../../../infrastructure/cache/cache-keys.utils';
-import { getUserCardio } from '../../cardio/services/cardio.service';
-import useCacheAndFetch from '../../../../shared/hooks/use-cache-and-fetch.hook';
-import useUpdateGlobalLoading from '../../../../shared/hooks/use-update-global-loading.hook';
 import moment from 'moment';
-import {
-  CardioProviderCachePayload,
-  CardioProviderValue,
-} from './types/cardio-provider.types';
-import { CardioDailyMap, CardioWeeklyMap } from '../../cardio/types/cardio.types';
-import { UserAerobicsResponse } from '@strong-together/shared';
+import { createContext, ReactNode, useContext, useMemo } from 'react';
+import useUpdateGlobalLoading from '../../../../shared/hooks/use-update-global-loading.hook';
+import { useAuth } from '../../../auth/shared/providers/AuthProvider';
+import useCardioCacheHandler from './hooks/use-cardio-cache-handler.hook';
+import { CardioProviderValue } from './types/cardio-provider.types';
 
 const CardioContext = createContext<CardioProviderValue | null>(null);
 
 export const CardioProvider = ({ children }: { children: ReactNode }) => {
   const { user, isValidatedWithServer } = useAuth();
 
-  const [dailyCardioMap, setDailyCardioMap] = useState<CardioDailyMap | null>(null);
-  const [weeklyCardioMap, setWeeklyCardioMap] = useState<CardioWeeklyMap | null>(null);
+  const { dailyCardioMap, setDailyCardioMap, weeklyCardioMap, setWeeklyCardioMap, loading } = useCardioCacheHandler({
+    user,
+    isValidatedWithServer,
+  });
+
   const cardioForToday = useMemo(
-    (): AerobicsDailyRecord | null => dailyCardioMap?.[moment().format('YYYY-MM-DD')]?.[0] || null,
+    (): AerobicsDailyRecord | null | undefined =>
+      dailyCardioMap === undefined ? undefined : dailyCardioMap?.[moment().format('YYYY-MM-DD')]?.[0] || null,
     [dailyCardioMap],
   );
-  const hasDoneCardioToday = useMemo((): boolean => !!cardioForToday, [dailyCardioMap]);
-
-  // -------------------------- useCacheHandler props ------------------------------
-
-  // Fetch function
-  const fetchFn = useCallback(async () => await getUserCardio(), []);
-
-  // On data function
-  const onDataFn = useCallback((data: UserAerobicsResponse | CardioProviderCachePayload) => {
-    setDailyCardioMap(data.daily);
-    setWeeklyCardioMap(data.weekly);
-  }, []);
-
-  // Cache payload
-  const cachePayload: CardioProviderCachePayload = useMemo(
-    () => ({
-      daily: dailyCardioMap,
-      weekly: weeklyCardioMap,
-    }),
-    [dailyCardioMap, weeklyCardioMap],
-  );
-
-  // Hook usage
-  const { loading, cacheKnown } = useCacheAndFetch(
-    user, // user prop
-    keyCardio, // key builder
-    isValidatedWithServer, // flag from server
-    fetchFn, // fetch cb
-    onDataFn, // on data cb
-    cachePayload, // cache payload
-    'Cardio Context', // log
-  );
+  const hasDoneCardioToday = useMemo((): boolean => !!cardioForToday, [cardioForToday]);
 
   // Report analysis loading to global loading
-  useUpdateGlobalLoading('Cardio', cacheKnown ? loading : true);
+  useUpdateGlobalLoading('Cardio', loading);
 
   const value = useMemo<CardioProviderValue>(
     () => ({
-      dailyCardioMap,
-      weeklyCardioMap,
+      dailyCardioMap: dailyCardioMap === undefined ? null : dailyCardioMap,
+      weeklyCardioMap: weeklyCardioMap === undefined ? null : weeklyCardioMap,
       setDailyCardioMap,
       setWeeklyCardioMap,
       hasDoneCardioToday,
-      cardioForToday,
+      cardioForToday: cardioForToday === undefined ? null : cardioForToday,
       loading,
     }),
-    [dailyCardioMap, weeklyCardioMap, hasDoneCardioToday, cardioForToday, loading],
+    [dailyCardioMap, weeklyCardioMap, setDailyCardioMap, setWeeklyCardioMap, hasDoneCardioToday, cardioForToday, loading],
   );
 
   return <CardioContext.Provider value={value}>{children}</CardioContext.Provider>;
@@ -83,4 +49,3 @@ export const useCardioContext = () => {
   }
   return context;
 };
-

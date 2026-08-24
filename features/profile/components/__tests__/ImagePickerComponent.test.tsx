@@ -96,9 +96,6 @@ const createAuthState = (overrides: Partial<AuthProviderValue> = {}): AuthProvid
   handleAppleAuth: jestObject.fn(async () => undefined),
   handleGoogleAuth: jestObject.fn(async () => undefined),
   logout: jestObject.fn(async () => undefined),
-  initial: {
-    initializeUserSession: jestObject.fn(async () => undefined),
-  },
   ...overrides,
 });
 
@@ -175,7 +172,9 @@ jestDescribe('ImagePickerComponent', () => {
       });
     });
 
-    const updater = setUser.mock.calls[0][0] as (prev: GetAuthenticatedUserByIdResponse | null) => GetAuthenticatedUserByIdResponse;
+    const updater = setUser.mock.calls[0][0] as (
+      prev: GetAuthenticatedUserByIdResponse | null | undefined
+    ) => GetAuthenticatedUserByIdResponse;
     jestExpect(updater(createUser()).profile_image_url).toBe('avatars/user-1.jpg');
   });
 
@@ -202,7 +201,9 @@ jestDescribe('ImagePickerComponent', () => {
         data: { path: 'avatars/user-1.jpg' },
       });
     });
-    const updater = setUser.mock.calls[0][0] as (prev: GetAuthenticatedUserByIdResponse | null) => GetAuthenticatedUserByIdResponse;
+    const updater = setUser.mock.calls[0][0] as (
+      prev: GetAuthenticatedUserByIdResponse | null | undefined
+    ) => GetAuthenticatedUserByIdResponse;
     jestExpect(updater(createUser({ profile_image_url: 'avatars/user-1.jpg' })).profile_image_url).toBeNull();
     jestExpect(setTriggerRemoveImg).toHaveBeenCalledWith(false);
   });

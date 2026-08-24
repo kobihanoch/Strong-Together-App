@@ -248,7 +248,7 @@ describe('useProfilePageLogic integration', () => {
     });
 
     await act(async () => {
-      result.current.profile.setUser((prev: typeof userWithoutWorkoutProfile.user) =>
+      result.current.profile.setUser((prev: typeof userWithoutWorkoutProfile.user | undefined) =>
         prev
           ? {
               ...prev,

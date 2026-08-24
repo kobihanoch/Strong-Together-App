@@ -31,7 +31,7 @@ jest.mock('expo-constants', () => ({
   },
 }));
 
-type UseCacheAndFetchReturn = { loading: boolean; cacheKnown: boolean };
+type UseCacheAndFetchReturn = { loading: boolean };
 type UseCacheAndFetchMockFn = (
   user: unknown,
   keyBuilderFn: unknown,
@@ -112,7 +112,6 @@ const createHydratingUseCacheAndFetchMock = (payload: GetAllUserMessagesResponse
     }
     return {
       loading: false,
-      cacheKnown: true,
     };
   };
 };
@@ -141,7 +140,6 @@ describe('NotificationsContext', () => {
     });
     mockUseCacheAndFetch.mockReturnValue({
       loading: false,
-      cacheKnown: true,
     });
     mockGetUserMessages.mockResolvedValue({
       messages: [],
@@ -161,9 +159,7 @@ describe('NotificationsContext', () => {
       false,
       expect.any(Function),
       expect.any(Function),
-      {
-        messages: [],
-      },
+      undefined,
       'Messages Context',
     );
     expect(mockRegisterToMessagesListener).not.toHaveBeenCalled();
@@ -234,7 +230,7 @@ describe('NotificationsContext', () => {
     });
 
     await act(async () => {
-      result.current.setAllReceivedMessages((prev: typeof result.current.allReceivedMessages) => [createSocketMessage(), ...prev]);
+      result.current.setAllReceivedMessages((prev) => [createSocketMessage(), ...(prev ?? [])]);
     });
 
     expect(result.current.allReceivedMessages[0]).toEqual(
@@ -266,9 +262,9 @@ describe('NotificationsContext', () => {
     });
 
     await act(async () => {
-      result.current.setAllReceivedMessages((prev: typeof result.current.allReceivedMessages) => [
+      result.current.setAllReceivedMessages((prev) => [
         createSocketMessage({ id: 'msg-4', is_read: true, subject: 'Read update' }),
-        ...prev,
+        ...(prev ?? []),
       ]);
     });
 

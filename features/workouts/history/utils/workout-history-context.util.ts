@@ -5,8 +5,9 @@ import { GetExerciseTrackingResponse } from '@strong-together/shared';
 type ETUnpacked = WorkoutHistoryAnalyzedExerciseTrackingData;
 
 export const unpackFromExerciseTrackingData = (
-  exerciseTrackingData: GetExerciseTrackingResponse['exerciseTrackingAnalysis'],
-): ETUnpacked => {
+  exerciseTrackingData: GetExerciseTrackingResponse['exerciseTrackingAnalysis'] | undefined,
+): ETUnpacked | undefined => {
+  if (exerciseTrackingData === undefined) return undefined;
   const pr = exerciseTrackingData.prs.pr_max;
   return {
     //prMapExId: exerciseTrackingData.prs.pr_map_exercise_id,
@@ -34,4 +35,3 @@ export const checkHasTrainedToday = (
   if (!lastWorkoutDate) return false;
   return lastWorkoutDate === DateTime.now().setZone(tz).toISODate(); // '2025-08-28'
 };
-

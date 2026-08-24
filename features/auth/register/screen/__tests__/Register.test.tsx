@@ -52,7 +52,7 @@ jestObject.mock('../../../shared/providers/AuthProvider', () => ({
   useAuth: () => mockAuthState,
 }));
 
-jestObject.mock('../../../../../shared/errors/error-alerts', () => ({
+jestObject.mock('../../../../../shared/alerts/error-alerts', () => ({
   showErrorAlert: (...args: [string, string]) => mockShowErrorAlert(...args),
 }));
 
@@ -76,9 +76,6 @@ const createAuthState = (overrides: Partial<AuthProviderValue> = {}): AuthProvid
   handleAppleAuth: jestObject.fn(async () => undefined),
   handleGoogleAuth: jestObject.fn(async () => undefined),
   logout: jestObject.fn(async () => undefined),
-  initial: {
-    initializeUserSession: jestObject.fn(async () => undefined),
-  },
   ...overrides,
 });
 

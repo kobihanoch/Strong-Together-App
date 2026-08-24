@@ -3,17 +3,43 @@
 ## Table of Contents
 
 1. [API Client](#api-client)
-2. [DPoP and Headers](#dpop-and-headers)
-3. [Response Handling](#response-handling)
-4. [Realtime Events](#realtime-events)
-5. [AI Video Analysis](#ai-video-analysis)
-6. [Related Files](#related-files)
+2. [Flow Sketch](#flow-sketch)
+3. [DPoP and Headers](#dpop-and-headers)
+4. [Response Handling](#response-handling)
+5. [Realtime Events](#realtime-events)
+6. [AI Video Analysis](#ai-video-analysis)
+7. [Related Files](#related-files)
 
 ## API Client
 
 The Axios client is configured with layered interceptors for **bootstrap**, **headers**, **DPoP**, **Sentry tracing**, **refresh-on-401**, network handling, and update-required handling.
 
 The bootstrap interceptor runs first so known startup requests can be served from a single bootstrap payload when possible.
+
+## Flow Sketch
+
+```text
+Screen or provider
+  |
+  v
+Axios client
+  |
+  +-- request: bootstrap -> headers -> DPoP -> Sentry
+  |
+  v
+Backend API
+  |
+  +-- response ok -------> typed service result
+  |
+  +-- 401 ---------------> refresh token -> retry once
+  |
+  +-- 426 ---------------> update modal
+  |
+  +-- network/server ----> annotated Axios error + alert
+
+Realtime side path:
+API ticket -> Socket.IO connect -> messages / AI analysis events
+```
 
 ## DPoP and Headers
 

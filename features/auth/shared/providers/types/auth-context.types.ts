@@ -1,13 +1,11 @@
 import { CreateUserBody, LoginRequestBody } from '@strong-together/shared';
 import { AppUser } from '../../types/auth.types';
 
-export type UserCachePayload = AppUser | null;
-
 export interface AuthProviderValue {
   authPhase: 'checking' | 'authed' | 'guest';
   isLoggedIn: boolean;
   user: AppUser | null;
-  setUser: React.Dispatch<React.SetStateAction<AppUser | null>>;
+  setUser: React.Dispatch<React.SetStateAction<AppUser | null | undefined>>;
   userIdCache: AppUser['id'] | null;
   loading: boolean;
   userDataLoading: boolean;
@@ -27,7 +25,4 @@ export interface AuthProviderValue {
   handleAppleAuth: () => Promise<void>;
   handleGoogleAuth: () => Promise<void>;
   logout: () => Promise<void>;
-  initial: {
-    initializeUserSession: (username: AppUser['username']) => Promise<void>;
-  };
 }

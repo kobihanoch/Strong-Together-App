@@ -8,7 +8,7 @@ import AnalyzeExerciseSheet from '../components/AnalyzeExerciseSheet';
 import ExercisesSection from '../components/ExercisesSection';
 import LastWorkoutData from '../components/LastWorkoutData';
 import TopBar from '../components/TopBar';
-import { showErrorAlert } from '../../../../shared/errors/error-alerts';
+import { showErrorAlert } from '../../../../shared/alerts/error-alerts';
 import useStartWorkoutPageLogic from '../hooks/use-start-workout-page-logic.hook';
 import { RootParamList } from '../../../../navigation/types/appStackTypes';
 import { TrackingMapItem } from '@strong-together/shared';

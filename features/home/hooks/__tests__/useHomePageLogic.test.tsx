@@ -199,6 +199,20 @@ const createPackedTrackingResponse = () => ({
   },
 });
 
+const createEmptyTrackingResponse = () => ({
+  exerciseTrackingMaps: userWithoutWorkoutProfile.exerciseTrackingMaps!,
+  exerciseTrackingAnalysis: {
+    unique_days: 0,
+    most_frequent_split: null,
+    most_frequent_split_days: null,
+    lastWorkoutDate: null,
+    splitDaysByName: {},
+    prs: {
+      pr_max: null,
+    },
+  },
+});
+
 const setupCacheForScenario = ({
   userId,
   auth,
@@ -235,7 +249,7 @@ describe('useHomePageLogic integration', () => {
     mockDisconnectSocket.mockReturnValue(undefined);
   });
 
-  it('shows the transient loading flow where user is still null before auth and data hydration complete', async () => {
+  it('starts with safe empty home data while user and provider data are still hydrating', async () => {
     setupCacheForScenario({ userId: 'user-1' });
     mockRefreshAndRotateTokens.mockResolvedValue({
       accessToken: 'access-token',
@@ -256,14 +270,11 @@ describe('useHomePageLogic integration', () => {
 
     const { result } = renderHook(() => useIntegratedHomeLogic(), { wrapper });
 
-    await waitFor(() => {
-      expect(result.current.data.isLoading).toBe(true);
-    });
-
     expect(result.current.auth.user).toBeNull();
     expect(result.current.data.username).toBe('');
     expect(result.current.data.hasAssignedWorkout).toBe(false);
     expect(result.current.data.hasTracking).toBe(false);
+    expect(result.current.data.isLoading).toBe(false);
 
     userDeferred.resolve(userWithWorkoutAndHistoryProfile.user);
     workoutDeferred.resolve({
@@ -290,10 +301,7 @@ describe('useHomePageLogic integration', () => {
         workoutPlan: userWithoutWorkoutProfile.workout,
         workoutPlanForEditWorkout: userWithoutWorkoutProfile.workoutForEdit,
       },
-      analysis: {
-        exerciseTrackingMaps: userWithoutWorkoutProfile.exerciseTrackingMaps,
-        exerciseTrackingAnalysisUnpacked: userWithoutWorkoutProfile.analyzedExerciseTrackingData,
-      },
+      analysis: createEmptyTrackingResponse(),
     });
     mockRefreshAndRotateTokens.mockRejectedValue(createNetworkAxiosError());
 
@@ -307,14 +315,22 @@ describe('useHomePageLogic integration', () => {
       username: 'johnny',
       userId: 'user-1',
       hasAssignedWorkout: false,
-      hasTracking: false,
+      hasTracking: true,
       profileImageUrl: '',
       firstName: 'John',
       lastWorkoutDate: 'none',
       totalWorkoutNumber: 0,
       workoutSplitsNumber: 0,
-      mostFrequentSplit: null,
-      PR: null,
+      mostFrequentSplit: {
+        splitName: null,
+        times: null,
+      },
+      PR: {
+        maxReps: 0,
+        maxWeight: 0,
+        maxExercise: null,
+        maxDate: '',
+      },
       isLoading: false,
     });
     expect(mockFetchSelfUserData).not.toHaveBeenCalled();
@@ -330,10 +346,7 @@ describe('useHomePageLogic integration', () => {
         workoutPlan: userWithWorkoutAndHistoryProfile.workout,
         workoutPlanForEditWorkout: userWithWorkoutAndHistoryProfile.workoutForEdit,
       },
-      analysis: {
-        exerciseTrackingMaps: userWithWorkoutAndHistoryProfile.exerciseTrackingMaps,
-        exerciseTrackingAnalysisUnpacked: userWithWorkoutAndHistoryProfile.analyzedExerciseTrackingData,
-      },
+      analysis: createPackedTrackingResponse(),
     });
     mockRefreshAndRotateTokens.mockRejectedValue(createNetworkAxiosError());
 

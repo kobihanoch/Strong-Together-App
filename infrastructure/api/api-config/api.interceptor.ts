@@ -1,5 +1,5 @@
 import { AxiosError, AxiosInstance, AxiosResponse, InternalAxiosRequestConfig } from 'axios';
-import { showErrorAlert } from '../../../shared/errors/error-alerts';
+import { showErrorAlert } from '../../../shared/alerts/error-alerts';
 import { handle401, handleNetworkProblems, handleUpdateRequired } from './helpers/error-handlers';
 import { finishHttpErrorSpan, finishHttpResponseSpan } from '../tracing/sentry-tracing';
 import { ensureBootstrap, isOpen, isTracked, responseMap } from './bootstrap';
@@ -12,7 +12,7 @@ export const initializeRequestInterceptor = (api: AxiosInstance) =>
   api.interceptors.request.use(
     async (config: InternalAxiosRequestConfig) => {
       const url = config.url;
-      console.log('[API]:', url);
+      if (!config._servedFromBootstrap) console.log('[API]:', url);
       const apiMode = config.apiMode || 'user';
 
       try {
@@ -100,6 +100,7 @@ export const initializeBootstrapInterceptor = (api: AxiosInstance) =>
 
       // Instead of going out with a network call, use adapter function
       if (slice !== undefined) {
+        config._servedFromBootstrap = true;
         config.adapter = async () => ({
           data: slice,
           status: 200,
@@ -113,7 +114,8 @@ export const initializeBootstrapInterceptor = (api: AxiosInstance) =>
   });
 
 export const initializeInterceptors = (api: AxiosInstance) => {
-  initializeBootstrapInterceptor(api);
   initializeRequestInterceptor(api);
+  // Axios request interceptors run last-in-first-out, so bootstrap must be registered after the logger/header interceptor.
+  initializeBootstrapInterceptor(api);
   initializeResponseInterceptor(api);
 };

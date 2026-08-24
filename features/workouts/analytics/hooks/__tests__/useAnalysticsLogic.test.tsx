@@ -203,6 +203,20 @@ const createPackedTrackingResponse = () => ({
   },
 });
 
+const createEmptyTrackingResponse = () => ({
+  exerciseTrackingMaps: userWithoutWorkoutProfile.exerciseTrackingMaps!,
+  exerciseTrackingAnalysis: {
+    unique_days: 0,
+    most_frequent_split: null,
+    most_frequent_split_days: null,
+    lastWorkoutDate: null,
+    splitDaysByName: {},
+    prs: {
+      pr_max: null,
+    },
+  },
+});
+
 const createAnalyticsResponseFromProfile = () => ({
   _1RM: {
     1: {
@@ -299,7 +313,7 @@ describe('useAnalysticsLogic integration', () => {
     expect(result.current.analytics.data.adherence.adh).toEqual({});
   });
 
-  it('keeps the analytics hook empty for a signed-in user without workout history', async () => {
+  it('derives an empty analysis object for a signed-in user without workout history', async () => {
     setupCacheForScenario({
       userId: 'user-1',
       auth: userWithoutWorkoutProfile.user,
@@ -307,10 +321,7 @@ describe('useAnalysticsLogic integration', () => {
         workoutPlan: userWithoutWorkoutProfile.workout,
         workoutPlanForEditWorkout: userWithoutWorkoutProfile.workoutForEdit,
       },
-      analysis: {
-        exerciseTrackingMaps: userWithoutWorkoutProfile.exerciseTrackingMaps,
-        exerciseTrackingAnalysisUnpacked: userWithoutWorkoutProfile.analyzedExerciseTrackingData,
-      },
+      analysis: createEmptyTrackingResponse(),
       analytics: null,
     });
     mockRefreshAndRotateTokens.mockRejectedValue(createNetworkAxiosError());
@@ -322,8 +333,8 @@ describe('useAnalysticsLogic integration', () => {
     });
 
     await waitFor(() => {
-      expect(result.current.analytics.hasData).toBe(false);
-      expect(result.current.analytics.loading).toBe(false);
+      expect(result.current.analytics.hasData).toBe(true);
+      expect(result.current.analytics.loading).toBe(true);
     });
 
     expect(result.current.analytics.data.overview).toEqual({
@@ -345,10 +356,7 @@ describe('useAnalysticsLogic integration', () => {
         workoutPlan: userWithWorkoutAndHistoryProfile.workout,
         workoutPlanForEditWorkout: userWithWorkoutAndHistoryProfile.workoutForEdit,
       },
-      analysis: {
-        exerciseTrackingMaps: userWithWorkoutAndHistoryProfile.exerciseTrackingMaps,
-        exerciseTrackingAnalysisUnpacked: userWithWorkoutAndHistoryProfile.analyzedExerciseTrackingData,
-      },
+      analysis: createPackedTrackingResponse(),
       analytics: analyticsPayload,
     });
     mockRefreshAndRotateTokens.mockRejectedValue(createNetworkAxiosError());

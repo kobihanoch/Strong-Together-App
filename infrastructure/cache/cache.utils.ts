@@ -13,13 +13,9 @@ export const TTL_36H = 36 * 60 * 60; // seconds
  * Save JSON value under a key with TTL (in seconds).
  * Overwrites any existing value for the same key.
  */
-export async function cacheSetJSON<T>(key: string, value: T, ttlSec: number): Promise<void> {
-  if (!Number.isFinite(ttlSec) || ttlSec <= 0) {
-    throw new Error('ttlSec must be a positive number (in seconds)');
-  }
+export async function cacheSetJSON<T>(key: string, value: T): Promise<void> {
   const payload = JSON.stringify({
     data: value,
-    exp: Date.now() + ttlSec * 1000, // absolute expiry in ms
   });
   await AsyncStorage.setItem(key, payload);
 }

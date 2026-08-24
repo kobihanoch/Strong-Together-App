@@ -10,6 +10,7 @@ declare module 'axios' {
     _sentrySpan?: Span;
     sentryContinueTrace?: boolean;
     apiMode?: 'guest' | 'user';
+    _servedFromBootstrap?: boolean;
   }
 
   export interface AxiosError {

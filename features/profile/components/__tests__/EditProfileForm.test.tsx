@@ -38,7 +38,7 @@ jestObject.mock('react-native-notifier', () => ({
   },
 }));
 
-jestObject.mock('../../../../shared/errors/error-alerts', () => ({
+jestObject.mock('../../../../shared/alerts/error-alerts', () => ({
   showErrorAlert: (...args: any[]) => mockShowErrorAlert(...args),
 }));
 

@@ -3,15 +3,33 @@
 ## Table of Contents
 
 1. [Purpose](#purpose)
-2. [Shared Error Alert](#shared-error-alert)
-3. [Network Feedback](#network-feedback)
-4. [Update Required](#update-required)
-5. [Success and Inline Feedback](#success-and-inline-feedback)
-6. [Related Files](#related-files)
+2. [Flow Sketch](#flow-sketch)
+3. [Shared Error Alert](#shared-error-alert)
+4. [Network Feedback](#network-feedback)
+5. [Update Required](#update-required)
+6. [Success and Inline Feedback](#success-and-inline-feedback)
+7. [Related Files](#related-files)
 
 ## Purpose
 
 User-facing failures are surfaced through consistent notification patterns so validation errors, network problems, auth issues, and media-processing failures feel like one app instead of many disconnected screens.
+
+## Flow Sketch
+
+```text
+User action / API request / media pipeline
+  |
+  v
+Error or status result
+  |
+  +-- validation issue -----> showErrorAlert(...)
+  |
+  +-- network/server issue -> annotate Axios error -> alert + cached fallback
+  |
+  +-- app too old ---------> 426 -> UpdateAppModal
+  |
+  +-- success moment ------> showSuccessAlert(...)
+```
 
 ## Shared Error Alert
 
@@ -51,7 +69,8 @@ The app also uses success/warning notifications for non-error UX moments:
 
 ## Related Files
 
-- `shared/errors/error-alerts.ts`
+- `shared/alerts/error-alerts.ts`
+- `shared/alerts/success-alerts.ts`
 - `infrastructure/api/api-config/helpers/network-check.ts`
 - `infrastructure/api/api-config/helpers/error-handlers.ts`
 - `shared/components/UpdateAppModal.tsx`

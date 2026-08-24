@@ -61,7 +61,7 @@ const Inbox = () => {
           </Text>{' '}
           unread messages
         </Text>
-        {allReceivedMessages.length != 0 ? (
+        {allReceivedMessages !== undefined && allReceivedMessages.length != 0 ? (
           <FlatList
             data={allReceivedMessages}
             renderItem={renderItem}

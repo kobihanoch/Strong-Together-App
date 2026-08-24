@@ -4,7 +4,7 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 import { RFValue } from 'react-native-responsive-fontsize';
 import InputField from '../../../../shared/components/InputField';
 import { useAuth } from '../../shared/providers/AuthProvider';
-import { showErrorAlert } from '../../../../shared/errors/error-alerts';
+import { showErrorAlert } from '../../../../shared/alerts/error-alerts';
 import { changeEmail, checkUserVerify, sendVerificationMail } from '../services/login.service';
 import { UserEntity } from '@strong-together/shared';
 

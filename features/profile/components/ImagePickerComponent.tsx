@@ -60,7 +60,7 @@ function ImagePickerComponent({
       const { path } = await uploadToStorageAndReturnPath(file);
       // Update in auth context
       setUser(
-        (prev: AppUser | null) =>
+        (prev: AppUser | null | undefined) =>
           ({
             ...prev,
             profile_image_url: path,
@@ -76,7 +76,7 @@ function ImagePickerComponent({
 
     // Update in auth context
     setUser(
-      (prev: AppUser | null) =>
+      (prev: AppUser | null | undefined) =>
         ({
           ...prev,
           profile_image_url: null,
