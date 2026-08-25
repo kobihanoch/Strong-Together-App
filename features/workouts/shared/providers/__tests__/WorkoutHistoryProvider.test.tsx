@@ -1,12 +1,14 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React from 'react';
-import { beforeEach, describe, expect, it, jest } from '@jest/globals';
 import { act, renderHook, waitFor } from '@testing-library/react-native';
+import { beforeEach, describe, expect, it, jest } from '@jest/globals';
 import { DateTime } from 'luxon';
-import {
-  guestProfile, userWithWorkoutAndHistoryProfile, userWithWorkoutNoHistoryProfile, userWithoutWorkoutProfile, } from '../../../../../tests/fixtures/userProfiles';
 import type { GetExerciseTrackingResponse } from '@strong-together/shared';
+
+const mockUseCacheAndFetch = jest.fn<(...args: any[]) => { loading: boolean }>();
+const mockUseUpdateGlobalLoading = jest.fn();
+const mockGetUserExerciseTracking = jest.fn<() => Promise<GetExerciseTrackingResponse>>();
+let mockAuthState: { user: any; isValidatedWithServer: boolean };
 
 jest.mock('@react-native-async-storage/async-storage', () => ({
   __esModule: true,
@@ -18,150 +20,93 @@ jest.mock('@react-native-async-storage/async-storage', () => ({
     multiRemove: jest.fn(),
   },
 }));
-
 jest.mock('expo-constants', () => ({
   __esModule: true,
-  default: {
-    expoConfig: {
-      version: 'test-version',
-    },
-  },
+  default: { expoConfig: { version: 'test-version' } },
 }));
-
-type UseCacheAndFetchReturn = { loading: boolean };
-type UseCacheAndFetchMockFn = (
-  user: unknown,
-  keyBuilderFn: unknown,
-  isValidatedByServerFlag: boolean,
-  fetchFn: unknown,
-  onDataFn: (data: any) => void,
-  cachedPayload: unknown,
-  logLabel: string,
-) => UseCacheAndFetchReturn;
-
-const mockAuthState = jest.fn<
-  () => {
-    user: typeof userWithoutWorkoutProfile.user;
-    isValidatedWithServer: boolean;
-  }
->();
-const mockUseCacheAndFetch = jest.fn<UseCacheAndFetchMockFn>();
-const mockUseUpdateGlobalLoading = jest.fn<(key: string, value: boolean) => void>();
-const mockGetUserExerciseTracking = jest.fn<() => Promise<GetExerciseTrackingResponse>>();
-
-const useCacheAndFetchMock = (
-  user: unknown,
-  keyBuilderFn: unknown,
-  isValidatedByServerFlag: boolean,
-  fetchFn: unknown,
-  onDataFn: (data: any) => void,
-  cachedPayload: unknown,
-  logLabel: string,
-) => mockUseCacheAndFetch(user, keyBuilderFn, isValidatedByServerFlag, fetchFn, onDataFn, cachedPayload, logLabel);
-
-const useUpdateGlobalLoadingMock = (key: string, value: boolean) => mockUseUpdateGlobalLoading(key, value);
-const getUserExerciseTrackingMock = () => mockGetUserExerciseTracking();
-
 jest.mock('../../../../auth/shared/providers/AuthProvider', () => ({
-  useAuth: () => mockAuthState(),
+  useAuth: () => mockAuthState,
 }));
-
 jest.mock('../../../../../shared/hooks/use-cache-and-fetch.hook', () => ({
   __esModule: true,
-  default: useCacheAndFetchMock,
+  default: (...args: any[]) => mockUseCacheAndFetch(...args),
 }));
-
 jest.mock('../../../../../shared/hooks/use-update-global-loading.hook', () => ({
   __esModule: true,
-  default: useUpdateGlobalLoadingMock,
+  default: (...args: any[]) => mockUseUpdateGlobalLoading(...args),
 }));
-
 jest.mock('../../../history/services/workout-history.service', () => ({
-  getUserExerciseTracking: getUserExerciseTrackingMock,
+  getUserExerciseTracking: () => mockGetUserExerciseTracking(),
 }));
 
 import { WorkoutHistoryProvider, useWorkoutHistoryContext } from '../WorkoutHistoryProvider';
+
+const user = { id: 'user-1' };
+
+const trackingItem = {
+  exerciseTracking: {
+    exerciseTrackingId: 9001,
+    sets: [{ setIndex: 0, weight: 85, reps: 8 }],
+    notes: null,
+    exerciseAssignment: {
+      exerciseToSplitId: 20,
+      orderIndex: 0,
+      exerciseId: 1,
+      workoutSplitId: 11,
+      workoutSplitName: 'A',
+      exerciseName: 'Bench Press',
+      targetMuscle: 'Chest',
+      specificTargetMuscle: 'Pectoralis major',
+    },
+  },
+};
+
+const createTrackingResponse = (...dates: string[]): GetExerciseTrackingResponse => ({
+  byDate: Object.fromEntries(dates.map((date) => [date, [trackingItem]])),
+  byExerciseToSplitId: dates.length ? { 20: [trackingItem] } : {},
+  bySplitName: dates.length ? { A: [trackingItem] } : {},
+});
 
 const wrapper = ({ children }: { children: React.ReactNode }) => (
   <WorkoutHistoryProvider>{children}</WorkoutHistoryProvider>
 );
 
-const createHydratingUseCacheAndFetchMock = (payload: GetExerciseTrackingResponse | any) => {
+const hydrateWith = (payload: GetExerciseTrackingResponse) => {
   let hydrated = false;
-  return (
-    user: unknown,
-    keyBuilderFn: unknown,
-    isValidated: boolean,
-    fetchFn: unknown,
-    onDataFn: (data: any) => void,
-    cachedPayload: unknown,
-    label: string,
-  ) => {
-    if (!hydrated) {
-      hydrated = true;
-      onDataFn(payload);
-    }
-    return {
-      loading: false,
-    };
-  };
+  mockUseCacheAndFetch.mockImplementation(
+    (
+      _user: unknown,
+      _key: unknown,
+      _validated: boolean,
+      _fetch: unknown,
+      onData: (data: GetExerciseTrackingResponse) => void,
+    ) => {
+      if (!hydrated) {
+        hydrated = true;
+        onData(payload);
+      }
+      return { loading: false };
+    },
+  );
 };
 
-const createEmptyTrackingResponse = (): GetExerciseTrackingResponse => ({
-  exerciseTrackingMaps: userWithoutWorkoutProfile.exerciseTrackingMaps!,
-  exerciseTrackingAnalysis: {
-    uniqueDays: 0,
-    mostFrequentSplit: null,
-    mostFrequentSplitDays: null,
-    lastWorkoutDate: null,
-    splitDaysByName: {},
-    prs: {
-      prMax: null,
-    },
-  },
-});
-
-const createPackedTrackingResponse = (): GetExerciseTrackingResponse => ({
-  exerciseTrackingMaps: userWithWorkoutAndHistoryProfile.exerciseTrackingMaps!,
-  exerciseTrackingAnalysis: {
-    uniqueDays: userWithWorkoutAndHistoryProfile.analyzedExerciseTrackingData!.workoutCount,
-    mostFrequentSplit: userWithWorkoutAndHistoryProfile.analyzedExerciseTrackingData!.mostFrequentSplit.splitName,
-    mostFrequentSplitDays: userWithWorkoutAndHistoryProfile.analyzedExerciseTrackingData!.mostFrequentSplit.times,
-    lastWorkoutDate: userWithWorkoutAndHistoryProfile.analyzedExerciseTrackingData!.lastWorkoutDate,
-    splitDaysByName: userWithWorkoutAndHistoryProfile.analyzedExerciseTrackingData!.splitDaysByName,
-    prs: {
-      prMax: {
-        exercise: userWithWorkoutAndHistoryProfile.analyzedExerciseTrackingData!.pr.maxExercise!,
-        weight: userWithWorkoutAndHistoryProfile.analyzedExerciseTrackingData!.pr.maxWeight,
-        reps: userWithWorkoutAndHistoryProfile.analyzedExerciseTrackingData!.pr.maxReps,
-        workoutTimeUtc: userWithWorkoutAndHistoryProfile.analyzedExerciseTrackingData!.pr.maxDate,
-      },
-    },
-  },
-});
-
-describe('WorkoutHistoryContext', () => {
+describe('WorkoutHistoryProvider', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    mockAuthState.mockReturnValue({
-      user: guestProfile.user,
-      isValidatedWithServer: false,
-    });
-    mockUseCacheAndFetch.mockReturnValue({
-      loading: false,
-    });
-    mockGetUserExerciseTracking.mockResolvedValue(createPackedTrackingResponse());
+    jest.restoreAllMocks();
+    mockAuthState = { user: null, isValidatedWithServer: false };
+    mockUseCacheAndFetch.mockReturnValue({ loading: false });
+    mockGetUserExerciseTracking.mockResolvedValue(createTrackingResponse());
   });
 
-  it('keeps all analysis state empty for the guest profile', () => {
+  it('exposes empty context state before tracking data hydrates', () => {
     const { result } = renderHook(() => useWorkoutHistoryContext(), { wrapper });
 
-    expect(result.current.exerciseTrackingMaps).toBe(guestProfile.exerciseTrackingMaps);
-    expect(result.current.analyzedExerciseTrackingData).toBe(guestProfile.analyzedExerciseTrackingData);
+    expect(result.current.exerciseTrackingMaps).toBeNull();
     expect(result.current.hasTrainedToday).toBe(false);
     expect(result.current.loading).toBe(false);
     expect(mockUseCacheAndFetch).toHaveBeenLastCalledWith(
-      guestProfile.user,
+      null,
       expect.any(Function),
       false,
       expect.any(Function),
@@ -171,148 +116,73 @@ describe('WorkoutHistoryContext', () => {
     );
   });
 
-  it('hydrates empty tracking maps and no analyzed data for a signed-in user with no workout and no history', async () => {
-    mockAuthState.mockReturnValue({
-      user: userWithoutWorkoutProfile.user,
-      isValidatedWithServer: true,
-    });
-    mockUseCacheAndFetch.mockImplementation(
-      createHydratingUseCacheAndFetchMock(createEmptyTrackingResponse()),
-    );
+  it('hydrates and caches the maps-only tracking response', async () => {
+    const maps = createTrackingResponse('2026-08-20');
+    mockAuthState = { user, isValidatedWithServer: true };
+    hydrateWith(maps);
 
     const { result } = renderHook(() => useWorkoutHistoryContext(), { wrapper });
 
-    await waitFor(() => {
-      expect(result.current.exerciseTrackingMaps).toEqual(userWithoutWorkoutProfile.exerciseTrackingMaps);
-    });
+    await waitFor(() => expect(result.current.exerciseTrackingMaps).toEqual(maps));
+    expect(result.current.hasTrainedToday).toBe(false);
+    expect(mockUseCacheAndFetch).toHaveBeenLastCalledWith(
+      user,
+      expect.any(Function),
+      true,
+      expect.any(Function),
+      expect.any(Function),
+      maps,
+      'Analysis Context',
+    );
+  });
 
-    expect(result.current.analyzedExerciseTrackingData).toEqual({
-      pr: {
-        maxReps: 0,
-        maxWeight: 0,
-        maxExercise: null,
-        maxDate: '',
-      },
-      workoutCount: 0,
-      mostFrequentSplit: {
-        splitName: null,
-        times: null,
-      },
-      lastWorkoutDate: null,
-      splitDaysByName: {},
-    });
+  it('handles an empty tracking response', async () => {
+    const maps = createTrackingResponse();
+    mockAuthState = { user, isValidatedWithServer: true };
+    hydrateWith(maps);
+
+    const { result } = renderHook(() => useWorkoutHistoryContext(), { wrapper });
+
+    await waitFor(() => expect(result.current.exerciseTrackingMaps).toEqual(maps));
     expect(result.current.hasTrainedToday).toBe(false);
   });
 
-  it('hydrates empty tracking maps and no analyzed data for a user with workout but no history', async () => {
-    mockAuthState.mockReturnValue({
-      user: userWithWorkoutNoHistoryProfile.user,
-      isValidatedWithServer: true,
-    });
-    mockUseCacheAndFetch.mockImplementation(
-      createHydratingUseCacheAndFetchMock({
-        ...createEmptyTrackingResponse(),
-        exerciseTrackingMaps: userWithWorkoutNoHistoryProfile.exerciseTrackingMaps!,
-      }),
+  it('uses the latest date regardless of byDate key insertion order', async () => {
+    const today = DateTime.now().setZone('UTC').toISODate()!;
+    const maps = createTrackingResponse('2026-01-01', today, '2026-04-15');
+    jest.spyOn(Intl, 'DateTimeFormat').mockImplementation(
+      () => ({ resolvedOptions: () => ({ timeZone: 'UTC' }) }) as Intl.DateTimeFormat,
     );
+    mockAuthState = { user, isValidatedWithServer: true };
+    hydrateWith(maps);
 
     const { result } = renderHook(() => useWorkoutHistoryContext(), { wrapper });
 
-    await waitFor(() => {
-      expect(result.current.exerciseTrackingMaps).toEqual(userWithWorkoutNoHistoryProfile.exerciseTrackingMaps);
-    });
-
-    expect(result.current.analyzedExerciseTrackingData).toEqual({
-      pr: {
-        maxReps: 0,
-        maxWeight: 0,
-        maxExercise: null,
-        maxDate: '',
-      },
-      workoutCount: 0,
-      mostFrequentSplit: {
-        splitName: null,
-        times: null,
-      },
-      lastWorkoutDate: null,
-      splitDaysByName: {},
-    });
-    expect(result.current.hasTrainedToday).toBe(false);
+    await waitFor(() => expect(result.current.hasTrainedToday).toBe(true));
   });
 
-  it('hydrates packed analysis data for a user with workout and history', async () => {
-    mockAuthState.mockReturnValue({
-      user: userWithWorkoutAndHistoryProfile.user,
-      isValidatedWithServer: true,
-    });
-    mockUseCacheAndFetch.mockImplementation(createHydratingUseCacheAndFetchMock(createPackedTrackingResponse()));
-
-    const { result } = renderHook(() => useWorkoutHistoryContext(), { wrapper });
-
-    await waitFor(() => {
-      expect(result.current.exerciseTrackingMaps).toEqual(userWithWorkoutAndHistoryProfile.exerciseTrackingMaps);
-    });
-
-    expect(result.current.analyzedExerciseTrackingData).toEqual(
-      userWithWorkoutAndHistoryProfile.analyzedExerciseTrackingData,
-    );
-    expect(result.current.hasTrainedToday).toBe(false);
-  });
-
-  it('unpacks packed API analysis data into the public derived shape', async () => {
-    mockAuthState.mockReturnValue({
-      user: userWithWorkoutAndHistoryProfile.user,
-      isValidatedWithServer: true,
-    });
-    mockUseCacheAndFetch.mockImplementation(createHydratingUseCacheAndFetchMock(createPackedTrackingResponse()));
-
-    const { result } = renderHook(() => useWorkoutHistoryContext(), { wrapper });
-
-    await waitFor(() => {
-      expect(result.current.analyzedExerciseTrackingData).toEqual(
-        userWithWorkoutAndHistoryProfile.analyzedExerciseTrackingData,
-      );
-    });
-
-    expect(result.current.exerciseTrackingMaps).toEqual(userWithWorkoutAndHistoryProfile.exerciseTrackingMaps);
-  });
-
-  it('updates hasTrainedToday when analyzed data is set to today through the exposed setter', async () => {
+  it('recomputes hasTrainedToday after a local maps update', async () => {
     const today = DateTime.now().setZone('UTC').toISODate()!;
     jest.spyOn(Intl, 'DateTimeFormat').mockImplementation(
-      () =>
-        ({
-          resolvedOptions: () => ({ timeZone: 'UTC' }),
-        }) as Intl.DateTimeFormat,
+      () => ({ resolvedOptions: () => ({ timeZone: 'UTC' }) }) as Intl.DateTimeFormat,
     );
+    mockAuthState = { user, isValidatedWithServer: true };
+    hydrateWith(createTrackingResponse('2026-01-01'));
 
-    mockAuthState.mockReturnValue({
-      user: userWithWorkoutAndHistoryProfile.user,
-      isValidatedWithServer: true,
-    });
-    mockUseCacheAndFetch.mockImplementation(
-      createHydratingUseCacheAndFetchMock(createPackedTrackingResponse()),
-    );
+    const { result } = renderHook(() => useWorkoutHistoryContext(), { wrapper });
+    await waitFor(() => expect(result.current.exerciseTrackingMaps).not.toBeNull());
+
+    act(() => result.current.setExerciseTrackingMaps(createTrackingResponse(today)));
+
+    expect(result.current.hasTrainedToday).toBe(true);
+  });
+
+  it('reports its loading state globally', () => {
+    mockUseCacheAndFetch.mockReturnValue({ loading: true });
 
     const { result } = renderHook(() => useWorkoutHistoryContext(), { wrapper });
 
-    await waitFor(() => {
-      expect(result.current.analyzedExerciseTrackingData).not.toBeNull();
-    });
-
-    await act(async () => {
-      result.current.setExerciseTrackingAnalysis((prev) =>
-        prev
-          ? {
-              ...prev,
-              lastWorkoutDate: today,
-            }
-          : prev,
-      );
-    });
-
-    expect(result.current.hasTrainedToday).toBe(true);
-    jest.restoreAllMocks();
+    expect(result.current.loading).toBe(true);
+    expect(mockUseUpdateGlobalLoading).toHaveBeenLastCalledWith('Analysis', true);
   });
 });
-

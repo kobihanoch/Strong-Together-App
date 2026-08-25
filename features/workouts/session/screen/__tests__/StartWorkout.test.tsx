@@ -5,7 +5,7 @@ import React from 'react';
 import { expect, beforeEach as jestBeforeEach, describe as jestDescribe, expect as jestExpect, it as jestIt, jest as jestObject, } from '@jest/globals';
 import { fireEvent, render, waitFor } from '@testing-library/react-native';
 import type { RootParamList } from '../../../../../navigation/types/appStackTypes';
-import type { WorkoutPlanSplit } from '../../../plan/types/workout-plan.types';
+import type { WorkoutSplit } from '../../../shared/types/workout.types';
 import type {
   ResumeWorkoutCachePayload, StartWorkoutPageLogicReturn, } from '../../types/use-start-workout.types';
 import type { TrackingMapItem } from '../../../shared/types/workout.types';
@@ -60,8 +60,8 @@ jestObject.mock('../../../../../shared/components/SlidingBottomModal', () => {
 import StartWorkout from '../StartWorkout';
 
 const createSplit = (
-  overrides: Partial<WorkoutPlanSplit> = {},
-): WorkoutPlanSplit => ({
+  overrides: Partial<WorkoutSplit> = {},
+): WorkoutSplit => ({
   id: 5,
   name: 'Push',
   muscleGroup: 'Chest, Shoulders, Triceps',

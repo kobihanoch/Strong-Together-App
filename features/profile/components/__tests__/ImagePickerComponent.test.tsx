@@ -3,7 +3,7 @@
 import React from 'react';
 import { beforeEach as jestBeforeEach, describe as jestDescribe, expect as jestExpect, it as jestIt, jest as jestObject, } from '@jest/globals';
 import { render, waitFor } from '@testing-library/react-native';
-import type { AuthProviderValue } from '../../../auth/shared/providers/types/auth-context.types';
+import type { AuthProviderValue } from '../../../auth/shared/types/auth.types';
 import type { AppUser } from '../../../auth/shared/types/auth.types';
 
 let mockAuthState: AuthProviderValue;

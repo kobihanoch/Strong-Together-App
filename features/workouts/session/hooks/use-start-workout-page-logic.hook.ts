@@ -7,7 +7,7 @@ import { cacheDeleteKey } from '../../../../infrastructure/cache/cache.utils';
 import { RootParamList } from '../../../../navigation/types/appStackTypes';
 import { showErrorAlert } from '../../../../shared/alerts/error-alerts';
 import { useAuth } from '../../../auth/shared/providers/AuthProvider';
-import { WorkoutPlanSplit } from '../../plan/types/workout-plan.types';
+import { WorkoutSplit } from '../../shared/types/workout.types';
 import { useWorkoutHistoryContext } from '../../shared/providers/WorkoutHistoryProvider';
 import { useWorkoutPlanContext } from '../../shared/providers/WorkoutPlanProvider';
 import { ExercisesDuringWorkout, ResumeWorkoutCachePayload, StartWorkoutPageLogicReturn } from '../types/use-start-workout.types';
@@ -16,7 +16,7 @@ import { useStartWorkoutCache } from './use-start-workout-cache.hook';
 import { useUserWorkout } from './use-user-workout.hook';
 
 const useStartWorkoutPageLogic = (
-  selectedSplit: WorkoutPlanSplit,
+  selectedSplit: WorkoutSplit,
   resumedWorkout?: Omit<ResumeWorkoutCachePayload, 'selectedSplit'>,
 ): StartWorkoutPageLogicReturn => {
   // --------------------[ Navigation ]--------------------------------------

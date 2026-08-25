@@ -1,11 +1,6 @@
 import type { Exercise, ExercisesByMuscle, WorkoutSplit } from '../../shared/types/workout.types';
 
-export interface ExerciseCandidate {
-  id: Exercise['id'];
-  name: Exercise['name'];
-  targetMuscle: Exercise['targetMuscle'];
-  specificTargetMuscle: Exercise['specificTargetMuscle'];
-}
+export type ExerciseCandidate = Pick<Exercise, 'id' | 'name' | 'targetMuscle' | 'specificTargetMuscle'>;
 
 export interface SelectedExercise extends ExerciseCandidate {
   // Chosen exercise
@@ -26,7 +21,7 @@ export interface CreateWorkoutControls {
   onDragEnd: (params: { data: SelectedExercise[] }) => void;
 }
 
-export interface CreateWorkoutLoadings {
+interface CreateWorkoutLoadings {
   isSaving: boolean;
   exLoading: boolean;
 }

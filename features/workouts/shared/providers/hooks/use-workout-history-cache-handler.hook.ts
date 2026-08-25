@@ -14,30 +14,19 @@ type UseWorkoutHistoryCacheHandlerProps = {
 const useWorkoutHistoryCacheHandler = ({ user, isValidatedWithServer }: UseWorkoutHistoryCacheHandlerProps) => {
   // Raw
   const [exerciseTrackingMaps, setExerciseTrackingMaps] = useState<WorkoutHistoryExerciseTrackingMaps | undefined>(undefined);
-  // Raw - not for useage
-  const [exerciseTrackingAnalysis, setExerciseTrackingAnalysis] = useState<
-    GetExerciseTrackingResponse['exerciseTrackingAnalysis'] | undefined
-  >(undefined);
 
   // Fetch function
   const fetchFn = useCallback(async (): Promise<GetExerciseTrackingResponse> => await getUserExerciseTracking(), []);
 
   // On data function
   const onDataFn = useCallback((data: GetExerciseTrackingResponse): void => {
-    setExerciseTrackingMaps(data.exerciseTrackingMaps); // Empty maps if doen;t exist
-    setExerciseTrackingAnalysis(data.exerciseTrackingAnalysis);
+    setExerciseTrackingMaps(data); // Empty maps if doen;t exist
   }, []);
 
   // Cache payload
   const cachePayload: GetExerciseTrackingResponse | undefined = useMemo(
-    () =>
-      exerciseTrackingMaps === undefined || exerciseTrackingAnalysis === undefined
-        ? undefined
-        : {
-            exerciseTrackingMaps,
-            exerciseTrackingAnalysis,
-          },
-    [exerciseTrackingMaps, exerciseTrackingAnalysis],
+    () => (exerciseTrackingMaps === undefined ? undefined : exerciseTrackingMaps),
+    [exerciseTrackingMaps],
   );
 
   // Hook usage
@@ -51,7 +40,7 @@ const useWorkoutHistoryCacheHandler = ({ user, isValidatedWithServer }: UseWorko
     'Analysis Context', // log
   );
 
-  return { exerciseTrackingMaps, setExerciseTrackingMaps, exerciseTrackingAnalysis, setExerciseTrackingAnalysis, loading };
+  return { exerciseTrackingMaps, setExerciseTrackingMaps, loading };
 };
 
 export default useWorkoutHistoryCacheHandler;

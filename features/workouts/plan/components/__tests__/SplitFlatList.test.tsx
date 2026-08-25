@@ -10,10 +10,10 @@ import {
 } from '@jest/globals';
 import { fireEvent, render } from '@testing-library/react-native';
 import { FlatList } from 'react-native';
-import type { WorkoutPlanSplit } from '../../types/workout-plan.types';
+import type { WorkoutSplit } from '../../../shared/types/workout.types';
 
 let mockMyWorkoutPlanLogic: {
-  workoutSplits: WorkoutPlanSplit[];
+  workoutSplits: WorkoutSplit[];
   exerciseCounter: Record<string, number> | undefined;
 };
 let mockAnalysisState: {
@@ -81,8 +81,8 @@ jestObject.mock('../../../cardio/components/StartCardioButton', () => (props: an
 import SplitFlatList from '../SplitFlatList';
 
 const createSplit = (
-  overrides: Partial<WorkoutPlanSplit> = {},
-): WorkoutPlanSplit => ({
+  overrides: Partial<WorkoutSplit> = {},
+): WorkoutSplit => ({
   id: 1,
   name: 'Push',
   muscleGroup: 'Chest, Shoulders (Front), Triceps',

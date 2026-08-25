@@ -1,492 +1,116 @@
-/* eslint-disable @typescript-eslint/no-require-imports */
 /* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-require-imports */
+/* eslint-disable react/display-name */
 import React from 'react';
-import {
-  beforeEach as jestBeforeEach,
-  describe as jestDescribe,
-  expect as jestExpect,
-  it as jestIt,
-  jest as jestObject,
-} from '@jest/globals';
 import { fireEvent, render } from '@testing-library/react-native';
-import { TouchableOpacity } from 'react-native';
+import { beforeEach, describe, expect, it, jest } from '@jest/globals';
+import Home from '../Home';
 
-const mockNavigate = jestObject.fn();
+const mockActions = {
+  openInbox: jest.fn(), createWorkout: jest.fn(), startWorkout: jest.fn(),
+  openProgress: jest.fn(), openHistory: jest.fn(),
+};
+let mockLogic: any;
 
-const createUser = (overrides = {}) => ({
-  id: 'user-1',
-  username: 'johnny',
-  name: 'John Doe',
-  profilePicPath: 'profiles/john.png',
-  gender: 'Male',
-  ...overrides,
-});
-
-const createPR = (overrides = {}) => ({
-  maxExercise: 'Bench Press',
-  maxWeight: 100,
-  maxReps: 8,
-  maxDate: '2026-03-20',
-  ...overrides,
-});
-
-const createMostFrequentSplit = (overrides = {}) => ({
-  splitName: 'Push',
-  times: 4,
-  ...overrides,
-});
-
-const createHomeData = (overrides = {}) => ({
-  username: 'johnny',
-  userId: 'user-1',
-  hasAssignedWorkout: true,
-  hasTracking: true,
-  profilePicPath: 'profiles/john.png',
-  firstName: 'John',
-  lastWorkoutDate: '2026-03-20',
-  totalWorkoutNumber: 8,
-  workoutSplitsNumber: 2,
-  mostFrequentSplit: createMostFrequentSplit(),
-  PR: createPR(),
-  isLoading: false,
-  ...overrides,
-});
-
-let mockAuthState: any;
-let mockLoadingState: any;
-let mockNotificationsState: any;
-let mockWorkoutState: any;
-let mockAnalysisState: any;
-let mockHomeLogicData: any;
-
-jestObject.mock('@react-navigation/native', () => ({
-  useNavigation: () => ({
-    navigate: mockNavigate,
-  }),
-}));
-
-jestObject.mock('@expo/vector-icons', () => {
-  const mockReact = require('react');
-  const { Text } = require('react-native');
-  return {
-    MaterialCommunityIcons: ({ name }: { name: string }) => mockReact.createElement(Text, null, name),
-  };
-});
-
-jestObject.mock('react-native-vector-icons/MaterialCommunityIcons', () => {
-  const mockReact = require('react');
-  const { Text } = require('react-native');
-  return ({ name }: { name: string }) => mockReact.createElement(Text, null, name);
-});
-
-jestObject.mock('expo-image', () => {
-  const { Image } = require('react-native');
-  return { Image };
-});
-
-jestObject.mock('expo-linear-gradient', () => {
-  const mockReact = require('react');
+jest.mock('moti/skeleton', () => {
+  const React = require('react');
   const { View } = require('react-native');
-  return {
-    LinearGradient: ({ children }: any) => mockReact.createElement(View, null, children),
-  };
-});
-
-jestObject.mock('moti/skeleton', () => {
-  const mockReact = require('react');
-  const { View } = require('react-native');
-  const Skeleton = ({ children }: any) => children;
-  Skeleton.Group = ({ children }: any) => mockReact.createElement(View, null, children);
+  const Skeleton = ({ children }: any) => React.createElement(View, { testID: 'skeleton' }, children);
+  Skeleton.Group = ({ children, show }: any) =>
+    React.createElement(View, { testID: show ? 'skeleton-group-loading' : 'skeleton-group-ready' }, children);
   return { Skeleton };
 });
-
-jestObject.mock('react-native-gesture-handler', () => {
-  const mockReact = require('react');
-  const { ScrollView, View } = require('react-native');
-  return {
-    ScrollView,
-    GestureDetector: ({ children }: any) => mockReact.createElement(View, null, children),
-    Gesture: {
-      Pan: () => {
-        const chain = {
-          onStart: () => chain,
-          onUpdate: () => chain,
-          onEnd: () => chain,
-        };
-        return chain;
-      },
-    },
-  };
-});
-
-jestObject.mock('react-native-reanimated', () => {
-  const { View } = require('react-native');
-  return {
-    __esModule: true,
-    default: {
-      View,
-    },
-    useSharedValue: (value: number) => ({ value }),
-    useAnimatedStyle: (cb: () => object) => cb(),
-    withSpring: (value: number) => value,
-    runOnJS: (fn: (...args: any[]) => any) => fn,
-  };
-});
-
-jestObject.mock('../../../auth/shared/providers/AuthProvider', () => ({
-  useAuth: () => mockAuthState,
-}));
-
-jestObject.mock('../../../../shared/providers/GlobalAppLoadingProvider', () => ({
-  useGlobalAppLoadingContext: () => mockLoadingState,
-}));
-
-jestObject.mock('../../../messages/providers/MessagesProvider', () => ({
-  useMessages: () => mockNotificationsState,
-}));
-
-jestObject.mock('../../../workouts/shared/providers/WorkoutPlanProvider', () => ({
-  useWorkoutPlanContext: () => mockWorkoutState,
-}));
-
-jestObject.mock('../../../workouts/shared/providers/WorkoutHistoryProvider', () => ({
-  useWorkoutHistoryContext: () => mockAnalysisState,
-}));
-
-jestObject.mock('../../hooks/use-home-page-logic.hook', () => ({
-  __esModule: true,
-  default: () => ({
-    data: mockHomeLogicData,
-  }),
-}));
-
-jestObject.mock('../../../../shared/components/Badge', () => {
-  const mockReact = require('react');
+jest.mock('../../../../shared/providers/AppThemeProvider', () => ({ useAppTheme: () => ({ mode: 'light' }) }));
+jest.mock('../../hooks/use-home-page-logic.hook', () => ({ __esModule: true, default: () => mockLogic }));
+jest.mock('../../components/HomeHeader', () => (props: any) => {
   const { Text } = require('react-native');
-  return ({ label }: { label: string }) => mockReact.createElement(Text, null, label);
+  return <Text onPress={props.onInbox}>Welcome, {props.data.displayName}</Text>;
 });
-
-jestObject.mock('../../../../shared/components/NumberCounter', () => {
-  const mockReact = require('react');
+jest.mock('../../components/NextWorkoutCard', () => (props: any) => {
   const { Text } = require('react-native');
-  return ({ numEnd }: { numEnd: number }) => mockReact.createElement(Text, null, numEnd);
+  return <Text onPress={props.onStart}>Next: {props.data.name}</Text>;
 });
-
-jestObject.mock('../../../../shared/components/PercentageCircle', () => {
-  const mockReact = require('react');
+jest.mock('../../components/NoWorkoutCard', () => (props: any) => {
+  const { Text } = require('react-native');
+  return <Text onPress={props.onCreate}>Create workout</Text>;
+});
+jest.mock('../../components/NoTrackingCard', () => () => {
+  const { Text } = require('react-native');
+  return <Text>No tracking</Text>;
+});
+jest.mock('../../components/GymActivityCard', () => () => {
   const { View } = require('react-native');
-  return ({ children }: any) => mockReact.createElement(View, null, children);
+  return <View testID="gym-card" />;
 });
-
-jestObject.mock('../../../../shared/components/Row', () => {
-  const mockReact = require('react');
+jest.mock('../../components/AerobicsCard', () => () => {
   const { View } = require('react-native');
-  return ({ children }: any) => mockReact.createElement(View, null, children);
+  return <View testID="aerobics-card" />;
+});
+jest.mock('../../components/AchievementCard', () => (props: any) => {
+  const { Text } = require('react-native');
+  return <Text onPress={props.onPress}>Achievement</Text>;
+});
+jest.mock('../../components/LastWorkoutCard', () => (props: any) => {
+  const { Text } = require('react-native');
+  return <Text onPress={props.onPress}>Last workout</Text>;
 });
 
-import Home from '../Home';
-import PRCard from '../../components/PRCard';
-import QuickActions from '../../components/QuickActions';
-import SlideToStart from '../../components/SlideToStart';
-import StartWorkoutCard from '../../../workouts/plan/components/StartWorkoutCard';
-import TopComponent from '../../components/TopComponent';
-
-const resetMockState = () => {
-  mockAuthState = {
-    user: createUser(),
-    isWorkoutMode: false,
-  };
-
-  mockLoadingState = {
-    isLoading: false,
-  };
-
-  mockNotificationsState = {
-    unreadMessages: [],
-  };
-
-  mockWorkoutState = {
-    workout: { id: 'workout-1' },
-    workoutSplits: [
-      { id: 1, name: 'Push', muscleGroup: 'Chest, Shoulders, Triceps' },
-      { id: 2, name: 'Legs', muscleGroup: 'Legs' },
-    ],
-    workoutForEdit: {
-      Push: [{ id: 'ex-1' }, { id: 'ex-2' }, { id: 'ex-3' }],
-    },
-  };
-
-  mockAnalysisState = {
-    analyzedExerciseTrackingData: {
-      pr: createPR(),
-      workoutCount: 8,
-      mostFrequentSplit: createMostFrequentSplit(),
-      lastWorkoutDate: '2026-03-20',
-    },
-    hasTrainedToday: false,
-  };
-
-  mockHomeLogicData = createHomeData();
+const data = {
+  theme: { canvas: '#fff' },
+  state: { hasWorkout: true, hasTracking: true },
+  user: { displayName: 'John', profilePicPath: null, gender: 'Male', unreadCount: 1 },
+  nextWorkout: { id: 12, name: 'B', orderIndex: 1, muscleGroup: 'Back', exerciseCount: 1, setCount: 3 },
+  gymActivity: { completedThisWeek: 2, weeklyTarget: 3, weekStreak: 4 },
+  lastWorkout: { name: 'A', dateLabel: 'Mar 27', exerciseCount: 5, setCount: 14 },
+  aerobics: { totalMinutes: 25, days: [] },
+  achievement: { exercise: 'Bench Press', value: '85 kg PR', estimatedOneRepMax: 107.7 },
 };
 
-jestDescribe('Home page components', () => {
-  jestBeforeEach(() => {
-    jestObject.clearAllMocks();
-    resetMockState();
+describe('Home', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+    mockLogic = { data, actions: mockActions, isLoading: false };
   });
 
-  jestDescribe('Home screen', () => {
-    jestIt('renders the home page sections when data exists', () => {
-      const { getByText } = render(React.createElement(Home));
+  it('renders the loaded dashboard and connects its actions', () => {
+    const { getByText, getByTestId } = render(<Home />);
+    expect(getByTestId('skeleton-group-ready')).toBeTruthy();
+    expect(getByTestId('gym-card')).toBeTruthy();
+    expect(getByText('Next: B')).toBeTruthy();
 
-      jestExpect(getByText('Hello,')).toBeTruthy();
-      jestExpect(getByText('Quick Start')).toBeTruthy();
-      jestExpect(getByText('Personal Record')).toBeTruthy();
-      jestExpect(getByText('Quick Actions')).toBeTruthy();
-    });
+    fireEvent.press(getByText('Welcome, John'));
+    fireEvent.press(getByText('Next: B'));
+    fireEvent.press(getByText('Achievement'));
+    fireEvent.press(getByText('Last workout'));
 
-    jestIt('renders safely while user-related data is still loading and contexts are null', () => {
-      mockAuthState = {
-        ...mockAuthState,
-        user: null,
-      };
-      mockLoadingState = {
-        isLoading: true,
-      };
-      mockWorkoutState = {
-        workout: null,
-        workoutSplits: [],
-        workoutForEdit: null,
-      };
-      mockAnalysisState = {
-        analyzedExerciseTrackingData: null,
-        hasTrainedToday: false,
-      };
-      mockHomeLogicData = createHomeData({
-        userId: '',
-        username: '',
-        firstName: '',
-        profilePicPath: '',
-        hasAssignedWorkout: false,
-        hasTracking: false,
-        totalWorkoutNumber: 0,
-        mostFrequentSplit: null,
-        PR: null,
-        isLoading: true,
-      });
-
-      const { getByText } = render(React.createElement(Home));
-
-      jestExpect(getByText('Hello,')).toBeTruthy();
-      jestExpect(getByText('Quick Start')).toBeTruthy();
-      jestExpect(getByText('Personal Record')).toBeTruthy();
-      jestExpect(getByText('Quick Actions')).toBeTruthy();
-    });
-
-    jestIt('renders the empty home state when there is no tracking and no assigned workout', () => {
-      mockHomeLogicData = createHomeData({
-        hasAssignedWorkout: false,
-        hasTracking: false,
-        totalWorkoutNumber: 0,
-        mostFrequentSplit: null,
-        PR: null,
-      });
-      mockWorkoutState = {
-        ...mockWorkoutState,
-        workout: null,
-        workoutSplits: [],
-        workoutForEdit: null,
-      };
-      mockAnalysisState = {
-        ...mockAnalysisState,
-        analyzedExerciseTrackingData: null,
-      };
-
-      const { getByText } = render(React.createElement(Home));
-
-      jestExpect(getByText('No history yet')).toBeTruthy();
-      jestExpect(getByText('Create a plan and finish your first workout')).toBeTruthy();
-      jestExpect(getByText('Create your workout')).toBeTruthy();
-    });
+    expect(mockActions.openInbox).toHaveBeenCalled();
+    expect(mockActions.startWorkout).toHaveBeenCalled();
+    expect(mockActions.openProgress).toHaveBeenCalled();
+    expect(mockActions.openHistory).toHaveBeenCalled();
   });
 
-  jestDescribe('TopComponent', () => {
-    jestIt('shows the full English name when it is available', () => {
-      const { getByText } = render(React.createElement(TopComponent));
+  it('renders the full skeleton dashboard while loading', () => {
+    mockLogic = { data, actions: mockActions, isLoading: true };
+    const { getByTestId, getAllByTestId } = render(<Home />);
 
-      jestExpect(getByText('John Doe')).toBeTruthy();
-    });
-
-    jestIt('falls back to username when the full name is not English', () => {
-      mockAuthState = {
-        ...mockAuthState,
-        user: createUser({ name: '×™×•×¡×™ ×›×”×Ÿ', username: 'yossi' }),
-      };
-
-      const { getByText } = render(React.createElement(TopComponent));
-
-      jestExpect(getByText('yossi')).toBeTruthy();
-    });
-
-    jestIt('renders safely when there is no user', () => {
-      mockAuthState = {
-        ...mockAuthState,
-        user: null,
-      };
-
-      const { getByText } = render(React.createElement(TopComponent));
-
-      jestExpect(getByText('Hello,')).toBeTruthy();
-    });
-
-    jestIt('shows an exclamation mark when unread messages exceed 99', () => {
-      mockNotificationsState = {
-        unreadMessages: new Array(120).fill({ id: 'msg' }),
-      };
-
-      const { getByText } = render(React.createElement(TopComponent));
-
-      jestExpect(getByText('!')).toBeTruthy();
-    });
-
-    jestIt('disables the inbox button when workout mode is active', () => {
-      mockAuthState = {
-        ...mockAuthState,
-        isWorkoutMode: true,
-      };
-
-      const { UNSAFE_getAllByType } = render(React.createElement(TopComponent));
-      const touchables = UNSAFE_getAllByType(TouchableOpacity);
-
-      jestExpect(touchables[0].props.disabled).toBe(true);
-    });
+    expect(getByTestId('skeleton-group-loading')).toBeTruthy();
+    expect(getAllByTestId('skeleton')).toHaveLength(6);
   });
 
-  jestDescribe('StartWorkoutCard', () => {
-    jestIt('shows the recommended split data when tracking exists and the user has not trained today', () => {
-      const { getByText } = render(React.createElement(StartWorkoutCard, { data: createHomeData() }));
+  it('renders the create-workout state when no plan exists', () => {
+    mockLogic = { data: { ...data, state: { hasWorkout: false, hasTracking: false } }, actions: mockActions, isLoading: false };
+    const { getByText, queryByTestId } = render(<Home />);
 
-      jestExpect(getByText('Split Push')).toBeTruthy();
-      jestExpect(getByText('Upper Body')).toBeTruthy();
-      jestExpect(getByText('3 exercises')).toBeTruthy();
-      jestExpect(getByText('Slide to start')).toBeTruthy();
-    });
-
-    jestIt('shows empty-state guidance when a workout exists but the user has not completed any workout yet', () => {
-      mockWorkoutState = {
-        ...mockWorkoutState,
-        workout: { id: 'workout-1' },
-      };
-
-      const { getByText, queryByText } = render(
-        React.createElement(StartWorkoutCard, {
-          data: createHomeData({
-            hasAssignedWorkout: true,
-            hasTracking: false,
-            totalWorkoutNumber: 0,
-            mostFrequentSplit: null,
-          }),
-        }),
-      );
-
-      jestExpect(getByText('No history yet')).toBeTruthy();
-      jestExpect(getByText('Create a plan and finish your first workout')).toBeTruthy();
-      jestExpect(queryByText('Slide to start')).toBeNull();
-    });
-
-    jestIt('shows the already trained state instead of the slider when the user trained today', () => {
-      mockAnalysisState = {
-        ...mockAnalysisState,
-        hasTrainedToday: true,
-      };
-
-      const { getByText, queryByText } = render(React.createElement(StartWorkoutCard, { data: createHomeData() }));
-
-      jestExpect(getByText('Already trained today')).toBeTruthy();
-      jestExpect(queryByText('Slide to start')).toBeNull();
-    });
-
-    jestIt('shows the empty state when there is no tracking data', () => {
-      const { getByText } = render(
-        React.createElement(StartWorkoutCard, {
-          data: createHomeData({
-            hasTracking: false,
-            totalWorkoutNumber: 0,
-            mostFrequentSplit: null,
-          }),
-        }),
-      );
-
-      jestExpect(getByText('No history yet')).toBeTruthy();
-      jestExpect(getByText('Create a plan and finish your first workout')).toBeTruthy();
-    });
-
-    jestIt('shows the empty state when the most frequent split is missing from workout splits', () => {
-      mockWorkoutState = {
-        ...mockWorkoutState,
-        workoutSplits: [{ id: 2, name: 'Legs', muscleGroup: 'Legs' }],
-      };
-
-      const { getByText } = render(React.createElement(StartWorkoutCard, { data: createHomeData() }));
-
-      jestExpect(getByText('No history yet')).toBeTruthy();
-    });
+    fireEvent.press(getByText('Create workout'));
+    expect(mockActions.createWorkout).toHaveBeenCalled();
+    expect(queryByTestId('gym-card')).toBeNull();
   });
 
-  jestDescribe('PRCard', () => {
-    jestIt('renders personal record details when tracking exists', () => {
-      const { getByText } = render(
-        React.createElement(PRCard, { hasAssignedWorkout: true, PR: createPR(), hasTracking: true }),
-      );
+  it('renders the no-tracking state for a plan without history', () => {
+    mockLogic = { data: { ...data, state: { hasWorkout: true, hasTracking: false } }, actions: mockActions, isLoading: false };
+    const { getByText, queryByTestId } = render(<Home />);
 
-      jestExpect(getByText('Bench Press')).toBeTruthy();
-      jestExpect(getByText('Mar 20, 2026')).toBeTruthy();
-      jestExpect(getByText('100 kg')).toBeTruthy();
-      jestExpect(getByText('8 reps')).toBeTruthy();
-    });
-
-    jestIt('renders fallback content when tracking does not exist', () => {
-      const { getAllByText } = render(
-        React.createElement(PRCard, { hasAssignedWorkout: false, PR: null, hasTracking: false }),
-      );
-
-      jestExpect(getAllByText('No data yet').length).toBeGreaterThanOrEqual(4);
-    });
-  });
-
-  jestDescribe('QuickActions', () => {
-    jestIt('shows create workout copy when no workout is assigned', () => {
-      const { getByText } = render(React.createElement(QuickActions, { hasAssignedWorkout: false }));
-
-      jestExpect(getByText('Create your workout')).toBeTruthy();
-      jestExpect(getByText('Build a new plan')).toBeTruthy();
-    });
-
-    jestIt('shows edit workout copy when a workout is assigned', () => {
-      const { getByText } = render(React.createElement(QuickActions, { hasAssignedWorkout: true }));
-
-      jestExpect(getByText('Edit your workout')).toBeTruthy();
-      jestExpect(getByText('Adjust exercises & sets')).toBeTruthy();
-    });
-
-    jestIt('navigates to the quick action destinations', () => {
-      const { getByText } = render(React.createElement(QuickActions, { hasAssignedWorkout: true }));
-
-      fireEvent.press(getByText('Check out your analytics'));
-      fireEvent.press(getByText('Edit your workout'));
-      fireEvent.press(getByText('History'));
-
-      jestExpect(mockNavigate).toHaveBeenNthCalledWith(1, 'Analytics');
-      jestExpect(mockNavigate).toHaveBeenNthCalledWith(2, 'CreateWorkout');
-      jestExpect(mockNavigate).toHaveBeenNthCalledWith(3, 'Statistics');
-    });
-  });
-
-  jestDescribe('SlideToStart', () => {
-    jestIt('renders the slide hint text', () => {
-      const { getByText } = render(React.createElement(SlideToStart, { onUnlock: jestObject.fn() }));
-
-      jestExpect(getByText('Slide to start')).toBeTruthy();
-    });
+    expect(getByText('No tracking')).toBeTruthy();
+    expect(queryByTestId('gym-card')).toBeNull();
   });
 });

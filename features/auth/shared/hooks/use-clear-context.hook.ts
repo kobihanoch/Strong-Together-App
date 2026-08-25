@@ -1,5 +1,4 @@
 import React, { SetStateAction, useCallback } from 'react';
-import { resetBootstrap } from '../../../../infrastructure/api/api-config/bootstrap';
 import { cacheDeleteAllCacheWithoutStartWorkout } from '../../../../infrastructure/cache/cache.utils';
 import { AppUser } from '../types/auth.types';
 import GlobalAuth from '../utils/auth.utils';
@@ -37,7 +36,6 @@ const useClearContext = ({
     await cacheDeleteAllCacheWithoutStartWorkout();
     GlobalAuth.setAccessToken(null);
     GlobalAuth.setUsernameInHeader(null);
-    resetBootstrap();
     setIsLoggedIn(false);
     setLoading(false);
     setAppleLoading(false);

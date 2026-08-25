@@ -3,7 +3,7 @@ import React from 'react';
 import { beforeEach as jestBeforeEach, describe as jestDescribe, expect as jestExpect, it as jestIt, jest as jestObject, } from '@jest/globals';
 import { fireEvent, render } from '@testing-library/react-native';
 import { TouchableOpacity } from 'react-native';
-import type { WorkoutPlanSplit } from '../../types/workout-plan.types';
+import type { WorkoutSplit } from '../../../shared/types/workout.types';
 import type { ExerciseInPlan } from '../../../shared/types/workout.types';
 
 const mockNavigate = jestObject.fn();
@@ -39,8 +39,8 @@ import RenderItemExercise from '../RenderItemExercise';
 import NoWorkoutPlan from '../NoWorkoutPlan';
 
 const createSplit = (
-  overrides: Partial<WorkoutPlanSplit> = {},
-): WorkoutPlanSplit => ({
+  overrides: Partial<WorkoutSplit> = {},
+): WorkoutSplit => ({
   id: 1,
   name: 'Push',
   muscleGroup: 'Chest, Shoulders, Triceps',

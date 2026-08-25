@@ -10,7 +10,7 @@ import useRetryServerValidationWhenOnline from '../hooks/use-retry-server-valida
 import useServerValidation from '../hooks/use-server-validation.hook';
 import useSyncUsernameHeader from '../hooks/use-sync-username-header.hook';
 import { AppUser } from '../types/auth.types';
-import { AuthProviderValue } from './types/auth-context.types';
+import { AuthProviderValue } from '../types/auth.types';
 
 const AuthContext = createContext<AuthProviderValue | null>(null);
 export const useAuth = () => {

@@ -13,13 +13,13 @@ import PageDots from '../../../../shared/components/PageDots';
 import Row from '../../../../shared/components/Row';
 import StartWorkoutButton from './StartWorkoutButton';
 import StartCardioButton from '../../cardio/components/StartCardioButton';
-import { WorkoutPlanSplit } from '../types/workout-plan.types';
+import { WorkoutSplit } from '../../shared/types/workout.types';
 
 const { width, height } = Dimensions.get('window');
 
 type SplitFlatListProps = {
-  setSelectedSplit: Dispatch<SetStateAction<WorkoutPlanSplit | null>>;
-  selectedSplit: WorkoutPlanSplit | null;
+  setSelectedSplit: Dispatch<SetStateAction<WorkoutSplit | null>>;
+  selectedSplit: WorkoutSplit | null;
   openCardioModal: (i?: number) => void;
 };
 
@@ -37,7 +37,7 @@ const SplitFlatList = ({ setSelectedSplit, selectedSplit, openCardioModal }: Spl
   const [curPageIndex, setCurPageIndex] = useState(0);
 
   const renderItem = useCallback(
-    ({ item }: { item: WorkoutPlanSplit }) => {
+    ({ item }: { item: WorkoutSplit }) => {
       const musclesText = (item?.muscleGroup || '').replace(/\s*\([^)]*\)/g, '').trim();
 
       const exCount = exerciseCounter?.[item.name] ?? 0;

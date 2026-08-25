@@ -1,14 +1,12 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React from 'react';
-import { beforeEach, describe, expect, it, jest } from '@jest/globals';
 import { act, renderHook, waitFor } from '@testing-library/react-native';
-import {
-  guestProfile,
-  userWithWorkoutAndHistoryProfile,
-  userWithWorkoutNoHistoryProfile,
-  userWithoutWorkoutProfile,
-} from '../../../../../tests/fixtures/userProfiles';
+import { beforeEach, describe, expect, it, jest } from '@jest/globals';
+
+const mockUseCacheAndFetch = jest.fn<(...args: any[]) => { loading: boolean }>();
+const mockUseUpdateGlobalLoading = jest.fn();
+const mockGetUserWorkout = jest.fn<() => Promise<any>>();
+let mockAuthState: { user: any; isValidatedWithServer: boolean };
 
 jest.mock('@react-native-async-storage/async-storage', () => ({
   __esModule: true,
@@ -20,256 +18,118 @@ jest.mock('@react-native-async-storage/async-storage', () => ({
     multiRemove: jest.fn(),
   },
 }));
-
 jest.mock('expo-constants', () => ({
   __esModule: true,
-  default: {
-    expoConfig: {
-      version: 'test-version',
-    },
-  },
+  default: { expoConfig: { version: 'test-version' } },
 }));
 
-type UseCacheAndFetchReturn = { loading: boolean };
-type UseCacheAndFetchMockFn = (
-  user: unknown,
-  keyBuilderFn: unknown,
-  isValidatedByServerFlag: boolean,
-  fetchFn: unknown,
-  onDataFn: (data: any) => void,
-  cachedPayload: unknown,
-  logLabel: string,
-) => UseCacheAndFetchReturn;
-
-const mockAuthState = jest.fn<
-  () => {
-    user: typeof userWithoutWorkoutProfile.user;
-    isValidatedWithServer: boolean;
-  }
->();
-const mockUseCacheAndFetch = jest.fn<UseCacheAndFetchMockFn>();
-const mockUseUpdateGlobalLoading = jest.fn<(key: string, value: boolean) => void>();
-const mockGetUserWorkout = jest.fn<() => Promise<any>>();
-
-const useCacheAndFetchMock = (
-  user: unknown,
-  keyBuilderFn: unknown,
-  isValidatedByServerFlag: boolean,
-  fetchFn: unknown,
-  onDataFn: (data: any) => void,
-  cachedPayload: unknown,
-  logLabel: string,
-) => mockUseCacheAndFetch(user, keyBuilderFn, isValidatedByServerFlag, fetchFn, onDataFn, cachedPayload, logLabel);
-
-const useUpdateGlobalLoadingMock = (key: string, value: boolean) => mockUseUpdateGlobalLoading(key, value);
-const getUserWorkoutMock = () => mockGetUserWorkout();
-
-jest.mock('../../../../auth/shared/providers/AuthProvider', () => ({
-  useAuth: () => mockAuthState(),
-}));
-
+jest.mock('../../../../auth/shared/providers/AuthProvider', () => ({ useAuth: () => mockAuthState }));
 jest.mock('../../../../../shared/hooks/use-cache-and-fetch.hook', () => ({
   __esModule: true,
-  default: useCacheAndFetchMock,
+  default: (...args: any[]) => mockUseCacheAndFetch(...args),
 }));
-
 jest.mock('../../../../../shared/hooks/use-update-global-loading.hook', () => ({
   __esModule: true,
-  default: useUpdateGlobalLoadingMock,
+  default: (...args: any[]) => mockUseUpdateGlobalLoading(...args),
 }));
-
-jest.mock('../../../plan/services/workout-plan.service', () => ({
-  getUserWorkout: getUserWorkoutMock,
-}));
+jest.mock('../../../plan/services/workout-plan.service', () => ({ getUserWorkout: () => mockGetUserWorkout() }));
 
 import { WorkoutPlanProvider, useWorkoutPlanContext } from '../WorkoutPlanProvider';
 
-const wrapper = ({ children }: { children: React.ReactNode }) => (
-  <WorkoutPlanProvider>{children}</WorkoutPlanProvider>
-);
-
-const createHydratingUseCacheAndFetchMock = (payload: {
-  workoutPlan: typeof userWithWorkoutNoHistoryProfile.workout;
-  workoutPlanForEditWorkout: typeof userWithWorkoutNoHistoryProfile.workoutForEdit;
-}) => {
-  let hydrated = false;
-  return (
-    user: unknown,
-    keyBuilderFn: unknown,
-    isValidated: boolean,
-    fetchFn: unknown,
-    onDataFn: (data: any) => void,
-    cachedPayload: unknown,
-    label: string,
-  ) => {
-    if (!hydrated) {
-      hydrated = true;
-      onDataFn(payload);
-    }
-    return {
-      loading: false,
-    };
-  };
+const user = { id: 'user-1' };
+const workout = {
+  id: 7,
+  numberOfSplits: 2,
+  createdAt: '2026-03-20T08:00:00.000Z',
+  userId: '00000000-0000-4000-8000-000000000001',
+  isActive: true,
+  updatedAt: '2026-03-26T08:00:00.000Z',
+  workoutSplits: [
+    {
+      id: 11, workoutId: 7, name: 'A', orderIndex: 0, createdAt: '2026-03-20T08:00:00.000Z',
+      muscleGroup: 'Chest', isActive: true,
+      exercises: [{
+        exerciseToSplitId: 20, exerciseId: 1, name: 'Bench Press',
+        sets: [{ orderIndex: 0, reps: 10 }, { orderIndex: 1, reps: 8 }],
+        orderIndex: 0, isActive: true, targetMuscle: 'Chest', specificTargetMuscle: 'Pectoralis major',
+      }],
+    },
+    {
+      id: 12, workoutId: 7, name: 'B', orderIndex: 1, createdAt: '2026-03-20T08:00:00.000Z',
+      muscleGroup: 'Back', isActive: true, exercises: [],
+    },
+  ],
 };
 
-describe('WorkoutPlanContext', () => {
+const wrapper = ({ children }: { children: React.ReactNode }) => <WorkoutPlanProvider>{children}</WorkoutPlanProvider>;
+
+const hydrateWith = (workoutPlan: any) => {
+  let hydrated = false;
+  mockUseCacheAndFetch.mockImplementation(
+    (_user: unknown, _key: unknown, _validated: boolean, _fetch: unknown, onData: (data: any) => void) => {
+      if (!hydrated) {
+        hydrated = true;
+        onData({ workoutPlan });
+      }
+      return { loading: false };
+    },
+  );
+};
+
+describe('WorkoutPlanProvider', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    mockAuthState.mockReturnValue({
-      user: guestProfile.user,
-      isValidatedWithServer: false,
-    });
-    mockUseCacheAndFetch.mockReturnValue({
-      loading: false,
-    });
-    mockGetUserWorkout.mockResolvedValue({
-      workoutPlan: null,
-      workoutPlanForEditWorkout: null,
-    });
+    mockAuthState = { user: null, isValidatedWithServer: false };
+    mockUseCacheAndFetch.mockReturnValue({ loading: false });
+    mockGetUserWorkout.mockResolvedValue({ workoutPlan: null });
   });
 
-  it('keeps all workout state empty for the guest profile', () => {
+  it('exposes an empty plan while no plan has hydrated', () => {
     const { result } = renderHook(() => useWorkoutPlanContext(), { wrapper });
-
-    expect(result.current.workout).toBe(guestProfile.workout);
-    expect(result.current.workoutForEdit).toBeUndefined();
-    expect(result.current.workoutSplits).toEqual([]);
-    expect(result.current.exercises).toEqual({});
-    expect(result.current.loading).toBe(false);
-    expect(mockUseCacheAndFetch).toHaveBeenLastCalledWith(
-      guestProfile.user,
-      expect.any(Function),
-      false,
-      expect.any(Function),
-      expect.any(Function),
-      undefined,
-      'Workout Context',
-    );
-  });
-
-  it('keeps workout state null for a signed-in user with no workout plan', async () => {
-    mockAuthState.mockReturnValue({
-      user: userWithoutWorkoutProfile.user,
-      isValidatedWithServer: true,
-    });
-    mockUseCacheAndFetch.mockImplementation(
-      createHydratingUseCacheAndFetchMock({
-        workoutPlan: userWithoutWorkoutProfile.workout,
-        workoutPlanForEditWorkout: userWithoutWorkoutProfile.workoutForEdit,
-      }),
-    );
-
-    const { result } = renderHook(() => useWorkoutPlanContext(), { wrapper });
-
-    await waitFor(() => {
-      expect(result.current.workout).toBeNull();
-    });
-
-    expect(result.current.workoutForEdit).toBeNull();
-    expect(result.current.workoutSplits).toEqual([]);
-    expect(result.current.exercises).toEqual({});
-    expect(mockUseCacheAndFetch).toHaveBeenLastCalledWith(
-      userWithoutWorkoutProfile.user,
-      expect.any(Function),
-      true,
-      expect.any(Function),
-      expect.any(Function),
-      {
-        workoutPlan: null,
-        workoutPlanForEditWorkout: null,
-      },
-      'Workout Context',
-    );
-  });
-
-  it('hydrates workout and derived split state for a user with a workout but no history', async () => {
-    mockAuthState.mockReturnValue({
-      user: userWithWorkoutNoHistoryProfile.user,
-      isValidatedWithServer: true,
-    });
-    mockUseCacheAndFetch.mockImplementation(
-      createHydratingUseCacheAndFetchMock({
-        workoutPlan: userWithWorkoutNoHistoryProfile.workout,
-        workoutPlanForEditWorkout: userWithWorkoutNoHistoryProfile.workoutForEdit,
-      }),
-    );
-
-    const { result } = renderHook(() => useWorkoutPlanContext(), { wrapper });
-
-    await waitFor(() => {
-      expect(result.current.workout).toEqual(userWithWorkoutNoHistoryProfile.workout);
-    });
-
-    expect(result.current.workoutForEdit).toEqual(userWithWorkoutNoHistoryProfile.workoutForEdit);
-    expect(result.current.workoutSplits).toEqual([
-      {
-        name: 'A',
-        id: 11,
-        muscleGroup: 'Chest(Major)',
-      },
-      {
-        name: 'B',
-        id: 12,
-        muscleGroup: 'Back(Lats)',
-      },
-    ]);
-    expect(result.current.exercises).toEqual({
-      A: userWithWorkoutNoHistoryProfile.workout!.workoutSplits![0].exerciseToWorkoutSplit,
-      B: userWithWorkoutNoHistoryProfile.workout!.workoutSplits![1].exerciseToWorkoutSplit,
-    });
-  });
-
-  it('keeps the same workout-derived state for a user with workout and history because history belongs elsewhere', async () => {
-    mockAuthState.mockReturnValue({
-      user: userWithWorkoutAndHistoryProfile.user,
-      isValidatedWithServer: true,
-    });
-    mockUseCacheAndFetch.mockImplementation(
-      createHydratingUseCacheAndFetchMock({
-        workoutPlan: userWithWorkoutAndHistoryProfile.workout,
-        workoutPlanForEditWorkout: userWithWorkoutAndHistoryProfile.workoutForEdit,
-      }),
-    );
-
-    const { result } = renderHook(() => useWorkoutPlanContext(), { wrapper });
-
-    await waitFor(() => {
-      expect(result.current.workout).toEqual(userWithWorkoutAndHistoryProfile.workout);
-    });
-
-    expect(result.current.workoutForEdit).toEqual(userWithWorkoutAndHistoryProfile.workoutForEdit);
-    expect(result.current.workoutSplits).toHaveLength(2);
-    expect(result.current.exercises.A[0].exercise).toBe('Bench Press');
-    expect(result.current.exercises.B[0].exercise).toBe('Lat Pulldown');
-  });
-
-  it('allows direct local state updates through the exposed setters after initial hydration', async () => {
-    mockAuthState.mockReturnValue({
-      user: userWithWorkoutNoHistoryProfile.user,
-      isValidatedWithServer: true,
-    });
-    mockUseCacheAndFetch.mockImplementation(
-      createHydratingUseCacheAndFetchMock({
-        workoutPlan: userWithWorkoutNoHistoryProfile.workout,
-        workoutPlanForEditWorkout: userWithWorkoutNoHistoryProfile.workoutForEdit,
-      }),
-    );
-
-    const { result } = renderHook(() => useWorkoutPlanContext(), { wrapper });
-
-    await waitFor(() => {
-      expect(result.current.workout).toEqual(userWithWorkoutNoHistoryProfile.workout);
-    });
-
-    await act(async () => {
-      result.current.setWorkout(null);
-      result.current.setWorkoutForEdit(null);
-    });
-
     expect(result.current.workout).toBeNull();
-    expect(result.current.workoutForEdit).toBeNull();
     expect(result.current.workoutSplits).toEqual([]);
-    expect(result.current.exercises).toEqual({});
+    expect(result.current.loading).toBe(false);
+  });
+
+  it('hydrates a null workout and caches the new response shape', async () => {
+    mockAuthState = { user, isValidatedWithServer: true };
+    hydrateWith(null);
+    const { result } = renderHook(() => useWorkoutPlanContext(), { wrapper });
+
+    await waitFor(() => expect(result.current.workout).toBeNull());
+    expect(result.current.workoutSplits).toEqual([]);
+    expect(mockUseCacheAndFetch).toHaveBeenLastCalledWith(
+      user, expect.any(Function), true, expect.any(Function), expect.any(Function),
+      { workoutPlan: null }, 'Workout Context',
+    );
+  });
+
+  it('exposes full nested splits without deriving a second exercise map', async () => {
+    mockAuthState = { user, isValidatedWithServer: true };
+    hydrateWith(workout);
+    const { result } = renderHook(() => useWorkoutPlanContext(), { wrapper });
+
+    await waitFor(() => expect(result.current.workout).toEqual(workout));
+    expect(result.current.workoutSplits).toEqual(workout.workoutSplits);
+    expect(result.current.workoutSplits[0].exercises[0].name).toBe('Bench Press');
+    expect(result.current.workoutSplits[0].exercises[0].sets).toHaveLength(2);
+  });
+
+  it('updates derived splits when setWorkout changes the plan', async () => {
+    mockAuthState = { user, isValidatedWithServer: true };
+    hydrateWith(workout);
+    const { result } = renderHook(() => useWorkoutPlanContext(), { wrapper });
+    await waitFor(() => expect(result.current.workout).toEqual(workout));
+
+    act(() => result.current.setWorkout(null));
+    expect(result.current.workout).toBeNull();
+    expect(result.current.workoutSplits).toEqual([]);
+  });
+
+  it('reports its loading state globally', () => {
+    mockUseCacheAndFetch.mockReturnValue({ loading: true });
+    const { result } = renderHook(() => useWorkoutPlanContext(), { wrapper });
+    expect(result.current.loading).toBe(true);
+    expect(mockUseUpdateGlobalLoading).toHaveBeenLastCalledWith('WorkoutPlan', true);
   });
 });
-

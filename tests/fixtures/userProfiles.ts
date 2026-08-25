@@ -3,7 +3,8 @@ import type {
   CardioDailyMap, CardioWeeklyMap, } from '../../features/workouts/cardio/types/cardio.types';
 import type { UserMessages } from '../../features/messages/types/messages.types';
 import type { AppUser } from '../../features/auth/shared/types/auth.types';
-import type { WorkoutPlan, WorkoutPlanForEdit } from '../../features/workouts/plan/types/workout-plan.types';
+import type { WorkoutPlan } from '../../features/workouts/shared/types/workout.types';
+import type { SelectedExercises as WorkoutPlanForEdit } from '../../features/workouts/editor/types/use-create-workout.types';
 
 export interface UserTestProfile {
   key: 'guest' | 'userWithoutWorkout' | 'userWithWorkoutNoHistory' | 'userWithWorkoutAndHistory';
