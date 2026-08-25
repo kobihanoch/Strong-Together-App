@@ -2,19 +2,20 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation, useNavigationState } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import React from 'react';
-import { Dimensions, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { RFValue } from 'react-native-responsive-fontsize';
+import { fontFamilies, fontSizes } from '../constants/typography';
+import { useAppTheme } from '../providers/AppThemeProvider';
 import { useAuth } from '../../features/auth/shared/providers/AuthProvider.tsx';
 import { useGlobalAppLoadingContext } from '../providers/GlobalAppLoadingProvider.tsx';
 import { RootParamList } from '../../navigation/types/appStackTypes';
-
-const { width, height } = Dimensions.get('window');
 
 type RouteName = keyof RootParamList;
 
 const BottomTabBar = () => {
   const navigation = useNavigation<StackNavigationProp<RootParamList>>();
   const { isLoading } = useGlobalAppLoadingContext();
+  const { colors } = useAppTheme();
 
   const routeName = useNavigationState((state) => {
     if (!state?.routes || state.index === undefined) return 'Home';
@@ -36,32 +37,36 @@ const BottomTabBar = () => {
     navigation.navigate(tabName as never);
   };
 
-  const tabs: { name: RouteName; icon: keyof typeof MaterialCommunityIcons.glyphMap; label?: string }[] = [
-    { name: 'Home', icon: 'home-variant' },
-    { name: 'Statistics', icon: 'poll' },
-    { name: 'MyWorkoutPlan', label: 'StartWorkout', icon: 'fire' },
-    { name: 'Profile', icon: 'account' },
-    { name: 'Settings', icon: 'wrench' },
+  const tabs: { name: RouteName; icon: keyof typeof MaterialCommunityIcons.glyphMap; label: string }[] = [
+    { name: 'Home', icon: 'home-variant-outline', label: 'Home' },
+    { name: 'MyWorkoutPlan', icon: 'calendar-blank-outline', label: 'Plan' },
+    { name: 'Analytics', icon: 'chart-bar', label: 'Progress' },
+    { name: 'Profile', icon: 'account-outline', label: 'Profile' },
   ];
 
   return (
     !isWorkoutMode && (
-      <View style={styles.tabBarContainer}>
-        {tabs.map((tab, index) => (
-          <TouchableOpacity
-            key={index}
-            style={[styles.tabButton, tab.name === 'MyWorkoutPlan' && styles.specialTabButton]}
-            onPress={() => handleTabPress(tab.name)}
-            disabled={navDisabled}
-          >
-            <MaterialCommunityIcons
-              name={tab.icon}
-              size={RFValue(20)}
-              color={routeName === tab.name ? '#2979FF' : 'rgb(184, 184, 184)'}
-              style={tab.name === 'MyWorkoutPlan' ? styles.specialIcon : undefined}
-            />
-          </TouchableOpacity>
-        ))}
+      <View style={[styles.tabBarContainer, { backgroundColor: colors.surface, borderTopColor: colors.border }]}>
+        {tabs.map((tab, index) => {
+          const isActive =
+            routeName === tab.name ||
+            (tab.name === 'Analytics' && routeName === 'Statistics') ||
+            (tab.name === 'Profile' && routeName === 'Settings');
+
+          return (
+            <TouchableOpacity
+              key={index}
+              style={styles.tabButton}
+              onPress={() => handleTabPress(tab.name)}
+              disabled={navDisabled}
+            >
+              <View style={[styles.iconContainer, isActive && { backgroundColor: colors.primarySoft }]}>
+                <MaterialCommunityIcons name={tab.icon} size={RFValue(19)} color={isActive ? colors.primary : colors.textSecondary} />
+              </View>
+              <Text style={[styles.tabLabel, { color: isActive ? colors.primary : colors.textSecondary }, isActive && styles.tabLabelActive]}>{tab.label}</Text>
+            </TouchableOpacity>
+          );
+        })}
       </View>
     )
   );
@@ -73,35 +78,31 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     justifyContent: 'center',
     alignItems: 'center',
-    height: height * 0.12,
-    backgroundColor: 'white',
-    elevation: 5,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 5 },
-    shadowOpacity: 0.1,
-    shadowRadius: 10,
-    paddingBottom: height * 0.02,
+    minHeight: 76,
+    borderTopWidth: 1,
+    paddingTop: 8,
+    paddingBottom: 12,
     width: '100%',
   },
   tabButton: {
-    alignItems: 'center',
-    width: width * 0.2,
-    marginHorizontal: height * -0.002,
-  },
-  specialTabButton: {
-    backgroundColor: '#2979FF',
-    borderRadius: width * 0.15,
-    padding: width * 0.02,
+    flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.1,
-    shadowRadius: 5,
-    elevation: 1,
+    gap: 4,
   },
-  specialIcon: {
-    color: 'white',
+  iconContainer: {
+    width: 42,
+    height: 28,
+    borderRadius: 14,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  tabLabel: {
+    fontFamily: fontFamilies.regular,
+    fontSize: fontSizes.caption,
+  },
+  tabLabelActive: {
+    fontFamily: fontFamilies.semiBold,
   },
   timerText: {
     color: '#2979FF',

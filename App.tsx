@@ -29,6 +29,7 @@ import BottomTabBar from './shared/components/BottomTabBar';
 import Theme1 from './shared/components/Theme1';
 import UpdateAppModal from './shared/components/UpdateAppModal';
 import { GlobalAppLoadingProvider } from './shared/providers/GlobalAppLoadingProvider';
+import { AppThemeProvider } from './shared/providers/AppThemeProvider';
 
 // ---------- Fonts Loader Hook ----------
 function useFontsReady() {
@@ -99,13 +100,15 @@ function App() {
         <AlertNotificationRoot>
           <GestureHandlerRootView style={{ flex: 1 }}>
             <GlobalAppLoadingProvider>
-              <AuthProvider>
-                <NavigationContainer ref={navigationRef}>
-                  <RootNavigator />
-                  <NotifierRoot />
-                  <UpdateAppModal />
-                </NavigationContainer>
-              </AuthProvider>
+              <AppThemeProvider>
+                <AuthProvider>
+                  <NavigationContainer ref={navigationRef}>
+                    <RootNavigator />
+                    <NotifierRoot />
+                    <UpdateAppModal />
+                  </NavigationContainer>
+                </AuthProvider>
+              </AppThemeProvider>
             </GlobalAppLoadingProvider>
           </GestureHandlerRootView>
         </AlertNotificationRoot>

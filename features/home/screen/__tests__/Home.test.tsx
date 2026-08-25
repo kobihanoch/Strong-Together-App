@@ -58,6 +58,13 @@ let mockNotificationsState: any;
 let mockWorkoutState: any;
 let mockAnalysisState: any;
 let mockHomeLogicData: any;
+const mockHomeActions = {
+  openInbox: jestObject.fn(),
+  createWorkout: jestObject.fn(),
+  startWorkout: jestObject.fn(),
+  openProgress: jestObject.fn(),
+  openHistory: jestObject.fn(),
+};
 
 jestObject.mock('@react-navigation/native', () => ({
   useNavigation: () => ({
@@ -157,6 +164,7 @@ jestObject.mock('../../hooks/use-home-page-logic.hook', () => ({
   __esModule: true,
   default: () => ({
     data: mockHomeLogicData,
+    actions: mockHomeActions,
   }),
 }));
 
@@ -226,7 +234,23 @@ const resetMockState = () => {
     hasTrainedToday: false,
   };
 
-  mockHomeLogicData = createHomeData();
+  mockHomeLogicData = {
+    theme: {
+      canvas: '#FAF8F5', surface: '#FFFFFF', surfaceMuted: '#F2EEE8', border: '#E7E0D8',
+      textPrimary: '#17130F', textSecondary: '#756B61', primary: '#2979FF', primarySoft: '#EAF2FF',
+      achievement: '#FF7A00', achievementSoft: '#FFF1E6', heroSurface: '#17130F', heroOverlay: 'rgba(9,9,9,0.7)', white: '#FFFFFF',
+    },
+    state: { hasWorkout: true, hasTracking: true },
+    user: { displayName: 'John', profilePicPath: null, gender: 'Male', unreadCount: 0 },
+    nextWorkout: { name: 'Push Day', exerciseCount: 6, setCount: 18 },
+    gymActivity: { completedThisWeek: 3, weeklyTarget: 4, weekStreak: 6 },
+    lastWorkout: { name: 'Pull Day', dateLabel: 'May 18', exerciseCount: 6, setCount: 17 },
+    aerobics: {
+      totalMinutes: 82,
+      days: ['M', 'T', 'W', 'T', 'F', 'S', 'S'].map((label, index) => ({ label, minutes: index + 5 })),
+    },
+    achievement: { exercise: 'Bench Press', value: '+5 kg PR', estimatedOneRepMaxKg: 117.5 },
+  };
 };
 
 jestDescribe('Home page components', () => {
@@ -236,13 +260,24 @@ jestDescribe('Home page components', () => {
   });
 
   jestDescribe('Home screen', () => {
-    jestIt('renders the home page sections when data exists', () => {
+    jestIt('renders the mocked dashboard sections', () => {
       const { getByText } = render(React.createElement(Home));
 
-      jestExpect(getByText('Hello,')).toBeTruthy();
-      jestExpect(getByText('Quick Start')).toBeTruthy();
-      jestExpect(getByText('Personal Record')).toBeTruthy();
-      jestExpect(getByText('Quick Actions')).toBeTruthy();
+      jestExpect(getByText('Welcome, John')).toBeTruthy();
+      jestExpect(getByText("TODAY'S WORKOUT")).toBeTruthy();
+      jestExpect(getByText('THIS WEEK')).toBeTruthy();
+      jestExpect(getByText('AEROBICS THIS WEEK')).toBeTruthy();
+      jestExpect(getByText('LATEST PROGRESS')).toBeTruthy();
+      jestExpect(getByText(/Est\. 1RM/)).toBeTruthy();
+      jestExpect(getByText('LAST WORKOUT')).toBeTruthy();
+    });
+
+    jestIt('scales aerobics bars from the supplied daily minutes', () => {
+      const { getByTestId } = render(React.createElement(Home));
+      const firstBarHeight = getByTestId('aerobics-bar-0').props.style[1].height;
+      const lastBarHeight = getByTestId('aerobics-bar-6').props.style[1].height;
+
+      jestExpect(lastBarHeight).toBeGreaterThan(firstBarHeight);
     });
 
     jestIt('renders safely while user-related data is still loading and contexts are null', () => {
@@ -262,51 +297,41 @@ jestDescribe('Home page components', () => {
         analyzedExerciseTrackingData: null,
         hasTrainedToday: false,
       };
-      mockHomeLogicData = createHomeData({
-        userId: '',
-        username: '',
-        firstName: '',
-        profilePicPath: '',
-        hasAssignedWorkout: false,
-        hasTracking: false,
-        totalWorkoutNumber: 0,
-        mostFrequentSplit: null,
-        PR: null,
-        isLoading: true,
-      });
+      mockHomeLogicData = { ...mockHomeLogicData, user: { displayName: 'Athlete', profilePicPath: null, gender: null, unreadCount: 0 } };
 
       const { getByText } = render(React.createElement(Home));
 
-      jestExpect(getByText('Hello,')).toBeTruthy();
-      jestExpect(getByText('Quick Start')).toBeTruthy();
-      jestExpect(getByText('Personal Record')).toBeTruthy();
-      jestExpect(getByText('Quick Actions')).toBeTruthy();
+      jestExpect(getByText('Welcome, Athlete')).toBeTruthy();
+      jestExpect(getByText('Upper Body')).toBeTruthy();
+      jestExpect(getByText(' hrs')).toBeTruthy();
+      jestExpect(getByText(' mins')).toBeTruthy();
     });
 
-    jestIt('renders the empty home state when there is no tracking and no assigned workout', () => {
-      mockHomeLogicData = createHomeData({
-        hasAssignedWorkout: false,
-        hasTracking: false,
-        totalWorkoutNumber: 0,
-        mostFrequentSplit: null,
-        PR: null,
-      });
-      mockWorkoutState = {
-        ...mockWorkoutState,
-        workout: null,
-        workoutSplits: [],
-        workoutForEdit: null,
-      };
-      mockAnalysisState = {
-        ...mockAnalysisState,
-        analyzedExerciseTrackingData: null,
-      };
-
+    jestIt('routes the mocked workout CTA to Plan when no real split is available', () => {
       const { getByText } = render(React.createElement(Home));
+      fireEvent.press(getByText('Start workout'));
 
-      jestExpect(getByText('No history yet')).toBeTruthy();
-      jestExpect(getByText('Create a plan and finish your first workout')).toBeTruthy();
-      jestExpect(getByText('Create your workout')).toBeTruthy();
+      jestExpect(mockHomeActions.startWorkout).toHaveBeenCalledTimes(1);
+    });
+
+    jestIt('shows a create-workout CTA when no workout is assigned', () => {
+      mockHomeLogicData = { ...mockHomeLogicData, state: { hasWorkout: false, hasTracking: false } };
+      const { getByText, queryByText } = render(React.createElement(Home));
+
+      jestExpect(getByText('Create your first workout')).toBeTruthy();
+      fireEvent.press(getByText('Create workout'));
+      jestExpect(mockHomeActions.createWorkout).toHaveBeenCalledTimes(1);
+      jestExpect(queryByText('LATEST ACHIEVEMENT')).toBeNull();
+    });
+
+    jestIt('shows first-workout guidance when a plan has no tracking yet', () => {
+      mockHomeLogicData = { ...mockHomeLogicData, state: { hasWorkout: true, hasTracking: false } };
+      const { getByText, queryByText } = render(React.createElement(Home));
+
+      jestExpect(getByText('YOUR FIRST WORKOUT')).toBeTruthy();
+      jestExpect(getByText('Start first workout')).toBeTruthy();
+      jestExpect(getByText('Your progress starts here')).toBeTruthy();
+      jestExpect(queryByText('LAST WORKOUT')).toBeNull();
     });
   });
 

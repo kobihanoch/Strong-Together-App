@@ -1,94 +1,115 @@
+import { useNavigation } from '@react-navigation/native';
+import { StackNavigationProp } from '@react-navigation/stack';
 import { useMemo } from 'react';
-import { useWorkoutHistoryContext } from '../../workouts/shared/providers/WorkoutHistoryProvider';
+import { RootParamList } from '../../../navigation/types/appStackTypes';
 import { useAuth } from '../../auth/shared/providers/AuthProvider';
-import { useGlobalAppLoadingContext } from '../../../shared/providers/GlobalAppLoadingProvider';
+import { useMessages } from '../../messages/providers/MessagesProvider';
+import { useCardioContext } from '../../workouts/shared/providers/CardioProvider';
+import { useWorkoutHistoryContext } from '../../workouts/shared/providers/WorkoutHistoryProvider';
 import { useWorkoutPlanContext } from '../../workouts/shared/providers/WorkoutPlanProvider';
-import { HomePageData } from '../types/use-home-page.types';
+import { HOME_DASHBOARD_MOCK, USE_MOCK_AEROBICS } from '../data/home-dashboard.mock';
+import { HomeDashboardData } from '../types/use-home-page.types';
+import { useAppTheme } from '../../../shared/providers/AppThemeProvider';
 
-const useHomePageLogic = (): { data: HomePageData } => {
-  // Auth state (user + global session loading)
+const DAY_LABELS = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
+
+const useHomePageLogic = () => {
+  const navigation = useNavigation<StackNavigationProp<RootParamList>>();
+  const { colors: theme } = useAppTheme();
   const { user } = useAuth();
-  const { isLoading } = useGlobalAppLoadingContext();
+  const { unreadMessages } = useMessages();
+  const { workout, workoutSplits, exercises } = useWorkoutPlanContext();
+  const { exerciseTrackingMaps, analyzedExerciseTrackingData } = useWorkoutHistoryContext();
+  const { weeklyCardioMap } = useCardioContext();
 
-  // Workout state (plan + derived maps + loading)
-  const {
+  const latestWorkout = useMemo(() => {
+    const entries = Object.entries(exerciseTrackingMaps?.byDate ?? {}).sort(([a], [b]) => b.localeCompare(a));
+    return entries[0] ?? null;
+  }, [exerciseTrackingMaps]);
+
+  const nextSplit = useMemo(() => {
+    if (!workoutSplits.length) return null;
+    const lastSplitName = latestWorkout?.[1]?.[0]?.splitName;
+    const lastIndex = workoutSplits.findIndex((split) => split.name === lastSplitName);
+    return workoutSplits[(lastIndex + 1) % workoutSplits.length];
+  }, [latestWorkout, workoutSplits]);
+
+  const data = useMemo<HomeDashboardData>(() => {
+    const weekly = Object.entries(weeklyCardioMap ?? {}).sort(([a], [b]) => b.localeCompare(a))[0]?.[1];
+    const aerobicMinutes = Array(7).fill(0) as number[];
+    weekly?.records.forEach((record) => {
+      aerobicMinutes[new Date(record.workoutTimeUtc).getDay()] += record.durationMins;
+    });
+    const orderedDays = [1, 2, 3, 4, 5, 6, 0].map((dayIndex) => ({
+      label: DAY_LABELS[dayIndex],
+      minutes: aerobicMinutes[dayIndex],
+    }));
+
+    const latestEntries = latestWorkout?.[1] ?? [];
+    const pr = analyzedExerciseTrackingData?.pr;
+    const estimatedOneRepMaxKg = pr?.maxWeight
+      ? Math.round(pr.maxWeight * (1 + pr.maxReps / 30) * 10) / 10
+      : HOME_DASHBOARD_MOCK.estimatedOneRepMax.valueKg;
+    const nextExercises = nextSplit ? (exercises[nextSplit.name] ?? []) : [];
+
+    return {
+      theme,
+      state: {
+        hasWorkout: !!workout && workoutSplits.length > 0,
+        hasTracking: !!latestWorkout && (analyzedExerciseTrackingData?.workoutCount ?? 0) > 0,
+      },
+      user: {
+        displayName: user?.name?.trim().split(' ')[0] || user?.username || 'Athlete',
+        profilePicPath: user?.profilePicPath ?? null,
+        gender: user?.gender ?? null,
+        unreadCount: unreadMessages.length,
+      },
+      nextWorkout: nextSplit
+        ? {
+            name: nextSplit.name,
+            exerciseCount: nextExercises.length,
+            setCount: nextExercises.reduce((total, exercise) => total + exercise.sets.length, 0),
+          }
+        : HOME_DASHBOARD_MOCK.nextWorkout,
+      gymActivity: HOME_DASHBOARD_MOCK.gymActivity,
+      lastWorkout: latestWorkout
+        ? {
+            name: latestEntries[0]?.splitName ?? HOME_DASHBOARD_MOCK.lastWorkout.name,
+            dateLabel: new Date(`${latestWorkout[0]}T00:00:00`).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+            exerciseCount: latestEntries.length,
+            setCount: latestEntries.reduce((total, exercise) => total + exercise.reps.length, 0),
+          }
+        : HOME_DASHBOARD_MOCK.lastWorkout,
+      aerobics: !USE_MOCK_AEROBICS && weekly ? { totalMinutes: weekly.totalDurationMins, days: orderedDays } : HOME_DASHBOARD_MOCK.aerobics,
+      achievement: {
+        exercise: pr?.maxExercise ?? HOME_DASHBOARD_MOCK.achievement.exercise,
+        value: pr?.maxWeight ? `${pr.maxWeight} kg PR` : HOME_DASHBOARD_MOCK.achievement.value,
+        estimatedOneRepMaxKg,
+      },
+    };
+  }, [
+    analyzedExerciseTrackingData,
+    exercises,
+    latestWorkout,
+    nextSplit,
+    theme,
+    unreadMessages.length,
+    user,
+    weeklyCardioMap,
     workout,
-    workoutSplits, // [A,B,C...]
-  } = useWorkoutPlanContext();
-
-  // Analysis state (tracking + derived analytics + loading)
-  const { analyzedExerciseTrackingData } = useWorkoutHistoryContext();
-  const hasTracking = useMemo(() => !!analyzedExerciseTrackingData, [analyzedExerciseTrackingData]);
-
-  // Derive stable user fields
-  const {
-    username = '',
-    userId = '',
-    firstName = '',
-    profilePicPath = '',
-  } = useMemo(() => {
-    const u = user;
-    return {
-      username: u?.username ?? '',
-      userId: u?.id ?? '',
-      firstName: u?.name!.trim().split(' ')[0],
-      profilePicPath: u?.profilePicPath ?? '',
-    };
-  }, [user]);
-
-  // Derived workout flags/counters
-  const { hasAssignedWorkout, workoutSplitsNumber } = useMemo(() => {
-    const hasWorkout = !!workout;
-    // workoutSplits is a map in the new context; count keys safely
-    const splitsCount = workoutSplits ? Object.keys(workoutSplits).length : 0;
-    return { hasAssignedWorkout: hasWorkout, workoutSplitsNumber: splitsCount };
-  }, [workout, workoutSplits]);
-
-  // Derived analysis fields
-  const { PR, totalWorkoutNumber, mostFrequentSplit, lastWorkoutDate } = useMemo(() => {
-    const a = analyzedExerciseTrackingData;
-    return {
-      PR: a?.pr ?? null,
-      totalWorkoutNumber: a?.workoutCount ?? 0,
-      mostFrequentSplit: a?.mostFrequentSplit ?? null,
-      lastWorkoutDate: a?.lastWorkoutDate ?? 'none',
-    };
-  }, [analyzedExerciseTrackingData]);
-
-  // Stable data object for easy consumption in components
-  const data = useMemo<HomePageData>(
-    () => ({
-      username,
-      userId,
-      hasAssignedWorkout,
-      hasTracking,
-      profilePicPath,
-      firstName,
-      lastWorkoutDate,
-      totalWorkoutNumber,
-      workoutSplitsNumber,
-      mostFrequentSplit,
-      PR,
-      isLoading,
-    }),
-    [
-      username,
-      userId,
-      hasAssignedWorkout,
-      profilePicPath,
-      firstName,
-      lastWorkoutDate,
-      totalWorkoutNumber,
-      workoutSplitsNumber,
-      mostFrequentSplit,
-      PR,
-      isLoading,
-      hasTracking,
-    ],
-  );
+    workoutSplits.length,
+  ]);
 
   return {
     data,
+    actions: {
+      openInbox: () => navigation.navigate('Inbox'),
+      createWorkout: () => navigation.navigate('CreateWorkout'),
+      startWorkout: () =>
+        nextSplit ? navigation.navigate('StartWorkout', { workoutSplit: nextSplit }) : navigation.navigate('MyWorkoutPlan'),
+      openProgress: () => navigation.navigate('Analytics'),
+      openHistory: () => navigation.navigate('Statistics'),
+    },
   };
 };
 

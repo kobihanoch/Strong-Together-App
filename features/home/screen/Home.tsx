@@ -1,89 +1,59 @@
 import React from 'react';
-import { Dimensions, StyleSheet, View } from 'react-native';
-import { ScrollView } from 'react-native-gesture-handler';
-import { RFValue } from 'react-native-responsive-fontsize';
-import PRCard from '../components/PRCard';
-import QuickActions from '../components/QuickActions';
-import StartWorkoutCard from '../../workouts/plan/components/StartWorkoutCard';
-import TopComponent from '../components/TopComponent';
+import { ScrollView, StyleSheet, useWindowDimensions } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import AchievementCard from '../components/AchievementCard';
+import AerobicsCard from '../components/AerobicsCard';
+import HomeHeader from '../components/HomeHeader';
+import GymActivityCard from '../components/GymActivityCard';
+import LastWorkoutCard from '../components/LastWorkoutCard';
+import NextWorkoutCard from '../components/NextWorkoutCard';
+import NoTrackingCard from '../components/NoTrackingCard';
+import NoWorkoutCard from '../components/NoWorkoutCard';
 import useHomePageLogic from '../hooks/use-home-page-logic.hook';
-
-const { width, height } = Dimensions.get('window');
+import { colors } from '../../../shared/constants/colors';
 
 const Home = () => {
-  // Hook handling
-  const { data: userData } = useHomePageLogic();
+  const { data, actions } = useHomePageLogic();
+  const { width, height } = useWindowDimensions();
+  const horizontalPadding = Math.max(14, Math.min(width * 0.045, 22));
+  const sectionGap = Math.max(12, Math.min(height * 0.016, 18));
 
   return (
-    <View style={{ flex: 1, flexDirection: 'column' }}>
-      <View style={{ flex: 2 }}>
-        <TopComponent />
-      </View>
-      <View style={{ flex: 8 }}>
-        <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false}>
-          <View style={styles.midContainer}>
-            <StartWorkoutCard data={userData}></StartWorkoutCard>
-            <PRCard
-              PR={userData.PR}
-              hasAssignedWorkout={userData.hasAssignedWorkout}
-              hasTracking={userData.hasTracking}
-            ></PRCard>
-            <QuickActions hasAssignedWorkout={userData.hasAssignedWorkout}></QuickActions>
-          </View>
-        </ScrollView>
-      </View>
-    </View>
+    <SafeAreaView style={[styles.safeArea, { backgroundColor: data.theme.canvas }]} edges={['top']}>
+      <ScrollView
+        contentContainerStyle={[styles.content, { paddingHorizontal: horizontalPadding, gap: sectionGap }]}
+        showsVerticalScrollIndicator={false}
+      >
+        <HomeHeader data={data.user} theme={data.theme} onInbox={actions.openInbox} />
+        {data.state.hasWorkout ? (
+          <NextWorkoutCard
+            data={data.nextWorkout}
+            theme={data.theme}
+            isFirstWorkout={!data.state.hasTracking}
+            onStart={actions.startWorkout}
+          />
+        ) : (
+          <NoWorkoutCard theme={data.theme} onCreate={actions.createWorkout} />
+        )}
+
+        {data.state.hasTracking ? (
+          <>
+            <GymActivityCard data={data.gymActivity} theme={data.theme} />
+            <AerobicsCard data={data.aerobics} theme={data.theme} />
+            <AchievementCard data={data.achievement} theme={data.theme} onPress={actions.openProgress} />
+            <LastWorkoutCard data={data.lastWorkout} theme={data.theme} onPress={actions.openHistory} />
+          </>
+        ) : data.state.hasWorkout ? (
+          <NoTrackingCard theme={data.theme} />
+        ) : null}
+      </ScrollView>
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
-  headerContainer: {
-    paddingHorizontal: width * 0.06,
-    flex: 1.5,
-    flexDirection: 'row',
-    gap: width * 0.05,
-    alignItems: 'center',
-  },
-  headerText: {
-    fontFamily: 'Inter_600SemiBold',
-    color: 'black',
-    fontSize: RFValue(35),
-    alignItems: 'flex-start',
-  },
-  semiHeaderText: {
-    fontFamily: 'Inter_400Regular',
-    fontSize: RFValue(13),
-    marginTop: height * 0.01,
-  },
-
-  midContainer: {
-    flexDirection: 'column',
-    justifyContent: 'flex-start',
-    alignItems: 'center',
-    gap: height * 0.03,
-  },
-
-  bottomContainer: {
-    flex: 0,
-    flexDirection: 'column',
-    justifyContent: 'space-around',
-    alignItems: 'center',
-  },
-
-  logoutButton: {
-    marginTop: height * 0.1,
-    backgroundColor: '#ff4d4d',
-    paddingVertical: height * 0.015,
-    paddingHorizontal: width * 0.2,
-    borderRadius: 25,
-    alignSelf: 'center',
-  },
-  logoutButtonText: {
-    color: 'white',
-    fontFamily: 'Inter_700Bold',
-    fontSize: width * 0.04,
-    textAlign: 'center',
-  },
+  safeArea: { flex: 1, backgroundColor: colors.canvas },
+  content: { paddingTop: 12, paddingBottom: 28 },
 });
 
 export default Home;

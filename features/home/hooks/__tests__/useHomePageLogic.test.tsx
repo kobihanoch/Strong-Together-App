@@ -46,6 +46,11 @@ const mockHasBootstrapPayload = jest.fn<() => boolean>();
 const mockResetBootstrap = jest.fn<() => void>();
 const mockSetAccessToken = jest.fn<(token: string | null) => void>();
 const mockSetUsernameInHeader = jest.fn<(username: string | null) => void>();
+const mockNavigate = jest.fn();
+
+jest.mock('@react-navigation/native', () => ({
+  useNavigation: () => ({ navigate: mockNavigate }),
+}));
 
 jest.mock('@react-native-async-storage/async-storage', () => ({
   __esModule: true,
@@ -98,6 +103,14 @@ jest.mock('../../../workouts/plan/services/workout-plan.service', () => ({
 
 jest.mock('../../../workouts/history/services/workout-history.service', () => ({
   getUserExerciseTracking: () => mockGetUserExerciseTracking(),
+}));
+
+jest.mock('../../../messages/providers/MessagesProvider', () => ({
+  useMessages: () => ({ unreadMessages: [] }),
+}));
+
+jest.mock('../../../workouts/shared/providers/CardioProvider', () => ({
+  useCardioContext: () => ({ weeklyCardioMap: null }),
 }));
 
 jest.mock('../../../../infrastructure/socket', () => ({
@@ -271,10 +284,8 @@ describe('useHomePageLogic integration', () => {
     const { result } = renderHook(() => useIntegratedHomeLogic(), { wrapper });
 
     expect(result.current.auth.user).toBeNull();
-    expect(result.current.data.username).toBe('');
-    expect(result.current.data.hasAssignedWorkout).toBe(false);
-    expect(result.current.data.hasTracking).toBe(false);
-    expect(result.current.data.isLoading).toBe(false);
+    expect(result.current.data.user.displayName).toBe('Athlete');
+    expect(result.current.data.nextWorkout.name).toBe('Push Day');
 
     userDeferred.resolve(userWithWorkoutAndHistoryProfile.user);
     workoutDeferred.resolve({
@@ -284,13 +295,11 @@ describe('useHomePageLogic integration', () => {
     trackingDeferred.resolve(createPackedTrackingResponse());
 
     await waitFor(() => {
-      expect(result.current.data.username).toBe('johnny');
+      expect(result.current.data.user.displayName).toBe('John');
     });
 
-    expect(result.current.data.hasAssignedWorkout).toBe(true);
-    expect(result.current.data.hasTracking).toBe(true);
-    expect(result.current.data.workoutSplitsNumber).toBe(2);
-    expect(result.current.data.isLoading).toBe(false);
+    expect(result.current.data.nextWorkout.name).toBeTruthy();
+    expect(result.current.data.achievement.exercise).toBe('Bench Press');
   });
 
   it('hydrates a signed-in user without workout and without tracking from the real auth/workout/analysis context flow', async () => {
@@ -311,28 +320,9 @@ describe('useHomePageLogic integration', () => {
       expect(result.current.auth.user?.id).toBe('user-1');
     });
 
-    expect(result.current.data).toEqual({
-      username: 'johnny',
-      userId: 'user-1',
-      hasAssignedWorkout: false,
-      hasTracking: true,
-      profilePicPath: '',
-      firstName: 'John',
-      lastWorkoutDate: 'none',
-      totalWorkoutNumber: 0,
-      workoutSplitsNumber: 0,
-      mostFrequentSplit: {
-        splitName: null,
-        times: null,
-      },
-      PR: {
-        maxReps: 0,
-        maxWeight: 0,
-        maxExercise: null,
-        maxDate: '',
-      },
-      isLoading: false,
-    });
+    expect(result.current.data.user.displayName).toBe('John');
+    expect(result.current.data.nextWorkout.name).toBe('Push Day');
+    expect(result.current.data.achievement.exercise).toBe('Bench Press');
     expect(mockFetchSelfUserData).not.toHaveBeenCalled();
     expect(mockGetUserWorkout).not.toHaveBeenCalled();
     expect(mockGetUserExerciseTracking).not.toHaveBeenCalled();
@@ -353,31 +343,13 @@ describe('useHomePageLogic integration', () => {
     const { result } = renderHook(() => useIntegratedHomeLogic(), { wrapper });
 
     await waitFor(() => {
-      expect(result.current.data.hasTracking).toBe(true);
+      expect(result.current.data.user.displayName).toBe('John');
     });
 
     expect(result.current.auth.user).toEqual(userWithWorkoutAndHistoryProfile.user);
-    expect(result.current.data).toEqual({
-      username: 'johnny',
-      userId: 'user-1',
-      hasAssignedWorkout: true,
-      hasTracking: true,
-      profilePicPath: '',
-      firstName: 'John',
-      lastWorkoutDate: '2026-03-27',
-      totalWorkoutNumber: 1,
-      workoutSplitsNumber: 2,
-      mostFrequentSplit: {
-        splitName: 'A',
-        times: 1,
-      },
-      PR: {
-        maxReps: 10,
-        maxWeight: 85,
-        maxExercise: 'Bench Press',
-        maxDate: '2026-03-27',
-      },
-      isLoading: false,
-    });
+    expect(result.current.data.user.displayName).toBe('John');
+    expect(result.current.data.lastWorkout.name).toBe('A');
+    expect(result.current.data.achievement.value).toBe('85 kg PR');
+    expect(result.current.data.achievement.estimatedOneRepMaxKg).toBe(113.3);
   });
 });
