@@ -30,9 +30,9 @@ const NextWorkoutCard = ({ data, theme, isFirstWorkout, onStart }: Props) => {
       />
       <Column style={[styles.overlay, { backgroundColor: theme.heroOverlay }]}>
         <Text style={styles.eyebrow}>{isFirstWorkout ? 'YOUR FIRST WORKOUT' : "TODAY'S WORKOUT"}</Text>
-        <Text style={styles.title}>{data.muscleGroup}</Text>
+        <Text style={styles.title}>{data.name}</Text>
         <Text style={styles.meta}>
-          Split A · {data.exerciseCount} exercises · {data.setCount} sets
+          {data.muscleGroup} · {data.exerciseCount} exercises · {data.setCount} sets
         </Text>
         <TouchableOpacity style={[common.primaryButton, styles.button]} onPress={onStart} activeOpacity={0.85}>
           <Text style={common.primaryButtonText}>{isFirstWorkout ? 'Start first workout' : 'Start workout'}</Text>

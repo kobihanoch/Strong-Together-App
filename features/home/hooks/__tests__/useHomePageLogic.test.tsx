@@ -1,355 +1,134 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import React from 'react';
-import { beforeEach, describe, expect, it, jest } from '@jest/globals';
-import { renderHook, waitFor } from '@testing-library/react-native';
-import { AxiosError } from 'axios';
-
-jest.mock('axios', () => ({
-  __esModule: true,
-  default: {
-    create: () => ({
-      get: jest.fn(),
-      post: jest.fn(),
-      put: jest.fn(),
-      patch: jest.fn(),
-      delete: jest.fn(),
-      interceptors: {
-        request: { use: jest.fn() },
-        response: { use: jest.fn() },
-      },
-    }),
-  },
-  AxiosError: class AxiosError extends Error {},
-}));
-
-const mockCacheGetJSON = jest.fn<(key: string) => Promise<unknown>>();
-const mockCacheSetJSON = jest.fn<(key: string, value: unknown, ttl: number) => Promise<void>>();
-const mockCacheDeleteAllCache = jest.fn<() => Promise<void>>();
-const mockCacheDeleteAllCacheWithoutStartWorkout = jest.fn<() => Promise<void>>();
-const mockGetRefreshToken = jest.fn<() => Promise<string | null>>();
-const mockSaveRefreshToken = jest.fn<(token: string) => Promise<void>>();
-const mockClearRefreshToken = jest.fn<() => Promise<void>>();
-const mockRefreshAndRotateTokens =
-  jest.fn<() => Promise<{ accessToken: string; refreshToken: string; userId: string }>>();
-const mockFetchSelfUserData = jest.fn<() => Promise<typeof userWithWorkoutAndHistoryProfile.user>>();
-const mockGetUserWorkout = jest.fn<
-  () => Promise<{
-    workoutPlan: typeof userWithWorkoutAndHistoryProfile.workout;
-    workoutPlanForEditWorkout: typeof userWithWorkoutAndHistoryProfile.workoutForEdit;
-  }>
->();
-const mockGetUserExerciseTracking = jest.fn<() => Promise<ReturnType<typeof createPackedTrackingResponse>>>();
-const mockConnectSocket = jest.fn<(username: string) => Promise<void>>();
-const mockDisconnectSocket = jest.fn<() => void>();
-const mockUseNetworkStatus = jest.fn<() => boolean>();
-const mockHasBootstrapPayload = jest.fn<() => boolean>();
-const mockResetBootstrap = jest.fn<() => void>();
-const mockSetAccessToken = jest.fn<(token: string | null) => void>();
-const mockSetUsernameInHeader = jest.fn<(username: string | null) => void>();
-const mockNavigate = jest.fn();
-
-jest.mock('@react-navigation/native', () => ({
-  useNavigation: () => ({ navigate: mockNavigate }),
-}));
-
-jest.mock('@react-native-async-storage/async-storage', () => ({
-  __esModule: true,
-  default: {
-    getItem: jest.fn(),
-    setItem: jest.fn(),
-    removeItem: jest.fn(),
-    getAllKeys: jest.fn(),
-    multiRemove: jest.fn(),
-  },
-}));
-
-jest.mock('expo-constants', () => ({
-  __esModule: true,
-  default: {
-    expoConfig: {
-      version: 'test-version',
-    },
-  },
-}));
-
-jest.mock('../../../../infrastructure/cache/cache.utils', () => {
-  const actual = jest.requireActual('../../../../infrastructure/cache/cache.utils') as Record<string, unknown>;
-  return {
-    ...actual,
-    cacheGetJSON: (key: string) => mockCacheGetJSON(key),
-    cacheSetJSON: (key: string, value: unknown, ttl: number) => mockCacheSetJSON(key, value, ttl),
-    cacheDeleteAllCache: () => mockCacheDeleteAllCache(),
-    cacheDeleteAllCacheWithoutStartWorkout: () => mockCacheDeleteAllCacheWithoutStartWorkout(),
-  };
-});
-
-jest.mock('../../../auth/shared/utils/token-storage.utils', () => ({
-  getRefreshToken: () => mockGetRefreshToken(),
-  saveRefreshToken: (token: string) => mockSaveRefreshToken(token),
-  clearRefreshToken: () => mockClearRefreshToken(),
-}));
-
-jest.mock('../../../auth/shared/services/auth.service', () => ({
-  refreshAndRotateTokens: () => mockRefreshAndRotateTokens(),
-  fetchSelfUserData: () => mockFetchSelfUserData(),
-  loginUser: jest.fn(),
-  logoutUser: jest.fn(),
-  registerUser: jest.fn(),
-}));
-
-jest.mock('../../../workouts/plan/services/workout-plan.service', () => ({
-  getUserWorkout: () => mockGetUserWorkout(),
-}));
-
-jest.mock('../../../workouts/history/services/workout-history.service', () => ({
-  getUserExerciseTracking: () => mockGetUserExerciseTracking(),
-}));
-
-jest.mock('../../../messages/providers/MessagesProvider', () => ({
-  useMessages: () => ({ unreadMessages: [] }),
-}));
-
-jest.mock('../../../workouts/shared/providers/CardioProvider', () => ({
-  useCardioContext: () => ({ weeklyCardioMap: null }),
-}));
-
-jest.mock('../../../../infrastructure/socket', () => ({
-  connectSocket: (username: string) => mockConnectSocket(username),
-  disconnectSocket: () => mockDisconnectSocket(),
-}));
-
-jest.mock('../../../../shared/hooks/use-network-status.hook', () => ({
-  useNetworkStatus: () => mockUseNetworkStatus(),
-}));
-
-jest.mock('../../../auth/shared/hooks/use-google-auth.hook', () => ({
-  useGoogleAuth: () => ({
-    signInWithGoogle: jest.fn(),
-  }),
-}));
-
-jest.mock('../../../auth/shared/hooks/use-apple-auth.hook', () => ({
-  useAppleAuth: () => ({
-    signInWithApple: jest.fn(),
-  }),
-}));
-
-jest.mock('../../../../infrastructure/api/api-config/bootstrap', () => ({
-  hasBootstrapPayload: () => mockHasBootstrapPayload(),
-  resetBootstrap: () => mockResetBootstrap(),
-}));
-
-jest.mock('../../../auth/shared/utils/auth.utils', () => ({
-  __esModule: true,
-  default: {
-    setAccessToken: (token: string | null) => mockSetAccessToken(token),
-    logout: null,
-    setUsernameInHeader: (username: string | null) => mockSetUsernameInHeader(username),
-  },
-}));
-
-import { WorkoutHistoryProvider } from '../../../workouts/shared/providers/WorkoutHistoryProvider';
-import { GlobalAppLoadingProvider } from '../../../../shared/providers/GlobalAppLoadingProvider';
-import { WorkoutPlanProvider } from '../../../workouts/shared/providers/WorkoutPlanProvider';
+import { act, renderHook } from '@testing-library/react-native';
 import useHomePageLogic from '../use-home-page-logic.hook';
-import {
-  userWithoutWorkoutProfile,
-  userWithWorkoutAndHistoryProfile,
-} from '../../../../tests/fixtures/userProfiles';
-import { AuthProvider, useAuth } from '../../../auth/shared/providers/AuthProvider';
 
-const wrapper = ({ children }: { children: React.ReactNode }) => (
-  <GlobalAppLoadingProvider>
-    <AuthProvider>
-      <WorkoutPlanProvider>
-        <WorkoutHistoryProvider>{children}</WorkoutHistoryProvider>
-      </WorkoutPlanProvider>
-    </AuthProvider>
-  </GlobalAppLoadingProvider>
-);
+const mockNavigate = jest.fn();
+let mockAuth: any;
+let mockMessages: any;
+let mockCardio: any;
+let mockWorkoutPlan: any;
+let mockDashboard: any;
+let mockAppLoading = false;
 
-const useIntegratedHomeLogic = () => {
-  const auth = useAuth();
-  const { data } = useHomePageLogic();
-  return {
-    auth,
-    data,
-  };
-};
-
-const createDeferred = <T,>() => {
-  let resolve!: (value: T) => void;
-  let reject!: (reason?: unknown) => void;
-  const promise = new Promise<T>((res, rej) => {
-    resolve = res;
-    reject = rej;
-  });
-  return { promise, resolve, reject };
-};
-
-const createNetworkAxiosError = (): AxiosError => {
-  const err = new AxiosError('offline');
-  (err as AxiosError & { isNetworkError: boolean }).isNetworkError = true;
-  return err;
-};
-
-const createPackedTrackingResponse = () => ({
-  exerciseTrackingMaps: userWithWorkoutAndHistoryProfile.exerciseTrackingMaps!,
-  exerciseTrackingAnalysis: {
-    uniqueDays: userWithWorkoutAndHistoryProfile.analyzedExerciseTrackingData!.workoutCount,
-    mostFrequentSplit: userWithWorkoutAndHistoryProfile.analyzedExerciseTrackingData!.mostFrequentSplit.splitName,
-    mostFrequentSplitDays: userWithWorkoutAndHistoryProfile.analyzedExerciseTrackingData!.mostFrequentSplit.times,
-    lastWorkoutDate: userWithWorkoutAndHistoryProfile.analyzedExerciseTrackingData!.lastWorkoutDate,
-    splitDaysByName: userWithWorkoutAndHistoryProfile.analyzedExerciseTrackingData!.splitDaysByName,
-    prs: {
-      prMax: {
-        exercise: userWithWorkoutAndHistoryProfile.analyzedExerciseTrackingData!.pr.maxExercise!,
-        weight: userWithWorkoutAndHistoryProfile.analyzedExerciseTrackingData!.pr.maxWeight,
-        reps: userWithWorkoutAndHistoryProfile.analyzedExerciseTrackingData!.pr.maxReps,
-        workoutTimeUtc: userWithWorkoutAndHistoryProfile.analyzedExerciseTrackingData!.pr.maxDate,
-      },
+jest.mock('@react-navigation/native', () => ({ useNavigation: () => ({ navigate: mockNavigate }) }));
+jest.mock('../../../../shared/providers/AppThemeProvider', () => ({
+  useAppTheme: () => ({
+    colors: {
+      canvas: '#fff', surface: '#fff', surfaceMuted: '#eee', border: '#ddd', textPrimary: '#111',
+      textSecondary: '#666', primary: '#2977ff', primarySoft: '#eef', achievement: '#f90',
+      achievementSoft: '#fff5e5', heroSurface: '#111', heroOverlay: 'rgba(0,0,0,.5)', white: '#fff', profit: '#080',
     },
-  },
-});
+  }),
+}));
+jest.mock('../../../../shared/providers/GlobalAppLoadingProvider', () => ({
+  useGlobalAppLoadingContext: () => ({ isLoading: mockAppLoading }),
+}));
+jest.mock('../../../auth/shared/providers/AuthProvider', () => ({ useAuth: () => mockAuth }));
+jest.mock('../../../messages/providers/MessagesProvider', () => ({ useMessages: () => mockMessages }));
+jest.mock('../../../workouts/shared/providers/CardioProvider', () => ({ useCardioContext: () => mockCardio }));
+jest.mock('../../../workouts/shared/providers/WorkoutPlanProvider', () => ({ useWorkoutPlanContext: () => mockWorkoutPlan }));
+jest.mock('../use-home-page-cache-handler.hook', () => ({ __esModule: true, default: () => mockDashboard }));
 
-const createEmptyTrackingResponse = () => ({
-  exerciseTrackingMaps: userWithoutWorkoutProfile.exerciseTrackingMaps!,
-  exerciseTrackingAnalysis: {
-    uniqueDays: 0,
-    mostFrequentSplit: null,
-    mostFrequentSplitDays: null,
-    lastWorkoutDate: null,
-    splitDaysByName: {},
-    prs: {
-      prMax: null,
-    },
+const splitA = {
+  id: 11, workoutId: 7, name: 'A', orderIndex: 0, createdAt: '2026-03-20T08:00:00.000Z',
+  muscleGroup: 'Chest', isActive: true,
+  exercises: [{ sets: [{ orderIndex: 0, reps: 10 }, { orderIndex: 1, reps: 8 }] }],
+};
+const splitB = {
+  ...splitA, id: 12, name: 'B', orderIndex: 1, muscleGroup: 'Back',
+  exercises: [{ sets: [{ orderIndex: 0, reps: 12 }] }],
+};
+const stats = {
+  workoutCount: 3,
+  hasExerciseTracking: true,
+  nextWorkoutSplit: { id: 12, name: 'B', orderIndex: 1, muscleGroup: 'Back' },
+  workoutTargets: { workoutCountThisWeek: 2, workoutCountScheduledPerWeek: 3, weekStreak: 4 },
+  lastWorkoutStats: {
+    workoutDate: '2026-03-27', workoutSplitName: 'A', exerciseTrackedCount: 5, setTrackedCount: 14,
   },
-});
-
-const setupCacheForScenario = ({
-  userId,
-  auth,
-  workout,
-  analysis,
-}: {
-  userId: string | null;
-  auth?: any;
-  workout?: any;
-  analysis?: any;
-}) => {
-  mockCacheGetJSON.mockImplementation(async (...args: [string]) => {
-    const [key] = args;
-    if (key === 'CACHE:USER_ID') return userId;
-    if (key.startsWith('CACHE:AUTH:')) return auth ?? null;
-    if (key.startsWith('CACHE:WORKOUTPLAN:')) return workout ?? null;
-    if (key.startsWith('CACHE:TRACKING:')) return analysis ?? null;
-    return null;
-  });
+  prs: [{
+    exerciseToSplitId: 20, exerciseId: 1, exerciseName: 'Bench Press', prWeight: 85,
+    prReps: 8, prSetIndex: 1, estimatedOneRepMax: 107.7,
+  }],
 };
 
-describe('useHomePageLogic integration', () => {
+describe('useHomePageLogic', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    mockUseNetworkStatus.mockReturnValue(true);
-    mockHasBootstrapPayload.mockReturnValue(false);
-    mockGetRefreshToken.mockResolvedValue('refresh-token');
-    mockSaveRefreshToken.mockResolvedValue(undefined);
-    mockClearRefreshToken.mockResolvedValue(undefined);
-    mockCacheSetJSON.mockResolvedValue(undefined);
-    mockCacheDeleteAllCache.mockResolvedValue(undefined);
-    mockCacheDeleteAllCacheWithoutStartWorkout.mockResolvedValue(undefined);
-    mockConnectSocket.mockResolvedValue(undefined);
-    mockDisconnectSocket.mockReturnValue(undefined);
+    mockAppLoading = false;
+    mockAuth = {
+      user: { name: 'John Doe', username: 'johnny', profilePicPath: null, gender: 'Male' },
+      isValidatedWithServer: true,
+    };
+    mockMessages = { unreadMessages: [{ id: 1 }] };
+    mockCardio = { weeklyCardioMap: null };
+    mockWorkoutPlan = { workout: { id: 7, workoutSplits: [splitA, splitB] }, workoutSplits: [splitA, splitB] };
+    mockDashboard = { dashboardStats: stats, loading: false };
   });
 
-  it('starts with safe empty home data while user and provider data are still hydrating', async () => {
-    setupCacheForScenario({ userId: 'user-1' });
-    mockRefreshAndRotateTokens.mockResolvedValue({
-      accessToken: 'access-token',
-      refreshToken: 'rotated-refresh-token',
-      userId: 'user-1',
+  it('maps dashboard stats and nested plan data into Home data', () => {
+    const { result } = renderHook(() => useHomePageLogic());
+
+    expect(result.current.isLoading).toBe(false);
+    expect(result.current.data.nextWorkout).toMatchObject({
+      id: 12, name: 'B', muscleGroup: 'Back', exerciseCount: 1, setCount: 1,
     });
-
-    const userDeferred = createDeferred<typeof userWithWorkoutAndHistoryProfile.user>();
-    const workoutDeferred = createDeferred<{
-      workoutPlan: typeof userWithWorkoutAndHistoryProfile.workout;
-      workoutPlanForEditWorkout: typeof userWithWorkoutAndHistoryProfile.workoutForEdit;
-    }>();
-    const trackingDeferred = createDeferred<ReturnType<typeof createPackedTrackingResponse>>();
-
-    mockFetchSelfUserData.mockReturnValue(userDeferred.promise);
-    mockGetUserWorkout.mockReturnValue(workoutDeferred.promise);
-    mockGetUserExerciseTracking.mockReturnValue(trackingDeferred.promise);
-
-    const { result } = renderHook(() => useIntegratedHomeLogic(), { wrapper });
-
-    expect(result.current.auth.user).toBeNull();
-    expect(result.current.data.user.displayName).toBe('Athlete');
-    expect(result.current.data.nextWorkout.name).toBe('Push Day');
-
-    userDeferred.resolve(userWithWorkoutAndHistoryProfile.user);
-    workoutDeferred.resolve({
-      workoutPlan: userWithWorkoutAndHistoryProfile.workout,
-      workoutPlanForEditWorkout: userWithWorkoutAndHistoryProfile.workoutForEdit,
+    expect(result.current.data.gymActivity).toEqual({ completedThisWeek: 2, weeklyTarget: 3, weekStreak: 4 });
+    expect(result.current.data.lastWorkout).toMatchObject({ name: 'A', exerciseCount: 5, setCount: 14 });
+    expect(result.current.data.achievement).toEqual({
+      exercise: 'Bench Press', value: '85 kg PR', estimatedOneRepMax: 107.7,
     });
-    trackingDeferred.resolve(createPackedTrackingResponse());
-
-    await waitFor(() => {
-      expect(result.current.data.user.displayName).toBe('John');
-    });
-
-    expect(result.current.data.nextWorkout.name).toBeTruthy();
-    expect(result.current.data.achievement.exercise).toBe('Bench Press');
   });
 
-  it('hydrates a signed-in user without workout and without tracking from the real auth/workout/analysis context flow', async () => {
-    setupCacheForScenario({
-      userId: 'user-1',
-      auth: userWithoutWorkoutProfile.user,
-      workout: {
-        workoutPlan: userWithoutWorkoutProfile.workout,
-        workoutPlanForEditWorkout: userWithoutWorkoutProfile.workoutForEdit,
+  it('stays loading until dashboard stats are known', () => {
+    mockDashboard = { dashboardStats: undefined, loading: false };
+    const { result } = renderHook(() => useHomePageLogic());
+    expect(result.current.isLoading).toBe(true);
+  });
+
+  it('returns the no-workout state when the plan is empty', () => {
+    mockWorkoutPlan = { workout: null, workoutSplits: [] };
+    mockDashboard = {
+      dashboardStats: { ...stats, hasExerciseTracking: false, nextWorkoutSplit: null },
+      loading: false,
+    };
+    const { result } = renderHook(() => useHomePageLogic());
+
+    expect(result.current.data.state).toEqual({ hasWorkout: false, hasTracking: false });
+    expect(result.current.data.nextWorkout.exerciseCount).toBe(0);
+  });
+
+  it('uses the latest cardio week and orders bars Monday through Sunday', () => {
+    mockCardio = {
+      weeklyCardioMap: {
+        '2026-03-16': { totalDurationMins: 10, records: [] },
+        '2026-03-23': {
+          totalDurationMins: 25,
+          records: [{ durationMins: 25, workoutTimeUtc: '2026-03-23T10:00:00.000Z' }],
+        },
       },
-      analysis: createEmptyTrackingResponse(),
-    });
-    mockRefreshAndRotateTokens.mockRejectedValue(createNetworkAxiosError());
+    };
+    const { result } = renderHook(() => useHomePageLogic());
 
-    const { result } = renderHook(() => useIntegratedHomeLogic(), { wrapper });
-
-    await waitFor(() => {
-      expect(result.current.auth.user?.id).toBe('user-1');
-    });
-
-    expect(result.current.data.user.displayName).toBe('John');
-    expect(result.current.data.nextWorkout.name).toBe('Push Day');
-    expect(result.current.data.achievement.exercise).toBe('Bench Press');
-    expect(mockFetchSelfUserData).not.toHaveBeenCalled();
-    expect(mockGetUserWorkout).not.toHaveBeenCalled();
-    expect(mockGetUserExerciseTracking).not.toHaveBeenCalled();
+    expect(result.current.data.aerobics.totalMinutes).toBe(25);
+    expect(result.current.data.aerobics.days[0]).toEqual({ label: 'M', minutes: 25 });
   });
 
-  it('hydrates a signed-in user with workout and history and lets the full provider chain reach HomePageLogic', async () => {
-    setupCacheForScenario({
-      userId: 'user-1',
-      auth: userWithWorkoutAndHistoryProfile.user,
-      workout: {
-        workoutPlan: userWithWorkoutAndHistoryProfile.workout,
-        workoutPlanForEditWorkout: userWithWorkoutAndHistoryProfile.workoutForEdit,
-      },
-      analysis: createPackedTrackingResponse(),
-    });
-    mockRefreshAndRotateTokens.mockRejectedValue(createNetworkAxiosError());
-
-    const { result } = renderHook(() => useIntegratedHomeLogic(), { wrapper });
-
-    await waitFor(() => {
-      expect(result.current.data.user.displayName).toBe('John');
+  it('routes Home actions and passes the selected full split', () => {
+    const { result } = renderHook(() => useHomePageLogic());
+    act(() => {
+      result.current.actions.openInbox();
+      result.current.actions.createWorkout();
+      result.current.actions.startWorkout();
+      result.current.actions.openProgress();
+      result.current.actions.openHistory();
     });
 
-    expect(result.current.auth.user).toEqual(userWithWorkoutAndHistoryProfile.user);
-    expect(result.current.data.user.displayName).toBe('John');
-    expect(result.current.data.lastWorkout.name).toBe('A');
-    expect(result.current.data.achievement.value).toBe('85 kg PR');
-    expect(result.current.data.achievement.estimatedOneRepMaxKg).toBe(113.3);
+    expect(mockNavigate).toHaveBeenNthCalledWith(1, 'Inbox');
+    expect(mockNavigate).toHaveBeenNthCalledWith(2, 'CreateWorkout');
+    expect(mockNavigate).toHaveBeenNthCalledWith(3, 'StartWorkout', { workoutSplit: splitB });
+    expect(mockNavigate).toHaveBeenNthCalledWith(4, 'Analytics');
+    expect(mockNavigate).toHaveBeenNthCalledWith(5, 'Statistics');
   });
 });
+

@@ -27,7 +27,7 @@ const AchievementCard = ({
         <View style={common.detailCopy}>
           <Text style={common.detailTitle}>{data.exercise}</Text>
           <Text style={[styles.value, { color: theme.profit }]}>{data.value}</Text>
-          <Text style={[styles.oneRepMax, { color: theme.textSecondary }]}>Est. 1RM · {data.estimatedOneRepMaxKg} kg</Text>
+          <Text style={[styles.oneRepMax, { color: theme.textSecondary }]}>Est. 1RM · {data.estimatedOneRepMax} kg</Text>
         </View>
         <MaterialCommunityIcons name="chevron-right" size={RFValue(25)} color={theme.textSecondary} />
       </View>
