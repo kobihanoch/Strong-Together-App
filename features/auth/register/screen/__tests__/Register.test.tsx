@@ -9,7 +9,7 @@ import {
   jest as jestObject,
 } from '@jest/globals';
 import { fireEvent, render, waitFor } from '@testing-library/react-native';
-import type { AuthProviderValue } from '../../../shared/providers/types/auth-context.types';
+import type { AuthProviderValue } from '../../../shared/types/auth.types';
 import { StackNavigationProp } from '@react-navigation/stack';
 import type { AuthRootParamList } from '../../../../../navigation/types/auth-stack.types';
 

@@ -11,7 +11,7 @@ export const initializeRequestInterceptor = (api: AxiosInstance) =>
   api.interceptors.request.use(
     async (config: InternalAxiosRequestConfig) => {
       const url = config.url;
-      if (!config._servedFromBootstrap) console.log('[API]:', url);
+      console.log('[API]:', url);
       const apiMode = config.apiMode || 'user';
 
       try {

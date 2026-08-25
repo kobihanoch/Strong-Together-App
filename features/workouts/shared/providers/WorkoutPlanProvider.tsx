@@ -2,7 +2,7 @@ import React, { createContext, useContext, useMemo } from 'react';
 import useUpdateGlobalLoading from '../../../../shared/hooks/use-update-global-loading.hook';
 import { useAuth } from '../../../auth/shared/providers/AuthProvider';
 import useWorkoutPlanCacheHandler from './hooks/use-workout-plan-cache-handler.hook';
-import { WorkoutPlanProviderValue } from './types/workout-plan-provider.types';
+import { WorkoutPlanProviderValue } from '../types/workout.types';
 
 const WorkoutPlanContext = createContext<WorkoutPlanProviderValue | null>(null);
 export const useWorkoutPlanContext = () => {

@@ -1,4 +1,4 @@
-import type { ExercisePickerItem } from '../../shared/types/workout.types';
+import type { Exercise } from '../../shared/types/workout.types';
 import { FontAwesome5 } from '@expo/vector-icons';
 import { BottomSheetFlatList } from '@gorhom/bottom-sheet';
 import React, { forwardRef, useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -11,7 +11,6 @@ import { colors } from '../../../../shared/constants/colors';
 import {
   CreateWorkoutControls, ExerciseCandidate, SelectedExercise, } from '../types/use-create-workout.types';
 import { ExercisesByMuscle } from '../../shared/types/workout.types';
-import type { Exercise } from '../../shared/types/workout.types';
 import type { WorkoutSplit } from '../../shared/types/workout.types';
 import Column from '../../../../shared/components/Column';
 import Row from '../../../../shared/components/Row';
@@ -20,7 +19,7 @@ import SlidingBottomModal, { SlidingBottomModalRef } from '../../../../shared/co
 const { height } = Dimensions.get('window');
 
 type ExerciseProps = {
-  item: ExercisePickerItem & { targetMuscle: Exercise['targetMuscle'] };
+  item: Exercise;
   selectedMuscle: string;
   handleExPress: (ex: ExerciseCandidate) => void;
 };
@@ -143,14 +142,14 @@ const ExercisePickerModal = forwardRef<SlidingBottomModalRef, ExercisePicketModa
   const hasNoSearchResults = !isLibraryEmpty && filteredExToShow.length === 0;
 
   const renderItem = useCallback(
-    ({ item }: { item: ExercisePickerItem & { targetMuscle: Exercise['targetMuscle'] } }) => (
+    ({ item }: { item: Exercise }) => (
       <Exercise item={item} selectedMuscle={selectedMuscle} handleExPress={handleExPress} />
     ),
     [selectedMuscle, handleExPress],
   );
 
   const keyExtractor = useCallback(
-    (item: ExercisePickerItem & { targetMuscle: Exercise['targetMuscle'] }) => item.id,
+    (item: Exercise) => item.id,
     [],
   );
 

@@ -1,6 +1,5 @@
 import { createContext, ReactNode, useCallback, useContext, useMemo, useState } from 'react';
 import { GlobalAppLoadingProviderSources, GlobalAppLoadingProviderValue } from './types/global-app-loading-context.types';
-import { hasBootstrapPayload } from '../../infrastructure/api/api-config/bootstrap';
 
 const GlobalAppLoadingContext = createContext<GlobalAppLoadingProviderValue | null>(null);
 
@@ -17,7 +16,7 @@ export const GlobalAppLoadingProvider = ({ children }: { children: ReactNode }) 
     });
   }, []);
 
-  const isLoading = useMemo((): boolean => Object.values(sources).some(Boolean) && hasBootstrapPayload(), [sources]);
+  const isLoading = useMemo((): boolean => Object.values(sources).some(Boolean), [sources]);
 
   // Stable value object except when isLoading changes
   const value = useMemo<GlobalAppLoadingProviderValue>(

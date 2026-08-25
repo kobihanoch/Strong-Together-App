@@ -1,4 +1,4 @@
-import { WorkoutSplitFullData } from '../../features/workouts/plan/types/workout-plan.types';
+import { WorkoutSplit } from '../../features/workouts/shared/types/workout.types';
 import { ResumeWorkoutCachePayload } from '../../features/workouts/session/types/use-start-workout.types';
 
 export type RootParamList = {
@@ -11,7 +11,7 @@ export type RootParamList = {
   Inbox: undefined;
   Analytics: undefined;
   StartWorkout: {
-    workoutSplit: WorkoutSplitFullData;
+    workoutSplit: WorkoutSplit;
     resumedWorkout?: Omit<ResumeWorkoutCachePayload, 'selectedSplit'>;
   };
 };

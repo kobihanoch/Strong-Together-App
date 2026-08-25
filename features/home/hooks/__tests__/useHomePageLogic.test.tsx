@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { act, renderHook } from '@testing-library/react-native';
+import { beforeEach, describe, expect, it, jest } from '@jest/globals';
 import useHomePageLogic from '../use-home-page-logic.hook';
 
 const mockNavigate = jest.fn();
@@ -131,4 +132,3 @@ describe('useHomePageLogic', () => {
     expect(mockNavigate).toHaveBeenNthCalledWith(5, 'Statistics');
   });
 });
-

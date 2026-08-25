@@ -1,9 +1,8 @@
-import { WorkoutPlanSplit } from '../../plan/types/workout-plan.types';
 import { FinishUserWorkoutBody } from '@strong-together/shared';
-import type { Exercise, ExerciseInPlan } from '../../shared/types/workout.types';
+import type { Exercise, ExerciseInPlan, WorkoutSplit } from '../../shared/types/workout.types';
 
 export type ResumeWorkoutCachePayload = {
-  selectedSplit: WorkoutPlanSplit;
+  selectedSplit: WorkoutSplit;
   workout: ExercisesDuringWorkout;
   startTime: number;
   lastPause: number;
@@ -46,5 +45,4 @@ export interface StartWorkoutPageLogicReturn {
 export type SetCountByExercise = Record<ExerciseName, { done: number; planned: number }>;
 export type WorkoutPayloadRow = FinishUserWorkoutBody['workout'][number];
 export type ExerciseName = Exercise['name'];
-export type SetValue = number;
 

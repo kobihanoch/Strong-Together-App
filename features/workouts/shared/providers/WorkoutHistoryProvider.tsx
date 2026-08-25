@@ -3,7 +3,7 @@ import useUpdateGlobalLoading from '../../../../shared/hooks/use-update-global-l
 import { useAuth } from '../../../auth/shared/providers/AuthProvider';
 import { checkHasTrainedToday } from '../../history/utils/workout-history-context.util';
 import useWorkoutHistoryCacheHandler from './hooks/use-workout-history-cache-handler.hook';
-import { WorkoutHistoryProviderValue } from './types/workout-history-provider.types';
+import { WorkoutHistoryProviderValue } from '../../history/types/workout-history.types';
 
 const WorkoutHistoryContext = createContext<WorkoutHistoryProviderValue | null>(null);
 export const useWorkoutHistoryContext = () => {

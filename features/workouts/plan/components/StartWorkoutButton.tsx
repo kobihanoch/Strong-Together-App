@@ -3,7 +3,7 @@ import { useNavigation } from '@react-navigation/native';
 import React from 'react';
 import { Dimensions, StyleSheet, Text, TouchableOpacity } from 'react-native';
 import { RFValue } from 'react-native-responsive-fontsize';
-import { WorkoutPlanSplit } from '../types/workout-plan.types';
+import { WorkoutSplit } from '../../shared/types/workout.types';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RootParamList } from '../../../../navigation/types/appStackTypes';
 
@@ -11,7 +11,7 @@ const { height } = Dimensions.get('window');
 
 type StartWorkoutButtonProps = {
   hasTrainedToday: boolean;
-  selectedSplit: WorkoutPlanSplit | null;
+  selectedSplit: WorkoutSplit | null;
 };
 
 const StartWorkoutButton = ({ hasTrainedToday, selectedSplit }: StartWorkoutButtonProps) => {

@@ -4,7 +4,7 @@ import { keyWorkoutPlan } from '../../../../../infrastructure/cache/cache-keys.u
 import useCacheAndFetch from '../../../../../shared/hooks/use-cache-and-fetch.hook';
 import { AppUser } from '../../../../auth/shared/types/auth.types';
 import { getUserWorkout } from '../../../plan/services/workout-plan.service';
-import { WorkoutPlan } from '../../../plan/types/workout-plan.types';
+import { WorkoutPlan } from '../../types/workout.types';
 
 type UseWorkoutPlanCacheHandlerProps = {
   user: AppUser | null;

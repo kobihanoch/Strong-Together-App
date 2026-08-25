@@ -2,7 +2,7 @@ export const EXERCISE_ANALYSIS_CATALOG = {
   squat: ['squat', 'smith machine squat'],
 } satisfies Record<string, readonly string[]>;
 
-export type SupportedAnalysisExercise = keyof typeof EXERCISE_ANALYSIS_CATALOG;
+type SupportedAnalysisExercise = keyof typeof EXERCISE_ANALYSIS_CATALOG;
 
 const normalizeLabel = (label: string | null | undefined) => label?.trim().toLowerCase() ?? '';
 

@@ -4,7 +4,7 @@ import { createContext, ReactNode, useContext, useMemo } from 'react';
 import useUpdateGlobalLoading from '../../../../shared/hooks/use-update-global-loading.hook';
 import { useAuth } from '../../../auth/shared/providers/AuthProvider';
 import useCardioCacheHandler from './hooks/use-cardio-cache-handler.hook';
-import { CardioProviderValue } from './types/cardio-provider.types';
+import { CardioProviderValue } from '../../cardio/types/cardio.types';
 
 const CardioContext = createContext<CardioProviderValue | null>(null);
 

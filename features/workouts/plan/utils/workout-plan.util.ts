@@ -1,6 +1,6 @@
-import type { WorkoutSplitFullData } from '../types/workout-plan.types';
+import type { WorkoutSplit } from '../../shared/types/workout.types';
 
-export const getBodyPartsForSplit = (split: WorkoutSplitFullData | null): string => {
+export const getBodyPartsForSplit = (split: WorkoutSplit | null): string => {
   if (!split || !split?.muscleGroup) return '';
   const groups = split.muscleGroup
     .replace(/\s*\([^)]*\)/g, '')

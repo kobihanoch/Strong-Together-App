@@ -1,11 +1,12 @@
-import type { GetAllUserMessagesResponse, MessageRow, UserRow } from '@strong-together/shared';
+import type { GetAllUserMessagesResponse, MessageAfterSendQueryDto } from '@strong-together/shared';
 
 export type UserMessages = GetAllUserMessagesResponse['messages'];
 export type UserMessage = UserMessages[number];
-export type IncomingMessage = Pick<MessageRow, 'id' | 'senderId' | 'receiverId' | 'subject' | 'msg' | 'isRead'> & {
-  sentAt: string;
-  senderUsername: UserRow['username'];
-  senderFullName: UserRow['name'];
-  senderProfilePicPath: UserRow['profilePicPath'];
-  senderGender: UserRow['gender'];
-};
+export type IncomingMessage = MessageAfterSendQueryDto;
+
+export interface MessagesProviderValue {
+  unreadMessages: UserMessages;
+  allReceivedMessages: UserMessages;
+  setAllReceivedMessages: React.Dispatch<React.SetStateAction<UserMessages | undefined>>;
+  loadingMessages: boolean;
+}

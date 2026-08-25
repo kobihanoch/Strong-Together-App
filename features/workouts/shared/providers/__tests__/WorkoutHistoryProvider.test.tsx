@@ -1,12 +1,13 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React from 'react';
 import { act, renderHook, waitFor } from '@testing-library/react-native';
+import { beforeEach, describe, expect, it, jest } from '@jest/globals';
 import { DateTime } from 'luxon';
 import type { GetExerciseTrackingResponse } from '@strong-together/shared';
 
-const mockUseCacheAndFetch = jest.fn();
+const mockUseCacheAndFetch = jest.fn<(...args: any[]) => { loading: boolean }>();
 const mockUseUpdateGlobalLoading = jest.fn();
-const mockGetUserExerciseTracking = jest.fn();
+const mockGetUserExerciseTracking = jest.fn<() => Promise<GetExerciseTrackingResponse>>();
 let mockAuthState: { user: any; isValidatedWithServer: boolean };
 
 jest.mock('@react-native-async-storage/async-storage', () => ({
@@ -185,4 +186,3 @@ describe('WorkoutHistoryProvider', () => {
     expect(mockUseUpdateGlobalLoading).toHaveBeenLastCalledWith('Analysis', true);
   });
 });
-

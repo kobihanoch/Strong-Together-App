@@ -3,13 +3,13 @@ import { AppState } from 'react-native';
 import { keyStartWorkout } from '../../../../infrastructure/cache/cache-keys.utils';
 import { cacheSetJSON } from '../../../../infrastructure/cache/cache.utils';
 import { AppUser } from '../../../auth/shared/types/auth.types';
-import { WorkoutPlanSplit } from '../../plan/types/workout-plan.types';
+import { WorkoutSplit } from '../../shared/types/workout.types';
 import { ExercisesDuringWorkout, ResumeWorkoutCachePayload } from '../types/use-start-workout.types';
 
 // Encapsulates: startTime, pausedTotal, and debounced cache writes (kept exactly as-is)
 export const useStartWorkoutCache = (
   userId: AppUser['id'],
-  selectedSplit: WorkoutPlanSplit,
+  selectedSplit: WorkoutSplit,
   resumedWorkout: Omit<ResumeWorkoutCachePayload, 'selectedSplit'> | undefined,
   workoutProgressObj: ExercisesDuringWorkout,
 ) => {

@@ -1,4 +1,4 @@
-import type { ExerciseName, ExercisesDuringWorkout, SetCountByExercise, SetValue, WorkoutPayloadRow, } from '../types/use-start-workout.types';
+import type { ExerciseName, ExercisesDuringWorkout, SetCountByExercise, WorkoutPayloadRow, } from '../types/use-start-workout.types';
 import type { ExerciseInPlan } from '../../shared/types/workout.types';
 import type { Exercise } from '../../shared/types/workout.types';
 
@@ -37,7 +37,7 @@ const dropInvalidPairs = (
   weights: number[] = [],
   reps: number[] = [],
 ): { weight: number[]; reps: number[] } => {
-  const isValid = (v: SetValue): boolean => Number.isFinite(+v) && +v !== 0;
+  const isValid = (v: number): boolean => Number.isFinite(+v) && +v !== 0;
 
   const maxLen = Math.min(weights.length, reps.length);
 
@@ -85,7 +85,7 @@ export const applyWeight = (
   state: ExercisesDuringWorkout,
   exerciseName: Exercise['name'],
   setIndex: number,
-  weight: SetValue,
+  weight: number,
 ): ExercisesDuringWorkout => {
   if (!state || !exerciseName || !state[exerciseName] || !Number.isInteger(setIndex) || setIndex < 0) return state;
 
@@ -107,7 +107,7 @@ export const applyReps = (
   state: ExercisesDuringWorkout,
   exerciseName: Exercise['name'],
   setIndex: number,
-  reps: SetValue,
+  reps: number,
 ): ExercisesDuringWorkout => {
   if (!state || !exerciseName || !state[exerciseName] || !Number.isInteger(setIndex) || setIndex < 0) return state;
 

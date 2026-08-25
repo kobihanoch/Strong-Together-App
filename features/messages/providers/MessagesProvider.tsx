@@ -3,7 +3,7 @@ import useUpdateGlobalLoading from '../../../shared/hooks/use-update-global-load
 import { useAuth } from '../../auth/shared/providers/AuthProvider';
 import useMessagesCacheHandler from '../hooks/use-messages-cache-handler.hook';
 import { registerToMessagesListener } from '../messages.listeners';
-import { MessagesProviderValue } from './types/messages-context.types';
+import { MessagesProviderValue } from '../types/messages.types';
 
 /**
  * Notifications Flow:

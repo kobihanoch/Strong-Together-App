@@ -8,7 +8,7 @@ import { useAuth } from '../../auth/shared/providers/AuthProvider';
 import { useMessages } from '../../messages/providers/MessagesProvider';
 import { useCardioContext } from '../../workouts/shared/providers/CardioProvider';
 import { useWorkoutPlanContext } from '../../workouts/shared/providers/WorkoutPlanProvider';
-import { ExerciseInPlan, WorkoutSplitFullData } from '../../workouts/shared/types/workout.types';
+import { ExerciseInPlan, WorkoutSplit } from '../../workouts/shared/types/workout.types';
 import { HomeDashboardData } from '../types/use-home-page.types';
 import useHomePageCacheHandler from './use-home-page-cache-handler.hook';
 
@@ -28,9 +28,9 @@ const useHomePageLogic = () => {
   // Global loading of app
   const { isLoading: appLoading = true } = useGlobalAppLoadingContext();
   const isLoading = appLoading || dashboardLoading || dashboardStats === undefined;
-  const nextSplit: WorkoutSplitFullData | undefined | null = workoutSplits.filter(
+  const nextSplit: WorkoutSplit | undefined = workoutSplits.find(
     (split) => split.id === dashboardStats?.nextWorkoutSplit?.id,
-  )[0];
+  );
 
   const data = useMemo<HomeDashboardData>(() => {
     // ssign to aerobics graph
@@ -47,7 +47,7 @@ const useHomePageLogic = () => {
     const lastWorkout = dashboardStats?.lastWorkoutStats;
     const pr = dashboardStats?.prs[0];
     const estimatedOneRepMax = pr?.estimatedOneRepMax ?? 0;
-    const nextExercises: ExerciseInPlan[] = nextSplit ? workoutSplits.filter((split) => split.id === nextSplit.id)[0].exercises : [];
+    const nextExercises: ExerciseInPlan[] = nextSplit?.exercises ?? [];
 
     return {
       theme,

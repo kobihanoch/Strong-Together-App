@@ -1,7 +1,7 @@
 import React, { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react';
 import { Text, TextStyle, StyleProp } from 'react-native';
 
-export interface TimerRef {
+interface TimerRef {
   pause: () => void;
   resume: () => void;
   reset: () => void;

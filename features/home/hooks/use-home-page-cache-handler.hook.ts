@@ -4,7 +4,6 @@ import { keyHomeDashboard } from '../../../infrastructure/cache/cache-keys.utils
 import useCacheAndFetch from '../../../shared/hooks/use-cache-and-fetch.hook';
 import { AppUser } from '../../auth/shared/types/auth.types';
 import { getUserDashboardStats } from '../services/home-page.service';
-import { DashboardStats } from '../types/use-home-page.types';
 
 type UseHomePageCacheHandlerProps = {
   user: AppUser | null;
@@ -12,7 +11,7 @@ type UseHomePageCacheHandlerProps = {
 };
 
 const useHomePageCacheHandler = ({ user, isValidatedWithServer }: UseHomePageCacheHandlerProps) => {
-  const [dashboardStats, setDashboardStats] = useState<DashboardStats | undefined>(undefined);
+  const [dashboardStats, setDashboardStats] = useState<GetExerciseTrackingStatsResponse | undefined>(undefined);
 
   // Fetch function
   const fetchFn = useCallback(async () => await getUserDashboardStats(), []);
