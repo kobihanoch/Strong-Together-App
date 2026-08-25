@@ -2,39 +2,38 @@ import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { useMemo } from 'react';
 import { RootParamList } from '../../../navigation/types/appStackTypes';
+import { useAppTheme } from '../../../shared/providers/AppThemeProvider';
+import { useGlobalAppLoadingContext } from '../../../shared/providers/GlobalAppLoadingProvider';
 import { useAuth } from '../../auth/shared/providers/AuthProvider';
 import { useMessages } from '../../messages/providers/MessagesProvider';
 import { useCardioContext } from '../../workouts/shared/providers/CardioProvider';
-import { useWorkoutHistoryContext } from '../../workouts/shared/providers/WorkoutHistoryProvider';
 import { useWorkoutPlanContext } from '../../workouts/shared/providers/WorkoutPlanProvider';
-import { HOME_DASHBOARD_MOCK, USE_MOCK_AEROBICS } from '../data/home-dashboard.mock';
+import { ExerciseInPlan, WorkoutSplitFullData } from '../../workouts/shared/types/workout.types';
 import { HomeDashboardData } from '../types/use-home-page.types';
-import { useAppTheme } from '../../../shared/providers/AppThemeProvider';
+import useHomePageCacheHandler from './use-home-page-cache-handler.hook';
 
 const DAY_LABELS = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
 
 const useHomePageLogic = () => {
   const navigation = useNavigation<StackNavigationProp<RootParamList>>();
   const { colors: theme } = useAppTheme();
-  const { user } = useAuth();
+  const { user, isValidatedWithServer } = useAuth();
   const { unreadMessages } = useMessages();
-  const { workout, workoutSplits, exercises } = useWorkoutPlanContext();
-  const { exerciseTrackingMaps, analyzedExerciseTrackingData } = useWorkoutHistoryContext();
+  const { workout, workoutSplits } = useWorkoutPlanContext();
   const { weeklyCardioMap } = useCardioContext();
 
-  const latestWorkout = useMemo(() => {
-    const entries = Object.entries(exerciseTrackingMaps?.byDate ?? {}).sort(([a], [b]) => b.localeCompare(a));
-    return entries[0] ?? null;
-  }, [exerciseTrackingMaps]);
+  // Data for home page goes through cache pipeline
+  const { dashboardStats = undefined, loading: dashboardLoading = true } = useHomePageCacheHandler({ user, isValidatedWithServer });
 
-  const nextSplit = useMemo(() => {
-    if (!workoutSplits.length) return null;
-    const lastSplitName = latestWorkout?.[1]?.[0]?.splitName;
-    const lastIndex = workoutSplits.findIndex((split) => split.name === lastSplitName);
-    return workoutSplits[(lastIndex + 1) % workoutSplits.length];
-  }, [latestWorkout, workoutSplits]);
+  // Global loading of app
+  const { isLoading: appLoading = true } = useGlobalAppLoadingContext();
+  const isLoading = appLoading || dashboardLoading || dashboardStats === undefined;
+  const nextSplit: WorkoutSplitFullData | undefined | null = workoutSplits.filter(
+    (split) => split.id === dashboardStats?.nextWorkoutSplit?.id,
+  )[0];
 
   const data = useMemo<HomeDashboardData>(() => {
+    // ssign to aerobics graph
     const weekly = Object.entries(weeklyCardioMap ?? {}).sort(([a], [b]) => b.localeCompare(a))[0]?.[1];
     const aerobicMinutes = Array(7).fill(0) as number[];
     weekly?.records.forEach((record) => {
@@ -45,18 +44,16 @@ const useHomePageLogic = () => {
       minutes: aerobicMinutes[dayIndex],
     }));
 
-    const latestEntries = latestWorkout?.[1] ?? [];
-    const pr = analyzedExerciseTrackingData?.pr;
-    const estimatedOneRepMaxKg = pr?.maxWeight
-      ? Math.round(pr.maxWeight * (1 + pr.maxReps / 30) * 10) / 10
-      : HOME_DASHBOARD_MOCK.estimatedOneRepMax.valueKg;
-    const nextExercises = nextSplit ? (exercises[nextSplit.name] ?? []) : [];
+    const lastWorkout = dashboardStats?.lastWorkoutStats;
+    const pr = dashboardStats?.prs[0];
+    const estimatedOneRepMax = pr?.estimatedOneRepMax ?? 0;
+    const nextExercises: ExerciseInPlan[] = nextSplit ? workoutSplits.filter((split) => split.id === nextSplit.id)[0].exercises : [];
 
     return {
       theme,
       state: {
         hasWorkout: !!workout && workoutSplits.length > 0,
-        hasTracking: !!latestWorkout && (analyzedExerciseTrackingData?.workoutCount ?? 0) > 0,
+        hasTracking: dashboardStats?.hasExerciseTracking ?? false,
       },
       user: {
         displayName: user?.name?.trim().split(' ')[0] || user?.username || 'Athlete',
@@ -66,38 +63,51 @@ const useHomePageLogic = () => {
       },
       nextWorkout: nextSplit
         ? {
+            id: nextSplit.id,
             name: nextSplit.name,
+            orderIndex: nextSplit.orderIndex,
+            muscleGroup: nextSplit.muscleGroup ?? '',
             exerciseCount: nextExercises.length,
-            setCount: nextExercises.reduce((total, exercise) => total + exercise.sets.length, 0),
+            setCount: nextExercises ? nextExercises.reduce((total, exercise) => total + exercise.sets.length, 0) : 0,
           }
-        : HOME_DASHBOARD_MOCK.nextWorkout,
-      gymActivity: HOME_DASHBOARD_MOCK.gymActivity,
-      lastWorkout: latestWorkout
+        : { id: 0, orderIndex: 0, muscleGroup: '', name: '', exerciseCount: 0, setCount: 0 },
+      gymActivity: dashboardStats
         ? {
-            name: latestEntries[0]?.splitName ?? HOME_DASHBOARD_MOCK.lastWorkout.name,
-            dateLabel: new Date(`${latestWorkout[0]}T00:00:00`).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
-            exerciseCount: latestEntries.length,
-            setCount: latestEntries.reduce((total, exercise) => total + exercise.reps.length, 0),
+            completedThisWeek: dashboardStats.workoutTargets.workoutCountThisWeek,
+            weeklyTarget: dashboardStats.workoutTargets.workoutCountScheduledPerWeek,
+            weekStreak: dashboardStats.workoutTargets.weekStreak,
           }
-        : HOME_DASHBOARD_MOCK.lastWorkout,
-      aerobics: !USE_MOCK_AEROBICS && weekly ? { totalMinutes: weekly.totalDurationMins, days: orderedDays } : HOME_DASHBOARD_MOCK.aerobics,
+        : { completedThisWeek: 0, weeklyTarget: 0, weekStreak: 0 },
+      lastWorkout: lastWorkout?.workoutDate
+        ? {
+            name: lastWorkout.workoutSplitName ?? '',
+            dateLabel: new Date(`${lastWorkout.workoutDate}T00:00:00`).toLocaleDateString('en-US', {
+              month: 'short',
+              day: 'numeric',
+            }),
+            exerciseCount: lastWorkout.exerciseTrackedCount ?? 0,
+            setCount: lastWorkout.setTrackedCount ?? 0,
+          }
+        : { name: '', dateLabel: '', exerciseCount: 0, setCount: 0 },
+      aerobics: { totalMinutes: weekly?.totalDurationMins ?? 0, days: orderedDays },
       achievement: {
-        exercise: pr?.maxExercise ?? HOME_DASHBOARD_MOCK.achievement.exercise,
-        value: pr?.maxWeight ? `${pr.maxWeight} kg PR` : HOME_DASHBOARD_MOCK.achievement.value,
-        estimatedOneRepMaxKg,
+        exercise: pr?.exerciseName ?? '',
+        value: pr ? `${pr.prWeight} kg PR` : '',
+        estimatedOneRepMax,
       },
     };
   }, [
-    analyzedExerciseTrackingData,
-    exercises,
-    latestWorkout,
+    dashboardStats,
     nextSplit,
     theme,
     unreadMessages.length,
-    user,
+    user?.gender,
+    user?.name,
+    user?.profilePicPath,
+    user?.username,
     weeklyCardioMap,
     workout,
-    workoutSplits.length,
+    workoutSplits,
   ]);
 
   return {
@@ -110,6 +120,7 @@ const useHomePageLogic = () => {
       openProgress: () => navigation.navigate('Analytics'),
       openHistory: () => navigation.navigate('Statistics'),
     },
+    isLoading,
   };
 };
 

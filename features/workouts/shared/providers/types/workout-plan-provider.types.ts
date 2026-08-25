@@ -1,11 +1,9 @@
-import { ExerciseInPlan, WorkoutPlan, WorkoutPlanForEdit, WorkoutPlanSplit } from '../../../plan/types/workout-plan.types';
+import { WorkoutPlan } from '../../../plan/types/workout-plan.types';
+import { WorkoutSplitFullData } from '../../types/workout.types';
 
 export interface WorkoutPlanProviderValue {
   workout: WorkoutPlan | null;
   setWorkout: React.Dispatch<React.SetStateAction<WorkoutPlan | null | undefined>>;
-  workoutSplits: WorkoutPlanSplit[];
-  exercises: Record<string, ExerciseInPlan[]>;
-  workoutForEdit: WorkoutPlanForEdit | null | undefined;
-  setWorkoutForEdit: React.Dispatch<React.SetStateAction<WorkoutPlanForEdit | null | undefined>>;
+  workoutSplits: WorkoutSplitFullData[];
   loading: boolean;
 }
