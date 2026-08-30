@@ -15,24 +15,24 @@ import { useGoogleAuth } from './use-google-auth.hook';
 import { AxiosError } from 'axios';
 
 type UseAuthActionsProps = {
-  setLoading: React.Dispatch<SetStateAction<boolean>>;
+  setAutheticationLoading: React.Dispatch<SetStateAction<boolean>>;
   setAppleLoading: React.Dispatch<SetStateAction<boolean>>;
   setGoogleLoading: React.Dispatch<SetStateAction<boolean>>;
   setUserIdCache: React.Dispatch<SetStateAction<AppUser['id'] | null | undefined>>;
   setIsLoggedIn: React.Dispatch<SetStateAction<boolean>>;
-  setUser: React.Dispatch<SetStateAction<AppUser | null | undefined>>;
+  updateAndCache: (newData: AppUser | null | undefined) => Promise<void>;
   setIsValidatedWithServer: React.Dispatch<SetStateAction<boolean>>;
   setAuthPhase: React.Dispatch<SetStateAction<'checking' | 'authed' | 'guest'>>;
   clearContext: () => Promise<void>;
 };
 
 const useAuthActions = ({
-  setLoading,
+  setAutheticationLoading,
   setAppleLoading,
   setGoogleLoading,
   setUserIdCache,
   setIsLoggedIn,
-  setUser,
+  updateAndCache,
   setIsValidatedWithServer,
   setAuthPhase,
   clearContext,
@@ -59,27 +59,27 @@ const useAuthActions = ({
       gender: RegistrationInput['gender'],
     ): Promise<void> => {
       try {
-        setLoading(true);
+        setAutheticationLoading(true);
         await registerUser(email, password, username, fullName, gender);
         showSuccessAlert('Please verify your account', `An email has been sent to ${email}`);
       } finally {
-        setLoading(false);
+        setAutheticationLoading(false);
       }
     },
-    [],
+    [setAutheticationLoading],
   );
 
   const login = useCallback(
     async (identifier: LoginCredentials['identifier'], password: LoginCredentials['password']): Promise<void> => {
       try {
-        setLoading(true);
+        setAutheticationLoading(true);
         const { accessToken: at, refreshToken: rt, user: u } = await loginUser(identifier, password);
         await completeAuthSession(at, rt, u);
       } finally {
-        setLoading(false);
+        setAutheticationLoading(false);
       }
     },
-    [completeAuthSession],
+    [completeAuthSession, setAutheticationLoading],
   );
 
   const { signInWithGoogle } = useGoogleAuth();
@@ -93,7 +93,7 @@ const useAuthActions = ({
     } finally {
       setGoogleLoading(false);
     }
-  }, [signInWithGoogle, completeAuthSession]);
+  }, [setGoogleLoading, signInWithGoogle, completeAuthSession]);
 
   const { signInWithApple } = useAppleAuth();
   const handleAppleAuth = useCallback(async () => {
@@ -106,13 +106,13 @@ const useAuthActions = ({
     } finally {
       setAppleLoading(false);
     }
-  }, [signInWithApple, completeAuthSession]);
+  }, [setAppleLoading, signInWithApple, completeAuthSession]);
 
   const logout = useCallback(async (): Promise<void> => {
     try {
       await logoutUser();
       setIsLoggedIn(false);
-      setUser(null);
+      updateAndCache(undefined);
       await cacheDeleteAllCache();
     } catch (err) {
       // Log but do not block local cleanup
@@ -123,7 +123,7 @@ const useAuthActions = ({
       } catch {}
       await clearContext();
     }
-  }, [clearContext, setIsLoggedIn, setUser]);
+  }, [clearContext, setIsLoggedIn, updateAndCache]);
 
   // Expose the real logout to axios interceptors via GlobalAuth.logout
   useEffect(() => {

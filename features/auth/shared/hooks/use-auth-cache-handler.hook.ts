@@ -7,28 +7,15 @@ import { fetchSelfUserData } from '../services/auth.service';
 type UseAuthCacheHandlerProps = {
   userIdCache: AppUser['id'] | null | undefined;
   isValidatedWithServer: boolean;
-  user: AppUser | null | undefined;
-  setUser: React.Dispatch<React.SetStateAction<AppUser | null | undefined>>;
 };
 
-const useAuthCacheHandler = ({ userIdCache, isValidatedWithServer, user, setUser }: UseAuthCacheHandlerProps) => {
+const useAuthCacheHandler = ({ userIdCache, isValidatedWithServer }: UseAuthCacheHandlerProps) => {
   const fetchFn = useCallback(async () => await fetchSelfUserData(), []);
+  const cacheKey = userIdCache ? keyAuth(userIdCache) : null;
 
-  const onDataFn = useCallback((u: AppUser) => {
-    setUser(u);
-  }, [setUser]);
+  const { data: user, updateAndCache, loading } = useCacheAndFetch<AppUser>(cacheKey, isValidatedWithServer, fetchFn, 'Auth Provider');
 
-  const { loading: userDataLoading } = useCacheAndFetch<AppUser>(
-    { id: userIdCache },
-    keyAuth,
-    isValidatedWithServer,
-    fetchFn,
-    onDataFn,
-    user,
-    'Auth Context',
-  );
-
-  return { userDataLoading };
+  return { loading, user, updateAndCache };
 };
 
 export default useAuthCacheHandler;

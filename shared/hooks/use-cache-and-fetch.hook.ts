@@ -36,11 +36,18 @@ const useCacheAndFetch = <APIDataType>(
   }, [cacheKey, fetchFn]);
 
   const updateAndCache = useCallback(
-    async (newData: APIDataType) => {
+    async (updater: APIDataType | null | undefined | ((prev: APIDataType | null | undefined) => APIDataType | null | undefined)) => {
       if (!cacheKey) return;
       try {
-        setData(newData);
-        await cacheSetJSON<APIDataType | null>(cacheKey, newData);
+        let nextData: APIDataType | null | undefined;
+        setData((prev) => {
+          nextData =
+            typeof updater === 'function'
+              ? (updater as (prev: APIDataType | null | undefined) => APIDataType | null | undefined)(prev)
+              : updater;
+          return nextData;
+        });
+        await cacheSetJSON<APIDataType | null | undefined>(cacheKey, nextData!);
       } finally {
         setLoading(false);
       }
@@ -64,7 +71,7 @@ const useCacheAndFetch = <APIDataType>(
 
       // Only if cache key exists (user session is already initlized) and cached payload has already been through check (not undefined)
       setCacheHydrated(false);
-      if (cacheKey) {
+      if (cacheKey !== undefined) {
         const cached = await cacheGetJSON<APIDataType>(cacheKey);
         if (cancelled) return;
 

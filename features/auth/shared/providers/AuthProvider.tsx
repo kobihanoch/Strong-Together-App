@@ -1,5 +1,5 @@
-import React, { createContext, useContext, useMemo, useRef, useState } from 'react';
-import useUpdateGlobalLoading from '../../../../shared/hooks/use-update-global-loading.hook';
+import { CreateUserBody, LoginRequestBody, UpdateUserBody } from '@strong-together/shared';
+import React, { createContext, useCallback, useContext, useMemo, useRef, useState } from 'react';
 import useAuthActions from '../hooks/use-auth-actions.hook';
 import useAuthCacheHandler from '../hooks/use-auth-cache-handler.hook';
 import useAuthSocketInitialization from '../hooks/use-auth-socket-initialization';
@@ -10,7 +10,35 @@ import useRetryServerValidationWhenOnline from '../hooks/use-retry-server-valida
 import useServerValidation from '../hooks/use-server-validation.hook';
 import useSyncUsernameHeader from '../hooks/use-sync-username-header.hook';
 import { AppUser } from '../types/auth.types';
-import { AuthProviderValue } from '../types/auth.types';
+import { updateSelfUser } from '../../../profile/services/user-update.service';
+
+interface AuthProviderValue {
+  authPhase: 'checking' | 'authed' | 'guest';
+  user: AppUser | null;
+  updateUser: (updatedUser: ModifiedUser) => Promise<void>;
+  isLoggedIn: boolean;
+  userIdCache: AppUser['id'] | null;
+  autheticationLoading: boolean;
+  fetchLoading: boolean;
+  updateLoading: boolean;
+  googleLoading: boolean;
+  appleLoading: boolean;
+  isWorkoutMode: boolean;
+  setIsWorkoutMode: React.Dispatch<React.SetStateAction<boolean>>;
+  isValidatedWithServer: boolean;
+  register: (
+    email: CreateUserBody['email'],
+    password: CreateUserBody['password'],
+    username: CreateUserBody['username'],
+    fullName: CreateUserBody['fullName'],
+    gender: CreateUserBody['gender'],
+  ) => Promise<void>;
+  login: (identifier: LoginRequestBody['identifier'], password: LoginRequestBody['password']) => Promise<void>;
+  handleAppleAuth: () => Promise<void>;
+  handleGoogleAuth: () => Promise<void>;
+  logout: () => Promise<void>;
+}
+export type ModifiedUser = UpdateUserBody;
 
 const AuthContext = createContext<AuthProviderValue | null>(null);
 export const useAuth = () => {
@@ -22,14 +50,15 @@ export const useAuth = () => {
 };
 
 /**
- * Auth Context
- * -------------
- * Responsibilities:
- * - Hold authentication & session state (user, isLoggedIn, loading flags)
- * - Expose auth actions (register, login, logout)
- * - Orchestrate session bootstrap, server validation, auth cache hydration, and socket setup
+ * Owns the application authentication and session lifecycle.
+ *
+ * The provider restores cached sessions, validates them with the server,
+ * hydrates user data, initializes authenticated sockets and exposes the
+ * application's authentication actions and loading states.
+ *
+ * @param children - Descendant React nodes that can consume authentication state.
+ * @returns A context provider containing the shared authentication state.
  */
-
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   // --- Cached session identifier ---
   const [userIdCache, setUserIdCache] = useState<AppUser['id'] | null | undefined>(undefined);
@@ -37,10 +66,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   // --- Auth & session state ---
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
-  const [loading, setLoading] = useState<boolean>(false); // UI loading for login/register
+  const [autheticationLoading, setAutheticationLoading] = useState<boolean>(false); // UI loading for login/register
   const [appleLoading, setAppleLoading] = useState<boolean>(false);
   const [googleLoading, setGoogleLoading] = useState<boolean>(false);
-  const [user, setUser] = useState<AppUser | null | undefined>(undefined);
   const [isWorkoutMode, setIsWorkoutMode] = useState<boolean>(false); // For start workout
 
   // --- Startup phase for smooth auth-stack/app-stack routing ---
@@ -53,18 +81,30 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const serverValidatingLockRef = useRef<boolean>(false);
   const attemptedServerValidationRef = useRef<boolean>(false);
 
-  const { userDataLoading } = useAuthCacheHandler({ userIdCache, isValidatedWithServer, user, setUser });
+  const { loading: fetchLoading, user, updateAndCache } = useAuthCacheHandler({ userIdCache, isValidatedWithServer });
+  const [updateLoading, setUpdateLoading] = useState(false);
 
-  // Report auth startup/user-data loading to the global loading coordinator
-  useUpdateGlobalLoading('Auth', authPhase === 'checking' || userDataLoading);
+  const updateUser = useCallback(
+    async (updatedUser: ModifiedUser) => {
+      setUpdateLoading(true);
+
+      try {
+        const { user } = await updateSelfUser(updatedUser);
+        await updateAndCache(user);
+      } finally {
+        setUpdateLoading(false);
+      }
+    },
+    [updateAndCache],
+  );
 
   // Clear context method
   const { clearContext } = useClearContext({
     setIsLoggedIn,
-    setLoading,
+    setAutheticationLoading,
     setAppleLoading,
     setGoogleLoading,
-    setUser,
+    updateAndCache,
     setIsWorkoutMode,
     setUserIdCache,
     setIsValidatedWithServer,
@@ -95,12 +135,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   useSyncUsernameHeader(user);
 
   const { register, login, handleAppleAuth, handleGoogleAuth, logout } = useAuthActions({
-    setLoading,
+    setAutheticationLoading,
     setAppleLoading,
     setGoogleLoading,
     setUserIdCache,
     setIsLoggedIn,
-    setUser,
+    updateAndCache,
     setIsValidatedWithServer,
     setAuthPhase,
     clearContext,
@@ -113,10 +153,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       authPhase,
       isLoggedIn,
       user: user ?? null,
-      setUser,
+      updateUser,
       userIdCache: userIdCache ?? null,
-      loading,
-      userDataLoading,
+      autheticationLoading,
+      fetchLoading,
+      updateLoading,
       // actions
       register,
       login,
@@ -132,12 +173,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     [
       isLoggedIn,
       user,
-      setUser,
+      updateUser,
       userIdCache,
-      loading,
+      autheticationLoading,
       googleLoading,
       appleLoading,
-      userDataLoading,
+      fetchLoading,
+      updateLoading,
       register,
       login,
       handleAppleAuth,

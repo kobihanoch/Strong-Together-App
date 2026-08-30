@@ -3,7 +3,6 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import { useMemo } from 'react';
 import { RootParamList } from '../../../navigation/types/appStackTypes';
 import { useAppTheme } from '../../../shared/providers/AppThemeProvider';
-import { useGlobalAppLoadingContext } from '../../../shared/providers/GlobalAppLoadingProvider';
 import { useAuth } from '../../auth/shared/providers/AuthProvider';
 import { useMessages } from '../../messages/providers/MessagesProvider';
 import { useAerobics } from '../../workouts/shared/providers/CardioProvider';
@@ -18,9 +17,9 @@ const useHomeDashboard = () => {
   const navigation = useNavigation<StackNavigationProp<RootParamList>>();
   const { colors: theme } = useAppTheme();
   const { user, isValidatedWithServer } = useAuth();
-  const { unreadMessages } = useMessages();
-  const { workoutPlan, workoutSplits } = useWorkoutPlan();
-  const { weeklyCardioMap } = useAerobics();
+  const { unreadMessages, fetchLoading: messagesFetchLoading } = useMessages();
+  const { hasWorkoutPlan, workoutSplits, fetchLoading: workoutPlanFetchLoading } = useWorkoutPlan();
+  const { weeklyCardioMap, fetchLoading: aerobicsFetchLoading } = useAerobics();
 
   // Home dashboard data goes through the cache pipeline.
   const { dashboardStats = undefined, loading: dashboardLoading = true } = useHomeDashboardCacheHandler({
@@ -28,12 +27,10 @@ const useHomeDashboard = () => {
     isValidatedWithServer,
   });
 
-  // Global loading of app
-  const { isLoading: appLoading = true } = useGlobalAppLoadingContext();
-  const isLoading = appLoading || dashboardLoading || dashboardStats === undefined;
-  const nextSplit: WorkoutSplit | undefined = workoutSplits.find(
-    (split) => split.id === dashboardStats?.nextWorkoutSplit?.id,
-  );
+  const isLoading =
+    dashboardLoading || dashboardStats === undefined || aerobicsFetchLoading || messagesFetchLoading || workoutPlanFetchLoading;
+
+  const nextSplit: WorkoutSplit | undefined = workoutSplits.find((split) => split.id === dashboardStats?.nextWorkoutSplit?.id);
 
   const data = useMemo<HomeDashboardData>(() => {
     // ssign to aerobics graph
@@ -55,7 +52,7 @@ const useHomeDashboard = () => {
     return {
       theme,
       state: {
-        hasWorkout: !!workoutPlan && workoutSplits.length > 0,
+        hasWorkout: hasWorkoutPlan,
         hasTracking: dashboardStats?.hasExerciseTracking ?? false,
       },
       user: {
@@ -109,8 +106,7 @@ const useHomeDashboard = () => {
     user?.profilePicPath,
     user?.username,
     weeklyCardioMap,
-    workoutPlan,
-    workoutSplits,
+    hasWorkoutPlan,
   ]);
 
   return {

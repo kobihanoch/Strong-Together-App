@@ -1,12 +1,19 @@
-import { createContext, ReactNode, useCallback, useContext, useEffect, useMemo } from 'react';
+import { createContext, ReactNode, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { keyInbox } from '../../../infrastructure/cache/cache-keys.utils';
 import useCacheAndFetch from '../../../shared/hooks/use-cache-and-fetch.hook';
-import useUpdateGlobalLoading from '../../../shared/hooks/use-update-global-loading.hook';
 import { useAuth } from '../../auth/shared/providers/AuthProvider';
 import { registerToMessagesListener } from '../messages.listeners';
-import { getUserMessages } from '../services/messages.service';
-import { MessagesProviderValue, UserMessages } from '../types/messages.types';
+import { getUserMessages, updateMsgReadStatus } from '../services/messages.service';
+import { UserMessage, UserMessages } from '../types/messages.types';
 import { filterMessagesByUnread } from '../utils/messages-context-utils';
+
+interface MessagesProviderValue {
+  unreadMessages: UserMessages;
+  allReceivedMessages: UserMessages;
+  updateMessageToRead: (msgId: UserMessage['id']) => Promise<void>;
+  fetchLoading: boolean;
+  updateLoading: boolean;
+}
 
 const MessagesContext = createContext<MessagesProviderValue | null>(null);
 
@@ -32,35 +39,50 @@ export const MessagesProvider = ({ children }: { children: ReactNode }) => {
   const { user, isValidatedWithServer } = useAuth();
   const fetchFn = useCallback(async () => (await getUserMessages()).messages, []);
   const cacheKey = useMemo(() => (user?.id ? keyInbox(user.id) : null), [user?.id]);
+  const [updateLoading, setUpdateLoading] = useState(false);
 
   const {
     data: allReceivedMessages,
-    updateAndCache: setAllReceivedMessages,
-    loading: loadingMessages,
+    updateAndCache,
+    loading: fetchLoading,
   } = useCacheAndFetch<UserMessages>(cacheKey, isValidatedWithServer, fetchFn, 'Messages Context');
 
   const unreadMessages = useMemo(() => filterMessagesByUnread(allReceivedMessages), [allReceivedMessages]);
 
-  // Report inbox loading to global loading
-  useUpdateGlobalLoading('Messages', loadingMessages);
+  const updateMessageToRead = useCallback(
+    async (msgId: UserMessage['id']) => {
+      setUpdateLoading(true);
+
+      try {
+        await updateMsgReadStatus(msgId);
+        await updateAndCache((prev) =>
+          prev ? prev.map((m: UserMessages[number]) => (m.id === msgId ? { ...m, isRead: true } : m)) : prev,
+        );
+      } finally {
+        setUpdateLoading(false);
+      }
+    },
+    [updateAndCache],
+  );
 
   // Load listener
   useEffect(() => {
     if (user) {
-      const cleanup = registerToMessagesListener(setAllReceivedMessages, allReceivedMessages);
+      const cleanup = registerToMessagesListener(updateAndCache);
       return cleanup;
     }
     return;
-  }, [setAllReceivedMessages, user, allReceivedMessages]);
+  }, [updateAndCache, user]);
 
   const value = useMemo<MessagesProviderValue>(
     () => ({
       unreadMessages: unreadMessages ?? [],
       allReceivedMessages: allReceivedMessages ?? [],
-      setAllReceivedMessages,
-      loadingMessages,
+      updateMessageToRead,
+      fetchLoading,
+      updateLoading,
     }),
-    [unreadMessages, allReceivedMessages, setAllReceivedMessages, loadingMessages],
+    [unreadMessages, allReceivedMessages, updateMessageToRead, fetchLoading, updateLoading],
   );
 
   return <MessagesContext.Provider value={value}>{children}</MessagesContext.Provider>;

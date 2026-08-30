@@ -6,10 +6,10 @@ import { clearRefreshToken } from '../utils/token-storage.utils';
 
 type UseClearContextProps = {
   setIsLoggedIn: React.Dispatch<SetStateAction<boolean>>;
-  setLoading: React.Dispatch<SetStateAction<boolean>>;
+  setAutheticationLoading: React.Dispatch<SetStateAction<boolean>>;
   setAppleLoading: React.Dispatch<SetStateAction<boolean>>;
   setGoogleLoading: React.Dispatch<SetStateAction<boolean>>;
-  setUser: React.Dispatch<SetStateAction<AppUser | null | undefined>>;
+  updateAndCache: (newData: AppUser | null | undefined) => Promise<void>;
   setIsWorkoutMode: React.Dispatch<SetStateAction<boolean>>;
   setUserIdCache: React.Dispatch<SetStateAction<AppUser['id'] | null | undefined>>;
   setIsValidatedWithServer: React.Dispatch<SetStateAction<boolean>>;
@@ -20,10 +20,10 @@ type UseClearContextProps = {
 
 const useClearContext = ({
   setIsLoggedIn,
-  setLoading,
+  setAutheticationLoading,
   setAppleLoading,
   setGoogleLoading,
-  setUser,
+  updateAndCache,
   setIsWorkoutMode,
   setUserIdCache,
   setIsValidatedWithServer,
@@ -37,10 +37,10 @@ const useClearContext = ({
     GlobalAuth.setAccessToken(null);
     GlobalAuth.setUsernameInHeader(null);
     setIsLoggedIn(false);
-    setLoading(false);
+    setAutheticationLoading(false);
     setAppleLoading(false);
     setGoogleLoading(false);
-    setUser(undefined);
+    updateAndCache(undefined);
     setIsWorkoutMode(false);
     setUserIdCache(undefined);
     setIsValidatedWithServer(false);
@@ -56,8 +56,8 @@ const useClearContext = ({
     setIsLoggedIn,
     setIsValidatedWithServer,
     setIsWorkoutMode,
-    setLoading,
-    setUser,
+    setAutheticationLoading,
+    updateAndCache,
     setUserIdCache,
   ]);
 
