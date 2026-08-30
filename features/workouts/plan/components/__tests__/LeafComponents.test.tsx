@@ -30,7 +30,7 @@ jestObject.mock('react-native-vector-icons/MaterialCommunityIcons', () => {
 });
 
 jestObject.mock('../../../shared/providers/CardioProvider', () => ({
-  useCardioContext: () => mockCardioContext,
+  useAerobics: () => mockCardioContext,
 }));
 
 import StartWorkoutButton from '../StartWorkoutButton';

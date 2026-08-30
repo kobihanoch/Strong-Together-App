@@ -18,10 +18,7 @@ export const useUserWorkout = (): {
       setSaving(true);
       try {
         const data = await saveWorkoutData(workoutData, startTime, endTime);
-        return {
-          exerciseTrackingMaps: data.exerciseTrackingMaps,
-          exerciseTrackingAnalysis: data.exerciseTrackingAnalysis,
-        };
+        return data.trackingMaps;
       } catch (err) {
         throw err;
       } finally {

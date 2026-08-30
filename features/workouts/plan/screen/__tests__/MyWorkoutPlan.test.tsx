@@ -55,7 +55,7 @@ jestObject.mock('../../hooks/use-my-workout-plan-page-logic.hook', () => ({
 }));
 
 jestObject.mock('../../../shared/providers/CardioProvider', () => ({
-  useCardioContext: () => mockCardioContext,
+  useAerobics: () => mockCardioContext,
 }));
 
 jestObject.mock('../../../../../shared/components/Column', () => {

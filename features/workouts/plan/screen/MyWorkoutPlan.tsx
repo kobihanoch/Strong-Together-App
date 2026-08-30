@@ -5,7 +5,7 @@ import Column from '../../../../shared/components/Column';
 import RenderItemExercise from '../components/RenderItemExercise';
 import SplitFlatList from '../components/SplitFlatList';
 import SlidingBottomModal, { SlidingBottomModalRef } from '../../../../shared/components/SlidingBottomModal';
-import { useCardioContext } from '../../shared/providers/CardioProvider';
+import { useAerobics } from '../../shared/providers/CardioProvider';
 import { useMyWorkoutPlanPageLogic } from '../hooks/use-my-workout-plan-page-logic.hook';
 import useLightStatusBar from '../../../../shared/hooks/use-light-status-bar.hook';
 import { formatTime } from '../../../../shared/utils/shared-utils';
@@ -31,7 +31,7 @@ const MyWorkoutPlan = () => {
   const nav = useNavigation<StackNavigationProp<RootParamList>>();
   const { hasWorkout, filteredExercises, setSelectedSplit, selectedSplit } = useMyWorkoutPlanPageLogic();
 
-  const { cardioForToday, setDailyCardioMap, setWeeklyCardioMap } = useCardioContext();
+  const { cardioForToday, updateAerobics } = useAerobics();
 
   // Modals
   const exRef = useRef(null);
@@ -57,8 +57,7 @@ const MyWorkoutPlan = () => {
       if (m === 0 && s === 0) return; // no-op
       const res = await logUserCardio(m, s, cardioType);
       const { daily, weekly } = res;
-      setDailyCardioMap(daily);
-      setWeeklyCardioMap(weekly);
+      await updateAerobics({ daily, weekly });
       Keyboard.dismiss();
       cardioRef.current?.close?.();
       Notifier.showNotification({

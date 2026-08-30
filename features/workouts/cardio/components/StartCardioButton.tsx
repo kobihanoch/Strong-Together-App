@@ -1,12 +1,12 @@
 import React from 'react';
 import { Dimensions, StyleSheet, Text, TouchableOpacity } from 'react-native';
 import { RFValue } from 'react-native-responsive-fontsize';
-import { useCardioContext } from '../../shared/providers/CardioProvider';
+import { useAerobics } from '../../shared/providers/CardioProvider';
 
 const { height } = Dimensions.get('window');
 
 const StartCardioButton = ({ openCardioModal }: { openCardioModal: (i?: number | undefined) => void }) => {
-  const { hasDoneCardioToday = false } = useCardioContext() || {};
+  const { hasDoneCardioToday = false } = useAerobics() || {};
   return (
     <TouchableOpacity style={styles.cta} onPress={() => openCardioModal(hasDoneCardioToday ? 0 : 1)}>
       <Text style={styles.ctaText}>{'Log daily cardio'}</Text>

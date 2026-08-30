@@ -3,7 +3,7 @@ import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { ALERT_TYPE, Dialog } from 'react-native-alert-notification';
-import { useWorkoutPlanContext } from '../../shared/providers/WorkoutPlanProvider';
+import { useWorkoutPlan } from '../../shared/providers/WorkoutPlanProvider';
 import { RootParamList } from '../../../../navigation/types/appStackTypes';
 import { addWorkout } from '../services/workout-editor.service';
 import { WorkoutSplit } from '../../shared/types/workout.types';
@@ -21,7 +21,7 @@ import useExercises from './use-exercises.hook';
 
 const useCreateWorkoutLogic = () => {
   // ----------------------------Workout and Analysis contexes----------------------------
-  const { setWorkout, setWorkoutForEdit, workoutForEdit } = useWorkoutPlanContext();
+  const { setWorkout, setWorkoutForEdit, workoutForEdit } = useWorkoutPlan();
   const hasWorkout = !!workoutForEdit;
 
   // ----------------------------Navigation----------------------------

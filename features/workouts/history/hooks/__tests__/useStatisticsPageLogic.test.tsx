@@ -133,9 +133,9 @@ jest.mock('../../../../auth/shared/utils/auth.utils', () => ({
   },
 }));
 
-import { WorkoutHistoryProvider, useWorkoutHistoryContext } from '../../../shared/providers/WorkoutHistoryProvider';
+import { WorkoutHistoryProvider, useWorkoutHistory } from '../../../shared/providers/WorkoutHistoryProvider';
 import { AuthProvider, useAuth } from '../../../../auth/shared/providers/AuthProvider';
-import { CardioProvider, useCardioContext } from '../../../shared/providers/CardioProvider';
+import { CardioProvider, useAerobics } from '../../../shared/providers/CardioProvider';
 import { GlobalAppLoadingProvider } from '../../../../../shared/providers/GlobalAppLoadingProvider';
 import useStatisticsPageLogic from '../use-statistics-page-logic.hook';
 
@@ -151,8 +151,8 @@ const wrapper = ({ children }: { children: React.ReactNode }) => (
 
 const useIntegratedStatisticsLogic = () => {
   const auth = useAuth();
-  const analysis = useWorkoutHistoryContext();
-  const cardio = useCardioContext();
+  const analysis = useWorkoutHistory();
+  const cardio = useAerobics();
   const statistics = useStatisticsPageLogic();
   return { auth, analysis, cardio, statistics };
 };

@@ -26,6 +26,9 @@ import Theme1 from './shared/components/Theme1';
 import UpdateAppModal from './shared/components/UpdateAppModal';
 import { GlobalAppLoadingProvider } from './shared/providers/GlobalAppLoadingProvider';
 import { AppThemeProvider } from './shared/providers/AppThemeProvider';
+import { WorkoutPlanProvider } from './features/workouts/shared/providers/WorkoutPlanProvider';
+import { CardioProvider } from './features/workouts/shared/providers/CardioProvider';
+import { WorkoutHistoryProvider } from './features/workouts/shared/providers/WorkoutHistoryProvider';
 
 // ---------- Fonts Loader Hook ----------
 function useFontsReady() {
@@ -133,7 +136,13 @@ function RootNavigator() {
 function AuthenticatedApp() {
   return (
     <MessagesProvider>
-      <MainApp />
+      <CardioProvider>
+        <WorkoutHistoryProvider>
+          <WorkoutPlanProvider>
+            <MainApp />
+          </WorkoutPlanProvider>
+        </WorkoutHistoryProvider>
+      </CardioProvider>
     </MessagesProvider>
   );
 }

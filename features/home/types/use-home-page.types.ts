@@ -1,3 +1,4 @@
+import { GetExerciseTrackingStatsResponse } from '@strong-together/shared';
 import { AppThemeColors } from '../../../shared/constants/theme';
 import { AppUser } from '../../auth/shared/types/auth.types';
 import { WorkoutSplit } from '../../workouts/shared/types/workout.types';
@@ -15,3 +16,5 @@ export type HomeDashboardData = {
   aerobics: { totalMinutes: number; days: Array<{ label: string; minutes: number }> };
   achievement: { exercise: string; value: string; estimatedOneRepMax: number };
 };
+
+export type HomeDashboardStats = GetExerciseTrackingStatsResponse;

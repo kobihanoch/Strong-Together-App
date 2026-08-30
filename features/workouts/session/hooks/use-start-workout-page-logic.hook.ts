@@ -8,8 +8,8 @@ import { RootParamList } from '../../../../navigation/types/appStackTypes';
 import { showErrorAlert } from '../../../../shared/alerts/error-alerts';
 import { useAuth } from '../../../auth/shared/providers/AuthProvider';
 import { WorkoutSplit } from '../../shared/types/workout.types';
-import { useWorkoutHistoryContext } from '../../shared/providers/WorkoutHistoryProvider';
-import { useWorkoutPlanContext } from '../../shared/providers/WorkoutPlanProvider';
+import { useWorkoutHistory } from '../../shared/providers/WorkoutHistoryProvider';
+import { useWorkoutPlan } from '../../shared/providers/WorkoutPlanProvider';
 import { ExercisesDuringWorkout, ResumeWorkoutCachePayload, StartWorkoutPageLogicReturn } from '../types/use-start-workout.types';
 import { applyNotes, applyReps, applyWeight, countSetsDone, createArrayForDataBase } from '../utils/start-workout.util';
 import { useStartWorkoutCache } from './use-start-workout-cache.hook';
@@ -23,8 +23,8 @@ const useStartWorkoutPageLogic = (
   const navigation = useNavigation<StackNavigationProp<RootParamList>>();
   // --------------------[ Context ]--------------------------------------
   const { setIsWorkoutMode, userIdCache } = useAuth();
-  const { exercises = {} } = useWorkoutPlanContext() || {};
-  const { setExerciseTrackingMaps, setExerciseTrackingAnalysis } = useWorkoutHistoryContext();
+  const { exercises = {} } = useWorkoutPlan() || {};
+  const { updateWorkoutHistory } = useWorkoutHistory();
 
   // --------------------[ Set workout mode ]--------------------------------------
   useFocusEffect(
@@ -120,12 +120,10 @@ const useStartWorkoutPageLogic = (
         return;
       }
 
-      const res = await saveWorkoutProcess(arr, startTime, Date.now());
-      const { exerciseTrackingMaps, exerciseTrackingAnalysis } = res;
+      const exerciseTrackingMaps = await saveWorkoutProcess(arr, startTime, Date.now());
 
-      // Update context
-      setExerciseTrackingMaps(exerciseTrackingMaps);
-      setExerciseTrackingAnalysis(exerciseTrackingAnalysis);
+      // Update shared state and persistent cache with the mutation response.
+      await updateWorkoutHistory(exerciseTrackingMaps);
       setIsWorkoutMode(false);
       disableCache();
       await clearCache();

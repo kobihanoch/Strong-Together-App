@@ -174,10 +174,10 @@ jest.mock('../../../../../shared/alerts/error-alerts', () => ({
 }));
 
 import { keyStartWorkout } from '../../../../../infrastructure/cache/cache-keys.utils';
-import { WorkoutHistoryProvider, useWorkoutHistoryContext } from '../../../shared/providers/WorkoutHistoryProvider';
+import { WorkoutHistoryProvider, useWorkoutHistory } from '../../../shared/providers/WorkoutHistoryProvider';
 import { AuthProvider, useAuth } from '../../../../auth/shared/providers/AuthProvider';
 import { GlobalAppLoadingProvider } from '../../../../../shared/providers/GlobalAppLoadingProvider';
-import { WorkoutPlanProvider, useWorkoutPlanContext } from '../../../shared/providers/WorkoutPlanProvider';
+import { WorkoutPlanProvider, useWorkoutPlan } from '../../../shared/providers/WorkoutPlanProvider';
 import useStartWorkoutPageLogic from '../use-start-workout-page-logic.hook';
 
 const baseWrapper = ({ children }: { children: React.ReactNode }) => (
@@ -192,8 +192,8 @@ const baseWrapper = ({ children }: { children: React.ReactNode }) => (
 
 const ReadyGate = ({ children }: { children: React.ReactNode }) => {
   const { user } = useAuth();
-  const { workout, loading: workoutLoading } = useWorkoutPlanContext();
-  const { loading: analysisLoading } = useWorkoutHistoryContext();
+  const { workout, loading: workoutLoading } = useWorkoutPlan();
+  const { loading: analysisLoading } = useWorkoutHistory();
 
   if (!user || !workout || workoutLoading || analysisLoading) return null;
   return <React.Fragment key="ready">{children}</React.Fragment>;
@@ -304,8 +304,8 @@ const useIntegratedStartWorkoutPageLogic = (
   resumedWorkout?: ReturnType<typeof createResumedWorkoutFromProfile>,
 ) => {
   const auth = useAuth();
-  const workout = useWorkoutPlanContext();
-  const analysis = useWorkoutHistoryContext();
+  const workout = useWorkoutPlan();
+  const analysis = useWorkoutHistory();
   const logic = useStartWorkoutPageLogic(createSelectedSplitFromProfile(), resumedWorkout);
   return { auth, workout, analysis, logic };
 };

@@ -21,7 +21,7 @@ jest.mock('moti/skeleton', () => {
   return { Skeleton };
 });
 jest.mock('../../../../shared/providers/AppThemeProvider', () => ({ useAppTheme: () => ({ mode: 'light' }) }));
-jest.mock('../../hooks/use-home-page-logic.hook', () => ({ __esModule: true, default: () => mockLogic }));
+jest.mock('../../hooks/use-home-dashboard.hook', () => ({ __esModule: true, default: () => mockLogic }));
 jest.mock('../../components/HomeHeader', () => (props: any) => {
   const { Text } = require('react-native');
   return <Text onPress={props.onInbox}>Welcome, {props.data.displayName}</Text>;

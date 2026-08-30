@@ -8,9 +8,9 @@ import { Skeleton } from 'moti/skeleton';
 import React, { useMemo } from 'react';
 import { Dimensions, StyleSheet, Text, View } from 'react-native';
 import { RFValue } from 'react-native-responsive-fontsize';
-import { useWorkoutHistoryContext } from '../../shared/providers/WorkoutHistoryProvider';
+import { useWorkoutHistory } from '../../shared/providers/WorkoutHistoryProvider';
 import { useGlobalAppLoadingContext } from '../../../../shared/providers/GlobalAppLoadingProvider';
-import { useWorkoutPlanContext } from '../../shared/providers/WorkoutPlanProvider';
+import { useWorkoutPlan } from '../../shared/providers/WorkoutPlanProvider';
 import { HomePageData } from '../../../home/types/use-home-page.types';
 import { RootParamList } from '../../../../navigation/types/appStackTypes';
 import { getBodyPartsForSplit } from '../utils/workout-plan.util';
@@ -24,8 +24,8 @@ const { height } = Dimensions.get('window');
 type StartWorkoutCardProps = { data: HomePageData };
 
 const StartWorkoutCard = ({ data }: StartWorkoutCardProps) => {
-  const { workoutSplits, workoutForEdit } = useWorkoutPlanContext();
-  const { hasTrainedToday } = useWorkoutHistoryContext();
+  const { workoutSplits, workoutForEdit } = useWorkoutPlan();
+  const { hasTrainedToday } = useWorkoutHistory();
   const { isLoading } = useGlobalAppLoadingContext();
   const { mostFrequentSplit, totalWorkoutNumber, hasTracking } = data || {};
   const navigation = useNavigation<StackNavigationProp<RootParamList>>();

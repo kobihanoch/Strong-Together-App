@@ -1,8 +1,8 @@
 import { useCallback, useMemo, useState } from 'react';
 import { keyAnalytics } from '../../../../infrastructure/cache/cache-keys.utils';
-import { useWorkoutHistoryContext } from '../../shared/providers/WorkoutHistoryProvider';
+import { useWorkoutHistory } from '../../shared/providers/WorkoutHistoryProvider';
 import { useAuth } from '../../../auth/shared/providers/AuthProvider';
-import { useWorkoutPlanContext } from '../../shared/providers/WorkoutPlanProvider';
+import { useWorkoutPlan } from '../../shared/providers/WorkoutPlanProvider';
 import { getTrackingAnalytics } from '../services/analytics.service';
 import useCacheAndFetch from '../../../../shared/hooks/use-cache-and-fetch.hook';
 import type { GetAnalyticsResponse } from '@strong-together/shared';
@@ -10,9 +10,9 @@ import { Analytics1RM, AnalyticsGoals } from '../types/use-analytics.types';
 
 const useAnalysticsLogic = () => {
   const { user, isValidatedWithServer } = useAuth();
-  const { analyzedExerciseTrackingData } = useWorkoutHistoryContext();
+  const { analyzedExerciseTrackingData } = useWorkoutHistory();
   const { workoutCount = 0, splitDaysByName: splitsCounter = {} } = analyzedExerciseTrackingData ?? {};
-  const { workout } = useWorkoutPlanContext();
+  const { workout } = useWorkoutPlan();
   const [oneRepMaxes, set1RM] = useState<Analytics1RM | undefined>(undefined);
   const [adherence, setAdherence] = useState<AnalyticsGoals | undefined>(undefined);
   const hasData = useMemo(() => !!analyzedExerciseTrackingData, [analyzedExerciseTrackingData]);

@@ -51,7 +51,7 @@ jestObject.mock('../../hooks/use-my-workout-plan-page-logic.hook', () => ({
 }));
 
 jestObject.mock('../../../shared/providers/WorkoutHistoryProvider', () => ({
-  useWorkoutHistoryContext: () => mockAnalysisState,
+  useWorkoutHistory: () => mockAnalysisState,
 }));
 
 jestObject.mock('../../../../../shared/components/Badge', () => {

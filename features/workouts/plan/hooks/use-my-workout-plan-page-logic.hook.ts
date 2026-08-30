@@ -1,12 +1,12 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { useWorkoutHistoryContext } from '../../shared/providers/WorkoutHistoryProvider';
+import { useWorkoutHistory } from '../../shared/providers/WorkoutHistoryProvider';
 import { WorkoutSplit } from '../../shared/types/workout.types';
-import { useWorkoutPlanContext } from '../../shared/providers/WorkoutPlanProvider';
+import { useWorkoutPlan } from '../../shared/providers/WorkoutPlanProvider';
 
 type ExerciseCounter = Record<WorkoutSplit['name'], number>;
 
 export const useMyWorkoutPlanPageLogic = () => {
-  const { workout, workoutForEdit, workoutSplits, exercises: allExercises } = useWorkoutPlanContext();
+  const { workout, workoutForEdit, workoutSplits, exercises: allExercises } = useWorkoutPlan();
 
   const hasWorkout = useMemo(() => !!workout, [workout]);
 
@@ -20,7 +20,7 @@ export const useMyWorkoutPlanPageLogic = () => {
     }, {});
   }, [hasWorkout, workoutForEdit]);
 
-  const { analyzedExerciseTrackingData, hasTrainedToday } = useWorkoutHistoryContext();
+  const { analyzedExerciseTrackingData, hasTrainedToday } = useWorkoutHistory();
   const [selectedSplit, setSelectedSplit] = useState<WorkoutSplit | null>(null);
 
   // Set selected split at startup

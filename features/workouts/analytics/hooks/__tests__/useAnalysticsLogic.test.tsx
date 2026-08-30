@@ -144,10 +144,10 @@ jest.mock('../../../../auth/shared/utils/auth.utils', () => ({
   },
 }));
 
-import { WorkoutHistoryProvider, useWorkoutHistoryContext } from '../../../shared/providers/WorkoutHistoryProvider';
+import { WorkoutHistoryProvider, useWorkoutHistory } from '../../../shared/providers/WorkoutHistoryProvider';
 import { AuthProvider, useAuth } from '../../../../auth/shared/providers/AuthProvider';
 import { GlobalAppLoadingProvider } from '../../../../../shared/providers/GlobalAppLoadingProvider';
-import { WorkoutPlanProvider, useWorkoutPlanContext } from '../../../shared/providers/WorkoutPlanProvider';
+import { WorkoutPlanProvider, useWorkoutPlan } from '../../../shared/providers/WorkoutPlanProvider';
 import useAnalysticsLogic from '../use-analystics-logic.hook';
 
 const wrapper = ({ children }: { children: React.ReactNode }) => (
@@ -162,8 +162,8 @@ const wrapper = ({ children }: { children: React.ReactNode }) => (
 
 const useIntegratedAnalyticsLogic = () => {
   const auth = useAuth();
-  const workout = useWorkoutPlanContext();
-  const analysis = useWorkoutHistoryContext();
+  const workout = useWorkoutPlan();
+  const analysis = useWorkoutHistory();
   const analytics = useAnalysticsLogic();
   return { auth, workout, analysis, analytics };
 };

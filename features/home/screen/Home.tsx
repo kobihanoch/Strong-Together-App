@@ -10,12 +10,12 @@ import LastWorkoutCard from '../components/LastWorkoutCard';
 import NextWorkoutCard from '../components/NextWorkoutCard';
 import NoTrackingCard from '../components/NoTrackingCard';
 import NoWorkoutCard from '../components/NoWorkoutCard';
-import useHomePageLogic from '../hooks/use-home-page-logic.hook';
+import useHomeDashboard from '../hooks/use-home-dashboard.hook';
 import { colors } from '../../../shared/constants/colors';
 import { useAppTheme } from '../../../shared/providers/AppThemeProvider';
 
 const Home = () => {
-  const { data, actions, isLoading } = useHomePageLogic();
+  const { data, actions, isLoading } = useHomeDashboard();
   const { width, height } = useWindowDimensions();
   const horizontalPadding = Math.max(14, Math.min(width * 0.045, 22));
   const sectionGap = Math.max(12, Math.min(height * 0.016, 18));

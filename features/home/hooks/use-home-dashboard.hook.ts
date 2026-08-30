@@ -6,15 +6,15 @@ import { useAppTheme } from '../../../shared/providers/AppThemeProvider';
 import { useGlobalAppLoadingContext } from '../../../shared/providers/GlobalAppLoadingProvider';
 import { useAuth } from '../../auth/shared/providers/AuthProvider';
 import { useMessages } from '../../messages/providers/MessagesProvider';
-import useAerobics from '../../workouts/cardio/hooks/use-aerobics.hook';
-import useWorkoutPlan from '../../workouts/plan/hooks/use-workout-plan.hook';
+import { useAerobics } from '../../workouts/shared/providers/CardioProvider';
+import { useWorkoutPlan } from '../../workouts/shared/providers/WorkoutPlanProvider';
 import { ExerciseInPlan, WorkoutSplit } from '../../workouts/shared/types/workout.types';
 import { HomeDashboardData } from '../types/use-home-page.types';
-import useHomePageCacheHandler from './use-home-page-cache-handler.hook';
+import useHomeDashboardCacheHandler from './use-home-dashboard-cache-handler.hook';
 
 const DAY_LABELS = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
 
-const useHomePageLogic = () => {
+const useHomeDashboard = () => {
   const navigation = useNavigation<StackNavigationProp<RootParamList>>();
   const { colors: theme } = useAppTheme();
   const { user, isValidatedWithServer } = useAuth();
@@ -22,8 +22,11 @@ const useHomePageLogic = () => {
   const { workoutPlan, workoutSplits } = useWorkoutPlan();
   const { weeklyCardioMap } = useAerobics();
 
-  // Data for home page goes through cache pipeline
-  const { dashboardStats = undefined, loading: dashboardLoading = true } = useHomePageCacheHandler({ user, isValidatedWithServer });
+  // Home dashboard data goes through the cache pipeline.
+  const { dashboardStats = undefined, loading: dashboardLoading = true } = useHomeDashboardCacheHandler({
+    user,
+    isValidatedWithServer,
+  });
 
   // Global loading of app
   const { isLoading: appLoading = true } = useGlobalAppLoadingContext();
@@ -124,4 +127,4 @@ const useHomePageLogic = () => {
   };
 };
 
-export default useHomePageLogic;
+export default useHomeDashboard;

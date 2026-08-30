@@ -98,7 +98,7 @@ const useCacheAndFetch = <APIDataType>(
     })();
   }, [isValidatedByServerFlag, cacheKey, cacheHydrated, fetchAndCache]);
 
-  return { loading, data, setData, fetchAndCache, updateAndCache };
+  return { loading, data, updateAndCache };
 };
 
 export default useCacheAndFetch;

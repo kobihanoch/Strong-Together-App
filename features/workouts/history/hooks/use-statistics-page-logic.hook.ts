@@ -1,11 +1,11 @@
 import moment from 'moment-timezone';
 import { useMemo, useState } from 'react';
-import { useWorkoutHistoryContext } from '../../shared/providers/WorkoutHistoryProvider';
-import { useCardioContext } from '../../shared/providers/CardioProvider';
+import { useWorkoutHistory } from '../../shared/providers/WorkoutHistoryProvider';
+import { useAerobics } from '../../shared/providers/CardioProvider';
 import { getLastWorkoutForEachExercise } from '../utils/statistics-page.utils';
 
 const useStatisticsPageLogic = () => {
-  const { exerciseTrackingMaps } = useWorkoutHistoryContext();
+  const { exerciseTrackingMaps } = useWorkoutHistory();
   const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
   // Map with date keys: Date, ETSId, splitName
   const {
@@ -14,7 +14,7 @@ const useStatisticsPageLogic = () => {
     bySplitName: exerciseTrackingWithSplitNameKey = null,
   } = exerciseTrackingMaps || {};
 
-  const { dailyCardioMap = null, weeklyCardioMap = null } = useCardioContext() || {};
+  const { dailyCardioMap = null, weeklyCardioMap = null } = useAerobics() || {};
 
   // Start as today's date
   const [selectedDate, setSelectedDate] = useState(moment.tz(timezone).format('YYYY-MM-DD'));
