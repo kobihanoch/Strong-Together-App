@@ -1,21 +1,25 @@
-import { Dispatch, SetStateAction } from 'react';
 import { getSocket } from '../../infrastructure/socket';
-import { UserMessages } from './types/messages.types';
 import type { IncomingMessage } from './types/messages.types';
+import { UserMessages } from './types/messages.types';
 
-export const registerToMessagesListener = (setMsgs: Dispatch<SetStateAction<UserMessages | undefined>>) => {
+export const registerToMessagesListener = (
+  setMsgs: (message: UserMessages) => Promise<void>,
+  allMessages: UserMessages | null | undefined,
+) => {
   const socket = getSocket();
   if (!socket) return;
 
   // Function
   const handler = (msg: IncomingMessage) => {
+    const msgs = allMessages ?? [];
     // Set all recieved messages at context.
     // Checks for duplications before
-    setMsgs((prev: UserMessages | undefined) => {
-      if (prev === undefined) return prev;
-      if (prev.some((m) => m.id === msg.id)) return prev;
-      return [msg, ...prev];
-    });
+    const updatedMessages = (() => {
+      if (msgs.some((m) => m.id === msg.id)) return msgs;
+      return [msg, ...msgs];
+    })();
+
+    setMsgs(updatedMessages);
   };
 
   // Registration

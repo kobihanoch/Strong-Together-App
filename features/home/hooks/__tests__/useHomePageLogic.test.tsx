@@ -26,8 +26,8 @@ jest.mock('../../../../shared/providers/GlobalAppLoadingProvider', () => ({
 }));
 jest.mock('../../../auth/shared/providers/AuthProvider', () => ({ useAuth: () => mockAuth }));
 jest.mock('../../../messages/providers/MessagesProvider', () => ({ useMessages: () => mockMessages }));
-jest.mock('../../../workouts/shared/providers/CardioProvider', () => ({ useCardioContext: () => mockCardio }));
-jest.mock('../../../workouts/shared/providers/WorkoutPlanProvider', () => ({ useWorkoutPlanContext: () => mockWorkoutPlan }));
+jest.mock('../../../workouts/cardio/hooks/use-aerobics.hook', () => ({ __esModule: true, default: () => mockCardio }));
+jest.mock('../../../workouts/plan/hooks/use-workout-plan.hook', () => ({ __esModule: true, default: () => mockWorkoutPlan }));
 jest.mock('../use-home-page-cache-handler.hook', () => ({ __esModule: true, default: () => mockDashboard }));
 
 const splitA = {
@@ -63,7 +63,7 @@ describe('useHomePageLogic', () => {
     };
     mockMessages = { unreadMessages: [{ id: 1 }] };
     mockCardio = { weeklyCardioMap: null };
-    mockWorkoutPlan = { workout: { id: 7, workoutSplits: [splitA, splitB] }, workoutSplits: [splitA, splitB] };
+    mockWorkoutPlan = { workoutPlan: { id: 7, workoutSplits: [splitA, splitB] }, workoutSplits: [splitA, splitB] };
     mockDashboard = { dashboardStats: stats, loading: false };
   });
 
@@ -88,7 +88,7 @@ describe('useHomePageLogic', () => {
   });
 
   it('returns the no-workout state when the plan is empty', () => {
-    mockWorkoutPlan = { workout: null, workoutSplits: [] };
+    mockWorkoutPlan = { workoutPlan: null, workoutSplits: [] };
     mockDashboard = {
       dashboardStats: { ...stats, hasExerciseTracking: false, nextWorkoutSplit: null },
       loading: false,

@@ -89,18 +89,6 @@ jest.mock('../features/messages/providers/MessagesProvider', () => ({
   MessagesProvider: ({ children }: { children: React.ReactNode }) => children,
 }));
 
-jest.mock('../features/workouts/shared/providers/WorkoutPlanProvider', () => ({
-  WorkoutPlanProvider: ({ children }: { children: React.ReactNode }) => children,
-}));
-
-jest.mock('../features/workouts/shared/providers/WorkoutHistoryProvider', () => ({
-  WorkoutHistoryProvider: ({ children }: { children: React.ReactNode }) => children,
-}));
-
-jest.mock('../features/workouts/shared/providers/CardioProvider', () => ({
-  CardioProvider: ({ children }: { children: React.ReactNode }) => children,
-}));
-
 jest.mock('../navigation/AuthStack', () => {
   const ReactLocal = require('react');
   const { Text: TextLocal } = require('react-native');

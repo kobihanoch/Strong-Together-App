@@ -7,6 +7,6 @@ export type IncomingMessage = MessageAfterSendQueryDto;
 export interface MessagesProviderValue {
   unreadMessages: UserMessages;
   allReceivedMessages: UserMessages;
-  setAllReceivedMessages: React.Dispatch<React.SetStateAction<UserMessages | undefined>>;
+  setAllReceivedMessages: (messages: UserMessages) => Promise<void>;
   loadingMessages: boolean;
 }

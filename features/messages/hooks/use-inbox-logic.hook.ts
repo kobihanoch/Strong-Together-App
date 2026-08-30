@@ -16,7 +16,7 @@ const useInboxLogic = () => {
     setAllReceivedMessages((prev: UserMessages | undefined) =>
       prev ? prev.map((m: UserMessages[number]) => (m.id === msgId ? { ...m, isRead: true } : m)) : prev,
     );
-  }, []);
+  }, [setAllReceivedMessages]);
 
   const confirmAndDeleteMessage = useCallback((msgId: UserMessage['id']): void => {
     let pressedYes = false;
@@ -44,7 +44,7 @@ const useInboxLogic = () => {
         }
       },
     });
-  }, []);
+  }, [setAllReceivedMessages]);
 
   return {
     allReceivedMessages,

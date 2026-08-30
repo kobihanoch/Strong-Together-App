@@ -1,20 +1,12 @@
-import { createContext, ReactNode, useContext, useEffect, useMemo } from 'react';
+import { createContext, ReactNode, useCallback, useContext, useEffect, useMemo } from 'react';
+import { keyInbox } from '../../../infrastructure/cache/cache-keys.utils';
+import useCacheAndFetch from '../../../shared/hooks/use-cache-and-fetch.hook';
 import useUpdateGlobalLoading from '../../../shared/hooks/use-update-global-loading.hook';
 import { useAuth } from '../../auth/shared/providers/AuthProvider';
-import useMessagesCacheHandler from '../hooks/use-messages-cache-handler.hook';
 import { registerToMessagesListener } from '../messages.listeners';
-import { MessagesProviderValue } from '../types/messages.types';
-
-/**
- * Notifications Flow:
- * 1. On mount (if user exists) -> fetch messages + senders in one API call.
- * 2. Store messages in allReceivedMessages, senders in allSendersUsersArr.
- * 3. Derive unreadMessages via useMemo(filterMessagesByUnread).
- * 4. Prefetch profile images on senders change -> build profileImagesCache.
- * 5. Listen to "new_message" socket events -> append message/sender if new.
- * 6. markAsRead -> API call + local state update.
- * 7. On logout -> clear all state.
- */
+import { getUserMessages } from '../services/messages.service';
+import { MessagesProviderValue, UserMessages } from '../types/messages.types';
+import { filterMessagesByUnread } from '../utils/messages-context-utils';
 
 const MessagesContext = createContext<MessagesProviderValue | null>(null);
 
@@ -26,13 +18,28 @@ export const useMessages = () => {
   return context;
 };
 
+/**
+ * Provides authenticated message state to the application. It hydrates the
+ * user's messages from cache, revalidates them after server authentication,
+ * persists local message updates, derives the unread collection, and owns the
+ * single app-wide listener for newly received messages.
+ *
+ * @param children Components that consume the shared message state.
+ * @returns A context provider containing messages, unread messages, loading
+ * state, and a setter that updates both context state and the local cache.
+ */
 export const MessagesProvider = ({ children }: { children: ReactNode }) => {
   const { user, isValidatedWithServer } = useAuth();
+  const fetchFn = useCallback(async () => (await getUserMessages()).messages, []);
+  const cacheKey = useMemo(() => (user?.id ? keyInbox(user.id) : null), [user?.id]);
 
-  const { allReceivedMessages, setAllReceivedMessages, unreadMessages, loadingMessages } = useMessagesCacheHandler({
-    user,
-    isValidatedWithServer,
-  });
+  const {
+    data: allReceivedMessages,
+    updateAndCache: setAllReceivedMessages,
+    loading: loadingMessages,
+  } = useCacheAndFetch<UserMessages>(cacheKey, isValidatedWithServer, fetchFn, 'Messages Context');
+
+  const unreadMessages = useMemo(() => filterMessagesByUnread(allReceivedMessages), [allReceivedMessages]);
 
   // Report inbox loading to global loading
   useUpdateGlobalLoading('Messages', loadingMessages);
@@ -40,16 +47,16 @@ export const MessagesProvider = ({ children }: { children: ReactNode }) => {
   // Load listener
   useEffect(() => {
     if (user) {
-      const cleanup = registerToMessagesListener(setAllReceivedMessages);
+      const cleanup = registerToMessagesListener(setAllReceivedMessages, allReceivedMessages);
       return cleanup;
     }
     return;
-  }, [setAllReceivedMessages, user]);
+  }, [setAllReceivedMessages, user, allReceivedMessages]);
 
   const value = useMemo<MessagesProviderValue>(
     () => ({
-      unreadMessages: unreadMessages === undefined ? [] : unreadMessages,
-      allReceivedMessages: allReceivedMessages === undefined ? [] : allReceivedMessages,
+      unreadMessages: unreadMessages ?? [],
+      allReceivedMessages: allReceivedMessages ?? [],
       setAllReceivedMessages,
       loadingMessages,
     }),

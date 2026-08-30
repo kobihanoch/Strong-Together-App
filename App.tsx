@@ -10,16 +10,12 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { Inter_400Regular, Inter_500Medium, Inter_600SemiBold, Inter_700Bold } from '@expo-google-fonts/inter';
 
 import { MessagesProvider } from './features/messages/providers/MessagesProvider';
-import { WorkoutHistoryProvider } from './features/workouts/shared/providers/WorkoutHistoryProvider';
-
 import { MaterialCommunityIcons as ExpoMaterialCommunityIcons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Constants from 'expo-constants';
 import { NotifierRoot } from 'react-native-notifier';
 import { AuthProvider, useAuth } from './features/auth/shared/providers/AuthProvider';
 import NotificationsSetup from './features/settings/push-notifications-setup/notifications-setup.setup';
-import { CardioProvider } from './features/workouts/shared/providers/CardioProvider';
-import { WorkoutPlanProvider } from './features/workouts/shared/providers/WorkoutPlanProvider';
 import ensureDpopKeyPair from './infrastructure/api/dpop/ensureDpopKeyPair';
 import { cacheHousekeepingOnBoot } from './infrastructure/cache/cache.utils';
 import Sentry from './infrastructure/sentry';
@@ -128,23 +124,16 @@ function RootNavigator() {
 
   return (
     <>
-      {/* Always render the tree so providers can mount */}
-      {isLoggedIn ? <AppWithProviders key={user?.id} /> : <AuthStack />}
+      {isLoggedIn ? <AuthenticatedApp key={user?.id} /> : <AuthStack />}
     </>
   );
 }
 
-// ---------- App branch wrapped with app-scoped providers ----------
-function AppWithProviders() {
+// ---------- Authenticated app-wide state ----------
+function AuthenticatedApp() {
   return (
     <MessagesProvider>
-      <WorkoutPlanProvider>
-        <WorkoutHistoryProvider>
-          <CardioProvider>
-            <MainApp />
-          </CardioProvider>
-        </WorkoutHistoryProvider>
-      </WorkoutPlanProvider>
+      <MainApp />
     </MessagesProvider>
   );
 }
