@@ -24,7 +24,6 @@ import AuthStack from './navigation/AuthStack';
 import BottomTabBar from './shared/components/BottomTabBar';
 import Theme1 from './shared/components/Theme1';
 import UpdateAppModal from './shared/components/UpdateAppModal';
-import { GlobalAppLoadingProvider } from './shared/providers/GlobalAppLoadingProvider';
 import { AppThemeProvider } from './shared/providers/AppThemeProvider';
 import { WorkoutPlanProvider } from './features/workouts/shared/providers/WorkoutPlanProvider';
 import { CardioProvider } from './features/workouts/shared/providers/CardioProvider';
@@ -98,17 +97,15 @@ function App() {
       <Sentry.ErrorBoundary fallback={<AppCrashFallback />}>
         <AlertNotificationRoot>
           <GestureHandlerRootView style={{ flex: 1 }}>
-            <GlobalAppLoadingProvider>
-              <AppThemeProvider>
-                <AuthProvider>
-                  <NavigationContainer ref={navigationRef}>
-                    <RootNavigator />
-                    <NotifierRoot />
-                    <UpdateAppModal />
-                  </NavigationContainer>
-                </AuthProvider>
-              </AppThemeProvider>
-            </GlobalAppLoadingProvider>
+            <AppThemeProvider>
+              <AuthProvider>
+                <NavigationContainer ref={navigationRef}>
+                  <RootNavigator />
+                  <NotifierRoot />
+                  <UpdateAppModal />
+                </NavigationContainer>
+              </AuthProvider>
+            </AppThemeProvider>
           </GestureHandlerRootView>
         </AlertNotificationRoot>
       </Sentry.ErrorBoundary>

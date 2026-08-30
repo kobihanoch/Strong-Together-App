@@ -37,14 +37,11 @@ type RefreshResponse = {
   refreshToken: string;
   userId: NonNullable<typeof userWithoutWorkoutProfile.user>['id'];
 };
-type UseCacheAndFetchResponse = { loading: boolean };
+type UseCacheAndFetchResponse = { loading: boolean; data: null; updateAndCache: ReturnType<typeof jest.fn> };
 type UseCacheAndFetchMockFn = (
-  user: unknown,
-  keyBuilderFn: unknown,
+  cacheKey: string | null,
   isValidatedByServerFlag: boolean,
   fetchFn: unknown,
-  onDataFn: unknown,
-  cachedPayload: unknown,
   logLabel: string,
 ) => UseCacheAndFetchResponse;
 
@@ -52,13 +49,11 @@ const mockCacheGetJSON = jest.fn<CacheGetFn>();
 const mockCacheSetJSON = jest.fn<CacheSetFn>();
 const mockCacheDeleteAllCache = jest.fn<VoidPromiseFn>();
 const mockCacheDeleteAllCacheWithoutStartWorkout = jest.fn<VoidPromiseFn>();
-const mockHasBootstrapPayload = jest.fn<() => boolean>();
-const mockResetBootstrap = jest.fn<() => void>();
 const mockUseGoogleAuth = jest.fn<() => { signInWithGoogle: ReturnType<typeof jest.fn> }>();
 const mockUseAppleAuth = jest.fn<() => { signInWithApple: ReturnType<typeof jest.fn> }>();
 const mockUseCacheAndFetch = jest.fn<UseCacheAndFetchMockFn>();
 const mockUseNetworkStatus = jest.fn<() => boolean>();
-const mockUseUpdateGlobalLoading = jest.fn<(...args: any[]) => void>();
+const mockUpdateAndCache = jest.fn<(value: unknown) => Promise<void>>();
 const mockLoginUser = jest.fn<(identifier: string, password: string) => Promise<LoginResponse>>();
 const mockLogoutUser = jest.fn<VoidPromiseFn>();
 const mockRefreshAndRotateTokens = jest.fn<() => Promise<RefreshResponse>>();
@@ -79,15 +74,11 @@ const cacheDeleteAllCacheWithoutStartWorkoutMock = () => mockCacheDeleteAllCache
 const cacheGetJSONMock = <T,>(key: string) => mockCacheGetJSON(key) as Promise<T | null>;
 const cacheSetJSONMock = <T,>(key: string, value: T, ttl?: number) => mockCacheSetJSON(key, value, ttl) as Promise<void>;
 const useCacheAndFetchMock = (
-  user: unknown,
-  keyBuilderFn: unknown,
+  cacheKey: string | null,
   isValidatedByServerFlag: boolean,
   fetchFn: unknown,
-  onDataFn: unknown,
-  cachedPayload: unknown,
   logLabel: string,
-) => mockUseCacheAndFetch(user, keyBuilderFn, isValidatedByServerFlag, fetchFn, onDataFn, cachedPayload, logLabel);
-const useUpdateGlobalLoadingMock = (key: string, value: boolean) => mockUseUpdateGlobalLoading(key, value);
+) => mockUseCacheAndFetch(cacheKey, isValidatedByServerFlag, fetchFn, logLabel);
 const loginUserMock = (identifier: string, password: string) => mockLoginUser(identifier, password);
 const logoutUserMock = () => mockLogoutUser();
 const refreshAndRotateTokensMock = () => mockRefreshAndRotateTokens();
@@ -110,11 +101,6 @@ jest.mock('react-native-notifier', () => ({
   NotifierComponents: {
     Alert: 'Alert',
   },
-}));
-
-jest.mock('../../../../../infrastructure/api/api-config/bootstrap', () => ({
-  hasBootstrapPayload: () => mockHasBootstrapPayload(),
-  resetBootstrap: () => mockResetBootstrap(),
 }));
 
 jest.mock('../../../../../infrastructure/cache/cache.utils', () => ({
@@ -144,11 +130,6 @@ jest.mock('../../../../../shared/hooks/use-cache-and-fetch.hook', () => ({
 
 jest.mock('../../../../../shared/hooks/use-network-status.hook', () => ({
   useNetworkStatus: () => mockUseNetworkStatus(),
-}));
-
-jest.mock('../../../../../shared/hooks/use-update-global-loading.hook', () => ({
-  __esModule: true,
-  default: useUpdateGlobalLoadingMock,
 }));
 
 jest.mock('../../services/auth.service', () => ({
@@ -199,7 +180,6 @@ describe('AuthContext', () => {
   beforeEach(() => {
     jest.clearAllMocks();
 
-    mockHasBootstrapPayload.mockReturnValue(false);
     mockUseGoogleAuth.mockReturnValue({
       signInWithGoogle: jest.fn(),
     });
@@ -208,7 +188,10 @@ describe('AuthContext', () => {
     });
     mockUseCacheAndFetch.mockReturnValue({
       loading: false,
+      data: null,
+      updateAndCache: mockUpdateAndCache,
     });
+    mockUpdateAndCache.mockResolvedValue(undefined);
     mockUseNetworkStatus.mockReturnValue(true);
     mockGetRefreshToken.mockResolvedValue(null);
     mockCacheGetJSON.mockResolvedValue(null);
@@ -247,17 +230,13 @@ describe('AuthContext', () => {
     expect(result.current.userIdCache).toBe(null);
     expect(result.current.isValidatedWithServer).toBe(false);
     expect(mockUseCacheAndFetch).toHaveBeenLastCalledWith(
-      { id: undefined },
-      expect.any(Function),
+      null,
       false,
       expect.any(Function),
-      expect.any(Function),
-      undefined,
-      'Auth Context',
+      'Auth Provider',
     );
     expect(mockClearRefreshToken).toHaveBeenCalledTimes(1);
     expect(mockCacheDeleteAllCacheWithoutStartWorkout).toHaveBeenCalledTimes(1);
-    expect(mockResetBootstrap).toHaveBeenCalledTimes(1);
   });
 
   it('restores a stored session and validates it with the server on boot', async () => {
@@ -279,13 +258,10 @@ describe('AuthContext', () => {
     expect(result.current.userIdCache).toBe(userWithoutWorkoutProfile.user!.id);
     expect(result.current.isValidatedWithServer).toBe(true);
     expect(mockUseCacheAndFetch).toHaveBeenLastCalledWith(
-      { id: userWithoutWorkoutProfile.user!.id },
-      expect.any(Function),
+      `CACHE:AUTH:${userWithoutWorkoutProfile.user!.id}:test-version`,
       true,
       expect.any(Function),
-      expect.any(Function),
-      undefined,
-      'Auth Context',
+      'Auth Provider',
     );
     expect(mockSaveRefreshToken).toHaveBeenCalledWith('refresh-token');
     expect(mockSetAccessToken).toHaveBeenCalledWith('access-token');
@@ -311,15 +287,12 @@ describe('AuthContext', () => {
     expect(result.current.userIdCache).toBe(userWithoutWorkoutProfile.user!.id);
     expect(result.current.isValidatedWithServer).toBe(true);
     expect(result.current.authPhase).toBe('authed');
-    expect(result.current.loading).toBe(false);
+    expect(result.current.autheticationLoading).toBe(false);
     expect(mockUseCacheAndFetch).toHaveBeenLastCalledWith(
-      { id: userWithoutWorkoutProfile.user!.id },
-      expect.any(Function),
+      `CACHE:AUTH:${userWithoutWorkoutProfile.user!.id}:test-version`,
       true,
       expect.any(Function),
-      expect.any(Function),
-      undefined,
-      'Auth Context',
+      'Auth Provider',
     );
     expect(mockCacheSetJSON).toHaveBeenCalledWith('CACHE:USER_ID', userWithoutWorkoutProfile.user!.id, undefined);
   });
@@ -351,13 +324,10 @@ describe('AuthContext', () => {
     expect(result.current.userIdCache).toBeNull();
     expect(result.current.isValidatedWithServer).toBe(false);
     expect(mockUseCacheAndFetch).toHaveBeenLastCalledWith(
-      { id: undefined },
-      expect.any(Function),
+      null,
       false,
       expect.any(Function),
-      expect.any(Function),
-      undefined,
-      'Auth Context',
+      'Auth Provider',
     );
   });
 

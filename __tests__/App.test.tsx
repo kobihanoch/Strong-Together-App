@@ -81,12 +81,20 @@ jest.mock('../features/auth/shared/providers/AuthProvider', () => ({
   useAuth: () => mockAuthState(),
 }));
 
-jest.mock('../shared/providers/GlobalAppLoadingProvider', () => ({
-  GlobalAppLoadingProvider: ({ children }: { children: React.ReactNode }) => children,
-}));
-
 jest.mock('../features/messages/providers/MessagesProvider', () => ({
   MessagesProvider: ({ children }: { children: React.ReactNode }) => children,
+}));
+
+jest.mock('../features/workouts/shared/providers/CardioProvider', () => ({
+  CardioProvider: ({ children }: { children: React.ReactNode }) => children,
+}));
+
+jest.mock('../features/workouts/shared/providers/WorkoutHistoryProvider', () => ({
+  WorkoutHistoryProvider: ({ children }: { children: React.ReactNode }) => children,
+}));
+
+jest.mock('../features/workouts/shared/providers/WorkoutPlanProvider', () => ({
+  WorkoutPlanProvider: ({ children }: { children: React.ReactNode }) => children,
 }));
 
 jest.mock('../navigation/AuthStack', () => {

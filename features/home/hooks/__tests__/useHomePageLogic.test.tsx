@@ -9,7 +9,6 @@ let mockMessages: any;
 let mockCardio: any;
 let mockWorkoutPlan: any;
 let mockDashboard: any;
-let mockAppLoading = false;
 
 jest.mock('@react-navigation/native', () => ({ useNavigation: () => ({ navigate: mockNavigate }) }));
 jest.mock('../../../../shared/providers/AppThemeProvider', () => ({
@@ -31,9 +30,6 @@ jest.mock('../../../../shared/providers/AppThemeProvider', () => ({
       profit: '#080',
     },
   }),
-}));
-jest.mock('../../../../shared/providers/GlobalAppLoadingProvider', () => ({
-  useGlobalAppLoadingContext: () => ({ isLoading: mockAppLoading }),
 }));
 jest.mock('../../../auth/shared/providers/AuthProvider', () => ({ useAuth: () => mockAuth }));
 jest.mock('../../../messages/providers/MessagesProvider', () => ({ useMessages: () => mockMessages }));
@@ -95,14 +91,13 @@ const stats = {
 describe('useHomeDashboard', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    mockAppLoading = false;
     mockAuth = {
       user: { name: 'John Doe', username: 'johnny', profilePicPath: null, gender: 'Male' },
       isValidatedWithServer: true,
     };
-    mockMessages = { unreadMessages: [{ id: 1 }] };
-    mockCardio = { weeklyCardioMap: null };
-    mockWorkoutPlan = { workoutPlan: { id: 7, workoutSplits: [splitA, splitB] }, workoutSplits: [splitA, splitB] };
+    mockMessages = { unreadMessages: [{ id: 1 }], fetchLoading: false };
+    mockCardio = { weeklyCardioMap: null, fetchLoading: false };
+    mockWorkoutPlan = { hasWorkoutPlan: true, workoutSplits: [splitA, splitB], fetchLoading: false };
     mockDashboard = { dashboardStats: stats, loading: false };
   });
 
@@ -133,7 +128,7 @@ describe('useHomeDashboard', () => {
   });
 
   it('returns the no-workout state when the plan is empty', () => {
-    mockWorkoutPlan = { workoutPlan: null, workoutSplits: [] };
+    mockWorkoutPlan = { hasWorkoutPlan: false, workoutSplits: [], fetchLoading: false };
     mockDashboard = {
       dashboardStats: { ...stats, hasExerciseTracking: false, nextWorkoutSplit: null },
       loading: false,
@@ -146,6 +141,7 @@ describe('useHomeDashboard', () => {
 
   it('uses the latest cardio week and orders bars Monday through Sunday', () => {
     mockCardio = {
+      fetchLoading: false,
       weeklyCardioMap: {
         '2026-03-16': { totalDurationMins: 10, records: [] },
         '2026-03-23': {
