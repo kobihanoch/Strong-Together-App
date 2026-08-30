@@ -7,7 +7,6 @@ import CardioSection from '../../cardio/components/CardioSection';
 import ExercisesFlatList from '../components/ExercisesFlatList';
 import TabSelect, { TabSelectHandleRef } from '../components/TabSelect';
 import WorkoutHeader from '../components/WorkoutHeader';
-import { useGlobalAppLoadingContext } from '../../../../shared/providers/GlobalAppLoadingProvider';
 import useStatisticsPageLogic from '../hooks/use-statistics-page-logic.hook';
 
 const { width, height } = Dimensions.get('window');
@@ -22,8 +21,6 @@ const StatisticsPage = () => {
     cardioByDate, // Cardio for date X
     cardioForWeek, // Cardio for week starting at sunday date Y
   } = useStatisticsPageLogic();
-
-  const { isLoading } = useGlobalAppLoadingContext();
 
   const [index, setIndex] = useState(0);
 
@@ -40,22 +37,13 @@ const StatisticsPage = () => {
     setIndex(exerciseTrackingByDate && exerciseTrackingByDate.length ? 0 : cardioByDate ? 1 : 0);
   }, [exerciseTrackingByDate, cardioByDate]);
 
-  if (isLoading) return null;
-
   return (
     <ScrollView style={styles.pageContainer} showsVerticalScrollIndicator={false}>
-      <CalendarStripCustom
-        onDateSelect={setSelectedDate}
-        selectedDate={selectedDate}
-        userExerciseLogs={exerciseTrackingWithDateKey}
-      />
+      <CalendarStripCustom onDateSelect={setSelectedDate} selectedDate={selectedDate} userExerciseLogs={exerciseTrackingWithDateKey} />
       <TabSelect index={index} setIndex={setIndex} ref={cardioDotRef}></TabSelect>
       {index == 0 ? <WorkoutHeader data={exerciseTrackingByDate} selectedDate={selectedDate}></WorkoutHeader> : null}
       {index === 0 ? (
-        <ExercisesFlatList
-          data={exerciseTrackingByDate}
-          dataToCompare={exerciseTrackingByDatePrev || []}
-        ></ExercisesFlatList>
+        <ExercisesFlatList data={exerciseTrackingByDate} dataToCompare={exerciseTrackingByDatePrev || []}></ExercisesFlatList>
       ) : (
         <CardioSection daily={cardioByDate} weekly={cardioForWeek}></CardioSection>
       )}
@@ -77,5 +65,3 @@ const styles = StyleSheet.create({
 });
 
 export default StatisticsPage;
-
-

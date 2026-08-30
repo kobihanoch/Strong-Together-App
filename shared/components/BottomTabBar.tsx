@@ -7,14 +7,12 @@ import { RFValue } from 'react-native-responsive-fontsize';
 import { fontFamilies, fontSizes } from '../constants/typography';
 import { useAppTheme } from '../providers/AppThemeProvider';
 import { useAuth } from '../../features/auth/shared/providers/AuthProvider.tsx';
-import { useGlobalAppLoadingContext } from '../providers/GlobalAppLoadingProvider.tsx';
 import { RootParamList } from '../../navigation/types/appStackTypes';
 
 type RouteName = keyof RootParamList;
 
 const BottomTabBar = () => {
   const navigation = useNavigation<StackNavigationProp<RootParamList>>();
-  const { isLoading } = useGlobalAppLoadingContext();
   const { colors } = useAppTheme();
 
   const routeName = useNavigationState((state) => {
@@ -31,7 +29,7 @@ const BottomTabBar = () => {
   });
 
   const { isWorkoutMode } = useAuth();
-  const navDisabled = isLoading;
+  const navDisabled = false;
 
   const handleTabPress = (tabName: RouteName) => {
     navigation.navigate(tabName as never);
@@ -45,7 +43,8 @@ const BottomTabBar = () => {
   ];
 
   return (
-    !isWorkoutMode && (
+    !isWorkoutMode &&
+    routeName !== 'CreateWorkout' && (
       <View style={[styles.tabBarContainer, { backgroundColor: colors.surface, borderTopColor: colors.border }]}>
         {tabs.map((tab, index) => {
           const isActive =
@@ -54,16 +53,15 @@ const BottomTabBar = () => {
             (tab.name === 'Profile' && routeName === 'Settings');
 
           return (
-            <TouchableOpacity
-              key={index}
-              style={styles.tabButton}
-              onPress={() => handleTabPress(tab.name)}
-              disabled={navDisabled}
-            >
+            <TouchableOpacity key={index} style={styles.tabButton} onPress={() => handleTabPress(tab.name)} disabled={navDisabled}>
               <View style={[styles.iconContainer, isActive && { backgroundColor: colors.primarySoft }]}>
                 <MaterialCommunityIcons name={tab.icon} size={RFValue(19)} color={isActive ? colors.primary : colors.textSecondary} />
               </View>
-              <Text style={[styles.tabLabel, { color: isActive ? colors.primary : colors.textSecondary }, isActive && styles.tabLabelActive]}>{tab.label}</Text>
+              <Text
+                style={[styles.tabLabel, { color: isActive ? colors.primary : colors.textSecondary }, isActive && styles.tabLabelActive]}
+              >
+                {tab.label}
+              </Text>
             </TouchableOpacity>
           );
         })}
