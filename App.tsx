@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-require-imports */
 require('./global');
 import { NavigationContainer, useNavigationContainerRef } from '@react-navigation/native';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import * as Font from 'expo-font';
 import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, StatusBar, StyleSheet, Text, View } from 'react-native';
@@ -28,6 +29,8 @@ import { AppThemeProvider } from './shared/providers/AppThemeProvider';
 import { WorkoutPlanProvider } from './features/workouts/shared/providers/WorkoutPlanProvider';
 import { CardioProvider } from './features/workouts/shared/providers/CardioProvider';
 import { WorkoutHistoryProvider } from './features/workouts/shared/providers/WorkoutHistoryProvider';
+
+const queryClient = new QueryClient();
 
 // ---------- Fonts Loader Hook ----------
 function useFontsReady() {
@@ -98,13 +101,15 @@ function App() {
         <AlertNotificationRoot>
           <GestureHandlerRootView style={{ flex: 1 }}>
             <AppThemeProvider>
-              <AuthProvider>
-                <NavigationContainer ref={navigationRef}>
-                  <RootNavigator />
-                  <NotifierRoot />
-                  <UpdateAppModal />
-                </NavigationContainer>
-              </AuthProvider>
+              <QueryClientProvider client={queryClient}>
+                <AuthProvider>
+                  <NavigationContainer ref={navigationRef}>
+                    <RootNavigator />
+                    <NotifierRoot />
+                    <UpdateAppModal />
+                  </NavigationContainer>
+                </AuthProvider>
+              </QueryClientProvider>
             </AppThemeProvider>
           </GestureHandlerRootView>
         </AlertNotificationRoot>
