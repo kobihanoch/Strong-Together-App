@@ -15,7 +15,7 @@ const useRetryServerValidationWhenOnline = (
         await attemptServerValidation();
       }
     })();
-  }, [isValidatedWithServer, isOnline, attemptServerValidation]);
+  }, [isValidatedWithServer, isOnline, attemptServerValidation, attemptedServerValidationRef]);
 
   return;
 };
