@@ -1,10 +1,11 @@
 import { AddUserAerobicsBody } from '@strong-together/shared';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useCallback } from 'react';
+import { getStartOfWeek } from '../../../../shared/utils/shared-utils';
 import { useAuth } from '../../../auth/shared/providers/AuthProvider';
 import { getUserCardio, logUserCardio } from '../services/cardio.service';
 import { CardioMaps } from '../types/cardio.types';
 import { checkIfDoneCardioInSelectedWeek, getCardioForToday } from '../utils/cardio.utils';
-import { useCallback } from 'react';
 
 type CardioInput = AddUserAerobicsBody['record'];
 
@@ -62,10 +63,11 @@ export const useCardio = () => {
     },
     [weeklyCardioMap],
   );
+  const cardioForSelectedWeek = (stringDate: string) => weeklyCardioMap?.[getStartOfWeek(stringDate)];
 
   return {
     // Data
-    data: { dailyCardioMap, weeklyCardioMap, cardioForToday, hasDoneCardioInSelectedWeek },
+    data: { dailyCardioMap, weeklyCardioMap, cardioForToday, hasDoneCardioInSelectedWeek, cardioForSelectedWeek },
 
     // Loading states
     loadingStates: {

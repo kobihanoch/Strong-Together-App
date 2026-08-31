@@ -14,7 +14,7 @@ const AerobicsCard = ({ data, theme }: { data: HomeDashboardData['aerobics']; th
   const barWidth = Math.min(Math.max(width * 0.07, 20), 30);
   const maxMinutes = Math.max(...data.days.map((day) => day.minutes), 1);
 
-  const formattedAerobicsTime = formatTime(data.totalMinutes);
+  const formattedAerobicsTime = formatTime(data.totalDurationMins, data.totalDurationSecs);
   const moreThanOneHour = formattedAerobicsTime.hours >= 1;
   return (
     <View style={common.card}>

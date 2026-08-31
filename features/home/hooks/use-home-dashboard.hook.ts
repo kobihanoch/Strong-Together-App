@@ -13,6 +13,7 @@ import { ExerciseInPlan, WorkoutSplit } from '../../workouts/plan/types/workout-
 import { getUserDashboardStats } from '../services/home-page.service';
 import { HomeDashboardStats } from '../types/use-home-page.types';
 import { fillCardioGraph, getNextWorkoutSplit } from '../utils/home-page.utils';
+import { getStartOfWeek } from '../../../shared/utils/shared-utils';
 
 /**
  * Composes the Home screen view model from TanStack-backed feature data.
@@ -104,7 +105,11 @@ const useHomeDashboard = () => {
             setCount: lastWorkout.setTrackedCount ?? 0,
           }
         : { name: '', dateLabel: '', exerciseCount: 0, setCount: 0 },
-      aerobics: { totalMinutes: cardioData.weeklyCardioMap?.totalDurationMins ?? 0, days: fillCardioGraph(cardioData.weeklyCardioMap) },
+      aerobics: {
+        totalDurationMins: cardioData.cardioForSelectedWeek(getStartOfWeek())?.totalDurationMins ?? 0,
+        totalDurationSecs: cardioData.cardioForSelectedWeek(getStartOfWeek())?.totalDurationSec ?? 0,
+        days: fillCardioGraph(cardioData.weeklyCardioMap),
+      },
       achievement: {
         exercise: pr?.exerciseName ?? '',
         value: pr ? `${pr.prWeight} kg PR` : '',

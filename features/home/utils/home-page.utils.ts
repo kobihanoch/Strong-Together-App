@@ -1,3 +1,4 @@
+import { getStartOfWeek } from '../../../shared/utils/shared-utils';
 import { CardioWeeklyMap } from '../../workouts/cardio/types/cardio.types';
 import { WorkoutSplit } from '../../workouts/plan/types/workout-plan.types';
 import { HomeDashboardStats } from '../types/use-home-page.types';
@@ -38,12 +39,12 @@ export const getNextWorkoutSplit = (workoutSplits: WorkoutSplit[], nextWorkoutSp
 };
 
 export const fillCardioGraph = (weeklyCardioMap: CardioWeeklyMap | undefined) => {
-  const weekly = Object.entries(weeklyCardioMap ?? {}).sort(([a], [b]) => b.localeCompare(a))[0]?.[1];
-  const aerobicMinutes = Array(7).fill(0) as number[];
-  weekly?.records.forEach((record) => {
-    aerobicMinutes[new Date(record.workoutTimeUtc).getDay()] += record.durationMins;
+  const cardioForThisWeek = weeklyCardioMap?.[getStartOfWeek()]?.records ?? [];
+  const aerobicMinutes = [0, 0, 0, 0, 0, 0, 0];
+  cardioForThisWeek.forEach((record) => {
+    aerobicMinutes[new Date(record.workoutTimeLocal).getDay()] += record.durationMins;
   });
-  return [1, 2, 3, 4, 5, 6, 0].map((dayIndex) => ({
+  return [0, 1, 2, 3, 4, 5, 6].map((dayIndex) => ({
     label: DAY_LABELS[dayIndex],
     minutes: aerobicMinutes[dayIndex],
   }));

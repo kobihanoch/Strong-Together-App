@@ -79,3 +79,22 @@ export const formatTime = (min: number = 0, sec: number = 0) => {
     return { hours, minutes, seconds };
   }
 };
+
+/**
+ * Returns the start of the week (Sunday) in 'YYYY-MM-DD' format.
+ * @param dateStr Optional date string in 'YYYY-MM-DD' format. Defaults to today.
+ * @returns Start of the week (Sunday) in 'YYYY-MM-DD' format.
+ */
+export const getStartOfWeek = (dateStr: string = new Date().toLocaleDateString('en-CA')): string => {
+  // Append midday time to prevent timezone-related date shifts
+  const d = new Date(`${dateStr}T12:00:00`);
+
+  // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
+  const dayOfWeek = d.getDay();
+
+  // Subtract days to shift back to Sunday
+  d.setDate(d.getDate() - dayOfWeek);
+
+  // Return formatted as YYYY-MM-DD
+  return d.toLocaleDateString('en-CA');
+};
