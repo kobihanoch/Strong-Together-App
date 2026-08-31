@@ -1,13 +1,25 @@
-import React, { createContext, ReactNode, useContext, useMemo } from 'react';
-import { AppThemeMode, themePalettes } from '../constants/theme';
+import React, { createContext, ReactNode, useContext, useMemo, useState } from 'react';
+import { AppThemeColors, AppThemeMode, themePalettes } from '../constants/theme';
+import useToggleStatusBarColor from '../hooks/use-toggle-status-bar-color.hook';
 
-const MOCK_THEME_MODE: AppThemeMode = 'light';
-
-const AppThemeContext = createContext({ mode: MOCK_THEME_MODE, colors: themePalettes[MOCK_THEME_MODE] });
+const AppThemeContext = createContext<{
+  mode: AppThemeMode;
+  setMode: React.Dispatch<React.SetStateAction<AppThemeMode>>;
+  colors: AppThemeColors;
+} | null>(null);
 
 export const AppThemeProvider = ({ children }: { children: ReactNode }) => {
-  const value = useMemo(() => ({ mode: MOCK_THEME_MODE, colors: themePalettes[MOCK_THEME_MODE] }), []);
+  const [mode, setMode] = useState<AppThemeMode>('light');
+  useToggleStatusBarColor(mode);
+
+  const value = useMemo(() => ({ mode, colors: themePalettes[mode], setMode }), [mode, setMode]);
   return <AppThemeContext.Provider value={value}>{children}</AppThemeContext.Provider>;
 };
 
-export const useAppTheme = () => useContext(AppThemeContext);
+export const useAppTheme = () => {
+  const ctx = useContext(AppThemeContext);
+  if (!ctx) {
+    throw new Error('useAppTheme must be used within an AppThemeProvider');
+  }
+  return ctx;
+};

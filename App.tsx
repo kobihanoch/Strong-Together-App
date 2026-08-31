@@ -1,23 +1,25 @@
 /* eslint-disable @typescript-eslint/no-require-imports */
 require('./global');
+import { Inter_400Regular, Inter_500Medium, Inter_600SemiBold, Inter_700Bold } from '@expo-google-fonts/inter';
 import { NavigationContainer, useNavigationContainerRef } from '@react-navigation/native';
-import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client';
 import { useIsRestoring } from '@tanstack/react-query';
+import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client';
+import Constants from 'expo-constants';
 import * as Font from 'expo-font';
 import React, { useEffect, useState } from 'react';
-import { ActivityIndicator, StatusBar, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
 import { AlertNotificationRoot } from 'react-native-alert-notification';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import Constants from 'expo-constants';
-import { Inter_400Regular, Inter_500Medium, Inter_600SemiBold, Inter_700Bold } from '@expo-google-fonts/inter';
 
 import { MaterialCommunityIcons as ExpoMaterialCommunityIcons } from '@expo/vector-icons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { NotifierRoot } from 'react-native-notifier';
-import { AuthProvider, useAuth } from './features/auth/shared/providers/AuthProvider';
 import AuthenticatedUserEffects from './features/auth/shared/components/AuthenticatedUserEffects';
+import { AuthProvider, useAuth } from './features/auth/shared/providers/AuthProvider';
 import { MessagesProvider } from './features/messages/providers/MessagesProvider';
 import NotificationsSetup from './features/settings/push-notifications-setup/notifications-setup.setup';
 import ensureDpopKeyPair from './infrastructure/api/dpop/ensureDpopKeyPair';
+import { cacheHousekeepingOnBoot } from './infrastructure/cache/cache.constants';
 import { logRestoredQueryCache, queryClient, queryPersistOptions } from './infrastructure/query/query-client';
 import Sentry from './infrastructure/sentry';
 import AppStack from './navigation/AppStack';
@@ -26,8 +28,6 @@ import BottomTabBar from './shared/components/BottomTabBar';
 import Theme1 from './shared/components/Theme1';
 import UpdateAppModal from './shared/components/UpdateAppModal';
 import { AppThemeProvider } from './shared/providers/AppThemeProvider';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { cacheHousekeepingOnBoot } from './infrastructure/cache/cache.constants';
 
 // ---------- Fonts Loader Hook ----------
 function useFontsReady() {
@@ -148,7 +148,6 @@ function AuthenticatedApp() {
 function MainApp() {
   return (
     <>
-      <StatusBar barStyle="dark-content" />
       <Theme1>
         <AppStack />
         <NotificationsSetup />
