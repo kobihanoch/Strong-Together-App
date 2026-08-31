@@ -1,22 +1,16 @@
-import type { UserMessage } from '../types/messages.types';
 import { useCallback } from 'react';
 import { ALERT_TYPE, Dialog } from 'react-native-alert-notification';
 import { useMessages } from '../providers/MessagesProvider';
-import { deleteMessage, updateMsgReadStatus } from '../services/messages.service';
-import { UserMessages } from '../types/messages.types';
+import type { UserMessage } from '../types/messages.types';
 
 const useInboxLogic = () => {
-  const { allReceivedMessages, setAllReceivedMessages, unreadMessages } = useMessages();
+  const { allReceivedMessages, unreadMessages, updateMessageToRead, deleteMessage } = useMessages();
 
   const unreadMessagesCount = unreadMessages?.length;
 
   const markAsRead = useCallback(async (msgId: UserMessage['id']): Promise<void> => {
-    await updateMsgReadStatus(msgId);
-    // Update state
-    setAllReceivedMessages((prev: UserMessages | undefined) =>
-      prev ? prev.map((m: UserMessages[number]) => (m.id === msgId ? { ...m, isRead: true } : m)) : prev,
-    );
-  }, [setAllReceivedMessages]);
+    await updateMessageToRead(msgId);
+  }, [updateMessageToRead]);
 
   const confirmAndDeleteMessage = useCallback((msgId: UserMessage['id']): void => {
     let pressedYes = false;
@@ -32,9 +26,6 @@ const useInboxLogic = () => {
         Dialog.hide();
         try {
           await deleteMessage(msgId);
-          setAllReceivedMessages((prev: UserMessages | undefined) =>
-            prev ? prev.filter((m: UserMessages[number]) => m.id !== msgId) : prev,
-          );
         } catch (err) {
           console.log('Delete failed:', err);
         }
@@ -44,7 +35,7 @@ const useInboxLogic = () => {
         }
       },
     });
-  }, [setAllReceivedMessages]);
+  }, [deleteMessage]);
 
   return {
     allReceivedMessages,

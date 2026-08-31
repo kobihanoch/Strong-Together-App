@@ -1,21 +1,16 @@
 import { act, renderHook } from '@testing-library/react-native';
 import { beforeEach, describe, expect, it, jest } from '@jest/globals';
-import type { UserMessages } from '../../types/messages.types';
 
 const mockUpdateMsgReadStatus = jest.fn<(messageId: string) => Promise<unknown>>();
-const mockSetAllReceivedMessages = jest.fn();
+const mockDeleteMessage = jest.fn<(messageId: string) => Promise<void>>();
 
 jest.mock('../../providers/MessagesProvider', () => ({
   useMessages: () => ({
     allReceivedMessages: [],
     unreadMessages: [],
-    setAllReceivedMessages: mockSetAllReceivedMessages,
+    updateMessageToRead: mockUpdateMsgReadStatus,
+    deleteMessage: mockDeleteMessage,
   }),
-}));
-
-jest.mock('../../services/messages.service', () => ({
-  updateMsgReadStatus: (messageId: string) => mockUpdateMsgReadStatus(messageId),
-  deleteMessage: jest.fn(),
 }));
 
 jest.mock('react-native-alert-notification', () => ({
@@ -31,7 +26,7 @@ describe('useInboxLogic', () => {
     mockUpdateMsgReadStatus.mockResolvedValue(undefined);
   });
 
-  it('marks a message as read on the server and in shared state', async () => {
+  it('marks a message as read through the shared message action', async () => {
     const { result } = renderHook(() => useInboxLogic());
 
     await act(async () => {
@@ -39,9 +34,5 @@ describe('useInboxLogic', () => {
     });
 
     expect(mockUpdateMsgReadStatus).toHaveBeenCalledWith('message-1');
-    const updater = mockSetAllReceivedMessages.mock.calls[0][0] as (messages: UserMessages) => UserMessages;
-    expect(updater([{ id: 'message-1', isRead: false }] as UserMessages)).toEqual([
-      { id: 'message-1', isRead: true },
-    ]);
   });
 });
