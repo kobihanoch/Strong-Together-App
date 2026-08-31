@@ -37,7 +37,7 @@ export async function cacheHousekeepingOnBoot(): Promise<void> {
   try {
     const keys = await AsyncStorage.getAllKeys();
     // Everything out of user id for soft login after udpate
-    const stale = keys.filter((k) => (k.startsWith('CACHE:') && k !== 'CACHE:USER_ID') || k === '__VERSION__');
+    const stale = keys.filter((k) => (k.startsWith('CACHE:') && k === 'CACHE:USER_ID') || k === '__VERSION__');
 
     if (stale.length) {
       const CHUNK = 100;
