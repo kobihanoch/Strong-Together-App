@@ -86,21 +86,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     attemptedServerValidationRef,
   });
 
-  // Attempt server validation method
-  const { attemptServerValidation } = useServerValidation({
-    clearContext,
-    setIsValidatedWithServer,
-    setUserIdCache,
-    serverValidatingLockRef,
-    attemptedServerValidationRef,
-  });
-
-  // Restore cached session on app start, then validate it in the background
-  useInitialCheck({ clearContext, attemptServerValidation, setUserIdCache, setIsLoggedIn, setAuthPhase });
-
-  // Retry server validation when a boot-time offline/server failure recovers
-  useRetryServerValidationWhenOnline(isValidatedWithServer, attemptServerValidation, attemptedServerValidationRef);
-
   const { register, login, handleAppleAuth, handleGoogleAuth, logout } = useAuthActions({
     setAutheticationLoading,
     setAppleLoading,
@@ -111,6 +96,22 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     setAuthPhase,
     clearContext,
   });
+
+  // Attempt server validation method
+  const { attemptServerValidation } = useServerValidation({
+    clearContext,
+    setIsValidatedWithServer,
+    setUserIdCache,
+    logout,
+    serverValidatingLockRef,
+    attemptedServerValidationRef,
+  });
+
+  // Restore cached session on app start, then validate it in the background
+  useInitialCheck({ clearContext, attemptServerValidation, setUserIdCache, setIsLoggedIn, setAuthPhase });
+
+  // Retry server validation when a boot-time offline/server failure recovers
+  useRetryServerValidationWhenOnline(isValidatedWithServer, attemptServerValidation, attemptedServerValidationRef);
 
   // Memoized context value
   const value = useMemo<AuthProviderValue>(

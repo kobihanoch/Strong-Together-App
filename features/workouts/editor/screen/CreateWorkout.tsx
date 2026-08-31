@@ -69,7 +69,7 @@ const CreateWorkout = () => {
             <View style={[styles.heading, { paddingHorizontal: gutter }]}>
               <Text style={[styles.headingText, { color: data.theme.textPrimary }]}>{split.name} exercises</Text>
               <Text style={[styles.meta, { color: data.theme.textSecondary }]}>
-                Hold and drag to reorder · {split.exercises.length} of 10
+                Hold and drag to reorder · {split.exercises.length} of 12
               </Text>
             </View>
 
@@ -124,7 +124,6 @@ const CreateWorkout = () => {
 
       <SlidingBottomModal ref={splitSheet} title="Split options" snapPoints={['32%', '42%']} flatListUsage={false}>
         <View style={[styles.options, { backgroundColor: data.theme.surface }]}>
-          <Text style={[styles.label, { color: data.theme.textSecondary }]}>SPLIT NAME</Text>
           <TextInput
             value={split.name}
             onChangeText={actions.renameSplit}

@@ -9,6 +9,7 @@ type UseServerValidationProps = {
   clearContext: () => Promise<void>;
   setIsValidatedWithServer: React.Dispatch<SetStateAction<boolean>>;
   setUserIdCache: React.Dispatch<SetStateAction<AppUser['id'] | null | undefined>>;
+  logout: () => Promise<void>;
   serverValidatingLockRef: React.MutableRefObject<boolean>;
   attemptedServerValidationRef: React.MutableRefObject<boolean>;
 };
@@ -17,6 +18,7 @@ const useServerValidation = ({
   clearContext,
   setIsValidatedWithServer,
   setUserIdCache,
+  logout,
   serverValidatingLockRef,
   attemptedServerValidationRef,
 }: UseServerValidationProps) => {
@@ -51,6 +53,7 @@ const useServerValidation = ({
       }
       console.log('\x1b[31m[Auth Context]: Validation with server failed => Logging out\x1b[0m');
       await clearContext();
+      await logout();
     } finally {
       attemptedServerValidationRef.current = true;
       serverValidatingLockRef.current = false;

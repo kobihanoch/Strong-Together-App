@@ -64,7 +64,6 @@ const PlanEditorHeader = ({
         </Pressable>
       </View>
 
-      <Text style={styles.label}>SPLIT NAME</Text>
       <View style={styles.nameRow}>
         <TextInput
           value={split.name}
@@ -124,10 +123,10 @@ const styles = StyleSheet.create({
     letterSpacing: 1.2,
     marginTop: 18,
   },
-  nameRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  nameRow: { flexDirection: 'row', alignItems: 'center', gap: 8, paddingTop: 20 },
   nameInput: { color: '#FFF', fontFamily: fontFamilies.bold, fontSize: fontSizes.metric, paddingVertical: 4, flexShrink: 1, minWidth: 80 },
   meta: { color: 'rgba(255,255,255,0.65)', fontFamily: fontFamilies.regular, fontSize: fontSizes.label },
-  splitBar: { flexDirection: 'row', alignItems: 'center', marginTop: 16, gap: 7 },
+  splitBar: { flexDirection: 'row', alignItems: 'center', marginTop: 16, gap: 7, paddingBottom: 10 },
   splitViewport: { flex: 1, minWidth: 0, overflow: 'hidden' },
   splitContent: { gap: 4, paddingRight: 8 },
   splitTab: {

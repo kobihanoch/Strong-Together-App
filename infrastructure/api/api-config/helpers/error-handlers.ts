@@ -6,6 +6,18 @@ import { showErrorAlert } from '../../../../shared/alerts/error-alerts';
 import { openUpdateModal } from '../../../../shared/utils/imperative-update-modal';
 import { notifyOffline, notifyServerDown } from './network-check';
 
+let refreshPromise: ReturnType<typeof refreshAndRotateTokens> | null = null;
+
+// Concurrent 401s must share one refresh because refresh tokens are rotated.
+const refreshTokensOnce = () => {
+  if (!refreshPromise) {
+    refreshPromise = refreshAndRotateTokens().finally(() => {
+      refreshPromise = null;
+    });
+  }
+  return refreshPromise;
+};
+
 export const handleUpdateRequired = (error: AxiosError) => {
   openUpdateModal(); // <-- imperative show
   error.isUpgradeRequired = true;
@@ -41,7 +53,7 @@ export const handle401 = async (api: AxiosInstance, error: AxiosError<{ message?
     // Try to refresh
     // Flag for second retry
     firstRequest._retry = true;
-    const { refreshToken, accessToken } = await refreshAndRotateTokens();
+    const { refreshToken, accessToken } = await refreshTokensOnce();
     await saveRefreshToken(refreshToken);
     GlobalAuth.setAccessToken(accessToken);
     firstRequest.headers = firstRequest.headers || {};

@@ -27,12 +27,12 @@ const Home = () => {
         contentContainerStyle={[styles.content, { paddingHorizontal: horizontalPadding, gap: sectionGap }]}
         showsVerticalScrollIndicator={false}
       >
-        <Skeleton.Group show={loadingStates.isLoading}>
+        <Skeleton.Group show={loadingStates.isLoading || loadingStates.isFetching}>
           <Skeleton colorMode={mode}>
             <HomeHeader data={data.user} theme={data.theme} onInbox={actions.openInbox} />
           </Skeleton>
 
-          {loadingStates.isLoading ? (
+          {loadingStates.isLoading || loadingStates.isFetching ? (
             <>
               <Skeleton colorMode={mode}>
                 <NextWorkoutCard data={data.nextWorkout} theme={data.theme} isFirstWorkout={false} onStart={actions.startWorkout} />
