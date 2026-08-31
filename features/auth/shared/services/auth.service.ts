@@ -26,7 +26,7 @@ export const logoutUser = async (): Promise<void> => {
       {},
       {
         headers: {
-          'x-refresh-token': `Bearer ${refreshToken}`,
+          'x-refresh-token': `DPoP ${refreshToken}`,
         },
       },
     );
