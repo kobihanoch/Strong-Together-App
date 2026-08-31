@@ -1,5 +1,5 @@
 import React, { SetStateAction, useCallback } from 'react';
-import { clearAllCacheWithoutStartWorkout } from '../../../../infrastructure/query/query-client';
+import { clearAllCacheWithStartWorkout } from '../../../../infrastructure/query/query-client';
 import { AppUser } from '../types/auth.types';
 import GlobalAuth from '../utils/auth.utils';
 import { clearRefreshToken } from '../utils/token-storage.utils';
@@ -29,33 +29,36 @@ const useClearContext = ({
   serverValidatingLockRef,
   attemptedServerValidationRef,
 }: UseClearContextProps) => {
-  const clearContext = useCallback(async (skipCacheCleanup: boolean = false) => {
-    await clearRefreshToken();
-    if (!skipCacheCleanup) await clearAllCacheWithoutStartWorkout();
-    GlobalAuth.setAccessToken(null);
-    GlobalAuth.setUsernameInHeader(null);
-    setIsLoggedIn(false);
-    setAutheticationLoading(false);
-    setAppleLoading(false);
-    setGoogleLoading(false);
-    setIsWorkoutMode(false);
-    setUserIdCache(undefined);
-    setIsValidatedWithServer(false);
-    setAuthPhase('guest');
-    serverValidatingLockRef.current = false;
-    attemptedServerValidationRef.current = false;
-  }, [
-    attemptedServerValidationRef,
-    serverValidatingLockRef,
-    setAppleLoading,
-    setAuthPhase,
-    setGoogleLoading,
-    setIsLoggedIn,
-    setIsValidatedWithServer,
-    setIsWorkoutMode,
-    setAutheticationLoading,
-    setUserIdCache,
-  ]);
+  const clearContext = useCallback(
+    async (skipCacheCleanup: boolean = false) => {
+      await clearRefreshToken();
+      if (!skipCacheCleanup) await clearAllCacheWithStartWorkout();
+      GlobalAuth.setAccessToken(null);
+      GlobalAuth.setUsernameInHeader(null);
+      setIsLoggedIn(false);
+      setAutheticationLoading(false);
+      setAppleLoading(false);
+      setGoogleLoading(false);
+      setIsWorkoutMode(false);
+      setUserIdCache(undefined);
+      setIsValidatedWithServer(false);
+      setAuthPhase('guest');
+      serverValidatingLockRef.current = false;
+      attemptedServerValidationRef.current = false;
+    },
+    [
+      attemptedServerValidationRef,
+      serverValidatingLockRef,
+      setAppleLoading,
+      setAuthPhase,
+      setGoogleLoading,
+      setIsLoggedIn,
+      setIsValidatedWithServer,
+      setIsWorkoutMode,
+      setAutheticationLoading,
+      setUserIdCache,
+    ],
+  );
 
   return { clearContext };
 };

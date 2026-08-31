@@ -4,18 +4,17 @@ import { refreshAndRotateTokens } from '../services/auth.service';
 import { AppUser } from '../types/auth.types';
 import GlobalAuth from '../utils/auth.utils';
 import { saveRefreshToken } from '../utils/token-storage.utils';
+import { clearAllCacheWithoutStartWorkout } from '../../../../infrastructure/query/query-client';
 
 type UseServerValidationProps = {
-  clearContext: () => Promise<void>;
   setIsValidatedWithServer: React.Dispatch<SetStateAction<boolean>>;
   setUserIdCache: React.Dispatch<SetStateAction<AppUser['id'] | null | undefined>>;
-  logout: () => Promise<void>;
+  logout: (skipCacheCleanup: boolean) => Promise<void>;
   serverValidatingLockRef: React.MutableRefObject<boolean>;
   attemptedServerValidationRef: React.MutableRefObject<boolean>;
 };
 
 const useServerValidation = ({
-  clearContext,
   setIsValidatedWithServer,
   setUserIdCache,
   logout,
@@ -30,7 +29,7 @@ const useServerValidation = ({
       const { accessToken: at, refreshToken: rt, userId } = await refreshAndRotateTokens();
       await saveRefreshToken(rt);
       GlobalAuth.setAccessToken(at);
-      console.log('\x1b[32m[Auth Context]: Validation with server completed => Fetching data from API\x1b[0m');
+      console.log('\x1b[32m[Auth Context]: Validation with server completed.\x1b[0m');
       setIsValidatedWithServer(true);
       setUserIdCache(userId);
     } catch (e) {
@@ -52,13 +51,13 @@ const useServerValidation = ({
         }
       }
       console.log('\x1b[31m[Auth Context]: Validation with server failed => Logging out\x1b[0m');
-      await clearContext();
-      await logout();
+      await logout(true);
+      await clearAllCacheWithoutStartWorkout();
     } finally {
       attemptedServerValidationRef.current = true;
       serverValidatingLockRef.current = false;
     }
-  }, [attemptedServerValidationRef, clearContext, serverValidatingLockRef, setIsValidatedWithServer, setUserIdCache]);
+  }, [attemptedServerValidationRef, logout, serverValidatingLockRef, setIsValidatedWithServer, setUserIdCache]);
 
   return { attemptServerValidation };
 };

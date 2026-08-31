@@ -2,11 +2,15 @@ import api from '../../../../infrastructure/api/api-config/api';
 
 const GlobalAuth: {
   setAccessToken: (t: string | null) => void;
-  logout: (() => void) | null;
+  logout: ((skipCacheCleanup: boolean) => Promise<void>) | null;
   setUsernameInHeader: (username: string | null) => void;
 } = {
-  setAccessToken: (t) => {
-    api.defaults.headers.common.Authorization = `DPoP ${t}`;
+  setAccessToken: (token) => {
+    if (token) {
+      api.defaults.headers.common.Authorization = `DPoP ${token}`;
+    } else {
+      delete api.defaults.headers.common.Authorization;
+    }
   },
   logout: null,
   setUsernameInHeader: (username) => {

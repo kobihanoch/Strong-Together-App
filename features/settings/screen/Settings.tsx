@@ -48,7 +48,7 @@ const Settings = () => {
           <NotificationsToggle></NotificationsToggle>
         </View>
 
-        <TouchableOpacity style={styles.box} onPress={() => logout()}>
+        <TouchableOpacity style={styles.box} onPress={() => logout(false)}>
           <Text
             style={{
               fontFamily: 'Inter_400Regular',

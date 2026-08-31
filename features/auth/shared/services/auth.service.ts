@@ -28,6 +28,7 @@ export const logoutUser = async (): Promise<void> => {
         headers: {
           'x-refresh-token': `DPoP ${refreshToken}`,
         },
+        timeout: 5_000,
       },
     );
   } catch (error) {

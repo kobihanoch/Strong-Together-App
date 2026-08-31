@@ -29,7 +29,7 @@ interface AuthProviderValue {
   login: (identifier: LoginRequestBody['identifier'], password: LoginRequestBody['password']) => Promise<void>;
   handleAppleAuth: () => Promise<void>;
   handleGoogleAuth: () => Promise<void>;
-  logout: () => Promise<void>;
+  logout: (skipCacheCleanup: boolean) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthProviderValue | null>(null);
@@ -99,7 +99,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   // Attempt server validation method
   const { attemptServerValidation } = useServerValidation({
-    clearContext,
     setIsValidatedWithServer,
     setUserIdCache,
     logout,

@@ -1,18 +1,17 @@
-import type { LoginCredentials, RegistrationInput } from '../types/auth.types';
+import { AxiosError } from 'axios';
 import React, { SetStateAction, useCallback, useEffect } from 'react';
+import { disconnectSocket } from '../../../../infrastructure/socket';
 import { showErrorAlert } from '../../../../shared/alerts/error-alerts';
 import { showSuccessAlert } from '../../../../shared/alerts/success-alerts';
-import { clearAllCacheWithStartWorkout } from '../../../../infrastructure/query/query-client';
-import { disconnectSocket } from '../../../../infrastructure/socket';
 import { loginUser } from '../../login/services/login.service';
 import { registerUser } from '../../register/services/register.service';
 import { logoutUser } from '../services/auth.service';
+import type { LoginCredentials, RegistrationInput } from '../types/auth.types';
 import { AppUser } from '../types/auth.types';
 import GlobalAuth from '../utils/auth.utils';
 import { saveRefreshToken } from '../utils/token-storage.utils';
 import { useAppleAuth } from './use-apple-auth.hook';
 import { useGoogleAuth } from './use-google-auth.hook';
-import { AxiosError } from 'axios';
 
 type UseAuthActionsProps = {
   setAutheticationLoading: React.Dispatch<SetStateAction<boolean>>;
@@ -106,21 +105,24 @@ const useAuthActions = ({
     }
   }, [setAppleLoading, signInWithApple, completeAuthSession]);
 
-  const logout = useCallback(async (): Promise<void> => {
-    try {
-      await logoutUser();
-      setIsLoggedIn(false);
-    } catch (err) {
-      // Log but do not block local cleanup
-      if (err instanceof AxiosError) console.log(err?.response?.data || err.message);
-    } finally {
+  const logout = useCallback(
+    async (skipCacheCleanup: boolean): Promise<void> => {
       try {
-        disconnectSocket();
-      } catch {}
-      await clearAllCacheWithStartWorkout();
-      await clearContext(true);
-    }
-  }, [clearContext, setIsLoggedIn]);
+        await logoutUser();
+        setIsLoggedIn(false);
+      } catch (err) {
+        // Log but do not block local cleanup
+        if (err instanceof AxiosError) console.log(err?.response?.data || err.message);
+      } finally {
+        try {
+          disconnectSocket();
+        } catch {}
+        // Clears with start workout
+        await clearContext(skipCacheCleanup);
+      }
+    },
+    [clearContext, setIsLoggedIn],
+  );
 
   // Expose the real logout to axios interceptors via GlobalAuth.logout
   useEffect(() => {
