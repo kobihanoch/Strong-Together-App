@@ -99,11 +99,8 @@ const CreateWorkout = () => {
       <PlanEditorActions
         horizontalPadding={gutter}
         bottomInset={insets.bottom}
-        isCreateMode={data.isCreateMode}
-        isSaving={data.isSaving}
         theme={data.theme}
         onAdd={() => exerciseSheet.current?.open(1)}
-        onSave={actions.save}
       />
 
       <ExerciseLibrarySheet
