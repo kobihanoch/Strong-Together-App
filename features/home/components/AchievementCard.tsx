@@ -5,14 +5,13 @@ import { RFValue } from 'react-native-responsive-fontsize';
 import { AppThemeColors } from '../../../shared/constants/theme';
 import { fontFamilies, fontSizes } from '../../../shared/constants/typography';
 import { createSharedComponentStyles } from '../../../shared/styles/component.styles';
-import { HomeDashboardData } from '../types/use-home-page.types';
 
 const AchievementCard = ({
   data,
   theme,
   onPress,
 }: {
-  data: HomeDashboardData['achievement'];
+  data: { exercise: string; value: string; estimatedOneRepMax: number };
   theme: AppThemeColors;
   onPress: () => void;
 }) => {
