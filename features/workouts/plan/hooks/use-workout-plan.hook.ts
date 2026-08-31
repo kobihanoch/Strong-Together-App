@@ -7,6 +7,14 @@ import { useAuth } from '../../../auth/shared/providers/AuthProvider';
 
 type ModifiedWorkoutPlan = AddWorkoutBody['workoutData'];
 
+/**
+ * Provides the authenticated user's persisted workout-plan server state.
+ *
+ * The query revalidates after server authentication, while the mutation and
+ * local updater keep the shared TanStack cache synchronized for all consumers.
+ *
+ * @returns Workout-plan data, loading states, and cache-aware actions.
+ */
 export const useWorkoutPlan = () => {
   const { isValidatedWithServer, userIdCache: userId } = useAuth();
   const queryClient = useQueryClient();

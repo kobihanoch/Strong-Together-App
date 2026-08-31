@@ -8,6 +8,14 @@ import { useCallback } from 'react';
 
 type CardioInput = AddUserAerobicsBody['record'];
 
+/**
+ * Provides the authenticated user's persisted cardio server state.
+ *
+ * The hook fetches daily and weekly cardio maps, updates them after logging
+ * cardio, and exposes derived helpers backed by the current query data.
+ *
+ * @returns Cardio data, loading states, and cache-aware actions.
+ */
 export const useCardio = () => {
   const { isValidatedWithServer, userIdCache: userId } = useAuth();
   const queryClient = useQueryClient();

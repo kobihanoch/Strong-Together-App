@@ -15,7 +15,7 @@ import { colors } from '../../../shared/constants/colors';
 import { useAppTheme } from '../../../shared/providers/AppThemeProvider';
 
 const Home = () => {
-  const { data, actions, isLoading } = useHomeDashboard();
+  const { data, actions, loadingStates } = useHomeDashboard();
   const { width, height } = useWindowDimensions();
   const horizontalPadding = Math.max(14, Math.min(width * 0.045, 22));
   const sectionGap = Math.max(12, Math.min(height * 0.016, 18));
@@ -27,12 +27,12 @@ const Home = () => {
         contentContainerStyle={[styles.content, { paddingHorizontal: horizontalPadding, gap: sectionGap }]}
         showsVerticalScrollIndicator={false}
       >
-        <Skeleton.Group show={isLoading}>
+        <Skeleton.Group show={loadingStates.isLoading}>
           <Skeleton colorMode={mode}>
             <HomeHeader data={data.user} theme={data.theme} onInbox={actions.openInbox} />
           </Skeleton>
 
-          {isLoading ? (
+          {loadingStates.isLoading ? (
             <>
               <Skeleton colorMode={mode}>
                 <NextWorkoutCard data={data.nextWorkout} theme={data.theme} isFirstWorkout={false} onStart={actions.startWorkout} />

@@ -1,5 +1,5 @@
 import React, { SetStateAction, useCallback } from 'react';
-import { clearQueryCache } from '../../../../infrastructure/query/query-client';
+import { clearAllCacheWithoutStartWorkout } from '../../../../infrastructure/query/query-client';
 import { AppUser } from '../types/auth.types';
 import GlobalAuth from '../utils/auth.utils';
 import { clearRefreshToken } from '../utils/token-storage.utils';
@@ -31,9 +31,9 @@ const useClearContext = ({
   serverValidatingLockRef,
   attemptedServerValidationRef,
 }: UseClearContextProps) => {
-  const clearContext = useCallback(async () => {
+  const clearContext = useCallback(async (skipCacheCleanup: boolean = false) => {
     await clearRefreshToken();
-    await clearQueryCache();
+    if (!skipCacheCleanup) await clearAllCacheWithoutStartWorkout();
     GlobalAuth.setAccessToken(null);
     GlobalAuth.setUsernameInHeader(null);
     setIsLoggedIn(false);

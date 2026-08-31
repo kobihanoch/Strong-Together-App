@@ -33,8 +33,8 @@ jest.mock('../../../../shared/providers/AppThemeProvider', () => ({
 }));
 jest.mock('../../../auth/shared/providers/AuthProvider', () => ({ useAuth: () => mockAuth }));
 jest.mock('../../../messages/providers/MessagesProvider', () => ({ useMessages: () => mockMessages }));
-jest.mock('../../../workouts/shared/providers/CardioProvider', () => ({ useAerobics: () => mockCardio }));
-jest.mock('../../../workouts/shared/providers/WorkoutPlanProvider', () => ({
+jest.mock('../../../workouts/cardio/hooks/use-cardio.hook', () => ({ useCardio: () => mockCardio }));
+jest.mock('../../../workouts/plan/hooks/use-workout-plan.hook', () => ({
   useWorkoutPlan: () => mockWorkoutPlan,
 }));
 jest.mock('../use-home-dashboard-cache-handler.hook', () => ({ __esModule: true, default: () => mockDashboard }));
@@ -96,9 +96,16 @@ describe('useHomeDashboard', () => {
       isValidatedWithServer: true,
     };
     mockMessages = { unreadMessages: [{ id: 1 }], fetchLoading: false };
-    mockCardio = { weeklyCardioMap: null, fetchLoading: false };
-    mockWorkoutPlan = { hasWorkoutPlan: true, workoutSplits: [splitA, splitB], fetchLoading: false };
-    mockDashboard = { dashboardStats: stats, loading: false };
+    mockCardio = { data: { weeklyCardioMap: null }, loadingStates: { isLoading: false } };
+    mockWorkoutPlan = {
+      data: { hasWorkoutPlan: true, workoutSplits: [splitA, splitB] },
+      loadingStates: { isLoading: false },
+    };
+    mockDashboard = {
+      data: { dashboardStats: stats },
+      loadingStates: { isLoading: false, isFetching: false },
+      actions: { refetch: jest.fn() },
+    };
   });
 
   it('maps dashboard stats and nested plan data into Home data', () => {
@@ -122,16 +129,21 @@ describe('useHomeDashboard', () => {
   });
 
   it('stays loading until dashboard stats are known', () => {
-    mockDashboard = { dashboardStats: undefined, loading: false };
+    mockDashboard = {
+      data: { dashboardStats: undefined },
+      loadingStates: { isLoading: false, isFetching: false },
+      actions: { refetch: jest.fn() },
+    };
     const { result } = renderHook(() => useHomeDashboard());
     expect(result.current.isLoading).toBe(true);
   });
 
   it('returns the no-workout state when the plan is empty', () => {
-    mockWorkoutPlan = { hasWorkoutPlan: false, workoutSplits: [], fetchLoading: false };
+    mockWorkoutPlan = { data: { hasWorkoutPlan: false, workoutSplits: [] }, loadingStates: { isLoading: false } };
     mockDashboard = {
-      dashboardStats: { ...stats, hasExerciseTracking: false, nextWorkoutSplit: null },
-      loading: false,
+      data: { dashboardStats: { ...stats, hasExerciseTracking: false, nextWorkoutSplit: null } },
+      loadingStates: { isLoading: false, isFetching: false },
+      actions: { refetch: jest.fn() },
     };
     const { result } = renderHook(() => useHomeDashboard());
 
@@ -141,12 +153,14 @@ describe('useHomeDashboard', () => {
 
   it('uses the latest cardio week and orders bars Monday through Sunday', () => {
     mockCardio = {
-      fetchLoading: false,
-      weeklyCardioMap: {
-        '2026-03-16': { totalDurationMins: 10, records: [] },
-        '2026-03-23': {
-          totalDurationMins: 25,
-          records: [{ durationMins: 25, workoutTimeUtc: '2026-03-23T10:00:00.000Z' }],
+      loadingStates: { isLoading: false },
+      data: {
+        weeklyCardioMap: {
+          '2026-03-16': { totalDurationMins: 10, records: [] },
+          '2026-03-23': {
+            totalDurationMins: 25,
+            records: [{ durationMins: 25, workoutTimeUtc: '2026-03-23T10:00:00.000Z' }],
+          },
         },
       },
     };

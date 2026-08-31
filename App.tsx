@@ -7,7 +7,7 @@ import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, StatusBar, StyleSheet, Text, View } from 'react-native';
 import { AlertNotificationRoot } from 'react-native-alert-notification';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
-
+import Constants from 'expo-constants';
 import { Inter_400Regular, Inter_500Medium, Inter_600SemiBold, Inter_700Bold } from '@expo-google-fonts/inter';
 
 import { MaterialCommunityIcons as ExpoMaterialCommunityIcons } from '@expo/vector-icons';
@@ -16,8 +16,7 @@ import { AuthProvider, useAuth } from './features/auth/shared/providers/AuthProv
 import { MessagesProvider } from './features/messages/providers/MessagesProvider';
 import NotificationsSetup from './features/settings/push-notifications-setup/notifications-setup.setup';
 import ensureDpopKeyPair from './infrastructure/api/dpop/ensureDpopKeyPair';
-import { CACHE_VERSION } from './infrastructure/cache/cache.constants';
-import { logRestoredQueryCache, queryClient, queryPersister } from './infrastructure/query/query-client';
+import { logRestoredQueryCache, queryClient, queryPersistOptions } from './infrastructure/query/query-client';
 import Sentry from './infrastructure/sentry';
 import AppStack from './navigation/AppStack';
 import AuthStack from './navigation/AuthStack';
@@ -25,6 +24,8 @@ import BottomTabBar from './shared/components/BottomTabBar';
 import Theme1 from './shared/components/Theme1';
 import UpdateAppModal from './shared/components/UpdateAppModal';
 import { AppThemeProvider } from './shared/providers/AppThemeProvider';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { cacheHousekeepingOnBoot } from './infrastructure/cache/cache.constants';
 
 // ---------- Fonts Loader Hook ----------
 function useFontsReady() {
@@ -70,6 +71,16 @@ function App() {
     })();
   }, [keyPairReady]);
 
+  // Deperacted in next release
+  useEffect(() => {
+    (async () => {
+      const cacheVer = await AsyncStorage.getItem('__VERSION__');
+      const appVer = Constants.expoConfig!.version;
+      if (cacheVer === appVer) return; // already cleaned for this version
+      await cacheHousekeepingOnBoot();
+    })();
+  }, []);
+
   if (!fontsReady) {
     return (
       <View style={styles.loadingContainer}>
@@ -85,11 +96,7 @@ function App() {
         <AlertNotificationRoot>
           <GestureHandlerRootView style={{ flex: 1 }}>
             <AppThemeProvider>
-              <PersistQueryClientProvider
-                client={queryClient}
-                persistOptions={{ persister: queryPersister, buster: CACHE_VERSION ?? '0.0.0' }}
-                onSuccess={logRestoredQueryCache}
-              >
+              <PersistQueryClientProvider client={queryClient} persistOptions={queryPersistOptions} onSuccess={logRestoredQueryCache}>
                 <AuthProvider>
                   <NavigationContainer ref={navigationRef}>
                     <RootNavigator />

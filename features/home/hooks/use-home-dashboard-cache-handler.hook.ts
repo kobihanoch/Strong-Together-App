@@ -1,28 +1,33 @@
-import { useCallback, useMemo } from 'react';
-import { keyHomeDashboard } from '../../../infrastructure/cache/cache-keys.utils';
-import useCacheAndFetch from '../../../shared/hooks/use-cache-and-fetch.hook';
-import { AppUser } from '../../auth/shared/types/auth.types';
+import { useQuery } from '@tanstack/react-query';
+import { useAuth } from '../../auth/shared/providers/AuthProvider';
 import { getUserDashboardStats } from '../services/home-page.service';
 import { HomeDashboardStats } from '../types/use-home-page.types';
 
-type UseHomeDashboardCacheHandlerProps = {
-  user: AppUser | null;
-  isValidatedWithServer: boolean;
-};
+/**
+ * Provides the authenticated user's persisted home-dashboard server state.
+ *
+ * The query remains disabled until server authentication succeeds, then
+ * revalidates cached dashboard statistics using the same conventions as the
+ * other authenticated TanStack feature hooks.
+ *
+ * @returns Dashboard data, loading states, and query actions.
+ */
+const useHomeDashboardCacheHandler = () => {
+  const { isValidatedWithServer, userIdCache: userId } = useAuth();
 
-const useHomeDashboardCacheHandler = ({ user, isValidatedWithServer }: UseHomeDashboardCacheHandlerProps) => {
-  // Fetch function
-  const fetchFn = useCallback(async () => await getUserDashboardStats(), []);
-  const cacheKey = useMemo(() => (user?.id ? keyHomeDashboard(user.id) : null), [user?.id]);
+  const query = useQuery({
+    queryKey: ['home-dashboard', userId],
+    queryFn: async (): Promise<HomeDashboardStats> => await getUserDashboardStats(),
+    enabled: Boolean(isValidatedWithServer && userId),
+    staleTime: 1000 * 60 * 5,
+    retry: false,
+  });
 
-  const { data: dashboardStats, loading } = useCacheAndFetch<HomeDashboardStats>(
-    cacheKey,
-    isValidatedWithServer,
-    fetchFn,
-    'Home Dashboard',
-  );
-
-  return { dashboardStats, loading };
+  return {
+    data: { dashboardStats: query.data },
+    loadingStates: { isLoading: query.isLoading, isFetching: query.isFetching },
+    actions: { refetch: query.refetch },
+  };
 };
 
 export default useHomeDashboardCacheHandler;
