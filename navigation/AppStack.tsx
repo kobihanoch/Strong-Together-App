@@ -1,7 +1,7 @@
 import { useNavigation } from '@react-navigation/native';
 import { createStackNavigator, StackNavigationProp } from '@react-navigation/stack';
 import React, { useEffect } from 'react';
-import { cacheDeleteKey, cacheGetJSON } from '../infrastructure/cache/cache.utils';
+import { cacheDeleteKey, cacheGetJSON } from '../infrastructure/cache/cache.constants';
 import { keyStartWorkout } from '../infrastructure/cache/cache-keys.utils';
 import { useAuth } from '../features/auth/shared/providers/AuthProvider';
 import Analytics from '../features/workouts/analytics/screen/Analytics';

@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { cacheSetJSON } from '../../../../infrastructure/cache/cache.utils';
+import { cacheSetJSON } from '../../../../infrastructure/cache/cache.constants';
 import { AppUser } from '../types/auth.types';
 
 const usePersistUserIdCache = (userIdCache: AppUser['id'] | null | undefined) => {

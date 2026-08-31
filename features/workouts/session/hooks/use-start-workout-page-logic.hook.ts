@@ -3,7 +3,7 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import type { Exercise } from '../../shared/types/workout.types';
 import { useCallback, useMemo, useRef, useState } from 'react';
 import { keyStartWorkout } from '../../../../infrastructure/cache/cache-keys.utils';
-import { cacheDeleteKey } from '../../../../infrastructure/cache/cache.utils';
+import { cacheDeleteKey } from '../../../../infrastructure/cache/cache.constants';
 import { RootParamList } from '../../../../navigation/types/appStackTypes';
 import { showErrorAlert } from '../../../../shared/alerts/error-alerts';
 import { useAuth } from '../../../auth/shared/providers/AuthProvider';

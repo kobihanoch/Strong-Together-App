@@ -1,5 +1,5 @@
 import { SetStateAction, useEffect } from 'react';
-import { cacheGetJSON } from '../../../../infrastructure/cache/cache.utils';
+import { cacheGetJSON } from '../../../../infrastructure/cache/cache.constants';
 import { AppUser } from '../types/auth.types';
 import { getRefreshToken } from '../utils/token-storage.utils';
 

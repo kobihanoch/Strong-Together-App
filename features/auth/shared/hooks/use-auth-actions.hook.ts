@@ -2,7 +2,7 @@ import type { LoginCredentials, RegistrationInput } from '../types/auth.types';
 import React, { SetStateAction, useCallback, useEffect } from 'react';
 import { showErrorAlert } from '../../../../shared/alerts/error-alerts';
 import { showSuccessAlert } from '../../../../shared/alerts/success-alerts';
-import { cacheDeleteAllCache } from '../../../../infrastructure/cache/cache.utils';
+import { cacheDeleteAllCache } from '../../../../infrastructure/cache/cache.constants';
 import { disconnectSocket } from '../../../../infrastructure/socket';
 import { loginUser } from '../../login/services/login.service';
 import { registerUser } from '../../register/services/register.service';

@@ -1,3 +1,6 @@
+import { WorkoutSplit } from '../../workouts/plan/types/workout-plan.types';
+import { HomeDashboardStats } from '../types/use-home-page.types';
+
 export const getDaysSince = (lastDateString: string): string => {
   if (!lastDateString) return 'today';
   const lastDate = new Date(lastDateString);
@@ -25,4 +28,8 @@ export const getDaysSince = (lastDateString: string): string => {
         return `${years} yr${years > 1 ? 's' : ''} ago`;
       }
   }
+};
+
+export const getNextWorkoutSplit = (workoutSplits: WorkoutSplit[], nextWorkoutSplit: HomeDashboardStats['nextWorkoutSplit'] | null) => {
+  return workoutSplits.find((split) => split.id === nextWorkoutSplit?.id);
 };

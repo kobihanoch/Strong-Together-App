@@ -37,7 +37,10 @@ jest.mock('expo-font', () => ({
 jest.mock('@react-native-async-storage/async-storage', () => ({
   __esModule: true,
   default: {
-    getItem: (...args: any[]) => mockGetItem(...args),
+    getItem: (...args: any[]) =>
+      args[0] === 'REACT_QUERY_OFFLINE_CACHE' ? Promise.resolve(null) : mockGetItem(...args),
+    setItem: jest.fn<(...args: any[]) => Promise<void>>().mockResolvedValue(undefined),
+    removeItem: jest.fn<(...args: any[]) => Promise<void>>().mockResolvedValue(undefined),
   },
 }));
 

@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { AppState } from 'react-native';
 import { keyStartWorkout } from '../../../../infrastructure/cache/cache-keys.utils';
-import { cacheSetJSON } from '../../../../infrastructure/cache/cache.utils';
+import { cacheSetJSON } from '../../../../infrastructure/cache/cache.constants';
 import { AppUser } from '../../../auth/shared/types/auth.types';
 import { WorkoutSplit } from '../../shared/types/workout.types';
 import { ExercisesDuringWorkout, ResumeWorkoutCachePayload } from '../types/use-start-workout.types';

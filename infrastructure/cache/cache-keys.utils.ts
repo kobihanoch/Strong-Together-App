@@ -1,4 +1,4 @@
-import { CACHE_VERSION } from './cache.utils';
+import { CACHE_VERSION } from './cache.constants';
 
 // ----- Simple key builders (uppercase "CACHE:*") -----
 export const keyWorkoutPlan = (userId: string): string => `CACHE:WORKOUTPLAN:${userId}:${CACHE_VERSION}`;

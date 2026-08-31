@@ -1,5 +1,5 @@
 import React, { SetStateAction, useCallback } from 'react';
-import { cacheDeleteAllCacheWithoutStartWorkout } from '../../../../infrastructure/cache/cache.utils';
+import { clearQueryCache } from '../../../../infrastructure/query/query-client';
 import { AppUser } from '../types/auth.types';
 import GlobalAuth from '../utils/auth.utils';
 import { clearRefreshToken } from '../utils/token-storage.utils';
@@ -33,7 +33,7 @@ const useClearContext = ({
 }: UseClearContextProps) => {
   const clearContext = useCallback(async () => {
     await clearRefreshToken();
-    await cacheDeleteAllCacheWithoutStartWorkout();
+    await clearQueryCache();
     GlobalAuth.setAccessToken(null);
     GlobalAuth.setUsernameInHeader(null);
     setIsLoggedIn(false);
