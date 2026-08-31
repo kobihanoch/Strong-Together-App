@@ -4,8 +4,8 @@ import { useQuery } from '@tanstack/react-query';
 import { useMemo } from 'react';
 import { RootParamList } from '../../../navigation/types/appStackTypes';
 import { useAppTheme } from '../../../shared/providers/AppThemeProvider';
-import { useAuth } from '../../auth/shared/providers/AuthProvider';
 import { useUser } from '../../auth/shared/hooks/use-user.hook';
+import { useAuth } from '../../auth/shared/providers/AuthProvider';
 import { useMessages } from '../../messages/providers/MessagesProvider';
 import { useCardio } from '../../workouts/cardio/hooks/use-cardio.hook';
 import { useWorkoutPlan } from '../../workouts/plan/hooks/use-workout-plan.hook';
@@ -26,7 +26,7 @@ const useHomeDashboard = () => {
   const navigation = useNavigation<StackNavigationProp<RootParamList>>();
   const { colors: theme } = useAppTheme();
   const { data: user, loadingStates: userLoadingStates } = useUser();
-  const { unreadMessages, fetchLoading: messagesFetchLoading } = useMessages();
+  const { unreadMessages, loadingStates: messagesLoadingStates } = useMessages();
   const { data: workoutPlanData, loadingStates: workoutPlanLoadingStates } = useWorkoutPlan();
   const { data: cardioData, loadingStates: cardioLoadingStates } = useCardio();
 
@@ -43,11 +43,11 @@ const useHomeDashboard = () => {
   const dashboardData = query.data;
 
   const isLoading =
-    query.isLoading ||
-    cardioLoadingStates.isLoading ||
-    messagesFetchLoading ||
-    workoutPlanLoadingStates.isLoading ||
-    userLoadingStates.isLoading;
+    query.isPending ||
+    cardioLoadingStates.isPending ||
+    messagesLoadingStates.isPending ||
+    workoutPlanLoadingStates.isPending ||
+    userLoadingStates.isPending;
 
   const nextSplit: WorkoutSplit | undefined = getNextWorkoutSplit(workoutPlanData.workoutSplits, dashboardData?.nextWorkoutSplit ?? null);
 
@@ -127,7 +127,7 @@ const useHomeDashboard = () => {
       openProgress: () => navigation.navigate('Analytics'),
       openHistory: () => navigation.navigate('Statistics'),
     },
-    loadingStates: { isLoading, isFetching: query.isFetching },
+    loadingStates: { isPending: query.isPending, isLoading, isFetching: query.isFetching },
   };
 };
 

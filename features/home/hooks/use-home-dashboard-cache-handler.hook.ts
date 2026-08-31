@@ -25,7 +25,7 @@ const useHomeDashboardCacheHandler = () => {
 
   return {
     data: { dashboardStats: query.data },
-    loadingStates: { isLoading: query.isLoading, isFetching: query.isFetching },
+    loadingStates: { isPending: query.isPending, isLoading: query.isLoading, isFetching: query.isFetching },
     actions: { refetch: query.refetch },
   };
 };

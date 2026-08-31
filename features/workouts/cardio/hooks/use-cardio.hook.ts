@@ -68,7 +68,12 @@ export const useCardio = () => {
     data: { dailyCardioMap, weeklyCardioMap, cardioForToday, hasDoneCardioInSelectedWeek },
 
     // Loading states
-    loadingStates: { isLoading: query.isLoading, isFetching: query.isFetching, isUpdating: addSourceCardio.isPending },
+    loadingStates: {
+      isPending: query.isPending,
+      isLoading: query.isLoading,
+      isFetching: query.isFetching,
+      isUpdating: addSourceCardio.isPending,
+    },
 
     // Actions
     actions: {

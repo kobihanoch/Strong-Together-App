@@ -9,9 +9,12 @@ interface MessagesProviderValue {
   allReceivedMessages: UserMessages;
   updateMessageToRead: (msgId: UserMessage['id']) => Promise<void>;
   deleteMessage: (msgId: UserMessage['id']) => Promise<void>;
-  fetchLoading: boolean;
-  isFetching: boolean;
-  updateLoading: boolean;
+  loadingStates: {
+    isPending: boolean;
+    isFetching: boolean;
+    isUpdating: boolean;
+    isLoading: boolean;
+  };
 }
 
 const MessagesContext = createContext<MessagesProviderValue | null>(null);
@@ -40,7 +43,7 @@ export const MessagesProvider = ({ children }: { children: ReactNode }) => {
   const { userIdCache: userId } = useAuth();
   const {
     data: { allReceivedMessages, unreadMessages },
-    loadingStates: { isLoading: fetchLoading, isFetching, isUpdating: updateLoading },
+    loadingStates: { isPending, isLoading, isFetching, isUpdating },
     actions: { updateMessageToRead, deleteMessage, updateLocalMessages },
   } = useMessagesQuery();
 
@@ -59,11 +62,14 @@ export const MessagesProvider = ({ children }: { children: ReactNode }) => {
       allReceivedMessages: allReceivedMessages ?? [],
       updateMessageToRead,
       deleteMessage,
-      fetchLoading,
-      isFetching,
-      updateLoading,
+      loadingStates: {
+        isPending,
+        isFetching,
+        isUpdating,
+        isLoading,
+      },
     }),
-    [unreadMessages, allReceivedMessages, updateMessageToRead, deleteMessage, fetchLoading, isFetching, updateLoading],
+    [unreadMessages, allReceivedMessages, updateMessageToRead, deleteMessage, isPending, isFetching, isUpdating, isLoading],
   );
 
   return <MessagesContext.Provider value={value}>{children}</MessagesContext.Provider>;

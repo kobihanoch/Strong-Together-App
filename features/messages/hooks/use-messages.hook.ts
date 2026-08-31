@@ -66,6 +66,7 @@ export const useMessages = () => {
   return {
     data: { allReceivedMessages, unreadMessages },
     loadingStates: {
+      isPending: query.isPending,
       isLoading: query.isLoading,
       isFetching: query.isFetching,
       isUpdating: updateMessageToReadMutation.isPending || deleteMessageMutation.isPending,

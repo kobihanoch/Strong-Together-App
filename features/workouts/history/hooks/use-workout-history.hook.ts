@@ -40,7 +40,7 @@ export const useWorkoutHistory = () => {
 
   return {
     data: { exerciseTrackingMaps, hasTrainedToday, hasVisibleHistory },
-    loadingStates: { isLoading: query.isLoading, isFetching: query.isFetching },
+    loadingStates: { isPending: query.isPending, isLoading: query.isLoading, isFetching: query.isFetching },
     actions: {
       updateLocalExerciseTracking,
       refetch: query.refetch,

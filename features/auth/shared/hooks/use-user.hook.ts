@@ -48,6 +48,7 @@ export const useUser = () => {
   return {
     data: query.data,
     loadingStates: {
+      isPending: query.isPending,
       isLoading: query.isLoading,
       isFetching: query.isFetching,
       isUpdating: updateSourceUser.isPending,

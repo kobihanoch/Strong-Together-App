@@ -57,7 +57,12 @@ export const useWorkoutPlan = () => {
 
   return {
     data: { workoutPlan, workoutSplits, hasWorkoutPlan },
-    loadingStates: { isLoading: query.isLoading, isFetching: query.isFetching, isUpdating: updateSourceWorkoutPlan.isPending },
+    loadingStates: {
+      isPending: query.isPending,
+      isLoading: query.isLoading,
+      isFetching: query.isFetching,
+      isUpdating: updateSourceWorkoutPlan.isPending,
+    },
     actions: {
       updateWorkoutPlan: updateSourceWorkoutPlan.mutateAsync,
       updateLocalWorkoutPlan,

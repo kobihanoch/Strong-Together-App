@@ -31,12 +31,13 @@ const useInitialCheck = ({
         return;
       }
       // Triggers SWR hook logic chain
+      // Builds cache key for every feautre - shows data from cache
       setUserIdCache(cacheUserId);
       setIsLoggedIn(true);
       setAuthPhase('authed');
 
       // Try to validate with server
-      // Silent background validation with server (if there was a previuos session)
+      // After success - fetch from server (TanStack)
       await attemptServerValidation();
     })();
   }, [clearContext, attemptServerValidation, setUserIdCache, setIsLoggedIn, setAuthPhase]);
