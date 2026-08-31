@@ -75,7 +75,8 @@ jest.mock('../infrastructure/api/dpop/ensureDpopKeyPair', () => ({
   default: () => mockEnsureDpopKeyPair(),
 }));
 
-jest.mock('../infrastructure/cache/cache.utils', () => ({
+jest.mock('../infrastructure/cache/cache.constants', () => ({
+  CACHE_VERSION: '4.5.0',
   cacheHousekeepingOnBoot: () => mockCacheHousekeepingOnBoot(),
 }));
 
@@ -88,16 +89,9 @@ jest.mock('../features/messages/providers/MessagesProvider', () => ({
   MessagesProvider: ({ children }: { children: React.ReactNode }) => children,
 }));
 
-jest.mock('../features/workouts/shared/providers/CardioProvider', () => ({
-  CardioProvider: ({ children }: { children: React.ReactNode }) => children,
-}));
-
-jest.mock('../features/workouts/shared/providers/WorkoutHistoryProvider', () => ({
-  WorkoutHistoryProvider: ({ children }: { children: React.ReactNode }) => children,
-}));
-
-jest.mock('../features/workouts/shared/providers/WorkoutPlanProvider', () => ({
-  WorkoutPlanProvider: ({ children }: { children: React.ReactNode }) => children,
+jest.mock('../features/auth/shared/components/AuthenticatedUserEffects', () => ({
+  __esModule: true,
+  default: () => null,
 }));
 
 jest.mock('../navigation/AuthStack', () => {

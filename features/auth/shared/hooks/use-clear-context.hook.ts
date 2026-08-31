@@ -9,7 +9,6 @@ type UseClearContextProps = {
   setAutheticationLoading: React.Dispatch<SetStateAction<boolean>>;
   setAppleLoading: React.Dispatch<SetStateAction<boolean>>;
   setGoogleLoading: React.Dispatch<SetStateAction<boolean>>;
-  updateAndCache: (newData: AppUser | null | undefined) => Promise<void>;
   setIsWorkoutMode: React.Dispatch<SetStateAction<boolean>>;
   setUserIdCache: React.Dispatch<SetStateAction<AppUser['id'] | null | undefined>>;
   setIsValidatedWithServer: React.Dispatch<SetStateAction<boolean>>;
@@ -23,7 +22,6 @@ const useClearContext = ({
   setAutheticationLoading,
   setAppleLoading,
   setGoogleLoading,
-  updateAndCache,
   setIsWorkoutMode,
   setUserIdCache,
   setIsValidatedWithServer,
@@ -40,7 +38,6 @@ const useClearContext = ({
     setAutheticationLoading(false);
     setAppleLoading(false);
     setGoogleLoading(false);
-    updateAndCache(undefined);
     setIsWorkoutMode(false);
     setUserIdCache(undefined);
     setIsValidatedWithServer(false);
@@ -57,7 +54,6 @@ const useClearContext = ({
     setIsValidatedWithServer,
     setIsWorkoutMode,
     setAutheticationLoading,
-    updateAndCache,
     setUserIdCache,
   ]);
 

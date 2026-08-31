@@ -20,7 +20,6 @@ type UseAuthActionsProps = {
   setGoogleLoading: React.Dispatch<SetStateAction<boolean>>;
   setUserIdCache: React.Dispatch<SetStateAction<AppUser['id'] | null | undefined>>;
   setIsLoggedIn: React.Dispatch<SetStateAction<boolean>>;
-  updateAndCache: (newData: AppUser | null | undefined) => Promise<void>;
   setIsValidatedWithServer: React.Dispatch<SetStateAction<boolean>>;
   setAuthPhase: React.Dispatch<SetStateAction<'checking' | 'authed' | 'guest'>>;
   clearContext: (skipCacheCleanup?: boolean) => Promise<void>;
@@ -32,7 +31,6 @@ const useAuthActions = ({
   setGoogleLoading,
   setUserIdCache,
   setIsLoggedIn,
-  updateAndCache,
   setIsValidatedWithServer,
   setAuthPhase,
   clearContext,
@@ -112,7 +110,6 @@ const useAuthActions = ({
     try {
       await logoutUser();
       setIsLoggedIn(false);
-      updateAndCache(undefined);
     } catch (err) {
       // Log but do not block local cleanup
       if (err instanceof AxiosError) console.log(err?.response?.data || err.message);
@@ -123,7 +120,7 @@ const useAuthActions = ({
       await clearAllCacheWithStartWorkout();
       await clearContext(true);
     }
-  }, [clearContext, setIsLoggedIn, updateAndCache]);
+  }, [clearContext, setIsLoggedIn]);
 
   // Expose the real logout to axios interceptors via GlobalAuth.logout
   useEffect(() => {

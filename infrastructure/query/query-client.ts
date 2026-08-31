@@ -6,8 +6,17 @@ import { CACHE_VERSION } from '../cache/cache.constants';
 
 export const START_WORKOUT_QUERY_SCOPE = 'start-workout';
 const QUERY_CACHE_BUSTER = CACHE_VERSION ?? '0.0.0';
+export const AUTH_SESSION_QUERY_KEY = ['auth-session'] as const;
+
+type CachedAuthSession = {
+  userId: string;
+};
 
 export const queryClient = new QueryClient();
+queryClient.setQueryDefaults(AUTH_SESSION_QUERY_KEY, {
+  gcTime: Infinity,
+  staleTime: Infinity,
+});
 
 export const queryPersister = createAsyncStoragePersister({
   storage: AsyncStorage,
@@ -17,6 +26,17 @@ export const queryPersister = createAsyncStoragePersister({
 export const queryPersistOptions = {
   persister: queryPersister,
   buster: QUERY_CACHE_BUSTER,
+  maxAge: Infinity,
+};
+
+/** Returns the non-sensitive session identifier restored by TanStack persistence. */
+export const getCachedAuthSession = (): CachedAuthSession | undefined =>
+  queryClient.getQueryData<CachedAuthSession>(AUTH_SESSION_QUERY_KEY);
+
+/** Stores and immediately persists the non-sensitive authenticated user identifier. */
+export const setCachedAuthSession = async (session: CachedAuthSession): Promise<void> => {
+  queryClient.setQueryData(AUTH_SESSION_QUERY_KEY, session);
+  await persistQueryClientSave({ queryClient, persister: queryPersister, buster: QUERY_CACHE_BUSTER });
 };
 
 /** Logs the query keys whose data was restored from persisted storage. */

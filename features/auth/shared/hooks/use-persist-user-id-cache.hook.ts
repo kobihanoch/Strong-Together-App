@@ -1,10 +1,10 @@
 import { useEffect } from 'react';
-import { cacheSetJSON } from '../../../../infrastructure/cache/cache.constants';
 import { AppUser } from '../types/auth.types';
+import { setCachedAuthSession } from '../../../../infrastructure/query/query-client';
 
 const usePersistUserIdCache = (userIdCache: AppUser['id'] | null | undefined) => {
   useEffect(() => {
-    if (userIdCache !== undefined) cacheSetJSON<AppUser['id'] | null>('CACHE:USER_ID', userIdCache);
+    if (userIdCache) void setCachedAuthSession({ userId: userIdCache });
   }, [userIdCache]);
 
   return;

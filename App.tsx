@@ -2,6 +2,7 @@
 require('./global');
 import { NavigationContainer, useNavigationContainerRef } from '@react-navigation/native';
 import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client';
+import { useIsRestoring } from '@tanstack/react-query';
 import * as Font from 'expo-font';
 import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, StatusBar, StyleSheet, Text, View } from 'react-native';
@@ -13,6 +14,7 @@ import { Inter_400Regular, Inter_500Medium, Inter_600SemiBold, Inter_700Bold } f
 import { MaterialCommunityIcons as ExpoMaterialCommunityIcons } from '@expo/vector-icons';
 import { NotifierRoot } from 'react-native-notifier';
 import { AuthProvider, useAuth } from './features/auth/shared/providers/AuthProvider';
+import AuthenticatedUserEffects from './features/auth/shared/components/AuthenticatedUserEffects';
 import { MessagesProvider } from './features/messages/providers/MessagesProvider';
 import NotificationsSetup from './features/settings/push-notifications-setup/notifications-setup.setup';
 import ensureDpopKeyPair from './infrastructure/api/dpop/ensureDpopKeyPair';
@@ -97,13 +99,15 @@ function App() {
           <GestureHandlerRootView style={{ flex: 1 }}>
             <AppThemeProvider>
               <PersistQueryClientProvider client={queryClient} persistOptions={queryPersistOptions} onSuccess={logRestoredQueryCache}>
-                <AuthProvider>
-                  <NavigationContainer ref={navigationRef}>
-                    <RootNavigator />
-                    <NotifierRoot />
-                    <UpdateAppModal />
-                  </NavigationContainer>
-                </AuthProvider>
+                <QueryHydrationGate>
+                  <AuthProvider>
+                    <NavigationContainer ref={navigationRef}>
+                      <RootNavigator />
+                      <NotifierRoot />
+                      <UpdateAppModal />
+                    </NavigationContainer>
+                  </AuthProvider>
+                </QueryHydrationGate>
               </PersistQueryClientProvider>
             </AppThemeProvider>
           </GestureHandlerRootView>
@@ -117,18 +121,24 @@ export default App;
 
 // ---------- Navigation Logic (auth-only here) ----------
 function RootNavigator() {
-  const { isLoggedIn, user, authPhase } = useAuth();
+  const { isLoggedIn, userIdCache, authPhase } = useAuth();
 
   // Ensures no UI is rendered if auth is not loaded yet
   if (authPhase === 'checking') return null;
 
-  return <>{isLoggedIn ? <AuthenticatedApp key={user?.id} /> : <AuthStack />}</>;
+  return <>{isLoggedIn ? <AuthenticatedApp key={userIdCache} /> : <AuthStack />}</>;
+}
+
+function QueryHydrationGate({ children }: { children: React.ReactNode }) {
+  const isRestoring = useIsRestoring();
+  return isRestoring ? null : children;
 }
 
 // ---------- Authenticated app-wide state ----------
 function AuthenticatedApp() {
   return (
     <MessagesProvider>
+      <AuthenticatedUserEffects />
       <MainApp />
     </MessagesProvider>
   );

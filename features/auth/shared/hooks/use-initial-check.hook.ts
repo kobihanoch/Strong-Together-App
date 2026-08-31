@@ -1,6 +1,6 @@
 import { SetStateAction, useEffect } from 'react';
-import { cacheGetJSON } from '../../../../infrastructure/cache/cache.constants';
 import { AppUser } from '../types/auth.types';
+import { getCachedAuthSession } from '../../../../infrastructure/query/query-client';
 import { getRefreshToken } from '../utils/token-storage.utils';
 
 const useInitialCheck = ({
@@ -22,7 +22,7 @@ const useInitialCheck = ({
       // At this point an auth key is building and automatically trying to fetch user data from cache
       // Auto start belows useEffect
       setAuthPhase('checking');
-      const cacheUserId = await cacheGetJSON<AppUser['id']>('CACHE:USER_ID');
+      const cacheUserId = getCachedAuthSession()?.userId;
       const existingRt = await getRefreshToken();
       if (!existingRt || !cacheUserId) {
         // No refresh token -> no session => stay logged out and auto renavifate to auth stack

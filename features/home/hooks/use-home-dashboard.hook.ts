@@ -5,6 +5,7 @@ import { useMemo } from 'react';
 import { RootParamList } from '../../../navigation/types/appStackTypes';
 import { useAppTheme } from '../../../shared/providers/AppThemeProvider';
 import { useAuth } from '../../auth/shared/providers/AuthProvider';
+import { useUser } from '../../auth/shared/hooks/use-user.hook';
 import { useMessages } from '../../messages/providers/MessagesProvider';
 import { useCardio } from '../../workouts/cardio/hooks/use-cardio.hook';
 import { useWorkoutPlan } from '../../workouts/plan/hooks/use-workout-plan.hook';
@@ -24,7 +25,7 @@ import { fillCardioGraph, getNextWorkoutSplit } from '../utils/home-page.utils';
 const useHomeDashboard = () => {
   const navigation = useNavigation<StackNavigationProp<RootParamList>>();
   const { colors: theme } = useAppTheme();
-  const { user } = useAuth();
+  const { data: user, loadingStates: userLoadingStates } = useUser();
   const { unreadMessages, fetchLoading: messagesFetchLoading } = useMessages();
   const { data: workoutPlanData, loadingStates: workoutPlanLoadingStates } = useWorkoutPlan();
   const { data: cardioData, loadingStates: cardioLoadingStates } = useCardio();
@@ -41,7 +42,12 @@ const useHomeDashboard = () => {
 
   const dashboardData = query.data;
 
-  const isLoading = query.isLoading || cardioLoadingStates.isLoading || messagesFetchLoading || workoutPlanLoadingStates.isLoading;
+  const isLoading =
+    query.isLoading ||
+    cardioLoadingStates.isLoading ||
+    messagesFetchLoading ||
+    workoutPlanLoadingStates.isLoading ||
+    userLoadingStates.isLoading;
 
   const nextSplit: WorkoutSplit | undefined = getNextWorkoutSplit(workoutPlanData.workoutSplits, dashboardData?.nextWorkoutSplit ?? null);
 

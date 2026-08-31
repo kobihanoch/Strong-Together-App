@@ -7,7 +7,7 @@ import { ActivityIndicator, Dimensions, StyleSheet, TouchableOpacity, View } fro
 import { RFValue } from 'react-native-responsive-fontsize';
 import api from '../../../infrastructure/api/api-config/api';
 import { colors } from '../../../shared/constants/colors';
-import { useAuth } from '../../auth/shared/providers/AuthProvider';
+import { useUser } from '../../auth/shared/hooks/use-user.hook';
 import useMediaUploads from '../hooks/use-media-uploads.hook';
 import { AppUser } from '../../auth/shared/types/auth.types';
 
@@ -33,7 +33,10 @@ function ImagePickerComponent({
   setTriggerRemoveImg,
   style,
 }: ImagePickerComponentProps) {
-  const { setUser, user } = useAuth();
+  const {
+    data: user,
+    actions: { updateLocalUser },
+  } = useUser();
   const { uploadToStorageAndReturnPath, loading: mediaLoading } = useMediaUploads();
 
   const profileimagePath = user?.profilePicPath;
@@ -58,7 +61,7 @@ function ImagePickerComponent({
 
       const { profilePicPath } = await uploadToStorageAndReturnPath(file);
       // Update in auth context
-      setUser(
+      updateLocalUser(
         (prev: AppUser | null | undefined) =>
           ({
             ...prev,
@@ -74,7 +77,7 @@ function ImagePickerComponent({
     });
 
     // Update in auth context
-    setUser(
+    updateLocalUser(
       (prev: AppUser | null | undefined) =>
         ({
           ...prev,

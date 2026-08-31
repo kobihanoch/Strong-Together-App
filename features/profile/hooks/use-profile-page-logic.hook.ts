@@ -1,8 +1,11 @@
-import { useAuth } from '../../auth/shared/providers/AuthProvider';
+import { useUser } from '../../auth/shared/hooks/use-user.hook';
 import { getDaysSince } from '../../home/utils/home-page.utils';
 
 const useProfilePageLogic = () => {
-  const { user, setUser } = useAuth();
+  const {
+    data: user,
+    actions: { updateLocalUser },
+  } = useUser();
   const username = user?.username ?? '';
   const email = user?.email ?? '';
   const fullName = user?.name ?? '';
@@ -18,7 +21,7 @@ const useProfilePageLogic = () => {
       gender,
       daysOnline,
     },
-    setUser,
+    setUser: updateLocalUser,
   };
 };
 

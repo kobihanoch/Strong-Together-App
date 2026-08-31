@@ -36,9 +36,9 @@ export const useMessages = () => {
  * state, and a setter that updates both context state and the local cache.
  */
 export const MessagesProvider = ({ children }: { children: ReactNode }) => {
-  const { user, isValidatedWithServer } = useAuth();
+  const { userIdCache: userId, isValidatedWithServer } = useAuth();
   const fetchFn = useCallback(async () => (await getUserMessages()).messages, []);
-  const cacheKey = useMemo(() => (user?.id ? keyInbox(user.id) : null), [user?.id]);
+  const cacheKey = useMemo(() => (userId ? keyInbox(userId) : null), [userId]);
   const [updateLoading, setUpdateLoading] = useState(false);
 
   const {
@@ -67,12 +67,12 @@ export const MessagesProvider = ({ children }: { children: ReactNode }) => {
 
   // Load listener
   useEffect(() => {
-    if (user) {
+    if (userId) {
       const cleanup = registerToMessagesListener(updateAndCache);
       return cleanup;
     }
     return;
-  }, [updateAndCache, user]);
+  }, [updateAndCache, userId]);
 
   const value = useMemo<MessagesProviderValue>(
     () => ({
