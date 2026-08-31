@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from 'react';
+/*import { useCallback, useMemo, useState } from 'react';
 import { keyAnalytics } from '../../../../infrastructure/cache/cache-keys.utils';
 import { useWorkoutHistory } from '../../shared/providers/WorkoutHistoryProvider';
 import { useAuth } from '../../../auth/shared/providers/AuthProvider';
@@ -6,10 +6,10 @@ import { useWorkoutPlan } from '../../shared/providers/WorkoutPlanProvider';
 import { getTrackingAnalytics } from '../services/analytics.service';
 import useCacheAndFetch from '../../../../shared/hooks/use-cache-and-fetch.hook';
 import type { GetAnalyticsResponse } from '@strong-together/shared';
-import { Analytics1RM, AnalyticsGoals } from '../types/use-analytics.types';
+import { Analytics1RM, AnalyticsGoals } from '../types/use-analytics.types';*/
 
 const useAnalysticsLogic = () => {
-  const { userIdCache: userId, isValidatedWithServer } = useAuth();
+  /*const { userIdCache: userId, isValidatedWithServer } = useAuth();
   const { analyzedExerciseTrackingData } = useWorkoutHistory();
   const { workoutCount = 0, splitDaysByName: splitsCounter = {} } = analyzedExerciseTrackingData ?? {};
   const { workout } = useWorkoutPlan();
@@ -65,7 +65,7 @@ const useAnalysticsLogic = () => {
     },
     loading: hasData ? loading : false,
     hasData,
-  };
+  };*/
 };
 
 export default useAnalysticsLogic;

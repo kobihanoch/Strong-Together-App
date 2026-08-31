@@ -1,383 +1,144 @@
-import React, { useRef, useState } from 'react';
-import { Dimensions, StyleSheet, Text, TouchableOpacity, View, TextInput, Keyboard, ActivityIndicator, } from 'react-native';
-import { RFValue } from 'react-native-responsive-fontsize';
-import Column from '../../../../shared/components/Column';
-import RenderItemExercise from '../components/RenderItemExercise';
-import SplitFlatList from '../components/SplitFlatList';
-import SlidingBottomModal, { SlidingBottomModalRef } from '../../../../shared/components/SlidingBottomModal';
-import { useAerobics } from '../../shared/providers/CardioProvider';
-import { useMyWorkoutPlanPageLogic } from '../hooks/use-my-workout-plan-page-logic.hook';
-import useLightStatusBar from '../../../../shared/hooks/use-light-status-bar.hook';
-import { formatTime } from '../../../../shared/utils/shared-utils';
-import Row from '../../../../shared/components/Row';
-import { logUserCardio } from '../../cardio/services/cardio.service';
-import { Notifier, NotifierComponents } from 'react-native-notifier';
-import { useNavigation } from '@react-navigation/native';
+import { Image } from 'expo-image';
+import React from 'react';
+import { ActivityIndicator, FlatList, Pressable, ScrollView, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import { fontFamilies, fontSizes } from '../../../../shared/constants/typography';
 import NoWorkoutPlan from '../components/NoWorkoutPlan';
-import { StackNavigationProp } from '@react-navigation/stack';
-import { RootParamList } from '../../../../navigation/types/appStackTypes';
-import { ExerciseInPlan } from '../../shared/types/workout.types';
-
-const { width, height } = Dimensions.get('window');
-
-const onlyDigits = (t: string) => t.replace(/\D/g, '');
-const clampSec = (t: string) => {
-  const n = parseInt(t || '0', 10);
-  if (Number.isNaN(n)) return '0';
-  return String(Math.max(0, Math.min(59, n)));
-};
+import useMyWorkoutPlan from '../hooks/use-my-workout-plan.hook';
 
 const MyWorkoutPlan = () => {
-  const nav = useNavigation<StackNavigationProp<RootParamList>>();
-  const { hasWorkout, filteredExercises, setSelectedSplit, selectedSplit } = useMyWorkoutPlanPageLogic();
+  const { data, actions } = useMyWorkoutPlan();
+  const { width, height } = useWindowDimensions();
+  const gutter = Math.max(16, Math.min(width * 0.045, 22));
+  const heroHeight = Math.max(190, Math.min(height * 0.25, 230));
 
-  const { cardioForToday, updateAerobics } = useAerobics();
-
-  // Modals
-  const exRef = useRef(null);
-  const cardioRef = useRef<SlidingBottomModalRef | null>(null);
-  const openCardioModal = (i = 0) => {
-    cardioRef?.current?.open?.(i);
-  };
-
-  // Local cardio inputs
-  const [cardioType, setCardioType] = useState('Walk');
-  const [mins, setMins] = useState('');
-  const [secs, setSecs] = useState('');
-  const [isCardioSave, setIsCardioSave] = useState(false);
-
-  const saveLockRef = useRef(false);
-  const onSaveCardio = async () => {
-    if (saveLockRef.current) return;
-    saveLockRef.current = true;
-    try {
-      setIsCardioSave(true);
-      const m = parseInt(mins || '0', 10) || 0;
-      const s = parseInt(clampSec(secs), 10) || 0;
-      if (m === 0 && s === 0) return; // no-op
-      const res = await logUserCardio(m, s, cardioType);
-      const { daily, weekly } = res;
-      await updateAerobics({ daily, weekly });
-      Keyboard.dismiss();
-      cardioRef.current?.close?.();
-      Notifier.showNotification({
-        title: 'Cardio logged',
-        description: 'Cardio added successfully',
-        duration: 2500,
-        showAnimationDuration: 250,
-        hideOnPress: true,
-        Component: NotifierComponents.Alert,
-        componentProps: {
-          alertType: 'success',
-          titleStyle: { fontSize: 16 },
-          descriptionStyle: { fontSize: 14 },
-        },
-      });
-      nav.replace('Statistics');
-    } finally {
-      saveLockRef.current = false;
-      setIsCardioSave(false);
-    }
-  };
-
-  useLightStatusBar();
-
-  return hasWorkout ? (
-    <View style={styles.container}>
-      <View>
-        {/* Splits */}
-        <SplitFlatList
-          setSelectedSplit={setSelectedSplit}
-          selectedSplit={selectedSplit}
-          openCardioModal={openCardioModal}
-        />
-
-        {/* Exercises modal */}
-        <SlidingBottomModal
-          title="Exercises"
-          ref={exRef}
-          data={filteredExercises}
-          renderItem={({ item }: { item: ExerciseInPlan }) => <RenderItemExercise item={item} />}
-          enableBackDrop={false}
-          enablePanDownClose={false}
-          snapPoints={['15%', '50%', '85%']}
-          flatListUsage={true}
-          initialIndex={0}
-        />
-
-        {/* Cardio modal */}
-        <SlidingBottomModal
-          title="Cardio"
-          ref={cardioRef}
-          enableBackDrop={true}
-          snapPoints={['30%', '50%', '85%']}
-          flatListUsage={false}
-          initialIndex={-1}
-        >
-          <Column
-            style={{
-              justifyContent: 'center',
-              alignItems: 'center',
-              marginTop: height * 0.05,
-              paddingHorizontal: 20,
-              gap: 16,
-            }}
-          >
-            {cardioForToday ? (
-              <Text style={styles.cardioText}>
-                You{' '}
-                <Text style={styles.cardioTextStrong}>
-                  {cardioForToday?.type === 'Run' ? 'Ran' : cardioForToday?.type + 'ed'}
-                </Text>{' '}
-                for{' '}
-                <Text style={styles.cardioTextStrong}>
-                  {formatTime(cardioForToday.durationMins, cardioForToday.durationSec)}
-                </Text>{' '}
-                today, good job!
-              </Text>
-            ) : (
-              <Column style={styles.cardioCard}>
-                {/* Type selector */}
-                <Row style={{ gap: 10 }}>
-                  {['Walk', 'Run'].map((opt) => {
-                    const active = cardioType === opt;
-                    return (
-                      <TouchableOpacity
-                        key={opt}
-                        onPress={() => setCardioType(opt)}
-                        style={[styles.typePill, active && { backgroundColor: '#2979FF' }]}
-                      >
-                        <Text
-                          style={[
-                            styles.typePillText,
-                            active && {
-                              color: 'white',
-                              fontFamily: 'Inter_600SemiBold',
-                            },
-                          ]}
-                        >
-                          {opt}
-                        </Text>
-                      </TouchableOpacity>
-                    );
-                  })}
-                </Row>
-
-                {/* Time inputs */}
-                <Row style={styles.timeRow}>
-                  <Column style={styles.timeField}>
-                    <Text style={styles.timeLabel}>Min</Text>
-                    <TextInput
-                      style={styles.timeInput}
-                      value={mins}
-                      onChangeText={(t) => setMins(onlyDigits(t))}
-                      keyboardType="number-pad"
-                      maxLength={3}
-                      placeholder="0"
-                      returnKeyType="done"
-                      onFocus={() => openCardioModal(2)}
-                    />
-                  </Column>
-
-                  <Text style={styles.colon}>:</Text>
-
-                  <Column style={styles.timeField}>
-                    <Text style={styles.timeLabel}>Sec</Text>
-                    <TextInput
-                      style={styles.timeInput}
-                      value={secs}
-                      onChangeText={(t) => setSecs(onlyDigits(t))}
-                      onBlur={() =>
-                        setSecs((s) => {
-                          return clampSec(s);
-                        })
-                      }
-                      keyboardType="number-pad"
-                      maxLength={2}
-                      placeholder="00"
-                      returnKeyType="done"
-                      onFocus={() => openCardioModal(2)}
-                    />
-                  </Column>
-                </Row>
-
-                {/* Save button */}
-                {isCardioSave ? (
-                  <ActivityIndicator />
-                ) : (
-                  <TouchableOpacity
-                    style={[
-                      styles.plusBtn,
-                      styles.saveBtn,
-                      (parseInt(mins || '0', 10) || 0) === 0 &&
-                        (parseInt(secs || '0', 10) || 0) === 0 && {
-                          opacity: 0.5,
-                        },
-                    ]}
-                    onPress={onSaveCardio}
-                    disabled={
-                      ((parseInt(mins || '0', 10) || 0) === 0 && (parseInt(secs || '0', 10) || 0) === 0) || isCardioSave
-                    }
-                  >
-                    <Text style={styles.saveText}>Save</Text>
-                  </TouchableOpacity>
-                )}
-              </Column>
-            )}
-          </Column>
-        </SlidingBottomModal>
+  if (data.isLoading)
+    return (
+      <View style={[styles.center, { backgroundColor: data.theme.canvas }]}>
+        <ActivityIndicator color={data.theme.primary} />
       </View>
-    </View>
-  ) : (
-    <NoWorkoutPlan onCreatePress={() => nav.navigate('CreateWorkout')}></NoWorkoutPlan>
+    );
+  if (!data.hasWorkoutPlan) return <NoWorkoutPlan onCreatePress={actions.createPlan} />;
+  const split = data.selectedSplit;
+  if (!split) return null;
+
+  return (
+    <SafeAreaView style={[styles.safeArea, { backgroundColor: data.theme.canvas }]} edges={['top']}>
+      <ScrollView contentContainerStyle={{ paddingHorizontal: gutter, paddingBottom: 28 }} showsVerticalScrollIndicator={false}>
+        <View style={styles.titleRow}>
+          <View>
+            <Text style={[styles.eyebrow, { color: data.theme.textSecondary }]}>YOUR TRAINING</Text>
+            <Text style={[styles.title, { color: data.theme.textPrimary }]}>Workout Plan</Text>
+          </View>
+          <MaterialCommunityIcons name="dots-vertical" size={fontSizes.title} color={data.theme.textPrimary} />
+        </View>
+
+        <View style={[styles.hero, { height: heroHeight, backgroundColor: data.theme.heroSurface }]}>
+          {/* eslint-disable-next-line @typescript-eslint/no-require-imports */}
+          <Image source={require('../../../../assets/workoutplanbg.png')} style={StyleSheet.absoluteFill} contentFit="cover" />
+          <View style={[StyleSheet.absoluteFill, { backgroundColor: data.theme.heroOverlay }]} />
+          <View style={styles.heroContent}>
+            <Text numberOfLines={1} style={styles.heroTitle}>
+              {split.name}
+            </Text>
+            <Text numberOfLines={1} style={styles.heroMeta}>
+              {data.muscles.join(' · ') || split.muscleGroup || 'Workout split'}
+            </Text>
+            <Text style={styles.heroMeta}>
+              {split.exercises.length} exercises · {data.setCount} sets
+            </Text>
+            <Pressable
+              disabled={data.hasTrainedToday}
+              onPress={actions.startWorkout}
+              style={[styles.primaryButton, { backgroundColor: data.theme.primary, opacity: data.hasTrainedToday ? 0.55 : 1 }]}
+            >
+              <Text style={styles.primaryButtonText}>{data.hasTrainedToday ? 'Workout completed today' : `Start ${split.name}`}</Text>
+            </Pressable>
+          </View>
+        </View>
+
+        <FlatList
+          horizontal
+          data={data.workoutSplits}
+          keyExtractor={(item) => String(item.id)}
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.tabs}
+          renderItem={({ item }) => {
+            const active = item.id === split.id;
+            return (
+              <Pressable onPress={() => actions.selectSplit(item)} style={[styles.tab, active && { backgroundColor: data.theme.primary }]}>
+                <Text numberOfLines={1} style={[styles.tabText, { color: active ? data.theme.white : data.theme.textPrimary }]}>
+                  {item.name}
+                </Text>
+              </Pressable>
+            );
+          }}
+        />
+
+        <View style={styles.sectionHeader}>
+          <Text style={[styles.sectionTitle, { color: data.theme.textPrimary }]}>{split.name} exercises</Text>
+          <Pressable onPress={actions.editPlan}>
+            <Text style={[styles.editText, { color: data.theme.primary }]}>Edit plan</Text>
+          </Pressable>
+        </View>
+
+        <View style={[styles.exerciseGroup, { borderColor: data.theme.border }]}>
+          {split.exercises.map((exercise, index) => (
+            <View
+              key={exercise.exerciseToSplitId}
+              style={[styles.exerciseRow, index > 0 && { borderTopColor: data.theme.border, borderTopWidth: StyleSheet.hairlineWidth }]}
+            >
+              <Text style={[styles.order, { color: data.theme.textPrimary }]}>{String(index + 1).padStart(2, '0')}</Text>
+              <View style={styles.exerciseCopy}>
+                <Text numberOfLines={1} style={[styles.exerciseName, { color: data.theme.textPrimary }]}>
+                  {exercise.name}
+                </Text>
+                <Text numberOfLines={1} style={[styles.exerciseMuscle, { color: data.theme.textSecondary }]}>
+                  {exercise.targetMuscle}
+                </Text>
+              </View>
+              <View style={styles.exerciseValues}>
+                <Text style={[styles.setCount, { color: data.theme.textSecondary }]}>{exercise.sets.length} sets</Text>
+                <Text numberOfLines={1} style={[styles.reps, { color: data.theme.textSecondary }]}>
+                  {exercise.sets.map((set) => set.reps).join(' · ')}
+                </Text>
+              </View>
+            </View>
+          ))}
+        </View>
+      </ScrollView>
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    flexDirection: 'column',
-  },
-
-  // Split cards (unchanged)
-  header: {
-    fontFamily: 'Inter_700Bold',
-    fontSize: RFValue(20),
-    marginLeft: width * 0.05,
-  },
-  loadingContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  splitContainer: {
-    padding: height * 0.01,
-    flex: 1,
-    backgroundColor: 'white',
-    width: width * 0.5,
-    borderRadius: width * 0.04,
-    borderColor: '#c9c9c9',
-    borderWidth: 0.2,
-    marginLeft: width * 0.05,
-    marginVertical: height * 0.02,
-  },
-  selectedSplitContainer: {
-    backgroundColor: '#00142a',
-    width: width * 0.7,
-  },
-  splitName: {
-    fontFamily: 'Inter_700Bold',
-    fontSize: RFValue(25),
-  },
-  splitExercises: {
-    fontFamily: 'Inter_400Regular',
-    fontSize: RFValue(12),
-    color: '#666',
-  },
-  exerciseContainer: {
-    backgroundColor: '#F3F4F6',
-    width: '90%',
-    alignSelf: 'center',
-    height: height * 0.14,
-    flex: 1,
-    borderRadius: width * 0.03,
-    marginVertical: height * 0.005,
-  },
-  exerciseName: {
-    fontFamily: 'Inter_700Bold',
-    fontSize: RFValue(16),
-    color: '#007bff',
-  },
-  exerciseDetails: {
-    fontFamily: 'Inter_400Regular',
-    fontSize: RFValue(12),
-    color: '#555',
-    marginTop: height * 0.005,
-  },
-
-  // Cardio display text
-  cardioText: {
-    fontFamily: 'Inter_400Regular',
-    fontSize: RFValue(14),
-    textAlign: 'center',
-  },
-  cardioTextStrong: {
-    fontFamily: 'Inter_700Bold',
-    fontSize: RFValue(14),
-    textAlign: 'center',
-  },
-
-  // Cardio input card
-  cardioCard: {
-    width: width * 0.9,
-    backgroundColor: '#F3F4F6',
-    borderRadius: 16,
-    padding: 14,
-    gap: 14,
-    alignItems: 'center',
-  },
-  typePill: {
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 999,
-    backgroundColor: '#E9EEF6',
-  },
-  typePillText: {
-    fontFamily: 'Inter_500Medium',
-    fontSize: RFValue(12),
-    color: 'black',
-  },
-  timeRow: {
-    width: '100%',
-    justifyContent: 'center',
-    alignItems: 'center',
-    gap: 10,
-  },
-  timeField: {
-    width: width * 0.28,
-    backgroundColor: 'white',
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: '#e6e6e6',
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-  },
-  timeLabel: {
-    fontFamily: 'Inter_500Medium',
-    fontSize: RFValue(10),
-    color: '#666',
-    marginBottom: 4,
-  },
-  timeInput: {
-    fontFamily: 'Inter_600SemiBold',
-    fontSize: RFValue(16),
-    color: 'black',
-  },
-  colon: {
-    fontFamily: 'Inter_600SemiBold',
-    fontSize: RFValue(16),
-    color: '#666',
-    marginHorizontal: 2,
-  },
-
-  // Save button + base plusBtn style
-  plusBtn: {
-    minWidth: 90,
-    paddingVertical: 10,
-    paddingHorizontal: 16,
-    borderRadius: 12,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  saveBtn: {
-    backgroundColor: '#2979FF',
-  },
-  saveText: {
-    fontFamily: 'Inter_600SemiBold',
-    fontSize: RFValue(12),
-    color: 'white',
-  },
+  safeArea: { flex: 1 },
+  center: { flex: 1, alignItems: 'center', justifyContent: 'center' },
+  titleRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingTop: 12, paddingBottom: 16 },
+  eyebrow: { fontFamily: fontFamilies.medium, fontSize: fontSizes.caption, letterSpacing: 1.4 },
+  title: { fontFamily: fontFamilies.bold, fontSize: fontSizes.metric, marginTop: 4 },
+  hero: { overflow: 'hidden', borderRadius: 28 },
+  heroContent: { flex: 1, padding: 20, justifyContent: 'flex-end', gap: 7 },
+  heroTitle: { color: '#FFFFFF', fontFamily: fontFamilies.bold, fontSize: fontSizes.metric, maxWidth: '75%' },
+  heroMeta: { color: 'rgba(255,255,255,0.82)', fontFamily: fontFamilies.regular, fontSize: fontSizes.bodySmall },
+  primaryButton: { minHeight: 50, borderRadius: 16, alignItems: 'center', justifyContent: 'center', marginTop: 8 },
+  primaryButtonText: { color: '#FFFFFF', fontFamily: fontFamilies.semiBold, fontSize: fontSizes.body },
+  tabs: { gap: 8, paddingVertical: 16 },
+  tab: { minWidth: 82, maxWidth: 126, paddingHorizontal: 18, height: 40, borderRadius: 14, alignItems: 'center', justifyContent: 'center' },
+  tabText: { fontFamily: fontFamilies.medium, fontSize: fontSizes.bodySmall },
+  sectionHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 },
+  sectionTitle: { fontFamily: fontFamilies.semiBold, fontSize: fontSizes.title },
+  editText: { fontFamily: fontFamilies.medium, fontSize: fontSizes.bodySmall },
+  exerciseGroup: { borderWidth: 1, borderRadius: 20, overflow: 'hidden' },
+  exerciseRow: { minHeight: 72, flexDirection: 'row', alignItems: 'center', paddingHorizontal: 14, paddingVertical: 12 },
+  order: { width: 40, fontFamily: fontFamilies.medium, fontSize: fontSizes.title },
+  exerciseCopy: { flex: 1, paddingRight: 8 },
+  exerciseName: { fontFamily: fontFamilies.semiBold, fontSize: fontSizes.bodySmall },
+  exerciseMuscle: { fontFamily: fontFamilies.regular, fontSize: fontSizes.label, marginTop: 3 },
+  exerciseValues: { alignItems: 'flex-end', maxWidth: '30%' },
+  setCount: { fontFamily: fontFamilies.medium, fontSize: fontSizes.label },
+  reps: { fontFamily: fontFamilies.regular, fontSize: fontSizes.label, marginTop: 3 },
 });
 
 export default MyWorkoutPlan;
-

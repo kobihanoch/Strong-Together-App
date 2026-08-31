@@ -1,11 +1,11 @@
-import moment from 'moment-timezone';
+/*import moment from 'moment-timezone';
 import { useMemo, useState } from 'react';
 import { useWorkoutHistory } from '../../shared/providers/WorkoutHistoryProvider';
-import { useAerobics } from '../../shared/providers/CardioProvider';
-import { getLastWorkoutForEachExercise } from '../utils/statistics-page.utils';
+import { useAerobics } from '../../shared/providers/CardioProvider';*/
+//import { getLastWorkoutForEachExercise } from '../utils/statistics-page.utils';
 
-const useStatisticsPageLogic = () => {
-  const { exerciseTrackingMaps } = useWorkoutHistory();
+const useStatisticsPageLogic = () => {};
+/* const { exerciseTrackingMaps } = useWorkoutHistory();
   const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
   // Map with date keys: Date, ETSId, splitName
   const {
@@ -61,8 +61,6 @@ const useStatisticsPageLogic = () => {
     cardioByDate,
     cardioForWeek,
   };
-};
+};*/
 
 export default useStatisticsPageLogic;
-
-

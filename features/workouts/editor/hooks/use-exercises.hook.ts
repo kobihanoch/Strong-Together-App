@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import api from '../../../../infrastructure/api/api-config/api';
-import { ExercisesByMuscle } from '../../shared/types/workout.types';
+import { ExercisesByMuscle } from '../../plan/types/workout-plan.types';
 
 const useExercises = (): { exercises: ExercisesByMuscle; error: Error | null; loading: boolean } => {
   const [exercises, setExercises] = useState<ExercisesByMuscle>({});

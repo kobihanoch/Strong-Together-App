@@ -1,4 +1,4 @@
-import { StackScreenProps } from '@react-navigation/stack';
+/*import { StackScreenProps } from '@react-navigation/stack';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Dimensions, StyleSheet, Vibration, View } from 'react-native';
 import { ALERT_TYPE, Dialog } from 'react-native-alert-notification';
@@ -11,12 +11,12 @@ import TopBar from '../components/TopBar';
 import { showErrorAlert } from '../../../../shared/alerts/error-alerts';
 import useStartWorkoutPageLogic from '../hooks/use-start-workout-page-logic.hook';
 import { RootParamList } from '../../../../navigation/types/appStackTypes';
-import { TrackingMapItem } from '../../shared/types/workout.types';
+
 import type { AnalyzeVideoResultPayloadDto } from '@strong-together/shared';
 import type { SquatRepetition } from '../types/video-analysis.types';
-import type { ExerciseInPlan } from '../../shared/types/workout.types';
+import { ExerciseInPlan } from '../../plan/types/workout-plan.types';*/
 
-const { width, height } = Dimensions.get('window');
+/*const { width, height } = Dimensions.get('window');
 
 export type ExerciseAnalysisOverview = {
   exerciseId: ExerciseInPlan['id'] | null;
@@ -28,10 +28,10 @@ export type ExerciseAnalysisOverview = {
 export type CachedExerciseAnalysis<T> = {
   overview: ExerciseAnalysisOverview;
   result: AnalyzeVideoResultPayloadDto<T> | null;
-};
+};*/
 
-const StartWorkout = ({ route }: StackScreenProps<RootParamList, 'StartWorkout'>) => {
-  const {
+const StartWorkout = (/*{ route }: StackScreenProps<RootParamList, 'StartWorkout'>*/) => {};
+/*const {
     data: workoutData,
     saving: workoutSaving,
     controls,
@@ -299,6 +299,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     textAlign: 'center',
   },
-});
+});*/
 
 export default StartWorkout;

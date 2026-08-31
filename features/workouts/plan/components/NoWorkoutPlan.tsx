@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Dimensions } from 'react-native';
 import { RFValue } from 'react-native-responsive-fontsize';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import { useAppTheme } from '../../../../shared/providers/AppThemeProvider';
 
 const { width } = Dimensions.get('window');
 
@@ -11,28 +12,29 @@ type NoWorkoutPlanProps = {
 
 // Reusable empty-state screen for when there's no workout plan
 const NoWorkoutPlan = ({ onCreatePress }: NoWorkoutPlanProps) => {
+  const { colors } = useAppTheme();
   return (
-    <View style={stylesNW.container}>
+    <View style={[stylesNW.container, { backgroundColor: colors.canvas }]}>
       {/* Icon + soft badge */}
       <View style={stylesNW.illustrationWrap}>
-        <View style={stylesNW.circleOuter}>
-          <View style={stylesNW.circleMid}>
-            <View style={stylesNW.circleInner}>
-              <MaterialCommunityIcons name="dumbbell" size={RFValue(36)} color="#2979FF" />
+        <View style={[stylesNW.circleOuter, { backgroundColor: colors.surfaceMuted }]}>
+          <View style={[stylesNW.circleMid, { backgroundColor: colors.surface }]}>
+            <View style={[stylesNW.circleInner, { backgroundColor: colors.primarySoft }]}>
+              <MaterialCommunityIcons name="dumbbell" size={RFValue(36)} color={colors.primary} />
             </View>
           </View>
         </View>
       </View>
 
       {/* Title + subtitle */}
-      <Text style={stylesNW.title}>No workout plan yet</Text>
-      <Text style={stylesNW.subtitle}>
+      <Text style={[stylesNW.title, { color: colors.textPrimary }]}>No workout plan yet</Text>
+      <Text style={[stylesNW.subtitle, { color: colors.textSecondary }]}>
         Create your first split and add exercises. Keep it simple - you can edit anytime.
       </Text>
 
       {/* Primary and secondary actions */}
       <View style={stylesNW.actionsRow}>
-        <TouchableOpacity style={[stylesNW.btn, stylesNW.btnPrimary]} onPress={onCreatePress}>
+        <TouchableOpacity style={[stylesNW.btn, { backgroundColor: colors.primary }]} onPress={onCreatePress}>
           <MaterialCommunityIcons name="plus" size={RFValue(14)} color="white" />
           <Text style={stylesNW.btnPrimaryText}>Create workout</Text>
         </TouchableOpacity>
