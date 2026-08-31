@@ -51,8 +51,11 @@ const useServerValidation = ({
         }
       }
       console.log('\x1b[31m[Auth Context]: Validation with server failed => Logging out\x1b[0m');
-      await logout(true);
-      await clearAllCacheWithoutStartWorkout();
+      try {
+        await logout(true);
+      } finally {
+        await clearAllCacheWithoutStartWorkout();
+      }
     } finally {
       attemptedServerValidationRef.current = true;
       serverValidatingLockRef.current = false;

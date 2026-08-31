@@ -64,8 +64,11 @@ export const handle401 = async (api: AxiosInstance, error: AxiosError<{ message?
     // If got here failed at refresh
     const isAuthError = (refreshErr as AxiosError).response?.status === 401;
     if (isAuthError && GlobalAuth.logout) {
-      await GlobalAuth.logout(true);
-      await clearAllCacheWithoutStartWorkout();
+      try {
+        await GlobalAuth.logout(true);
+      } finally {
+        await clearAllCacheWithoutStartWorkout();
+      }
     }
     // Some toast to show error
     showErrorAlert('Error', data?.message || 'Session expired');

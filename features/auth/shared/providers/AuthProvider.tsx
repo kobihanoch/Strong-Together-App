@@ -107,7 +107,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   });
 
   // Restore cached session on app start, then validate it in the background
-  useInitialCheck({ clearContext, attemptServerValidation, setUserIdCache, setIsLoggedIn, setAuthPhase });
+  useInitialCheck({ clearContext, logout, attemptServerValidation, setUserIdCache, setIsLoggedIn, setAuthPhase });
 
   // Retry server validation when a boot-time offline/server failure recovers
   useRetryServerValidationWhenOnline(isValidatedWithServer, attemptServerValidation, attemptedServerValidationRef);
