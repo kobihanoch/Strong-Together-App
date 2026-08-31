@@ -28,8 +28,8 @@ const useServerValidation = ({
       const { accessToken: at, refreshToken: rt, userId } = await refreshAndRotateTokens();
       await saveRefreshToken(rt);
       GlobalAuth.setAccessToken(at);
-      setIsValidatedWithServer(true);
       console.log('\x1b[32m[Auth Context]: Validation with server completed => Fetching data from API\x1b[0m');
+      setIsValidatedWithServer(true);
       setUserIdCache(userId);
     } catch (e) {
       if (e instanceof AxiosError) {
@@ -39,16 +39,12 @@ const useServerValidation = ({
           return;
         }
         if (e.isNetworkError) {
-          console.log(
-            '\x1b[33m[Auth Context]: Server validation skipped (offline). Staying logged-in with cached data.\x1b[0m',
-          );
+          console.log('\x1b[33m[Auth Context]: Server validation skipped (offline). Staying logged-in with cached data.\x1b[0m');
           setIsValidatedWithServer(false);
           return;
         }
         if (e.isServerError) {
-          console.log(
-            '\x1b[33m[Auth Context]: Server validation skipped (offline). Staying logged-in with cached data.\x1b[0m',
-          );
+          console.log('\x1b[33m[Auth Context]: Server validation skipped (offline). Staying logged-in with cached data.\x1b[0m');
           setIsValidatedWithServer(false);
           return;
         }
@@ -59,13 +55,7 @@ const useServerValidation = ({
       attemptedServerValidationRef.current = true;
       serverValidatingLockRef.current = false;
     }
-  }, [
-    attemptedServerValidationRef,
-    clearContext,
-    serverValidatingLockRef,
-    setIsValidatedWithServer,
-    setUserIdCache,
-  ]);
+  }, [attemptedServerValidationRef, clearContext, serverValidatingLockRef, setIsValidatedWithServer, setUserIdCache]);
 
   return { attemptServerValidation };
 };

@@ -9,7 +9,7 @@ import type { GetAnalyticsResponse } from '@strong-together/shared';
 import { Analytics1RM, AnalyticsGoals } from '../types/use-analytics.types';
 
 const useAnalysticsLogic = () => {
-  const { user, isValidatedWithServer } = useAuth();
+  const { userIdCache: userId, isValidatedWithServer } = useAuth();
   const { analyzedExerciseTrackingData } = useWorkoutHistory();
   const { workoutCount = 0, splitDaysByName: splitsCounter = {} } = analyzedExerciseTrackingData ?? {};
   const { workout } = useWorkoutPlan();
@@ -40,7 +40,7 @@ const useAnalysticsLogic = () => {
 
   // Hook usage
   const { loading } = useCacheAndFetch<GetAnalyticsResponse>(
-    user, // user prop
+    userId, // user prop
     keyAnalytics, // key builder
     validateFlag, // flag from server
     fetchFn, // fetch cb

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { cacheGetJSON, cacheSetJSON } from '../../infrastructure/cache/cache.utils';
+import { cacheGetJSON, cacheSetJSON } from '../../infrastructure/cache/cache.constants';
 
 /**
  * Hydrates data from a local cache and revalidates it against the server once

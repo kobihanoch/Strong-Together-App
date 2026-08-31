@@ -9,16 +9,10 @@ export const getUserCardio = async (): Promise<UserAerobicsResponse> => {
   return data;
 };
 
-export const logUserCardio = async (
-  durationMins: AddUserAerobicsBody['record']['durationMins'],
-  durationSec: AddUserAerobicsBody['record']['durationSec'],
-  type: AddUserAerobicsBody['record']['type'],
-) => {
-  const { data } = await api.post('/api/aerobics/add', {
+export const logUserCardio = async (payload: AddUserAerobicsBody['record']): Promise<UserAerobicsResponse> => {
+  const { data } = await api.post<UserAerobicsResponse>('/api/aerobics/add', {
     record: {
-      durationMins,
-      durationSec,
-      type,
+      ...payload,
     },
     tz: Intl.DateTimeFormat().resolvedOptions().timeZone,
   } satisfies AddUserAerobicsBody);

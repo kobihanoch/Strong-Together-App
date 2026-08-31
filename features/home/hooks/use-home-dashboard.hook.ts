@@ -1,59 +1,67 @@
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
+import { useQuery } from '@tanstack/react-query';
 import { useMemo } from 'react';
 import { RootParamList } from '../../../navigation/types/appStackTypes';
 import { useAppTheme } from '../../../shared/providers/AppThemeProvider';
+import { useUser } from '../../auth/shared/hooks/use-user.hook';
 import { useAuth } from '../../auth/shared/providers/AuthProvider';
 import { useMessages } from '../../messages/providers/MessagesProvider';
-import { useAerobics } from '../../workouts/shared/providers/CardioProvider';
-import { useWorkoutPlan } from '../../workouts/shared/providers/WorkoutPlanProvider';
-import { ExerciseInPlan, WorkoutSplit } from '../../workouts/shared/types/workout.types';
-import { HomeDashboardData } from '../types/use-home-page.types';
-import useHomeDashboardCacheHandler from './use-home-dashboard-cache-handler.hook';
+import { useCardio } from '../../workouts/cardio/hooks/use-cardio.hook';
+import { useWorkoutPlan } from '../../workouts/plan/hooks/use-workout-plan.hook';
+import { ExerciseInPlan, WorkoutSplit } from '../../workouts/plan/types/workout-plan.types';
+import { getUserDashboardStats } from '../services/home-page.service';
+import { HomeDashboardStats } from '../types/use-home-page.types';
+import { fillCardioGraph, getNextWorkoutSplit } from '../utils/home-page.utils';
 
-const DAY_LABELS = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
-
+/**
+ * Composes the Home screen view model from TanStack-backed feature data.
+ *
+ * It combines dashboard statistics, workout-plan and cardio queries with
+ * messages, authenticated-user presentation data, and navigation actions.
+ *
+ * @returns The Home view model, navigation actions, and aggregate loading state.
+ */
 const useHomeDashboard = () => {
   const navigation = useNavigation<StackNavigationProp<RootParamList>>();
   const { colors: theme } = useAppTheme();
-  const { user, isValidatedWithServer } = useAuth();
-  const { unreadMessages, fetchLoading: messagesFetchLoading } = useMessages();
-  const { hasWorkoutPlan, workoutSplits, fetchLoading: workoutPlanFetchLoading } = useWorkoutPlan();
-  const { weeklyCardioMap, fetchLoading: aerobicsFetchLoading } = useAerobics();
+  const { data: user, loadingStates: userLoadingStates } = useUser();
+  const { unreadMessages, loadingStates: messagesLoadingStates } = useMessages();
+  const { data: workoutPlanData, loadingStates: workoutPlanLoadingStates } = useWorkoutPlan();
+  const { data: cardioData, loadingStates: cardioLoadingStates } = useCardio();
 
-  // Home dashboard data goes through the cache pipeline.
-  const { dashboardStats = undefined, loading: dashboardLoading = true } = useHomeDashboardCacheHandler({
-    user,
-    isValidatedWithServer,
+  const { isValidatedWithServer, userIdCache: userId } = useAuth();
+
+  const query = useQuery({
+    queryKey: ['home-dashboard', userId],
+    queryFn: async (): Promise<HomeDashboardStats> => await getUserDashboardStats(),
+    enabled: Boolean(isValidatedWithServer && userId),
+    staleTime: 1000 * 60 * 5,
+    retry: false,
   });
 
+  const dashboardData = query.data;
+
   const isLoading =
-    dashboardLoading || dashboardStats === undefined || aerobicsFetchLoading || messagesFetchLoading || workoutPlanFetchLoading;
+    query.isPending ||
+    cardioLoadingStates.isPending ||
+    messagesLoadingStates.isPending ||
+    workoutPlanLoadingStates.isPending ||
+    userLoadingStates.isPending;
 
-  const nextSplit: WorkoutSplit | undefined = workoutSplits.find((split) => split.id === dashboardStats?.nextWorkoutSplit?.id);
+  const nextSplit: WorkoutSplit | undefined = getNextWorkoutSplit(workoutPlanData.workoutSplits, dashboardData?.nextWorkoutSplit ?? null);
 
-  const data = useMemo<HomeDashboardData>(() => {
-    // ssign to aerobics graph
-    const weekly = Object.entries(weeklyCardioMap ?? {}).sort(([a], [b]) => b.localeCompare(a))[0]?.[1];
-    const aerobicMinutes = Array(7).fill(0) as number[];
-    weekly?.records.forEach((record) => {
-      aerobicMinutes[new Date(record.workoutTimeUtc).getDay()] += record.durationMins;
-    });
-    const orderedDays = [1, 2, 3, 4, 5, 6, 0].map((dayIndex) => ({
-      label: DAY_LABELS[dayIndex],
-      minutes: aerobicMinutes[dayIndex],
-    }));
-
-    const lastWorkout = dashboardStats?.lastWorkoutStats;
-    const pr = dashboardStats?.prs[0];
+  const data = useMemo(() => {
+    const lastWorkout = dashboardData?.lastWorkoutStats;
+    const pr = dashboardData?.prs[0];
     const estimatedOneRepMax = pr?.estimatedOneRepMax ?? 0;
     const nextExercises: ExerciseInPlan[] = nextSplit?.exercises ?? [];
 
     return {
       theme,
       state: {
-        hasWorkout: hasWorkoutPlan,
-        hasTracking: dashboardStats?.hasExerciseTracking ?? false,
+        hasWorkout: workoutPlanData.hasWorkoutPlan,
+        hasTracking: dashboardData?.hasExerciseTracking ?? false,
       },
       user: {
         displayName: user?.name?.trim().split(' ')[0] || user?.username || 'Athlete',
@@ -71,11 +79,11 @@ const useHomeDashboard = () => {
             setCount: nextExercises ? nextExercises.reduce((total, exercise) => total + exercise.sets.length, 0) : 0,
           }
         : { id: 0, orderIndex: 0, muscleGroup: '', name: '', exerciseCount: 0, setCount: 0 },
-      gymActivity: dashboardStats
+      gymActivity: dashboardData
         ? {
-            completedThisWeek: dashboardStats.workoutTargets.workoutCountThisWeek,
-            weeklyTarget: dashboardStats.workoutTargets.workoutCountScheduledPerWeek,
-            weekStreak: dashboardStats.workoutTargets.weekStreak,
+            completedThisWeek: dashboardData.workoutTargets.workoutCountThisWeek,
+            weeklyTarget: dashboardData.workoutTargets.workoutCountScheduledPerWeek,
+            weekStreak: dashboardData.workoutTargets.weekStreak,
           }
         : { completedThisWeek: 0, weeklyTarget: 0, weekStreak: 0 },
       lastWorkout: lastWorkout?.workoutDate
@@ -89,7 +97,7 @@ const useHomeDashboard = () => {
             setCount: lastWorkout.setTrackedCount ?? 0,
           }
         : { name: '', dateLabel: '', exerciseCount: 0, setCount: 0 },
-      aerobics: { totalMinutes: weekly?.totalDurationMins ?? 0, days: orderedDays },
+      aerobics: { totalMinutes: cardioData.weeklyCardioMap?.totalDurationMins ?? 0, days: fillCardioGraph(cardioData.weeklyCardioMap) },
       achievement: {
         exercise: pr?.exerciseName ?? '',
         value: pr ? `${pr.prWeight} kg PR` : '',
@@ -97,16 +105,16 @@ const useHomeDashboard = () => {
       },
     };
   }, [
-    dashboardStats,
+    cardioData,
+    dashboardData,
     nextSplit,
     theme,
-    unreadMessages.length,
-    user?.gender,
+    workoutPlanData.hasWorkoutPlan,
     user?.name,
-    user?.profilePicPath,
     user?.username,
-    weeklyCardioMap,
-    hasWorkoutPlan,
+    user?.profilePicPath,
+    user?.gender,
+    unreadMessages.length,
   ]);
 
   return {
@@ -119,7 +127,7 @@ const useHomeDashboard = () => {
       openProgress: () => navigation.navigate('Analytics'),
       openHistory: () => navigation.navigate('Statistics'),
     },
-    isLoading,
+    loadingStates: { isPending: query.isPending, isLoading, isFetching: query.isFetching },
   };
 };
 

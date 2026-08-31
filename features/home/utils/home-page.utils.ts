@@ -1,3 +1,9 @@
+import { CardioWeeklyMap } from '../../workouts/cardio/types/cardio.types';
+import { WorkoutSplit } from '../../workouts/plan/types/workout-plan.types';
+import { HomeDashboardStats } from '../types/use-home-page.types';
+
+const DAY_LABELS = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
+
 export const getDaysSince = (lastDateString: string): string => {
   if (!lastDateString) return 'today';
   const lastDate = new Date(lastDateString);
@@ -25,4 +31,20 @@ export const getDaysSince = (lastDateString: string): string => {
         return `${years} yr${years > 1 ? 's' : ''} ago`;
       }
   }
+};
+
+export const getNextWorkoutSplit = (workoutSplits: WorkoutSplit[], nextWorkoutSplit: HomeDashboardStats['nextWorkoutSplit'] | null) => {
+  return workoutSplits.find((split) => split.id === nextWorkoutSplit?.id);
+};
+
+export const fillCardioGraph = (weeklyCardioMap: CardioWeeklyMap | undefined) => {
+  const weekly = Object.entries(weeklyCardioMap ?? {}).sort(([a], [b]) => b.localeCompare(a))[0]?.[1];
+  const aerobicMinutes = Array(7).fill(0) as number[];
+  weekly?.records.forEach((record) => {
+    aerobicMinutes[new Date(record.workoutTimeUtc).getDay()] += record.durationMins;
+  });
+  return [1, 2, 3, 4, 5, 6, 0].map((dayIndex) => ({
+    label: DAY_LABELS[dayIndex],
+    minutes: aerobicMinutes[dayIndex],
+  }));
 };

@@ -2,7 +2,7 @@ import type { LoginCredentials, RegistrationInput } from '../types/auth.types';
 import React, { SetStateAction, useCallback, useEffect } from 'react';
 import { showErrorAlert } from '../../../../shared/alerts/error-alerts';
 import { showSuccessAlert } from '../../../../shared/alerts/success-alerts';
-import { cacheDeleteAllCache } from '../../../../infrastructure/cache/cache.utils';
+import { clearAllCacheWithStartWorkout } from '../../../../infrastructure/query/query-client';
 import { disconnectSocket } from '../../../../infrastructure/socket';
 import { loginUser } from '../../login/services/login.service';
 import { registerUser } from '../../register/services/register.service';
@@ -20,10 +20,9 @@ type UseAuthActionsProps = {
   setGoogleLoading: React.Dispatch<SetStateAction<boolean>>;
   setUserIdCache: React.Dispatch<SetStateAction<AppUser['id'] | null | undefined>>;
   setIsLoggedIn: React.Dispatch<SetStateAction<boolean>>;
-  updateAndCache: (newData: AppUser | null | undefined) => Promise<void>;
   setIsValidatedWithServer: React.Dispatch<SetStateAction<boolean>>;
   setAuthPhase: React.Dispatch<SetStateAction<'checking' | 'authed' | 'guest'>>;
-  clearContext: () => Promise<void>;
+  clearContext: (skipCacheCleanup?: boolean) => Promise<void>;
 };
 
 const useAuthActions = ({
@@ -32,7 +31,6 @@ const useAuthActions = ({
   setGoogleLoading,
   setUserIdCache,
   setIsLoggedIn,
-  updateAndCache,
   setIsValidatedWithServer,
   setAuthPhase,
   clearContext,
@@ -112,8 +110,6 @@ const useAuthActions = ({
     try {
       await logoutUser();
       setIsLoggedIn(false);
-      updateAndCache(undefined);
-      await cacheDeleteAllCache();
     } catch (err) {
       // Log but do not block local cleanup
       if (err instanceof AxiosError) console.log(err?.response?.data || err.message);
@@ -121,9 +117,10 @@ const useAuthActions = ({
       try {
         disconnectSocket();
       } catch {}
-      await clearContext();
+      await clearAllCacheWithStartWorkout();
+      await clearContext(true);
     }
-  }, [clearContext, setIsLoggedIn, updateAndCache]);
+  }, [clearContext, setIsLoggedIn]);
 
   // Expose the real logout to axios interceptors via GlobalAuth.logout
   useEffect(() => {

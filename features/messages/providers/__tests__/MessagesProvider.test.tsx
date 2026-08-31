@@ -2,7 +2,7 @@ import React from 'react';
 import { renderHook } from '@testing-library/react-native';
 import { beforeEach, describe, expect, it, jest } from '@jest/globals';
 
-const mockUseCacheAndFetch = jest.fn();
+const mockUseMessagesQuery = jest.fn();
 const mockRegisterToMessagesListener = jest.fn<() => () => void>();
 
 jest.mock('@react-native-async-storage/async-storage', () => ({
@@ -15,12 +15,11 @@ jest.mock('@react-native-async-storage/async-storage', () => ({
 }));
 
 jest.mock('../../../auth/shared/providers/AuthProvider', () => ({
-  useAuth: () => ({ user: { id: 'user-1' }, isValidatedWithServer: true }),
+  useAuth: () => ({ userIdCache: 'user-1', isValidatedWithServer: true }),
 }));
 
-jest.mock('../../../../shared/hooks/use-cache-and-fetch.hook', () => ({
-  __esModule: true,
-  default: (...args: unknown[]) => mockUseCacheAndFetch(...args),
+jest.mock('../../hooks/use-messages.hook', () => ({
+  useMessages: () => mockUseMessagesQuery(),
 }));
 
 jest.mock('../../messages.listeners', () => ({
@@ -40,13 +39,20 @@ describe('MessagesProvider', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockRegisterToMessagesListener.mockReturnValue(jest.fn());
-    mockUseCacheAndFetch.mockReturnValue({
-      data: [
-        { id: 'unread', isRead: false },
-        { id: 'read', isRead: true },
-      ],
-      updateAndCache: jest.fn(),
-      loading: false,
+    mockUseMessagesQuery.mockReturnValue({
+      data: {
+        allReceivedMessages: [
+          { id: 'unread', isRead: false },
+          { id: 'read', isRead: true },
+        ],
+        unreadMessages: [{ id: 'unread', isRead: false }],
+      },
+      loadingStates: { isLoading: false, isFetching: false, isUpdating: false },
+      actions: {
+        updateMessageToRead: jest.fn(),
+        deleteMessage: jest.fn(),
+        updateLocalMessages: jest.fn(),
+      },
     });
   });
 

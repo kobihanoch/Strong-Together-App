@@ -1,88 +1,75 @@
-import { createContext, ReactNode, useCallback, useContext, useEffect, useMemo, useState } from 'react';
-import { keyInbox } from '../../../infrastructure/cache/cache-keys.utils';
-import useCacheAndFetch from '../../../shared/hooks/use-cache-and-fetch.hook';
+import { createContext, ReactNode, useContext, useEffect, useMemo } from 'react';
 import { useAuth } from '../../auth/shared/providers/AuthProvider';
+import { useMessages as useMessagesQuery } from '../hooks/use-messages.hook';
 import { registerToMessagesListener } from '../messages.listeners';
-import { getUserMessages, updateMsgReadStatus } from '../services/messages.service';
 import { UserMessage, UserMessages } from '../types/messages.types';
-import { filterMessagesByUnread } from '../utils/messages-context-utils';
 
 interface MessagesProviderValue {
   unreadMessages: UserMessages;
   allReceivedMessages: UserMessages;
   updateMessageToRead: (msgId: UserMessage['id']) => Promise<void>;
-  fetchLoading: boolean;
-  updateLoading: boolean;
+  deleteMessage: (msgId: UserMessage['id']) => Promise<void>;
+  loadingStates: {
+    isPending: boolean;
+    isFetching: boolean;
+    isUpdating: boolean;
+    isLoading: boolean;
+  };
 }
 
 const MessagesContext = createContext<MessagesProviderValue | null>(null);
 
-export const useMessages = () => {
+export const useMessagesContext = () => {
   const context = useContext(MessagesContext);
   if (!context) {
-    throw new Error('useMessages must be used within a MessagesProvider');
+    throw new Error('useMessagesContext must be used within a MessagesProvider');
   }
   return context;
 };
 
+// Backwards-compatible context consumer. TanStack state lives in the feature hook.
+export const useMessages = useMessagesContext;
+
 /**
  * Provides authenticated message state to the application. It hydrates the
- * user's messages from cache, revalidates them after server authentication,
- * persists local message updates, derives the unread collection, and owns the
- * single app-wide listener for newly received messages.
+ * It exposes TanStack-backed message state and owns the single app-wide
+ * listener for newly received WebSocket messages.
  *
  * @param children Components that consume the shared message state.
  * @returns A context provider containing messages, unread messages, loading
  * state, and a setter that updates both context state and the local cache.
  */
 export const MessagesProvider = ({ children }: { children: ReactNode }) => {
-  const { user, isValidatedWithServer } = useAuth();
-  const fetchFn = useCallback(async () => (await getUserMessages()).messages, []);
-  const cacheKey = useMemo(() => (user?.id ? keyInbox(user.id) : null), [user?.id]);
-  const [updateLoading, setUpdateLoading] = useState(false);
-
+  const { userIdCache: userId } = useAuth();
   const {
-    data: allReceivedMessages,
-    updateAndCache,
-    loading: fetchLoading,
-  } = useCacheAndFetch<UserMessages>(cacheKey, isValidatedWithServer, fetchFn, 'Messages Context');
-
-  const unreadMessages = useMemo(() => filterMessagesByUnread(allReceivedMessages), [allReceivedMessages]);
-
-  const updateMessageToRead = useCallback(
-    async (msgId: UserMessage['id']) => {
-      setUpdateLoading(true);
-
-      try {
-        await updateMsgReadStatus(msgId);
-        await updateAndCache((prev) =>
-          prev ? prev.map((m: UserMessages[number]) => (m.id === msgId ? { ...m, isRead: true } : m)) : prev,
-        );
-      } finally {
-        setUpdateLoading(false);
-      }
-    },
-    [updateAndCache],
-  );
+    data: { allReceivedMessages, unreadMessages },
+    loadingStates: { isPending, isLoading, isFetching, isUpdating },
+    actions: { updateMessageToRead, deleteMessage, updateLocalMessages },
+  } = useMessagesQuery();
 
   // Load listener
   useEffect(() => {
-    if (user) {
-      const cleanup = registerToMessagesListener(updateAndCache);
+    if (userId) {
+      const cleanup = registerToMessagesListener(updateLocalMessages);
       return cleanup;
     }
     return;
-  }, [updateAndCache, user]);
+  }, [updateLocalMessages, userId]);
 
   const value = useMemo<MessagesProviderValue>(
     () => ({
       unreadMessages: unreadMessages ?? [],
       allReceivedMessages: allReceivedMessages ?? [],
       updateMessageToRead,
-      fetchLoading,
-      updateLoading,
+      deleteMessage,
+      loadingStates: {
+        isPending,
+        isFetching,
+        isUpdating,
+        isLoading,
+      },
     }),
-    [unreadMessages, allReceivedMessages, updateMessageToRead, fetchLoading, updateLoading],
+    [unreadMessages, allReceivedMessages, updateMessageToRead, deleteMessage, isPending, isFetching, isUpdating, isLoading],
   );
 
   return <MessagesContext.Provider value={value}>{children}</MessagesContext.Provider>;
