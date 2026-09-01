@@ -1,6 +1,6 @@
-import type { AddWorkoutBody } from '@strong-together/shared';
+import type { ReplaceWorkoutPlanBody } from '@strong-together/shared';
 
-export type WorkoutData = AddWorkoutBody['workoutData'];
+export type WorkoutData = ReplaceWorkoutPlanBody['workoutData'];
 
 export type EditorState = {
   splits: WorkoutData;
@@ -31,6 +31,7 @@ export const initialEditorState: EditorState = {
 };
 
 // Applies a change only to the currently selected split.
+
 const updateSelectedSplit = (state: EditorState, update: (split: WorkoutData[number]) => WorkoutData[number]): EditorState => ({
   ...state,
   splits: state.splits.map((split, index) => (index === state.selectedSplitIndex ? update(split) : split)),
@@ -57,7 +58,13 @@ export const workoutEditorReducer = (state: EditorState, action: EditorAction): 
       const splits = state.splits
         .filter((_, index) => index !== state.selectedSplitIndex)
         .map((split, orderIndex) => ({ ...split, orderIndex }));
-      return { ...state, splits, selectedSplitIndex: Math.min(state.selectedSplitIndex, splits.length - 1), expandedExerciseId: null, isDirty: true };
+      return {
+        ...state,
+        splits,
+        selectedSplitIndex: Math.min(state.selectedSplitIndex, splits.length - 1),
+        expandedExerciseId: null,
+        isDirty: true,
+      };
     }
     case 'renameSplit':
       return updateSelectedSplit(state, (split) => ({ ...split, name: action.name }));

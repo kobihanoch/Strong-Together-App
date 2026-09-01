@@ -1,5 +1,5 @@
 import api from '../../../infrastructure/api/api-config/api';
-import { SetProfilePicAndUpdateDBResponse } from '@strong-together/shared';
+import { ReplaceProfilePictureResponse } from '@strong-together/shared';
 
 export type UploadableFile = {
   uri: string;
@@ -8,9 +8,8 @@ export type UploadableFile = {
 };
 
 // Return URL
-export const uploadProfilePictureToStorageAndGetPath = async (
-  file: UploadableFile,
-): Promise<SetProfilePicAndUpdateDBResponse> => {
+
+export const uploadProfilePictureToStorageAndGetPath = async (file: UploadableFile): Promise<ReplaceProfilePictureResponse> => {
   try {
     const formData = new FormData();
     formData.append('file', {
@@ -19,7 +18,7 @@ export const uploadProfilePictureToStorageAndGetPath = async (
       type: file.type || 'image/jpeg',
     } as unknown as Blob);
 
-    const { data } = await api.put<SetProfilePicAndUpdateDBResponse>('/api/users/setprofilepic', formData, {
+    const { data } = await api.put<ReplaceProfilePictureResponse>('/api/users/me/profile-picture', formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },

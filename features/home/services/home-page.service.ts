@@ -1,10 +1,11 @@
-import { GetExerciseTrackingQuery, GetExerciseTrackingStatsResponse } from '@strong-together/shared';
+import { GetWorkoutHistoryQuery, GetWorkoutStatisticsResponse } from '@strong-together/shared';
 import api from '../../../infrastructure/api/api-config/api';
 
 // Gets user exercise tracking data - including home page ata PR most common etc...
-export const getUserDashboardStats = async (): Promise<GetExerciseTrackingStatsResponse> => {
-  const { data } = await api.get<GetExerciseTrackingStatsResponse>(`/api/workouts/gettrackingstats`, {
-    params: { tz: Intl.DateTimeFormat().resolvedOptions().timeZone } satisfies GetExerciseTrackingQuery,
+
+export const getUserDashboardStats = async (): Promise<GetWorkoutStatisticsResponse> => {
+  const { data } = await api.get<GetWorkoutStatisticsResponse>(`/api/workout-statistics`, {
+    params: { tz: Intl.DateTimeFormat().resolvedOptions().timeZone } satisfies GetWorkoutHistoryQuery,
   });
   return data;
 };

@@ -1,4 +1,4 @@
-import { AddUserAerobicsBody } from '@strong-together/shared';
+import { CreateAerobicEntryBody } from '@strong-together/shared';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useCallback } from 'react';
 import { getStartOfWeek } from '../../../../shared/utils/shared-utils';
@@ -7,7 +7,7 @@ import { getUserCardio, logUserCardio } from '../services/cardio.service';
 import { CardioMaps } from '../types/cardio.types';
 import { checkIfDoneCardioInSelectedWeek, getCardioForToday } from '../utils/cardio.utils';
 
-type CardioInput = AddUserAerobicsBody['record'];
+type CardioInput = CreateAerobicEntryBody['record'];
 
 /**
  * Provides the authenticated user's persisted cardio server state.
@@ -25,6 +25,7 @@ export const useCardio = () => {
   // Fetching with SWR
   const query = useQuery({
     queryKey,
+
     queryFn: async (): Promise<CardioMaps> => await getUserCardio(),
     enabled: Boolean(isValidatedWithServer && userId),
     staleTime: 1000 * 60 * 5,
@@ -40,12 +41,14 @@ export const useCardio = () => {
       const data = await logUserCardio(cardioEntry);
       return data;
     },
+
     onSuccess: (updatedCardioMaps) => {
       queryClient.setQueryData<CardioMaps | null>(queryKey, updatedCardioMaps);
     },
   });
 
   // Update local
+
   const updateLocalCardioMaps = (updater: CardioMaps) => {
     if (userId) queryClient.setQueryData<CardioMaps>(queryKey, updater);
   };
@@ -63,6 +66,7 @@ export const useCardio = () => {
     },
     [weeklyCardioMap],
   );
+
   const cardioForSelectedWeek = (stringDate: string) => weeklyCardioMap?.[getStartOfWeek(stringDate)];
 
   return {

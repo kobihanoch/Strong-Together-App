@@ -1,12 +1,13 @@
-import { AddWorkoutBody } from '@strong-together/shared';
+import { ReplaceWorkoutPlanBody } from '@strong-together/shared';
 import api from '../../../../infrastructure/api/api-config/api';
-import { AddWorkoutResponse } from '@strong-together/shared';
+import { ReplaceWorkoutPlanResponse } from '@strong-together/shared';
 
 // Add a new workout plan
-export const addWorkout = async (workoutData: AddWorkoutBody['workoutData']): Promise<AddWorkoutResponse> => {
-  const { data } = await api.post<AddWorkoutResponse>('/api/workouts/add', {
+
+export const addWorkout = async (workoutData: ReplaceWorkoutPlanBody['workoutData']): Promise<ReplaceWorkoutPlanResponse> => {
+  const { data } = await api.put<ReplaceWorkoutPlanResponse>('/api/workout-plan', {
     workoutData,
     tz: Intl.DateTimeFormat().resolvedOptions().timeZone,
-  } satisfies AddWorkoutBody);
+  } satisfies ReplaceWorkoutPlanBody);
   return data;
 };

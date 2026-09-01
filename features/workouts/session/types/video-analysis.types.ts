@@ -1,4 +1,4 @@
-import type { GetPresignedUrlFromS3Body, SquatRepetitionDto } from '@strong-together/shared';
+import type { CreateVideoUploadUrlBody, SquatRepetitionDto } from '@strong-together/shared';
 
 export type SquatRepetition = SquatRepetitionDto;
-export type VideoUploadRequest = GetPresignedUrlFromS3Body;
+export type VideoUploadRequest = CreateVideoUploadUrlBody;

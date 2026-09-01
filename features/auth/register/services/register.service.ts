@@ -10,7 +10,7 @@ export const registerUser = async (
   gender: CreateUserBody['gender'],
 ): Promise<void> => {
   try {
-    await api.post<CreateUserResponse>('/api/users/create', {
+    await api.post<CreateUserResponse>('/api/users', {
       username,
       fullName,
       email,

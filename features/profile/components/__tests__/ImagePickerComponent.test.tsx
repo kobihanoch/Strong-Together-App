@@ -1,7 +1,13 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-require-imports */
 import React from 'react';
-import { beforeEach as jestBeforeEach, describe as jestDescribe, expect as jestExpect, it as jestIt, jest as jestObject, } from '@jest/globals';
+import {
+  beforeEach as jestBeforeEach,
+  describe as jestDescribe,
+  expect as jestExpect,
+  it as jestIt,
+  jest as jestObject,
+} from '@jest/globals';
 import { render, waitFor } from '@testing-library/react-native';
 import type { AuthProviderValue } from '../../../auth/shared/types/auth.types';
 import type { AppUser } from '../../../auth/shared/types/auth.types';
@@ -31,6 +37,7 @@ jestObject.mock('expo-image', () => ({
 
 jestObject.mock('expo-image-picker', () => ({
   requestMediaLibraryPermissionsAsync: () => mockRequestMediaLibraryPermissionsAsync(),
+
   launchImageLibraryAsync: () => mockLaunchImageLibraryAsync(),
   MediaTypeOptions: {
     Images: 'Images',
@@ -50,6 +57,7 @@ jestObject.mock('../../../auth/shared/providers/AuthProvider', () => ({
 
 jestObject.mock('../../hooks/use-media-uploads.hook', () => ({
   __esModule: true,
+
   default: () => mockMediaUploadsState,
 }));
 
@@ -171,9 +179,7 @@ jestDescribe('ImagePickerComponent', () => {
       });
     });
 
-    const updater = setUser.mock.calls[0][0] as (
-      prev: AppUser | null | undefined
-    ) => AppUser;
+    const updater = setUser.mock.calls[0][0] as (prev: AppUser | null | undefined) => AppUser;
     jestExpect(updater(createUser()).profilePicPath).toBe('avatars/user-1.jpg');
   });
 
@@ -196,13 +202,11 @@ jestDescribe('ImagePickerComponent', () => {
     );
 
     await waitFor(() => {
-      jestExpect(mockApiDelete).toHaveBeenCalledWith('/api/users/deleteprofilepic', {
+      jestExpect(mockApiDelete).toHaveBeenCalledWith('/api/users/me/profile-picture', {
         data: { path: 'avatars/user-1.jpg' },
       });
     });
-    const updater = setUser.mock.calls[0][0] as (
-      prev: AppUser | null | undefined
-    ) => AppUser;
+    const updater = setUser.mock.calls[0][0] as (prev: AppUser | null | undefined) => AppUser;
     jestExpect(updater(createUser({ profilePicPath: 'avatars/user-1.jpg' })).profilePicPath).toBeNull();
     jestExpect(setTriggerRemoveImg).toHaveBeenCalledWith(false);
   });

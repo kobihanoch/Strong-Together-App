@@ -1,4 +1,4 @@
-import type { AddWorkoutBody } from '@strong-together/shared';
+import type { ReplaceWorkoutPlanBody } from '@strong-together/shared';
 import React from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, TextInput, useWindowDimensions, View } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -7,7 +7,7 @@ import { fontFamilies, fontSizes } from '../../../../shared/constants/typography
 import EditorPressable from './EditorPressable';
 
 type Props = {
-  splits: AddWorkoutBody['workoutData'];
+  splits: ReplaceWorkoutPlanBody['workoutData'];
   selectedIndex: number;
   isCreateMode: boolean;
   isDirty: boolean;

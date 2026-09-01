@@ -72,7 +72,7 @@ function ImagePickerComponent({
   };
 
   const deleteProfilePicture = async () => {
-    await api.delete(`/api/users/deleteprofilepic`, {
+    await api.delete(`/api/users/me/profile-picture`, {
       data: { path: profileimagePath },
     });
 

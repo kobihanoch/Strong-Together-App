@@ -1,4 +1,4 @@
-import { UpdateUserBody } from '@strong-together/shared';
+import { UpdateCurrentUserBody } from '@strong-together/shared';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { SetStateAction } from 'react';
 import { updateSelfUser } from '../../../profile/services/user-update.service';
@@ -6,7 +6,7 @@ import { fetchSelfUserData } from '../services/auth.service';
 import { AppUser } from '../types/auth.types';
 import { useAuth } from '../providers/AuthProvider';
 
-type ModifiedUser = UpdateUserBody;
+type ModifiedUser = UpdateCurrentUserBody;
 
 /**
  * Provides the authenticated user's persisted profile server state.
@@ -24,6 +24,7 @@ export const useUser = () => {
 
   const query = useQuery({
     queryKey,
+
     queryFn: async (): Promise<AppUser> => await fetchSelfUserData(),
     enabled: Boolean(isValidatedWithServer && userId),
     staleTime: 1000 * 60 * 5,
@@ -36,6 +37,7 @@ export const useUser = () => {
       const { user } = await updateSelfUser(updatedUser);
       return user;
     },
+
     onSuccess: (user) => {
       queryClient.setQueryData<AppUser>(queryKey, user);
     },

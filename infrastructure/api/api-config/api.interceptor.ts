@@ -6,6 +6,7 @@ import { isDeviceOnline } from './helpers/network-check';
 import { addAppVersionHeader, addDpopHeader, addTracingHeader } from './helpers/header-injections';
 
 // Initalize interceptors
+
 export const initializeRequestInterceptor = (api: AxiosInstance) =>
   // Request interceptor
   api.interceptors.request.use(
@@ -25,6 +26,7 @@ export const initializeRequestInterceptor = (api: AxiosInstance) =>
 
       return config;
     },
+
     (error: unknown) => {
       return Promise.reject(error);
     },
@@ -45,6 +47,7 @@ export const initializeResponseInterceptor = (api: AxiosInstance) =>
 
   api.interceptors.response.use(
     (res: AxiosResponse) => finishHttpResponseSpan(res),
+
     async (error: AxiosError<{ message?: string }>) => {
       finishHttpErrorSpan(error);
 
@@ -69,7 +72,7 @@ export const initializeResponseInterceptor = (api: AxiosInstance) =>
         original?._retry ||
         url.includes('/api/auth/refresh') ||
         url.includes('/api/auth/login') ||
-        url.includes('/api/users/create') ||
+        url.includes('/api/users') ||
         url.includes('/api/auth/logout')
       ) {
         // Some toast to show error

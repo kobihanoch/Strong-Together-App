@@ -1,11 +1,11 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { AddWorkoutBody } from '@strong-together/shared';
+import { ReplaceWorkoutPlanBody } from '@strong-together/shared';
 import { getUserWorkout } from '../../plan/services/workout-plan.service';
 import { addWorkout } from '../../editor/services/workout-editor.service';
 import { WorkoutPlan } from '../types/workout-plan.types';
 import { useAuth } from '../../../auth/shared/providers/AuthProvider';
 
-type ModifiedWorkoutPlan = AddWorkoutBody['workoutData'];
+type ModifiedWorkoutPlan = ReplaceWorkoutPlanBody['workoutData'];
 
 /**
  * Provides the authenticated user's persisted workout-plan server state.
@@ -23,6 +23,7 @@ export const useWorkoutPlan = () => {
   // Fetching with SWR
   const query = useQuery({
     queryKey,
+
     queryFn: async (): Promise<WorkoutPlan | null> => (await getUserWorkout()).workoutPlan ?? null,
     enabled: Boolean(isValidatedWithServer && userId),
     staleTime: 1000 * 60 * 5,
@@ -38,12 +39,14 @@ export const useWorkoutPlan = () => {
       const { workoutPlan } = await addWorkout(editedPlan);
       return workoutPlan;
     },
+
     onSuccess: (updatedWorkoutPlan) => {
       queryClient.setQueryData<WorkoutPlan | null>(queryKey, updatedWorkoutPlan);
     },
   });
 
   // Update local
+
   const updateLocalWorkoutPlan = (updater: WorkoutPlan | null | ((prev: WorkoutPlan | null | undefined) => WorkoutPlan | null)) => {
     if (userId) queryClient.setQueryData<WorkoutPlan | null>(queryKey, updater);
   };

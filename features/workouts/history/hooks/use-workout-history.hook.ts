@@ -1,7 +1,7 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '../../../auth/shared/providers/AuthProvider';
 import { getUserExerciseTracking } from '../services/workout-history.service';
-import { WorkoutHistoryExerciseTrackingMaps } from '../types/workout-history.types';
+import { WorkoutHistoryMap } from '../types/workout-history.types';
 import { checkHasTrainedToday, checkHasVisibleHistory } from '../utils/workout-history-context.util';
 
 /**
@@ -20,15 +20,15 @@ export const useWorkoutHistory = () => {
   // Fetching with SWR
   const query = useQuery({
     queryKey,
-    queryFn: async (): Promise<WorkoutHistoryExerciseTrackingMaps> => await getUserExerciseTracking(),
+    queryFn: async (): Promise<WorkoutHistoryMap> => await getUserExerciseTracking(),
     enabled: Boolean(isValidatedWithServer && userId),
     staleTime: 1000 * 60 * 5,
     retry: false,
   });
 
   // Update local
-  const updateLocalExerciseTracking = (updater: WorkoutHistoryExerciseTrackingMaps) => {
-    if (userId) queryClient.setQueryData<WorkoutHistoryExerciseTrackingMaps>(queryKey, updater);
+  const updateLocalExerciseTracking = (updater: WorkoutHistoryMap) => {
+    if (userId) queryClient.setQueryData<WorkoutHistoryMap>(queryKey, updater);
   };
 
   // Main data

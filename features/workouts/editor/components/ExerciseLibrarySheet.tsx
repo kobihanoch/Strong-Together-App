@@ -1,4 +1,4 @@
-import type { AddWorkoutBody } from '@strong-together/shared';
+import type { ReplaceWorkoutPlanBody } from '@strong-together/shared';
 import React, { RefObject } from 'react';
 import { FlatList, Pressable, ScrollView, StyleSheet, Text, TextInput, useWindowDimensions, View } from 'react-native';
 import Animated, { FadeIn } from 'react-native-reanimated';
@@ -12,7 +12,7 @@ import { Exercise } from '../../plan/types/workout-plan.types';
 type Props = {
   modalRef: RefObject<SlidingBottomModalRef | null>;
   height: number;
-  split: AddWorkoutBody['workoutData'][number];
+  split: ReplaceWorkoutPlanBody['workoutData'][number];
   exercises: Exercise[];
   isLoading: boolean;
   muscles: string[];

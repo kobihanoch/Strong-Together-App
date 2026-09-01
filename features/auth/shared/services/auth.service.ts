@@ -1,10 +1,11 @@
 import api from '../../../../infrastructure/api/api-config/api';
-import { GetAuthenticatedUserByIdResponse, RefreshTokenResponse } from '@strong-together/shared';
+import { GetCurrentUserResponse, RefreshTokenResponse } from '@strong-together/shared';
 import { getRefreshToken } from '../utils/token-storage.utils';
 
 // Fetch self data
-export const fetchSelfUserData = async (): Promise<GetAuthenticatedUserByIdResponse> => {
-  const { data } = await api.get<GetAuthenticatedUserByIdResponse>('/api/users/get');
+
+export const fetchSelfUserData = async (): Promise<GetCurrentUserResponse> => {
+  const { data } = await api.get<GetCurrentUserResponse>('/api/users/me');
   return data;
 };
 

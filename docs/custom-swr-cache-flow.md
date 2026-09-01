@@ -73,11 +73,11 @@ The API bootstrap interceptor maps common startup endpoints to slices of one `/a
 
 | Request | Bootstrap slice |
 | ------- | --------------- |
-| `/api/users/get` | `user` |
-| `/api/workouts/gettracking` | `tracking` |
-| `/api/aerobics/get` | `aerobics` |
-| `/api/messages/getmessages` | `messages` |
-| `/api/workouts/getworkout` | `workout` |
+| `/api/users/me` | `user` |
+| `/api/workout-history` | `tracking` |
+| `/api/aerobics` | `aerobics` |
+| `/api/messages` | `messages` |
+| `/api/workout-plan` | `workout` |
 
 When bootstrap is open, tracked requests receive data through an Axios adapter instead of making duplicate network calls.
 

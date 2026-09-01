@@ -1,4 +1,4 @@
-import type { AddWorkoutBody } from '@strong-together/shared';
+import type { ReplaceWorkoutPlanBody } from '@strong-together/shared';
 import React, { useCallback } from 'react';
 import { Pressable, StyleSheet, Text, TextInput, useWindowDimensions, View } from 'react-native';
 import DraggableFlatList, { ScaleDecorator } from 'react-native-draggable-flatlist';
@@ -8,7 +8,7 @@ import type { AppThemeColors } from '../../../../shared/constants/theme';
 import { fontFamilies, fontSizes } from '../../../../shared/constants/typography';
 import { Exercise } from '../../plan/types/workout-plan.types';
 
-type ExerciseInput = AddWorkoutBody['workoutData'][number]['exercises'][number];
+type ExerciseInput = ReplaceWorkoutPlanBody['workoutData'][number]['exercises'][number];
 
 type Props = {
   exercises: ExerciseInput[];

@@ -35,7 +35,7 @@ export async function setupPush(userId: AppUser['id']) {
     if (!token) return null;
 
     // Add to DB
-    await api.put('/api/users/pushtoken', { token: token });
+    await api.put('/api/users/me/push-token', { token: token });
 
     return token;
   } catch (e) {

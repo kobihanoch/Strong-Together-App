@@ -4,11 +4,8 @@ import { act, renderHook, waitFor } from '@testing-library/react-native';
 import { afterEach, beforeEach, describe, expect, it, jest } from '@jest/globals';
 import { AxiosError } from 'axios';
 import { AppState } from 'react-native';
-import type { GetExerciseTrackingResponse } from '@strong-together/shared';
-import {
-  userWithWorkoutAndHistoryProfile,
-  userWithWorkoutNoHistoryProfile,
-} from '../../../../../tests/fixtures/userProfiles';
+import type { GetWorkoutHistoryResponse } from '@strong-together/shared';
+import { userWithWorkoutAndHistoryProfile, userWithWorkoutNoHistoryProfile } from '../../../../../tests/fixtures/userProfiles';
 
 jest.mock('axios', () => ({
   __esModule: true,
@@ -37,20 +34,16 @@ const mockCacheDeleteAllCacheWithoutStartWorkout = jest.fn<() => Promise<void>>(
 const mockGetRefreshToken = jest.fn<() => Promise<string | null>>();
 const mockSaveRefreshToken = jest.fn<(token: string) => Promise<void>>();
 const mockClearRefreshToken = jest.fn<() => Promise<void>>();
-const mockRefreshAndRotateTokens =
-  jest.fn<() => Promise<{ accessToken: string; refreshToken: string; userId: string }>>();
+const mockRefreshAndRotateTokens = jest.fn<() => Promise<{ accessToken: string; refreshToken: string; userId: string }>>();
 const mockFetchSelfUserData = jest.fn<() => Promise<typeof userWithWorkoutAndHistoryProfile.user>>();
 const mockGetUserWorkout = jest.fn<
-  () =>
-    Promise<{
-      workoutPlan: typeof userWithWorkoutAndHistoryProfile.workout;
-      workoutPlanForEditWorkout: typeof userWithWorkoutAndHistoryProfile.workoutForEdit;
-    }>
+  () => Promise<{
+    workoutPlan: typeof userWithWorkoutAndHistoryProfile.workout;
+    workoutPlanForEditWorkout: typeof userWithWorkoutAndHistoryProfile.workoutForEdit;
+  }>
 >();
-const mockGetUserExerciseTracking = jest.fn<() => Promise<GetExerciseTrackingResponse>>();
-const mockSaveWorkoutData = jest.fn<
-  (workout: unknown, startTime: number, endTime: number) => Promise<GetExerciseTrackingResponse>
->();
+const mockGetUserExerciseTracking = jest.fn<() => Promise<GetWorkoutHistoryResponse>>();
+const mockSaveWorkoutData = jest.fn<(workout: unknown, startTime: number, endTime: number) => Promise<GetWorkoutHistoryResponse>>();
 const mockConnectSocket = jest.fn<(username: string) => Promise<void>>();
 const mockDisconnectSocket = jest.fn<() => void>();
 const mockUseNetworkStatus = jest.fn<() => boolean>();
@@ -67,6 +60,7 @@ jest.mock('@react-navigation/native', () => {
     useNavigation: () => ({
       replace: (screen: string) => mockReplace(screen),
     }),
+
     useFocusEffect: (effect: () => void | (() => void)) => {
       ReactLocal.useEffect(() => effect(), [effect]);
     },
@@ -97,22 +91,30 @@ jest.mock('../../../../../infrastructure/cache/cache.utils', () => {
   const actual = jest.requireActual('../../../../../infrastructure/cache/cache.utils') as Record<string, unknown>;
   return {
     ...actual,
+
     cacheGetJSON: (key: string) => mockCacheGetJSON(key),
+
     cacheSetJSON: (key: string, value: unknown, ttl?: number) => mockCacheSetJSON(key, value, ttl),
+
     cacheDeleteKey: (key: string) => mockCacheDeleteKey(key),
+
     cacheDeleteAllCache: () => mockCacheDeleteAllCache(),
+
     cacheDeleteAllCacheWithoutStartWorkout: () => mockCacheDeleteAllCacheWithoutStartWorkout(),
   };
 });
 
 jest.mock('../../../../auth/shared/utils/token-storage.utils', () => ({
   getRefreshToken: () => mockGetRefreshToken(),
+
   saveRefreshToken: (token: string) => mockSaveRefreshToken(token),
+
   clearRefreshToken: () => mockClearRefreshToken(),
 }));
 
 jest.mock('../../../../auth/shared/services/auth.service', () => ({
   refreshAndRotateTokens: () => mockRefreshAndRotateTokens(),
+
   fetchSelfUserData: () => mockFetchSelfUserData(),
   loginUser: jest.fn(),
   logoutUser: jest.fn(),
@@ -128,12 +130,12 @@ jest.mock('../../../history/services/workout-history.service', () => ({
 }));
 
 jest.mock('../../services/workout-session.service', () => ({
-  saveWorkoutData: (workout: unknown, startTime: number, endTime: number) =>
-    mockSaveWorkoutData(workout, startTime, endTime),
+  saveWorkoutData: (workout: unknown, startTime: number, endTime: number) => mockSaveWorkoutData(workout, startTime, endTime),
 }));
 
 jest.mock('../../../../../infrastructure/socket', () => ({
   connectSocket: (username: string) => mockConnectSocket(username),
+
   disconnectSocket: () => mockDisconnectSocket(),
 }));
 
@@ -155,7 +157,9 @@ jest.mock('../../../../auth/shared/hooks/use-apple-auth.hook', () => ({
 
 jest.mock('../../../../../infrastructure/api/api-config/bootstrap', () => ({
   hasBootstrapPayload: () => mockHasBootstrapPayload(),
+
   resetBootstrap: () => mockResetBootstrap(),
+
   isOpen: () => false,
   ensureBootstrap: jest.fn(async () => ({})),
 }));
@@ -165,6 +169,7 @@ jest.mock('../../../../auth/shared/utils/auth.utils', () => ({
   default: {
     setAccessToken: (token: string | null) => mockSetAccessToken(token),
     logout: null,
+
     setUsernameInHeader: (username: string | null) => mockSetUsernameInHeader(username),
   },
 }));
@@ -246,7 +251,7 @@ const createPackedTrackingResponse = () => ({
   },
 });
 
-const createEmptyTrackingResponse = (): GetExerciseTrackingResponse => ({
+const createEmptyTrackingResponse = (): GetWorkoutHistoryResponse => ({
   exerciseTrackingMaps: userWithWorkoutNoHistoryProfile.exerciseTrackingMaps!,
   exerciseTrackingAnalysis: {
     uniqueDays: 0,
@@ -300,9 +305,7 @@ const createResumedWorkoutFromProfile = () => ({
   pausedTotal: 0,
 });
 
-const useIntegratedStartWorkoutPageLogic = (
-  resumedWorkout?: ReturnType<typeof createResumedWorkoutFromProfile>,
-) => {
+const useIntegratedStartWorkoutPageLogic = (resumedWorkout?: ReturnType<typeof createResumedWorkoutFromProfile>) => {
   const auth = useAuth();
   const workout = useWorkoutPlan();
   const analysis = useWorkoutHistory();
@@ -506,9 +509,7 @@ describe('use-start-workout-page-logic.hook integration', () => {
       expect.any(Number),
     );
     expect(result.current.analysis.exerciseTrackingMaps).toEqual(userWithWorkoutAndHistoryProfile.exerciseTrackingMaps);
-    expect(result.current.analysis.analyzedExerciseTrackingData).toEqual(
-      userWithWorkoutAndHistoryProfile.analyzedExerciseTrackingData,
-    );
+    expect(result.current.analysis.analyzedExerciseTrackingData).toEqual(userWithWorkoutAndHistoryProfile.analyzedExerciseTrackingData);
     expect(result.current.auth.isWorkoutMode).toBe(false);
     expect(mockCacheDeleteKey).toHaveBeenCalledWith(keyStartWorkout('user-1'));
     expect(mockReplace).toHaveBeenCalledWith('Statistics');
@@ -608,5 +609,3 @@ describe('use-start-workout-page-logic.hook integration', () => {
     });
   });
 });
-
-

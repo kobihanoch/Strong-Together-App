@@ -3,19 +3,19 @@ import { io, Socket } from 'socket.io-client';
 import api from './api/api-config/api';
 import { API_BASE_URL } from '../infrastructure/api/api-url.config';
 import { AppUser } from '../features/auth/shared/types/auth.types';
+import { CreateWebSocketTicketBody, CreateWebSocketTicketResponse } from '@strong-together/shared';
 
 let socket: Socket | null = null;
 
 // Helper to mint a fresh short-lived ticket
+
 async function mintTicket(username: AppUser['username']) {
-  // NOTE: adjust path to match your api base (avoid double "api")
-  const res = await api.post('api/ws/generateticket', { username });
+  const res = await api.post<CreateWebSocketTicketResponse>('/api/websocket-tickets', { username } satisfies CreateWebSocketTicketBody);
   const ticket = res?.data?.ticket;
   if (!ticket) throw new Error('Failed to get socket ticket');
   return ticket;
 }
 
-// English-only comments: reconnect with a fresh ticket (idempotent)
 async function reconnectWithFreshTicket(username: AppUser['username']) {
   if (!socket) return;
   try {

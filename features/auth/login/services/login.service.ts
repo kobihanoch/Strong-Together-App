@@ -1,10 +1,10 @@
 import api from '../../../../infrastructure/api/api-config/api';
 import {
-  ChangeEmailAndVerifyBody,
-  CheckUserVerifyQuery,
+  UpdateUnverifiedAccountEmailBody,
+  GetVerificationStatusQuery,
   LoginRequestBody,
-  SendChangePassEmailBody,
-  SendVerificationMailBody,
+  CreatePasswordResetRequestBody,
+  CreateVerificationEmailBody,
 } from '@strong-together/shared';
 import { LoginResponse } from '@strong-together/shared';
 
@@ -28,35 +28,35 @@ export const loginUser = async (
 };
 
 export const changeEmail = async (
-  username: ChangeEmailAndVerifyBody['username'],
-  password: ChangeEmailAndVerifyBody['password'],
-  newEmail: ChangeEmailAndVerifyBody['newEmail'],
+  username: UpdateUnverifiedAccountEmailBody['username'],
+  password: UpdateUnverifiedAccountEmailBody['password'],
+  newEmail: UpdateUnverifiedAccountEmailBody['newEmail'],
 ): Promise<void> => {
-  await api.put(
-    'api/auth/changeemailverify',
+  await api.patch(
+    '/api/auth/unverified-account/email',
     {
       username,
       password,
       newEmail,
-    } satisfies ChangeEmailAndVerifyBody,
+    } satisfies UpdateUnverifiedAccountEmailBody,
     { apiMode: 'guest' },
   );
 };
 
-export const forgotPassword = async (identifier: SendChangePassEmailBody['identifier']): Promise<void> => {
-  await api.post('api/auth/forgotpassemail', { identifier } satisfies SendChangePassEmailBody, { apiMode: 'guest' });
+export const forgotPassword = async (identifier: CreatePasswordResetRequestBody['identifier']): Promise<void> => {
+  await api.post('/api/auth/password-reset-requests', { identifier } satisfies CreatePasswordResetRequestBody, { apiMode: 'guest' });
 };
 
-export const checkUserVerify = async (username: CheckUserVerifyQuery['username']): Promise<{ isVerified: boolean }> => {
-  const { data } = await api.get<{ isVerified: boolean }>(`api/auth/checkuserverify`, {
+export const checkUserVerify = async (username: GetVerificationStatusQuery['username']): Promise<{ isVerified: boolean }> => {
+  const { data } = await api.get<{ isVerified: boolean }>(`/api/auth/verification-status`, {
     params: {
       username,
-    } satisfies CheckUserVerifyQuery,
+    } satisfies GetVerificationStatusQuery,
     apiMode: 'guest',
   });
   return data;
 };
 
-export const sendVerificationMail = async (email: SendVerificationMailBody['email']) => {
-  await api.post('api/auth/sendverificationemail', { email } satisfies SendVerificationMailBody, { apiMode: 'guest' });
+export const sendVerificationMail = async (email: CreateVerificationEmailBody['email']) => {
+  await api.post('/api/auth/verification-emails', { email } satisfies CreateVerificationEmailBody, { apiMode: 'guest' });
 };
