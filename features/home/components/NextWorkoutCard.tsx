@@ -9,6 +9,7 @@ import { AppThemeColors } from '../../../shared/constants/theme';
 import { fontFamilies, fontSizes } from '../../../shared/constants/typography';
 import { createSharedComponentStyles } from '../../../shared/styles/component.styles';
 import { HomeDashboardData } from '../types/use-home-page.types';
+import { getBodyPartsForSplit } from '../../workouts/plan/utils/workout-plan.util';
 
 type Props = {
   data: HomeDashboardData['nextWorkout'];
@@ -32,7 +33,7 @@ const NextWorkoutCard = ({ data, theme, isFirstWorkout, onStart }: Props) => {
         <Text style={styles.eyebrow}>{isFirstWorkout ? 'YOUR FIRST WORKOUT' : "TODAY'S WORKOUT"}</Text>
         <Text style={styles.title}>{data.name}</Text>
         <Text style={styles.meta}>
-          {data.muscleGroup} · {data.exerciseCount} exercises · {data.setCount} sets
+          {getBodyPartsForSplit(data.muscleGroup)} · {data.exerciseCount} exercises · {data.setCount} sets
         </Text>
         <TouchableOpacity style={[common.primaryButton, styles.button]} onPress={onStart} activeOpacity={0.85}>
           <Text style={common.primaryButtonText}>{isFirstWorkout ? 'Start first workout' : 'Start workout'}</Text>
