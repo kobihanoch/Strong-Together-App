@@ -4,6 +4,7 @@ import { handle401, handleNetworkProblems, handleUpdateRequired } from './helper
 import { finishHttpErrorSpan, finishHttpResponseSpan } from '../tracing/sentry-tracing';
 import { isDeviceOnline } from './helpers/network-check';
 import { addAppVersionHeader, addDpopHeader, addTracingHeader } from './helpers/header-injections';
+import { isUserRegistrationRequest } from './helpers/refresh-exclusions';
 
 // Initalize interceptors
 
@@ -72,7 +73,7 @@ export const initializeResponseInterceptor = (api: AxiosInstance) =>
         original?._retry ||
         url.includes('/api/auth/refresh') ||
         url.includes('/api/auth/login') ||
-        url.includes('/api/users') ||
+        isUserRegistrationRequest(url, original.method) ||
         url.includes('/api/auth/logout')
       ) {
         // Some toast to show error
