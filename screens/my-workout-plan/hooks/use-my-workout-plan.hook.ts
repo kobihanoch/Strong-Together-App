@@ -10,12 +10,12 @@ import {
 } from '../utils/my-workout-plan.utils';
 
 import useDashboard from '../../../features/dashboard/use-dashboard.hook';
+import { useExerciseHistory } from '../../../features/workouts/history/hooks/use-exercise-history.hook';
 import { useWorkoutHistory } from '../../../features/workouts/history/hooks/use-workout-history.hook';
 import { useWorkoutPlan } from '../../../features/workouts/plan/hooks/use-workout-plan.hook';
-import { WorkoutSplit } from '../../../features/workouts/plan/types/workout-plan.types';
+import { ExerciseInPlan, WorkoutSplit } from '../../../features/workouts/plan/types/workout-plan.types';
 import { RootParamList } from '../../../navigation/types/appStackTypes';
 import { useAppTheme } from '../../../shared/providers/AppThemeProvider';
-import { createMockExercisePerformance } from '../mocks/exercise-performance.mock';
 
 export type MyWorkoutPlanReturn = ReturnType<typeof useMyWorkoutPlan>;
 
@@ -28,48 +28,53 @@ const useMyWorkoutPlan = () => {
   const navigation = useNavigation<StackNavigationProp<RootParamList>>();
   const { colors: theme } = useAppTheme();
   const { data: workoutPlanData, loadingStates: workoutPlanLoadingStates } = useWorkoutPlan();
-  const { data: historyData, loadingStates: historyLoadingStates } = useWorkoutHistory();
+  const { data: workoutHistoryData, loadingStates: workoutHistoryLoadingStates } = useWorkoutHistory();
+  const { data: exerciseHistoryData, loadingStates: exerciseHistoryLoadingStates } = useExerciseHistory();
   const { data: dashboardData, loadingStates: dashboardLoadingStates } = useDashboard();
-
   const { hasWorkoutPlan, workoutPlan, workoutSplits } = workoutPlanData;
 
-  const [selectedSplitId, setSelectedSplitId] = useState<number | null>(null);
+  // States
+  const [selectedSplitId, setSelectedSplitId] = useState<WorkoutSplit['id'] | null>(null);
+  const [expandedExerciseToSplitId, setExpandedExerciseToSplitId] = useState<ExerciseInPlan['exerciseToSplitId'] | null>(null);
 
+  // Intial set for split
   useEffect(() => {
     if (!workoutSplits.length) return setSelectedSplitId(null);
     if (!workoutSplits.some((split) => split.id === selectedSplitId)) setSelectedSplitId(workoutSplits[0].id);
   }, [selectedSplitId, workoutSplits]);
 
+  // Derived
   const selectedSplit = useMemo<WorkoutSplit | null>(
     () => selectWorkoutSplit(workoutSplits, selectedSplitId),
     [selectedSplitId, workoutSplits],
   );
   const selectedSplitDetails = useMemo(() => deriveSelectedSplitDetails(selectedSplit), [selectedSplit]);
 
-  // Need to change
-  const exercisePerformance = useMemo(() => createMockExercisePerformance(workoutSplits), [workoutSplits]);
-  const expandedExercisePerformance = selectedSplit ? exercisePerformance.byExerciseToSplitId : {};
-  // -----------------
+  const expandedExercisePerformance = exerciseHistoryData.getLastPerformanceForExercise(expandedExerciseToSplitId);
 
-  const weekDays = useMemo(() => deriveWorkoutWeekDays(historyData.workoutHistoryMap), [historyData.workoutHistoryMap]);
+  const weekDays = useMemo(() => deriveWorkoutWeekDays(workoutHistoryData.workoutHistoryMap), [workoutHistoryData.workoutHistoryMap]);
   const selectedSplitDates = useMemo(
-    () => deriveSelectedSplitDates(historyData.workoutHistoryMap, selectedSplit),
-    [historyData.workoutHistoryMap, selectedSplit],
+    () => deriveSelectedSplitDates(workoutHistoryData.workoutHistoryMap, selectedSplit),
+    [workoutHistoryData.workoutHistoryMap, selectedSplit],
   );
   const targets = deriveWorkoutTargets(dashboardData);
-  const isPending = workoutPlanLoadingStates.isPending || dashboardLoadingStates.isPending || historyLoadingStates.isPending;
+  const isPending =
+    workoutPlanLoadingStates.isPending ||
+    dashboardLoadingStates.isPending ||
+    workoutHistoryLoadingStates.isPending ||
+    exerciseHistoryLoadingStates.isPending;
 
   return {
     data: {
       theme,
       isPending,
-      isLoading: isPending,
       hasWorkoutPlan,
       workoutPlan,
       workoutSplits,
       selectedSplit,
+      expandedExerciseToSplitId,
       ...selectedSplitDetails,
-      hasTrainedToday: historyData.hasTrainedToday,
+      hasTrainedToday: workoutHistoryData.hasTrainedToday,
       ...targets,
       weekDays,
       lastCompletedDate: selectedSplitDates[0] ?? null,
@@ -77,6 +82,7 @@ const useMyWorkoutPlan = () => {
     },
     actions: {
       selectSplit: (split: WorkoutSplit) => setSelectedSplitId(split.id),
+      setExpandedExerciseToSplitId,
       createPlan: () => navigation.navigate('CreateWorkout'),
       editPlan: () => navigation.navigate('CreateWorkout'),
       startWorkout: () => selectedSplit && navigation.navigate('StartWorkout', { workoutSplit: selectedSplit }),

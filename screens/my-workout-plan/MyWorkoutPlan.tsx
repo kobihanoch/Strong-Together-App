@@ -14,10 +14,9 @@ const MyWorkoutPlan = () => {
   const { width, height } = useWindowDimensions();
   const gutter = Math.max(14, Math.min(width * 0.045, 22));
 
-  if (data.isPending) return <WorkoutPlanSkeleton />;
-  if (!data.hasWorkoutPlan) return <NoWorkoutPlan onCreatePress={actions.createPlan} />;
   const split = data.selectedSplit;
-  if (!split) return null;
+  if (data.isPending || !split) return <WorkoutPlanSkeleton />;
+  if (!data.hasWorkoutPlan) return <NoWorkoutPlan onCreatePress={actions.createPlan} />;
 
   return (
     <SafeAreaView style={[styles.safeArea, { backgroundColor: data.theme.canvas }]} edges={['top']}>
@@ -32,7 +31,13 @@ const MyWorkoutPlan = () => {
         <WorkoutPlanHeader theme={data.theme} />
         <WorkoutPlanSummary data={data} split={split} onStart={actions.startWorkout} onEdit={actions.editPlan} />
         <WorkoutSplitSelector theme={data.theme} splits={data.workoutSplits} selectedSplit={split} onSelect={actions.selectSplit} />
-        <WorkoutPlanExerciseList theme={data.theme} split={split} performanceByAssignmentId={data.exercisePerformanceByAssignmentId} />
+        <WorkoutPlanExerciseList
+          theme={data.theme}
+          onExerciseExpand={actions.setExpandedExerciseToSplitId}
+          split={split}
+          performanceByAssignmentId={data.exercisePerformanceByAssignmentId}
+          expandedExerciseId={data.expandedExerciseToSplitId}
+        />
       </ScrollView>
     </SafeAreaView>
   );

@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+/*import React, { useEffect, useRef, useState } from 'react';
 import { Dimensions, StyleSheet } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 import { RFValue } from 'react-native-responsive-fontsize';
@@ -9,10 +9,10 @@ import TabSelect, { TabSelectHandleRef } from '../components/TabSelect';
 import WorkoutHeader from '../components/WorkoutHeader';
 import useStatisticsPageLogic from '../hooks/use-statistics-page-logic.hook';
 
-const { width, height } = Dimensions.get('window');
+const { width, height } = Dimensions.get('window');*/
 
-const StatisticsPage = () => {
-  const {
+const StatisticsPage = () => {};
+/*const {
     selectedDate,
     setSelectedDate,
     exerciseTrackingByDate, // Workout for date X
@@ -62,6 +62,6 @@ const styles = StyleSheet.create({
     paddingVertical: height * 0,
     paddingHorizontal: width * 0,
   },
-});
+});*/
 
 export default StatisticsPage;

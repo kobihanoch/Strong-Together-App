@@ -21,7 +21,7 @@ export const lightThemeColors: AppThemeColors = {
   canvas: '#FAF8F5',
   surface: '#FFFFFF',
   surfaceMuted: '#F2EEE8',
-  border: '#E7E0D8',
+  border: '#dddad636',
   textPrimary: '#17130F',
   textSecondary: '#756B61',
   primary: '#2977ff',

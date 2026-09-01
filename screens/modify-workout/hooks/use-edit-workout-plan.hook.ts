@@ -4,11 +4,11 @@ import { useCallback, useEffect, useMemo, useReducer, useRef, useState } from 'r
 import { Alert, BackHandler } from 'react-native';
 import { RootParamList } from '../../../navigation/types/appStackTypes';
 import { useAppTheme } from '../../../shared/providers/AppThemeProvider';
-import type { Exercise } from '../../../features/workouts/plan/types/workout-plan.types';
 import { useWorkoutPlan } from '../../../features/workouts/plan/hooks/use-workout-plan.hook';
 import { initialEditorState, workoutEditorReducer, type WorkoutData } from '../reducers/workout-editor.reducer';
 import useExercises from '../../../features/workouts/plan/hooks/use-exercises.hook';
 import { showErrorAlert } from '../../../shared/alerts/error-alerts';
+import { Exercise } from '../../../features/workouts/plan/types/exercises.types';
 
 const MAX_SPLITS = 6;
 const MAX_EXERCISES = 12;
@@ -21,7 +21,7 @@ const useEditWorkoutPlan = () => {
     loadingStates: workoutPlanLoadingStates,
     actions: { updateWorkoutPlan },
   } = useWorkoutPlan();
-  const { exercises: availableExercises, loading: exercisesLoading } = useExercises();
+  const { data: availableExercises, loadingStates: exercisesLoadingStates } = useExercises();
 
   // The reducer owns all related plan-editing state.
   const [editor, dispatch] = useReducer(workoutEditorReducer, initialEditorState);
@@ -53,13 +53,13 @@ const useEditWorkoutPlan = () => {
   // Display-only exercise metadata is looked up separately from the request body.
   const allExercises = useMemo<Exercise[]>(
     () =>
-      Object.entries(availableExercises).flatMap(([targetMuscle, exercises]) =>
+      Object.entries(availableExercises ?? {}).flatMap(([targetMuscle, exercises]) =>
         exercises.map((exercise) => ({ ...exercise, targetMuscle })),
       ),
     [availableExercises],
   );
   const exercisesById = useMemo(() => new Map(allExercises.map((exercise) => [exercise.id, exercise])), [allExercises]);
-  const muscles = useMemo(() => ['All', ...Object.keys(availableExercises)], [availableExercises]);
+  const muscles = useMemo(() => (availableExercises ? ['All', ...Object.keys(availableExercises)] : ['All']), [availableExercises]);
   const filteredExercises = useMemo(() => {
     const query = exerciseQuery.trim().toLowerCase();
     return allExercises.filter(
@@ -136,9 +136,9 @@ const useEditWorkoutPlan = () => {
       theme,
       isCreateMode: !workoutPlan,
       isLoading: workoutPlanLoadingStates.isPending || !initialized.current,
-      exercisesLoading,
+      exercisesLoading: exercisesLoadingStates.isPending,
       themeMode,
-      isSaving: isSavingRef.current || workoutPlanLoadingStates.isUpdating,
+      isSaving: isSavingRef.current || workoutPlanLoadingStates.isPending,
       isDirty,
       splits,
       selectedSplit,

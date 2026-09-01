@@ -26,7 +26,9 @@ const WorkoutPlanSummary = ({ data, split, onStart, onEdit }: Props) => {
     <View style={[styles.card, { backgroundColor: data.theme.heroSurface }]}>
       <Text style={[styles.mutedText, styles.label, { color: data.theme.white }]}>CURRENT SPLIT</Text>
       <View style={styles.titleRow}>
-        <Text numberOfLines={1} style={[styles.title, { color: data.theme.white }]}>{split.name}</Text>
+        <Text numberOfLines={1} style={[styles.title, { color: data.theme.white }]}>
+          {split.name}
+        </Text>
         <View style={[styles.status, { borderColor: data.theme.primary }]}>
           <Text style={[styles.statusText, { color: data.theme.white }]}>{data.hasTrainedToday ? 'DONE TODAY' : 'READY'}</Text>
         </View>
@@ -37,7 +39,10 @@ const WorkoutPlanSummary = ({ data, split, onStart, onEdit }: Props) => {
         <Text style={[styles.dividerText, { color: data.theme.white }]}>·</Text>
         <Metric theme={data.theme} icon="layers-outline" text={`${data.setCount} sets`} />
         {split.estimatedDurationMinutes != null && (
-          <><Text style={[styles.dividerText, { color: data.theme.white }]}>·</Text><Metric theme={data.theme} icon="clock-outline" text={`~${Math.round(split.estimatedDurationMinutes)} min`} /></>
+          <>
+            <Text style={[styles.dividerText, { color: data.theme.white }]}>·</Text>
+            <Metric theme={data.theme} icon="clock-outline" text={`~${Math.round(split.estimatedDurationMinutes)} min`} />
+          </>
         )}
       </View>
 
@@ -45,7 +50,9 @@ const WorkoutPlanSummary = ({ data, split, onStart, onEdit }: Props) => {
         <View style={styles.progressBlock}>
           <View style={styles.progressLabels}>
             <Text style={[styles.mutedText, styles.progressLabel, { color: data.theme.white }]}>WEEKLY GOAL</Text>
-            <Text style={[styles.mutedText, styles.progressValue, { color: data.theme.white }]}>{data.completedThisWeek} of {data.weeklyTarget}</Text>
+            <Text style={[styles.mutedText, styles.progressValue, { color: data.theme.white }]}>
+              {data.completedThisWeek} of {data.weeklyTarget}
+            </Text>
           </View>
           <View style={[styles.progressTrack, { backgroundColor: data.theme.border }]}>
             <View style={[styles.progressFill, { width: `${progress * 100}%`, backgroundColor: data.theme.primary }]} />
@@ -58,7 +65,13 @@ const WorkoutPlanSummary = ({ data, split, onStart, onEdit }: Props) => {
           <View key={day.date} style={styles.day}>
             <Text style={[styles.mutedText, styles.dayLabel, { color: data.theme.white }]}>{day.label}</Text>
             <View style={[styles.todayRing, day.isToday && { borderColor: data.theme.white }]}>
-              <View style={[styles.dayDot, { borderColor: data.theme.border }, day.trained && { backgroundColor: data.theme.primary, borderColor: data.theme.primary }]} />
+              <View
+                style={[
+                  styles.dayDot,
+                  { borderColor: data.theme.border },
+                  day.trained && { backgroundColor: data.theme.primary, borderColor: data.theme.primary },
+                ]}
+              />
             </View>
           </View>
         ))}
@@ -66,15 +79,24 @@ const WorkoutPlanSummary = ({ data, split, onStart, onEdit }: Props) => {
 
       <View style={styles.lastDoneRow}>
         <MaterialCommunityIcons name="calendar-blank-outline" size={fontSizes.body} color={data.theme.white} style={styles.mutedIcon} />
-        <Text style={[styles.mutedText, styles.lastDone, { color: data.theme.white }]}>{lastDone ? `Last done ${lastDone.toLowerCase()}` : 'No previous workout'}</Text>
+        <Text style={[styles.mutedText, styles.lastDone, { color: data.theme.white }]}>
+          {lastDone ? `Last done ${lastDone.toLowerCase()}` : 'No previous workout'}
+        </Text>
       </View>
 
       <View style={styles.actions}>
-        <Pressable disabled={data.hasTrainedToday} onPress={onStart} style={({ pressed }) => [common.primaryButton, styles.startButton, { opacity: data.hasTrainedToday ? 0.5 : pressed ? 0.84 : 1 }]}>
+        <Pressable
+          disabled={data.hasTrainedToday}
+          onPress={onStart}
+          style={({ pressed }) => [common.primaryButton, styles.startButton, { opacity: data.hasTrainedToday ? 0.5 : pressed ? 0.84 : 1 }]}
+        >
           <MaterialCommunityIcons name="play" size={fontSizes.title} color={data.theme.white} />
           <Text style={[common.primaryButtonText, styles.startText]}>{data.hasTrainedToday ? 'Completed today' : 'Start workout'}</Text>
         </Pressable>
-        <Pressable onPress={onEdit} style={({ pressed }) => [styles.editButton, { borderColor: data.theme.border }, pressed && styles.pressed]}>
+        <Pressable
+          onPress={onEdit}
+          style={({ pressed }) => [styles.editButton, { borderColor: data.theme.border }, pressed && styles.pressed]}
+        >
           <MaterialCommunityIcons name="pencil-outline" size={fontSizes.title} color={data.theme.white} />
           <Text style={[styles.editText, { color: data.theme.white }]}>Edit</Text>
         </Pressable>
@@ -83,8 +105,19 @@ const WorkoutPlanSummary = ({ data, split, onStart, onEdit }: Props) => {
   );
 };
 
-const Metric = ({ theme, icon, text }: { theme: PlanData['theme']; icon: 'dumbbell' | 'layers-outline' | 'clock-outline'; text: string }) => (
-  <View style={metricStyles.container}><MaterialCommunityIcons name={icon} size={fontSizes.body} color={theme.white} style={metricStyles.muted} /><Text style={[metricStyles.text, { color: theme.white }]}>{text}</Text></View>
+const Metric = ({
+  theme,
+  icon,
+  text,
+}: {
+  theme: PlanData['theme'];
+  icon: 'dumbbell' | 'layers-outline' | 'clock-outline';
+  text: string;
+}) => (
+  <View style={metricStyles.container}>
+    <MaterialCommunityIcons name={icon} size={fontSizes.body} color={theme.white} style={metricStyles.muted} />
+    <Text style={[metricStyles.text, { color: theme.white }]}>{text}</Text>
+  </View>
 );
 
 const metricStyles = StyleSheet.create({
@@ -103,9 +136,20 @@ const createStyles = (width: number, height: number) => {
     label: { fontFamily: fontFamilies.medium, fontSize: fontSizes.caption, letterSpacing: 1.2 },
     titleRow: { marginTop: Math.max(8, height * 0.011), flexDirection: 'row', alignItems: 'center', gap: Math.max(9, width * 0.03) },
     title: { flexShrink: 1, fontFamily: fontFamilies.bold, fontSize: fontSizes.metric },
-    status: { borderWidth: 1, borderRadius: 10, paddingHorizontal: Math.max(8, width * 0.025), paddingVertical: Math.max(4, height * 0.006) },
+    status: {
+      borderWidth: 1,
+      borderRadius: 10,
+      paddingHorizontal: Math.max(8, width * 0.025),
+      paddingVertical: Math.max(4, height * 0.006),
+    },
     statusText: { fontFamily: fontFamilies.medium, fontSize: fontSizes.caption, letterSpacing: 0.8 },
-    metrics: { marginTop: Math.max(11, height * 0.016), flexDirection: 'row', alignItems: 'center', flexWrap: 'wrap', gap: Math.max(5, width * 0.018) },
+    metrics: {
+      marginTop: Math.max(11, height * 0.016),
+      flexDirection: 'row',
+      alignItems: 'center',
+      flexWrap: 'wrap',
+      gap: Math.max(5, width * 0.018),
+    },
     dividerText: { opacity: 0.38 },
     progressBlock: { marginTop: Math.max(14, height * 0.021) },
     progressLabels: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: Math.max(5, height * 0.008) },
@@ -116,7 +160,15 @@ const createStyles = (width: number, height: number) => {
     weekRow: { flexDirection: 'row', justifyContent: 'space-between', marginTop: Math.max(13, height * 0.019) },
     day: { alignItems: 'center', gap: Math.max(4, height * 0.006) },
     dayLabel: { fontFamily: fontFamilies.medium, fontSize: fontSizes.caption },
-    todayRing: { width: dot + 8, height: dot + 8, borderRadius: (dot + 8) / 2, borderWidth: 1, borderColor: 'transparent', alignItems: 'center', justifyContent: 'center' },
+    todayRing: {
+      width: dot + 8,
+      height: dot + 8,
+      borderRadius: (dot + 8) / 2,
+      borderWidth: 1,
+      borderColor: 'transparent',
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
     dayDot: { width: dot, height: dot, borderRadius: dot / 2, borderWidth: 1.5 },
     lastDoneRow: { marginTop: Math.max(12, height * 0.018), flexDirection: 'row', alignItems: 'center', gap: Math.max(5, width * 0.018) },
     mutedIcon: { opacity: 0.68 },
@@ -124,7 +176,17 @@ const createStyles = (width: number, height: number) => {
     actions: { marginTop: Math.max(14, height * 0.021), flexDirection: 'row', gap: Math.max(7, width * 0.022) },
     startButton: { minHeight: buttonHeight, flex: 1, justifyContent: 'center', gap: 7, borderRadius: Math.max(15, width * 0.04) },
     startText: { flex: 0, marginLeft: 0 },
-    editButton: { minHeight: buttonHeight, minWidth: Math.max(82, width * 0.22), paddingHorizontal: Math.max(12, width * 0.035), borderRadius: Math.max(15, width * 0.04), borderWidth: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6 },
+    editButton: {
+      minHeight: buttonHeight,
+      minWidth: Math.max(82, width * 0.22),
+      paddingHorizontal: Math.max(12, width * 0.035),
+      borderRadius: Math.max(15, width * 0.04),
+      borderWidth: 1,
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      gap: 6,
+    },
     editText: { fontFamily: fontFamilies.semiBold, fontSize: fontSizes.bodySmall },
     pressed: { opacity: 0.72 },
   });

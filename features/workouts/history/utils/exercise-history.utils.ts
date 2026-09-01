@@ -8,8 +8,9 @@ export const checkHasVisibleHistory = (exerciseHistoryMap: ExerciseHistoryMap | 
 
 export const getLastLogPerformance = (
   exerciseHistoryMap: ExerciseHistoryMap | undefined | null,
-  exerciseToSplitId: ExerciseInPlan['exerciseToSplitId'],
+  exerciseToSplitId: ExerciseInPlan['exerciseToSplitId'] | null,
 ) => {
-  const lastOccured = exerciseHistoryMap?.byExerciseToSplitId[exerciseToSplitId].exerciseTracked[0] ?? null;
+  if (!exerciseToSplitId || !exerciseHistoryMap) return null;
+  const lastOccured = exerciseHistoryMap?.byExerciseToSplitId?.[exerciseToSplitId]?.exerciseTracked?.[0] ?? null;
   return lastOccured ? { performance: lastOccured?.sets, date: lastOccured?.workoutStartLocal } : null;
 };

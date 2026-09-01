@@ -69,7 +69,7 @@ const Register = () => {
                 <Text style={styles.introText}>Intro</Text>
               </View>
             </TouchableOpacity>
-            <Image source={require('../../../../assets/minilogoNew.png')} style={styles.logoImage} />
+            <Image source={require('../../assets/minilogoNew.png')} style={styles.logoImage} />
           </View>
 
           <View style={styles.body}>

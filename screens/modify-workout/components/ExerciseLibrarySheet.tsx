@@ -7,7 +7,7 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 import SlidingBottomModal, { SlidingBottomModalRef } from '../../../shared/components/SlidingBottomModal';
 import type { AppThemeColors, AppThemeMode } from '../../../shared/constants/theme';
 import { fontFamilies, fontSizes } from '../../../shared/constants/typography';
-import { Exercise } from '../../../features/workouts/plan/types/workout-plan.types';
+import { Exercise } from '../../../features/workouts/plan/types/exercises.types';
 
 type Props = {
   modalRef: RefObject<SlidingBottomModalRef | null>;
@@ -64,7 +64,12 @@ const ExerciseLibrarySheet = ({
         </View>
 
         {!isLoading && (
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.filters}>
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            style={styles.filterScroll}
+            contentContainerStyle={styles.filters}
+          >
             {muscles.map((muscle) => {
               const active = muscle === selectedMuscle;
               return (
@@ -142,6 +147,7 @@ const styles = StyleSheet.create({
     marginTop: 16,
   },
   searchInput: { flex: 1, fontFamily: fontFamilies.regular, fontSize: fontSizes.bodySmall },
+  filterScroll: { flexGrow: 0 },
   filters: { gap: 7, paddingVertical: 12 },
   filter: { paddingHorizontal: 14, height: 34, borderRadius: 12, alignItems: 'center', justifyContent: 'center' },
   filterText: { fontFamily: fontFamilies.medium, fontSize: fontSizes.label },

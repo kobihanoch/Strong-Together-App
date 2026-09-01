@@ -149,7 +149,7 @@ const Intro = () => {
                   }}
                 >
                   <Image
-                    source={require('../../../../assets/googleicon.png')}
+                    source={require('../../assets/googleicon.png')}
                     style={{ height: 28, aspectRatio: 1 }}
                     contentFit="contain"
                     cachePolicy="disk"

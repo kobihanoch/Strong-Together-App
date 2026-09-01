@@ -5,7 +5,7 @@ import { fontFamilies, fontSizes } from '../../../shared/constants/typography';
 import { createSharedComponentStyles } from '../../../shared/styles/component.styles';
 import { formatDate } from '../../../shared/utils/shared-utils';
 import type { MyWorkoutPlanReturn } from '../hooks/use-my-workout-plan.hook';
-import type { ExercisePerformanceEntry } from '../types/my-workout-plan.types';
+import { ExerciseInPlan } from '../../../features/workouts/plan/types/workout-plan.types';
 
 type PlanData = MyWorkoutPlanReturn['data'];
 type Exercise = NonNullable<PlanData['selectedSplit']>['exercises'][number];
@@ -14,9 +14,9 @@ type Props = {
   exercise: Exercise;
   index: number;
   expanded: boolean;
-  performance?: ExercisePerformanceEntry;
+  performance?: PlanData['exercisePerformanceByAssignmentId'];
   theme: PlanData['theme'];
-  onToggle: () => void;
+  onToggle: React.Dispatch<React.SetStateAction<ExerciseInPlan['exerciseToSplitId'] | null>>;
 };
 
 const WorkoutPlanExerciseRow = ({ exercise, index, expanded, performance, theme, onToggle }: Props) => {
@@ -27,7 +27,7 @@ const WorkoutPlanExerciseRow = ({ exercise, index, expanded, performance, theme,
     <Pressable
       accessibilityRole="button"
       accessibilityState={{ expanded }}
-      onPress={onToggle}
+      onPress={() => onToggle((prev) => (prev === exercise.exerciseToSplitId ? null : exercise.exerciseToSplitId))}
       style={({ pressed }) => [common.card, styles.card, { borderColor: theme.border, opacity: pressed ? 0.84 : 1 }]}
     >
       <View style={styles.summaryRow}>
@@ -51,17 +51,15 @@ const WorkoutPlanExerciseRow = ({ exercise, index, expanded, performance, theme,
         <View style={[styles.expanded, { borderTopColor: theme.border }]}>
           <View style={styles.performanceHeader}>
             <Text style={[styles.performanceLabel, { color: theme.textSecondary }]}>LAST PERFORMANCE</Text>
-            {performance && (
-              <Text style={[styles.performanceDate, { color: theme.textSecondary }]}>{formatDate(performance.workoutDate)}</Text>
-            )}
+            {performance && <Text style={[styles.performanceDate, { color: theme.textSecondary }]}>{formatDate(performance.date)}</Text>}
           </View>
           {performance ? (
             <View style={styles.performanceSets}>
-              {performance.exerciseTracking.sets.map((set, setIndex) => (
+              {performance.performance.map((set, setIndex) => (
                 <View key={`${set.setIndex}-${setIndex}`} style={[styles.performanceSet, { backgroundColor: theme.surfaceMuted }]}>
                   <Text style={[styles.setLabel, { color: theme.textSecondary }]}>SET {setIndex + 1}</Text>
                   <Text style={[styles.setValue, { color: theme.textPrimary }]}>
-                    {set.weight} kg × {set.reps}
+                    {set.weight} kg x {set.reps}
                   </Text>
                 </View>
               ))}
@@ -69,9 +67,6 @@ const WorkoutPlanExerciseRow = ({ exercise, index, expanded, performance, theme,
           ) : (
             <Text style={[styles.emptyPerformance, { color: theme.textSecondary }]}>No previous performance yet</Text>
           )}
-          {performance?.exerciseTracking.notes ? (
-            <Text style={[styles.notes, { color: theme.textSecondary }]}>{performance.exerciseTracking.notes}</Text>
-          ) : null}
         </View>
       )}
     </Pressable>

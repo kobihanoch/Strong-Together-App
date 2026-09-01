@@ -35,7 +35,7 @@ export const useExerciseHistory = () => {
   // Derived values
   const hasVisibleHistory = checkHasVisibleHistory(exerciseHistoryMap);
   const getLastPerformanceForExercise = useCallback(
-    (etsid: ExerciseInPlan['exerciseToSplitId']) => getLastLogPerformance(exerciseHistoryMap, etsid),
+    (etsid: ExerciseInPlan['exerciseToSplitId'] | null) => getLastLogPerformance(exerciseHistoryMap, etsid),
     [exerciseHistoryMap],
   );
 
