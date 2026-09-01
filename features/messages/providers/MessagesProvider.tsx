@@ -1,5 +1,5 @@
 import { createContext, ReactNode, useContext, useEffect, useMemo } from 'react';
-import { useAuth } from '../../auth/shared/providers/AuthProvider';
+import { useAuth } from '../../auth/providers/AuthProvider';
 import { useMessages as useMessagesQuery } from '../hooks/use-messages.hook';
 import { registerToMessagesListener } from '../messages.listeners';
 import { UserMessage, UserMessages } from '../types/messages.types';

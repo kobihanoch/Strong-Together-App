@@ -2,7 +2,7 @@
 import { io, Socket } from 'socket.io-client';
 import api from './api/api-config/api';
 import { API_BASE_URL } from '../infrastructure/api/api-url.config';
-import { AppUser } from '../features/auth/shared/types/auth.types';
+import { AppUser } from '../features/user/types/user.types';
 import { CreateWebSocketTicketBody, CreateWebSocketTicketResponse } from '@strong-together/shared';
 
 let socket: Socket | null = null;

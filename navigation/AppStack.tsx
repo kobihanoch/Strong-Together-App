@@ -3,18 +3,18 @@ import { createStackNavigator, StackNavigationProp } from '@react-navigation/sta
 import React, { useEffect } from 'react';
 import { cacheDeleteKey, cacheGetJSON } from '../infrastructure/cache/cache.constants';
 import { keyStartWorkout } from '../infrastructure/cache/cache-keys.utils';
-import { useAuth } from '../features/auth/shared/providers/AuthProvider';
+import { useAuth } from '../features/auth/providers/AuthProvider';
 import Analytics from '../features/workouts/analytics/screen/Analytics';
-import CreateWorkout from '../features/workouts/editor/screen/CreateWorkout';
-import Home from '../features/home/screen/Home';
-import Inbox from '../features/messages/screen/Inbox';
-import MyWorkoutPlan from '../features/workouts/plan/screen/MyWorkoutPlan';
-import Profile from '../features/profile/screen/Profile';
-import Settings from '../features/settings/screen/Settings';
-import StartWorkout from '../features/workouts/session/screen/StartWorkout';
-import Statistics from '../features/workouts/history/screen/Statistics';
+import CreateWorkout from '../screens/modify-workout/CreateWorkout';
+import Home from '../screens/home/Home';
+import Inbox from '../screens/inbox/Inbox';
+import MyWorkoutPlan from '../screens/my-workout-plan/MyWorkoutPlan';
+import Profile from '../screens/profile/Profile';
+import Settings from '../screens/settings/Settings';
+import StartWorkout from '../screens/start-workout/StartWorkout';
+import Statistics from '../screens/workout-history/Statistics';
 import { ymdInCurrentTZ } from '../shared/utils/shared-utils';
-import { ResumeWorkoutCachePayload } from '../features/workouts/session/types/use-start-workout.types';
+import { ResumeWorkoutCachePayload } from '../screens/start-workout/types/use-start-workout.types';
 import { RootParamList } from './types/appStackTypes';
 
 const Stack = createStackNavigator<RootParamList>();

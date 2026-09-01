@@ -1,5 +1,5 @@
-import { WorkoutSplit } from '../../features/workouts/shared/types/workout.types';
-import { ResumeWorkoutCachePayload } from '../../features/workouts/session/types/use-start-workout.types';
+import { WorkoutSplit } from '../../features/workouts/plan/types/workout-plan.types';
+import { ResumeWorkoutCachePayload } from '../../screens/start-workout/types/use-start-workout.types';
 
 export type RootParamList = {
   Home: undefined;

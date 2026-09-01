@@ -34,16 +34,13 @@ const mockCacheDeleteAllCacheWithoutStartWorkout = jest.fn<() => Promise<void>>(
 const mockGetRefreshToken = jest.fn<() => Promise<string | null>>();
 const mockSaveRefreshToken = jest.fn<(token: string) => Promise<void>>();
 const mockClearRefreshToken = jest.fn<() => Promise<void>>();
-const mockRefreshAndRotateTokens = jest.fn<
-  () => Promise<{ accessToken: string; refreshToken: string; userId: string }>
->();
+const mockRefreshAndRotateTokens = jest.fn<() => Promise<{ accessToken: string; refreshToken: string; userId: string }>>();
 const mockFetchSelfUserData = jest.fn<() => Promise<typeof userWithWorkoutAndHistoryProfile.user>>();
 const mockGetUserWorkout = jest.fn<
-  () =>
-    Promise<{
-      workoutPlan: typeof userWithWorkoutAndHistoryProfile.workout;
-      workoutPlanForEditWorkout: typeof userWithWorkoutAndHistoryProfile.workoutForEdit;
-    }>
+  () => Promise<{
+    workoutPlan: typeof userWithWorkoutAndHistoryProfile.workout;
+    workoutPlanForEditWorkout: typeof userWithWorkoutAndHistoryProfile.workoutForEdit;
+  }>
 >();
 const mockGetUserExerciseTracking = jest.fn<() => Promise<ReturnType<typeof createPackedTrackingResponse>>>();
 const mockConnectSocket = jest.fn<(username: string) => Promise<void>>();
@@ -143,7 +140,7 @@ jest.mock('../../../../auth/shared/utils/auth.utils', () => ({
 }));
 
 import { WorkoutHistoryProvider } from '../../../shared/providers/WorkoutHistoryProvider';
-import { AuthProvider, useAuth } from '../../../../auth/shared/providers/AuthProvider';
+import { AuthProvider, useAuth } from '../../../../auth/providers/AuthProvider';
 import { GlobalAppLoadingProvider } from '../../../../../shared/providers/GlobalAppLoadingProvider';
 import { WorkoutPlanProvider } from '../../../shared/providers/WorkoutPlanProvider';
 import { useMyWorkoutPlanPageLogic } from '../use-my-workout-plan-page-logic.hook';
@@ -415,4 +412,3 @@ describe('useMyWorkoutPlanPageLogic integration', () => {
     expect(result.current.logic.filteredExercises?.[0].exercise).toBe('Lat Pulldown');
   });
 });
-

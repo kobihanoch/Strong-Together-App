@@ -1,4 +1,4 @@
-import { useUser } from '../../auth/shared/hooks/use-user.hook';
+import { useUser } from '../../auth/hooks/use-user.hook';
 import { getDaysSince } from '../../home/utils/home-page.utils';
 
 const useProfilePageLogic = () => {

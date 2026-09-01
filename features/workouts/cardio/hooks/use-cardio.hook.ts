@@ -2,7 +2,7 @@ import { CreateAerobicEntryBody } from '@strong-together/shared';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useCallback } from 'react';
 import { getStartOfWeek } from '../../../../shared/utils/shared-utils';
-import { useAuth } from '../../../auth/shared/providers/AuthProvider';
+import { useAuth } from '../../../auth/providers/AuthProvider';
 import { getUserCardio, logUserCardio } from '../services/cardio.service';
 import { CardioMaps } from '../types/cardio.types';
 import { checkIfDoneCardioInSelectedWeek, getCardioForToday } from '../utils/cardio.utils';

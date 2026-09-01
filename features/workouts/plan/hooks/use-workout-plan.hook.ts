@@ -1,9 +1,9 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { ReplaceWorkoutPlanBody } from '@strong-together/shared';
 import { getUserWorkout } from '../../plan/services/workout-plan.service';
-import { addWorkout } from '../../editor/services/workout-editor.service';
+import { addWorkout } from '../../plan/services/workout-plan.service';
 import { WorkoutPlan } from '../types/workout-plan.types';
-import { useAuth } from '../../../auth/shared/providers/AuthProvider';
+import { useAuth } from '../../../auth/providers/AuthProvider';
 
 type ModifiedWorkoutPlan = ReplaceWorkoutPlanBody['workoutData'];
 

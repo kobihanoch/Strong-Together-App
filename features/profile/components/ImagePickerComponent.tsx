@@ -7,9 +7,9 @@ import { ActivityIndicator, Dimensions, StyleSheet, TouchableOpacity, View } fro
 import { RFValue } from 'react-native-responsive-fontsize';
 import api from '../../../infrastructure/api/api-config/api';
 import { colors } from '../../../shared/constants/colors';
-import { useUser } from '../../auth/shared/hooks/use-user.hook';
+import { useUser } from '../../auth/hooks/use-user.hook';
 import useMediaUploads from '../hooks/use-media-uploads.hook';
-import { AppUser } from '../../auth/shared/types/auth.types';
+import { AppUser } from '../../auth/types/auth.types';
 
 const { width, height } = Dimensions.get('window');
 

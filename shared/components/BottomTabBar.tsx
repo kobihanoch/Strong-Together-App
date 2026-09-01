@@ -6,7 +6,7 @@ import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { RFValue } from 'react-native-responsive-fontsize';
 import { fontFamilies, fontSizes } from '../constants/typography';
 import { useAppTheme } from '../providers/AppThemeProvider';
-import { useAuth } from '../../features/auth/shared/providers/AuthProvider.tsx';
+import { useAuth } from '../../features/auth/providers/AuthProvider.tsx';
 import { RootParamList } from '../../navigation/types/appStackTypes';
 
 type RouteName = keyof RootParamList;

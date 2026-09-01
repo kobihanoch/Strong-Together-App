@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useCallback, useMemo } from 'react';
-import { useAuth } from '../../auth/shared/providers/AuthProvider';
+import { useAuth } from '../../auth/providers/AuthProvider';
 import { deleteMessage, getUserMessages, updateMsgReadStatus } from '../services/messages.service';
 import { UserMessage, UserMessages } from '../types/messages.types';
 import { filterMessagesByUnread } from '../utils/messages-context-utils';
@@ -47,9 +47,7 @@ export const useMessages = () => {
       await deleteMessage(messageId);
     },
     onSuccess: (_, messageId) => {
-      queryClient.setQueryData<UserMessages>(queryKey, (previous) =>
-        previous?.filter((message) => message.id !== messageId),
-      );
+      queryClient.setQueryData<UserMessages>(queryKey, (previous) => previous?.filter((message) => message.id !== messageId));
     },
   });
 
@@ -57,7 +55,7 @@ export const useMessages = () => {
     (updater: MessagesUpdater) => {
       if (userId) queryClient.setQueryData<UserMessages | undefined>(queryKey, updater);
     },
-    [queryClient, userId],
+    [queryClient, queryKey, userId],
   );
 
   const allReceivedMessages = query.data ?? [];

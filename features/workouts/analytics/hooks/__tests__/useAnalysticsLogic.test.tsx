@@ -3,10 +3,7 @@ import React from 'react';
 import { renderHook, waitFor } from '@testing-library/react-native';
 import { beforeEach, describe, expect, it, jest } from '@jest/globals';
 import { AxiosError } from 'axios';
-import {
-  userWithWorkoutAndHistoryProfile,
-  userWithoutWorkoutProfile,
-} from '../../../../../tests/fixtures/userProfiles';
+import { userWithWorkoutAndHistoryProfile, userWithoutWorkoutProfile } from '../../../../../tests/fixtures/userProfiles';
 
 jest.mock('axios', () => ({
   __esModule: true,
@@ -33,8 +30,7 @@ const mockCacheDeleteAllCacheWithoutStartWorkout = jest.fn<() => Promise<void>>(
 const mockGetRefreshToken = jest.fn<() => Promise<string | null>>();
 const mockSaveRefreshToken = jest.fn<(token: string) => Promise<void>>();
 const mockClearRefreshToken = jest.fn<() => Promise<void>>();
-const mockRefreshAndRotateTokens =
-  jest.fn<() => Promise<{ accessToken: string; refreshToken: string; userId: string }>>();
+const mockRefreshAndRotateTokens = jest.fn<() => Promise<{ accessToken: string; refreshToken: string; userId: string }>>();
 const mockFetchSelfUserData = jest.fn<() => Promise<typeof userWithWorkoutAndHistoryProfile.user>>();
 const mockGetUserWorkout = jest.fn<
   () => Promise<{
@@ -145,7 +141,7 @@ jest.mock('../../../../auth/shared/utils/auth.utils', () => ({
 }));
 
 import { WorkoutHistoryProvider, useWorkoutHistory } from '../../../shared/providers/WorkoutHistoryProvider';
-import { AuthProvider, useAuth } from '../../../../auth/shared/providers/AuthProvider';
+import { AuthProvider, useAuth } from '../../../../auth/providers/AuthProvider';
 import { GlobalAppLoadingProvider } from '../../../../../shared/providers/GlobalAppLoadingProvider';
 import { WorkoutPlanProvider, useWorkoutPlan } from '../../../shared/providers/WorkoutPlanProvider';
 import useAnalysticsLogic from '../use-analystics-logic.hook';
