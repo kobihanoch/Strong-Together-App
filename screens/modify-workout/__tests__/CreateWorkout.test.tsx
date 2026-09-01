@@ -1,275 +1,88 @@
 /* eslint-disable @typescript-eslint/no-require-imports */
-
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import { beforeEach, describe, expect, it, jest } from '@jest/globals';
-import { fireEvent, render } from '@testing-library/react-native';
+import { fireEvent, render, waitFor } from '@testing-library/react-native';
 import React from 'react';
-import { UseCreateWorkoutLogicReturn } from '../types/use-create-workout.types';
-
-const mockOpen = jest.fn();
-const mockLogic = jest.fn();
-
-jest.mock('../CreateWorkout', () => jest.requireActual('../CreateWorkout'));
-
-jest.mock('../../hooks/use-create-workout-logic.hook', () => ({
-  __esModule: true,
-  default: () => mockLogic(),
-}));
-
-jest.mock('../../components/TopSection', () => {
-  const ReactLocal = require('react');
-  const { Text, TouchableOpacity, View } = require('react-native');
-  return function MockTopSection(props: any) {
-    return ReactLocal.createElement(
-      View,
-      null,
-      ReactLocal.createElement(Text, null, `top:${props.selectedSplit}:${props.totalExercises}:${props.hasWorkout}`),
-      ...(props.splitsList || []).map((split: string) =>
-        ReactLocal.createElement(
-          TouchableOpacity,
-          { key: split, onPress: () => props.setSelectedSplit(split) },
-          ReactLocal.createElement(Text, null, `split-${split}`),
-        ),
-      ),
-      ReactLocal.createElement(TouchableOpacity, { onPress: props.addSplit }, ReactLocal.createElement(Text, null, 'top-add')),
-      ReactLocal.createElement(
-        TouchableOpacity,
-        { onPress: () => props.removeSplit(props.selectedSplit) },
-        ReactLocal.createElement(Text, null, 'top-remove'),
-      ),
-      ReactLocal.createElement(TouchableOpacity, { onPress: props.saveWorkout }, ReactLocal.createElement(Text, null, 'top-save')),
-    );
-  };
-});
-
-jest.mock('../../components/SelectedExercisesList', () => {
-  const ReactLocal = require('react');
-  const { Text, View } = require('react-native');
-  return function MockSelectedExercisesList(props: any) {
-    return ReactLocal.createElement(
-      View,
-      null,
-      ReactLocal.createElement(Text, null, `selected:${props.selectedSplit}:${props.exForSplit.length}`),
-    );
-  };
-});
-
-jest.mock('../../components/ExercisePickerModal', () => {
-  const ReactLocal = require('react');
-  const { Text, View } = require('react-native');
-  return ReactLocal.forwardRef((props: any, ref: any) => {
-    ReactLocal.useImperativeHandle(ref, () => ({
-      open: mockOpen,
-      close: jest.fn(),
-      snapToIndex: jest.fn(),
-    }));
-
-    return ReactLocal.createElement(
-      View,
-      null,
-      ReactLocal.createElement(Text, null, `picker:${props.selectedSplit}:${props.muscles.join('|')}:${props.allExercises.length}`),
-    );
-  });
-});
-
 import CreateWorkout from '../CreateWorkout';
 
-const createLogicState = (): UseCreateWorkoutLogicReturn => ({
-  selectedExercises: {
-    A: [
-      {
-        id: 1,
-        name: 'Bench Press',
-        targetMuscle: 'Chest',
-        specificTargetMuscle: 'Upper Chest',
-        orderIndex: 0,
-        sets: [10, 10, 10],
-      },
-    ],
-    B: [],
-  },
-  splitsList: ['A', 'B'],
-  availableExercises: {
-    Chest: [{ id: 1, name: 'Bench Press', specificTargetMuscle: 'Upper Chest' }],
-  },
-  allExercises: [{ id: 1, name: 'Bench Press', specificTargetMuscle: 'Upper Chest', targetMuscle: 'Chest' }],
-  muscles: ['All', 'Chest'],
-  saveWorkout: async () => {},
-  controls: {
-    addSplit: jest.fn(),
-    removeSplit: jest.fn(),
-    addExercise: jest.fn(),
-    updateSets: jest.fn(),
-    removeExercise: jest.fn(),
-    onDragEnd: jest.fn(),
-  },
-  loadings: {
-    isSaving: false,
-    exLoading: false,
-  },
-  hasWorkout: false,
-  setSelectedSplit: jest.fn(),
-  selectedSplit: 'A',
-  exerciseCountMap: { A: 1, B: 0 },
-  totalExercises: 1,
-  exForSplit: [
-    {
-      id: 1,
-      name: 'Bench Press',
-      targetMuscle: 'Chest',
-      specificTargetMuscle: 'Upper Chest',
-      orderIndex: 0,
-      sets: [10, 10, 10],
-    },
-  ],
-});
+const mockNavigate = { goBack: jest.fn(), replace: jest.fn() };
+const mockUpdateWorkoutPlan = jest.fn(async () => undefined);
+const mockPlanState = { pending: false, workoutPlan: null as any };
 
-describe('CreateWorkout screen', () => {
+jest.mock('@react-navigation/native', () => ({ useNavigation: () => mockNavigate }));
+jest.mock('react-native-safe-area-context', () => {
+  const ReactLocal = require('react');
+  const { View } = require('react-native');
+  return {
+    SafeAreaView: ({ children, ...props }: any) => ReactLocal.createElement(View, props, children),
+    useSafeAreaInsets: () => ({ top: 0, right: 0, bottom: 0, left: 0 }),
+  };
+});
+jest.mock('../../../shared/providers/AppThemeProvider', () => ({
+  useAppTheme: () => ({ mode: 'light', colors: { canvas: '#fff', surface: '#fff', textPrimary: '#111', textSecondary: '#777', border: '#ddd' } }),
+}));
+jest.mock('../../../features/workouts/plan/hooks/use-workout-plan.hook', () => ({
+  useWorkoutPlan: () => ({
+    data: { workoutPlan: mockPlanState.workoutPlan },
+    loadingStates: { isPending: mockPlanState.pending, isUpdating: false },
+    actions: { updateWorkoutPlan: mockUpdateWorkoutPlan },
+  }),
+}));
+jest.mock('../../../features/workouts/plan/hooks/use-exercises.hook', () => ({
+  __esModule: true,
+  default: () => ({
+    data: { Chest: [{ id: 11, name: 'Bench Press', specificTargetMuscle: 'Upper chest' }] },
+    loadingStates: { isPending: false },
+  }),
+}));
+jest.mock('../../../shared/components/SlidingBottomModal', () => {
+  const ReactLocal = require('react');
+  const { View } = require('react-native');
+  return { __esModule: true, default: ReactLocal.forwardRef(({ children }: any, _ref: any) => <View>{children}</View>) };
+});
+jest.mock('../components/PlanEditorHeader', () => ({ splits, selectedIndex, onAddSplit, onSelect }: any) => {
+  const { Text, View } = require('react-native');
+  return (
+    <View>
+      <Text>Splits: {splits.length}</Text>
+      <Text>Selected: {splits[selectedIndex]?.name}</Text>
+      <Text onPress={onAddSplit}>Add split</Text>
+      {splits.map((split: any, index: number) => <Text key={index} onPress={() => onSelect(index)}>Choose {split.name}</Text>)}
+    </View>
+  );
+});
+jest.mock('../components/PlanExerciseList', () => ({ exercises }: any) => {
+  const { Text } = require('react-native');
+  return <Text>Exercises: {exercises.length}</Text>;
+});
+jest.mock('../components/PlanEditorActions', () => () => null);
+jest.mock('../components/ExerciseLibrarySheet', () => () => null);
+
+describe('CreateWorkout integration', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    mockPlanState.pending = false;
+    mockPlanState.workoutPlan = null;
   });
 
-  it('passes the hook state into its child components', () => {
-    mockLogic.mockReturnValue(createLogicState());
-
-    const { getByText } = render(React.createElement(CreateWorkout));
-
-    expect(getByText('top:A:1:false')).toBeTruthy();
-    expect(getByText('selected:A:1')).toBeTruthy();
-    expect(getByText('picker:A:All|Chest:1')).toBeTruthy();
+  it('initializes a new plan through the real editor hook and reducer', async () => {
+    const { getByText } = render(<CreateWorkout />);
+    await waitFor(() => expect(getByText('Selected: Split A')).toBeTruthy());
+    expect(getByText('Splits: 1')).toBeTruthy();
   });
 
-  it('opens the exercise picker modal when the floating add button is pressed', () => {
-    mockLogic.mockReturnValue(createLogicState());
-
-    const { getByText } = render(React.createElement(CreateWorkout));
-
-    fireEvent.press(getByText('+'));
-
-    expect(mockOpen).toHaveBeenCalledWith(1);
+  it('adds and selects a split through the real editor hook', async () => {
+    const { getByText } = render(<CreateWorkout />);
+    await waitFor(() => expect(getByText('Selected: Split A')).toBeTruthy());
+    fireEvent.press(getByText('Add split'));
+    expect(getByText('Splits: 2')).toBeTruthy();
+    expect(getByText('Selected: Split B')).toBeTruthy();
   });
 
-  it('does not crash during initial loading while exercises are still loading', () => {
-    const state = createLogicState();
-    state.loadings = {
-      isSaving: false,
-      exLoading: true,
+  it('hydrates an existing workout through the real editor hook', async () => {
+    mockPlanState.workoutPlan = {
+      workoutSplits: [{ id: 4, name: 'Push', orderIndex: 0, exercises: [{ exerciseId: 11, orderIndex: 0, sets: [{ reps: 8 }] }] }],
     };
-    state.availableExercises = {} as UseCreateWorkoutLogicReturn['availableExercises'];
-    state.allExercises = [];
-    state.muscles = ['All'];
-    state.exForSplit = [];
-    state.totalExercises = 0;
-    mockLogic.mockReturnValue(state);
-
-    const { getByText } = render(React.createElement(CreateWorkout));
-
-    expect(getByText('top:A:0:false')).toBeTruthy();
-    expect(getByText('selected:A:0')).toBeTruthy();
-    expect(getByText('picker:A:All:0')).toBeTruthy();
-  });
-
-  it('forwards add and remove split actions from TopSection controls', () => {
-    const state = createLogicState();
-    mockLogic.mockReturnValue(state);
-
-    const { getByText } = render(React.createElement(CreateWorkout));
-
-    fireEvent.press(getByText('top-add'));
-    fireEvent.press(getByText('top-remove'));
-
-    expect(state.controls.addSplit).toHaveBeenCalledTimes(1);
-    expect(state.controls.removeSplit).toHaveBeenCalledWith('A');
-  });
-
-  it('switches splits and updates the selected exercises UI', () => {
-    mockLogic.mockImplementation(() => {
-      const [selectedSplit, setSelectedSplit] = React.useState<'A' | 'B'>('A');
-      const exercisesBySplit = {
-        A: [
-          {
-            id: 1,
-            name: 'Bench Press',
-            targetMuscle: 'Chest',
-            specificTargetMuscle: 'Upper Chest',
-            orderIndex: 0,
-            sets: [10, 10, 10],
-          },
-        ],
-        B: [
-          {
-            id: 2,
-            name: 'Barbell Row',
-            targetMuscle: 'Back',
-            specificTargetMuscle: 'Lats',
-            orderIndex: 0,
-            sets: [12, 12, 12],
-          },
-          {
-            id: 3,
-            name: 'Lat Pulldown',
-            targetMuscle: 'Back',
-            specificTargetMuscle: 'Lats',
-            orderIndex: 1,
-            sets: [10, 10, 10],
-          },
-        ],
-      };
-
-      return {
-        ...createLogicState(),
-        splitsList: ['A', 'B'],
-        selectedSplit,
-        setSelectedSplit,
-        totalExercises: 3,
-        exerciseCountMap: { A: 1, B: 2 },
-        selectedExercises: exercisesBySplit,
-        exForSplit: exercisesBySplit[selectedSplit],
-      };
-    });
-
-    const { getByText, rerender } = render(React.createElement(CreateWorkout));
-
-    expect(getByText('selected:A:1')).toBeTruthy();
-
-    fireEvent.press(getByText('split-B'));
-    rerender(React.createElement(CreateWorkout));
-
-    expect(getByText('top:B:3:false')).toBeTruthy();
-    expect(getByText('selected:B:2')).toBeTruthy();
-    expect(getByText('picker:B:All|Chest:1')).toBeTruthy();
-  });
-
-  it('keeps edit-mode values intact when the hook reports an existing workout', () => {
-    const state = createLogicState();
-    state.hasWorkout = true;
-    state.selectedSplit = 'B';
-    state.totalExercises = 4;
-    state.selectedExercises = {
-      A: [
-        {
-          id: 1,
-          name: 'Bench Press',
-          targetMuscle: 'Chest',
-          specificTargetMuscle: 'Upper Chest',
-          orderIndex: 0,
-          sets: [10, 10, 10],
-        },
-      ],
-      B: [],
-    };
-    state.exForSplit = [];
-    state.muscles = ['All', 'Chest', 'Back'];
-    state.allExercises = [
-      { id: 1, name: 'Bench Press', specificTargetMuscle: 'Upper Chest', targetMuscle: 'Chest' },
-      { id: 2, name: 'Row', specificTargetMuscle: 'Lats', targetMuscle: 'Back' },
-    ];
-    mockLogic.mockReturnValue(state);
-
-    const { getByText } = render(React.createElement(CreateWorkout));
-
-    expect(getByText('top:B:4:true')).toBeTruthy();
-    expect(getByText('selected:B:0')).toBeTruthy();
-    expect(getByText('picker:B:All|Chest|Back:2')).toBeTruthy();
+    const { getByText } = render(<CreateWorkout />);
+    await waitFor(() => expect(getByText('Selected: Push')).toBeTruthy());
+    expect(getByText('Exercises: 1')).toBeTruthy();
   });
 });

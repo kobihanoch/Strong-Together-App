@@ -15,8 +15,9 @@ const MyWorkoutPlan = () => {
   const gutter = Math.max(14, Math.min(width * 0.045, 22));
 
   const split = data.selectedSplit;
-  if (data.isPending || !split) return <WorkoutPlanSkeleton />;
+  if (data.isPending) return <WorkoutPlanSkeleton />;
   if (!data.hasWorkoutPlan) return <NoWorkoutPlan onCreatePress={actions.createPlan} />;
+  if (!split) return <WorkoutPlanSkeleton />;
 
   return (
     <SafeAreaView style={[styles.safeArea, { backgroundColor: data.theme.canvas }]} edges={['top']}>
