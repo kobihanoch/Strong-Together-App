@@ -9,7 +9,7 @@ import { AppThemeColors } from '../../../shared/constants/theme';
 import { fontFamilies, fontSizes } from '../../../shared/constants/typography';
 import { createSharedComponentStyles } from '../../../shared/styles/component.styles';
 import { HomeDashboardData } from '../types/use-home-page.types';
-import { getBodyPartsForSplit } from '../../workouts/plan/utils/workout-plan.util';
+import { getBodyPartsForSplit } from '../../workouts/plan/utils/workout-plan.utils';
 
 type Props = {
   data: HomeDashboardData['nextWorkout'];

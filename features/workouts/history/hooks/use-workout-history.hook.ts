@@ -32,14 +32,14 @@ export const useWorkoutHistory = () => {
   };
 
   // Main data
-  const exerciseTrackingMaps = query.data;
+  const workoutHistoryMap = query.data;
 
   // Derived values
-  const hasTrainedToday = checkHasTrainedToday(Intl.DateTimeFormat().resolvedOptions().timeZone, exerciseTrackingMaps);
-  const hasVisibleHistory = checkHasVisibleHistory(exerciseTrackingMaps);
+  const hasTrainedToday = checkHasTrainedToday(Intl.DateTimeFormat().resolvedOptions().timeZone, workoutHistoryMap);
+  const hasVisibleHistory = checkHasVisibleHistory(workoutHistoryMap);
 
   return {
-    data: { exerciseTrackingMaps, hasTrainedToday, hasVisibleHistory },
+    data: { workoutHistoryMap, hasTrainedToday, hasVisibleHistory },
     loadingStates: { isPending: query.isPending, isLoading: query.isLoading, isFetching: query.isFetching },
     actions: {
       updateLocalExerciseTracking,

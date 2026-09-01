@@ -43,19 +43,12 @@ const useHomeDashboard = () => {
 
   const dashboardData = query.data;
 
-  const isLoading =
+  const isPending =
     query.isPending ||
     cardioLoadingStates.isPending ||
     messagesLoadingStates.isPending ||
     workoutPlanLoadingStates.isPending ||
     userLoadingStates.isPending;
-
-  const isFetching =
-    query.isFetching ||
-    cardioLoadingStates.isFetching ||
-    messagesLoadingStates.isFetching ||
-    workoutPlanLoadingStates.isFetching ||
-    userLoadingStates.isFetching;
 
   const nextSplit: WorkoutSplit | undefined = getNextWorkoutSplit(workoutPlanData.workoutSplits, dashboardData?.nextWorkoutSplit ?? null);
 
@@ -139,7 +132,7 @@ const useHomeDashboard = () => {
       openProgress: () => navigation.navigate('Analytics'),
       openHistory: () => navigation.navigate('Statistics'),
     },
-    loadingStates: { isLoading, isFetching },
+    loadingStates: { isPending },
   };
 };
 

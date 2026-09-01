@@ -64,7 +64,6 @@ export const useWorkoutPlan = () => {
       isPending: query.isPending,
       isLoading: query.isLoading,
       isFetching: query.isFetching,
-      isUpdating: updateSourceWorkoutPlan.isPending,
     },
     actions: {
       updateWorkoutPlan: updateSourceWorkoutPlan.mutateAsync,

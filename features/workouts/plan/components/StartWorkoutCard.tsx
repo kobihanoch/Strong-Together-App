@@ -13,7 +13,7 @@ import { useGlobalAppLoadingContext } from '../../../../shared/providers/GlobalA
 import { useWorkoutPlan } from '../../shared/providers/WorkoutPlanProvider';
 import { HomePageData } from '../../../home/types/use-home-page.types';
 import { RootParamList } from '../../../../navigation/types/appStackTypes';
-import { getBodyPartsForSplit } from '../utils/workout-plan.util';
+import { getBodyPartsForSplit } from '../utils/workout-plan.utils';
 import Badge from '../../../../shared/components/Badge';
 import NumberCounter from '../../../../shared/components/NumberCounter';
 import PercantageCircle from '../../../../shared/components/PercentageCircle';
@@ -36,9 +36,7 @@ const StartWorkoutCard = ({ data }: StartWorkoutCardProps) => {
     if (!hasTracking) return false;
     if (!totalWorkoutNumber || totalWorkoutNumber <= 0) return false;
     if (!mostFrequentSplit?.splitName) return false;
-    const splitExists = Array.isArray(workoutSplits)
-      ? workoutSplits.some((ws) => ws?.name === mostFrequentSplit.splitName)
-      : false;
+    const splitExists = Array.isArray(workoutSplits) ? workoutSplits.some((ws) => ws?.name === mostFrequentSplit.splitName) : false;
     return splitExists;
   }, [isLoading, hasTracking, totalWorkoutNumber, mostFrequentSplit, workoutSplits]);
 
@@ -77,16 +75,8 @@ const StartWorkoutCard = ({ data }: StartWorkoutCardProps) => {
               {hasData ? (
                 <>
                   <View style={{ marginTop: 35 }}>
-                    <Skeleton
-                      colors={['rgba(136, 136, 136, 1)', 'rgba(201, 201, 201, 1)', 'rgba(136, 136, 136, 1)']}
-                      width={80}
-                    >
-                      <Badge
-                        bg="#2979ff"
-                        color="#ffffffff"
-                        label={'Split ' + data?.mostFrequentSplit?.splitName}
-                        style={[styles.badge]}
-                      />
+                    <Skeleton colors={['rgba(136, 136, 136, 1)', 'rgba(201, 201, 201, 1)', 'rgba(136, 136, 136, 1)']} width={80}>
+                      <Badge bg="#2979ff" color="#ffffffff" label={'Split ' + data?.mostFrequentSplit?.splitName} style={[styles.badge]} />
                     </Skeleton>
                   </View>
 
@@ -97,15 +87,8 @@ const StartWorkoutCard = ({ data }: StartWorkoutCardProps) => {
                   </View>
 
                   <View style={{ flexDirection: 'row', marginTop: 10, gap: 8 }}>
-                    <MaterialCommunityIcons
-                      name={'whistle-outline'}
-                      size={RFValue(13)}
-                      color={'rgba(206, 206, 206, 0.86)'}
-                    />
-                    <Skeleton
-                      colors={['rgba(136, 136, 136, 1)', 'rgba(201, 201, 201, 1)', 'rgba(136, 136, 136, 1)']}
-                      width={80}
-                    >
+                    <MaterialCommunityIcons name={'whistle-outline'} size={RFValue(13)} color={'rgba(206, 206, 206, 0.86)'} />
+                    <Skeleton colors={['rgba(136, 136, 136, 1)', 'rgba(201, 201, 201, 1)', 'rgba(136, 136, 136, 1)']} width={80}>
                       <Text style={styles.exCount}>{exCountForMostFrqSplit} exercises</Text>
                     </Skeleton>
                   </View>
@@ -126,10 +109,7 @@ const StartWorkoutCard = ({ data }: StartWorkoutCardProps) => {
             {/* Right-side circle: only when data exists */}
             <View>
               {hasData ? (
-                <Skeleton
-                  colors={['rgba(136, 136, 136, 1)', 'rgba(201, 201, 201, 1)', 'rgba(136, 136, 136, 1)']}
-                  radius={'round'}
-                >
+                <Skeleton colors={['rgba(136, 136, 136, 1)', 'rgba(201, 201, 201, 1)', 'rgba(136, 136, 136, 1)']} radius={'round'}>
                   <PercantageCircle
                     percent={progress}
                     fullColor="#dddddd4c"
@@ -251,4 +231,3 @@ const styles = StyleSheet.create({
 });
 
 export default StartWorkoutCard;
-

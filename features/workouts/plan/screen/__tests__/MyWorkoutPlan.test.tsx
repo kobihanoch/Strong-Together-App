@@ -1,277 +1,143 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-require-imports */
 import React from 'react';
-import { beforeEach as jestBeforeEach, describe as jestDescribe, expect as jestExpect, it as jestIt, jest as jestObject, } from '@jest/globals';
-import { fireEvent, render, waitFor } from '@testing-library/react-native';
-import { Keyboard, TouchableOpacity } from 'react-native';
-import type { ExerciseInPlan } from '../../../shared/types/workout.types';
-import type { CardioDailyRecord } from '../../../cardio/types/cardio.types';
-
-const mockNavigate = jestObject.fn();
-const mockReplace = jestObject.fn();
-const mockLogUserCardio = jestObject.fn<(mins: number, secs: number, type: string) => Promise<any>>();
-const mockShowNotification = jestObject.fn();
-const mockModalOpen = jestObject.fn();
-const mockModalClose = jestObject.fn();
-let mockWorkoutPlanLogic: {
-  hasWorkout: boolean;
-  filteredExercises: ExerciseInPlan[] | undefined;
-  setSelectedSplit: ReturnType<typeof jestObject.fn>;
-  selectedSplit: { id: number; name: string; muscleGroup: string | null } | null;
-};
-let mockCardioContext: {
-  cardioForToday: CardioDailyRecord | null;
-  setDailyCardioMap: ReturnType<typeof jestObject.fn>;
-  setWeeklyCardioMap: ReturnType<typeof jestObject.fn>;
-};
-
-jestObject.mock('@react-navigation/native', () => ({
-  useNavigation: () => ({
-    navigate: mockNavigate,
-    replace: mockReplace,
-  }),
-}));
-
-jestObject.mock('react-native-notifier', () => ({
-  Notifier: {
-    showNotification: (...args: any[]) => mockShowNotification(...args),
-  },
-  NotifierComponents: {
-    Alert: 'Alert',
-  },
-}));
-
-jestObject.mock('../../../cardio/services/cardio.service', () => ({
-  logUserCardio: (...args: [number, number, string]) => mockLogUserCardio(...args),
-}));
-
-jestObject.mock('../../../../../shared/hooks/use-light-status-bar.hook', () => ({
-  __esModule: true,
-  default: jestObject.fn(),
-}));
-
-jestObject.mock('../../hooks/use-my-workout-plan-page-logic.hook', () => ({
-  useMyWorkoutPlanPageLogic: () => mockWorkoutPlanLogic,
-}));
-
-jestObject.mock('../../../shared/providers/CardioProvider', () => ({
-  useAerobics: () => mockCardioContext,
-}));
-
-jestObject.mock('../../../../../shared/components/Column', () => {
-  const mockReact = require('react');
-  const { View: RNView } = require('react-native');
-  return ({ children, ...props }: any) => mockReact.createElement(RNView, props, children);
-});
-
-jestObject.mock('../../../../../shared/components/Row', () => {
-  const mockReact = require('react');
-  const { View: RNView } = require('react-native');
-  return ({ children, ...props }: any) => mockReact.createElement(RNView, props, children);
-});
-
-jestObject.mock('../../components/SplitFlatList', () => {
-  const mockReact = require('react');
-  const { Text: RNText, TouchableOpacity: RNTouchableOpacity, View: RNView } = require('react-native');
-  return ({ openCardioModal }: { openCardioModal: (i?: number) => void }) =>
-    mockReact.createElement(
-      RNView,
-      null,
-      mockReact.createElement(RNText, null, 'Split list'),
-      mockReact.createElement(
-        RNTouchableOpacity,
-        { onPress: () => openCardioModal(1) },
-        mockReact.createElement(RNText, null, 'Open cardio modal'),
-      ),
-    );
-});
-
-jestObject.mock('../../components/RenderItemExercise', () => {
-  const mockReact = require('react');
-  const { Text: RNText } = require('react-native');
-  return ({ item }: { item: ExerciseInPlan }) => mockReact.createElement(RNText, null, item.exercise);
-});
-
-jestObject.mock('../../components/NoWorkoutPlan', () => {
-  const mockReact = require('react');
-  const { Text: RNText, TouchableOpacity: RNTouchableOpacity } = require('react-native');
-  return ({ onCreatePress }: { onCreatePress: () => void }) =>
-    mockReact.createElement(
-      RNTouchableOpacity,
-      { onPress: onCreatePress },
-      mockReact.createElement(RNText, null, 'Create workout'),
-    );
-});
-
-jestObject.mock('../../../../../shared/components/SlidingBottomModal', () => {
-  const mockReact = require('react');
-  const { Text: RNText, View: RNView } = require('react-native');
-  return {
-    __esModule: true,
-    default: mockReact.forwardRef(({ title, children, data, renderItem }: any, ref: any) => {
-      mockReact.useImperativeHandle(ref, () => ({
-        open: mockModalOpen,
-        close: mockModalClose,
-        snapToIndex: jestObject.fn(),
-      }));
-
-      return mockReact.createElement(
-        RNView,
-        null,
-        title ? mockReact.createElement(RNText, null, title) : null,
-        Array.isArray(data) && renderItem
-          ? data.map((item, index) =>
-              mockReact.createElement(RNView, { key: `${title}-${index}` }, renderItem({ item })),
-            )
-          : null,
-        children,
-      );
-    }),
-  };
-});
-
+import { fireEvent, render } from '@testing-library/react-native';
+import { beforeEach, describe, expect, it, jest } from '@jest/globals';
 import MyWorkoutPlan from '../MyWorkoutPlan';
 
-const createExercise = (overrides: Partial<ExerciseInPlan> = {}): ExerciseInPlan => ({
-  id: 11,
-  sets: [8, 10, 12],
+jest.mock('react-native-vector-icons/MaterialCommunityIcons', () => 'MaterialCommunityIcons');
+jest.mock('moti/skeleton', () => {
+  const mockReact = require('react');
+  const { View: MockView } = require('react-native');
+  return { Skeleton: (props: any) => mockReact.createElement(MockView, props) };
+});
+jest.mock('../../../../../shared/providers/AppThemeProvider', () => ({
+  useAppTheme: () => ({ colors: mockTheme }),
+}));
+
+const mockActions = {
+  selectSplit: jest.fn(),
+  createPlan: jest.fn(),
+  editPlan: jest.fn(),
+  startWorkout: jest.fn(),
+};
+
+const mockTheme = {
+  canvas: '#FAF8F5', surface: '#FFF', surfaceMuted: '#F2EEE8', border: '#E7E0D8', textPrimary: '#17130F',
+  textSecondary: '#756B61', primary: '#2977FF', primarySoft: '#EAF2FF', achievement: '#E9A23B',
+  achievementSoft: '#FFF5E5', heroSurface: '#17130F', heroOverlay: 'rgba(0,0,0,.5)', white: '#FFF', profit: '#080',
+};
+
+const exercise = {
+  exerciseToSplitId: 101,
+  exerciseId: 11,
+  name: 'Bench Press',
+  sets: [{ orderIndex: 0, reps: 10 }, { orderIndex: 1, reps: 8 }],
+  orderIndex: 0,
   isActive: true,
   targetMuscle: 'Chest',
-  specificTargetMuscle: 'Upper Chest',
-  exercise: 'Incline Bench Press',
-  workoutSplit: 'Push',
-  ...overrides,
-});
+  specificTargetMuscle: 'Upper chest',
+};
 
-const createCardioRecord = (overrides: Partial<CardioDailyRecord> = {}): CardioDailyRecord => ({
-  type: 'Walk',
-  durationMins: 12,
-  durationSec: 30,
-  ...overrides,
-});
+const split = {
+  id: 1, workoutId: 1, name: 'Push Day', orderIndex: 0, createdAt: '2026-08-01', muscleGroup: 'Chest',
+  estimatedDurationMinutes: 52, isActive: true, exercises: [exercise],
+};
 
-jestDescribe('MyWorkoutPlan screen', () => {
-  jestBeforeEach(() => {
-    jestObject.clearAllMocks();
-    mockWorkoutPlanLogic = {
-      hasWorkout: true,
-      filteredExercises: [createExercise()],
-      setSelectedSplit: jestObject.fn(),
-      selectedSplit: {
-        id: 1,
-        name: 'Push',
-        muscleGroup: 'Chest, Shoulders, Triceps',
-      },
-    };
-    mockCardioContext = {
-      cardioForToday: null,
-      setDailyCardioMap: jestObject.fn(),
-      setWeeklyCardioMap: jestObject.fn(),
-    };
-    mockLogUserCardio.mockResolvedValue({
-      daily: {
-        '2026-03-25': [createCardioRecord()],
-      },
-      weekly: {
-        '2026-W13': {
-          records: [],
-          totalDurationMins: 12,
-          totalDurationSec: 30,
+let mockLogic: any;
+
+jest.mock('../../hooks/use-my-workout-plan.hook', () => ({
+  __esModule: true,
+  default: () => mockLogic,
+}));
+
+describe('MyWorkoutPlan', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+    mockLogic = {
+      data: {
+        theme: mockTheme,
+        isPending: false,
+        isLoading: false,
+        hasWorkoutPlan: true,
+        workoutPlan: { numberOfSplits: 1 },
+        workoutSplits: [split],
+        selectedSplit: split,
+        setCount: 2,
+        muscles: ['Chest'],
+        hasTrainedToday: false,
+        completedThisWeek: 2,
+        weeklyTarget: 4,
+        weekDays: [
+          { label: 'M', date: '2026-08-31', trained: true, isToday: false },
+          { label: 'T', date: '2026-09-01', trained: false, isToday: true },
+        ],
+        lastCompletedDate: null,
+        exercisePerformanceByAssignmentId: {
+          '101': {
+            exerciseTracked: [{
+              workoutDate: '2026-08-27',
+              exerciseTracking: {
+                exerciseTrackingId: 9,
+                sets: [{ setIndex: 0, weight: 60, reps: 10 }, { setIndex: 1, weight: 65, reps: 8 }],
+                notes: null,
+                exerciseAssignment: {
+                  exerciseToSplitId: 101, orderIndex: 0, exerciseId: 11, workoutSplitId: 1,
+                  workoutSplitName: 'Push Day', exerciseName: 'Bench Press', targetMuscle: 'Chest', specificTargetMuscle: 'Upper chest',
+                },
+              },
+            }],
+          },
         },
       },
-    });
-    jestObject.spyOn(Keyboard, 'dismiss').mockImplementation(() => undefined);
+      actions: mockActions,
+    };
   });
 
-  jestIt('renders the no-workout branch and navigates to CreateWorkout', () => {
-    mockWorkoutPlanLogic = {
-      ...mockWorkoutPlanLogic,
-      hasWorkout: false,
-    };
+  it('renders the plan summary without obsolete controls', () => {
+    const { getAllByText, getByText, queryByText, queryByLabelText } = render(<MyWorkoutPlan />);
 
-    const { getByText } = render(React.createElement(MyWorkoutPlan));
+    expect(getAllByText('Push Day')).toHaveLength(2);
+    expect(getByText('2 of 4')).toBeTruthy();
+    expect(getByText('~52 min')).toBeTruthy();
+    expect(getByText('Start workout')).toBeTruthy();
+    expect(getByText('Edit')).toBeTruthy();
+    expect(queryByText('BARBELL')).toBeNull();
+    expect(queryByLabelText('More options')).toBeNull();
+  });
 
+  it('renders the workout-plan skeleton while data is pending', () => {
+    mockLogic.data.isPending = true;
+    const { getByLabelText, queryByText } = render(<MyWorkoutPlan />);
+
+    expect(getByLabelText('Loading workout plan')).toBeTruthy();
+    expect(queryByText('Workout Plan')).toBeNull();
+  });
+
+  it('expands a row to show its mocked last performance', () => {
+    const { getByText, queryByText } = render(<MyWorkoutPlan />);
+
+    expect(queryByText('LAST PERFORMANCE')).toBeNull();
+    fireEvent.press(getByText('Bench Press'));
+    expect(getByText('LAST PERFORMANCE')).toBeTruthy();
+    expect(getByText('60 kg × 10')).toBeTruthy();
+    expect(getByText('65 kg × 8')).toBeTruthy();
+    fireEvent.press(getByText('Bench Press'));
+    expect(queryByText('LAST PERFORMANCE')).toBeNull();
+  });
+
+  it('routes the primary and edit actions', () => {
+    const { getByText } = render(<MyWorkoutPlan />);
+    fireEvent.press(getByText('Start workout'));
+    fireEvent.press(getByText('Edit'));
+    expect(mockActions.startWorkout).toHaveBeenCalledTimes(1);
+    expect(mockActions.editPlan).toHaveBeenCalledTimes(1);
+  });
+
+  it('renders the empty-plan state', () => {
+    mockLogic.data.hasWorkoutPlan = false;
+    const { getByText } = render(<MyWorkoutPlan />);
     fireEvent.press(getByText('Create workout'));
-
-    jestExpect(mockNavigate).toHaveBeenCalledWith('CreateWorkout');
-  });
-
-  jestIt('renders the cardio summary when cardioForToday exists', () => {
-    mockCardioContext = {
-      ...mockCardioContext,
-      cardioForToday: createCardioRecord({ type: 'Run', durationMins: 61, durationSec: 5 }),
-    };
-
-    const { getByText } = render(React.createElement(MyWorkoutPlan));
-
-    jestExpect(getByText('Cardio')).toBeTruthy();
-    jestExpect(getByText('Ran')).toBeTruthy();
-    jestExpect(getByText('1 hr 1 min')).toBeTruthy();
-  });
-
-  jestIt('renders the cardio form and keeps save disabled when both values are zero', () => {
-    const { getByText, UNSAFE_getAllByType } = render(React.createElement(MyWorkoutPlan));
-
-    jestExpect(getByText('Walk')).toBeTruthy();
-    jestExpect(getByText('Run')).toBeTruthy();
-    jestExpect(getByText('Save')).toBeTruthy();
-    const touchables = UNSAFE_getAllByType(TouchableOpacity);
-    const saveButton = touchables[touchables.length - 1];
-    jestExpect(saveButton.props.disabled).toBe(true);
-
-    fireEvent.press(getByText('Save'));
-
-    jestExpect(mockLogUserCardio).not.toHaveBeenCalled();
-  });
-
-  jestIt('filters non-digit input, clamps seconds on blur, and opens the modal to the input snap point on focus', () => {
-    const { getByPlaceholderText, getByDisplayValue } = render(React.createElement(MyWorkoutPlan));
-
-    const minsInput = getByPlaceholderText('0');
-    const secsInput = getByPlaceholderText('00');
-
-    fireEvent.changeText(minsInput, '1a2');
-    fireEvent.changeText(secsInput, '99');
-    fireEvent(minsInput, 'focus');
-    fireEvent(secsInput, 'focus');
-    fireEvent(secsInput, 'blur');
-
-    jestExpect(getByDisplayValue('12')).toBeTruthy();
-    jestExpect(getByDisplayValue('59')).toBeTruthy();
-    jestExpect(mockModalOpen).toHaveBeenNthCalledWith(1, 2);
-    jestExpect(mockModalOpen).toHaveBeenNthCalledWith(2, 2);
-  });
-
-  jestIt('saves cardio with the selected type and parsed numeric values', async () => {
-    const { getByText, getByPlaceholderText } = render(React.createElement(MyWorkoutPlan));
-
-    fireEvent.press(getByText('Run'));
-    fireEvent.changeText(getByPlaceholderText('0'), '12');
-    fireEvent.changeText(getByPlaceholderText('00'), '61');
-    fireEvent(getByPlaceholderText('00'), 'blur');
-    fireEvent.press(getByText('Save'));
-
-    await waitFor(() => {
-      jestExpect(mockLogUserCardio).toHaveBeenCalledWith(12, 59, 'Run');
-    });
-    jestExpect(mockCardioContext.setDailyCardioMap).toHaveBeenCalled();
-    jestExpect(mockCardioContext.setWeeklyCardioMap).toHaveBeenCalled();
-    jestExpect(Keyboard.dismiss).toHaveBeenCalled();
-    jestExpect(mockModalClose).toHaveBeenCalled();
-    jestExpect(mockShowNotification).toHaveBeenCalledWith(
-      jestExpect.objectContaining({
-        title: 'Cardio logged',
-        description: 'Cardio added successfully',
-      }),
-    );
-    jestExpect(mockReplace).toHaveBeenCalledWith('Statistics');
-  });
-
-  jestIt('renders the exercises modal list from filteredExercises', () => {
-    const { getByText } = render(React.createElement(MyWorkoutPlan));
-
-    jestExpect(getByText('Exercises')).toBeTruthy();
-    jestExpect(getByText('Incline Bench Press')).toBeTruthy();
+    expect(mockActions.createPlan).toHaveBeenCalledTimes(1);
   });
 });
-

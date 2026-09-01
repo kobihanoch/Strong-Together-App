@@ -69,7 +69,7 @@ const data = {
 describe('Home', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    mockLogic = { data, actions: mockActions, isLoading: false };
+    mockLogic = { data, actions: mockActions, loadingStates: { isPending: false, isFetching: false } };
   });
 
   it('renders the loaded dashboard and connects its actions', () => {
@@ -90,7 +90,7 @@ describe('Home', () => {
   });
 
   it('renders the full skeleton dashboard while loading', () => {
-    mockLogic = { data, actions: mockActions, isLoading: true };
+    mockLogic = { data, actions: mockActions, loadingStates: { isPending: true, isFetching: true } };
     const { getByTestId, getAllByTestId } = render(<Home />);
 
     expect(getByTestId('skeleton-group-loading')).toBeTruthy();
@@ -98,7 +98,7 @@ describe('Home', () => {
   });
 
   it('renders the create-workout state when no plan exists', () => {
-    mockLogic = { data: { ...data, state: { hasWorkout: false, hasTracking: false } }, actions: mockActions, isLoading: false };
+    mockLogic = { data: { ...data, state: { hasWorkout: false, hasTracking: false } }, actions: mockActions, loadingStates: { isPending: false, isFetching: false } };
     const { getByText, queryByTestId } = render(<Home />);
 
     fireEvent.press(getByText('Create workout'));
@@ -107,7 +107,7 @@ describe('Home', () => {
   });
 
   it('renders the no-tracking state for a plan without history', () => {
-    mockLogic = { data: { ...data, state: { hasWorkout: true, hasTracking: false } }, actions: mockActions, isLoading: false };
+    mockLogic = { data: { ...data, state: { hasWorkout: true, hasTracking: false } }, actions: mockActions, loadingStates: { isPending: false, isFetching: false } };
     const { getByText, queryByTestId } = render(<Home />);
 
     expect(getByText('No tracking')).toBeTruthy();

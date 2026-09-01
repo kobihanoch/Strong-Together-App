@@ -6,7 +6,7 @@ import { Dimensions, FlatList, NativeScrollEvent, NativeSyntheticEvent, StyleShe
 import { RFValue } from 'react-native-responsive-fontsize';
 import { useWorkoutHistory } from '../../shared/providers/WorkoutHistoryProvider';
 import { useMyWorkoutPlanPageLogic } from '../hooks/use-my-workout-plan-page-logic.hook';
-import { getBodyPartsForSplit } from '../utils/workout-plan.util';
+import { getBodyPartsForSplit } from '../utils/workout-plan.utils';
 import Badge from '../../../../shared/components/Badge';
 import Column from '../../../../shared/components/Column';
 import PageDots from '../../../../shared/components/PageDots';
@@ -27,10 +27,7 @@ const SplitFlatList = ({ setSelectedSplit, selectedSplit, openCardioModal }: Spl
   const { workoutSplits, exerciseCounter } = useMyWorkoutPlanPageLogic();
   const { hasTrainedToday, analyzedExerciseTrackingData } = useWorkoutHistory();
 
-  const splitDaysCompletions = useMemo(
-    () => analyzedExerciseTrackingData?.splitDaysByName ?? {},
-    [analyzedExerciseTrackingData],
-  );
+  const splitDaysCompletions = useMemo(() => analyzedExerciseTrackingData?.splitDaysByName ?? {}, [analyzedExerciseTrackingData]);
 
   // Page width for FlatList paging
   const [pageW, setPageW] = useState(0);
