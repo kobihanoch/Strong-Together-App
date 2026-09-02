@@ -7,7 +7,7 @@ export type RootParamList = {
   Profile: undefined;
   MyWorkoutPlan: undefined;
   CreateWorkout: undefined;
-  Statistics: undefined;
+  TrackHistory: undefined;
   Inbox: undefined;
   Analytics: undefined;
   StartWorkout: {

@@ -38,7 +38,7 @@ const BottomTabBar = () => {
   const tabs: { name: RouteName; icon: keyof typeof MaterialCommunityIcons.glyphMap; label: string }[] = [
     { name: 'Home', icon: 'home-variant-outline', label: 'Home' },
     { name: 'MyWorkoutPlan', icon: 'calendar-blank-outline', label: 'Plan' },
-    { name: 'Analytics', icon: 'chart-bar', label: 'Progress' },
+    { name: 'TrackHistory', icon: 'chart-bar', label: 'Progress' },
     { name: 'Profile', icon: 'account-outline', label: 'Profile' },
   ];
 
@@ -49,7 +49,7 @@ const BottomTabBar = () => {
         {tabs.map((tab, index) => {
           const isActive =
             routeName === tab.name ||
-            (tab.name === 'Analytics' && routeName === 'Statistics') ||
+            (tab.name === 'Analytics' && routeName === 'TrackHistory') ||
             (tab.name === 'Profile' && routeName === 'Settings');
 
           return (

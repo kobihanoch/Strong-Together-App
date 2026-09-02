@@ -184,6 +184,6 @@ describe('useHomeDashboard', () => {
     expect(mockNavigate).toHaveBeenNthCalledWith(2, 'CreateWorkout');
     expect(mockNavigate).toHaveBeenNthCalledWith(3, 'StartWorkout', { workoutSplit: splitB });
     expect(mockNavigate).toHaveBeenNthCalledWith(4, 'Analytics');
-    expect(mockNavigate).toHaveBeenNthCalledWith(5, 'Statistics');
+    expect(mockNavigate).toHaveBeenNthCalledWith(5, 'TrackHistory');
   });
 });

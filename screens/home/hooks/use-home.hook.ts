@@ -33,8 +33,8 @@ const useHome = () => {
 
   const data = useMemo(() => {
     const lastWorkout = dashboardData?.lastWorkoutStats;
-    const pr = dashboardData?.prs[0];
-    const estimatedOneRepMax = pr?.estimatedOneRepMax ?? 0;
+    const latestPr = dashboardData?.latestPr?.[0];
+    const estimatedOneRepMax = latestPr?.estimatedOneRepMax ? Number(latestPr.estimatedOneRepMax.toFixed(0)) : 0;
     const nextExercises: ExerciseInPlan[] = nextSplit?.exercises ?? [];
 
     return {
@@ -83,8 +83,8 @@ const useHome = () => {
         days: fillCardioGraph(cardioData.weeklyCardioMap),
       },
       achievement: {
-        exercise: pr?.exerciseName ?? '',
-        value: pr ? `${pr.prWeight} kg PR` : '',
+        exercise: latestPr?.exerciseName ?? '',
+        value: latestPr ? `${latestPr.prWeight} kg PR` : '',
         estimatedOneRepMax,
       },
     };
@@ -109,7 +109,7 @@ const useHome = () => {
       startWorkout: () =>
         nextSplit ? navigation.navigate('StartWorkout', { workoutSplit: nextSplit }) : navigation.navigate('MyWorkoutPlan'),
       openProgress: () => navigation.navigate('Analytics'),
-      openHistory: () => navigation.navigate('Statistics'),
+      openHistory: () => navigation.navigate('TrackHistory'),
     },
     loadingStates: {
       isPending:

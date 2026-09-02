@@ -127,7 +127,7 @@ const useStartWorkoutPageLogic = (
       setIsWorkoutMode(false);
       disableCache();
       await clearCache();
-      navigation.replace('Statistics');
+      navigation.replace('TrackHistory');
     } catch (err) {
       throw err;
     } finally {

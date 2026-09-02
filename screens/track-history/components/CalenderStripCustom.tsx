@@ -3,7 +3,7 @@ import React, { useCallback, useMemo, useRef, useState } from 'react';
 import { Dimensions, FlatList, StyleSheet, Text, TouchableOpacity, View, ViewToken } from 'react-native';
 import { RFValue } from 'react-native-responsive-fontsize';
 import { colors } from '../../../../shared/constants/colors';
-import { WorkoutHistoryExerciseTrackingMaps } from '../types/workout-history.types';
+import { WorkoutHistoryExerciseTrackingMaps as TrackHistoryExerciseTrackingMaps } from '../types/workout-history.types';
 import useGenerateDays from '../../../../shared/hooks/use-generate-days.hook';
 import Row from '../../../../shared/components/Row';
 
@@ -16,7 +16,7 @@ const ITEM_W = width * 0.18;
 type CalendarStripCustomProps = {
   onDateSelect: React.Dispatch<React.SetStateAction<string>>;
   selectedDate: string;
-  userExerciseLogs: WorkoutHistoryExerciseTrackingMaps['byDate'] | null;
+  userExerciseLogs: TrackHistoryExerciseTrackingMaps['byDate'] | null;
 };
 
 const CalendarStripCustom = ({ onDateSelect, selectedDate, userExerciseLogs }: CalendarStripCustomProps) => {

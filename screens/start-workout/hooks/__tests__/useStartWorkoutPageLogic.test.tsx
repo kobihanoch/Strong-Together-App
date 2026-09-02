@@ -512,7 +512,7 @@ describe('use-start-workout-page-logic.hook integration', () => {
     expect(result.current.analysis.analyzedExerciseTrackingData).toEqual(userWithWorkoutAndHistoryProfile.analyzedExerciseTrackingData);
     expect(result.current.auth.isWorkoutMode).toBe(false);
     expect(mockCacheDeleteKey).toHaveBeenCalledWith(keyStartWorkout('user-1'));
-    expect(mockReplace).toHaveBeenCalledWith('Statistics');
+    expect(mockReplace).toHaveBeenCalledWith('TrackHistory');
   });
 
   it('blocks save when no set was actually performed and keeps the user inside the workout flow', async () => {
@@ -539,7 +539,7 @@ describe('use-start-workout-page-logic.hook integration', () => {
 
     expect(mockShowErrorAlert).toHaveBeenCalledWith('Saving Error', 'Please perform at least one set');
     expect(mockSaveWorkoutData).not.toHaveBeenCalled();
-    expect(mockReplace).not.toHaveBeenCalledWith('Statistics');
+    expect(mockReplace).not.toHaveBeenCalledWith('TrackHistory');
     expect(result.current.auth.isWorkoutMode).toBe(true);
   });
 

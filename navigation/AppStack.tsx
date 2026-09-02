@@ -12,7 +12,7 @@ import MyWorkoutPlan from '../screens/my-workout-plan/MyWorkoutPlan';
 import Profile from '../screens/profile/Profile';
 import Settings from '../screens/settings/Settings';
 import StartWorkout from '../screens/start-workout/StartWorkout';
-import Statistics from '../screens/workout-history/Statistics';
+import TrackHistory from '../screens/track-history/TrackHistory';
 import { ymdInCurrentTZ } from '../shared/utils/shared-utils';
 import { ResumeWorkoutCachePayload } from '../screens/start-workout/types/use-start-workout.types';
 import { RootParamList } from './types/appStackTypes';
@@ -67,7 +67,7 @@ const AppStack = () => {
       <Stack.Screen name="MyWorkoutPlan" component={MyWorkoutPlan} />
       <Stack.Screen name="StartWorkout" component={StartWorkout} />
       <Stack.Screen name="CreateWorkout" component={CreateWorkout} />
-      <Stack.Screen name="Statistics" component={Statistics} />
+      <Stack.Screen name="TrackHistory" component={TrackHistory} />
       <Stack.Screen name="Inbox" component={Inbox} />
       <Stack.Screen name="Analytics" component={Analytics} />
     </Stack.Navigator>
