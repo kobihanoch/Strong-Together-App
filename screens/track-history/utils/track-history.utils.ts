@@ -9,7 +9,7 @@ export const TRACK_HISTORY_DAYS = 45;
 type ExerciseHistory = ExerciseHistoryItem['exerciseTracked'];
 type PreviousWorkout = { performance: ExerciseHistory[number]['sets']; date: string } | null;
 
-export type TrackHistoryPoint = { date: string; value: number };
+export type TrackHistoryPoint = { date: string; value: number; reps: number; setNumber: number };
 
 export const getTrackHistoryDateBounds = () => {
   const today = DateTime.local().startOf('day');
@@ -24,6 +24,11 @@ export const getTrackWorkout = (history: WorkoutHistoryMap | undefined, selected
 export const getTrackWorkoutDates = (history: WorkoutHistoryMap | undefined) => new Set(Object.keys(history?.byDate ?? {}));
 
 export const getMaxWeight = (sets: ExerciseHistory[number]['sets']) => Math.max(0, ...sets.map((set) => set.weight));
+
+export const getTopSet = (sets: ExerciseHistory[number]['sets']) => {
+  const topSet = sets.reduce<(typeof sets)[number] | null>((best, set) => (!best || set.weight > best.weight ? set : best), null);
+  return topSet ? { value: topSet.weight, reps: topSet.reps, setNumber: topSet.setIndex + 1 } : { value: 0, reps: 0, setNumber: 1 };
+};
 
 export const getProgressChange = (points: TrackHistoryPoint[]) => {
   const firstValue = points[0]?.value ?? 0;
@@ -48,17 +53,21 @@ export const getPlannedSetCounts = (splits: WorkoutSplit[]) => {
   return counts;
 };
 
-export const getMaxWeightProgress = (exerciseHistory: ExerciseHistory, selectedDate: string, currentMax: number): TrackHistoryPoint[] => {
+export const getMaxWeightProgress = (
+  exerciseHistory: ExerciseHistory,
+  selectedDate: string,
+  currentSets: ExerciseHistory[number]['sets'],
+): TrackHistoryPoint[] => {
   const points = exerciseHistory
     .filter((entry) => entry.workoutStartLocal.slice(0, 10) <= selectedDate)
     .sort((a, b) => b.workoutStartLocal.localeCompare(a.workoutStartLocal))
     .slice(0, 5)
     .sort((a, b) => a.workoutStartLocal.localeCompare(b.workoutStartLocal))
-    .map((entry) => ({ date: entry.workoutStartLocal, value: getMaxWeight(entry.sets) }));
+    .map((entry) => ({ date: entry.workoutStartLocal, ...getTopSet(entry.sets) }));
 
   // A freshly completed workout can reach this map before exercise history refreshes.
   if (!points.some((point) => point.date.slice(0, 10) === selectedDate)) {
-    points.push({ date: selectedDate, value: currentMax });
+    points.push({ date: selectedDate, ...getTopSet(currentSets) });
   }
 
   return points.sort((a, b) => a.date.localeCompare(b.date)).slice(-5);
@@ -102,7 +111,7 @@ export const buildTrackExercises = (
         previousBest: getPreviousBest(exerciseHistory, selectedDate),
         previousMax: previous ? getMaxWeight(previous.performance) : null,
         previousDate: previous?.date ?? null,
-        progress: getMaxWeightProgress(exerciseHistory, selectedDate, currentMax),
+        progress: getMaxWeightProgress(exerciseHistory, selectedDate, exerciseTracking.sets),
       };
     })
     .sort((a, b) => a.orderIndex - b.orderIndex);

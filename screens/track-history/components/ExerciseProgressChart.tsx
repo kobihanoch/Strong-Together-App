@@ -4,13 +4,12 @@ import { LayoutChangeEvent, StyleSheet, Text, useWindowDimensions, View } from '
 import Svg, { Circle, Line, Path } from 'react-native-svg';
 import { AppThemeColors } from '../../../shared/constants/theme';
 import { fontFamilies, fontSizes } from '../../../shared/constants/typography';
-import { getProgressChange } from '../utils/track-history.utils';
+import { getProgressChange, TrackHistoryPoint } from '../utils/track-history.utils';
 
-type Point = { date: string; value: number };
-
-const ExerciseProgressChart = ({ points, theme }: { points: Point[]; theme: AppThemeColors }) => {
+const ExerciseProgressChart = ({ points, theme }: { points: TrackHistoryPoint[]; theme: AppThemeColors }) => {
   const { height } = useWindowDimensions();
   const [chartWidth, setChartWidth] = useState(0);
+  const [selectedDate, setSelectedDate] = useState<string | null>(null);
   if (!points.length) return null;
   const chartHeight = Math.max(72, Math.min(height * 0.1, 92));
   const edgePadding = 6;
@@ -29,6 +28,7 @@ const ExerciseProgressChart = ({ points, theme }: { points: Point[]; theme: AppT
   const change = getProgressChange(points);
   const changeLabel = `${change > 0 ? '+' : ''}${change.toFixed(1)}% over the last ${points.length} workouts`;
   const measureChart = (event: LayoutChangeEvent) => setChartWidth(event.nativeEvent.layout.width);
+  const selectedPoint = points.find((point) => point.date === selectedDate) ?? null;
 
   return (
     <View style={styles.wrap}>
@@ -43,12 +43,31 @@ const ExerciseProgressChart = ({ points, theme }: { points: Point[]; theme: AppT
               <Line x1={edgePadding} x2={chartWidth - edgePadding} y1={chartHeight - 1} y2={chartHeight - 1} stroke={theme.border} />
               {area ? <Path d={area} fill={theme.primarySoft} opacity={0.45} /> : null}
               <Path d={line} fill="none" stroke={theme.primary} strokeWidth={2} />
-              {xy.map((point, index) => <Circle key={index} cx={point.x} cy={point.y} r={3} fill={theme.surface} stroke={theme.primary} strokeWidth={2} />)}
+              {xy.map((point, index) => (
+                <React.Fragment key={points[index].date}>
+                  <Circle cx={point.x} cy={point.y} r={14} fill="transparent" onPress={() => setSelectedDate(points[index].date)} />
+                  <Circle
+                    cx={point.x}
+                    cy={point.y}
+                    r={selectedDate === points[index].date ? 4 : 3}
+                    fill={selectedDate === points[index].date ? theme.primary : theme.surface}
+                    stroke={theme.primary}
+                    strokeWidth={2}
+                    pointerEvents="none"
+                  />
+                </React.Fragment>
+              ))}
             </Svg>
           )}
         </View>
       </View>
       <View style={styles.dateRow}><View style={styles.axisSpacer} /><View style={styles.dates}>{points.map((point) => <Text key={point.date} style={[styles.date, { color: theme.textSecondary }]}>{DateTime.fromISO(point.date).toFormat('MMM d')}</Text>)}</View></View>
+      {selectedPoint && (
+        <View style={[styles.pointDetails, { borderTopColor: theme.border }]}>
+          <Text style={[styles.pointDate, { color: theme.textSecondary }]}>{DateTime.fromISO(selectedPoint.date).toFormat('MMM d')}</Text>
+          <Text style={[styles.pointValue, { color: theme.textPrimary }]}>Set {selectedPoint.setNumber} · {selectedPoint.value} kg × {selectedPoint.reps}</Text>
+        </View>
+      )}
     </View>
   );
 };
@@ -65,6 +84,9 @@ const styles = StyleSheet.create({
   axisSpacer: { width: 48 },
   dates: { flex: 1, flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: 2 },
   date: { fontFamily: fontFamilies.regular, fontSize: fontSizes.caption },
+  pointDetails: { marginLeft: 48, marginTop: 10, paddingTop: 10, borderTopWidth: 1, flexDirection: 'row', justifyContent: 'space-between' },
+  pointDate: { fontFamily: fontFamilies.regular, fontSize: fontSizes.bodySmall },
+  pointValue: { fontFamily: fontFamilies.semiBold, fontSize: fontSizes.bodySmall },
 });
 
 export default ExerciseProgressChart;
