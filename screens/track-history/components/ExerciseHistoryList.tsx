@@ -19,7 +19,10 @@ const ExpandedExercise = ({ exercise, data }: { exercise: Exercise; data: Data }
       <View style={styles.sets}>
         {exercise.sets.map((set, index) => (
           <View key={`${set.setIndex}-${index}`} style={[styles.setRow, { borderBottomColor: data.theme.border }]}>
-            <Text style={[styles.setText, { color: data.theme.textPrimary }]}>Set {index + 1}</Text>
+            <View style={styles.setLabel}>
+              <Text style={[styles.setText, { color: data.theme.textPrimary }]}>Set {index + 1}</Text>
+              {set.isExtra && <Text style={[styles.extra, { color: data.theme.primary, backgroundColor: data.theme.primarySoft }]}>EXTRA</Text>}
+            </View>
             <Text style={[styles.setText, { color: data.theme.textPrimary }]}>
               {set.weight} kg × {set.reps}
             </Text>
@@ -113,6 +116,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
   },
   setText: { fontFamily: fontFamilies.regular, fontSize: fontSizes.bodySmall },
+  setLabel: { flexDirection: 'row', alignItems: 'center', gap: 7 },
+  extra: { fontFamily: fontFamilies.semiBold, fontSize: fontSizes.caption, paddingHorizontal: 7, paddingVertical: 2, borderRadius: 6 },
   achievement: { flexDirection: 'row', alignItems: 'center', gap: 14, marginTop: 20, paddingHorizontal: 6 },
   achievementText: { flex: 1 },
   achievementLabel: { fontFamily: fontFamilies.semiBold, fontSize: fontSizes.caption, letterSpacing: 1.5 },

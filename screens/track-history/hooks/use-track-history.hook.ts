@@ -2,8 +2,15 @@ import { useEffect, useMemo, useState } from 'react';
 import { useExerciseHistory } from '../../../features/workouts/history/hooks/use-exercise-history.hook';
 import { usePrHistory } from '../../../features/workouts/history/hooks/use-pr-history.hook';
 import { useWorkoutHistory } from '../../../features/workouts/history/hooks/use-workout-history.hook';
+import { useWorkoutPlan } from '../../../features/workouts/plan/hooks/use-workout-plan.hook';
 import { useAppTheme } from '../../../shared/providers/AppThemeProvider';
-import { buildTrackExercises, getTrackHistoryDateBounds, getTrackWorkout, getTrackWorkoutDates } from '../utils/track-history.utils';
+import {
+  buildTrackExercises,
+  getPlannedSetCounts,
+  getTrackHistoryDateBounds,
+  getTrackWorkout,
+  getTrackWorkoutDates,
+} from '../utils/track-history.utils';
 
 /**
  * Builds the Track History screen state from workout, exercise-history, and PR data.
@@ -14,6 +21,7 @@ const useTrackHistory = () => {
   const { data: workoutData, loadingStates: workoutLoading } = useWorkoutHistory();
   const { data: exerciseData, loadingStates: exerciseLoading } = useExerciseHistory();
   const { data: prsData, loadingStates: prsLoading } = usePrHistory();
+  const { data: planData, loadingStates: planLoading } = useWorkoutPlan();
 
   const { today, minDate } = getTrackHistoryDateBounds();
   const [selectedDate, setSelectedDate] = useState(today);
@@ -27,10 +35,18 @@ const useTrackHistory = () => {
         workout,
         prsData.prHistoryMap,
         selectedDate,
+        getPlannedSetCounts(planData.workoutSplits),
         exerciseData.getExerciseHistoryData,
         exerciseData.getLastWorkoutData,
       ),
-    [prsData.prHistoryMap, exerciseData.getExerciseHistoryData, exerciseData.getLastWorkoutData, selectedDate, workout],
+    [
+      prsData.prHistoryMap,
+      planData.workoutSplits,
+      exerciseData.getExerciseHistoryData,
+      exerciseData.getLastWorkoutData,
+      selectedDate,
+      workout,
+    ],
   );
 
   // Open the first exercise whenever a new workout is selected.
@@ -53,7 +69,7 @@ const useTrackHistory = () => {
       exercises,
       expandedId,
       workoutDates: getTrackWorkoutDates(workoutData.workoutHistoryMap),
-      isLoading: workoutLoading.isPending || exerciseLoading.isPending || prsLoading.isPending,
+      isLoading: workoutLoading.isPending || exerciseLoading.isPending || prsLoading.isPending || planLoading.isPending,
     },
     actions: { setDate, toggleExercise: (id: number) => setExpandedId((current) => (current === id ? null : id)) },
   };

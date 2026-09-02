@@ -2,7 +2,7 @@ import { DateTime } from 'luxon';
 import { ExerciseHistoryItem } from '../../../features/workouts/history/types/exercise-history.types';
 import { PrHistoryMap } from '../../../features/workouts/history/types/pr-history.types';
 import { WorkoutHistoryItem, WorkoutHistoryMap } from '../../../features/workouts/history/types/workout-history.types';
-import { ExerciseInPlan } from '../../../features/workouts/plan/types/workout-plan.types';
+import { ExerciseInPlan, WorkoutSplit } from '../../../features/workouts/plan/types/workout-plan.types';
 
 export const TRACK_HISTORY_DAYS = 45;
 
@@ -38,6 +38,16 @@ export const getPreviousBest = (exerciseHistory: ExerciseHistory, selectedDate: 
   return previousWeights.length ? Math.max(...previousWeights) : null;
 };
 
+export const getPlannedSetCounts = (splits: WorkoutSplit[]) => {
+  const counts = new Map<number, number>();
+  splits.forEach((split) => {
+    split.exercises.forEach((exercise) => {
+      if (exercise.exerciseToSplitId !== null) counts.set(exercise.exerciseToSplitId, exercise.sets.length);
+    });
+  });
+  return counts;
+};
+
 export const getMaxWeightProgress = (exerciseHistory: ExerciseHistory, selectedDate: string, currentMax: number): TrackHistoryPoint[] => {
   const points = exerciseHistory
     .filter((entry) => entry.workoutStartLocal.slice(0, 10) <= selectedDate)
@@ -58,6 +68,7 @@ export const buildTrackExercises = (
   workout: WorkoutHistoryItem | null,
   prs: PrHistoryMap | undefined,
   selectedDate: string,
+  plannedSetCounts: Map<number, number>,
   getExerciseHistory: (id: ExerciseInPlan['exerciseToSplitId'] | null) => ExerciseHistory,
   getPreviousWorkout: (id: ExerciseInPlan['exerciseToSplitId'] | null, beforeDate: string) => PreviousWorkout,
 ) => {
@@ -68,6 +79,7 @@ export const buildTrackExercises = (
       const previous = getPreviousWorkout(assignment.exerciseToSplitId, selectedDate);
       const currentMax = getMaxWeight(exerciseTracking.sets);
       const currentPr = prs?.prs[exerciseTracking.exerciseAssignment.exerciseId];
+      const plannedSetCount = assignment.exerciseToSplitId === null ? null : (plannedSetCounts.get(assignment.exerciseToSplitId) ?? null);
       const isPr = Boolean(
         currentPr &&
           selectedDate === currentPr.workoutStartLocal.slice(0, 10) &&
@@ -80,7 +92,10 @@ export const buildTrackExercises = (
         name: assignment.exerciseName,
         muscle: assignment.specificTargetMuscle || assignment.targetMuscle,
         splitName: assignment.workoutSplitName,
-        sets: exerciseTracking.sets,
+        sets: exerciseTracking.sets.map((set) => ({
+          ...set,
+          isExtra: plannedSetCount !== null && set.setIndex >= plannedSetCount,
+        })),
         addedDuringWorkout: assignment.exerciseToSplitId === null,
         isPr,
         currentMax,
