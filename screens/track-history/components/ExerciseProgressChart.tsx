@@ -35,7 +35,10 @@ const ExerciseProgressChart = ({ points, theme }: { points: TrackHistoryPoint[];
       <Text style={[styles.label, { color: theme.textPrimary }]}>MAX WEIGHT PROGRESS</Text>
       <Text style={[styles.change, { color: change > 0 ? theme.profit : theme.textSecondary }]}>{changeLabel}</Text>
       <View style={styles.chartRow}>
-        <View style={styles.axis}><Text style={[styles.axisText, { color: theme.textSecondary }]}>{max} kg</Text><Text style={[styles.axisText, { color: theme.textSecondary }]}>{min}</Text></View>
+        <View style={styles.axis}>
+          <Text style={[styles.axisText, { color: theme.textSecondary }]}>{max} kg</Text>
+          <Text style={[styles.axisText, { color: theme.textSecondary }]}>{min}</Text>
+        </View>
         <View style={styles.plot} onLayout={measureChart}>
           {chartWidth > 0 && (
             <Svg width="100%" height={chartHeight}>
@@ -61,11 +64,22 @@ const ExerciseProgressChart = ({ points, theme }: { points: TrackHistoryPoint[];
           )}
         </View>
       </View>
-      <View style={styles.dateRow}><View style={styles.axisSpacer} /><View style={styles.dates}>{points.map((point) => <Text key={point.date} style={[styles.date, { color: theme.textSecondary }]}>{DateTime.fromISO(point.date).toFormat('MMM d')}</Text>)}</View></View>
+      <View style={styles.dateRow}>
+        <View style={styles.axisSpacer} />
+        <View style={styles.dates}>
+          {points.map((point) => (
+            <Text key={point.date} style={[styles.date, { color: theme.textSecondary }]}>
+              {DateTime.fromISO(point.date).toFormat('MMM d')}
+            </Text>
+          ))}
+        </View>
+      </View>
       {selectedPoint && (
         <View style={[styles.pointDetails, { borderTopColor: theme.border }]}>
           <Text style={[styles.pointDate, { color: theme.textSecondary }]}>{DateTime.fromISO(selectedPoint.date).toFormat('MMM d')}</Text>
-          <Text style={[styles.pointValue, { color: theme.textPrimary }]}>Set {selectedPoint.setNumber} · {selectedPoint.value} kg × {selectedPoint.reps}</Text>
+          <Text style={[styles.pointValue, { color: theme.textPrimary }]}>
+            Set {selectedPoint.setNumber} · {selectedPoint.value} kg × {selectedPoint.reps}
+          </Text>
         </View>
       )}
     </View>
