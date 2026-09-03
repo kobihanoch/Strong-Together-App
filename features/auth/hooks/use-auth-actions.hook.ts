@@ -6,7 +6,7 @@ import { showSuccessAlert } from '../../../shared/alerts/success-alerts';
 import { loginUser } from '../services/login.service';
 import { registerUser } from '../services/register.service';
 import { logoutUser } from '../services/auth.service';
-import type { LoginCredentials, RegistrationInput } from '../types/auth.types';
+import type { AuthPhase, LoginCredentials, RegistrationInput } from '../types/auth.types';
 import { AppUser } from '../../user/types/user.types';
 import GlobalAuth from '../utils/auth.utils';
 import { saveRefreshToken, saveUserId } from '../utils/token-storage.utils';
@@ -18,9 +18,8 @@ type UseAuthActionsProps = {
   setAppleLoading: React.Dispatch<SetStateAction<boolean>>;
   setGoogleLoading: React.Dispatch<SetStateAction<boolean>>;
   setUserIdCache: React.Dispatch<SetStateAction<AppUser['id'] | null | undefined>>;
-  setIsLoggedIn: React.Dispatch<SetStateAction<boolean>>;
   setIsValidatedWithServer: React.Dispatch<SetStateAction<boolean>>;
-  setAuthPhase: React.Dispatch<SetStateAction<'checking' | 'authed' | 'guest'>>;
+  setAuthPhase: React.Dispatch<SetStateAction<AuthPhase>>;
   clearContext: () => Promise<void>;
 };
 
@@ -29,7 +28,6 @@ const useAuthActions = ({
   setAppleLoading,
   setGoogleLoading,
   setUserIdCache,
-  setIsLoggedIn,
   setIsValidatedWithServer,
   setAuthPhase,
   clearContext,
@@ -39,12 +37,11 @@ const useAuthActions = ({
       await Promise.all([saveRefreshToken(refreshToken), saveUserId(userId)]);
       GlobalAuth.setAccessToken(accessToken);
       setUserIdCache(userId);
-      setIsLoggedIn(true);
       setIsValidatedWithServer(true);
       setAuthPhase('authed');
       console.log('\x1b[32m[Auth Context]: Login succeeded!\x1b[0m');
     },
-    [setAuthPhase, setIsLoggedIn, setIsValidatedWithServer, setUserIdCache],
+    [setAuthPhase, setIsValidatedWithServer, setUserIdCache],
   );
 
   const register = useCallback(
@@ -109,7 +106,6 @@ const useAuthActions = ({
     async (): Promise<void> => {
       try {
         await logoutUser();
-        setIsLoggedIn(false);
       } catch (err) {
         // Log but do not block local cleanup
         if (err instanceof AxiosError) console.log(err?.response?.data || err.message);
@@ -121,7 +117,7 @@ const useAuthActions = ({
         await clearContext();
       }
     },
-    [clearContext, setIsLoggedIn],
+    [clearContext],
   );
 
   // Expose the real logout to axios interceptors via GlobalAuth.logout

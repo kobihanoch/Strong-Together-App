@@ -84,7 +84,6 @@ const createUser = (overrides: Partial<AppUser> = {}): AppUser => ({
 
 const createAuthState = (overrides: Partial<AuthProviderValue> = {}): AuthProviderValue => ({
   authPhase: 'authed',
-  isLoggedIn: true,
   user: createUser(),
   setUser: jestObject.fn(),
   userIdCache: 'user-1',

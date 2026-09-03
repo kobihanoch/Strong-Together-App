@@ -14,7 +14,6 @@ const mockAuthState =
   jest.fn<
     () => {
       authPhase: 'checking' | 'authed' | 'guest';
-      isLoggedIn: boolean;
       user: typeof userWithoutWorkoutProfile.user;
     }
   >();
@@ -159,7 +158,6 @@ describe('App', () => {
     mockUseNavigationContainerRef.mockReturnValue({ current: null });
     mockAuthState.mockReturnValue({
       authPhase: 'guest',
-      isLoggedIn: false,
       user: null,
     });
   });
@@ -183,7 +181,6 @@ describe('App', () => {
   it('renders the auth branch for a guest user profile', async () => {
     mockAuthState.mockReturnValue({
       authPhase: 'guest',
-      isLoggedIn: false,
       user: null,
     });
 
@@ -200,7 +197,6 @@ describe('App', () => {
   it('renders the authenticated app branch for a signed-in user profile', async () => {
     mockAuthState.mockReturnValue({
       authPhase: 'authed',
-      isLoggedIn: true,
       user: userWithoutWorkoutProfile.user,
     });
 
@@ -218,7 +214,6 @@ describe('App', () => {
   it('renders neither auth nor app stacks while auth is still checking', async () => {
     mockAuthState.mockReturnValue({
       authPhase: 'checking',
-      isLoggedIn: false,
       user: null,
     });
 

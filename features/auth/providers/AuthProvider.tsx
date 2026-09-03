@@ -6,10 +6,10 @@ import useInitialCheck from '../hooks/use-initial-check.hook';
 import useRetryServerValidationWhenOnline from '../hooks/use-retry-server-validation-when-online.hook';
 import useServerValidation from '../hooks/use-server-validation.hook';
 import { AppUser } from '../../user/types/user.types';
+import { AuthPhase } from '../types/auth.types';
 
 interface AuthProviderValue {
-  authPhase: 'checking' | 'authed' | 'guest';
-  isLoggedIn: boolean;
+  authPhase: AuthPhase;
   userIdCache: AppUser['id'] | null;
   autheticationLoading: boolean;
   loading: boolean;
@@ -54,14 +54,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [userIdCache, setUserIdCache] = useState<AppUser['id'] | null | undefined>(undefined);
 
   // --- Auth & session state ---
-  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
   const [autheticationLoading, setAutheticationLoading] = useState<boolean>(false); // UI loading for login/register
   const [appleLoading, setAppleLoading] = useState<boolean>(false);
   const [googleLoading, setGoogleLoading] = useState<boolean>(false);
   const [isWorkoutMode, setIsWorkoutMode] = useState<boolean>(false); // For start workout
 
   // --- Startup phase for smooth auth-stack/app-stack routing ---
-  const [authPhase, setAuthPhase] = useState<'checking' | 'authed' | 'guest'>('checking');
+  const [authPhase, setAuthPhase] = useState<AuthPhase>('checking');
 
   // --- Unlocks API revalidation for cache-backed providers ---
   const [isValidatedWithServer, setIsValidatedWithServer] = useState(false);
@@ -72,7 +71,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   // Clear context method
   const { clearContext } = useClearContext({
-    setIsLoggedIn,
     setAutheticationLoading,
     setAppleLoading,
     setGoogleLoading,
@@ -89,7 +87,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     setAppleLoading,
     setGoogleLoading,
     setUserIdCache,
-    setIsLoggedIn,
     setIsValidatedWithServer,
     setAuthPhase,
     clearContext,
@@ -105,7 +102,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   });
 
   // Restore cached session on app start, then validate it in the background
-  useInitialCheck({ clearContext, logout, attemptServerValidation, setUserIdCache, setIsLoggedIn, setAuthPhase });
+  useInitialCheck({ clearContext, logout, attemptServerValidation, setUserIdCache, setAuthPhase });
 
   // Retry server validation when a boot-time offline/server failure recovers
   useRetryServerValidationWhenOnline(isValidatedWithServer, attemptServerValidation, attemptedServerValidationRef);
@@ -115,7 +112,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     () => ({
       // state
       authPhase,
-      isLoggedIn,
       userIdCache: userIdCache ?? null,
       autheticationLoading,
       loading: autheticationLoading,
@@ -132,7 +128,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       isValidatedWithServer,
     }),
     [
-      isLoggedIn,
       userIdCache,
       autheticationLoading,
       googleLoading,

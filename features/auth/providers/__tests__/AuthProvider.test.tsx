@@ -181,7 +181,6 @@ describe('AuthContext', () => {
       expect(result.current.authPhase).toBe('guest');
     });
 
-    expect(result.current.isLoggedIn).toBe(false);
     expect(result.current.userIdCache).toBe(null);
     expect(result.current.isValidatedWithServer).toBe(false);
     expect(mockClearRefreshToken).toHaveBeenCalledTimes(1);
@@ -202,7 +201,6 @@ describe('AuthContext', () => {
       expect(mockRefreshAndRotateTokens).toHaveBeenCalledTimes(1);
     });
 
-    expect(result.current.isLoggedIn).toBe(true);
     expect(result.current.userIdCache).toBe(userWithoutWorkoutProfile.user!.id);
     expect(result.current.isValidatedWithServer).toBe(true);
     expect(mockSaveRefreshToken).toHaveBeenCalledWith('refresh-token');
@@ -224,7 +222,6 @@ describe('AuthContext', () => {
     expect(mockLoginUser).toHaveBeenCalledWith('johnny', 'Secret123');
     expect(mockSaveRefreshToken).toHaveBeenCalledWith('refresh-token');
     expect(mockSetAccessToken).toHaveBeenCalledWith('access-token');
-    expect(result.current.isLoggedIn).toBe(true);
     expect(result.current.userIdCache).toBe(userWithoutWorkoutProfile.user!.id);
     expect(result.current.isValidatedWithServer).toBe(true);
     expect(result.current.authPhase).toBe('authed');
@@ -239,7 +236,6 @@ describe('AuthContext', () => {
     const { result } = renderHook(() => useAuth(), { wrapper });
 
     await waitFor(() => {
-      expect(result.current.isLoggedIn).toBe(true);
     });
 
     await act(async () => {
@@ -254,7 +250,6 @@ describe('AuthContext', () => {
     expect(mockDisconnectSocket).toHaveBeenCalledTimes(1);
     expect(mockClearTanStackCache).toHaveBeenCalledTimes(1);
     expect(mockClearRefreshToken).toHaveBeenCalled();
-    expect(result.current.isLoggedIn).toBe(false);
     expect(result.current.userIdCache).toBeNull();
     expect(result.current.isValidatedWithServer).toBe(false);
   });
@@ -277,7 +272,6 @@ describe('AuthContext', () => {
       expect(result.current.authPhase).toBe('guest');
     });
 
-    expect(result.current.isLoggedIn).toBe(false);
     expect(result.current.userIdCache).toBeNull();
     expect(result.current.isValidatedWithServer).toBe(false);
   });
@@ -300,7 +294,6 @@ describe('AuthContext', () => {
       expect(mockRefreshAndRotateTokens).toHaveBeenCalledTimes(1);
     });
 
-    expect(result.current.isLoggedIn).toBe(true);
     expect(result.current.userIdCache).toBe(userWithoutWorkoutProfile.user!.id);
     expect(result.current.isValidatedWithServer).toBe(false);
     expect(mockClearRefreshToken).not.toHaveBeenCalled();
@@ -332,7 +325,6 @@ describe('AuthContext', () => {
       rerender(undefined);
     });
 
-    expect(result.current.isLoggedIn).toBe(true);
     expect(result.current.userIdCache).toBe(userWithoutWorkoutProfile.user!.id);
     expect(result.current.isValidatedWithServer).toBe(false);
     expect(mockRefreshAndRotateTokens).toHaveBeenCalledTimes(1);
@@ -376,7 +368,6 @@ describe('AuthContext', () => {
       expect(result.current.isValidatedWithServer).toBe(true);
     });
 
-    expect(result.current.isLoggedIn).toBe(true);
     expect(result.current.userIdCache).toBe(userWithoutWorkoutProfile.user!.id);
     expect(mockSaveRefreshToken).toHaveBeenCalledWith('refresh-token');
     expect(mockSetAccessToken).toHaveBeenCalledWith('access-token');
@@ -401,7 +392,6 @@ describe('AuthContext', () => {
       expect(mockRefreshAndRotateTokens).toHaveBeenCalledTimes(1);
     });
 
-    expect(result.current.isLoggedIn).toBe(true);
     expect(result.current.userIdCache).toBe(userWithoutWorkoutProfile.user!.id);
     expect(result.current.isValidatedWithServer).toBe(false);
     expect(mockClearRefreshToken).not.toHaveBeenCalled();

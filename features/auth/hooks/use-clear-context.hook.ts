@@ -3,22 +3,21 @@ import { clearTanStackCache } from '../../../infrastructure/query/query-client';
 import { AppUser } from '../../user/types/user.types';
 import GlobalAuth from '../utils/auth.utils';
 import { clearAuthStorage } from '../utils/token-storage.utils';
+import { AuthPhase } from '../types/auth.types';
 
 type UseClearContextProps = {
-  setIsLoggedIn: React.Dispatch<SetStateAction<boolean>>;
   setAutheticationLoading: React.Dispatch<SetStateAction<boolean>>;
   setAppleLoading: React.Dispatch<SetStateAction<boolean>>;
   setGoogleLoading: React.Dispatch<SetStateAction<boolean>>;
   setIsWorkoutMode: React.Dispatch<SetStateAction<boolean>>;
   setUserIdCache: React.Dispatch<SetStateAction<AppUser['id'] | null | undefined>>;
   setIsValidatedWithServer: React.Dispatch<SetStateAction<boolean>>;
-  setAuthPhase: React.Dispatch<SetStateAction<'checking' | 'authed' | 'guest'>>;
+  setAuthPhase: React.Dispatch<SetStateAction<AuthPhase>>;
   serverValidatingLockRef: React.MutableRefObject<boolean>;
   attemptedServerValidationRef: React.MutableRefObject<boolean>;
 };
 
 const useClearContext = ({
-  setIsLoggedIn,
   setAutheticationLoading,
   setAppleLoading,
   setGoogleLoading,
@@ -35,7 +34,6 @@ const useClearContext = ({
       await clearTanStackCache();
       GlobalAuth.setAccessToken(null);
       GlobalAuth.setUsernameInHeader(null);
-      setIsLoggedIn(false);
       setAutheticationLoading(false);
       setAppleLoading(false);
       setGoogleLoading(false);
@@ -52,7 +50,6 @@ const useClearContext = ({
       setAppleLoading,
       setAuthPhase,
       setGoogleLoading,
-      setIsLoggedIn,
       setIsValidatedWithServer,
       setIsWorkoutMode,
       setAutheticationLoading,

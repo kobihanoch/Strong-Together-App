@@ -121,12 +121,12 @@ export default App;
 
 // ---------- Navigation Logic (auth-only here) ----------
 function RootNavigator() {
-  const { isLoggedIn, userIdCache, authPhase } = useAuth();
+  const { userIdCache, authPhase } = useAuth();
 
   // Ensures no UI is rendered if auth is not loaded yet
   if (authPhase === 'checking') return null;
 
-  return <>{isLoggedIn ? <AuthenticatedApp key={userIdCache} /> : <AuthStack />}</>;
+  return <>{authPhase === 'authed' ? <AuthenticatedApp key={userIdCache} /> : <AuthStack />}</>;
 }
 
 function QueryHydrationGate({ children }: { children: React.ReactNode }) {

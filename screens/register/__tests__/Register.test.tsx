@@ -60,7 +60,6 @@ import Register from '../Register';
 
 const createAuthState = (overrides: Partial<AuthProviderValue> = {}): AuthProviderValue => ({
   authPhase: 'guest',
-  isLoggedIn: false,
   user: null,
   setUser: jestObject.fn(),
   userIdCache: null,

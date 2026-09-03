@@ -1,20 +1,19 @@
 import { SetStateAction, useEffect } from 'react';
 import { AppUser } from '../../user/types/user.types';
 import { getRefreshToken, getUserId } from '../utils/token-storage.utils';
+import { AuthPhase } from '../types/auth.types';
 
 const useInitialCheck = ({
   clearContext,
   attemptServerValidation,
   setUserIdCache,
-  setIsLoggedIn,
   setAuthPhase,
   logout,
 }: {
   clearContext: () => Promise<void>;
   attemptServerValidation: () => Promise<void>;
   setUserIdCache: React.Dispatch<SetStateAction<AppUser['id'] | null | undefined>>;
-  setIsLoggedIn: React.Dispatch<SetStateAction<boolean>>;
-  setAuthPhase: React.Dispatch<SetStateAction<'authed' | 'guest' | 'checking'>>;
+  setAuthPhase: React.Dispatch<SetStateAction<AuthPhase>>;
   logout: () => Promise<void>;
 }) => {
   useEffect(() => {
@@ -37,14 +36,13 @@ const useInitialCheck = ({
       // Triggers SWR hook logic chain
       // Builds cache key for every feautre - shows data from cache
       setUserIdCache(cacheUserId);
-      setIsLoggedIn(true);
       setAuthPhase('authed');
 
       // Try to validate with server
       // After success - fetch from server (TanStack)
       await attemptServerValidation();
     })();
-  }, [clearContext, attemptServerValidation, setUserIdCache, setIsLoggedIn, setAuthPhase, logout]);
+  }, [clearContext, attemptServerValidation, setUserIdCache, setAuthPhase, logout]);
 
   return;
 };
