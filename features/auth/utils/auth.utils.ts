@@ -2,7 +2,7 @@ import api from '../../../infrastructure/api/api-config/api';
 
 const GlobalAuth: {
   setAccessToken: (t: string | null) => void;
-  logout: ((skipCacheCleanup: boolean) => Promise<void>) | null;
+  logout: (() => Promise<void>) | null;
   setUsernameInHeader: (username: string | null) => void;
 } = {
   setAccessToken: (token) => {

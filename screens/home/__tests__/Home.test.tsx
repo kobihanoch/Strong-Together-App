@@ -23,7 +23,11 @@ jest.mock('../../../features/workouts/plan/hooks/use-workout-plan.hook', () => (
   }),
 }));
 jest.mock('../../../features/workouts/cardio/hooks/use-cardio.hook', () => ({
-  useCardio: () => ({ data: { weeklyCardioMap: {}, cardioForSelectedWeek: () => null }, loadingStates: { isPending: mockFeatureState.pending } }),
+  useCardio: () => ({
+    data: { weeklyCardioMap: {}, cardioForSelectedWeek: () => null },
+    loadingStates: { isPending: mockFeatureState.pending, isUpdating: false },
+    actions: { logCardio: jest.fn() },
+  }),
 }));
 jest.mock('../../../features/dashboard/use-dashboard.hook', () => ({
   __esModule: true,
@@ -53,6 +57,7 @@ jest.mock('../components/GymActivityCard', () => () => null);
 jest.mock('../components/AerobicsCard', () => () => null);
 jest.mock('../components/AchievementCard', () => () => null);
 jest.mock('../components/LastWorkoutCard', () => () => null);
+jest.mock('../../../features/workouts/cardio/components/CardioEntrySheet', () => () => null);
 
 describe('Home integration', () => {
   beforeEach(() => {

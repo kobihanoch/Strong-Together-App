@@ -3,7 +3,6 @@ import React, { createContext, useContext, useMemo, useRef, useState } from 'rea
 import useAuthActions from '../hooks/use-auth-actions.hook';
 import useClearContext from '../hooks/use-clear-context.hook';
 import useInitialCheck from '../hooks/use-initial-check.hook';
-import usePersistUserIdCache from '../hooks/use-persist-user-id-cache.hook';
 import useRetryServerValidationWhenOnline from '../hooks/use-retry-server-validation-when-online.hook';
 import useServerValidation from '../hooks/use-server-validation.hook';
 import { AppUser } from '../../user/types/user.types';
@@ -29,7 +28,7 @@ interface AuthProviderValue {
   login: (identifier: LoginRequestBody['identifier'], password: LoginRequestBody['password']) => Promise<void>;
   handleAppleAuth: () => Promise<void>;
   handleGoogleAuth: () => Promise<void>;
-  logout: (skipCacheCleanup: boolean) => Promise<void>;
+  logout: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthProviderValue | null>(null);
@@ -53,7 +52,6 @@ export const useAuth = () => {
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   // --- Cached session identifier ---
   const [userIdCache, setUserIdCache] = useState<AppUser['id'] | null | undefined>(undefined);
-  usePersistUserIdCache(userIdCache);
 
   // --- Auth & session state ---
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);

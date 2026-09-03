@@ -3,8 +3,8 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useCallback } from 'react';
 import { getStartOfWeek } from '../../../../shared/utils/shared-utils';
 import { useAuth } from '../../../auth/providers/AuthProvider';
-import { getUserCardio, logUserCardio } from '../services/cardio.service';
-import { CardioMaps } from '../types/cardio.types';
+import { deleteUserCardio, getUserCardio, logUserCardio, updateUserCardio } from '../services/cardio.service';
+import { CardioEntryInput, CardioMaps, EditableCardioRecord } from '../types/cardio.types';
 import { checkIfDoneCardioInSelectedWeek, getCardioForToday } from '../utils/cardio.utils';
 
 type CardioInput = CreateAerobicEntryBody['record'];
@@ -46,6 +46,14 @@ export const useCardio = () => {
       queryClient.setQueryData<CardioMaps | null>(queryKey, updatedCardioMaps);
     },
   });
+  const updateSourceCardio = useMutation({
+    mutationFn: ({ id, record }: { id: EditableCardioRecord['id']; record: CardioEntryInput }) => updateUserCardio(id, record),
+    onSuccess: (maps) => queryClient.setQueryData<CardioMaps>(queryKey, maps),
+  });
+  const deleteSourceCardio = useMutation({
+    mutationFn: (id: EditableCardioRecord['id']) => deleteUserCardio(id),
+    onSuccess: (maps) => queryClient.setQueryData<CardioMaps>(queryKey, maps),
+  });
 
   // Update local
 
@@ -79,11 +87,15 @@ export const useCardio = () => {
       isLoading: query.isLoading,
       isFetching: query.isFetching,
       isUpdating: addSourceCardio.isPending,
+      isEditing: updateSourceCardio.isPending,
+      isDeleting: deleteSourceCardio.isPending,
     },
 
     // Actions
     actions: {
       logCardio: addSourceCardio.mutateAsync,
+      updateCardio: updateSourceCardio.mutateAsync,
+      deleteCardio: deleteSourceCardio.mutateAsync,
       updateLocalCardioMaps,
       refetch: query.refetch,
     },

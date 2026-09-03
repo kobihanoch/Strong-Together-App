@@ -37,8 +37,7 @@ type RefreshResponse = {
 };
 const mockGetCachedUserId = jest.fn<() => string | null>();
 const mockSetCachedUserId = jest.fn<(userId: string) => Promise<void>>();
-const mockClearAllCacheWithStartWorkout = jest.fn<VoidPromiseFn>();
-const mockClearAllCacheWithoutStartWorkout = jest.fn<VoidPromiseFn>();
+const mockClearTanStackCache = jest.fn<VoidPromiseFn>();
 const mockUseGoogleAuth = jest.fn<() => { signInWithGoogle: ReturnType<typeof jest.fn> }>();
 const mockUseAppleAuth = jest.fn<() => { signInWithApple: ReturnType<typeof jest.fn> }>();
 const mockUseNetworkStatus = jest.fn<() => boolean>();
@@ -80,13 +79,7 @@ jest.mock('react-native-notifier', () => ({
 }));
 
 jest.mock('../../../../../infrastructure/query/query-client', () => ({
-  clearAllCacheWithStartWorkout: () => mockClearAllCacheWithStartWorkout(),
-  clearAllCacheWithoutStartWorkout: () => mockClearAllCacheWithoutStartWorkout(),
-  getCachedAuthSession: () => {
-    const userId = mockGetCachedUserId();
-    return userId ? { userId } : undefined;
-  },
-  setCachedAuthSession: ({ userId }: { userId: string }) => mockSetCachedUserId(userId),
+  clearTanStackCache: () => mockClearTanStackCache(),
 }));
 
 jest.mock('../../hooks/use-google-auth.hook', () => ({
@@ -116,9 +109,12 @@ jest.mock('../../../register/services/register.service', () => ({
 }));
 
 jest.mock('../../utils/token-storage.utils', () => ({
+  clearAuthStorage: clearRefreshTokenMock,
   clearRefreshToken: clearRefreshTokenMock,
   getRefreshToken: getRefreshTokenMock,
+  getUserId: mockGetCachedUserId,
   saveRefreshToken: saveRefreshTokenMock,
+  saveUserId: (userId: string) => mockSetCachedUserId(userId),
 }));
 
 jest.mock('../../../../../infrastructure/socket', () => ({
@@ -169,8 +165,7 @@ describe('AuthContext', () => {
     });
     mockLogoutUser.mockResolvedValue(undefined);
     mockClearRefreshToken.mockResolvedValue(undefined);
-    mockClearAllCacheWithStartWorkout.mockResolvedValue(undefined);
-    mockClearAllCacheWithoutStartWorkout.mockResolvedValue(undefined);
+    mockClearTanStackCache.mockResolvedValue(undefined);
     mockSetCachedUserId.mockResolvedValue(undefined);
     mockSaveRefreshToken.mockResolvedValue(undefined);
     mockConnectSocket.mockResolvedValue(undefined);
@@ -190,7 +185,7 @@ describe('AuthContext', () => {
     expect(result.current.userIdCache).toBe(null);
     expect(result.current.isValidatedWithServer).toBe(false);
     expect(mockClearRefreshToken).toHaveBeenCalledTimes(1);
-    expect(mockClearAllCacheWithoutStartWorkout).toHaveBeenCalledTimes(1);
+    expect(mockClearTanStackCache).toHaveBeenCalledTimes(1);
   });
 
   it('restores a stored session and validates it with the server on boot', async () => {
@@ -257,7 +252,7 @@ describe('AuthContext', () => {
 
     expect(mockLogoutUser).toHaveBeenCalledTimes(1);
     expect(mockDisconnectSocket).toHaveBeenCalledTimes(1);
-    expect(mockClearAllCacheWithStartWorkout).toHaveBeenCalledTimes(1);
+    expect(mockClearTanStackCache).toHaveBeenCalledTimes(1);
     expect(mockClearRefreshToken).toHaveBeenCalled();
     expect(result.current.isLoggedIn).toBe(false);
     expect(result.current.userIdCache).toBeNull();
@@ -309,7 +304,7 @@ describe('AuthContext', () => {
     expect(result.current.userIdCache).toBe(userWithoutWorkoutProfile.user!.id);
     expect(result.current.isValidatedWithServer).toBe(false);
     expect(mockClearRefreshToken).not.toHaveBeenCalled();
-    expect(mockClearAllCacheWithoutStartWorkout).not.toHaveBeenCalled();
+    expect(mockClearTanStackCache).not.toHaveBeenCalled();
   });
 
   it('does not retry server validation while the device is still offline after the first failure', async () => {
@@ -410,6 +405,6 @@ describe('AuthContext', () => {
     expect(result.current.userIdCache).toBe(userWithoutWorkoutProfile.user!.id);
     expect(result.current.isValidatedWithServer).toBe(false);
     expect(mockClearRefreshToken).not.toHaveBeenCalled();
-    expect(mockClearAllCacheWithoutStartWorkout).not.toHaveBeenCalled();
+    expect(mockClearTanStackCache).not.toHaveBeenCalled();
   });
 });

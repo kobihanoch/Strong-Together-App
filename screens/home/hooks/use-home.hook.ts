@@ -26,7 +26,7 @@ const useHome = () => {
   const { data: userData, loadingStates: userLoadingStates } = useUser();
   const { data: messagesData, loadingStates: messagesLoadingStates } = useMessages();
   const { data: workoutPlanData, loadingStates: workoutPlanLoadingStates } = useWorkoutPlan();
-  const { data: cardioData, loadingStates: cardioLoadingStates } = useCardio();
+  const { data: cardioData, loadingStates: cardioLoadingStates, actions: cardioActions } = useCardio();
   const { data: dashboardData, loadingStates: dashboardLoadingStates } = useDashboard();
 
   const nextSplit: WorkoutSplit | undefined = getNextWorkoutSplit(workoutPlanData.workoutSplits, dashboardData?.nextWorkoutSplit ?? null);
@@ -110,6 +110,7 @@ const useHome = () => {
         nextSplit ? navigation.navigate('StartWorkout', { workoutSplit: nextSplit }) : navigation.navigate('MyWorkoutPlan'),
       openProgress: () => navigation.navigate('Analytics'),
       openHistory: () => navigation.navigate('TrackHistory'),
+      logCardio: cardioActions.logCardio,
     },
     loadingStates: {
       isPending:
@@ -118,6 +119,7 @@ const useHome = () => {
         messagesLoadingStates.isPending ||
         workoutPlanLoadingStates.isPending ||
         userLoadingStates.isPending,
+      isCardioUpdating: cardioLoadingStates.isUpdating,
     },
   };
 };

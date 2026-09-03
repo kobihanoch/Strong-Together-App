@@ -3,6 +3,8 @@ import { ExerciseHistoryItem } from '../../../features/workouts/history/types/ex
 import { PrHistoryMap } from '../../../features/workouts/history/types/pr-history.types';
 import { WorkoutHistoryItem, WorkoutHistoryMap } from '../../../features/workouts/history/types/workout-history.types';
 import { ExerciseInPlan, WorkoutSplit } from '../../../features/workouts/plan/types/workout-plan.types';
+import { CardioWeeklyMap } from '../../../features/workouts/cardio/types/cardio.types';
+import { getStartOfWeek } from '../../../shared/utils/shared-utils';
 
 export const TRACK_HISTORY_DAYS = 45;
 
@@ -22,6 +24,18 @@ export const getTrackHistoryDateBounds = () => {
 export const getTrackWorkout = (history: WorkoutHistoryMap | undefined, selectedDate: string) => history?.byDate[selectedDate] ?? null;
 
 export const getTrackWorkoutDates = (history: WorkoutHistoryMap | undefined) => new Set(Object.keys(history?.byDate ?? {}));
+
+/** Builds the Sunday-to-Saturday cardio bars for the selected week. */
+export const getTrackCardioWeek = (weeklyMap: CardioWeeklyMap | undefined, selectedDate: string) => {
+  const minutes = [0, 0, 0, 0, 0, 0, 0];
+  const records = weeklyMap?.[getStartOfWeek(selectedDate)]?.records ?? [];
+
+  records.forEach((record) => {
+    minutes[new Date(record.workoutTimeLocal).getDay()] += record.durationMins;
+  });
+
+  return ['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((label, index) => ({ label, minutes: minutes[index] }));
+};
 
 export const getMaxWeight = (sets: ExerciseHistory[number]['sets']) => Math.max(0, ...sets.map((set) => set.weight));
 

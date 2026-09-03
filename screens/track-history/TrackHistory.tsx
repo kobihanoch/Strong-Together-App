@@ -8,11 +8,15 @@ import ExerciseHistoryList from './components/ExerciseHistoryList';
 import HistoryWeekStrip from './components/HistoryWeekStrip';
 import TrackHistorySummary from './components/TrackHistorySummary';
 import useTrackHistory from './hooks/use-track-history.hook';
+import CardioHistorySection from './components/CardioHistorySection';
+import CardioEntrySheet from '../../features/workouts/cardio/components/CardioEntrySheet';
+import { EditableCardioRecord } from '../../features/workouts/cardio/types/cardio.types';
 
 const TrackHistory = () => {
   const { data, actions } = useTrackHistory();
   const { width, height } = useWindowDimensions();
   const [calendarOpen, setCalendarOpen] = useState(false);
+  const [editingCardio, setEditingCardio] = useState<EditableCardioRecord | null>(null);
   const gutter = Math.max(16, Math.min(width * 0.055, 24));
 
   if (data.isLoading) {
@@ -36,8 +40,19 @@ const TrackHistory = () => {
           </Pressable>
         </View>
         <HistoryWeekStrip data={data} onSelect={actions.setDate} />
-        <TrackHistorySummary date={data.selectedDate} workout={data.workout} theme={data.theme} />
+        {data.workout ? <TrackHistorySummary date={data.selectedDate} workout={data.workout} theme={data.theme} /> : null}
         <ExerciseHistoryList data={data} onToggle={actions.toggleExercise} />
+        <CardioHistorySection
+          records={data.cardioRecords}
+          week={data.cardioWeek}
+          theme={data.theme}
+          isDeleting={data.isCardioDeleting}
+          onEdit={setEditingCardio}
+          onDelete={actions.deleteCardio}
+        />
+        {!data.workout && !data.cardioRecords.length ? (
+          <Text style={[styles.empty, { color: data.theme.textSecondary }]}>No activity recorded on this day.</Text>
+        ) : null}
       </ScrollView>
 
       <Modal transparent visible={calendarOpen} animationType="fade" onRequestClose={() => setCalendarOpen(false)}>
@@ -63,6 +78,19 @@ const TrackHistory = () => {
           </Pressable>
         </Pressable>
       </Modal>
+
+      <CardioEntrySheet
+        visible={Boolean(editingCardio)}
+        initial={editingCardio}
+        saving={data.isCardioEditing}
+        theme={data.theme}
+        onClose={() => setEditingCardio(null)}
+        onSave={async (record) => {
+          if (!editingCardio) return;
+          await actions.updateCardio(editingCardio.id, record);
+          setEditingCardio(null);
+        }}
+      />
     </SafeAreaView>
   );
 };
@@ -76,6 +104,7 @@ const styles = StyleSheet.create({
   calendarButton: { width: 48, height: 48, borderWidth: 1, borderRadius: 14, alignItems: 'center', justifyContent: 'center' },
   backdrop: { flex: 1, backgroundColor: 'rgba(0,0,0,0.35)', justifyContent: 'center', paddingHorizontal: 20 },
   calendarModal: { borderRadius: 20, padding: 8 },
+  empty: { fontFamily: fontFamilies.regular, fontSize: fontSizes.body, textAlign: 'center', marginTop: 48 },
 });
 
 export default TrackHistory;

@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, Text, View, useWindowDimensions } from 'react-native';
+import { Pressable, StyleSheet, Text, View, useWindowDimensions } from 'react-native';
 import Row from '../../../shared/components/Row';
 import { AppThemeColors } from '../../../shared/constants/theme';
 import { fontFamilies, fontSizes } from '../../../shared/constants/typography';
@@ -7,7 +7,7 @@ import { createSharedComponentStyles } from '../../../shared/styles/component.st
 import { formatTime } from '../../../shared/utils/shared-utils';
 import { HomeDashboardData } from '../types/use-home-page.types';
 
-const AerobicsCard = ({ data, theme }: { data: HomeDashboardData['aerobics']; theme: AppThemeColors }) => {
+const AerobicsCard = ({ data, theme, onLog }: { data: HomeDashboardData['aerobics']; theme: AppThemeColors; onLog: () => void }) => {
   const common = createSharedComponentStyles(theme);
   const { width } = useWindowDimensions();
   const barHeight = Math.min(Math.max(width * 0.2, 64), 84);
@@ -18,7 +18,12 @@ const AerobicsCard = ({ data, theme }: { data: HomeDashboardData['aerobics']; th
   const moreThanOneHour = formattedAerobicsTime.hours >= 1;
   return (
     <View style={common.card}>
-      <Text style={common.cardTitle}>AEROBICS THIS WEEK</Text>
+      <View style={styles.header}>
+        <Text style={common.cardTitle}>CARDIO THIS WEEK</Text>
+        <Pressable onPress={onLog} hitSlop={8}>
+          <Text style={[styles.log, { color: theme.primary }]}>+ Log</Text>
+        </Pressable>
+      </View>
       <View style={[styles.chart, { height: barHeight + 28 }]}>
         {data.days.map((day, index) => (
           <View key={`${day.label}-${index}`} style={styles.day}>
@@ -64,6 +69,8 @@ const AerobicsCard = ({ data, theme }: { data: HomeDashboardData['aerobics']; th
 };
 
 const styles = StyleSheet.create({
+  header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+  log: { fontFamily: fontFamilies.semiBold, fontSize: fontSizes.bodySmall },
   chart: { height: 104, marginTop: 18, flexDirection: 'row', alignItems: 'flex-end', justifyContent: 'space-between' },
   day: { flex: 1, height: '100%', alignItems: 'center', justifyContent: 'flex-end', gap: 8 },
   track: { borderRadius: 9, justifyContent: 'flex-end', overflow: 'hidden' },

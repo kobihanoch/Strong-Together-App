@@ -9,7 +9,7 @@ import { logoutUser } from '../services/auth.service';
 import type { LoginCredentials, RegistrationInput } from '../types/auth.types';
 import { AppUser } from '../../user/types/user.types';
 import GlobalAuth from '../utils/auth.utils';
-import { saveRefreshToken } from '../utils/token-storage.utils';
+import { saveRefreshToken, saveUserId } from '../utils/token-storage.utils';
 import { useAppleAuth } from './use-apple-auth.hook';
 import { useGoogleAuth } from './use-google-auth.hook';
 
@@ -21,7 +21,7 @@ type UseAuthActionsProps = {
   setIsLoggedIn: React.Dispatch<SetStateAction<boolean>>;
   setIsValidatedWithServer: React.Dispatch<SetStateAction<boolean>>;
   setAuthPhase: React.Dispatch<SetStateAction<'checking' | 'authed' | 'guest'>>;
-  clearContext: (skipCacheCleanup?: boolean) => Promise<void>;
+  clearContext: () => Promise<void>;
 };
 
 const useAuthActions = ({
@@ -36,7 +36,7 @@ const useAuthActions = ({
 }: UseAuthActionsProps) => {
   const completeAuthSession = useCallback(
     async (accessToken: string, refreshToken: string, userId: AppUser['id']) => {
-      await saveRefreshToken(refreshToken);
+      await Promise.all([saveRefreshToken(refreshToken), saveUserId(userId)]);
       GlobalAuth.setAccessToken(accessToken);
       setUserIdCache(userId);
       setIsLoggedIn(true);
@@ -106,7 +106,7 @@ const useAuthActions = ({
   }, [setAppleLoading, signInWithApple, completeAuthSession]);
 
   const logout = useCallback(
-    async (skipCacheCleanup: boolean): Promise<void> => {
+    async (): Promise<void> => {
       try {
         await logoutUser();
         setIsLoggedIn(false);
@@ -118,7 +118,7 @@ const useAuthActions = ({
           disconnectSocket();
         } catch {}
         // Clears with start workout
-        await clearContext(skipCacheCleanup);
+        await clearContext();
       }
     },
     [clearContext, setIsLoggedIn],

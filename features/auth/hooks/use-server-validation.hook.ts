@@ -3,13 +3,12 @@ import React, { SetStateAction, useCallback } from 'react';
 import { refreshAndRotateTokens } from '../services/auth.service';
 import { AppUser } from '../../user/types/user.types';
 import GlobalAuth from '../utils/auth.utils';
-import { saveRefreshToken } from '../utils/token-storage.utils';
-import { clearAllCacheWithoutStartWorkout } from '../../../infrastructure/query/query-client';
+import { saveRefreshToken, saveUserId } from '../utils/token-storage.utils';
 
 type UseServerValidationProps = {
   setIsValidatedWithServer: React.Dispatch<SetStateAction<boolean>>;
   setUserIdCache: React.Dispatch<SetStateAction<AppUser['id'] | null | undefined>>;
-  logout: (skipCacheCleanup: boolean) => Promise<void>;
+  logout: () => Promise<void>;
   serverValidatingLockRef: React.MutableRefObject<boolean>;
   attemptedServerValidationRef: React.MutableRefObject<boolean>;
 };
@@ -27,7 +26,7 @@ const useServerValidation = ({
       if (serverValidatingLockRef.current) return;
       serverValidatingLockRef.current = true;
       const { accessToken: at, refreshToken: rt, userId } = await refreshAndRotateTokens();
-      await saveRefreshToken(rt);
+      await Promise.all([saveRefreshToken(rt), saveUserId(userId)]);
       GlobalAuth.setAccessToken(at);
       console.log('\x1b[32m[Auth Context]: Validation with server completed.\x1b[0m');
       setIsValidatedWithServer(true);
@@ -51,11 +50,7 @@ const useServerValidation = ({
         }
       }
       console.log('\x1b[31m[Auth Context]: Validation with server failed => Logging out\x1b[0m');
-      try {
-        await logout(true);
-      } finally {
-        await clearAllCacheWithoutStartWorkout();
-      }
+      await logout();
     } finally {
       attemptedServerValidationRef.current = true;
       serverValidatingLockRef.current = false;

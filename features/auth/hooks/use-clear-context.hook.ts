@@ -1,8 +1,8 @@
 import React, { SetStateAction, useCallback } from 'react';
-import { clearAllCacheWithStartWorkout } from '../../../infrastructure/query/query-client';
+import { clearTanStackCache } from '../../../infrastructure/query/query-client';
 import { AppUser } from '../../user/types/user.types';
 import GlobalAuth from '../utils/auth.utils';
-import { clearRefreshToken } from '../utils/token-storage.utils';
+import { clearAuthStorage } from '../utils/token-storage.utils';
 
 type UseClearContextProps = {
   setIsLoggedIn: React.Dispatch<SetStateAction<boolean>>;
@@ -30,9 +30,9 @@ const useClearContext = ({
   attemptedServerValidationRef,
 }: UseClearContextProps) => {
   const clearContext = useCallback(
-    async (skipCacheCleanup: boolean = false) => {
-      await clearRefreshToken();
-      if (!skipCacheCleanup) await clearAllCacheWithStartWorkout();
+    async () => {
+      await clearAuthStorage();
+      await clearTanStackCache();
       GlobalAuth.setAccessToken(null);
       GlobalAuth.setUsernameInHeader(null);
       setIsLoggedIn(false);

@@ -49,7 +49,7 @@ const Profile = () => {
       onPressButton: async () => {
         Dialog.hide();
         await deleteSelfUser();
-        logout(false);
+        logout();
       },
       onHide: () => {
         Dialog.hide();

@@ -55,8 +55,7 @@ const config = ({ config }: ConfigContext): ExpoConfig => {
       bundleIdentifier: iosBundle,
       infoPlist: {
         ITSAppUsesNonExemptEncryption: false,
-        NSPhotoLibraryUsageDescription:
-          'We use your photo library so you can select a profile picture for your account.',
+        NSPhotoLibraryUsageDescription: 'We use your photo library so you can select a profile picture for your account.',
       },
     },
     android: {

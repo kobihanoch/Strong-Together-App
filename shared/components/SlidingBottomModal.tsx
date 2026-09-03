@@ -61,6 +61,8 @@ interface SlidingBottomModalProps {
   enableBackDrop?: boolean;
   enablePanDownClose?: boolean;
   onChange?: (index: number) => void;
+  keyboardBehavior?: 'interactive' | 'extend' | 'fillParent';
+  keyboardBlurBehavior?: 'none' | 'restore';
 }
 
 const SlidingBottomModal = forwardRef<SlidingBottomModalRef, SlidingBottomModalProps>(function SlidingBottomModal(
@@ -76,6 +78,8 @@ const SlidingBottomModal = forwardRef<SlidingBottomModalRef, SlidingBottomModalP
     enableBackDrop = true,
     enablePanDownClose = true,
     onChange,
+    keyboardBehavior = 'interactive',
+    keyboardBlurBehavior = 'restore',
   },
   ref,
 ) {
@@ -145,6 +149,10 @@ const SlidingBottomModal = forwardRef<SlidingBottomModalRef, SlidingBottomModalP
         enableDynamicSizing={false}
         {...(enableBackDrop ? { backdropComponent: renderBackdrop } : {})}
         enablePanDownToClose={enablePanDownClose}
+        keyboardBehavior={keyboardBehavior}
+        keyboardBlurBehavior={keyboardBlurBehavior}
+        android_keyboardInputMode="adjustResize"
+        enableBlurKeyboardOnGesture
         handleComponent={Handle}
         backgroundStyle={[styles.sheetBg, { backgroundColor: colors.surface }]}
         {...(onChange ? { onChange: (index: number) => onChange(index) } : {})}

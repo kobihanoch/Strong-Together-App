@@ -5,7 +5,6 @@ import { saveRefreshToken } from '../../../../features/auth/utils/token-storage.
 import { showErrorAlert } from '../../../../shared/alerts/error-alerts';
 import { openUpdateModal } from '../../../../shared/utils/imperative-update-modal';
 import { notifyOffline, notifyServerDown } from './network-check';
-import { clearAllCacheWithoutStartWorkout } from '../../../query/query-client';
 
 let refreshPromise: ReturnType<typeof refreshAndRotateTokens> | null = null;
 
@@ -64,11 +63,7 @@ export const handle401 = async (api: AxiosInstance, error: AxiosError<{ message?
     // If got here failed at refresh
     const isAuthError = (refreshErr as AxiosError).response?.status === 401;
     if (isAuthError && GlobalAuth.logout) {
-      try {
-        await GlobalAuth.logout(true);
-      } finally {
-        await clearAllCacheWithoutStartWorkout();
-      }
+      await GlobalAuth.logout();
     }
     // Some toast to show error
     showErrorAlert('Error', data?.message || 'Session expired');
