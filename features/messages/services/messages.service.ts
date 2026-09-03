@@ -1,11 +1,10 @@
 import api from '../../../infrastructure/api/api-config/api';
 import { DeleteMessageParams, ListMessagesQuery, MarkMessageAsReadParams } from '@strong-together/shared';
-import { DeleteMessageResponse, ListMessagesResponse, MarkMessageAsReadResponse } from '@strong-together/shared';
+import { ListMessagesResponse } from '@strong-together/shared';
 
-export const updateMsgReadStatus = async (msgId: MarkMessageAsReadParams['id']): Promise<MarkMessageAsReadResponse['id']> => {
+export const updateMsgReadStatus = async (msgId: MarkMessageAsReadParams['id']): Promise<void> => {
   const pathParams = { id: msgId } satisfies MarkMessageAsReadParams;
-  const response = await api.patch<MarkMessageAsReadResponse>(`/api/messages/${pathParams.id}/read`);
-  return response.data.id;
+  await api.patch(`/api/messages/${pathParams.id}/read`);
 };
 
 // Get messages
@@ -21,5 +20,5 @@ export const getUserMessages = async (): Promise<ListMessagesResponse> => {
 
 export const deleteMessage = async (msgId: DeleteMessageParams['id']): Promise<void> => {
   const pathParams = { id: msgId } satisfies DeleteMessageParams;
-  await api.delete<DeleteMessageResponse>(`/api/messages/${pathParams.id}`);
+  await api.delete(`/api/messages/${pathParams.id}`);
 };

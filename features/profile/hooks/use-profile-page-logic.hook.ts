@@ -4,7 +4,7 @@ import { getDaysSince } from '../../home/utils/home-page.utils';
 const useProfilePageLogic = () => {
   const {
     data: user,
-    actions: { updateLocalUser },
+    actions: { refetch },
   } = useUser();
   const username = user?.username ?? '';
   const email = user?.email ?? '';
@@ -21,7 +21,9 @@ const useProfilePageLogic = () => {
       gender,
       daysOnline,
     },
-    setUser: updateLocalUser,
+    refreshUser: async () => {
+      await refetch();
+    },
   };
 };
 

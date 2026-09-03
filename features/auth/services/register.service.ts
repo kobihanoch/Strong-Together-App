@@ -1,6 +1,5 @@
 import api from '../../../infrastructure/api/api-config/api';
 import { CreateUserBody } from '@strong-together/shared';
-import { CreateUserResponse } from '@strong-together/shared';
 
 export const registerUser = async (
   email: CreateUserBody['email'],
@@ -10,7 +9,7 @@ export const registerUser = async (
   gender: CreateUserBody['gender'],
 ): Promise<void> => {
   try {
-    await api.post<CreateUserResponse>('/api/users', {
+    await api.post('/api/users', {
       username,
       fullName,
       email,

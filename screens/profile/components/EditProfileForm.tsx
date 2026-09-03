@@ -18,7 +18,6 @@ import { showErrorAlert } from '../../../shared/alerts/error-alerts';
 import { updateSelfUser } from '../../../features/user/services/user.service';
 import Column from '../../../shared/components/Column';
 import Row from '../../../shared/components/Row';
-import type { AppUser } from '../../../features/user/types/user.types';
 
 type EditProfileFormProps = {
   initialData: {
@@ -30,10 +29,10 @@ type EditProfileFormProps = {
   };
   closeEditSheet: () => void;
   openEditSheet: (i?: number) => void;
-  setUser: React.Dispatch<React.SetStateAction<AppUser | null | undefined>>;
+  refreshUser: () => Promise<void>;
 };
 
-const EditProfileForm = ({ initialData, closeEditSheet, openEditSheet, setUser }: EditProfileFormProps) => {
+const EditProfileForm = ({ initialData, closeEditSheet, openEditSheet, refreshUser }: EditProfileFormProps) => {
   const { fullName, email, username } = initialData;
   const [fullNameInput, setFullNameInput] = useState(fullName);
   const [emailInput, setEmailInput] = useState(email);
@@ -74,12 +73,11 @@ const EditProfileForm = ({ initialData, closeEditSheet, openEditSheet, setUser }
     // Sets all user updated profile out of email (old email is showing)
     // Server sent an email request
 
-    let res;
     try {
       setUpdating(true);
-      res = await updateSelfUser(payload);
-      setUser(res?.user);
-      if (res?.emailChanged) {
+      await updateSelfUser(payload);
+      await refreshUser();
+      if (payload.email) {
         Notifier.showNotification({
           title: 'An email has beent sent to you',
           description: `Please confirm this new email. Check ${emailInput} inbox or spam.`,

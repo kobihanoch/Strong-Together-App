@@ -1,6 +1,5 @@
 import { UpdateCurrentUserBody } from '@strong-together/shared';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { SetStateAction } from 'react';
 import { useAuth } from '../../auth/providers/AuthProvider';
 import { fetchSelfUserData, updateSelfUser } from '../services/user.service';
 import { AppUser } from '../types/user.types';
@@ -31,20 +30,15 @@ export const useUser = () => {
   });
 
   const updateSourceUser = useMutation({
-    mutationFn: async (updatedUser: ModifiedUser): Promise<AppUser> => {
+    mutationFn: async (updatedUser: ModifiedUser): Promise<void> => {
       if (!userId) throw new Error('User is not authenticated');
-      const { user } = await updateSelfUser(updatedUser);
-      return user;
+      await updateSelfUser(updatedUser);
     },
 
-    onSuccess: (user) => {
-      queryClient.setQueryData<AppUser>(queryKey, user);
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey });
     },
   });
-
-  const updateLocalUser = (updater: SetStateAction<AppUser | null | undefined>) => {
-    if (userId) queryClient.setQueryData<AppUser | null | undefined>(queryKey, updater);
-  };
 
   return {
     data: query.data,
@@ -55,7 +49,6 @@ export const useUser = () => {
     },
     actions: {
       updateUser: updateSourceUser.mutateAsync,
-      updateLocalUser,
       refetch: query.refetch,
     },
   };

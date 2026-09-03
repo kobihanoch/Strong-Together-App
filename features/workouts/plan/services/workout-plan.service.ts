@@ -1,4 +1,4 @@
-import { GetWorkoutPlanQuery, ReplaceWorkoutPlanBody, ReplaceWorkoutPlanResponse } from '@strong-together/shared';
+import { GetWorkoutPlanQuery, ReplaceWorkoutPlanBody } from '@strong-together/shared';
 import api from '../../../../infrastructure/api/api-config/api';
 import { GetWorkoutPlanResponse } from '@strong-together/shared';
 
@@ -11,10 +11,9 @@ export const getUserWorkout = async (): Promise<GetWorkoutPlanResponse> => {
   return data;
 };
 
-export const addWorkout = async (workoutData: ReplaceWorkoutPlanBody['workoutData']): Promise<ReplaceWorkoutPlanResponse> => {
-  const { data } = await api.put<ReplaceWorkoutPlanResponse>('/api/workout-plan', {
+export const addWorkout = async (workoutData: ReplaceWorkoutPlanBody['workoutData']): Promise<void> => {
+  await api.put('/api/workout-plan', {
     workoutData,
     tz: Intl.DateTimeFormat().resolvedOptions().timeZone,
   } satisfies ReplaceWorkoutPlanBody);
-  return data;
 };

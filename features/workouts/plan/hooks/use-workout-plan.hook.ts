@@ -36,20 +36,13 @@ export const useWorkoutPlan = () => {
       if (!userId) {
         throw new Error('User is not authenticated');
       }
-      const { workoutPlan } = await addWorkout(editedPlan);
-      return workoutPlan;
+      await addWorkout(editedPlan);
     },
 
-    onSuccess: (updatedWorkoutPlan) => {
-      queryClient.setQueryData<WorkoutPlan | null>(queryKey, updatedWorkoutPlan);
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey });
     },
   });
-
-  // Update local
-
-  const updateLocalWorkoutPlan = (updater: WorkoutPlan | null | ((prev: WorkoutPlan | null | undefined) => WorkoutPlan | null)) => {
-    if (userId) queryClient.setQueryData<WorkoutPlan | null>(queryKey, updater);
-  };
 
   // Main data
   const workoutPlan = query.data;
@@ -67,7 +60,6 @@ export const useWorkoutPlan = () => {
     },
     actions: {
       updateWorkoutPlan: updateSourceWorkoutPlan.mutateAsync,
-      updateLocalWorkoutPlan,
       refetch: query.refetch,
     },
   };

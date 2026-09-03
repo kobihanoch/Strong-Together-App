@@ -7,9 +7,8 @@ import { ActivityIndicator, Dimensions, StyleSheet, TouchableOpacity, View } fro
 import { RFValue } from 'react-native-responsive-fontsize';
 import api from '../../../infrastructure/api/api-config/api';
 import { colors } from '../../../shared/constants/colors';
-import { useUser } from '../../auth/hooks/use-user.hook';
-import useMediaUploads from '../hooks/use-media-uploads.hook';
-import { AppUser } from '../../auth/types/auth.types';
+import useMediaUploads from '../../../screens/profile/hooks/use-media-uploads.hook';
+import { useUser } from '../../user/hooks/use-user.hook';
 
 const { width, height } = Dimensions.get('window');
 
@@ -35,7 +34,7 @@ function ImagePickerComponent({
 }: ImagePickerComponentProps) {
   const {
     data: user,
-    actions: { updateLocalUser },
+    actions: { refetch },
   } = useUser();
   const { uploadToStorageAndReturnPath, loading: mediaLoading } = useMediaUploads();
 
@@ -59,15 +58,8 @@ function ImagePickerComponent({
         type: 'image/jpeg',
       };
 
-      const { profilePicPath } = await uploadToStorageAndReturnPath(file);
-      // Update in auth context
-      updateLocalUser(
-        (prev: AppUser | null | undefined) =>
-          ({
-            ...prev,
-            profilePicPath,
-          }) as AppUser,
-      );
+      await uploadToStorageAndReturnPath(file);
+      await refetch();
     }
   };
 
@@ -76,14 +68,7 @@ function ImagePickerComponent({
       data: { path: profileimagePath },
     });
 
-    // Update in auth context
-    updateLocalUser(
-      (prev: AppUser | null | undefined) =>
-        ({
-          ...prev,
-          profilePicPath: null,
-        }) as AppUser,
-    );
+    await refetch();
   };
 
   useEffect(() => {

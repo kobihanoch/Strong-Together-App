@@ -38,28 +38,25 @@ export const useCardio = () => {
       if (!userId) {
         throw new Error('User is not authenticated');
       }
-      const data = await logUserCardio(cardioEntry);
-      return data;
+      await logUserCardio(cardioEntry);
     },
 
-    onSuccess: (updatedCardioMaps) => {
-      queryClient.setQueryData<CardioMaps | null>(queryKey, updatedCardioMaps);
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey });
     },
   });
   const updateSourceCardio = useMutation({
     mutationFn: ({ id, record }: { id: EditableCardioRecord['id']; record: CardioEntryInput }) => updateUserCardio(id, record),
-    onSuccess: (maps) => queryClient.setQueryData<CardioMaps>(queryKey, maps),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey });
+    },
   });
   const deleteSourceCardio = useMutation({
     mutationFn: (id: EditableCardioRecord['id']) => deleteUserCardio(id),
-    onSuccess: (maps) => queryClient.setQueryData<CardioMaps>(queryKey, maps),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey });
+    },
   });
-
-  // Update local
-
-  const updateLocalCardioMaps = (updater: CardioMaps) => {
-    if (userId) queryClient.setQueryData<CardioMaps>(queryKey, updater);
-  };
 
   const cardioMaps = query.data;
 
@@ -96,7 +93,6 @@ export const useCardio = () => {
       logCardio: addSourceCardio.mutateAsync,
       updateCardio: updateSourceCardio.mutateAsync,
       deleteCardio: deleteSourceCardio.mutateAsync,
-      updateLocalCardioMaps,
       refetch: query.refetch,
     },
   };

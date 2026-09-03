@@ -16,7 +16,7 @@ import { deleteSelfUser } from '../../features/user/services/user.service';
 const { height } = Dimensions.get('window');
 
 const Profile = () => {
-  const { data, setUser } = useProfilePageLogic();
+  const { data, refreshUser } = useProfilePageLogic();
   const { logout } = useAuth();
   const { username, email, fullName, gender, daysOnline } = data;
   const normalizedGender = gender.toLowerCase();
@@ -168,7 +168,7 @@ const Profile = () => {
           }}
           closeEditSheet={closeEditSheet}
           openEditSheet={openEditSheet}
-          setUser={setUser}
+          refreshUser={refreshUser}
         />
       </SlidingBottomModal>
     </Column>
