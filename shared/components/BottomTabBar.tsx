@@ -47,10 +47,7 @@ const BottomTabBar = () => {
     routeName !== 'CreateWorkout' && (
       <View style={[styles.tabBarContainer, { backgroundColor: colors.surface, borderTopColor: colors.border }]}>
         {tabs.map((tab, index) => {
-          const isActive =
-            routeName === tab.name ||
-            (tab.name === 'Analytics' && routeName === 'TrackHistory') ||
-            (tab.name === 'Profile' && routeName === 'Settings');
+          const isActive = routeName === tab.name || (tab.name === 'Profile' && routeName === 'Settings');
 
           return (
             <TouchableOpacity key={index} style={styles.tabButton} onPress={() => handleTabPress(tab.name)} disabled={navDisabled}>

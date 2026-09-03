@@ -108,7 +108,7 @@ const useHome = () => {
       createWorkout: () => navigation.navigate('CreateWorkout'),
       startWorkout: () =>
         nextSplit ? navigation.navigate('StartWorkout', { workoutSplit: nextSplit }) : navigation.navigate('MyWorkoutPlan'),
-      openProgress: () => navigation.navigate('Analytics'),
+      openProgress: () => navigation.navigate('TrackHistory'),
       openHistory: () => navigation.navigate('TrackHistory'),
       logCardio: cardioActions.logCardio,
     },

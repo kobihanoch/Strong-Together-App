@@ -1,18 +1,11 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createAsyncStoragePersister } from '@tanstack/query-async-storage-persister';
-import { QueryClient } from '@tanstack/react-query';
 import { CACHE_VERSION } from '../cache/cache.constants';
+import { queryClient } from './query-client-instance';
+
+export { queryClient } from './query-client-instance';
 
 const QUERY_CACHE_BUSTER = CACHE_VERSION ?? '0.0.0';
-export const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      staleTime: 5 * 60 * 1000,
-      gcTime: Infinity,
-    },
-  },
-});
-
 export const queryPersister = createAsyncStoragePersister({
   storage: AsyncStorage,
   key: 'REACT_QUERY_OFFLINE_CACHE',

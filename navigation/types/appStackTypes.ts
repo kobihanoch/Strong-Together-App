@@ -9,7 +9,6 @@ export type RootParamList = {
   CreateWorkout: undefined;
   TrackHistory: undefined;
   Inbox: undefined;
-  Analytics: undefined;
   StartWorkout: {
     workoutSplit: WorkoutSplit;
     resumedWorkout?: Omit<ResumeWorkoutCachePayload, 'selectedSplit'>;

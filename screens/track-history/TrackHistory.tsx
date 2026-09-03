@@ -1,6 +1,6 @@
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import React, { useState } from 'react';
-import { ActivityIndicator, Modal, Pressable, ScrollView, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
+import { ActivityIndicator, Modal, Pressable, RefreshControl, ScrollView, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
 import { Calendar } from 'react-native-calendars';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { fontFamilies, fontSizes } from '../../shared/constants/typography';
@@ -11,6 +11,9 @@ import useTrackHistory from './hooks/use-track-history.hook';
 import CardioHistorySection from './components/CardioHistorySection';
 import CardioEntrySheet from '../../features/workouts/cardio/components/CardioEntrySheet';
 import { EditableCardioRecord } from '../../features/workouts/cardio/types/cardio.types';
+import { usePullToRefresh } from '../../shared/hooks/use-pull-to-refresh.hook';
+
+const historyQueryNames = ['workout-history', 'exercise-history', 'pr-history', 'workout-plan', 'cardio-maps'];
 
 const TrackHistory = () => {
   const { data, actions } = useTrackHistory();
@@ -18,6 +21,7 @@ const TrackHistory = () => {
   const [calendarOpen, setCalendarOpen] = useState(false);
   const [editingCardio, setEditingCardio] = useState<EditableCardioRecord | null>(null);
   const gutter = Math.max(16, Math.min(width * 0.055, 24));
+  const { isRefreshing, refresh } = usePullToRefresh(historyQueryNames);
 
   if (data.isLoading) {
     return (
@@ -29,7 +33,11 @@ const TrackHistory = () => {
 
   return (
     <SafeAreaView style={[styles.safeArea, { backgroundColor: data.theme.canvas }]} edges={['top']}>
-      <ScrollView contentContainerStyle={{ paddingHorizontal: gutter, paddingBottom: height * 0.04 }} showsVerticalScrollIndicator={false}>
+      <ScrollView
+        contentContainerStyle={{ paddingHorizontal: gutter, paddingBottom: height * 0.04 }}
+        showsVerticalScrollIndicator={false}
+        refreshControl={<RefreshControl refreshing={isRefreshing} onRefresh={refresh} tintColor={data.theme.primary} />}
+      >
         <View style={[styles.header, { paddingTop: height * 0.015 }]}>
           <View>
             <Text style={[styles.eyebrow, { color: data.theme.textSecondary }]}>YOUR PROGRESS</Text>

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Skeleton } from 'moti/skeleton';
-import { ScrollView, StyleSheet, useWindowDimensions } from 'react-native';
+import { RefreshControl, ScrollView, StyleSheet, useWindowDimensions } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import AchievementCard from './components/AchievementCard';
 import AerobicsCard from './components/AerobicsCard';
@@ -14,6 +14,9 @@ import useHomeDashboard from './hooks/use-home.hook';
 import { colors } from '../../shared/constants/colors';
 import { useAppTheme } from '../../shared/providers/AppThemeProvider';
 import CardioEntrySheet from '../../features/workouts/cardio/components/CardioEntrySheet';
+import { usePullToRefresh } from '../../shared/hooks/use-pull-to-refresh.hook';
+
+const homeQueryNames = ['user', 'messages', 'workout-plan', 'cardio-maps', 'home-dashboard'];
 
 const Home = () => {
   const { data, actions, loadingStates } = useHomeDashboard();
@@ -22,10 +25,12 @@ const Home = () => {
   const sectionGap = Math.max(12, Math.min(height * 0.016, 18));
   const { mode } = useAppTheme();
   const [cardioOpen, setCardioOpen] = useState(false);
+  const { isRefreshing, refresh } = usePullToRefresh(homeQueryNames);
 
   return (
     <SafeAreaView style={[styles.safeArea, { backgroundColor: data.theme.canvas }]} edges={['top']}>
       <ScrollView
+        refreshControl={<RefreshControl refreshing={isRefreshing} onRefresh={refresh} tintColor={data.theme.primary} />}
         contentContainerStyle={[styles.content, { paddingHorizontal: horizontalPadding, gap: sectionGap }]}
         showsVerticalScrollIndicator={false}
       >

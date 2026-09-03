@@ -6,16 +6,19 @@ import MessageItem from './components/MessageItem';
 import useInboxLogic from './hooks/use-inbox-logic.hook';
 import { colors } from '../../shared/constants/colors';
 import type { UserMessage } from '../../features/messages/types/messages.types';
+import { usePullToRefresh } from '../../shared/hooks/use-pull-to-refresh.hook';
 const { width } = Dimensions.get('window');
+const inboxQueryNames = ['messages'];
 
 const Inbox = () => {
   const { allReceivedMessages, confirmAndDeleteMessage, markAsRead, unreadMessagesCount } = useInboxLogic();
+  const { isRefreshing, refresh } = usePullToRefresh(inboxQueryNames);
 
   const renderItem: ListRenderItem<UserMessage> = useCallback(
     ({ item }) => {
       return <MessageItem item={item} deleteMessage={confirmAndDeleteMessage} markAsRead={markAsRead} />;
     },
-    [confirmAndDeleteMessage],
+    [confirmAndDeleteMessage, markAsRead],
   );
 
   const keyExtractor = useCallback((item: UserMessage) => item.id, []);
@@ -61,19 +64,21 @@ const Inbox = () => {
           </Text>{' '}
           unread messages
         </Text>
-        {allReceivedMessages !== undefined && allReceivedMessages.length != 0 ? (
-          <FlatList
-            data={allReceivedMessages}
-            renderItem={renderItem}
-            keyExtractor={keyExtractor}
-            style={{ width: '100%' }}
-            showsVerticalScrollIndicator={false}
-          ></FlatList>
-        ) : (
-          <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <FlatList
+          data={allReceivedMessages}
+          renderItem={renderItem}
+          keyExtractor={keyExtractor}
+          style={{ width: '100%' }}
+          contentContainerStyle={allReceivedMessages.length === 0 ? { flexGrow: 1 } : undefined}
+          showsVerticalScrollIndicator={false}
+          refreshing={isRefreshing}
+          onRefresh={refresh}
+          ListEmptyComponent={
+            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
             <Text style={{ fontFamily: 'Inter_600SemiBold', fontSize: RFValue(18) }}>No messages yet</Text>
-          </View>
-        )}
+            </View>
+          }
+        />
       </View>
     </View>
   );

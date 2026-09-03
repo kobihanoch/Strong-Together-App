@@ -4,7 +4,6 @@ import React, { useEffect } from 'react';
 import { cacheDeleteKey, cacheGetJSON } from '../infrastructure/cache/cache.constants';
 import { keyStartWorkout } from '../infrastructure/cache/cache-keys.utils';
 import { useAuth } from '../features/auth/providers/AuthProvider';
-import Analytics from '../features/workouts/analytics/screen/Analytics';
 import CreateWorkout from '../screens/modify-workout/CreateWorkout';
 import Home from '../screens/home/Home';
 import Inbox from '../screens/inbox/Inbox';
@@ -69,7 +68,6 @@ const AppStack = () => {
       <Stack.Screen name="CreateWorkout" component={CreateWorkout} />
       <Stack.Screen name="TrackHistory" component={TrackHistory} />
       <Stack.Screen name="Inbox" component={Inbox} />
-      <Stack.Screen name="Analytics" component={Analytics} />
     </Stack.Navigator>
   );
 };
