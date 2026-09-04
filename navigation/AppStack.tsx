@@ -10,10 +10,10 @@ import Inbox from '../screens/inbox/Inbox';
 import MyWorkoutPlan from '../screens/my-workout-plan/MyWorkoutPlan';
 import Profile from '../screens/profile/Profile';
 import Settings from '../screens/settings/Settings';
-import StartWorkout from '../screens/start-workout/StartWorkout';
+import StartWorkout from '../screens/workout-session/StartWorkout';
 import TrackHistory from '../screens/track-history/TrackHistory';
 import { ymdInCurrentTZ } from '../shared/utils/shared-utils';
-import { ResumeWorkoutCachePayload } from '../screens/start-workout/types/use-start-workout.types';
+import { ResumeWorkoutCachePayload } from '../screens/workout-session/types/use-start-workout.types';
 import { RootParamList } from './types/appStackTypes';
 
 const Stack = createStackNavigator<RootParamList>();
