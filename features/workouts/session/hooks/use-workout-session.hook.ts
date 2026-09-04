@@ -63,8 +63,6 @@ export const useWorkoutSession = () => {
     },
   });
 
-  console.log(JSON.stringify(draft, null, 2));
-
   // Finalizes and submits the current draft; failed submissions keep it available for retry.
   const saveWorkout = async (): Promise<void> => {
     if (!userId) throw new Error('User is not authenticated');
