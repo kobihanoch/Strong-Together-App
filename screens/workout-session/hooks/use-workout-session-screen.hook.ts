@@ -43,6 +43,17 @@ const useWorkoutSessionScreen = (workoutSplit: WorkoutSplit) => {
 
   const totalSets = data.draft?.workout.reduce((total, exercise) => total + exercise.trackedSets.length, 0) ?? 0;
   const completedCount = completedSetKeys.length;
+  const navigatorExercises = (data.draft?.workout ?? []).map((exercise, index) => {
+    const plannedExercise = workoutSplit.exercises.find((item) => item.exerciseToSplitId === exercise.exerciseToSplitId);
+    const key = exercise.exerciseToSplitId ?? `added-${exercise.exerciseId ?? index}`;
+    return {
+      key: String(key),
+      name: plannedExercise?.name ?? 'Added exercise',
+      isAdded: !exercise.isExerciseAssignedToSplit,
+      completedSets: exercise.trackedSets.filter((set) => completedSetKeys.includes(`${key}:${set.setIndex}`)).length,
+      totalSets: exercise.trackedSets.length,
+    };
+  });
 
   const selectExercise = (nextIndex: number): void => {
     const count = data.draft?.workout.length ?? 0;
@@ -101,11 +112,14 @@ const useWorkoutSessionScreen = (workoutSplit: WorkoutSplit) => {
       completedCount,
       totalSets,
       rest,
+      navigatorExercises,
       isSaving: loadingStates.isSaving,
     },
     actions: {
       previousExercise: () => selectExercise(exerciseIndex - 1),
       nextExercise: () => selectExercise(exerciseIndex + 1),
+      selectExercise,
+      reorderExercises: actions.reorderExercises,
       selectSet: actions.setActiveSet,
       addSet,
       removeSet,

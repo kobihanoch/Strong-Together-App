@@ -1,14 +1,16 @@
 import type { StackScreenProps } from '@react-navigation/stack';
-import React from 'react';
+import React, { useRef } from 'react';
 import { Alert, Pressable, ScrollView, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import type { RootParamList } from '../../navigation/types/appStackTypes';
 import { fontFamilies, fontSizes } from '../../shared/constants/typography';
 import ElapsedRestControl from './components/ElapsedRestControl';
+import ExerciseNavigatorSheet from './components/ExerciseNavigatorSheet';
 import SetNavigator from './components/SetNavigator';
 import WorkoutMetricEditor from './components/WorkoutMetricEditor';
 import WorkoutSessionHeader from './components/WorkoutSessionHeader';
 import useWorkoutSessionScreen from './hooks/use-workout-session-screen.hook';
+import type { SlidingBottomModalRef } from '../../shared/components/SlidingBottomModal';
 import useToggleStatusBarColor from '../../shared/hooks/use-toggle-status-bar-color.hook';
 
 type Props = StackScreenProps<RootParamList, 'WorkoutSession'>;
@@ -17,9 +19,10 @@ const WorkoutSession = ({ route, navigation }: Props) => {
   useToggleStatusBarColor('dark');
   const { data, actions } = useWorkoutSessionScreen(route.params.workoutSplit);
   const { width, height } = useWindowDimensions();
+  const navigatorRef = useRef<SlidingBottomModalRef | null>(null);
   const gutter = Math.max(12, Math.min(width * 0.035, 16));
 
-  // Navigator and finish flows will be connected in their dedicated slices.
+  // Finish flow will be connected in its dedicated slice.
   const noop = (): void => undefined;
   const exitWorkout = (): void => {
     Alert.alert('Exit workout?', 'Your workout draft will be deleted.', [
@@ -50,7 +53,7 @@ const WorkoutSession = ({ route, navigation }: Props) => {
         onBack={exitWorkout}
         onPrevious={actions.previousExercise}
         onNext={actions.nextExercise}
-        onOpenNavigator={noop}
+        onOpenNavigator={() => navigatorRef.current?.open(0)}
         onFinish={noop}
       />
 
@@ -122,6 +125,15 @@ const WorkoutSession = ({ route, navigation }: Props) => {
           />
         </View>
       )}
+
+      <ExerciseNavigatorSheet
+        modalRef={navigatorRef}
+        theme={data.theme}
+        exercises={data.navigatorExercises}
+        activeIndex={data.exerciseIndex}
+        onSelect={actions.selectExercise}
+        onReorder={actions.reorderExercises}
+      />
     </SafeAreaView>
   );
 };

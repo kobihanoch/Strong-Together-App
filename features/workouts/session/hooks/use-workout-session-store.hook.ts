@@ -30,6 +30,7 @@ type WorkoutSessionStore = {
   setWorkoutSplit: (workoutSplit: WorkoutSplit) => void;
   addExercise: (exerciseId: Exercise['id']) => void;
   removeExercise: (exerciseId: Exercise['id']) => void;
+  reorderExercises: (fromIndex: number, toIndex: number) => void;
   addSet: (workoutIndex: number, trackedSet: TrackedSet) => void;
   removeSet: (workoutIndex: number, setIndex: TrackedSet['setIndex'], setKey: string) => void;
   updateSet: (workoutIndex: number, trackedSet: TrackedSet) => void;
@@ -104,6 +105,22 @@ export const useWorkoutSessionStore = create<WorkoutSessionStore>()(
               }
             : state,
         ),
+
+      reorderExercises: (fromIndex: number, toIndex: number) =>
+        set((state) => {
+          if (!state.draft || fromIndex === toIndex) return state;
+          const workout = [...state.draft.workout];
+          const [movedExercise] = workout.splice(fromIndex, 1);
+          if (!movedExercise) return state;
+          workout.splice(toIndex, 0, movedExercise);
+
+          // Reordering changes position only; the active exercise keeps its data and identity.
+          const activeExercise = state.draft.workout[state.progress.activeExerciseIndex];
+          return {
+            draft: { ...state.draft, workout },
+            progress: { ...state.progress, activeExerciseIndex: activeExercise ? workout.indexOf(activeExercise) : 0 },
+          };
+        }),
 
       addSet: (workoutIndex: number, trackedSet: TrackedSet) =>
         set((state) => {

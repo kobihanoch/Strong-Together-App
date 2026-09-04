@@ -25,6 +25,8 @@ export const useWorkoutSession = () => {
   const addExercise = useWorkoutSessionStore((state) => state.addExercise);
   // Removes an exercise that was added during the active workout.
   const removeExercise = useWorkoutSessionStore((state) => state.removeExercise);
+  // Reorders exercises without detaching their sets, notes, or completion state.
+  const reorderExercises = useWorkoutSessionStore((state) => state.reorderExercises);
   // Appends an extra set to an exercise.
   const addSet = useWorkoutSessionStore((state) => state.addSet);
   // Removes an extra set from an exercise.
@@ -61,6 +63,8 @@ export const useWorkoutSession = () => {
     },
   });
 
+  console.log(JSON.stringify(draft, null, 2));
+
   // Finalizes and submits the current draft; failed submissions keep it available for retry.
   const saveWorkout = async (): Promise<void> => {
     if (!userId) throw new Error('User is not authenticated');
@@ -87,6 +91,7 @@ export const useWorkoutSession = () => {
       startWorkout,
       addExercise,
       removeExercise,
+      reorderExercises,
       addSet,
       removeSet,
       updateSet,
