@@ -4,6 +4,8 @@ import { AppUser } from '../../user/types/user.types';
 import GlobalAuth from '../utils/auth.utils';
 import { clearAuthStorage } from '../utils/token-storage.utils';
 import { AuthPhase } from '../types/auth.types';
+import { useWorkoutSessionStore } from '../../workouts/session/hooks/use-workout-session-store.hook';
+import { clearWorkoutSessionStorage } from '../../workouts/session/utils/workout-session-cache.utils';
 
 type UseClearContextProps = {
   setAutheticationLoading: React.Dispatch<SetStateAction<boolean>>;
@@ -32,6 +34,8 @@ const useClearContext = ({
     async () => {
       await clearAuthStorage();
       await clearTanStackCache();
+      useWorkoutSessionStore.getState().resetWorkout();
+      await clearWorkoutSessionStorage();
       GlobalAuth.setAccessToken(null);
       GlobalAuth.setUsernameInHeader(null);
       setAutheticationLoading(false);

@@ -60,9 +60,10 @@ export const handle401 = async (api: AxiosInstance, error: AxiosError<{ message?
     firstRequest.headers.Authorization = `DPoP ${accessToken}`;
     return api(firstRequest);
   } catch (refreshErr) {
-    // If got here failed at refresh
-    const isAuthError = (refreshErr as AxiosError).response?.status === 401;
-    if (isAuthError && GlobalAuth.logout) {
+    const error = refreshErr as AxiosError;
+    const shouldPreserveWorkoutSession = error.isUpgradeRequired || error.isNetworkError || error.isServerError;
+
+    if (!shouldPreserveWorkoutSession && GlobalAuth.logout) {
       await GlobalAuth.logout();
     }
     // Some toast to show error
