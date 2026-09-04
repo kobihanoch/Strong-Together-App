@@ -107,7 +107,7 @@ const useHome = () => {
       openInbox: () => navigation.navigate('Inbox'),
       createWorkout: () => navigation.navigate('CreateWorkout'),
       startWorkout: () =>
-        nextSplit ? navigation.navigate('StartWorkout', { workoutSplit: nextSplit }) : navigation.navigate('MyWorkoutPlan'),
+        nextSplit ? navigation.navigate('WorkoutSession', { workoutSplit: nextSplit }) : navigation.navigate('MyWorkoutPlan'),
       openProgress: () => navigation.navigate('TrackHistory'),
       openHistory: () => navigation.navigate('TrackHistory'),
       logCardio: cardioActions.logCardio,

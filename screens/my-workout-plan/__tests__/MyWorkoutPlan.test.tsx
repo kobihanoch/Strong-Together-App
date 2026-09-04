@@ -54,7 +54,7 @@ describe('MyWorkoutPlan integration', () => {
     expect(getByText('Expanded: 101')).toBeTruthy();
     fireEvent.press(getByText('Start'));
     fireEvent.press(getByText('Edit'));
-    expect(mockNavigate).toHaveBeenCalledWith('StartWorkout', { workoutSplit: mockSplit });
+    expect(mockNavigate).toHaveBeenCalledWith('WorkoutSession', { workoutSplit: mockSplit });
     expect(mockNavigate).toHaveBeenCalledWith('CreateWorkout');
   });
 

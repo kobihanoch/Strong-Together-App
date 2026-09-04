@@ -182,7 +182,7 @@ describe('useHomeDashboard', () => {
 
     expect(mockNavigate).toHaveBeenNthCalledWith(1, 'Inbox');
     expect(mockNavigate).toHaveBeenNthCalledWith(2, 'CreateWorkout');
-    expect(mockNavigate).toHaveBeenNthCalledWith(3, 'StartWorkout', { workoutSplit: splitB });
+    expect(mockNavigate).toHaveBeenNthCalledWith(3, 'WorkoutSession', { workoutSplit: splitB });
     expect(mockNavigate).toHaveBeenNthCalledWith(4, 'TrackHistory');
     expect(mockNavigate).toHaveBeenNthCalledWith(5, 'TrackHistory');
   });

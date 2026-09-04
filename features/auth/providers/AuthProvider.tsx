@@ -15,8 +15,6 @@ interface AuthProviderValue {
   loading: boolean;
   googleLoading: boolean;
   appleLoading: boolean;
-  isWorkoutMode: boolean;
-  setIsWorkoutMode: React.Dispatch<React.SetStateAction<boolean>>;
   isValidatedWithServer: boolean;
   register: (
     email: CreateUserBody['email'],
@@ -57,7 +55,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [autheticationLoading, setAutheticationLoading] = useState<boolean>(false); // UI loading for login/register
   const [appleLoading, setAppleLoading] = useState<boolean>(false);
   const [googleLoading, setGoogleLoading] = useState<boolean>(false);
-  const [isWorkoutMode, setIsWorkoutMode] = useState<boolean>(false); // For start workout
 
   // --- Startup phase for smooth auth-stack/app-stack routing ---
   const [authPhase, setAuthPhase] = useState<AuthPhase>('checking');
@@ -74,7 +71,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     setAutheticationLoading,
     setAppleLoading,
     setGoogleLoading,
-    setIsWorkoutMode,
     setUserIdCache,
     setIsValidatedWithServer,
     setAuthPhase,
@@ -123,8 +119,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       handleAppleAuth,
       handleGoogleAuth,
       logout,
-      isWorkoutMode,
-      setIsWorkoutMode,
       isValidatedWithServer,
     }),
     [
@@ -137,8 +131,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       handleAppleAuth,
       handleGoogleAuth,
       logout,
-      isWorkoutMode,
-      setIsWorkoutMode,
       isValidatedWithServer,
       authPhase,
     ],

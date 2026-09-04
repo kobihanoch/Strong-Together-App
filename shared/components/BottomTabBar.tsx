@@ -4,16 +4,17 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import React from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { RFValue } from 'react-native-responsive-fontsize';
+import { useWorkoutSessionStore } from '../../features/workouts/session/hooks/use-workout-session-store.hook';
+import { RootParamList } from '../../navigation/types/appStackTypes';
 import { fontFamilies, fontSizes } from '../constants/typography';
 import { useAppTheme } from '../providers/AppThemeProvider';
-import { useAuth } from '../../features/auth/providers/AuthProvider.tsx';
-import { RootParamList } from '../../navigation/types/appStackTypes';
 
 type RouteName = keyof RootParamList;
 
 const BottomTabBar = () => {
   const navigation = useNavigation<StackNavigationProp<RootParamList>>();
   const { colors } = useAppTheme();
+  const hasActiveWorkout = useWorkoutSessionStore((state) => Boolean(state.draft));
 
   const routeName = useNavigationState((state) => {
     if (!state?.routes || state.index === undefined) return 'Home';
@@ -28,7 +29,6 @@ const BottomTabBar = () => {
     return appRoute?.name ?? 'Home';
   });
 
-  const { isWorkoutMode } = useAuth();
   const navDisabled = false;
 
   const handleTabPress = (tabName: RouteName) => {
@@ -43,8 +43,9 @@ const BottomTabBar = () => {
   ];
 
   return (
-    !isWorkoutMode &&
-    routeName !== 'CreateWorkout' && (
+    !hasActiveWorkout &&
+    routeName !== 'CreateWorkout' &&
+    routeName !== 'WorkoutSession' && (
       <View style={[styles.tabBarContainer, { backgroundColor: colors.surface, borderTopColor: colors.border }]}>
         {tabs.map((tab, index) => {
           const isActive = routeName === tab.name || (tab.name === 'Profile' && routeName === 'Settings');
