@@ -84,7 +84,7 @@ export const useWorkoutSessionStore = create<WorkoutSessionStore>()(
                   exerciseToSplitId: null,
                   isExerciseAssignedToSplit: false,
                   notes: null,
-                  trackedSets: [],
+                  trackedSets: [{ setIndex: 0, reps: 0, weight: 0 }],
                 },
               ],
             },
@@ -93,18 +93,28 @@ export const useWorkoutSessionStore = create<WorkoutSessionStore>()(
 
       // Only exercises added during the session can be removed with this action.
       removeExercise: (exerciseId: Exercise['id']) =>
-        set((state) =>
-          state.draft
-            ? {
-                draft: {
-                  ...state.draft,
-                  workout: state.draft.workout.filter(
-                    (exercise) => exercise.isExerciseAssignedToSplit || exercise.exerciseId !== exerciseId,
-                  ),
-                },
-              }
-            : state,
-        ),
+        set((state) => {
+          if (!state.draft) return state;
+          const removedIndex = state.draft.workout.findIndex(
+            (exercise) => !exercise.isExerciseAssignedToSplit && exercise.exerciseId === exerciseId,
+          );
+          if (removedIndex < 0) return state;
+
+          const workout = state.draft.workout.filter((_, index) => index !== removedIndex);
+          const currentIndex = state.progress.activeExerciseIndex;
+          const activeExerciseIndex =
+            currentIndex > removedIndex ? currentIndex - 1 : Math.min(currentIndex, Math.max(0, workout.length - 1));
+
+          return {
+            draft: { ...state.draft, workout },
+            progress: {
+              ...state.progress,
+              activeExerciseIndex,
+              activeSetIndex: currentIndex === removedIndex ? 0 : state.progress.activeSetIndex,
+              completedSetKeys: state.progress.completedSetKeys.filter((key) => !key.startsWith(`added-${exerciseId}:`)),
+            },
+          };
+        }),
 
       reorderExercises: (fromIndex: number, toIndex: number) =>
         set((state) => {

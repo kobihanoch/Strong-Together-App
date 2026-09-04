@@ -5,14 +5,7 @@ import DraggableFlatList, { RenderItemParams, ScaleDecorator } from 'react-nativ
 import SlidingBottomModal, { SlidingBottomModalRef } from '../../../shared/components/SlidingBottomModal';
 import type { AppThemeColors } from '../../../shared/constants/theme';
 import { fontFamilies, fontSizes } from '../../../shared/constants/typography';
-
-export type NavigatorExercise = {
-  key: string;
-  name: string;
-  isAdded: boolean;
-  completedSets: number;
-  totalSets: number;
-};
+import type { NavigatorExercise } from '../utils/workout-session-screen.utils';
 
 type Props = {
   modalRef: RefObject<SlidingBottomModalRef | null>;
@@ -21,9 +14,10 @@ type Props = {
   activeIndex: number;
   onSelect: (index: number) => void;
   onReorder: (fromIndex: number, toIndex: number) => void;
+  onAddExercise: () => void;
 };
 
-const ExerciseNavigatorSheet = ({ modalRef, theme, exercises, activeIndex, onSelect, onReorder }: Props) => {
+const ExerciseNavigatorSheet = ({ modalRef, theme, exercises, activeIndex, onSelect, onReorder, onAddExercise }: Props) => {
   const { height, width } = useWindowDimensions();
   const [isEditingOrder, setIsEditingOrder] = useState(false);
 
@@ -92,6 +86,12 @@ const ExerciseNavigatorSheet = ({ modalRef, theme, exercises, activeIndex, onSel
           showsVerticalScrollIndicator={false}
           contentContainerStyle={styles.list}
         />
+        {!isEditingOrder && (
+          <Pressable onPress={onAddExercise} style={[styles.addButton, { backgroundColor: theme.primary }]}>
+            <MaterialCommunityIcons name="plus" size={20} color={theme.white} />
+            <Text style={styles.addText}>Add exercise</Text>
+          </Pressable>
+        )}
       </View>
     </SlidingBottomModal>
   );
@@ -112,6 +112,8 @@ const styles = StyleSheet.create({
   name: { flexShrink: 1, fontFamily: fontFamilies.semiBold, fontSize: fontSizes.bodySmall },
   added: { fontFamily: fontFamilies.bold, fontSize: fontSizes.caption },
   progress: { marginTop: 3, fontFamily: fontFamilies.regular, fontSize: fontSizes.label },
+  addButton: { minHeight: 48, borderRadius: 15, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 7 },
+  addText: { color: '#FFFFFF', fontFamily: fontFamilies.semiBold, fontSize: fontSizes.bodySmall },
 });
 
 export default ExerciseNavigatorSheet;

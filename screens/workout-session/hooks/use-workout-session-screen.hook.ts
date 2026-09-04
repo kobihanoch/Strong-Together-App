@@ -1,59 +1,57 @@
-import type { CreateWorkoutSessionBody } from '@strong-together/shared';
-import { useEffect } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useExerciseHistory } from '../../../features/workouts/history/hooks/use-exercise-history.hook';
 import type { WorkoutSplit } from '../../../features/workouts/plan/types/workout-plan.types';
+import useExercises from '../../../features/workouts/plan/hooks/use-exercises.hook';
+import type { Exercise } from '../../../features/workouts/plan/types/exercises.types';
 import { useWorkoutSession } from '../../../features/workouts/session/hooks/use-workout-session.hook';
 import { useAppTheme } from '../../../shared/providers/AppThemeProvider';
-
-type WorkoutEntry = CreateWorkoutSessionBody['workout'][number];
-type TrackedSet = WorkoutEntry['trackedSets'][number];
+import {
+  buildNavigatorExercises,
+  createWorkoutEntries,
+  filterExercises,
+  findNextIncompleteSetIndex,
+  flattenExercises,
+  getExerciseKey,
+  getTotalSets,
+  isExerciseAlreadyAdded,
+  type TrackedSet,
+} from '../utils/workout-session-screen.utils';
 
 /** Connects the Workout Session screen to the persisted session feature. */
 const useWorkoutSessionScreen = (workoutSplit: WorkoutSplit) => {
-  const { colors: theme } = useAppTheme();
+  const { colors: theme, mode: themeMode } = useAppTheme();
   const { actions, data, loadingStates } = useWorkoutSession();
   const { startWorkout, discardWorkout } = actions;
   const { data: history } = useExerciseHistory();
+  const { data: exerciseCollection, loadingStates: exerciseLoading } = useExercises();
+  const [exerciseQuery, setExerciseQuery] = useState('');
+  const [selectedMuscle, setSelectedMuscle] = useState('All');
   const { activeExerciseIndex: exerciseIndex, activeSetIndex: setIndex, completedSetKeys, rest } = data.progress;
 
   useEffect(() => {
     if (data.draft || !workoutSplit.exercises.length) return;
-    startWorkout(
-      workoutSplit.exercises.map<WorkoutEntry>((exercise) => ({
-        exerciseId: null,
-        exerciseToSplitId: exercise.exerciseToSplitId,
-        isExerciseAssignedToSplit: true,
-        notes: null,
-        trackedSets: exercise.sets.map<TrackedSet>((set) => ({
-          setIndex: set.orderIndex,
-          reps: 0,
-          weight: 0,
-        })),
-      })),
-      workoutSplit,
-    );
+    startWorkout(createWorkoutEntries(workoutSplit), workoutSplit);
   }, [data.draft, startWorkout, workoutSplit]);
 
   const draftExercise = data.draft?.workout[exerciseIndex] ?? null;
   const planExercise = workoutSplit.exercises.find((exercise) => exercise.exerciseToSplitId === draftExercise?.exerciseToSplitId);
   const activeSet = draftExercise?.trackedSets[setIndex] ?? null;
+  const isActiveExerciseAdded = Boolean(draftExercise && !draftExercise.isExerciseAssignedToSplit);
   const previousSet = history.getLastPerformanceForExercise(planExercise?.exerciseToSplitId ?? null)?.performance?.[setIndex] ?? null;
-  const exerciseKey = draftExercise?.exerciseToSplitId ?? `added-${draftExercise?.exerciseId ?? exerciseIndex}`;
+  const exerciseKey = getExerciseKey(draftExercise, exerciseIndex);
   const setKey = `${exerciseKey}:${activeSet?.setIndex ?? setIndex}`;
 
-  const totalSets = data.draft?.workout.reduce((total, exercise) => total + exercise.trackedSets.length, 0) ?? 0;
+  const workout = data.draft?.workout ?? [];
+  const totalSets = getTotalSets(workout);
   const completedCount = completedSetKeys.length;
-  const navigatorExercises = (data.draft?.workout ?? []).map((exercise, index) => {
-    const plannedExercise = workoutSplit.exercises.find((item) => item.exerciseToSplitId === exercise.exerciseToSplitId);
-    const key = exercise.exerciseToSplitId ?? `added-${exercise.exerciseId ?? index}`;
-    return {
-      key: String(key),
-      name: plannedExercise?.name ?? 'Added exercise',
-      isAdded: !exercise.isExerciseAssignedToSplit,
-      completedSets: exercise.trackedSets.filter((set) => completedSetKeys.includes(`${key}:${set.setIndex}`)).length,
-      totalSets: exercise.trackedSets.length,
-    };
-  });
+  const allExercises = useMemo(() => flattenExercises(exerciseCollection), [exerciseCollection]);
+  const exercisesById = useMemo(() => new Map(allExercises.map((exercise) => [exercise.id, exercise])), [allExercises]);
+  const muscles = useMemo(() => (exerciseCollection ? ['All', ...Object.keys(exerciseCollection)] : ['All']), [exerciseCollection]);
+  const filteredExercises = useMemo(
+    () => filterExercises(allExercises, selectedMuscle, exerciseQuery),
+    [allExercises, exerciseQuery, selectedMuscle],
+  );
+  const navigatorExercises = buildNavigatorExercises(workout, workoutSplit, exercisesById, completedSetKeys);
 
   const selectExercise = (nextIndex: number): void => {
     const count = data.draft?.workout.length ?? 0;
@@ -71,10 +69,8 @@ const useWorkoutSessionScreen = (workoutSplit: WorkoutSplit) => {
 
     actions.completeSet(setKey, planExercise?.name ?? 'Exercise');
 
-    const nextSetIndex = draftExercise?.trackedSets.findIndex(
-      (set, index) => index > setIndex && !completedSetKeys.includes(`${exerciseKey}:${set.setIndex}`),
-    );
-    if (nextSetIndex !== undefined && nextSetIndex >= 0) actions.setActiveSet(nextSetIndex);
+    const nextSetIndex = findNextIncompleteSetIndex(draftExercise?.trackedSets ?? [], setIndex, exerciseKey, completedSetKeys);
+    if (nextSetIndex >= 0) actions.setActiveSet(nextSetIndex);
   };
 
   const addSet = (): void => {
@@ -93,9 +89,17 @@ const useWorkoutSessionScreen = (workoutSplit: WorkoutSplit) => {
     if (setIndex >= draftExercise.trackedSets.length - 1) actions.setActiveSet(Math.max(0, setIndex - 1));
   };
 
+  const addExercise = (exercise: Exercise): void => {
+    if (data.draft?.workout.some((item) => item.exerciseId === exercise.id)) return;
+    const nextIndex = data.draft?.workout.length ?? 0;
+    actions.addExercise(exercise.id);
+    actions.setActiveExercise(nextIndex);
+  };
+
   return {
     data: {
       theme,
+      themeMode,
       workoutName: workoutSplit.name,
       workoutStartedAtUtc: data.draft?.workoutStartUtc ?? null,
       exerciseName: planExercise?.name ?? 'Exercise',
@@ -104,8 +108,9 @@ const useWorkoutSessionScreen = (workoutSplit: WorkoutSplit) => {
       exerciseCount: data.draft?.workout.length ?? workoutSplit.exercises.length,
       setIndex,
       sets: draftExercise?.trackedSets ?? [],
-      plannedSetCount: planExercise?.sets.length ?? 0,
-      isActiveSetExtra: setIndex >= (planExercise?.sets.length ?? 0),
+      plannedSetCount: isActiveExerciseAdded ? draftExercise?.trackedSets.length ?? 0 : planExercise?.sets.length ?? 0,
+      isActiveSetExtra: !isActiveExerciseAdded && setIndex >= (planExercise?.sets.length ?? 0),
+      isActiveExerciseAdded,
       activeSet,
       previousSet,
       completedSetKeys,
@@ -113,6 +118,17 @@ const useWorkoutSessionScreen = (workoutSplit: WorkoutSplit) => {
       totalSets,
       rest,
       navigatorExercises,
+      exercisePicker: {
+        exercises: filteredExercises,
+        muscles,
+        selectedMuscle,
+        query: exerciseQuery,
+        isLoading: exerciseLoading.isPending,
+        isAdded: (exercise: Exercise) =>
+          Boolean(
+            isExerciseAlreadyAdded(exercise, workout, workoutSplit),
+          ),
+      },
       isSaving: loadingStates.isSaving,
     },
     actions: {
@@ -120,10 +136,16 @@ const useWorkoutSessionScreen = (workoutSplit: WorkoutSplit) => {
       nextExercise: () => selectExercise(exerciseIndex + 1),
       selectExercise,
       reorderExercises: actions.reorderExercises,
+      addExercise,
+      setExerciseQuery,
+      setSelectedMuscle,
       selectSet: actions.setActiveSet,
       addSet,
       removeSet,
       removeActiveSet: () => activeSet && removeSet(activeSet.setIndex),
+      removeActiveExercise: () => {
+        if (draftExercise?.exerciseId) actions.removeExercise(draftExercise.exerciseId);
+      },
       updateWeight: (value: number) => updateValue('weight', value),
       updateReps: (value: number) => updateValue('reps', value),
       completeSet,

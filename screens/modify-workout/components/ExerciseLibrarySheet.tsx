@@ -1,4 +1,3 @@
-import type { ReplaceWorkoutPlanBody } from '@strong-together/shared';
 import React, { RefObject } from 'react';
 import { FlatList, Pressable, ScrollView, StyleSheet, Text, TextInput, useWindowDimensions, View } from 'react-native';
 import Animated, { FadeIn } from 'react-native-reanimated';
@@ -12,7 +11,8 @@ import { Exercise } from '../../../features/workouts/plan/types/exercises.types'
 type Props = {
   modalRef: RefObject<SlidingBottomModalRef | null>;
   height: number;
-  split: ReplaceWorkoutPlanBody['workoutData'][number];
+  contextName: string;
+  exerciseCount: number;
   exercises: Exercise[];
   isLoading: boolean;
   muscles: string[];
@@ -23,12 +23,14 @@ type Props = {
   onQuery: (value: string) => void;
   onMuscle: (value: string) => void;
   onAdd: (exercise: Exercise) => void;
+  isExerciseAdded: (exercise: Exercise) => boolean;
 };
 
 const ExerciseLibrarySheet = ({
   modalRef,
   height,
-  split,
+  contextName,
+  exerciseCount,
   exercises,
   isLoading,
   muscles,
@@ -39,6 +41,7 @@ const ExerciseLibrarySheet = ({
   onQuery,
   onMuscle,
   onAdd,
+  isExerciseAdded,
 }: Props) => {
   const { width } = useWindowDimensions();
   const titleWidth = Math.max(120, Math.min(width * 0.4, 170));
@@ -49,7 +52,7 @@ const ExerciseLibrarySheet = ({
       <View style={[styles.content, { height: height * 0.72, backgroundColor: theme.surface }]}>
         <Text style={[styles.title, { color: theme.textPrimary }]}>Add Exercise</Text>
         <Text style={[styles.meta, { color: theme.textSecondary }]}>
-          {split.name} · {split.exercises.length} of 10 exercises
+          {contextName} · {exerciseCount} of 10 exercises
         </Text>
 
         <View style={[styles.search, { backgroundColor: theme.surfaceMuted, borderColor: theme.border }]}>
@@ -104,7 +107,7 @@ const ExerciseLibrarySheet = ({
             keyExtractor={(item) => String(item.id)}
             keyboardShouldPersistTaps="handled"
             renderItem={({ item, index }) => {
-              const added = split.exercises.some((exercise) => exercise.exerciseId === item.id);
+              const added = isExerciseAdded(item);
               return (
                 <Pressable disabled={added} onPress={() => onAdd(item)} style={[styles.row, { borderBottomColor: theme.border }]}>
                   <Text style={[styles.order, { color: theme.textPrimary }]}>{String(index + 1).padStart(2, '0')}</Text>

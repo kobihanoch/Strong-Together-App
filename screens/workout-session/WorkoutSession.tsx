@@ -6,6 +6,7 @@ import type { RootParamList } from '../../navigation/types/appStackTypes';
 import { fontFamilies, fontSizes } from '../../shared/constants/typography';
 import ElapsedRestControl from './components/ElapsedRestControl';
 import ExerciseNavigatorSheet from './components/ExerciseNavigatorSheet';
+import ExerciseLibrarySheet from '../modify-workout/components/ExerciseLibrarySheet';
 import SetNavigator from './components/SetNavigator';
 import WorkoutMetricEditor from './components/WorkoutMetricEditor';
 import WorkoutSessionHeader from './components/WorkoutSessionHeader';
@@ -20,6 +21,7 @@ const WorkoutSession = ({ route, navigation }: Props) => {
   const { data, actions } = useWorkoutSessionScreen(route.params.workoutSplit);
   const { width, height } = useWindowDimensions();
   const navigatorRef = useRef<SlidingBottomModalRef | null>(null);
+  const exerciseLibraryRef = useRef<SlidingBottomModalRef | null>(null);
   const gutter = Math.max(12, Math.min(width * 0.035, 16));
 
   // Finish flow will be connected in its dedicated slice.
@@ -35,6 +37,12 @@ const WorkoutSession = ({ route, navigation }: Props) => {
           await actions.discardWorkout();
         },
       },
+    ]);
+  };
+  const removeAddedExercise = (): void => {
+    Alert.alert('Remove added exercise?', 'Its entered sets and progress will be deleted from this workout.', [
+      { text: 'Cancel', style: 'cancel' },
+      { text: 'Remove exercise', style: 'destructive', onPress: actions.removeActiveExercise },
     ]);
   };
 
@@ -86,6 +94,11 @@ const WorkoutSession = ({ route, navigation }: Props) => {
             <Text style={styles.removeSetText}>Remove extra set</Text>
           </Pressable>
         )}
+        {data.isActiveExerciseAdded && (
+          <Pressable accessibilityRole="button" onPress={removeAddedExercise} style={styles.removeSet}>
+            <Text style={styles.removeSetText}>Remove added exercise</Text>
+          </Pressable>
+        )}
 
         <ScrollView
           style={styles.scroll}
@@ -133,6 +146,28 @@ const WorkoutSession = ({ route, navigation }: Props) => {
         activeIndex={data.exerciseIndex}
         onSelect={actions.selectExercise}
         onReorder={actions.reorderExercises}
+        onAddExercise={() => {
+          navigatorRef.current?.close();
+          setTimeout(() => exerciseLibraryRef.current?.open(1), 220);
+        }}
+      />
+
+      <ExerciseLibrarySheet
+        modalRef={exerciseLibraryRef}
+        height={height}
+        contextName={data.workoutName}
+        exerciseCount={data.navigatorExercises.length}
+        exercises={data.exercisePicker.exercises}
+        isLoading={data.exercisePicker.isLoading}
+        muscles={data.exercisePicker.muscles}
+        selectedMuscle={data.exercisePicker.selectedMuscle}
+        query={data.exercisePicker.query}
+        theme={data.theme}
+        themeMode={data.themeMode}
+        onQuery={actions.setExerciseQuery}
+        onMuscle={actions.setSelectedMuscle}
+        onAdd={actions.addExercise}
+        isExerciseAdded={data.exercisePicker.isAdded}
       />
     </SafeAreaView>
   );
