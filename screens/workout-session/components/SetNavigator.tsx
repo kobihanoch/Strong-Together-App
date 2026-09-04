@@ -35,7 +35,7 @@ const SetNavigator = ({ theme, sets, activeIndex, completedSetKeys, exerciseKey,
               {isExtra && (
                 <Text style={[styles.extra, { color: theme.achievement }]}>EXTRA</Text>
               )}
-              <Pressable disabled={!isUnlocked} onPress={() => onSelect(index)} style={styles.status}>
+              <Pressable disabled={!isUnlocked} onPress={() => onSelect(index)} style={({ pressed }) => [styles.status, pressed && styles.pressed]}>
                 {completed && <Text style={[styles.check, { color: theme.profit }]}>✓</Text>}
                 {active && !completed && <View style={[styles.activeDot, { backgroundColor: theme.primary }]} />}
                 <Text style={[styles.number, { color: active ? theme.primary : theme.textPrimary }]}>{index + 1}</Text>
@@ -46,7 +46,7 @@ const SetNavigator = ({ theme, sets, activeIndex, completedSetKeys, exerciseKey,
       </ScrollView>
 
       <View style={[styles.divider, { backgroundColor: theme.border }]} />
-      <Pressable accessibilityLabel="Add set" onPress={onAdd} style={styles.add}>
+      <Pressable accessibilityLabel="Add set" onPress={onAdd} style={({ pressed }) => [styles.add, pressed && styles.pressed]}>
         <Text style={[styles.addText, { color: theme.textPrimary }]}>+</Text>
       </Pressable>
     </View>
@@ -66,6 +66,7 @@ const styles = StyleSheet.create({
   divider: { width: StyleSheet.hairlineWidth },
   add: { width: 56, alignItems: 'center', justifyContent: 'center' },
   addText: { fontFamily: fontFamilies.regular, fontSize: 32, lineHeight: 34 },
+  pressed: { opacity: 0.65, transform: [{ scale: 0.94 }] },
 });
 
 export default SetNavigator;

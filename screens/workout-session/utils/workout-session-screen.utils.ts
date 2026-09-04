@@ -70,6 +70,25 @@ export const findNextIncompleteSetIndex = (
 export const getTotalSets = (workout: WorkoutEntry[]): number =>
   workout.reduce((total, exercise) => total + exercise.trackedSets.length, 0);
 
+/** Counts progress from planned exercises and planned sets only. */
+export const getPlannedWorkoutProgress = (
+  workout: WorkoutEntry[],
+  workoutSplit: WorkoutSplit,
+  completedSetKeys: string[],
+): { completed: number; total: number } => {
+  const total = workoutSplit.exercises.reduce((sum, exercise) => sum + exercise.sets.length, 0);
+  const completed = workout.reduce((sum, exercise, exerciseIndex) => {
+    if (!exercise.isExerciseAssignedToSplit) return sum;
+    const planned = workoutSplit.exercises.find((item) => item.exerciseToSplitId === exercise.exerciseToSplitId);
+    const key = getExerciseKey(exercise, exerciseIndex);
+    return sum + exercise.trackedSets
+      .slice(0, planned?.sets.length ?? 0)
+      .filter((set) => completedSetKeys.includes(`${key}:${set.setIndex}`)).length;
+  }, 0);
+
+  return { completed, total };
+};
+
 export const isExerciseAlreadyAdded = (
   exercise: Exercise,
   workout: WorkoutEntry[],

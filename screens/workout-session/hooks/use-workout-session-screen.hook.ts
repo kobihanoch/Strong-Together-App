@@ -14,6 +14,7 @@ import {
   findNextIncompleteSetIndex,
   flattenExercises,
   getExerciseKey,
+  getPlannedWorkoutProgress,
   getTotalSets,
   isExerciseAlreadyAdded,
   type TrackedSet,
@@ -49,6 +50,7 @@ const useWorkoutSessionScreen = (workoutSplit: WorkoutSplit) => {
   const workout = data.draft?.workout ?? [];
   const totalSets = getTotalSets(workout);
   const completedCount = completedSetKeys.length;
+  const plannedProgress = getPlannedWorkoutProgress(workout, workoutSplit, completedSetKeys);
   const allExercises = useMemo(() => flattenExercises(exerciseCollection), [exerciseCollection]);
   const exercisesById = useMemo(() => new Map(allExercises.map((exercise) => [exercise.id, exercise])), [allExercises]);
   const muscles = useMemo(() => (exerciseCollection ? ['All', ...Object.keys(exerciseCollection)] : ['All']), [exerciseCollection]);
@@ -143,6 +145,7 @@ const useWorkoutSessionScreen = (workoutSplit: WorkoutSplit) => {
       completedSetKeys,
       completedCount,
       totalSets,
+      plannedProgress,
       rest,
       navigatorExercises,
       exerciseHistory,

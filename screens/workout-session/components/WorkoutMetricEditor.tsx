@@ -17,6 +17,8 @@ const WorkoutMetricEditor = ({ theme, label, value, step = 1, allowDecimal = fal
   const { width, height } = useWindowDimensions();
   const [input, setInput] = useState(String(value));
   const controlSize = Math.max(52, Math.min(width * 0.15, 62));
+  const unit = label.match(/\(([^)]+)\)/)?.[1];
+  const metricName = label.replace(/\s*\([^)]+\)/, '');
 
   useEffect(() => setInput(String(value)), [value]);
 
@@ -37,9 +39,20 @@ const WorkoutMetricEditor = ({ theme, label, value, step = 1, allowDecimal = fal
 
   return (
     <View>
-      <Text style={[styles.label, { color: theme.textSecondary }]}>{label}</Text>
+      <View style={styles.labelRow}>
+        <Text style={[styles.label, { color: theme.textPrimary }]}>{metricName}</Text>
+        {unit && <Text style={[styles.unit, { color: theme.textSecondary }]}>{unit}</Text>}
+      </View>
       <View style={[styles.editor, { minHeight: Math.max(88, Math.min(height * 0.12, 108)) }]}> 
-        <Pressable accessibilityLabel={`Decrease ${label}`} onPress={() => stepValue(value - step)} style={[styles.button, { width: controlSize, height: controlSize, borderColor: theme.border }]}> 
+        <Pressable
+          accessibilityLabel={`Decrease ${label}`}
+          onPress={() => stepValue(value - step)}
+          style={({ pressed }) => [
+            styles.button,
+            { width: controlSize, height: controlSize, borderColor: theme.border },
+            pressed && styles.pressed,
+          ]}
+        >
           <MaterialCommunityIcons name="minus" size={24} color={theme.textSecondary} />
         </Pressable>
         <TextInput
@@ -50,7 +63,15 @@ const WorkoutMetricEditor = ({ theme, label, value, step = 1, allowDecimal = fal
           selectTextOnFocus
           style={[styles.value, { color: theme.textPrimary }]}
         />
-        <Pressable accessibilityLabel={`Increase ${label}`} onPress={() => stepValue(value + step)} style={[styles.button, { width: controlSize, height: controlSize, borderColor: theme.border }]}> 
+        <Pressable
+          accessibilityLabel={`Increase ${label}`}
+          onPress={() => stepValue(value + step)}
+          style={({ pressed }) => [
+            styles.button,
+            { width: controlSize, height: controlSize, borderColor: theme.border },
+            pressed && styles.pressed,
+          ]}
+        >
           <MaterialCommunityIcons name="plus" size={24} color={theme.textSecondary} />
         </Pressable>
       </View>
@@ -59,10 +80,13 @@ const WorkoutMetricEditor = ({ theme, label, value, step = 1, allowDecimal = fal
 };
 
 const styles = StyleSheet.create({
-  label: { fontFamily: fontFamilies.semiBold, fontSize: fontSizes.caption, letterSpacing: 0.8, marginBottom: 8 },
+  labelRow: { marginBottom: 6, flexDirection: 'row', alignItems: 'baseline', gap: 6 },
+  label: { fontFamily: fontFamilies.bold, fontSize: fontSizes.bodySmall, letterSpacing: 0.8 },
+  unit: { fontFamily: fontFamilies.medium, fontSize: fontSizes.caption, letterSpacing: 1 },
   editor: { flexDirection: 'row', alignItems: 'center' },
   button: { borderRadius: 13, borderWidth: 1, alignItems: 'center', justifyContent: 'center' },
-  value: { flex: 1, textAlign: 'center', fontFamily: fontFamilies.bold, fontSize: fontSizes.hero + 20, paddingVertical: 0 },
+  pressed: { opacity: 0.65, transform: [{ scale: 0.94 }] },
+  value: { flex: 1, textAlign: 'center', fontFamily: fontFamilies.bold, fontSize: fontSizes.hero + 22, letterSpacing: -1.8, paddingVertical: 0 },
 });
 
 export default WorkoutMetricEditor;

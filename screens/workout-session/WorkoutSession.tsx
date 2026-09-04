@@ -60,6 +60,8 @@ const WorkoutSession = ({ route, navigation }: Props) => {
         setCount={data.sets.length}
         completedCount={data.completedCount}
         totalSets={data.totalSets}
+        plannedCompletedSets={data.plannedProgress.completed}
+        plannedTotalSets={data.plannedProgress.total}
         workoutStartedAtUtc={data.workoutStartedAtUtc}
         previousSet={data.previousSet}
         onBack={exitWorkout}
@@ -129,15 +131,16 @@ const WorkoutSession = ({ route, navigation }: Props) => {
           )}
 
           <View style={styles.completionRow}>
-            <Text style={[styles.completionHint, { color: data.theme.textSecondary }]}>Values save automatically</Text>
+            <Text style={[styles.completionHint, { color: data.theme.textSecondary }]}>CHANGES SAVE AUTOMATICALLY</Text>
             <Pressable
               disabled={!data.canCompleteActiveSet}
               onPress={actions.completeSet}
-              style={[
+              style={({ pressed }) => [
                 styles.done,
                 {
                   backgroundColor: data.canCompleteActiveSet ? data.theme.primary : data.theme.primarySoft,
-                  opacity: data.canCompleteActiveSet ? 1 : 0.55,
+                  opacity: data.canCompleteActiveSet ? (pressed ? 0.82 : 1) : 0.55,
+                  transform: [{ scale: pressed ? 0.985 : 1 }],
                 },
               ]}
             >
@@ -234,7 +237,7 @@ const styles = StyleSheet.create({
   removeActionText: { color: '#B93838', fontFamily: fontFamilies.semiBold, fontSize: fontSizes.label },
   metrics: { marginTop: 0 },
   completionRow: { marginTop: 18, gap: 9 },
-  completionHint: { textAlign: 'center', fontFamily: fontFamilies.regular, fontSize: fontSizes.label },
+  completionHint: { textAlign: 'center', fontFamily: fontFamilies.semiBold, fontSize: fontSizes.caption, letterSpacing: 1.1 },
   done: {
     minHeight: 48,
     borderRadius: 15,
@@ -248,7 +251,7 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 3 },
     elevation: 3,
   },
-  doneText: { fontFamily: fontFamilies.semiBold, fontSize: fontSizes.bodySmall },
+  doneText: { fontFamily: fontFamilies.bold, fontSize: fontSizes.bodySmall, letterSpacing: 0.1 },
   restWrap: { position: 'absolute', bottom: 14 },
 });
 
