@@ -2,7 +2,7 @@ import type { CreateWorkoutSessionBody } from '@strong-together/shared';
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import type { Exercise } from '../../plan/types/exercises.types';
-import { WORKOUT_SESSION_STORAGE_KEY, workoutSessionStorage } from '../utils/workout-session-cache.utils';
+import { WORKOUT_SESSION_CACHE_VERSION, WORKOUT_SESSION_STORAGE_KEY, workoutSessionStorage } from '../utils/workout-session-cache.utils';
 
 type WorkoutEntry = CreateWorkoutSessionBody['workout'][number];
 type TrackedSet = WorkoutEntry['trackedSets'][number];
@@ -128,8 +128,10 @@ export const useWorkoutSessionStore = create<WorkoutSessionStore>()(
     }),
     {
       name: WORKOUT_SESSION_STORAGE_KEY,
+      version: WORKOUT_SESSION_CACHE_VERSION,
       storage: workoutSessionStorage,
       partialize: (state) => ({ draft: state.draft }),
+      migrate: () => ({ draft: null }),
     },
   ),
 );
