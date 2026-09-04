@@ -1,4 +1,5 @@
 import type { StackScreenProps } from '@react-navigation/stack';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import React, { useRef } from 'react';
 import { Alert, Pressable, ScrollView, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -7,9 +8,11 @@ import { fontFamilies, fontSizes } from '../../shared/constants/typography';
 import ElapsedRestControl from './components/ElapsedRestControl';
 import ExerciseNavigatorSheet from './components/ExerciseNavigatorSheet';
 import ExerciseLibrarySheet from '../modify-workout/components/ExerciseLibrarySheet';
+import WorkoutExerciseProgress from './components/WorkoutExerciseProgress';
 import SetNavigator from './components/SetNavigator';
 import WorkoutMetricEditor from './components/WorkoutMetricEditor';
 import WorkoutSessionHeader from './components/WorkoutSessionHeader';
+import WorkoutExerciseHistorySheet from './components/WorkoutExerciseHistorySheet';
 import useWorkoutSessionScreen from './hooks/use-workout-session-screen.hook';
 import type { SlidingBottomModalRef } from '../../shared/components/SlidingBottomModal';
 import useToggleStatusBarColor from '../../shared/hooks/use-toggle-status-bar-color.hook';
@@ -22,6 +25,7 @@ const WorkoutSession = ({ route, navigation }: Props) => {
   const { width, height } = useWindowDimensions();
   const navigatorRef = useRef<SlidingBottomModalRef | null>(null);
   const exerciseLibraryRef = useRef<SlidingBottomModalRef | null>(null);
+  const historyRef = useRef<SlidingBottomModalRef | null>(null);
   const gutter = Math.max(12, Math.min(width * 0.035, 16));
 
   // Finish flow will be connected in its dedicated slice.
@@ -61,7 +65,7 @@ const WorkoutSession = ({ route, navigation }: Props) => {
         onBack={exitWorkout}
         onPrevious={actions.previousExercise}
         onNext={actions.nextExercise}
-        onOpenNavigator={() => navigatorRef.current?.open(0)}
+        onOpenNavigator={() => navigatorRef.current?.open(1)}
         onFinish={noop}
       />
 
@@ -90,13 +94,15 @@ const WorkoutSession = ({ route, navigation }: Props) => {
         </View>
 
         {data.isActiveSetExtra && (
-          <Pressable accessibilityRole="button" onPress={actions.removeActiveSet} style={styles.removeSet}>
-            <Text style={styles.removeSetText}>Remove extra set</Text>
+          <Pressable accessibilityRole="button" onPress={actions.removeActiveSet} style={styles.removeAction}>
+            <MaterialCommunityIcons name="delete-outline" size={16} color="#B93838" />
+            <Text style={styles.removeActionText}>Remove extra set</Text>
           </Pressable>
         )}
         {data.isActiveExerciseAdded && (
-          <Pressable accessibilityRole="button" onPress={removeAddedExercise} style={styles.removeSet}>
-            <Text style={styles.removeSetText}>Remove added exercise</Text>
+          <Pressable accessibilityRole="button" onPress={removeAddedExercise} style={styles.removeAction}>
+            <MaterialCommunityIcons name="delete-outline" size={16} color="#B93838" />
+            <Text style={styles.removeActionText}>Remove added exercise</Text>
           </Pressable>
         )}
 
@@ -122,9 +128,26 @@ const WorkoutSession = ({ route, navigation }: Props) => {
             </View>
           )}
 
-          <Pressable disabled={!data.activeSet} onPress={actions.completeSet} style={[styles.done, { opacity: data.activeSet ? 1 : 0.5 }]}>
-            <Text style={[styles.doneText, { color: data.theme.primary }]}>✓ Done</Text>
-          </Pressable>
+          <View style={styles.completionRow}>
+            <Text style={[styles.completionHint, { color: data.theme.textSecondary }]}>Values save automatically</Text>
+            <Pressable
+              disabled={!data.canCompleteActiveSet}
+              onPress={actions.completeSet}
+              style={[
+                styles.done,
+                {
+                  backgroundColor: data.canCompleteActiveSet ? data.theme.primary : data.theme.primarySoft,
+                  opacity: data.canCompleteActiveSet ? 1 : 0.55,
+                },
+              ]}
+            >
+              <Text style={[styles.doneText, { color: data.canCompleteActiveSet ? data.theme.white : data.theme.primary }]}>
+                ✓ Mark set complete
+              </Text>
+            </Pressable>
+          </View>
+
+          <WorkoutExerciseProgress theme={data.theme} points={data.historyPoints} onViewAll={() => historyRef.current?.open(1)} />
         </ScrollView>
       </View>
 
@@ -169,6 +192,16 @@ const WorkoutSession = ({ route, navigation }: Props) => {
         onAdd={actions.addExercise}
         isExerciseAdded={data.exercisePicker.isAdded}
       />
+
+      <WorkoutExerciseHistorySheet
+        modalRef={historyRef}
+        theme={data.theme}
+        exerciseName={data.exerciseName}
+        history={data.exerciseHistory}
+        points={data.historyPoints}
+        plannedSetCount={data.plannedSetCount}
+        onFillValues={actions.fillFromHistory}
+      />
     </SafeAreaView>
   );
 };
@@ -189,10 +222,32 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 3 },
     elevation: 3,
   },
-  removeSet: { alignSelf: 'flex-end', minHeight: 36, justifyContent: 'center', marginRight: 18 },
-  removeSetText: { color: '#C33D3D', fontFamily: fontFamilies.semiBold, fontSize: fontSizes.label },
+  removeAction: {
+    alignSelf: 'center',
+    minHeight: 36,
+    marginTop: 6,
+    paddingHorizontal: 12,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5,
+  },
+  removeActionText: { color: '#B93838', fontFamily: fontFamilies.semiBold, fontSize: fontSizes.label },
   metrics: { marginTop: 0 },
-  done: { minHeight: 44, alignSelf: 'flex-end', alignItems: 'center', justifyContent: 'center', paddingHorizontal: 4 },
+  completionRow: { marginTop: 18, gap: 9 },
+  completionHint: { textAlign: 'center', fontFamily: fontFamilies.regular, fontSize: fontSizes.label },
+  done: {
+    minHeight: 48,
+    borderRadius: 15,
+    alignItems: 'center',
+    justifyContent: 'center',
+    alignSelf: 'stretch',
+    paddingHorizontal: 20,
+    shadowColor: '#000000',
+    shadowOpacity: 0.14,
+    shadowRadius: 6,
+    shadowOffset: { width: 0, height: 3 },
+    elevation: 3,
+  },
   doneText: { fontFamily: fontFamilies.semiBold, fontSize: fontSizes.bodySmall },
   restWrap: { position: 'absolute', bottom: 14 },
 });

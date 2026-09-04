@@ -47,7 +47,7 @@ const WorkoutSessionHeader = ({
         styles.container,
         {
           backgroundColor: theme.heroSurface,
-          height: Math.max(210, Math.min(height * 0.265, 232)),
+          height: Math.max(258, Math.min(height * 0.325, 286)),
           paddingHorizontal: gutter,
           borderBottomLeftRadius: Math.max(24, Math.min(width * 0.075, 32)),
           borderBottomRightRadius: Math.max(24, Math.min(width * 0.075, 32)),
@@ -73,17 +73,21 @@ const WorkoutSessionHeader = ({
         <Pressable accessibilityLabel="Previous exercise" onPress={onPrevious} style={styles.arrow}>
           <MaterialCommunityIcons name="chevron-left" size={28} color={theme.white} />
         </Pressable>
-        <Pressable accessibilityRole="button" onPress={onOpenNavigator} style={styles.exerciseTitle}>
+        <View style={styles.exerciseTitle}>
           <Text numberOfLines={1} style={styles.name}>
             {exerciseName}
           </Text>
-          <MaterialCommunityIcons name="chevron-down" size={20} color={theme.white} />
-        </Pressable>
+        </View>
         <Pressable accessibilityLabel="Next exercise" onPress={onNext} style={styles.arrow}>
           <MaterialCommunityIcons name="chevron-right" size={28} color={theme.white} />
         </Pressable>
       </View>
 
+      <Pressable accessibilityRole="button" accessibilityLabel="Open exercise navigator" onPress={onOpenNavigator} style={styles.navigatorAction}>
+        <MaterialCommunityIcons name="format-list-bulleted" size={16} color={theme.primary} />
+        <Text style={[styles.navigatorActionText, { color: theme.primary }]}>Manage exercises</Text>
+        <MaterialCommunityIcons name="chevron-right" size={16} color={theme.primary} />
+      </Pressable>
       <Text style={styles.position}>
         Set <Text style={{ color: theme.primary }}>{setNumber}</Text> of {setCount}
       </Text>
@@ -102,12 +106,23 @@ const styles = StyleSheet.create({
   workoutTitle: { color: '#FFFFFF', fontFamily: fontFamilies.semiBold, fontSize: fontSizes.bodySmall },
   timer: { color: '#B8AEA4', fontFamily: fontFamilies.medium, fontSize: fontSizes.caption, marginTop: 2 },
   finish: { width: 52, color: '#FFFFFF', textAlign: 'right', fontFamily: fontFamilies.semiBold, fontSize: fontSizes.bodySmall },
-  exerciseRow: { flexDirection: 'row', alignItems: 'center', marginTop: 15 },
+  exerciseRow: { flexDirection: 'row', alignItems: 'center', marginTop: 21 },
   arrow: { width: 44, height: 44, alignItems: 'center', justifyContent: 'center' },
-  exerciseTitle: { flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 4 },
+  exerciseTitle: { flex: 1, alignItems: 'center', justifyContent: 'center' },
   name: { color: '#FFFFFF', fontFamily: fontFamilies.bold, fontSize: fontSizes.title + 2, maxWidth: '88%' },
-  position: { color: '#FFFFFF', textAlign: 'center', fontFamily: fontFamilies.medium, fontSize: fontSizes.body, marginTop: 4 },
-  previous: { color: '#D3CCC5', textAlign: 'center', fontFamily: fontFamilies.medium, fontSize: fontSizes.bodySmall, marginTop: 8 },
+  position: { color: '#FFFFFF', textAlign: 'center', fontFamily: fontFamilies.medium, fontSize: fontSizes.body, marginTop: 8 },
+  navigatorAction: {
+    alignSelf: 'center',
+    minHeight: 32,
+    marginTop: 5,
+    paddingHorizontal: 8,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 3,
+  },
+  navigatorActionText: { fontFamily: fontFamilies.semiBold, fontSize: fontSizes.label },
+  previous: { color: '#D3CCC5', textAlign: 'center', fontFamily: fontFamilies.medium, fontSize: fontSizes.bodySmall, marginTop: 7 },
 });
 
 export default WorkoutSessionHeader;

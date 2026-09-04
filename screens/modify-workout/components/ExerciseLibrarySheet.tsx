@@ -67,12 +67,7 @@ const ExerciseLibrarySheet = ({
         </View>
 
         {!isLoading && (
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            style={styles.filterScroll}
-            contentContainerStyle={styles.filters}
-          >
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.filterScroll} contentContainerStyle={styles.filters}>
             {muscles.map((muscle) => {
               const active = muscle === selectedMuscle;
               return (

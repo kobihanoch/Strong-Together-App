@@ -11,7 +11,7 @@ export const TRACK_HISTORY_DAYS = 45;
 type ExerciseHistory = ExerciseHistoryItem['exerciseTracked'];
 type PreviousWorkout = { performance: ExerciseHistory[number]['sets']; date: string } | null;
 
-export type TrackHistoryPoint = { date: string; value: number; reps: number; setNumber: number };
+export type TrackHistoryPoint = { date: string; value: number; reps: number; setNumber: number; isPr?: boolean };
 
 export const getTrackHistoryDateBounds = () => {
   const today = DateTime.local().startOf('day');
@@ -105,8 +105,8 @@ export const buildTrackExercises = (
       const plannedSetCount = assignment.exerciseToSplitId === null ? null : (plannedSetCounts.get(assignment.exerciseToSplitId) ?? null);
       const isPr = Boolean(
         currentPr &&
-          selectedDate === currentPr.workoutStartLocal.slice(0, 10) &&
-          exerciseTracking.sets.some((set) => set.weight === currentPr.prWeight && set.reps === currentPr.prReps),
+        selectedDate === currentPr.workoutStartLocal.slice(0, 10) &&
+        exerciseTracking.sets.some((set) => set.weight === currentPr.prWeight && set.reps === currentPr.prReps),
       );
 
       return {

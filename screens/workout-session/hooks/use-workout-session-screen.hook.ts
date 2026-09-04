@@ -1,10 +1,12 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useExerciseHistory } from '../../../features/workouts/history/hooks/use-exercise-history.hook';
+import { usePrHistory } from '../../../features/workouts/history/hooks/use-pr-history.hook';
 import type { WorkoutSplit } from '../../../features/workouts/plan/types/workout-plan.types';
 import useExercises from '../../../features/workouts/plan/hooks/use-exercises.hook';
 import type { Exercise } from '../../../features/workouts/plan/types/exercises.types';
 import { useWorkoutSession } from '../../../features/workouts/session/hooks/use-workout-session.hook';
 import { useAppTheme } from '../../../shared/providers/AppThemeProvider';
+import { getTopSet, type TrackHistoryPoint } from '../../track-history/utils/track-history.utils';
 import {
   buildNavigatorExercises,
   createWorkoutEntries,
@@ -23,6 +25,7 @@ const useWorkoutSessionScreen = (workoutSplit: WorkoutSplit) => {
   const { actions, data, loadingStates } = useWorkoutSession();
   const { startWorkout, discardWorkout } = actions;
   const { data: history } = useExerciseHistory();
+  const { data: personalRecords } = usePrHistory();
   const { data: exerciseCollection, loadingStates: exerciseLoading } = useExercises();
   const [exerciseQuery, setExerciseQuery] = useState('');
   const [selectedMuscle, setSelectedMuscle] = useState('All');
@@ -38,8 +41,10 @@ const useWorkoutSessionScreen = (workoutSplit: WorkoutSplit) => {
   const activeSet = draftExercise?.trackedSets[setIndex] ?? null;
   const isActiveExerciseAdded = Boolean(draftExercise && !draftExercise.isExerciseAssignedToSplit);
   const previousSet = history.getLastPerformanceForExercise(planExercise?.exerciseToSplitId ?? null)?.performance?.[setIndex] ?? null;
+  const exerciseHistory = history.getExerciseHistoryData(planExercise?.exerciseToSplitId ?? null);
   const exerciseKey = getExerciseKey(draftExercise, exerciseIndex);
   const setKey = `${exerciseKey}:${activeSet?.setIndex ?? setIndex}`;
+  const canCompleteActiveSet = Boolean(activeSet && activeSet.weight > 0 && activeSet.reps > 0);
 
   const workout = data.draft?.workout ?? [];
   const totalSets = getTotalSets(workout);
@@ -52,6 +57,19 @@ const useWorkoutSessionScreen = (workoutSplit: WorkoutSplit) => {
     [allExercises, exerciseQuery, selectedMuscle],
   );
   const navigatorExercises = buildNavigatorExercises(workout, workoutSplit, exercisesById, completedSetKeys);
+  const personalRecord = planExercise ? personalRecords.getPrForExerciseId(planExercise.exerciseId) : null;
+  const historyPoints = exerciseHistory
+    .slice(0, 5)
+    .reverse()
+    .map<TrackHistoryPoint>((entry) => ({
+      date: entry.workoutStartLocal,
+      ...getTopSet(entry.sets),
+      isPr: Boolean(
+        personalRecord &&
+        personalRecord.workoutStartLocal.slice(0, 10) === entry.workoutStartLocal.slice(0, 10) &&
+        entry.sets.some((set) => set.weight === personalRecord.prWeight && set.reps === personalRecord.prReps),
+      ),
+    }));
 
   const selectExercise = (nextIndex: number): void => {
     const count = data.draft?.workout.length ?? 0;
@@ -65,7 +83,7 @@ const useWorkoutSessionScreen = (workoutSplit: WorkoutSplit) => {
   };
 
   const completeSet = (): void => {
-    if (!activeSet) return;
+    if (!activeSet || !canCompleteActiveSet) return;
 
     actions.completeSet(setKey, planExercise?.name ?? 'Exercise');
 
@@ -78,8 +96,8 @@ const useWorkoutSessionScreen = (workoutSplit: WorkoutSplit) => {
     const lastSet = draftExercise.trackedSets.at(-1);
     actions.addSet(exerciseIndex, {
       setIndex: (lastSet?.setIndex ?? -1) + 1,
-      reps: lastSet?.reps ?? 0,
-      weight: lastSet?.weight ?? 0,
+      reps: 0,
+      weight: 0,
     });
   };
 
@@ -96,6 +114,14 @@ const useWorkoutSessionScreen = (workoutSplit: WorkoutSplit) => {
     actions.setActiveExercise(nextIndex);
   };
 
+  const fillFromHistory = (sets: (typeof exerciseHistory)[number]['sets']): void => {
+    draftExercise?.trackedSets.forEach((set, index) => {
+      const previous = sets[index];
+      const isCompleted = completedSetKeys.includes(`${exerciseKey}:${set.setIndex}`);
+      if (previous && !isCompleted) actions.updateSet(exerciseIndex, { ...set, weight: previous.weight, reps: previous.reps });
+    });
+  };
+
   return {
     data: {
       theme,
@@ -108,26 +134,26 @@ const useWorkoutSessionScreen = (workoutSplit: WorkoutSplit) => {
       exerciseCount: data.draft?.workout.length ?? workoutSplit.exercises.length,
       setIndex,
       sets: draftExercise?.trackedSets ?? [],
-      plannedSetCount: isActiveExerciseAdded ? draftExercise?.trackedSets.length ?? 0 : planExercise?.sets.length ?? 0,
+      plannedSetCount: isActiveExerciseAdded ? (draftExercise?.trackedSets.length ?? 0) : (planExercise?.sets.length ?? 0),
       isActiveSetExtra: !isActiveExerciseAdded && setIndex >= (planExercise?.sets.length ?? 0),
       isActiveExerciseAdded,
       activeSet,
+      canCompleteActiveSet,
       previousSet,
       completedSetKeys,
       completedCount,
       totalSets,
       rest,
       navigatorExercises,
+      exerciseHistory,
+      historyPoints,
       exercisePicker: {
         exercises: filteredExercises,
         muscles,
         selectedMuscle,
         query: exerciseQuery,
         isLoading: exerciseLoading.isPending,
-        isAdded: (exercise: Exercise) =>
-          Boolean(
-            isExerciseAlreadyAdded(exercise, workout, workoutSplit),
-          ),
+        isAdded: (exercise: Exercise) => Boolean(isExerciseAlreadyAdded(exercise, workout, workoutSplit)),
       },
       isSaving: loadingStates.isSaving,
     },
@@ -139,6 +165,7 @@ const useWorkoutSessionScreen = (workoutSplit: WorkoutSplit) => {
       addExercise,
       setExerciseQuery,
       setSelectedMuscle,
+      fillFromHistory,
       selectSet: actions.setActiveSet,
       addSet,
       removeSet,

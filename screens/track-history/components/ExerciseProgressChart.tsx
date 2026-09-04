@@ -6,7 +6,15 @@ import { AppThemeColors } from '../../../shared/constants/theme';
 import { fontFamilies, fontSizes } from '../../../shared/constants/typography';
 import { getProgressChange, TrackHistoryPoint } from '../utils/track-history.utils';
 
-const ExerciseProgressChart = ({ points, theme }: { points: TrackHistoryPoint[]; theme: AppThemeColors }) => {
+const ExerciseProgressChart = ({
+  points,
+  theme,
+  onPointSelect,
+}: {
+  points: TrackHistoryPoint[];
+  theme: AppThemeColors;
+  onPointSelect?: (point: TrackHistoryPoint) => void;
+}) => {
   const { height } = useWindowDimensions();
   const [chartWidth, setChartWidth] = useState(0);
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
@@ -29,6 +37,10 @@ const ExerciseProgressChart = ({ points, theme }: { points: TrackHistoryPoint[];
   const changeLabel = `${change > 0 ? '+' : ''}${change.toFixed(1)}% over the last ${points.length} workouts`;
   const measureChart = (event: LayoutChangeEvent) => setChartWidth(event.nativeEvent.layout.width);
   const selectedPoint = points.find((point) => point.date === selectedDate) ?? null;
+  const selectPoint = (point: TrackHistoryPoint) => {
+    setSelectedDate(point.date);
+    onPointSelect?.(point);
+  };
 
   return (
     <View style={styles.wrap}>
@@ -48,7 +60,7 @@ const ExerciseProgressChart = ({ points, theme }: { points: TrackHistoryPoint[];
               <Path d={line} fill="none" stroke={theme.primary} strokeWidth={2} />
               {xy.map((point, index) => (
                 <React.Fragment key={points[index].date}>
-                  <Circle cx={point.x} cy={point.y} r={14} fill="transparent" onPress={() => setSelectedDate(points[index].date)} />
+                  <Circle cx={point.x} cy={point.y} r={14} fill="transparent" onPress={() => selectPoint(points[index])} />
                   <Circle
                     cx={point.x}
                     cy={point.y}
@@ -68,9 +80,10 @@ const ExerciseProgressChart = ({ points, theme }: { points: TrackHistoryPoint[];
         <View style={styles.axisSpacer} />
         <View style={styles.dates}>
           {points.map((point) => (
-            <Text key={point.date} style={[styles.date, { color: theme.textSecondary }]}>
-              {DateTime.fromISO(point.date).toFormat('MMM d')}
-            </Text>
+            <View key={point.date} style={styles.dateItem}>
+              <Text style={[styles.date, { color: theme.textSecondary }]}>{DateTime.fromISO(point.date).toFormat('MMM d')}</Text>
+              {point.isPr && <Text style={[styles.prBadge, { color: theme.achievement, backgroundColor: theme.achievementSoft }]}>PR</Text>}
+            </View>
           ))}
         </View>
       </View>
@@ -80,6 +93,7 @@ const ExerciseProgressChart = ({ points, theme }: { points: TrackHistoryPoint[];
           <Text style={[styles.pointValue, { color: theme.textPrimary }]}>
             Set {selectedPoint.setNumber} · {selectedPoint.value} kg × {selectedPoint.reps}
           </Text>
+          {selectedPoint.isPr && <Text style={[styles.prBadge, { color: theme.achievement, backgroundColor: theme.achievementSoft }]}>PR</Text>}
         </View>
       )}
     </View>
@@ -98,6 +112,8 @@ const styles = StyleSheet.create({
   axisSpacer: { width: 48 },
   dates: { flex: 1, flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: 2 },
   date: { fontFamily: fontFamilies.regular, fontSize: fontSizes.caption },
+  dateItem: { alignItems: 'center', gap: 3 },
+  prBadge: { paddingHorizontal: 5, paddingVertical: 1, borderRadius: 5, overflow: 'hidden', fontFamily: fontFamilies.bold, fontSize: fontSizes.caption },
   pointDetails: { marginLeft: 48, marginTop: 10, paddingTop: 10, borderTopWidth: 1, flexDirection: 'row', justifyContent: 'space-between' },
   pointDate: { fontFamily: fontFamilies.regular, fontSize: fontSizes.bodySmall },
   pointValue: { fontFamily: fontFamilies.semiBold, fontSize: fontSizes.bodySmall },
