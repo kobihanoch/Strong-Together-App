@@ -8,6 +8,7 @@ import Profile from '../screens/profile/Profile';
 import Settings from '../screens/settings/Settings';
 import TrackHistory from '../screens/track-history/TrackHistory';
 import WorkoutSession from '../screens/workout-session/WorkoutSession';
+import WorkoutSummary from '../screens/workout-session/WorkoutSummary';
 import { useAppTheme } from '../shared/providers/AppThemeProvider';
 import useWorkoutSessionResume from './hooks/use-workout-session-resume.hook';
 import { RootParamList } from './types/appStackTypes';
@@ -22,7 +23,6 @@ const AppStack = () => {
 
   return (
     <Stack.Navigator
-      key={resume ? 'resume-workout' : 'standard-app'}
       initialRouteName={resume ? 'WorkoutSession' : 'Home'}
       screenOptions={{ headerShown: false, gestureEnabled: false, cardStyle: { backgroundColor: theme.canvas, flex: 1 } }}
     >
@@ -35,6 +35,7 @@ const AppStack = () => {
         component={WorkoutSession}
         {...(restoredWorkoutSplit ? { initialParams: { workoutSplit: restoredWorkoutSplit } } : {})}
       />
+      <Stack.Screen name="WorkoutSummary" component={WorkoutSummary} />
       <Stack.Screen name="CreateWorkout" component={CreateWorkout} />
       <Stack.Screen name="TrackHistory" component={TrackHistory} />
       <Stack.Screen name="Inbox" component={Inbox} />

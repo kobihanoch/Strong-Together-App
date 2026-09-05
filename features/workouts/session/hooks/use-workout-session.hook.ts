@@ -80,7 +80,7 @@ export const useWorkoutSession = () => {
   };
 
   // Finalizes and submits the current draft; failed submissions keep it available for retry.
-  const saveWorkout = async (): Promise<void> => {
+  const saveWorkout = async () => {
     if (!userId) throw new Error('User is not authenticated');
     if (!draft) throw new Error('There is no active workout to save');
 
@@ -93,6 +93,7 @@ export const useWorkoutSession = () => {
 
     await saveMutation.mutateAsync(normalizedDraft);
     await cancelWorkoutSessionReminder();
+    return normalizedDraft;
   };
 
   // Explicitly discards both the in-memory session and its AsyncStorage entry.

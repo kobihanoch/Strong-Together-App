@@ -32,9 +32,10 @@ const ExerciseProgressChart = ({
   }));
   const line = xy.map((point, index) => `${index ? 'L' : 'M'} ${point.x} ${point.y}`).join(' ');
   const area = points.length > 1 ? `${line} L ${chartWidth - edgePadding} ${chartHeight} L ${edgePadding} ${chartHeight} Z` : '';
-  // Compare the oldest displayed workout with the newest one.
-  const change = getProgressChange(points);
-  const changeLabel = `${change > 0 ? '+' : ''}${change.toFixed(1)}% over the last ${points.length} workouts`;
+  // An older PR may be shown for context, but the trend still compares only the recent workouts.
+  const recentPoints = points.filter((point) => !point.isHistoricalReference);
+  const change = getProgressChange(recentPoints);
+  const changeLabel = `${change > 0 ? '+' : ''}${change.toFixed(1)}% over the last ${recentPoints.length} workouts`;
   const measureChart = (event: LayoutChangeEvent) => setChartWidth(event.nativeEvent.layout.width);
   const selectedPoint = points.find((point) => point.date === selectedDate) ?? null;
   const selectPoint = (point: TrackHistoryPoint) => {

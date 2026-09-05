@@ -10,7 +10,7 @@ import { useWorkoutSession } from '../../../features/workouts/session/hooks/use-
 import type { RootParamList } from '../../../navigation/types/appStackTypes';
 import { showErrorAlert } from '../../../shared/alerts/error-alerts';
 import { useAppTheme } from '../../../shared/providers/AppThemeProvider';
-import { getTopSet, type TrackHistoryPoint } from '../../track-history/utils/track-history.utils';
+import { getTopSet, includePersonalRecordPoint, type TrackHistoryPoint } from '../../track-history/utils/track-history.utils';
 import {
   buildNavigatorExercises,
   createWorkoutEntries,
@@ -62,9 +62,9 @@ const useWorkoutSessionScreen = (workoutSplit: WorkoutSplit, navigation: StackNa
   const plannedSets = draftExercise?.trackedSets.slice(0, completionSetCount) ?? [];
   const isActiveExerciseComplete = Boolean(
     activeSet &&
-      completedSetKeys.includes(setKey) &&
-      plannedSets.length &&
-      plannedSets.every((set) => completedSetKeys.includes(`${exerciseKey}:${set.setIndex}`)),
+    completedSetKeys.includes(setKey) &&
+    plannedSets.length &&
+    plannedSets.every((set) => completedSetKeys.includes(`${exerciseKey}:${set.setIndex}`)),
   );
   const isPlannedWorkoutComplete = plannedProgress.total > 0 && plannedProgress.completed === plannedProgress.total;
   const allExercises = useMemo(() => flattenExercises(exerciseCollection), [exerciseCollection]);
@@ -76,18 +76,20 @@ const useWorkoutSessionScreen = (workoutSplit: WorkoutSplit, navigation: StackNa
   );
   const navigatorExercises = buildNavigatorExercises(workout, workoutSplit, exercisesById, completedSetKeys);
   const personalRecord = planExercise ? personalRecords.getPrForExerciseId(planExercise.exerciseId) : null;
-  const historyPoints = exerciseHistory
+  const activeExerciseName = planExercise?.name ?? exercisesById.get(draftExercise?.exerciseId ?? -1)?.name ?? 'Exercise';
+  const recentHistoryPoints = exerciseHistory
     .slice(0, 5)
     .reverse()
     .map<TrackHistoryPoint>((entry) => ({
       date: entry.workoutStartLocal,
       ...getTopSet(entry.sets),
-      isPr: Boolean(
-        personalRecord &&
-        personalRecord.workoutStartLocal.slice(0, 10) === entry.workoutStartLocal.slice(0, 10) &&
-        entry.sets.some((set) => set.weight === personalRecord.prWeight && set.reps === personalRecord.prReps),
-      ),
     }));
+  const historyPoints = includePersonalRecordPoint(
+    recentHistoryPoints,
+    exerciseHistory,
+    personalRecord,
+    !isActiveExerciseComplete,
+  );
 
   const selectExercise = (nextIndex: number): void => {
     const count = data.draft?.workout.length ?? 0;
@@ -103,7 +105,7 @@ const useWorkoutSessionScreen = (workoutSplit: WorkoutSplit, navigation: StackNa
   const completeSet = (): void => {
     if (!activeSet || !canCompleteActiveSet) return;
 
-    actions.completeSet(setKey, planExercise?.name ?? 'Exercise');
+    actions.completeSet(setKey, activeExerciseName);
 
     const nextSetIndex = findNextIncompleteSetIndex(draftExercise?.trackedSets ?? [], setIndex, exerciseKey, completedSetKeys);
     if (nextSetIndex >= 0) actions.setActiveSet(nextSetIndex);
@@ -149,9 +151,7 @@ const useWorkoutSessionScreen = (workoutSplit: WorkoutSplit, navigation: StackNa
       const nextExercise = workout[nextExerciseIndex];
       if (!nextExercise) continue;
       const nextExerciseKey = getExerciseKey(nextExercise, nextExerciseIndex);
-      const nextSetIndex = nextExercise.trackedSets.findIndex(
-        (set) => !completedSetKeys.includes(`${nextExerciseKey}:${set.setIndex}`),
-      );
+      const nextSetIndex = nextExercise.trackedSets.findIndex((set) => !completedSetKeys.includes(`${nextExerciseKey}:${set.setIndex}`));
       if (nextSetIndex < 0) continue;
       actions.setActiveExercise(nextExerciseIndex);
       actions.setActiveSet(nextSetIndex);
@@ -161,8 +161,27 @@ const useWorkoutSessionScreen = (workoutSplit: WorkoutSplit, navigation: StackNa
 
   /** Submits the normalized workout and leaves only after server success. */
   const submitWorkout = async (): Promise<void> => {
-    await actions.saveWorkout();
-    navigation.replace('Home');
+    const submitted = await actions.saveWorkout();
+    const startedAt = Date.parse(submitted.workoutStartUtc);
+    const endedAt = Date.parse(submitted.workoutEndUtc!);
+    let extraSets = 0;
+    const exercises = submitted.workout.map((exercise) => {
+      const planned = workoutSplit.exercises.find((item) => item.exerciseToSplitId === exercise.exerciseToSplitId);
+      if (planned) extraSets += exercise.trackedSets.filter((set) => set.setIndex >= planned.sets.length).length;
+      return {
+        exerciseId: exercise.exerciseId ?? planned?.exerciseId ?? 0,
+        name: planned?.name ?? exercisesById.get(exercise.exerciseId ?? -1)?.name ?? 'Added exercise',
+        sets: exercise.trackedSets.map(({ weight, reps }) => ({ weight, reps })),
+      };
+    });
+
+    navigation.replace('WorkoutSummary', {
+      workoutName: workoutSplit.name,
+      durationSeconds: Math.max(0, Math.round((endedAt - startedAt) / 1000)),
+      completedSets: submitted.workout.reduce((count, exercise) => count + exercise.trackedSets.length, 0),
+      extraSets,
+      exercises,
+    });
   };
 
   /** Validates and confirms finishing complete and incomplete workouts. */
@@ -221,7 +240,7 @@ const useWorkoutSessionScreen = (workoutSplit: WorkoutSplit, navigation: StackNa
       themeMode,
       workoutName: workoutSplit.name,
       workoutStartedAtUtc: data.draft?.workoutStartUtc ?? null,
-      exerciseName: planExercise?.name ?? 'Exercise',
+      exerciseName: activeExerciseName,
       exerciseIndex,
       exerciseKey: String(exerciseKey),
       exerciseCount: data.draft?.workout.length ?? workoutSplit.exercises.length,

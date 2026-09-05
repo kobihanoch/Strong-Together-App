@@ -279,7 +279,7 @@ A save failure is not a new screen. The existing top Error/Info component report
 
 ## Workout Completion and Summary
 
-The summary appears only after server confirmation. It presents factual returned or reliably calculated outcomes such as duration, completed sets, exercise count, total volume, and confirmed PRs. It may identify added exercises and extra completed sets. It must not invent analysis or performance metrics.
+The summary appears only after server confirmation and uses a lightweight confetti celebration. It presents duration, completed sets, exercise count, confirmed PRs, and completed extra sets; volume is not shown. PRs are matched by comparing the submitted exercise sets with the refreshed personal-record cache. `View workout` opens Track History on today, while `Done` returns Home.
 
 ## Complete Workout Session Flow
 

@@ -1,6 +1,6 @@
 import { DateTime } from 'luxon';
 import { ExerciseHistoryItem } from '../../../features/workouts/history/types/exercise-history.types';
-import { PrHistoryMap } from '../../../features/workouts/history/types/pr-history.types';
+import { PrHistoryItem, PrHistoryMap } from '../../../features/workouts/history/types/pr-history.types';
 import { WorkoutHistoryItem, WorkoutHistoryMap } from '../../../features/workouts/history/types/workout-history.types';
 import { ExerciseInPlan, WorkoutSplit } from '../../../features/workouts/plan/types/workout-plan.types';
 import { CardioWeeklyMap } from '../../../features/workouts/cardio/types/cardio.types';
@@ -11,7 +11,14 @@ export const TRACK_HISTORY_DAYS = 45;
 type ExerciseHistory = ExerciseHistoryItem['exerciseTracked'];
 type PreviousWorkout = { performance: ExerciseHistory[number]['sets']; date: string } | null;
 
-export type TrackHistoryPoint = { date: string; value: number; reps: number; setNumber: number; isPr?: boolean };
+export type TrackHistoryPoint = {
+  date: string;
+  value: number;
+  reps: number;
+  setNumber: number;
+  isPr?: boolean;
+  isHistoricalReference?: boolean;
+};
 
 export const getTrackHistoryDateBounds = () => {
   const today = DateTime.local().startOf('day');
@@ -44,6 +51,46 @@ export const getTopSet = (sets: ExerciseHistory[number]['sets']) => {
   return topSet ? { value: topSet.weight, reps: topSet.reps, setNumber: topSet.setIndex + 1 } : { value: 0, reps: 0, setNumber: 1 };
 };
 
+/** Marks the PR in the visible points and appends its workout when it falls outside the recent range. */
+export const includePersonalRecordPoint = (
+  points: TrackHistoryPoint[],
+  exerciseHistory: ExerciseHistory,
+  personalRecord: PrHistoryItem | null | undefined,
+  includeMissing = true,
+): TrackHistoryPoint[] => {
+  if (!personalRecord) return points;
+
+  const recordDate = personalRecord.workoutStartLocal.slice(0, 10);
+  const isPersonalRecord = (point: TrackHistoryPoint) => point.date.slice(0, 10) === recordDate;
+  const markedPoints = points.map((point) => ({ ...point, isPr: isPersonalRecord(point) }));
+
+  if (markedPoints.some((point) => point.isPr) || !includeMissing) return markedPoints;
+
+  const recordWorkout = exerciseHistory.find(
+    (entry) =>
+      entry.workoutStartLocal.slice(0, 10) === recordDate &&
+      entry.sets.some((set) => set.weight === personalRecord.prWeight && set.reps === personalRecord.prReps),
+  );
+  const recordSetIndex = recordWorkout?.sets.findIndex(
+    (set) => set.weight === personalRecord.prWeight && set.reps === personalRecord.prReps,
+  );
+
+  return [
+    ...markedPoints,
+    {
+      date: recordWorkout?.workoutStartLocal ?? personalRecord.workoutStartLocal,
+      value: personalRecord.prWeight,
+      reps: personalRecord.prReps,
+      setNumber:
+        recordWorkout && recordSetIndex !== undefined && recordSetIndex >= 0
+          ? recordWorkout.sets[recordSetIndex]!.setIndex + 1
+          : personalRecord.prSetIndex + 1,
+      isPr: true,
+      isHistoricalReference: true,
+    },
+  ].sort((a, b) => a.date.localeCompare(b.date));
+};
+
 export const getProgressChange = (points: TrackHistoryPoint[]) => {
   const firstValue = points[0]?.value ?? 0;
   const lastValue = points[points.length - 1]?.value ?? 0;
@@ -71,6 +118,7 @@ export const getMaxWeightProgress = (
   exerciseHistory: ExerciseHistory,
   selectedDate: string,
   currentSets: ExerciseHistory[number]['sets'],
+  personalRecord?: PrHistoryItem | null,
 ): TrackHistoryPoint[] => {
   const points = exerciseHistory
     .filter((entry) => entry.workoutStartLocal.slice(0, 10) <= selectedDate)
@@ -84,7 +132,8 @@ export const getMaxWeightProgress = (
     points.push({ date: selectedDate, ...getTopSet(currentSets) });
   }
 
-  return points.sort((a, b) => a.date.localeCompare(b.date)).slice(-5);
+  const recentPoints = points.sort((a, b) => a.date.localeCompare(b.date)).slice(-5);
+  return includePersonalRecordPoint(recentPoints, exerciseHistory, personalRecord);
 };
 
 export const buildTrackExercises = (
@@ -125,7 +174,12 @@ export const buildTrackExercises = (
         previousBest: getPreviousBest(exerciseHistory, selectedDate),
         previousMax: previous ? getMaxWeight(previous.performance) : null,
         previousDate: previous?.date ?? null,
-        progress: getMaxWeightProgress(exerciseHistory, selectedDate, exerciseTracking.sets),
+        progress: getMaxWeightProgress(
+          exerciseHistory,
+          selectedDate,
+          exerciseTracking.sets,
+          currentPr && currentPr.workoutStartLocal.slice(0, 10) <= selectedDate ? currentPr : null,
+        ),
       };
     })
     .sort((a, b) => a.orderIndex - b.orderIndex);

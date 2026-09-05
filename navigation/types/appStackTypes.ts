@@ -11,4 +11,11 @@ export type RootParamList = {
   WorkoutSession: {
     workoutSplit: WorkoutSplit;
   };
+  WorkoutSummary: {
+    workoutName: string;
+    durationSeconds: number;
+    completedSets: number;
+    extraSets: number;
+    exercises: { exerciseId: number; name: string; sets: { weight: number; reps: number }[] }[];
+  };
 };
