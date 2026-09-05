@@ -247,6 +247,8 @@ Do not invent an overall score, coaching verdict, symmetry metric, tempo metric,
 
 **Edge cases:** Elapsed workout/rest values are derived from persisted timestamps. Invalid or incompatible draft data follows the application's cache-version policy. An intentional discard/logout may clear the draft according to the data-layer contract.
 
+One local inactivity reminder is scheduled two hours after workout start and rescheduled two hours after each newly completed set. It is cancelled after successful submission or explicit discard. The reminder is skipped when notification permission has not already been granted; starting a workout never prompts for permission.
+
 ## Finish Workout Flow
 
 **Purpose:** End and submit the workout with the fewest necessary states while protecting the draft.

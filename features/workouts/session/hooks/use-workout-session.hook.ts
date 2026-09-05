@@ -2,6 +2,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '../../../auth/providers/AuthProvider';
 import { saveWorkoutSession } from '../services/workout-session.service';
 import { clearWorkoutSessionStorage } from '../utils/workout-session-cache.utils';
+import { cancelWorkoutSessionReminder, scheduleWorkoutSessionReminder } from '../utils/workout-session-reminder.utils';
 import { useWorkoutSessionStore } from './use-workout-session-store.hook';
 
 /**
@@ -20,7 +21,7 @@ export const useWorkoutSession = () => {
   const progress = useWorkoutSessionStore((state) => state.progress);
 
   // Creates a new persisted workout draft and its session context.
-  const startWorkout = useWorkoutSessionStore((state) => state.startWorkout);
+  const startWorkoutInStore = useWorkoutSessionStore((state) => state.startWorkout);
   // Adds an unplanned exercise to the active draft.
   const addExercise = useWorkoutSessionStore((state) => state.addExercise);
   // Removes an exercise that was added during the active workout.
@@ -40,7 +41,7 @@ export const useWorkoutSession = () => {
   // Persists which set is currently selected.
   const setActiveSet = useWorkoutSessionStore((state) => state.setActiveSet);
   // Marks a set performed and starts/replaces elapsed rest tracking.
-  const completeSet = useWorkoutSessionStore((state) => state.completeSet);
+  const completeSetInStore = useWorkoutSessionStore((state) => state.completeSet);
   // Stops the current elapsed rest measurement.
   const finishRest = useWorkoutSessionStore((state) => state.finishRest);
   // Adds the workout end timestamp before submission.
@@ -51,6 +52,7 @@ export const useWorkoutSession = () => {
   const saveMutation = useMutation({
     mutationFn: saveWorkoutSession,
     onSuccess: async () => {
+      await cancelWorkoutSessionReminder();
       resetWorkout();
       await clearWorkoutSessionStorage();
 
@@ -63,6 +65,19 @@ export const useWorkoutSession = () => {
     },
   });
 
+  // Starts the draft and schedules one inactivity reminder.
+  const startWorkout: typeof startWorkoutInStore = (workout, split) => {
+    startWorkoutInStore(workout, split);
+    void scheduleWorkoutSessionReminder(split.name);
+  };
+
+  // Completing a new set moves the single reminder two hours forward.
+  const completeSet: typeof completeSetInStore = (setKey, exerciseName) => {
+    const wasCompleted = useWorkoutSessionStore.getState().progress.completedSetKeys.includes(setKey);
+    completeSetInStore(setKey, exerciseName);
+    if (!wasCompleted) void scheduleWorkoutSessionReminder(workoutSplit?.name ?? 'active');
+  };
+
   // Finalizes and submits the current draft; failed submissions keep it available for retry.
   const saveWorkout = async (): Promise<void> => {
     if (!userId) throw new Error('User is not authenticated');
@@ -73,10 +88,12 @@ export const useWorkoutSession = () => {
     if (!finishedDraft) throw new Error('There is no active workout to save');
 
     await saveMutation.mutateAsync(finishedDraft);
+    await cancelWorkoutSessionReminder();
   };
 
   // Explicitly discards both the in-memory session and its AsyncStorage entry.
   const discardWorkout = async (): Promise<void> => {
+    await cancelWorkoutSessionReminder();
     await clearWorkoutSessionStorage();
     resetWorkout();
   };
