@@ -1,10 +1,14 @@
-import { useEffect, useMemo, useState } from 'react';
+import type { StackNavigationProp } from '@react-navigation/stack';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { Alert } from 'react-native';
 import { useExerciseHistory } from '../../../features/workouts/history/hooks/use-exercise-history.hook';
 import { usePrHistory } from '../../../features/workouts/history/hooks/use-pr-history.hook';
 import type { WorkoutSplit } from '../../../features/workouts/plan/types/workout-plan.types';
 import useExercises from '../../../features/workouts/plan/hooks/use-exercises.hook';
 import type { Exercise } from '../../../features/workouts/plan/types/exercises.types';
 import { useWorkoutSession } from '../../../features/workouts/session/hooks/use-workout-session.hook';
+import type { RootParamList } from '../../../navigation/types/appStackTypes';
+import { showErrorAlert } from '../../../shared/alerts/error-alerts';
 import { useAppTheme } from '../../../shared/providers/AppThemeProvider';
 import { getTopSet, type TrackHistoryPoint } from '../../track-history/utils/track-history.utils';
 import {
@@ -21,7 +25,7 @@ import {
 } from '../utils/workout-session-screen.utils';
 
 /** Connects the Workout Session screen to the persisted session feature. */
-const useWorkoutSessionScreen = (workoutSplit: WorkoutSplit) => {
+const useWorkoutSessionScreen = (workoutSplit: WorkoutSplit, navigation: StackNavigationProp<RootParamList, 'WorkoutSession'>) => {
   const { colors: theme, mode: themeMode } = useAppTheme();
   const { actions, data, loadingStates } = useWorkoutSession();
   const { startWorkout, discardWorkout } = actions;
@@ -30,10 +34,12 @@ const useWorkoutSessionScreen = (workoutSplit: WorkoutSplit) => {
   const { data: exerciseCollection, loadingStates: exerciseLoading } = useExercises();
   const [exerciseQuery, setExerciseQuery] = useState('');
   const [selectedMuscle, setSelectedMuscle] = useState('All');
+  const initializedSession = useRef(Boolean(data.draft));
   const { activeExerciseIndex: exerciseIndex, activeSetIndex: setIndex, completedSetKeys, rest } = data.progress;
 
   useEffect(() => {
-    if (data.draft || !workoutSplit.exercises.length) return;
+    if (initializedSession.current || data.draft || !workoutSplit.exercises.length) return;
+    initializedSession.current = true;
     startWorkout(createWorkoutEntries(workoutSplit), workoutSplit);
   }, [data.draft, startWorkout, workoutSplit]);
 
@@ -45,12 +51,22 @@ const useWorkoutSessionScreen = (workoutSplit: WorkoutSplit) => {
   const exerciseHistory = history.getExerciseHistoryData(planExercise?.exerciseToSplitId ?? null);
   const exerciseKey = getExerciseKey(draftExercise, exerciseIndex);
   const setKey = `${exerciseKey}:${activeSet?.setIndex ?? setIndex}`;
-  const canCompleteActiveSet = Boolean(activeSet && activeSet.weight > 0 && activeSet.reps > 0);
+  const isActiveSetCompleted = completedSetKeys.includes(setKey);
+  const canCompleteActiveSet = Boolean(activeSet && !isActiveSetCompleted && activeSet.weight > 0 && activeSet.reps > 0);
 
   const workout = data.draft?.workout ?? [];
   const totalSets = getTotalSets(workout);
   const completedCount = completedSetKeys.length;
   const plannedProgress = getPlannedWorkoutProgress(workout, workoutSplit, completedSetKeys);
+  const completionSetCount = isActiveExerciseAdded ? (draftExercise?.trackedSets.length ?? 0) : (planExercise?.sets.length ?? 0);
+  const plannedSets = draftExercise?.trackedSets.slice(0, completionSetCount) ?? [];
+  const isActiveExerciseComplete = Boolean(
+    activeSet &&
+      completedSetKeys.includes(setKey) &&
+      plannedSets.length &&
+      plannedSets.every((set) => completedSetKeys.includes(`${exerciseKey}:${set.setIndex}`)),
+  );
+  const isPlannedWorkoutComplete = plannedProgress.total > 0 && plannedProgress.completed === plannedProgress.total;
   const allExercises = useMemo(() => flattenExercises(exerciseCollection), [exerciseCollection]);
   const exercisesById = useMemo(() => new Map(allExercises.map((exercise) => [exercise.id, exercise])), [allExercises]);
   const muscles = useMemo(() => (exerciseCollection ? ['All', ...Object.keys(exerciseCollection)] : ['All']), [exerciseCollection]);
@@ -101,6 +117,7 @@ const useWorkoutSessionScreen = (workoutSplit: WorkoutSplit) => {
       reps: 0,
       weight: 0,
     });
+    actions.setActiveSet(draftExercise.trackedSets.length);
   };
 
   const removeSet = (trackedSetIndex: TrackedSet['setIndex']): void => {
@@ -124,6 +141,80 @@ const useWorkoutSessionScreen = (workoutSplit: WorkoutSplit) => {
     });
   };
 
+  /** Opens the first unfinished set in the next unfinished exercise. */
+  const selectNextIncompleteExercise = (): void => {
+    if (!workout.length) return;
+    for (let offset = 1; offset <= workout.length; offset += 1) {
+      const nextExerciseIndex = (exerciseIndex + offset) % workout.length;
+      const nextExercise = workout[nextExerciseIndex];
+      if (!nextExercise) continue;
+      const nextExerciseKey = getExerciseKey(nextExercise, nextExerciseIndex);
+      const nextSetIndex = nextExercise.trackedSets.findIndex(
+        (set) => !completedSetKeys.includes(`${nextExerciseKey}:${set.setIndex}`),
+      );
+      if (nextSetIndex < 0) continue;
+      actions.setActiveExercise(nextExerciseIndex);
+      actions.setActiveSet(nextSetIndex);
+      return;
+    }
+  };
+
+  /** Submits the normalized workout and leaves only after server success. */
+  const submitWorkout = async (): Promise<void> => {
+    await actions.saveWorkout();
+    navigation.replace('Home');
+  };
+
+  /** Validates and confirms finishing complete and incomplete workouts. */
+  const finishWorkout = (): void => {
+    if (loadingStates.isSaving) return;
+    if (!completedCount) {
+      showErrorAlert('Workout is not ready', 'Complete at least one set before finishing the workout.');
+      return;
+    }
+
+    const isIncomplete = completedCount < totalSets;
+    Alert.alert(
+      isIncomplete ? 'Finish incomplete workout?' : 'Finish workout?',
+      isIncomplete
+        ? `${totalSets - completedCount} sets are still unfinished. Are you sure you want to finish?`
+        : 'Are you sure you have finished this workout?',
+      [
+        { text: 'Keep working', style: 'cancel' },
+        { text: 'Finish workout', onPress: () => void submitWorkout() },
+      ],
+    );
+  };
+
+  /** Confirms leaving and clears the persisted draft when explicitly discarded. */
+  const exitWorkout = (): void => {
+    Alert.alert('Exit workout?', 'Your workout draft will be deleted.', [
+      { text: 'Keep working', style: 'cancel' },
+      {
+        text: 'Exit without saving',
+        style: 'destructive',
+        onPress: async () => {
+          navigation.replace('Home');
+          await discardWorkout();
+        },
+      },
+    ]);
+  };
+
+  /** Confirms removal of an exercise added during this workout. */
+  const removeActiveExercise = (): void => {
+    Alert.alert('Remove added exercise?', 'Its entered sets and progress will be deleted from this workout.', [
+      { text: 'Cancel', style: 'cancel' },
+      {
+        text: 'Remove exercise',
+        style: 'destructive',
+        onPress: () => {
+          if (draftExercise?.exerciseId) actions.removeExercise(draftExercise.exerciseId);
+        },
+      },
+    ]);
+  };
+
   return {
     data: {
       theme,
@@ -140,12 +231,15 @@ const useWorkoutSessionScreen = (workoutSplit: WorkoutSplit) => {
       isActiveSetExtra: !isActiveExerciseAdded && setIndex >= (planExercise?.sets.length ?? 0),
       isActiveExerciseAdded,
       activeSet,
+      isActiveSetCompleted,
       canCompleteActiveSet,
       previousSet,
       completedSetKeys,
       completedCount,
       totalSets,
       plannedProgress,
+      isActiveExerciseComplete,
+      isPlannedWorkoutComplete,
       rest,
       navigatorExercises,
       exerciseHistory,
@@ -174,14 +268,15 @@ const useWorkoutSessionScreen = (workoutSplit: WorkoutSplit) => {
       removeSet,
       removeActiveSet: () => activeSet && removeSet(activeSet.setIndex),
       removeActiveExercise: () => {
-        if (draftExercise?.exerciseId) actions.removeExercise(draftExercise.exerciseId);
+        removeActiveExercise();
       },
       updateWeight: (value: number) => updateValue('weight', value),
       updateReps: (value: number) => updateValue('reps', value),
       completeSet,
+      selectNextIncompleteExercise,
       finishRest: actions.finishRest,
-      saveWorkout: actions.saveWorkout,
-      discardWorkout,
+      finishWorkout,
+      exitWorkout,
     },
   };
 };

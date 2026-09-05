@@ -22,6 +22,7 @@ type Props = {
   onNext: () => void;
   onOpenNavigator: () => void;
   onFinish: () => void;
+  isSaving: boolean;
 };
 
 const WorkoutSessionHeader = ({
@@ -41,6 +42,7 @@ const WorkoutSessionHeader = ({
   onNext,
   onOpenNavigator,
   onFinish,
+  isSaving,
 }: Props) => {
   const { width, height } = useWindowDimensions();
   const gutter = Math.max(14, Math.min(width * 0.045, 22));
@@ -75,8 +77,8 @@ const WorkoutSessionHeader = ({
           </Text>
           <WorkoutElapsedTimer startedAtUtc={workoutStartedAtUtc} style={styles.timer} />
         </View>
-        <Pressable accessibilityRole="button" onPress={onFinish} hitSlop={10}>
-          <Text style={styles.finish}>Finish</Text>
+        <Pressable accessibilityRole="button" accessibilityState={{ disabled: isSaving }} disabled={isSaving} onPress={onFinish} hitSlop={10} style={{ opacity: isSaving ? 0.55 : 1 }}>
+          <Text style={styles.finish}>{isSaving ? 'Saving…' : 'Finish'}</Text>
         </Pressable>
       </View>
 

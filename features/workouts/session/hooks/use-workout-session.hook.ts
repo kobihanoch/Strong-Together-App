@@ -3,6 +3,7 @@ import { useAuth } from '../../../auth/providers/AuthProvider';
 import { saveWorkoutSession } from '../services/workout-session.service';
 import { clearWorkoutSessionStorage } from '../utils/workout-session-cache.utils';
 import { cancelWorkoutSessionReminder, scheduleWorkoutSessionReminder } from '../utils/workout-session-reminder.utils';
+import { normalizeWorkoutForSubmission } from '../utils/workout-session.utils';
 import { useWorkoutSessionStore } from './use-workout-session-store.hook';
 
 /**
@@ -54,9 +55,9 @@ export const useWorkoutSession = () => {
     onSuccess: async () => {
       await cancelWorkoutSessionReminder();
       resetWorkout();
-      await clearWorkoutSessionStorage();
+      await clearWorkoutSessionStorage().catch((error) => console.log('[Workout Session]: Local cleanup failed.', error));
 
-      await Promise.all([
+      await Promise.allSettled([
         queryClient.invalidateQueries({ queryKey: ['workout-history', userId] }),
         queryClient.invalidateQueries({ queryKey: ['exercise-history', userId] }),
         queryClient.invalidateQueries({ queryKey: ['pr-history', userId] }),
@@ -87,7 +88,10 @@ export const useWorkoutSession = () => {
     const finishedDraft = useWorkoutSessionStore.getState().draft;
     if (!finishedDraft) throw new Error('There is no active workout to save');
 
-    await saveMutation.mutateAsync(finishedDraft);
+    const normalizedDraft = normalizeWorkoutForSubmission(finishedDraft, progress.completedSetKeys);
+    if (!normalizedDraft.workout.length) throw new Error('Complete at least one set before finishing the workout');
+
+    await saveMutation.mutateAsync(normalizedDraft);
     await cancelWorkoutSessionReminder();
   };
 

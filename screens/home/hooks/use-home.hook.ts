@@ -11,6 +11,7 @@ import { useMessages } from '../../../features/messages/hooks/use-messages.hook'
 import { useWorkoutPlan } from '../../../features/workouts/plan/hooks/use-workout-plan.hook';
 import { useCardio } from '../../../features/workouts/cardio/hooks/use-cardio.hook';
 import { ExerciseInPlan, WorkoutSplit } from '../../../features/workouts/plan/types/workout-plan.types';
+import { useWorkoutHistory } from '../../../features/workouts/history/hooks/use-workout-history.hook';
 
 /**
  * Composes the Home screen view model from TanStack-backed feature data.
@@ -28,6 +29,7 @@ const useHome = () => {
   const { data: workoutPlanData, loadingStates: workoutPlanLoadingStates } = useWorkoutPlan();
   const { data: cardioData, loadingStates: cardioLoadingStates, actions: cardioActions } = useCardio();
   const { data: dashboardData, loadingStates: dashboardLoadingStates } = useDashboard();
+  const { data: workoutHistoryData, loadingStates: workoutHistoryLoadingStates } = useWorkoutHistory();
 
   const nextSplit: WorkoutSplit | undefined = getNextWorkoutSplit(workoutPlanData.workoutSplits, dashboardData?.nextWorkoutSplit ?? null);
 
@@ -42,6 +44,7 @@ const useHome = () => {
       state: {
         hasWorkout: workoutPlanData.hasWorkoutPlan,
         hasTracking: dashboardData?.hasExerciseTracking ?? false,
+        hasTrainedToday: workoutHistoryData.hasTrainedToday,
       },
       user: {
         displayName: userData?.name?.trim().split(' ')[0] || userData?.username || 'Athlete',
@@ -93,6 +96,7 @@ const useHome = () => {
     nextSplit,
     theme,
     workoutPlanData.hasWorkoutPlan,
+    workoutHistoryData.hasTrainedToday,
     userData?.name,
     userData?.username,
     userData?.profilePicPath,
@@ -106,8 +110,11 @@ const useHome = () => {
     actions: {
       openInbox: () => navigation.navigate('Inbox'),
       createWorkout: () => navigation.navigate('CreateWorkout'),
-      startWorkout: () =>
-        nextSplit ? navigation.navigate('WorkoutSession', { workoutSplit: nextSplit }) : navigation.navigate('MyWorkoutPlan'),
+      startWorkout: () => {
+        if (workoutHistoryData.hasTrainedToday) return;
+        if (nextSplit) navigation.navigate('WorkoutSession', { workoutSplit: nextSplit });
+        else navigation.navigate('MyWorkoutPlan');
+      },
       openProgress: () => navigation.navigate('TrackHistory'),
       openHistory: () => navigation.navigate('TrackHistory'),
       logCardio: cardioActions.logCardio,
@@ -118,6 +125,7 @@ const useHome = () => {
         cardioLoadingStates.isPending ||
         messagesLoadingStates.isPending ||
         workoutPlanLoadingStates.isPending ||
+        workoutHistoryLoadingStates.isPending ||
         userLoadingStates.isPending,
       isCardioUpdating: cardioLoadingStates.isUpdating,
     },

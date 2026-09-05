@@ -1,54 +1,33 @@
-import type { StackScreenProps } from '@react-navigation/stack';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import type { StackScreenProps } from '@react-navigation/stack';
 import React, { useRef } from 'react';
-import { Alert, Pressable, ScrollView, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import type { RootParamList } from '../../navigation/types/appStackTypes';
+import type { SlidingBottomModalRef } from '../../shared/components/SlidingBottomModal';
 import { fontFamilies, fontSizes } from '../../shared/constants/typography';
+import useToggleStatusBarColor from '../../shared/hooks/use-toggle-status-bar-color.hook';
+import ExerciseLibrarySheet from '../modify-workout/components/ExerciseLibrarySheet';
 import ElapsedRestControl from './components/ElapsedRestControl';
 import ExerciseNavigatorSheet from './components/ExerciseNavigatorSheet';
-import ExerciseLibrarySheet from '../modify-workout/components/ExerciseLibrarySheet';
-import WorkoutExerciseProgress from './components/WorkoutExerciseProgress';
 import SetNavigator from './components/SetNavigator';
+import WorkoutExerciseHistorySheet from './components/WorkoutExerciseHistorySheet';
+import WorkoutExerciseProgress from './components/WorkoutExerciseProgress';
 import WorkoutMetricEditor from './components/WorkoutMetricEditor';
 import WorkoutSessionHeader from './components/WorkoutSessionHeader';
-import WorkoutExerciseHistorySheet from './components/WorkoutExerciseHistorySheet';
+import ExerciseCompletionActions from './components/ExerciseCompletionActions';
 import useWorkoutSessionScreen from './hooks/use-workout-session-screen.hook';
-import type { SlidingBottomModalRef } from '../../shared/components/SlidingBottomModal';
-import useToggleStatusBarColor from '../../shared/hooks/use-toggle-status-bar-color.hook';
 
 type Props = StackScreenProps<RootParamList, 'WorkoutSession'>;
 
 const WorkoutSession = ({ route, navigation }: Props) => {
-  useToggleStatusBarColor('dark');
-  const { data, actions } = useWorkoutSessionScreen(route.params.workoutSplit);
+  const { data, actions } = useWorkoutSessionScreen(route.params.workoutSplit, navigation);
+  useToggleStatusBarColor('dark', data.themeMode);
   const { width, height } = useWindowDimensions();
   const navigatorRef = useRef<SlidingBottomModalRef | null>(null);
   const exerciseLibraryRef = useRef<SlidingBottomModalRef | null>(null);
   const historyRef = useRef<SlidingBottomModalRef | null>(null);
   const gutter = Math.max(12, Math.min(width * 0.035, 16));
-
-  // Finish flow will be connected in its dedicated slice.
-  const noop = (): void => undefined;
-  const exitWorkout = (): void => {
-    Alert.alert('Exit workout?', 'Your workout draft will be deleted.', [
-      { text: 'Keep working', style: 'cancel' },
-      {
-        text: 'Exit without saving',
-        style: 'destructive',
-        onPress: async () => {
-          navigation.replace('Home');
-          await actions.discardWorkout();
-        },
-      },
-    ]);
-  };
-  const removeAddedExercise = (): void => {
-    Alert.alert('Remove added exercise?', 'Its entered sets and progress will be deleted from this workout.', [
-      { text: 'Cancel', style: 'cancel' },
-      { text: 'Remove exercise', style: 'destructive', onPress: actions.removeActiveExercise },
-    ]);
-  };
 
   return (
     <SafeAreaView style={[styles.safeArea, { backgroundColor: data.theme.heroSurface }]} edges={['top']}>
@@ -64,11 +43,12 @@ const WorkoutSession = ({ route, navigation }: Props) => {
         plannedTotalSets={data.plannedProgress.total}
         workoutStartedAtUtc={data.workoutStartedAtUtc}
         previousSet={data.previousSet}
-        onBack={exitWorkout}
+        onBack={actions.exitWorkout}
         onPrevious={actions.previousExercise}
         onNext={actions.nextExercise}
         onOpenNavigator={() => navigatorRef.current?.open(1)}
-        onFinish={noop}
+        onFinish={actions.finishWorkout}
+        isSaving={data.isSaving}
       />
 
       <View style={[styles.body, { backgroundColor: data.theme.canvas }]}>
@@ -102,7 +82,7 @@ const WorkoutSession = ({ route, navigation }: Props) => {
           </Pressable>
         )}
         {data.isActiveExerciseAdded && (
-          <Pressable accessibilityRole="button" onPress={removeAddedExercise} style={styles.removeAction}>
+          <Pressable accessibilityRole="button" onPress={actions.removeActiveExercise} style={styles.removeAction}>
             <MaterialCommunityIcons name="delete-outline" size={16} color="#B93838" />
             <Text style={styles.removeActionText}>Remove added exercise</Text>
           </Pressable>
@@ -130,25 +110,36 @@ const WorkoutSession = ({ route, navigation }: Props) => {
             </View>
           )}
 
-          <View style={styles.completionRow}>
-            <Text style={[styles.completionHint, { color: data.theme.textSecondary }]}>CHANGES SAVE AUTOMATICALLY</Text>
-            <Pressable
-              disabled={!data.canCompleteActiveSet}
-              onPress={actions.completeSet}
-              style={({ pressed }) => [
-                styles.done,
-                {
-                  backgroundColor: data.canCompleteActiveSet ? data.theme.primary : data.theme.primarySoft,
-                  opacity: data.canCompleteActiveSet ? (pressed ? 0.82 : 1) : 0.55,
-                  transform: [{ scale: pressed ? 0.985 : 1 }],
-                },
-              ]}
-            >
-              <Text style={[styles.doneText, { color: data.canCompleteActiveSet ? data.theme.white : data.theme.primary }]}>
-                ✓ Mark set complete
-              </Text>
-            </Pressable>
-          </View>
+          {data.isActiveExerciseComplete ? (
+            <ExerciseCompletionActions
+              theme={data.theme}
+              workoutComplete={data.isPlannedWorkoutComplete}
+              canAddExtraSet={!data.isActiveExerciseAdded}
+              onNext={actions.selectNextIncompleteExercise}
+              onFinish={actions.finishWorkout}
+              onAddSet={actions.addSet}
+            />
+          ) : (
+            <View style={styles.completionRow}>
+              <Text style={[styles.completionHint, { color: data.theme.textSecondary }]}>CHANGES SAVE AUTOMATICALLY</Text>
+              <Pressable
+                disabled={!data.canCompleteActiveSet}
+                onPress={actions.completeSet}
+                style={({ pressed }) => [
+                  styles.done,
+                  {
+                    backgroundColor: data.canCompleteActiveSet ? data.theme.primary : data.theme.primarySoft,
+                    opacity: data.canCompleteActiveSet ? (pressed ? 0.82 : 1) : 0.55,
+                    transform: [{ scale: pressed ? 0.985 : 1 }],
+                  },
+                ]}
+              >
+                <Text style={[styles.doneText, { color: data.canCompleteActiveSet ? data.theme.white : data.theme.primary }]}>
+                  ✓ {data.isActiveSetCompleted ? 'Set completed' : 'Mark set complete'}
+                </Text>
+              </Pressable>
+            </View>
+          )}
 
           <WorkoutExerciseProgress theme={data.theme} points={data.historyPoints} onViewAll={() => historyRef.current?.open(1)} />
         </ScrollView>
