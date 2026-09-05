@@ -13,11 +13,12 @@ type Props = {
   completedSetKeys: string[];
   exerciseKey: string;
   plannedSetCount: number;
+  canAddSet: boolean;
   onSelect: (index: number) => void;
   onAdd: () => void;
 };
 
-const SetNavigator = ({ theme, sets, activeIndex, completedSetKeys, exerciseKey, plannedSetCount, onSelect, onAdd }: Props) => {
+const SetNavigator = ({ theme, sets, activeIndex, completedSetKeys, exerciseKey, plannedSetCount, canAddSet, onSelect, onAdd }: Props) => {
   const { width } = useWindowDimensions();
   const itemWidth = Math.max(48, Math.min(64, (width - 92) / Math.min(sets.length + 1, 5)));
 
@@ -46,8 +47,14 @@ const SetNavigator = ({ theme, sets, activeIndex, completedSetKeys, exerciseKey,
       </ScrollView>
 
       <View style={[styles.divider, { backgroundColor: theme.border }]} />
-      <Pressable accessibilityLabel="Add set" onPress={onAdd} style={({ pressed }) => [styles.add, pressed && styles.pressed]}>
-        <Text style={[styles.addText, { color: theme.textPrimary }]}>+</Text>
+      <Pressable
+        accessibilityLabel="Add extra set"
+        accessibilityState={{ disabled: !canAddSet }}
+        disabled={!canAddSet}
+        onPress={onAdd}
+        style={({ pressed }) => [styles.add, { opacity: canAddSet ? 1 : 0.28 }, pressed && canAddSet && styles.pressed]}
+      >
+        <Text style={[styles.addText, { color: canAddSet ? theme.textPrimary : theme.textSecondary }]}>+</Text>
       </Pressable>
     </View>
   );

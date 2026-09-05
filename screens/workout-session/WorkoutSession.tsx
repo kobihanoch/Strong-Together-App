@@ -70,6 +70,7 @@ const WorkoutSession = ({ route, navigation }: Props) => {
             exerciseKey={data.exerciseKey}
             plannedSetCount={data.plannedSetCount}
             completedSetKeys={data.completedSetKeys}
+            canAddSet={data.canAddExtraSet}
             onSelect={actions.selectSet}
             onAdd={actions.addSet}
           />

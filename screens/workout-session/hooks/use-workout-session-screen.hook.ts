@@ -53,6 +53,10 @@ const useWorkoutSessionScreen = (workoutSplit: WorkoutSplit, navigation: StackNa
   const setKey = `${exerciseKey}:${activeSet?.setIndex ?? setIndex}`;
   const isActiveSetCompleted = completedSetKeys.includes(setKey);
   const canCompleteActiveSet = Boolean(activeSet && !isActiveSetCompleted && activeSet.weight > 0 && activeSet.reps > 0);
+  const lastSet = draftExercise?.trackedSets.at(-1);
+  const canAddExtraSet = Boolean(
+    !isActiveExerciseAdded && lastSet && completedSetKeys.includes(`${exerciseKey}:${lastSet.setIndex}`),
+  );
 
   const workout = data.draft?.workout ?? [];
   const totalSets = getTotalSets(workout);
@@ -112,8 +116,7 @@ const useWorkoutSessionScreen = (workoutSplit: WorkoutSplit, navigation: StackNa
   };
 
   const addSet = (): void => {
-    if (!draftExercise) return;
-    const lastSet = draftExercise.trackedSets.at(-1);
+    if (!draftExercise || !canAddExtraSet) return;
     actions.addSet(exerciseIndex, {
       setIndex: (lastSet?.setIndex ?? -1) + 1,
       reps: 0,
@@ -252,6 +255,7 @@ const useWorkoutSessionScreen = (workoutSplit: WorkoutSplit, navigation: StackNa
       activeSet,
       isActiveSetCompleted,
       canCompleteActiveSet,
+      canAddExtraSet,
       previousSet,
       completedSetKeys,
       completedCount,
