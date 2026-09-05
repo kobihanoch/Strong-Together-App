@@ -72,6 +72,7 @@ const useHome = () => {
       lastWorkout: lastWorkout?.workoutDate
         ? {
             name: lastWorkout.workoutSplitName ?? '',
+            date: lastWorkout.workoutDate,
             dateLabel: new Date(`${lastWorkout.workoutDate}T00:00:00`).toLocaleDateString('en-US', {
               month: 'short',
               day: 'numeric',
@@ -79,7 +80,7 @@ const useHome = () => {
             exerciseCount: lastWorkout.exerciseTrackedCount ?? 0,
             setCount: lastWorkout.setTrackedCount ?? 0,
           }
-        : { name: '', dateLabel: '', exerciseCount: 0, setCount: 0 },
+        : { name: '', date: '', dateLabel: '', exerciseCount: 0, setCount: 0 },
       aerobics: {
         totalDurationMins: cardioData.cardioForSelectedWeek(getStartOfWeek())?.totalDurationMins ?? 0,
         totalDurationSecs: cardioData.cardioForSelectedWeek(getStartOfWeek())?.totalDurationSec ?? 0,
@@ -89,6 +90,7 @@ const useHome = () => {
         exercise: latestPr?.exerciseName ?? '',
         value: latestPr ? `${latestPr.prWeight} kg PR` : '',
         estimatedOneRepMax,
+        date: latestPr?.workoutStartLocal.slice(0, 10) ?? '',
       },
     };
   }, [
@@ -115,8 +117,8 @@ const useHome = () => {
         if (nextSplit) navigation.navigate('WorkoutSession', { workoutSplit: nextSplit });
         else navigation.navigate('MyWorkoutPlan');
       },
-      openProgress: () => navigation.navigate('TrackHistory'),
-      openHistory: () => navigation.navigate('TrackHistory'),
+      openProgress: () => navigation.navigate('TrackHistory', data.achievement.date ? { date: data.achievement.date } : undefined),
+      openHistory: () => navigation.navigate('TrackHistory', data.lastWorkout.date ? { date: data.lastWorkout.date } : undefined),
       logCardio: cardioActions.logCardio,
     },
     loadingStates: {

@@ -19,7 +19,7 @@ import {
  * Builds the Track History screen state from workout, exercise-history, and PR data.
  * It owns only selected-date and expanded-exercise UI state; calculations live in utilities.
  */
-const useTrackHistory = () => {
+const useTrackHistory = (initialDate?: string) => {
   const { colors: theme } = useAppTheme();
   const { data: workoutData, loadingStates: workoutLoading } = useWorkoutHistory();
   const { data: exerciseData, loadingStates: exerciseLoading } = useExerciseHistory();
@@ -28,8 +28,14 @@ const useTrackHistory = () => {
   const { data: cardioData, loadingStates: cardioLoading, actions: cardioActions } = useCardio();
 
   const { today, minDate } = getTrackHistoryDateBounds();
-  const [selectedDate, setSelectedDate] = useState(today);
+  const routeDate = initialDate?.slice(0, 10);
+  const [selectedDate, setSelectedDate] = useState(routeDate ?? today);
   const [expandedId, setExpandedId] = useState<number | null>(null);
+
+  // Keep the selected day in sync when an existing History screen receives new route params.
+  useEffect(() => {
+    if (routeDate) setSelectedDate(routeDate);
+  }, [routeDate]);
 
   // Derive the selected workout and its display-ready exercises.
   const workout = getTrackWorkout(workoutData.workoutHistoryMap, selectedDate);
