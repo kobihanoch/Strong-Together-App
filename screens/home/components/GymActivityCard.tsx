@@ -10,7 +10,7 @@ import { createSharedComponentStyles } from '../../../shared/styles/component.st
 import { HomeDashboardData } from '../types/use-home-page.types';
 
 type Props = {
-  data: HomeDashboardData['gymActivity'];
+  data: HomeDashboardData['training'];
   theme: AppThemeColors;
 };
 
@@ -57,9 +57,9 @@ const GymActivityCard = ({ data, theme }: Props) => {
         <View style={[styles.divider, { backgroundColor: theme.border }]} />
 
         <Column style={styles.metric}>
-          <MaterialCommunityIcons name="fire" size={fontSizes.metric} color={theme.achievement} />
-          <Text style={[styles.streakValue, { color: theme.textPrimary }]}>{data.weekStreak}</Text>
-          <Text style={[styles.label, { color: theme.textSecondary }]}>week streak</Text>
+          <MaterialCommunityIcons name="dumbbell" size={fontSizes.metric} color={theme.primary} />
+          <Text style={[styles.streakValue, { color: theme.textPrimary }]}>{data.totalWorkouts}</Text>
+          <Text style={[styles.label, { color: theme.textSecondary }]}>total workouts</Text>
         </Column>
       </Row>
       <Text style={[styles.remaining, { color: theme.textSecondary }]}>

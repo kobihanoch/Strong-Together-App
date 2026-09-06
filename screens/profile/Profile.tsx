@@ -122,6 +122,11 @@ const Profile = () => {
         </Column>
       </Column>
 
+      {/* Temporary logout shortcut. */}
+      <TouchableOpacity accessibilityRole="button" style={styles.logoutButton} onPress={() => logout()}>
+        <Text style={styles.logoutButtonText}>Log out</Text>
+      </TouchableOpacity>
+
       <Row style={[styles.contactCard, { marginTop: 'auto', marginHorizontal: 20 }]}>
         <Column>
           <Text style={styles.dangerZoneHeader}>Danger Zone</Text>
@@ -179,6 +184,21 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     paddingBottom: 20,
+  },
+  logoutButton: {
+    marginHorizontal: 20,
+    marginBottom: 16,
+    minHeight: 44,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: colors.primary,
+    borderRadius: 10,
+  },
+  logoutButtonText: {
+    color: colors.primary,
+    fontFamily: 'Inter_500Medium',
+    fontSize: RFValue(12),
   },
   topSectionContainer: {
     backgroundColor: colors.lightCardBg,

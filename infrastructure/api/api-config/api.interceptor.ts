@@ -13,7 +13,7 @@ export const initializeRequestInterceptor = (api: AxiosInstance) =>
   api.interceptors.request.use(
     async (config: InternalAxiosRequestConfig) => {
       const url = config.url;
-      console.log('[API]:', url);
+      console.log('[API]:', config.method?.toUpperCase(), url);
       const apiMode = config.apiMode || 'user';
 
       try {

@@ -4,25 +4,24 @@ import { RefreshControl, ScrollView, StyleSheet, useWindowDimensions } from 'rea
 import { SafeAreaView } from 'react-native-safe-area-context';
 import AchievementCard from './components/AchievementCard';
 import AerobicsCard from './components/AerobicsCard';
+import AdaptiveWorkoutCard from './components/AdaptiveWorkoutCard';
 import HomeHeader from './components/HomeHeader';
-import GymActivityCard from './components/GymActivityCard';
-import LastWorkoutCard from './components/LastWorkoutCard';
-import NextWorkoutCard from './components/NextWorkoutCard';
 import NoTrackingCard from './components/NoTrackingCard';
 import NoWorkoutCard from './components/NoWorkoutCard';
+import TrainingOverviewCard from './components/TrainingOverviewCard';
 import useHomeDashboard from './hooks/use-home.hook';
 import { colors } from '../../shared/constants/colors';
 import { useAppTheme } from '../../shared/providers/AppThemeProvider';
 import CardioEntrySheet from '../../features/workouts/cardio/components/CardioEntrySheet';
 import { usePullToRefresh } from '../../shared/hooks/use-pull-to-refresh.hook';
 
-const homeQueryNames = ['user', 'messages', 'workout-plan', 'cardio-maps', 'home-dashboard', 'workout-history'];
+const homeQueryNames = ['user', 'messages', 'workout-plan', 'workout-schedules', 'cardio-maps', 'home-dashboard', 'workout-history'];
 
 const Home = () => {
   const { data, actions, loadingStates } = useHomeDashboard();
   const { width, height } = useWindowDimensions();
   const horizontalPadding = Math.max(14, Math.min(width * 0.045, 22));
-  const sectionGap = Math.max(12, Math.min(height * 0.016, 18));
+  const sectionGap = Math.max(22, Math.min(height * 0.034, 30));
   const { mode } = useAppTheme();
   const [cardioOpen, setCardioOpen] = useState(false);
   const { isRefreshing, refresh } = usePullToRefresh(homeQueryNames);
@@ -42,10 +41,17 @@ const Home = () => {
           {loadingStates.isPending ? (
             <>
               <Skeleton colorMode={mode}>
-                <NextWorkoutCard data={data.nextWorkout} theme={data.theme} isFirstWorkout={false} onStart={actions.startWorkout} />
+                <AdaptiveWorkoutCard
+                  {...data.hero}
+                  theme={data.theme}
+                  onStart={() => actions.startWorkout(data.hero.workout.id)}
+                  onManageSchedule={actions.openSchedule}
+                  onViewPlan={actions.openPlan}
+                  onViewSummary={actions.openTodaySummary}
+                />
               </Skeleton>
               <Skeleton colorMode={mode}>
-                <GymActivityCard data={data.gymActivity} theme={data.theme} />
+                <TrainingOverviewCard {...data.training} hasSchedule={data.state.hasSchedule} theme={data.theme} onManage={actions.openSchedule} />
               </Skeleton>
               <Skeleton colorMode={mode}>
                 <AerobicsCard data={data.aerobics} theme={data.theme} onLog={() => setCardioOpen(true)} />
@@ -53,34 +59,31 @@ const Home = () => {
               <Skeleton colorMode={mode}>
                 <AchievementCard data={data.achievement} theme={data.theme} onPress={actions.openProgress} />
               </Skeleton>
-              <Skeleton colorMode={mode}>
-                <LastWorkoutCard data={data.lastWorkout} theme={data.theme} onPress={actions.openHistory} />
-              </Skeleton>
             </>
           ) : (
             <>
               {data.state.hasWorkout ? (
-                <NextWorkoutCard
-                  data={data.nextWorkout}
+                <AdaptiveWorkoutCard
+                  {...data.hero}
                   theme={data.theme}
-                  isFirstWorkout={!data.state.hasTracking}
-                  disabled={data.state.hasTrainedToday}
-                  onStart={actions.startWorkout}
+                  onStart={() => actions.startWorkout(data.hero.workout.id)}
+                  onManageSchedule={actions.openSchedule}
+                  onViewPlan={actions.openPlan}
+                  onViewSummary={actions.openTodaySummary}
                 />
               ) : (
                 <NoWorkoutCard theme={data.theme} onCreate={actions.createWorkout} />
               )}
 
-              {data.state.hasTracking ? (
-                <>
-                  <GymActivityCard data={data.gymActivity} theme={data.theme} />
-                  <AchievementCard data={data.achievement} theme={data.theme} onPress={actions.openProgress} />
-                  <LastWorkoutCard data={data.lastWorkout} theme={data.theme} onPress={actions.openHistory} />
-                </>
+              {data.state.hasWorkout ? (
+                <TrainingOverviewCard {...data.training} hasSchedule={data.state.hasSchedule} theme={data.theme} onManage={actions.openSchedule} />
+              ) : null}
+              <AerobicsCard data={data.aerobics} theme={data.theme} onLog={() => setCardioOpen(true)} />
+              {data.state.hasTracking && data.achievement.exercise ? (
+                <AchievementCard data={data.achievement} theme={data.theme} onPress={actions.openProgress} />
               ) : data.state.hasWorkout ? (
                 <NoTrackingCard theme={data.theme} />
               ) : null}
-              <AerobicsCard data={data.aerobics} theme={data.theme} onLog={() => setCardioOpen(true)} />
             </>
           )}
         </Skeleton.Group>

@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-require-imports */
+/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-require-imports, react/display-name */
 import { fireEvent, render } from '@testing-library/react-native';
 import React from 'react';
 import Home from '../Home';
@@ -22,6 +22,19 @@ jest.mock('../../../features/workouts/plan/hooks/use-workout-plan.hook', () => (
     loadingStates: { isPending: mockFeatureState.pending },
   }),
 }));
+jest.mock('../../../features/workout-schedule/hooks/use-workout-schedule.hook', () => ({
+  useWorkoutSchedule: () => ({
+    data: { workoutSchedules: { schedules: [] }, hasScheduledWorkouts: false, nextScheduledWorkout: null },
+    loadingStates: { isPending: mockFeatureState.pending },
+  }),
+}));
+jest.mock('../../../features/workouts/history/hooks/use-workout-history.hook', () => ({
+  useWorkoutHistory: () => ({
+    data: { workoutHistoryMap: { byDate: {} }, hasTrainedToday: false },
+    loadingStates: { isPending: mockFeatureState.pending },
+  }),
+}));
+jest.mock('../../../shared/stores/time-zone.store', () => ({ getTimeZoneFromStore: () => 'UTC' }));
 jest.mock('../../../features/workouts/cardio/hooks/use-cardio.hook', () => ({
   useCardio: () => ({
     data: { weeklyCardioMap: {}, cardioForSelectedWeek: () => null },
@@ -31,7 +44,17 @@ jest.mock('../../../features/workouts/cardio/hooks/use-cardio.hook', () => ({
 }));
 jest.mock('../../../features/dashboard/use-dashboard.hook', () => ({
   __esModule: true,
-  default: () => ({ data: { hasExerciseTracking: mockFeatureState.hasTracking, nextWorkoutSplit: { id: 1 }, workoutTargets: { workoutCountThisWeek: 2, workoutCountScheduledPerWeek: 4, weekStreak: 3 }, lastWorkoutStats: null, prs: [] }, loadingStates: { isPending: mockFeatureState.pending } }),
+  default: () => ({
+    data: {
+      workoutCount: 12,
+      hasExerciseTracking: mockFeatureState.hasTracking,
+      nextSplitByOrderIndex: { id: 1 },
+      workoutTargets: { workoutCountThisWeek: 2, workoutCountScheduledPerWeek: 4 },
+      lastWorkoutStats: null,
+      latestPr: [],
+    },
+    loadingStates: { isPending: mockFeatureState.pending },
+  }),
 }));
 jest.mock('moti/skeleton', () => {
   const ReactLocal = require('react');
@@ -44,16 +67,16 @@ jest.mock('../components/HomeHeader', () => ({ data, onInbox }: any) => {
   const { Text } = require('react-native');
   return <Text onPress={onInbox}>Hello {data.displayName}</Text>;
 });
-jest.mock('../components/NextWorkoutCard', () => ({ data, onStart }: any) => {
+jest.mock('../components/AdaptiveWorkoutCard', () => ({ workout, onStart }: any) => {
   const { Text } = require('react-native');
-  return <Text onPress={onStart}>Next {data.name}</Text>;
+  return <Text onPress={onStart}>Next {workout.name}</Text>;
 });
 jest.mock('../components/NoWorkoutCard', () => ({ onCreate }: any) => {
   const { Text } = require('react-native');
   return <Text onPress={onCreate}>Create workout</Text>;
 });
 jest.mock('../components/NoTrackingCard', () => () => null);
-jest.mock('../components/GymActivityCard', () => () => null);
+jest.mock('../components/TrainingOverviewCard', () => () => null);
 jest.mock('../components/AerobicsCard', () => () => null);
 jest.mock('../components/AchievementCard', () => () => null);
 jest.mock('../components/LastWorkoutCard', () => () => null);
