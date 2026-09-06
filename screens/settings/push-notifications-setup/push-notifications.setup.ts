@@ -19,13 +19,12 @@ export async function setupPush(userId: AppUser['id']) {
       });
     }
 
-    // Allowences
-    let { status } = await Notifications.getPermissionsAsync();
-    if (status !== 'granted') {
-      const req = await Notifications.requestPermissionsAsync();
-      status = req.status;
-      if (status !== 'granted') return null;
+    // Prompt only when the user has not answered yet.
+    let permission = await Notifications.getPermissionsAsync();
+    if (permission.status === Notifications.PermissionStatus.UNDETERMINED && permission.canAskAgain) {
+      permission = await Notifications.requestPermissionsAsync();
     }
+    if (permission.status !== Notifications.PermissionStatus.GRANTED) return null;
 
     // If expo project id exists
     const projectId = Constants?.expoConfig?.extra?.eas?.projectId || Constants?.easConfig?.projectId || undefined;
