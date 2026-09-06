@@ -106,7 +106,8 @@ const CreateWorkout = () => {
       <ExerciseLibrarySheet
         modalRef={exerciseSheet}
         height={height}
-        split={split}
+        contextName={split.name}
+        exerciseCount={split.exercises.length}
         exercises={data.filteredExercises}
         isLoading={data.exercisesLoading}
         muscles={data.muscles}
@@ -117,6 +118,7 @@ const CreateWorkout = () => {
         onQuery={actions.setExerciseQuery}
         onMuscle={actions.setSelectedMuscle}
         onAdd={actions.addExercise}
+        isExerciseAdded={(exercise) => split.exercises.some((item) => item.exerciseId === exercise.id)}
       />
 
       <SlidingBottomModal ref={splitSheet} title="Split options" snapPoints={['32%', '42%']} flatListUsage={false}>

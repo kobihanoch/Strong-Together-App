@@ -69,7 +69,7 @@ describe('Home integration', () => {
     const { getByText } = render(<Home />);
     expect(getByText('Hello John')).toBeTruthy();
     fireEvent.press(getByText('Next Push'));
-    expect(mockNavigate).toHaveBeenCalledWith('StartWorkout', expect.objectContaining({ workoutSplit: expect.objectContaining({ id: 1 }) }));
+    expect(mockNavigate).toHaveBeenCalledWith('WorkoutSession', expect.objectContaining({ workoutSplit: expect.objectContaining({ id: 1 }) }));
   });
 
   it('derives the empty-plan state and opens the editor', () => {

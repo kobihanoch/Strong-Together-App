@@ -4,17 +4,15 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import React from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { RFValue } from 'react-native-responsive-fontsize';
+import { RootParamList } from '../../navigation/types/appStackTypes';
 import { fontFamilies, fontSizes } from '../constants/typography';
 import { useAppTheme } from '../providers/AppThemeProvider';
-import { useAuth } from '../../features/auth/providers/AuthProvider.tsx';
-import { RootParamList } from '../../navigation/types/appStackTypes';
 
 type RouteName = keyof RootParamList;
 
 const BottomTabBar = () => {
   const navigation = useNavigation<StackNavigationProp<RootParamList>>();
   const { colors } = useAppTheme();
-
   const routeName = useNavigationState((state) => {
     if (!state?.routes || state.index === undefined) return 'Home';
 
@@ -28,7 +26,6 @@ const BottomTabBar = () => {
     return appRoute?.name ?? 'Home';
   });
 
-  const { isWorkoutMode } = useAuth();
   const navDisabled = false;
 
   const handleTabPress = (tabName: RouteName) => {
@@ -43,7 +40,7 @@ const BottomTabBar = () => {
   ];
 
   return (
-    !isWorkoutMode &&
+    routeName !== 'WorkoutSession' &&
     routeName !== 'CreateWorkout' && (
       <View style={[styles.tabBarContainer, { backgroundColor: colors.surface, borderTopColor: colors.border }]}>
         {tabs.map((tab, index) => {

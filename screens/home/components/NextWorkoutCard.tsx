@@ -15,10 +15,11 @@ type Props = {
   data: HomeDashboardData['nextWorkout'];
   theme: AppThemeColors;
   isFirstWorkout: boolean;
+  disabled?: boolean;
   onStart: () => void;
 };
 
-const NextWorkoutCard = ({ data, theme, isFirstWorkout, onStart }: Props) => {
+const NextWorkoutCard = ({ data, theme, isFirstWorkout, disabled = false, onStart }: Props) => {
   const common = createSharedComponentStyles(theme);
 
   return (
@@ -35,9 +36,16 @@ const NextWorkoutCard = ({ data, theme, isFirstWorkout, onStart }: Props) => {
         <Text style={styles.meta}>
           {getBodyPartsForSplit(data.muscleGroup)} · {data.exerciseCount} exercises · {data.setCount} sets
         </Text>
-        <TouchableOpacity style={[common.primaryButton, styles.button]} onPress={onStart} activeOpacity={0.85}>
-          <Text style={common.primaryButtonText}>{isFirstWorkout ? 'Start first workout' : 'Start workout'}</Text>
-          <MaterialCommunityIcons name="chevron-right" size={RFValue(24)} color={theme.white} />
+        <TouchableOpacity
+          style={[common.primaryButton, styles.button, disabled && styles.disabled]}
+          onPress={onStart}
+          activeOpacity={0.85}
+          disabled={disabled}
+        >
+          <Text style={common.primaryButtonText}>
+            {disabled ? 'Workout completed today' : isFirstWorkout ? 'Start first workout' : 'Start workout'}
+          </Text>
+          <MaterialCommunityIcons name={disabled ? 'check' : 'chevron-right'} size={RFValue(24)} color={theme.white} />
         </TouchableOpacity>
       </Column>
     </View>
@@ -51,6 +59,7 @@ const styles = StyleSheet.create({
   title: { marginTop: 15, fontFamily: fontFamilies.semiBold, fontSize: fontSizes.metric, color: '#FFFFFF' },
   meta: { marginTop: 10, fontFamily: fontFamilies.regular, fontSize: fontSizes.bodySmall, color: '#FFFFFF' },
   button: { marginTop: 30 },
+  disabled: { opacity: 0.58 },
 });
 
 export default NextWorkoutCard;

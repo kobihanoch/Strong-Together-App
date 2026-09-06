@@ -16,7 +16,7 @@ import { useAppTheme } from '../../shared/providers/AppThemeProvider';
 import CardioEntrySheet from '../../features/workouts/cardio/components/CardioEntrySheet';
 import { usePullToRefresh } from '../../shared/hooks/use-pull-to-refresh.hook';
 
-const homeQueryNames = ['user', 'messages', 'workout-plan', 'cardio-maps', 'home-dashboard'];
+const homeQueryNames = ['user', 'messages', 'workout-plan', 'cardio-maps', 'home-dashboard', 'workout-history'];
 
 const Home = () => {
   const { data, actions, loadingStates } = useHomeDashboard();
@@ -64,6 +64,7 @@ const Home = () => {
                   data={data.nextWorkout}
                   theme={data.theme}
                   isFirstWorkout={!data.state.hasTracking}
+                  disabled={data.state.hasTrainedToday}
                   onStart={actions.startWorkout}
                 />
               ) : (

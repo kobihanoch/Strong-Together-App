@@ -111,7 +111,7 @@ const createTrackingMapItem = (overrides: Partial<TrackingMapItem> = {}): Tracki
   ...overrides,
 });
 
-const createRoute = (): { params: RootParamList['StartWorkout'] } => ({
+const createRoute = (): { params: RootParamList['WorkoutSession'] } => ({
   params: {
     workoutSplit: createSplit(),
     resumedWorkout: createResumedWorkout(),

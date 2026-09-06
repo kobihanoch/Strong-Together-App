@@ -11,6 +11,7 @@ import { useMessages } from '../../../features/messages/hooks/use-messages.hook'
 import { useWorkoutPlan } from '../../../features/workouts/plan/hooks/use-workout-plan.hook';
 import { useCardio } from '../../../features/workouts/cardio/hooks/use-cardio.hook';
 import { ExerciseInPlan, WorkoutSplit } from '../../../features/workouts/plan/types/workout-plan.types';
+import { useWorkoutHistory } from '../../../features/workouts/history/hooks/use-workout-history.hook';
 
 /**
  * Composes the Home screen view model from TanStack-backed feature data.
@@ -28,6 +29,7 @@ const useHome = () => {
   const { data: workoutPlanData, loadingStates: workoutPlanLoadingStates } = useWorkoutPlan();
   const { data: cardioData, loadingStates: cardioLoadingStates, actions: cardioActions } = useCardio();
   const { data: dashboardData, loadingStates: dashboardLoadingStates } = useDashboard();
+  const { data: workoutHistoryData, loadingStates: workoutHistoryLoadingStates } = useWorkoutHistory();
 
   const nextSplit: WorkoutSplit | undefined = getNextWorkoutSplit(workoutPlanData.workoutSplits, dashboardData?.nextWorkoutSplit ?? null);
 
@@ -42,6 +44,7 @@ const useHome = () => {
       state: {
         hasWorkout: workoutPlanData.hasWorkoutPlan,
         hasTracking: dashboardData?.hasExerciseTracking ?? false,
+        hasTrainedToday: workoutHistoryData.hasTrainedToday,
       },
       user: {
         displayName: userData?.name?.trim().split(' ')[0] || userData?.username || 'Athlete',
@@ -69,6 +72,7 @@ const useHome = () => {
       lastWorkout: lastWorkout?.workoutDate
         ? {
             name: lastWorkout.workoutSplitName ?? '',
+            date: lastWorkout.workoutDate,
             dateLabel: new Date(`${lastWorkout.workoutDate}T00:00:00`).toLocaleDateString('en-US', {
               month: 'short',
               day: 'numeric',
@@ -76,7 +80,7 @@ const useHome = () => {
             exerciseCount: lastWorkout.exerciseTrackedCount ?? 0,
             setCount: lastWorkout.setTrackedCount ?? 0,
           }
-        : { name: '', dateLabel: '', exerciseCount: 0, setCount: 0 },
+        : { name: '', date: '', dateLabel: '', exerciseCount: 0, setCount: 0 },
       aerobics: {
         totalDurationMins: cardioData.cardioForSelectedWeek(getStartOfWeek())?.totalDurationMins ?? 0,
         totalDurationSecs: cardioData.cardioForSelectedWeek(getStartOfWeek())?.totalDurationSec ?? 0,
@@ -86,6 +90,7 @@ const useHome = () => {
         exercise: latestPr?.exerciseName ?? '',
         value: latestPr ? `${latestPr.prWeight} kg PR` : '',
         estimatedOneRepMax,
+        date: latestPr?.workoutStartLocal.slice(0, 10) ?? '',
       },
     };
   }, [
@@ -93,6 +98,7 @@ const useHome = () => {
     nextSplit,
     theme,
     workoutPlanData.hasWorkoutPlan,
+    workoutHistoryData.hasTrainedToday,
     userData?.name,
     userData?.username,
     userData?.profilePicPath,
@@ -106,10 +112,13 @@ const useHome = () => {
     actions: {
       openInbox: () => navigation.navigate('Inbox'),
       createWorkout: () => navigation.navigate('CreateWorkout'),
-      startWorkout: () =>
-        nextSplit ? navigation.navigate('StartWorkout', { workoutSplit: nextSplit }) : navigation.navigate('MyWorkoutPlan'),
-      openProgress: () => navigation.navigate('TrackHistory'),
-      openHistory: () => navigation.navigate('TrackHistory'),
+      startWorkout: () => {
+        if (workoutHistoryData.hasTrainedToday) return;
+        if (nextSplit) navigation.navigate('WorkoutSession', { workoutSplit: nextSplit });
+        else navigation.navigate('MyWorkoutPlan');
+      },
+      openProgress: () => navigation.navigate('TrackHistory', data.achievement.date ? { date: data.achievement.date } : undefined),
+      openHistory: () => navigation.navigate('TrackHistory', data.lastWorkout.date ? { date: data.lastWorkout.date } : undefined),
       logCardio: cardioActions.logCardio,
     },
     loadingStates: {
@@ -118,6 +127,7 @@ const useHome = () => {
         cardioLoadingStates.isPending ||
         messagesLoadingStates.isPending ||
         workoutPlanLoadingStates.isPending ||
+        workoutHistoryLoadingStates.isPending ||
         userLoadingStates.isPending,
       isCardioUpdating: cardioLoadingStates.isUpdating,
     },

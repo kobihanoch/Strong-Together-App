@@ -1,4 +1,5 @@
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { RouteProp, useRoute } from '@react-navigation/native';
 import React, { useState } from 'react';
 import { ActivityIndicator, Modal, Pressable, RefreshControl, ScrollView, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
 import { Calendar } from 'react-native-calendars';
@@ -12,11 +13,13 @@ import CardioHistorySection from './components/CardioHistorySection';
 import CardioEntrySheet from '../../features/workouts/cardio/components/CardioEntrySheet';
 import { EditableCardioRecord } from '../../features/workouts/cardio/types/cardio.types';
 import { usePullToRefresh } from '../../shared/hooks/use-pull-to-refresh.hook';
+import { RootParamList } from '../../navigation/types/appStackTypes';
 
 const historyQueryNames = ['workout-history', 'exercise-history', 'pr-history', 'workout-plan', 'cardio-maps'];
 
 const TrackHistory = () => {
-  const { data, actions } = useTrackHistory();
+  const route = useRoute<RouteProp<RootParamList, 'TrackHistory'>>();
+  const { data, actions } = useTrackHistory(route.params?.date);
   const { width, height } = useWindowDimensions();
   const [calendarOpen, setCalendarOpen] = useState(false);
   const [editingCardio, setEditingCardio] = useState<EditableCardioRecord | null>(null);

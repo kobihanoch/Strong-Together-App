@@ -73,7 +73,7 @@ function App() {
     })();
   }, [keyPairReady]);
 
-  // Deperacted in next release
+  /**@deprecated */
   useEffect(() => {
     (async () => {
       const cacheVer = await AsyncStorage.getItem('__VERSION__');

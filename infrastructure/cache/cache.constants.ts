@@ -36,8 +36,7 @@ export async function cacheDeleteKey(key: string): Promise<void> {
 export async function cacheHousekeepingOnBoot(): Promise<void> {
   try {
     const keys = await AsyncStorage.getAllKeys();
-    // Everything out of user id for soft login after udpate
-    const stale = keys.filter((k) => (k.startsWith('CACHE:') && k === 'CACHE:USER_ID') || k === '__VERSION__');
+    const stale = keys.filter((key) => key.startsWith('CACHE:') || key === '__VERSION__');
 
     if (stale.length) {
       const CHUNK = 100;
@@ -45,7 +44,7 @@ export async function cacheHousekeepingOnBoot(): Promise<void> {
         await AsyncStorage.multiRemove(stale.slice(i, i + CHUNK));
       }
     }
-    console.log('[Cache]: Housekeeping suscceeded. User id kept.');
+    console.log('[Cache]: Legacy cache housekeeping succeeded.');
   } catch (e) {
     if (e instanceof Error) console.warn('[Cache] Housekeeping failed:', e?.message);
   }
