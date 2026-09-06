@@ -96,7 +96,6 @@ export const getScheduleWeek = (
     const date = sunday.plus({ days: index });
     const dayOfWeek = date.weekday % 7;
     const schedule = schedules.find((item) => item.dayOfWeek === dayOfWeek);
-    if (!schedule) return [];
     const split = splits.find((item) => item.id === schedule?.workoutSplitId);
     const tracked = history?.byDate[date.toISODate() ?? '']?.exerciseTracked ?? [];
     const workout = history?.byDate[date.toISODate() ?? ''];
@@ -109,14 +108,23 @@ export const getScheduleWeek = (
       date: date.toISODate() ?? '',
       isToday: date.hasSame(now, 'day'),
     };
-    const completed = completedSplits.has(schedule.workoutSplitId);
-    return [{
+    const completed = schedule ? completedSplits.has(schedule.workoutSplitId) : false;
+    const extraRows = Array.from(completedSplits).filter(([id]) => id !== schedule?.workoutSplitId).map(([id, name]) => ({
+      ...day,
+      completed: true,
+      isScheduled: false,
+      name: name || splits.find((item) => item.id === id)?.name || 'Workout',
+      startTime: '',
+      durationMinutes: completedSplits.size === 1 && workout ? Math.round(workout.durationMins) : null,
+    }));
+    return [...(schedule ? [{
       ...day,
       completed,
+      isScheduled: true,
       name: split?.name || completedSplits.get(schedule.workoutSplitId) || 'Workout',
       startTime: schedule.startTime?.slice(0, 5) ?? '',
-      durationMinutes: completed && workout ? Math.round(workout.durationMins) : null,
-    }];
+      durationMinutes: completed && completedSplits.size === 1 && workout ? Math.round(workout.durationMins) : null,
+    }] : []), ...extraRows];
   }).flat();
 };
 

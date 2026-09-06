@@ -9,7 +9,7 @@ const AppThemeContext = createContext<{
 } | null>(null);
 
 export const AppThemeProvider = ({ children }: { children: ReactNode }) => {
-  const [mode, setMode] = useState<AppThemeMode>('light');
+  const [mode, setMode] = useState<AppThemeMode>('dark');
   useToggleStatusBarColor(mode);
 
   const value = useMemo(() => ({ mode, colors: themePalettes[mode], setMode }), [mode, setMode]);
