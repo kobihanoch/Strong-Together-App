@@ -1,10 +1,10 @@
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import type { StackScreenProps } from '@react-navigation/stack';
-import React, { useRef } from 'react';
+import React, { useCallback, useRef, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import type { RootParamList } from '../../navigation/types/appStackTypes';
-import type { SlidingBottomModalRef } from '../../shared/components/SlidingBottomModal';
+import SlidingBottomModal, { type SlidingBottomModalRef } from '../../shared/components/SlidingBottomModal';
 import { fontFamilies, fontSizes } from '../../shared/constants/typography';
 import useToggleStatusBarColor from '../../shared/hooks/use-toggle-status-bar-color.hook';
 import ExerciseLibrarySheet from '../modify-workout/components/ExerciseLibrarySheet';
@@ -16,6 +16,9 @@ import WorkoutExerciseProgress from './components/WorkoutExerciseProgress';
 import WorkoutMetricEditor from './components/WorkoutMetricEditor';
 import WorkoutSessionHeader from './components/WorkoutSessionHeader';
 import ExerciseCompletionActions from './components/ExerciseCompletionActions';
+import AnalyzeExerciseSheet, { type VideoAnalysisStatus } from './components/AnalyzeExerciseSheet';
+import VideoAnalysisAction from './components/VideoAnalysisAction';
+import { showErrorAlert } from '../../shared/alerts/error-alerts';
 import useWorkoutSessionScreen from './hooks/use-workout-session-screen.hook';
 
 type Props = StackScreenProps<RootParamList, 'WorkoutSession'>;
@@ -27,7 +30,18 @@ const WorkoutSession = ({ route, navigation }: Props) => {
   const navigatorRef = useRef<SlidingBottomModalRef | null>(null);
   const exerciseLibraryRef = useRef<SlidingBottomModalRef | null>(null);
   const historyRef = useRef<SlidingBottomModalRef | null>(null);
+  const analysisRef = useRef<SlidingBottomModalRef | null>(null);
+  const [analysisExerciseName, setAnalysisExerciseName] = useState<string | null>(null);
+  const [analysisStatus, setAnalysisStatus] = useState<VideoAnalysisStatus>('idle');
   const gutter = Math.max(12, Math.min(width * 0.035, 16));
+  const openAnalysis = useCallback(() => {
+    if (analysisStatus === 'processing' && analysisExerciseName && analysisExerciseName !== data.exerciseName) {
+      showErrorAlert('Analysis in progress', `${analysisExerciseName} is still being analyzed.`);
+      return;
+    }
+    setAnalysisExerciseName(data.exerciseName);
+    analysisRef.current?.open(1);
+  }, [analysisExerciseName, analysisStatus, data.exerciseName]);
 
   return (
     <SafeAreaView style={[styles.safeArea, { backgroundColor: data.theme.heroSurface }]} edges={['top']}>
@@ -142,6 +156,14 @@ const WorkoutSession = ({ route, navigation }: Props) => {
             </View>
           )}
 
+          {data.isVideoAnalysisSupported && (
+            <VideoAnalysisAction
+              theme={data.theme}
+              status={analysisExerciseName === data.exerciseName ? analysisStatus : 'idle'}
+              onPress={openAnalysis}
+            />
+          )}
+
           <WorkoutExerciseProgress theme={data.theme} points={data.historyPoints} onViewAll={() => historyRef.current?.open(1)} />
         </ScrollView>
       </View>
@@ -197,6 +219,17 @@ const WorkoutSession = ({ route, navigation }: Props) => {
         plannedSetCount={data.plannedSetCount}
         onFillValues={actions.fillFromHistory}
       />
+
+      <SlidingBottomModal ref={analysisRef} title="Video analysis" snapPoints={['72%', '92%']} flatListUsage={false}>
+        {analysisExerciseName && (
+          <AnalyzeExerciseSheet
+            key={analysisExerciseName}
+            exerciseName={analysisExerciseName}
+            theme={data.theme}
+            onStatusChange={setAnalysisStatus}
+          />
+        )}
+      </SlidingBottomModal>
     </SafeAreaView>
   );
 };

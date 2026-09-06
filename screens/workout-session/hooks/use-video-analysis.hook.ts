@@ -2,16 +2,15 @@ import * as Sentry from '@sentry/react-native';
 import { startNewTrace } from '@sentry/core';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { uuidv4 } from 'react-native-compressor';
-import { showErrorAlert } from '../../../../shared/alerts/error-alerts';
-import { getPresignedUrlFromS3, uploadVideoToS3 } from '../services/analyze-video.service';
+import { showErrorAlert } from '../../../shared/alerts/error-alerts';
+import { getPresignedUrlFromS3, uploadVideoToS3 } from '../../../features/workouts/session/services/analyze-video.service';
 import type { AnalyzeVideoResultPayloadDto } from '@strong-together/shared';
 import type { SquatRepetition, VideoUploadRequest } from '../types/video-analysis.types';
-import type { Exercise } from '../../../features/workouts/plan/types/workout-plan.types';
 import { registerToVideoAnalysisResultsListener } from '../video-analysis.listeners';
 
 type UseVideoAnalysisProps = {
   fileType: VideoUploadRequest['fileType'];
-  exercise: Exercise['name'];
+  exercise: string;
   fileURI: string;
 };
 

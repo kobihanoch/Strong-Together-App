@@ -11,6 +11,7 @@ import type { RootParamList } from '../../../navigation/types/appStackTypes';
 import { showErrorAlert } from '../../../shared/alerts/error-alerts';
 import { useAppTheme } from '../../../shared/providers/AppThemeProvider';
 import { getTopSet, includePersonalRecordPoint, type TrackHistoryPoint } from '../../track-history/utils/track-history.utils';
+import { isExerciseAnalysisSupported } from '../constants/video-analysis.constant';
 import {
   buildNavigatorExercises,
   createWorkoutEntries,
@@ -244,6 +245,7 @@ const useWorkoutSessionScreen = (workoutSplit: WorkoutSplit, navigation: StackNa
       workoutName: workoutSplit.name,
       workoutStartedAtUtc: data.draft?.workoutStartUtc ?? null,
       exerciseName: activeExerciseName,
+      isVideoAnalysisSupported: isExerciseAnalysisSupported(activeExerciseName),
       exerciseIndex,
       exerciseKey: String(exerciseKey),
       exerciseCount: data.draft?.workout.length ?? workoutSplit.exercises.length,
