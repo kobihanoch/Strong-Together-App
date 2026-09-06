@@ -1,6 +1,7 @@
 import api from '../../../infrastructure/api/api-config/api';
 import { DeleteMessageParams, ListMessagesQuery, MarkMessageAsReadParams } from '@strong-together/shared';
 import { ListMessagesResponse } from '@strong-together/shared';
+import { getTimeZoneFromStore } from '../../../shared/stores/time-zone.store';
 
 export const updateMsgReadStatus = async (msgId: MarkMessageAsReadParams['id']): Promise<void> => {
   const pathParams = { id: msgId } satisfies MarkMessageAsReadParams;
@@ -11,7 +12,7 @@ export const updateMsgReadStatus = async (msgId: MarkMessageAsReadParams['id']):
 
 export const getUserMessages = async (): Promise<ListMessagesResponse> => {
   const { data } = await api.get<ListMessagesResponse>('/api/messages', {
-    params: { tz: Intl.DateTimeFormat().resolvedOptions().timeZone } satisfies ListMessagesQuery,
+    params: { tz: getTimeZoneFromStore() } satisfies ListMessagesQuery,
   });
   return data;
 };

@@ -4,6 +4,7 @@ import { persist } from 'zustand/middleware';
 import type { Exercise } from '../../plan/types/exercises.types';
 import type { WorkoutSplit } from '../../plan/types/workout-plan.types';
 import { WORKOUT_SESSION_CACHE_VERSION, WORKOUT_SESSION_STORAGE_KEY, workoutSessionStorage } from '../utils/workout-session-cache.utils';
+import { getTimeZoneFromStore } from '../../../../shared/stores/time-zone.store';
 
 type WorkoutEntry = CreateWorkoutSessionBody['workout'][number];
 type TrackedSet = WorkoutEntry['trackedSets'][number];
@@ -62,7 +63,7 @@ export const useWorkoutSessionStore = create<WorkoutSessionStore>()(
             workout,
             workoutStartUtc: new Date().toISOString(),
             workoutEndUtc: null,
-            tz: Intl.DateTimeFormat().resolvedOptions().timeZone,
+            tz: getTimeZoneFromStore(),
           },
           workoutSplit,
           progress: initialProgress,
