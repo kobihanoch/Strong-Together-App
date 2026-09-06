@@ -43,6 +43,8 @@ export const useWorkoutSession = () => {
   const setActiveSet = useWorkoutSessionStore((state) => state.setActiveSet);
   // Marks a set performed and starts/replaces elapsed rest tracking.
   const completeSetInStore = useWorkoutSessionStore((state) => state.completeSet);
+  // Marks history-filled sets complete without starting rest for each imported set.
+  const markSetsCompletedInStore = useWorkoutSessionStore((state) => state.markSetsCompleted);
   // Stops the current elapsed rest measurement.
   const finishRest = useWorkoutSessionStore((state) => state.finishRest);
   // Adds the workout end timestamp before submission.
@@ -77,6 +79,13 @@ export const useWorkoutSession = () => {
     const wasCompleted = useWorkoutSessionStore.getState().progress.completedSetKeys.includes(setKey);
     completeSetInStore(setKey, exerciseName);
     if (!wasCompleted) void scheduleWorkoutSessionReminder(workoutSplit?.name ?? 'active');
+  };
+
+  // Bulk completion persists once and moves the inactivity reminder forward once.
+  const markSetsCompleted: typeof markSetsCompletedInStore = (setKeys) => {
+    if (!setKeys.length) return;
+    markSetsCompletedInStore(setKeys);
+    void scheduleWorkoutSessionReminder(workoutSplit?.name ?? 'active');
   };
 
   // Finalizes and submits the current draft; failed submissions keep it available for retry.
@@ -119,6 +128,7 @@ export const useWorkoutSession = () => {
       setActiveExercise,
       setActiveSet,
       completeSet,
+      markSetsCompleted,
       finishRest,
       saveWorkout,
       discardWorkout,

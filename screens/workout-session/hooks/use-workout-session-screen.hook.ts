@@ -140,11 +140,16 @@ const useWorkoutSessionScreen = (workoutSplit: WorkoutSplit, navigation: StackNa
   };
 
   const fillFromHistory = (sets: (typeof exerciseHistory)[number]['sets']): void => {
+    const filledSetKeys: string[] = [];
     draftExercise?.trackedSets.forEach((set, index) => {
       const previous = sets[index];
       const isCompleted = completedSetKeys.includes(`${exerciseKey}:${set.setIndex}`);
-      if (previous && !isCompleted) actions.updateSet(exerciseIndex, { ...set, weight: previous.weight, reps: previous.reps });
+      if (!previous || isCompleted) return;
+
+      actions.updateSet(exerciseIndex, { ...set, weight: previous.weight, reps: previous.reps });
+      filledSetKeys.push(`${exerciseKey}:${set.setIndex}`);
     });
+    actions.markSetsCompleted(filledSetKeys);
   };
 
   /** Opens the first unfinished set in the next unfinished exercise. */

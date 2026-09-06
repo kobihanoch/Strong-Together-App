@@ -38,6 +38,7 @@ type WorkoutSessionStore = {
   setActiveExercise: (workoutIndex: number) => void;
   setActiveSet: (setIndex: number) => void;
   completeSet: (setKey: string, exerciseName: string) => void;
+  markSetsCompleted: (setKeys: string[]) => void;
   finishRest: () => void;
   finishWorkout: () => void;
   resetWorkout: () => void;
@@ -211,6 +212,15 @@ export const useWorkoutSessionStore = create<WorkoutSessionStore>()(
               ? state.progress.completedSetKeys
               : [...state.progress.completedSetKeys, setKey],
             rest: { startedAtUtc: new Date().toISOString(), exerciseName },
+          },
+        })),
+
+      // History-filled sets are completed together without starting an artificial rest timer.
+      markSetsCompleted: (setKeys: string[]) =>
+        set((state) => ({
+          progress: {
+            ...state.progress,
+            completedSetKeys: [...new Set([...state.progress.completedSetKeys, ...setKeys])],
           },
         })),
 
