@@ -1,4 +1,8 @@
-import { GetWorkoutSchedulesResponse, ReplaceWorkoutSchedulesBody } from '@strong-together/shared';
+import {
+  GetWorkoutSchedulesResponse,
+  ReplaceWorkoutSchedulesBody,
+  ReplaceWorkoutSchedulesResponse,
+} from '@strong-together/shared';
 import api from '../../../infrastructure/api/api-config/api';
 
 export const getUserWorkoutSchedule = async (): Promise<GetWorkoutSchedulesResponse> => {
@@ -6,8 +10,12 @@ export const getUserWorkoutSchedule = async (): Promise<GetWorkoutSchedulesRespo
   return data;
 };
 
-export const replaceUserWorkotuSchedules = async (workoutSchedules: ReplaceWorkoutSchedulesBody['schedules']): Promise<void> => {
-  await api.put('/api/workout-schedules', {
+export const replaceUserWorkoutSchedules = async (
+  workoutSchedules: ReplaceWorkoutSchedulesBody['schedules'],
+): Promise<ReplaceWorkoutSchedulesResponse> => {
+  const { data } = await api.put<ReplaceWorkoutSchedulesResponse>('/api/workout-schedules', {
     schedules: workoutSchedules,
   } satisfies ReplaceWorkoutSchedulesBody);
+
+  return data;
 };

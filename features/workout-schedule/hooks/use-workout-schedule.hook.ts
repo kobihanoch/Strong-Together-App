@@ -1,7 +1,7 @@
 import { ReplaceWorkoutSchedulesBody } from '@strong-together/shared';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '../../auth/providers/AuthProvider';
-import { getUserWorkoutSchedule, replaceUserWorkotuSchedules } from '../services/workout-schedule.service';
+import { getUserWorkoutSchedule, replaceUserWorkoutSchedules } from '../services/workout-schedule.service';
 import { WorkoutSchedules } from '../types/workout-schedule.types';
 import { getNextScheduledWorkout } from '../utils/workout-schedule.utils';
 
@@ -13,7 +13,6 @@ export const useWorkoutSchedule = () => {
   const queryKey = ['workout-schedules', userId];
   const queryClient = useQueryClient();
 
-  // Fetching with SWR
   const query = useQuery({
     queryKey,
     queryFn: async (): Promise<WorkoutSchedules> => await getUserWorkoutSchedule(),
@@ -35,17 +34,25 @@ export const useWorkoutSchedule = () => {
       if (!userId) {
         throw new Error('User is not authenticated');
       }
-      await replaceUserWorkotuSchedules(editedWorkoutSchedules);
+      await replaceUserWorkoutSchedules(editedWorkoutSchedules);
     },
 
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey });
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey }),
+        queryClient.invalidateQueries({ queryKey: ['home-dashboard'] }),
+      ]);
     },
   });
 
   return {
     data: { workoutSchedules, hasScheduledWorkouts, nextScheduledWorkout },
-    loadingStates: { isPending: query.isPending, isLoading: query.isLoading, isFetching: query.isFetching },
+    loadingStates: {
+      isPending: query.isPending,
+      isLoading: query.isLoading,
+      isFetching: query.isFetching,
+      isUpdating: updateSourceWorkoutSchedules.isPending,
+    },
     actions: {
       refetch: query.refetch,
       updateWorkoutSchedules: updateSourceWorkoutSchedules.mutateAsync,
