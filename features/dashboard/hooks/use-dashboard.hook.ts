@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
-import { useAuth } from '../auth/providers/AuthProvider';
-import { getUserDashboardStats } from './services/dashboard.service';
-import { HomeDashboardStats } from './types/dashboard.types';
+import { useAuth } from '../../auth/providers/AuthProvider';
+import { getUserDashboardStats } from '../services/dashboard.service';
+import { HomeDashboardStats } from '../types/dashboard.types';
 
 /**
  * Loads the authenticated user's dashboard statistics.

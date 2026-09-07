@@ -1,17 +1,11 @@
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { useMemo } from 'react';
-import useDashboard from '../../../features/dashboard/use-dashboard.hook';
+import useDashboard from '../../../features/dashboard/hooks/use-dashboard.hook';
 import { RootParamList } from '../../../navigation/types/appStackTypes';
 import { useAppTheme } from '../../../shared/providers/AppThemeProvider';
 import { getStartOfWeek } from '../../../shared/utils/shared-utils';
-import {
-  fillCardioGraph,
-  formatNextSchedule,
-  getNextWorkoutSplit,
-  getScheduleWeek,
-  getTodayWorkout,
-} from '../utils/home-page.utils';
+import { fillCardioGraph, formatNextSchedule, getNextWorkoutSplit, getScheduleWeek, getTodayWorkout } from '../utils/home-page.utils';
 import { useUser } from '../../../features/user/hooks/use-user.hook';
 import { useMessages } from '../../../features/messages/hooks/use-messages.hook';
 import { useWorkoutPlan } from '../../../features/workouts/plan/hooks/use-workout-plan.hook';
@@ -154,9 +148,7 @@ const useHomeScreen = () => {
         reps: latestPr?.prReps ?? 0,
         estimatedOneRepMax,
         date: latestPr?.workoutStartLocal.slice(0, 10) ?? '',
-        dateLabel: latestPr?.workoutStartLocal
-          ? DateTime.fromISO(latestPr.workoutStartLocal).toFormat('MMM d')
-          : '',
+        dateLabel: latestPr?.workoutStartLocal ? DateTime.fromISO(latestPr.workoutStartLocal).toFormat('MMM d') : '',
       },
     };
   }, [

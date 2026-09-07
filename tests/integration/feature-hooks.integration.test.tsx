@@ -4,7 +4,7 @@ import React, { type PropsWithChildren } from 'react';
 import api from '../../infrastructure/api/api-config/api';
 import { useLogin } from '../../features/auth/hooks/use-login.hook';
 import { AuthProvider, useAuth } from '../../features/auth/providers/AuthProvider';
-import useDashboard from '../../features/dashboard/use-dashboard.hook';
+import useDashboard from '../../features/dashboard/hooks/use-dashboard.hook';
 import { useMessages } from '../../features/messages/hooks/use-messages.hook';
 import { useWorkoutPlan } from '../../features/workouts/plan/hooks/use-workout-plan.hook';
 
@@ -34,7 +34,9 @@ describe('core feature-hook integration', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    queryClient = new QueryClient({ defaultOptions: { queries: { retry: false, gcTime: Infinity }, mutations: { retry: false, gcTime: Infinity } } });
+    queryClient = new QueryClient({
+      defaultOptions: { queries: { retry: false, gcTime: Infinity }, mutations: { retry: false, gcTime: Infinity } },
+    });
     wrapper = ({ children }) => (
       <QueryClientProvider client={queryClient}>
         <AuthProvider>{children}</AuthProvider>
@@ -105,7 +107,10 @@ describe('core feature-hook integration', () => {
 
     await act(async () => result.current.plan.actions.updateWorkoutPlan([{ name: 'Pull', exercises: [] }] as never));
 
-    expect(mockedApi.put).toHaveBeenCalledWith('/api/workout-plan', expect.objectContaining({ workoutData: [{ name: 'Pull', exercises: [] }] }));
+    expect(mockedApi.put).toHaveBeenCalledWith(
+      '/api/workout-plan',
+      expect.objectContaining({ workoutData: [{ name: 'Pull', exercises: [] }] }),
+    );
     await waitFor(() => expect(mockedApi.get.mock.calls.filter(([url]) => url === '/api/workout-plan')).toHaveLength(2));
   });
 });
