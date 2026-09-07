@@ -3,6 +3,7 @@ import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Switch, Text, Tex
 import { SafeAreaView } from 'react-native-safe-area-context';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import SlidingBottomModal from '../../shared/components/SlidingBottomModal';
+import { colors } from '../../shared/constants/colors';
 import { fontFamilies, fontSizes } from '../../shared/constants/typography';
 import useWorkoutScheduleScreen from './hooks/use-workout-schedule-screen.hook';
 
@@ -102,6 +103,16 @@ const WorkoutSchedules = () => {
             <Text style={[styles.saveText, { color: data.theme.white }]}>Save schedule</Text>
           )}
         </Pressable>
+
+        <Pressable
+          accessibilityRole="button"
+          disabled={loadingStates.isSaving || data.trainingDays === 0}
+          onPress={actions.deleteSchedule}
+          style={({ pressed }) => [styles.delete, { opacity: pressed || data.trainingDays === 0 ? 0.55 : 1 }]}
+        >
+          <MaterialCommunityIcons name="trash-can-outline" size={20} color={colors.error} />
+          <Text style={[styles.deleteText, { color: colors.error }]}>Delete schedule</Text>
+        </Pressable>
       </ScrollView>
 
       <SlidingBottomModal
@@ -188,6 +199,8 @@ const styles = StyleSheet.create({
   change: { fontFamily: fontFamilies.medium, fontSize: fontSizes.bodySmall },
   save: { height: 58, marginTop: 27, borderRadius: 10, alignItems: 'center', justifyContent: 'center' },
   saveText: { fontFamily: fontFamilies.semiBold, fontSize: fontSizes.body },
+  delete: { height: 48, marginTop: 10, flexDirection: 'row', gap: 8, alignItems: 'center', justifyContent: 'center' },
+  deleteText: { fontFamily: fontFamilies.semiBold, fontSize: fontSizes.bodySmall },
   editor: { paddingHorizontal: 22, paddingBottom: 32 },
   editorHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 },
   editorDay: { fontFamily: fontFamilies.semiBold, fontSize: fontSizes.caption, letterSpacing: 1.2 },

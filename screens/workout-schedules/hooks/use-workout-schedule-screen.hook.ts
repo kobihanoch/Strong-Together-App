@@ -2,6 +2,7 @@ import { ReplaceWorkoutSchedulesBody } from '@strong-together/shared';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { Alert } from 'react-native';
 import { useReminder } from '../../../features/reminder/hooks/use-reminder.hook';
 import { useWorkoutSchedule } from '../../../features/workout-schedule/hooks/use-workout-schedule.hook';
 import { useWorkoutPlan } from '../../../features/workouts/plan/hooks/use-workout-plan.hook';
@@ -125,6 +126,29 @@ const useWorkoutScheduleScreen = () => {
     navigation.goBack();
   };
 
+  const deleteSchedule = () => {
+    Alert.alert('Delete schedule?', 'This will remove every scheduled workout and turn off workout reminders.', [
+      { text: 'Cancel', style: 'cancel' },
+      {
+        text: 'Delete',
+        style: 'destructive',
+        onPress: async () => {
+          await Promise.all([
+            scheduleActions.updateWorkoutSchedules([]),
+            reminderActions.updateReminder({
+              reminderEnabled: false,
+              reminderOffsetMinutes,
+              timeZone: getTimeZoneFromStore(),
+            }),
+          ]);
+          setSchedules([]);
+          setReminderEnabled(false);
+          navigation.goBack();
+        },
+      },
+    ]);
+  };
+
   return {
     refs: { dayEditorRef },
     data: {
@@ -156,6 +180,7 @@ const useWorkoutScheduleScreen = () => {
       doneEditing,
       toggleReminder,
       save,
+      deleteSchedule,
     },
   };
 };
