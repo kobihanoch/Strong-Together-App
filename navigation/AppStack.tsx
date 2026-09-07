@@ -9,6 +9,7 @@ import Settings from '../screens/settings/Settings';
 import TrackHistory from '../screens/track-history/TrackHistory';
 import WorkoutSession from '../screens/workout-session/WorkoutSession';
 import WorkoutSummary from '../screens/workout-session/WorkoutSummary';
+import WorkoutSchedules from '../screens/workout-schedules/WorkoutSchedules';
 import { useAppTheme } from '../shared/providers/AppThemeProvider';
 import useWorkoutSessionResume from './hooks/use-workout-session-resume.hook';
 import { RootParamList } from './types/appStackTypes';
@@ -30,6 +31,7 @@ const AppStack = () => {
       <Stack.Screen name="Settings" component={Settings} />
       <Stack.Screen name="Profile" component={Profile} />
       <Stack.Screen name="MyWorkoutPlan" component={MyWorkoutPlan} />
+      <Stack.Screen name="WorkoutSchedules" component={WorkoutSchedules} />
       <Stack.Screen
         name="WorkoutSession"
         component={WorkoutSession}

@@ -34,7 +34,7 @@ const MyWorkoutPlan = () => {
         }}
         showsVerticalScrollIndicator={false}
       >
-        <WorkoutPlanHeader theme={data.theme} />
+        <WorkoutPlanHeader theme={data.theme} onSchedulePress={actions.openSchedule} />
         <WorkoutPlanSummary data={data} split={split} onStart={actions.startWorkout} onEdit={actions.editPlan} />
         <WorkoutSplitSelector theme={data.theme} splits={data.workoutSplits} selectedSplit={split} onSelect={actions.selectSplit} />
         <WorkoutPlanExerciseList

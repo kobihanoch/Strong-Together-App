@@ -188,7 +188,7 @@ const useHome = () => {
         if (split) navigation.navigate('WorkoutSession', { workoutSplit: split });
         else navigation.navigate('MyWorkoutPlan');
       },
-      openSchedule: () => navigation.navigate('MyWorkoutPlan'),
+      openSchedule: () => navigation.navigate('WorkoutSchedules'),
       openPlan: () => navigation.navigate('MyWorkoutPlan'),
       openTodaySummary: () => navigation.navigate('TrackHistory'),
       openProgress: () => navigation.navigate('TrackHistory', data.achievement.date ? { date: data.achievement.date } : undefined),

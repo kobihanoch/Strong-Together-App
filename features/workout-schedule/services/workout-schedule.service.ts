@@ -13,8 +13,13 @@ export const getUserWorkoutSchedule = async (): Promise<GetWorkoutSchedulesRespo
 export const replaceUserWorkoutSchedules = async (
   workoutSchedules: ReplaceWorkoutSchedulesBody['schedules'],
 ): Promise<ReplaceWorkoutSchedulesResponse> => {
+  const schedules = workoutSchedules.map((schedule) => ({
+    ...schedule,
+    startTime: schedule.startTime.slice(0, 5),
+  }));
+
   const { data } = await api.put<ReplaceWorkoutSchedulesResponse>('/api/workout-schedules', {
-    schedules: workoutSchedules,
+    schedules,
   } satisfies ReplaceWorkoutSchedulesBody);
 
   return data;

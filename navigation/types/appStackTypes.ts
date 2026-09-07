@@ -5,6 +5,7 @@ export type RootParamList = {
   Settings: undefined;
   Profile: undefined;
   MyWorkoutPlan: undefined;
+  WorkoutSchedules: undefined;
   CreateWorkout: undefined;
   TrackHistory: { date?: string } | undefined;
   Inbox: undefined;

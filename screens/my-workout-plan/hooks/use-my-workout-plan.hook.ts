@@ -85,6 +85,7 @@ const useMyWorkoutPlan = () => {
       setExpandedExerciseToSplitId,
       createPlan: () => navigation.navigate('CreateWorkout'),
       editPlan: () => navigation.navigate('CreateWorkout'),
+      openSchedule: () => navigation.navigate('WorkoutSchedules'),
       startWorkout: () => selectedSplit && navigation.navigate('WorkoutSession', { workoutSplit: selectedSplit }),
     },
   };
