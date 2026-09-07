@@ -79,7 +79,6 @@ jest.mock('../components/NoTrackingCard', () => () => null);
 jest.mock('../components/TrainingOverviewCard', () => () => null);
 jest.mock('../components/AerobicsCard', () => () => null);
 jest.mock('../components/AchievementCard', () => () => null);
-jest.mock('../components/LastWorkoutCard', () => () => null);
 jest.mock('../../../features/workouts/cardio/components/CardioEntrySheet', () => () => null);
 
 describe('Home integration', () => {

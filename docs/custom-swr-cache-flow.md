@@ -90,5 +90,4 @@ Cache keys include app-version-aware cleanup. On boot, `cacheHousekeepingOnBoot(
 - `shared/hooks/use-cache-and-fetch.hook.ts`
 - `shared/hooks/use-update-global-loading.hook.ts`
 - `infrastructure/cache/cache.utils.ts`
-- `infrastructure/cache/cache-keys.utils.ts`
 - `infrastructure/api/api-config/bootstrap.ts`

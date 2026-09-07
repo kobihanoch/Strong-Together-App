@@ -228,14 +228,12 @@ This matrix covers every screen registered in `AuthStack` and `AppStack`. It lis
 | `Profile` | `useProfileScreen`; child `useMediaUploads` | ● | ● | | | | | | | | |
 | `Inbox` | `useInboxScreen` | indirect | | ● via provider | | | | | | | |
 | `Settings` | child `useSettingsLogic` | ● | | | | | | | | | |
-| `StartWorkout` | intended: `useStartWorkoutScreen`, `useStartWorkoutCache`, `useUserWorkout`, child `useVideoAnalysis` | intended | | | intended | | | | intended | | |
 | `Analytics` | intended: `useAnalysticsLogic` | intended | | | intended | | | | intended | | |
 
 Legend:
 
 - **●** means the screen, its screen logic hook, or a screen-owned child directly consumes that application hook.
 - **indirect** means the feature hook consumes `useAuth` to obtain `userId` and `isValidatedWithServer`.
-- **intended** means the dependency exists only in commented code at present. `StartWorkout` currently renders nothing, and `useAnalysticsLogic` currently returns nothing; these should be visually dashed until their refactors are restored.
 
 ### Hook and cache-key legend
 
@@ -264,9 +262,6 @@ Legend:
 | `useMediaUploads` | Profile image component | Upload lifecycle; uses a service rather than TanStack Query |
 | `useInboxScreen` | Inbox | Adapts message actions and confirmation UI |
 | `useSettingsLogic` | Notifications toggle | Reads and changes device notification permission state |
-| `useStartWorkoutScreen` | Start Workout, currently commented | Intended workout-session orchestration |
-| `useStartWorkoutCache` | Start Workout, currently commented | Intended local workout-resume persistence |
-| `useUserWorkout` | Start Workout, currently commented/missing | Intended workout-save orchestration |
 | `useVideoAnalysis` | Start Workout analysis sheet, currently commented | Intended upload/socket video-analysis pipeline |
 | `useAnalysticsLogic` | Analytics, currently commented | Intended analytics presentation/data orchestration |
 

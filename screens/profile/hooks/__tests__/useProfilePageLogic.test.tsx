@@ -27,7 +27,6 @@ jest.mock('axios', () => ({
 const mockCacheGetJSON = jest.fn<(key: string) => Promise<unknown>>();
 const mockCacheSetJSON = jest.fn<(key: string, value: unknown, ttl: number) => Promise<void>>();
 const mockCacheDeleteAllCache = jest.fn<() => Promise<void>>();
-const mockCacheDeleteAllCacheWithoutStartWorkout = jest.fn<() => Promise<void>>();
 const mockGetRefreshToken = jest.fn<() => Promise<string | null>>();
 const mockSaveRefreshToken = jest.fn<(token: string) => Promise<void>>();
 const mockClearRefreshToken = jest.fn<() => Promise<void>>();
@@ -68,7 +67,6 @@ jest.mock('../../../../infrastructure/cache/cache.utils', () => {
     cacheGetJSON: (key: string) => mockCacheGetJSON(key),
     cacheSetJSON: (key: string, value: unknown, ttl: number) => mockCacheSetJSON(key, value, ttl),
     cacheDeleteAllCache: () => mockCacheDeleteAllCache(),
-    cacheDeleteAllCacheWithoutStartWorkout: () => mockCacheDeleteAllCacheWithoutStartWorkout(),
   };
 });
 
@@ -174,7 +172,6 @@ describe('useProfileScreen integration', () => {
     mockClearRefreshToken.mockResolvedValue(undefined);
     mockCacheSetJSON.mockResolvedValue(undefined);
     mockCacheDeleteAllCache.mockResolvedValue(undefined);
-    mockCacheDeleteAllCacheWithoutStartWorkout.mockResolvedValue(undefined);
     mockConnectSocket.mockResolvedValue(undefined);
     mockDisconnectSocket.mockReturnValue(undefined);
   });

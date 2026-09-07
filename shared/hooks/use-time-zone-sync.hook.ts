@@ -6,7 +6,7 @@ import { useTimeZoneStore } from '../stores/time-zone.store';
 import { getClientTimeZone } from '../utils/time-zone.utils';
 
 // Enable only after updateReminderTimeZone contains the agreed server contract.
-const IS_SERVER_SYNC_ENABLED = false;
+const IS_SERVER_SYNC_ENABLED = true;
 
 /** Detects timezone changes on navigation focus and coordinates server sync. */
 export const useTimeZoneSync = (): void => {
