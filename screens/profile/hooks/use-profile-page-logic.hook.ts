@@ -9,14 +9,18 @@ import { getDaysSince } from '../../home/utils/home-page.utils';
 const useProfilePageLogic = () => {
   const {
     data: user,
-    actions: { refetch },
+    actions: { refetch, updateUser },
   } = useUser();
   const username = user?.username ?? '';
   const email = user?.email ?? '';
   const fullName = user?.name ?? '';
-  const gender = user?.gender ?? '';
+  const rawGender = user?.gender?.trim() ?? '';
+  const gender = ['male', 'female'].includes(rawGender.toLowerCase()) ? rawGender : '';
   const createdAtDate = user?.createdAt?.split('T')[0] ?? '';
   const daysOnline = createdAtDate ? getDaysSince(createdAtDate) : '';
+  const memberSince = user?.createdAt
+    ? new Intl.DateTimeFormat('en', { month: 'long', year: 'numeric' }).format(new Date(user.createdAt))
+    : '';
 
   return {
     data: {
@@ -25,9 +29,16 @@ const useProfilePageLogic = () => {
       fullName,
       gender,
       daysOnline,
+      memberSince,
+      isVerified: user?.isVerified ?? false,
+      userId: user?.id ?? '',
+      profilePicPath: user?.profilePicPath ?? null,
     },
-    refreshUser: async () => {
-      await refetch();
+    actions: {
+      updateUser,
+      refreshUser: async () => {
+        await refetch();
+      },
     },
   };
 };

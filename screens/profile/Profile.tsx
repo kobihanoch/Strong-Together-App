@@ -1,466 +1,227 @@
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import React, { ComponentProps, useRef, useState } from 'react';
-import { Dimensions, StyleSheet, Text, TouchableOpacity } from 'react-native';
-import { RFValue } from 'react-native-responsive-fontsize';
-import Column from '../../shared/components/Column';
-import ImagePickerComponent from './components/ImagePickerComponent';
-import Row from '../../shared/components/Row';
-import SlidingBottomModal, { SlidingBottomModalRef } from '../../shared/components/SlidingBottomModal';
-import { colors } from '../../shared/constants/colors';
-import useProfilePageLogic from './hooks/use-profile-page-logic.hook';
-import EditProfileForm from './components/EditProfileForm';
+import React, { useRef, useState } from 'react';
+import { Alert, Pressable, RefreshControl, ScrollView, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useAuth } from '../../features/auth/providers/AuthProvider';
-import { ALERT_TYPE, Dialog } from 'react-native-alert-notification';
 import { deleteSelfUser } from '../../features/user/services/user.service';
+import SlidingBottomModal, { SlidingBottomModalRef } from '../../shared/components/SlidingBottomModal';
+import { AppThemeColors } from '../../shared/constants/theme';
+import { fontFamilies, fontSizes } from '../../shared/constants/typography';
+import { usePullToRefresh } from '../../shared/hooks/use-pull-to-refresh.hook';
+import { useAppTheme } from '../../shared/providers/AppThemeProvider';
+import ImagePickerComponent from './components/ImagePickerComponent';
+import ProfileDetailsSheet from './components/ProfileDetailsSheet';
+import ProfileNotificationsToggle from './components/ProfileNotificationsToggle';
+import useProfilePageLogic from './hooks/use-profile-page-logic.hook';
 
-const { height } = Dimensions.get('window');
+const clamp = (value: number, minimum: number, maximum: number) => Math.max(minimum, Math.min(value, maximum));
+const profileQueryNames = ['user'] as const;
 
 const Profile = () => {
-  const { data, refreshUser } = useProfilePageLogic();
+  const { data, actions } = useProfilePageLogic();
+  const { colors, mode, setMode } = useAppTheme();
   const { logout } = useAuth();
-  const { username, email, fullName, gender, daysOnline } = data;
-  const normalizedGender = gender.toLowerCase();
+  const { width, height } = useWindowDimensions();
+  const { isRefreshing, refresh } = usePullToRefresh(profileQueryNames);
+  const pageGutter = clamp(width * 0.055, 18, 26);
+  const avatarSize = clamp(width * 0.265, 96, 120);
+  const sectionSpacing = clamp(height * 0.038, 26, 38);
+  const photoSheet = useRef<SlidingBottomModalRef>(null);
+  const detailsSheet = useRef<SlidingBottomModalRef>(null);
+  const [pickPhoto, setPickPhoto] = useState(false);
+  const [removePhoto, setRemovePhoto] = useState(false);
+  const [viewPhoto, setViewPhoto] = useState(false);
 
-  const actionSheetRef = useRef<SlidingBottomModalRef | null>(null);
-  const openActionSheet = () => {
-    actionSheetRef?.current?.open(0);
-  };
-  const closeActionSheet = () => {
-    actionSheetRef?.current?.close();
-  };
-
-  const editSheetRef = useRef<SlidingBottomModalRef | null>(null);
-  const openEditSheet = (i = 0) => {
-    editSheetRef?.current?.open(i);
-  };
-  const closeEditSheet = () => {
-    editSheetRef?.current?.close();
-  };
-  const [triggerImgPicker, setTriggerImgPicker] = useState(false);
-  const [triggerRemoveImg, setTriggerRemoveImg] = useState(false);
-
-  const handleDelPress = async () => {
-    Dialog.show({
-      type: ALERT_TYPE.DANGER,
-      title: 'Delete Account',
-      textBody: 'Are you sure you want to delete your account?',
-      button: 'Yes, delete',
-      closeOnOverlayTap: true,
-      onPressButton: async () => {
-        Dialog.hide();
-        await deleteSelfUser();
-        logout();
-      },
-      onHide: () => {
-        Dialog.hide();
-      },
-    });
+  const confirmAccountDeletion = () => {
+    Alert.alert(
+      'Delete account?',
+      'Your profile, workout history, and account data will be permanently deleted. This cannot be undone.',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Delete account',
+          style: 'destructive',
+          onPress: async () => {
+            await deleteSelfUser();
+            await logout();
+          },
+        },
+      ],
+    );
   };
 
   return (
-    <Column style={styles.container}>
-      <Column style={styles.topSectionContainer}>
-        <Row style={{ justifyContent: 'space-between', alignItems: 'center' }}>
-          <Column style={{ gap: 7 }}>
-            <Text style={styles.header}>Profile</Text>
-            <Row style={{ width: '100%' }}>
-              <Text style={styles.semiHeader}>Manage your account information</Text>
-            </Row>
-          </Column>
-        </Row>
-      </Column>
+    <SafeAreaView style={[styles.safeArea, { backgroundColor: colors.canvas }]} edges={['top']}>
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        refreshControl={<RefreshControl refreshing={isRefreshing} onRefresh={refresh} tintColor={colors.primary} colors={[colors.primary]} />}
+        contentContainerStyle={[styles.content, { paddingHorizontal: pageGutter, paddingBottom: clamp(height * 0.05, 32, 48) }]}
+      >
+        <Text style={[styles.eyebrow, { color: colors.textSecondary }]}>YOUR ACCOUNT</Text>
+        <Text style={[styles.pageTitle, { color: colors.textPrimary }]}>Profile</Text>
 
-      <Column style={styles.infoContainer}>
-        <Row style={{ gap: 15, alignItems: 'flex-start', width: '100%' }}>
+        <View style={[styles.profileHero, { marginTop: clamp(height * 0.03, 22, 32), gap: clamp(width * 0.055, 18, 26) }]}>
           <ImagePickerComponent
-            style={{ height: height * 0.1, aspectRatio: 1 }}
-            openActionSheet={openActionSheet}
-            closeActionSheet={closeActionSheet}
-            triggerImgPicker={triggerImgPicker}
-            triggerRemoveImg={triggerRemoveImg}
-            setTriggerImgPicker={setTriggerImgPicker}
-            setTriggerRemoveImg={setTriggerRemoveImg}
+            style={{ width: avatarSize, height: avatarSize }}
+            openActionSheet={() => photoSheet.current?.open(0)}
+            closeActionSheet={() => photoSheet.current?.close()}
+            triggerImgPicker={pickPhoto}
+            triggerRemoveImg={removePhoto}
+            triggerViewImg={viewPhoto}
+            userId={data.userId}
+            gender={data.gender}
+            profilePicPath={data.profilePicPath}
+            refreshUser={actions.refreshUser}
+            setTriggerImgPicker={setPickPhoto}
+            setTriggerRemoveImg={setRemovePhoto}
           />
-          <Column style={{ marginTop: 15, gap: 5, flex: 1 }}>
-            <Text style={styles.name}>{fullName}</Text>
-            <Text style={styles.username}>@{username}</Text>
-            {(normalizedGender === 'male' || normalizedGender === 'female') && (
-              <Row style={{ gap: 5 }}>
-                <Text style={styles.username}>{gender}</Text>
-                <MaterialCommunityIcons
-                  name={`gender-${normalizedGender}` as ComponentProps<typeof MaterialCommunityIcons>['name']}
-                  color={colors.textSecondary}
-                />
-              </Row>
-            )}
-          </Column>
-          <TouchableOpacity style={styles.editProfileBtnContainer} onPress={() => openEditSheet(0)}>
-            <Row style={{ gap: 5 }}>
-              <Text style={styles.editProfileBtnText}>Edit profile</Text>
-            </Row>
-          </TouchableOpacity>
-        </Row>
-        <Column style={{ marginTop: 50, width: '100%', gap: 10 }}>
-          <Row style={{ gap: 5 }}>
-            <MaterialCommunityIcons name={'account'} color={'black'} size={RFValue(13)} />
-            <Text style={styles.contactHeader}>Account Information</Text>
-          </Row>
-          <Row style={[styles.contactCard, { marginTop: 10 }]}>
-            <MaterialCommunityIcons name={'email-outline'} color={'black'} size={RFValue(15)} />
-            <Column>
-              <Text style={styles.contactCardHeader}>Email</Text>
-              <Text style={styles.contactCardData}>{email}</Text>
-            </Column>
-          </Row>
-          <Row style={styles.contactCard}>
-            <MaterialCommunityIcons name={'calendar-outline'} color={'black'} size={RFValue(15)} />
-            <Column>
-              <Text style={styles.contactCardHeader}>Online Since</Text>
-              <Text style={styles.contactCardData}>{daysOnline}</Text>
-            </Column>
-          </Row>
-        </Column>
-      </Column>
+          <View style={styles.identity}>
+            <Text style={[styles.fullName, { color: colors.textPrimary }]} numberOfLines={2}>{data.fullName}</Text>
+            <Text style={[styles.username, { color: colors.textSecondary }]}>@{data.username}</Text>
+            {data.gender ? <Text style={[styles.gender, { color: colors.textSecondary }]}>{data.gender}</Text> : null}
+            <Pressable hitSlop={10} style={styles.editLink} onPress={() => detailsSheet.current?.open(0)}>
+              <Text style={[styles.editLinkText, { color: colors.primary }]}>Edit profile</Text>
+              <MaterialCommunityIcons name="arrow-right" size={18} color={colors.primary} />
+            </Pressable>
+          </View>
+        </View>
 
-      {/* Temporary logout shortcut. */}
-      <TouchableOpacity accessibilityRole="button" style={styles.logoutButton} onPress={() => logout()}>
-        <Text style={styles.logoutButtonText}>Log out</Text>
-      </TouchableOpacity>
+        {(data.memberSince || data.daysOnline) ? (
+          <View style={[styles.membership, { marginTop: clamp(height * 0.032, 22, 34) }]}>
+            {data.memberSince ? <Fact label="MEMBER SINCE" value={data.memberSince} colors={colors} /> : null}
+            {data.memberSince && data.daysOnline ? <View style={[styles.verticalRule, { backgroundColor: colors.border }]} /> : null}
+            {data.daysOnline ? <Fact label="ONLINE FOR" value={data.daysOnline} colors={colors} /> : null}
+          </View>
+        ) : null}
 
-      <Row style={[styles.contactCard, { marginTop: 'auto', marginHorizontal: 20 }]}>
-        <Column>
-          <Text style={styles.dangerZoneHeader}>Danger Zone</Text>
-          <Text style={styles.dangerZoneSemiHeader}>Delete you account</Text>
-        </Column>
-        <TouchableOpacity style={styles.delBtnContainer} onPress={handleDelPress}>
-          <Row style={{ gap: 7 }}>
-            <MaterialCommunityIcons name={'delete'} color={'white'} size={RFValue(15)} />
-            <Text style={styles.delBtnText}>Delete</Text>
-          </Row>
-        </TouchableOpacity>
-      </Row>
+        <Divider color={colors.border} spacing={sectionSpacing} />
+        <Text style={[styles.sectionLabel, { color: colors.textSecondary }]}>ACCOUNT DETAILS</Text>
+        <View style={styles.detailsRow}>
+          <AccountDetail label="EMAIL" value={data.email} colors={colors} />
+          <AccountDetail label="USERNAME" value={`@${data.username}`} colors={colors} />
+        </View>
+        <View style={styles.detailFooter}>
+          <View style={styles.verification}>
+            <MaterialCommunityIcons
+              name={data.isVerified ? 'check-decagram' : 'clock-outline'}
+              size={16}
+              color={data.isVerified ? colors.primary : colors.textSecondary}
+            />
+            <Text style={[styles.statusText, { color: colors.textSecondary }]}>{data.isVerified ? 'Email verified' : 'Verification pending'}</Text>
+          </View>
+          <Pressable hitSlop={10} onPress={() => detailsSheet.current?.open(0)}>
+            <Text style={[styles.changeDetails, { color: colors.primary }]}>Change details</Text>
+          </Pressable>
+        </View>
 
-      {/* Action sheet for profile pic */}
-      <SlidingBottomModal ref={actionSheetRef} snapPoints={['25%', '25%', '25%']} flatListUsage={false} title={''}>
-        <Column style={{ gap: 20, paddingHorizontal: 20, marginTop: 10 }}>
-          <TouchableOpacity style={styles.sheetBtn} onPress={() => setTriggerImgPicker(true)}>
-            <MaterialCommunityIcons name={'camera'} size={RFValue(15)} color={'black'} />
-            <Text style={styles.sheetBtnText}>Choose image from gallery</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.sheetBtn} onPress={() => setTriggerRemoveImg(true)}>
-            <MaterialCommunityIcons name={'delete'} size={RFValue(15)} color={'black'} />
-            <Text style={styles.sheetBtnText}>Remove image</Text>
-          </TouchableOpacity>
-        </Column>
+        <Divider color={colors.border} spacing={sectionSpacing} />
+        <Text style={[styles.sectionLabel, { color: colors.textSecondary }]}>APP EXPERIENCE</Text>
+        <View style={[styles.controlRow, { borderBottomColor: colors.border }]}>
+          <View style={styles.controlCopy}>
+            <Text style={[styles.controlTitle, { color: colors.textPrimary }]}>Appearance</Text>
+            <Text style={[styles.controlSubtitle, { color: colors.textSecondary }]}>{mode === 'dark' ? 'Dark mode' : 'Light mode'}</Text>
+          </View>
+          <View style={[styles.themeControl, { backgroundColor: colors.surfaceMuted }]}>
+            {(['light', 'dark'] as const).map((themeMode) => (
+              <Pressable
+                key={themeMode}
+                accessibilityLabel={`Use ${themeMode} mode`}
+                onPress={() => setMode(themeMode)}
+                style={[styles.themeOption, mode === themeMode && { backgroundColor: colors.primary }]}
+              >
+                <Text style={[styles.themeOptionText, { color: mode === themeMode ? colors.white : colors.textSecondary }]}>
+                  {themeMode === 'light' ? 'Light' : 'Dark'}
+                </Text>
+              </Pressable>
+            ))}
+          </View>
+        </View>
+        <View style={[styles.controlRow, { borderBottomColor: colors.border }]}>
+          <View style={styles.controlCopy}>
+            <Text style={[styles.controlTitle, { color: colors.textPrimary }]}>Notifications</Text>
+            <Text style={[styles.controlSubtitle, { color: colors.textSecondary }]}>Workout reminders and account updates</Text>
+          </View>
+          <ProfileNotificationsToggle />
+        </View>
+
+        <Pressable accessibilityRole="button" onPress={logout} style={styles.logoutAction}>
+          <MaterialCommunityIcons name="logout" size={21} color={colors.textPrimary} />
+          <Text style={[styles.logoutText, { color: colors.textPrimary }]}>Log out</Text>
+        </Pressable>
+
+        <Divider color={colors.border} spacing={clamp(sectionSpacing * 0.75, 22, 30)} />
+        <Text style={[styles.sectionLabel, { color: colors.textSecondary }]}>ACCOUNT OWNERSHIP</Text>
+        <Text style={[styles.deletionExplanation, { color: colors.textSecondary }]}>Permanently remove your account and all associated data.</Text>
+        <Pressable accessibilityRole="button" hitSlop={10} onPress={confirmAccountDeletion} style={styles.deleteAction}>
+          <Text style={styles.deleteText}>Delete account</Text>
+        </Pressable>
+      </ScrollView>
+
+      <SlidingBottomModal ref={photoSheet} title="Profile photo" snapPoints={['34%', '34%', '34%']} flatListUsage={false}>
+        <View style={[styles.photoMenu, { paddingHorizontal: pageGutter }]}>
+          <PhotoAction icon="image-outline" label="View photo" color={colors.textPrimary} border={colors.border} onPress={() => {
+            setViewPhoto(false);
+            requestAnimationFrame(() => setViewPhoto(true));
+          }} />
+          <PhotoAction icon="image-plus" label="Choose a new photo" color={colors.textPrimary} border={colors.border} onPress={() => setPickPhoto(true)} />
+          {data.profilePicPath ? <PhotoAction icon="delete-outline" label="Remove photo" color="#DC2626" onPress={() => setRemovePhoto(true)} /> : null}
+        </View>
       </SlidingBottomModal>
 
-      {/* Edit profile sheet */}
       <SlidingBottomModal
-        ref={editSheetRef}
-        snapPoints={['60%', '65%', '75%']}
+        ref={detailsSheet}
+        title=""
+        snapPoints={['67%', '78%', '88%']}
         flatListUsage={false}
-        title={''}
-        enablePanDownClose={false}
-        enableBackDrop={false}
+        keyboardBehavior="interactive"
+        keyboardBlurBehavior="restore"
       >
-        <EditProfileForm
-          initialData={{
-            username,
-            email,
-            fullName,
-            gender,
-            daysOnline,
-          }}
-          closeEditSheet={closeEditSheet}
-          openEditSheet={openEditSheet}
-          refreshUser={refreshUser}
+        <ProfileDetailsSheet
+          initialData={{ fullName: data.fullName, username: data.username, email: data.email }}
+          onClose={() => detailsSheet.current?.close()}
+          onFocus={() => detailsSheet.current?.snapToIndex(2)}
+          onSave={actions.updateUser}
         />
       </SlidingBottomModal>
-    </Column>
+    </SafeAreaView>
   );
 };
 
+const Fact = ({ label, value, colors }: { label: string; value: string; colors: AppThemeColors }) => (
+  <View style={styles.fact}><Text style={[styles.microLabel, { color: colors.textSecondary }]}>{label}</Text><Text style={[styles.factValue, { color: colors.textPrimary }]}>{value}</Text></View>
+);
+const AccountDetail = ({ label, value, colors }: { label: string; value: string; colors: AppThemeColors }) => (
+  <View style={styles.detail}><Text style={[styles.microLabel, { color: colors.textSecondary }]}>{label}</Text><Text style={[styles.detailValue, { color: colors.textPrimary }]} numberOfLines={2}>{value}</Text></View>
+);
+const Divider = ({ color, spacing }: { color: string; spacing: number }) => <View style={[styles.divider, { backgroundColor: color, marginVertical: spacing }]} />;
+const PhotoAction = ({ icon, label, color, border, onPress }: { icon: React.ComponentProps<typeof MaterialCommunityIcons>['name']; label: string; color: string; border?: string; onPress: () => void }) => (
+  <Pressable style={[styles.photoAction, border ? { borderBottomColor: border, borderBottomWidth: StyleSheet.hairlineWidth } : null]} onPress={onPress}>
+    <MaterialCommunityIcons name={icon} size={21} color={color} /><Text style={[styles.photoActionText, { color }]}>{label}</Text>
+  </Pressable>
+);
+
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    paddingBottom: 20,
-  },
-  logoutButton: {
-    marginHorizontal: 20,
-    marginBottom: 16,
-    minHeight: 44,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 1,
-    borderColor: colors.primary,
-    borderRadius: 10,
-  },
-  logoutButtonText: {
-    color: colors.primary,
-    fontFamily: 'Inter_500Medium',
-    fontSize: RFValue(12),
-  },
-  topSectionContainer: {
-    backgroundColor: colors.lightCardBg,
-    height: height * 0.2,
-    justifyContent: 'flex-end',
-    paddingBottom: 20,
-    paddingHorizontal: 20,
-  },
-  header: {
-    fontFamily: 'Inter_600SemiBold',
-    color: 'black',
-    fontSize: RFValue(20),
-  },
-  semiHeader: {
-    fontFamily: 'Inter_400Regular',
-    color: colors.textSecondary,
-    fontSize: RFValue(12),
-  },
-  sheetBtn: {
-    width: '100%',
-    flexDirection: 'row',
-    paddingHorizontal: 20,
-    alignItems: 'center',
-    paddingVertical: 15,
-    gap: 15,
-    borderRadius: 16,
-    borderColor: '#e4e4e4ff',
-    borderWidth: 1,
-  },
-  sheetBtnText: {
-    fontSize: RFValue(12),
-    fontFamily: 'Inter_400Regular',
-  },
-  infoContainer: {
-    padding: 20,
-    alignItems: 'flex-start',
-    justifyContent: 'flex-start',
-  },
-  name: {
-    fontFamily: 'Inter_600SemiBold',
-    fontSize: RFValue(17),
-    color: 'black',
-  },
-  username: {
-    fontFamily: 'Inter_500Medium',
-    fontSize: RFValue(12),
-    color: colors.textSecondary,
-  },
-  editProfileBtnContainer: {
-    marginLeft: 'auto',
-    padding: 10,
-    marginTop: 10,
-  },
-  editProfileBtnText: {
-    fontFamily: 'Inter_500Medium',
-    color: colors.primary,
-    fontSize: RFValue(10),
-  },
-  contactHeader: {
-    fontFamily: 'Inter_600SemiBold',
-    color: 'black',
-    fontSize: RFValue(13),
-  },
-  contactCard: {
-    padding: 15,
-    borderColor: '#ddd',
-    borderWidth: 1,
-    borderRadius: 16,
-    gap: 15,
-  },
-  contactCardHeader: {
-    fontFamily: 'Inter_400Regular',
-    color: colors.textSecondary,
-    fontSize: RFValue(12),
-  },
-  contactCardData: {
-    fontFamily: 'Inter_500Medium',
-    color: 'black',
-    fontSize: RFValue(14),
-  },
-  dangerZoneHeader: {
-    fontFamily: 'Inter_600SemiBold',
-    color: colors.error,
-    fontSize: RFValue(14),
-  },
-  dangerZoneSemiHeader: {
-    fontFamily: 'Inter_400Regular',
-    color: colors.error,
-    fontSize: RFValue(12),
-  },
-  delBtnContainer: {
-    backgroundColor: colors.error,
-    padding: 10,
-    paddingHorizontal: 15,
-    borderRadius: 16,
-    marginLeft: 'auto',
-  },
-  delBtnText: {
-    color: 'white',
-    fontFamily: 'Inter_600SemiBold',
-    fontSize: RFValue(12),
-  },
+  safeArea: { flex: 1 }, content: { paddingTop: 12 },
+  eyebrow: { fontFamily: fontFamilies.semiBold, fontSize: fontSizes.label, letterSpacing: 3 },
+  pageTitle: { marginTop: 3, fontFamily: fontFamilies.bold, fontSize: fontSizes.hero },
+  profileHero: { flexDirection: 'row', alignItems: 'center' }, identity: { flex: 1, alignItems: 'flex-start' },
+  fullName: { fontFamily: fontFamilies.bold, fontSize: fontSizes.title, lineHeight: 24 },
+  username: { marginTop: 4, fontFamily: fontFamilies.regular, fontSize: fontSizes.body },
+  gender: { marginTop: 2, fontFamily: fontFamilies.regular, fontSize: fontSizes.bodySmall },
+  editLink: { minHeight: 36, marginTop: 10, flexDirection: 'row', alignItems: 'center', gap: 6 }, editLinkText: { fontFamily: fontFamilies.medium, fontSize: fontSizes.bodySmall },
+  membership: { flexDirection: 'row' }, fact: { flex: 1 }, verticalRule: { width: StyleSheet.hairlineWidth, marginHorizontal: 20 },
+  microLabel: { fontFamily: fontFamilies.semiBold, fontSize: fontSizes.caption, letterSpacing: 1.5 }, factValue: { marginTop: 7, fontFamily: fontFamilies.medium, fontSize: fontSizes.bodySmall },
+  divider: { height: StyleSheet.hairlineWidth }, sectionLabel: { fontFamily: fontFamilies.semiBold, fontSize: fontSizes.label, letterSpacing: 2 },
+  detailsRow: { marginTop: 21, flexDirection: 'row', gap: 24 }, detail: { flex: 1, minWidth: 0 },
+  detailValue: { marginTop: 7, fontFamily: fontFamilies.medium, fontSize: fontSizes.bodySmall, lineHeight: 19 },
+  detailFooter: { marginTop: 20, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 14 }, verification: { flexDirection: 'row', alignItems: 'center', gap: 7 },
+  statusText: { fontFamily: fontFamilies.regular, fontSize: fontSizes.bodySmall }, changeDetails: { fontFamily: fontFamilies.medium, fontSize: fontSizes.bodySmall },
+  controlRow: { minHeight: 80, flexDirection: 'row', alignItems: 'center', borderBottomWidth: StyleSheet.hairlineWidth, gap: 14 }, controlCopy: { flex: 1 },
+  controlTitle: { fontFamily: fontFamilies.medium, fontSize: fontSizes.body }, controlSubtitle: { marginTop: 3, fontFamily: fontFamilies.regular, fontSize: fontSizes.bodySmall, lineHeight: 18 },
+  themeControl: { flexDirection: 'row', borderRadius: 9, overflow: 'hidden' }, themeOption: { minWidth: 56, height: 38, borderRadius: 8, alignItems: 'center', justifyContent: 'center' }, themeOptionText: { fontFamily: fontFamilies.medium, fontSize: fontSizes.bodySmall },
+  logoutAction: { minHeight: 70, flexDirection: 'row', alignItems: 'center', gap: 13 }, logoutText: { fontFamily: fontFamilies.medium, fontSize: fontSizes.body },
+  deletionExplanation: { marginTop: 11, fontFamily: fontFamilies.regular, fontSize: fontSizes.bodySmall, lineHeight: 19 }, deleteAction: { minHeight: 44, alignSelf: 'flex-start', justifyContent: 'center' }, deleteText: { color: '#DC2626', fontFamily: fontFamilies.medium, fontSize: fontSizes.bodySmall },
+  photoMenu: { paddingBottom: 26 }, photoAction: { minHeight: 58, flexDirection: 'row', alignItems: 'center', gap: 13 }, photoActionText: { fontFamily: fontFamilies.medium, fontSize: fontSizes.body },
 });
-/*<View
-      style={{
-        flex: 1,
-        alignItems: "center",
-        paddingVertical: height * 0.07,
-      }}
-    >
-      <View
-        style={{
-          flex: 3,
-          width: "90%",
-          justifyContent: "center",
-          alignItems: "center",
-          flexDirection: "column",
-          gap: height * 0.01,
-        }}
-      >
-        <ImagePickerComponent
-          user={user}
-          setMediaLoading={setMediaLoading}
-        ></ImagePickerComponent>
-      </View>
-      <View
-        style={{
-          flex: 3,
-          width: "90%",
-          justifyContent: "flex-start",
-          alignItems: "center",
-          gap: height * 0.02,
-          flexDirection: "column",
-        }}
-      >
-        <View
-          style={{
-            marginTop: height * 0.02,
-            flexDirection: "column",
-            justifyContent: "center",
-            alignItems: "center",
-          }}
-        >
-          <Text
-            style={{
-              fontFamily: "Inter_600SemiBold",
-              fontSize: RFValue(25),
-              color: "black",
-            }}
-          >
-            {data.fullName}
-          </Text>
-          <Text
-            style={{
-              fontFamily: "Inter_400Regular",
-              fontSize: RFValue(15),
-              color: "rgb(128, 128, 128)",
-            }}
-          >
-            {data.email}
-          </Text>
-        </View>
-        <TouchableOpacity
-          style={{
-            flexDirection: "row",
-            justifyContent: "center",
-            alignItems: "center",
-            backgroundColor: "#2979FF",
-            borderRadius: height * 0.02,
-            width: "60%",
-            height: height * 0.05,
-            gap: width * 0.03,
-          }}
-          onPress={() => {
-            Alert.alert("Coming soon!");
-          }}
-        >
-          <Text
-            style={{
-              color: "white",
-              fontSize: RFValue(12),
-              fontFamily: "Inter_600SemiBold",
-            }}
-          >
-            Edit profile
-          </Text>
-        </TouchableOpacity>
-      </View>
-      <View
-        style={{
-          flex: 4,
-          alignSelf: "center",
-          width: "80%",
-          alignItems: "center",
-        }}
-      >
-        <View
-          style={{
-            flexDirection: "row",
-            backgroundColor: "white",
-            width: "100%",
-            height: "40%",
-            borderRadius: height * 0.04,
-            shadowColor: "#000",
-            shadowOffset: { width: 0, height: 0 },
-            shadowOpacity: 0.05,
-            shadowRadius: 5,
-            elevation: 1,
-          }}
-        >
-          <View
-            style={{
-              flexDirection: "column",
-              justifyContent: "center",
-              alignItems: "center",
-              flex: 5,
-              gap: height * 0.01,
-            }}
-          >
-            <Text
-              style={{ fontFamily: "Inter_600SemiBold", fontSize: RFValue(14) }}
-            >
-              Workouts
-            </Text>
-            <Text
-              style={{
-                fontFamily: "Inter_400Regular",
-                fontSize: RFValue(20),
-                color: "rgb(128, 128, 128)",
-              }}
-            >
-              {data.workoutCount}
-            </Text>
-          </View>
-          <View
-            style={{
-              flexDirection: "column",
-              justifyContent: "center",
-              alignItems: "center",
-              flex: 5,
-              borderLeftWidth: 1,
-              borderLeftColor: "rgba(233, 233, 233, 0.54)",
-              gap: height * 0.01,
-            }}
-          >
-            <Text
-              style={{ fontFamily: "Inter_600SemiBold", fontSize: RFValue(14) }}
-            >
-              Online since
-            </Text>
-            <Text
-              style={{
-                fontFamily: "Inter_400Regular",
-                fontSize: RFValue(18),
-                color: "rgb(128, 128, 128)",
-              }}
-            >
-              {data.daysOnline.toString()}
-            </Text>
-          </View>
-        </View>
-      </View>
-    </View>*/
 
 export default Profile;

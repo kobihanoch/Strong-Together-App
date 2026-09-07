@@ -2,21 +2,23 @@
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { Image } from 'expo-image';
 import * as ImagePicker from 'expo-image-picker';
-import React, { useEffect } from 'react';
-import { ActivityIndicator, Dimensions, StyleSheet, TouchableOpacity, View } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { ActivityIndicator, Modal, Pressable, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { RFValue } from 'react-native-responsive-fontsize';
 import api from '../../../infrastructure/api/api-config/api';
-import { colors } from '../../../shared/constants/colors';
-import { useUser } from '../../../features/user/hooks/use-user.hook';
+import { useAppTheme } from '../../../shared/providers/AppThemeProvider';
 import useMediaUploads from '../hooks/use-media-uploads.hook';
-
-const { width, height } = Dimensions.get('window');
 
 type ImagePickerComponentProps = {
   openActionSheet: () => void;
   closeActionSheet: () => void;
   triggerImgPicker: boolean;
   triggerRemoveImg: boolean;
+  triggerViewImg?: boolean;
+  userId: string;
+  gender: string;
+  profilePicPath: string | null;
+  refreshUser: () => Promise<void>;
   setTriggerImgPicker: React.Dispatch<React.SetStateAction<boolean>>;
   setTriggerRemoveImg: React.Dispatch<React.SetStateAction<boolean>>;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -29,16 +31,28 @@ function ImagePickerComponent({
   triggerImgPicker,
   setTriggerImgPicker,
   triggerRemoveImg,
+  triggerViewImg = false,
+  userId,
+  gender,
+  profilePicPath,
+  refreshUser,
   setTriggerRemoveImg,
   style,
 }: ImagePickerComponentProps) {
-  const {
-    data: user,
-    actions: { refetch },
-  } = useUser();
   const { uploadToStorageAndReturnPath, loading: mediaLoading } = useMediaUploads();
+  const { colors: theme } = useAppTheme();
+  const [viewerOpen, setViewerOpen] = useState(false);
 
-  const profileimagePath = user?.profilePicPath;
+  const imageSource = profilePicPath
+    ? {
+        uri:
+          process.env.EXPO_PUBLIC_ENVIRONMENT === 'production'
+            ? `${process.env.EXPO_PUBLIC_SUPABASE_URL}/storage/v1/object/public/${profilePicPath}`
+            : `${process.env.EXPO_PUBLIC_DEV_IMAGE_BUCKET}/${profilePicPath}`,
+      }
+    : gender === 'Female'
+      ? require('../../../assets/woman.png')
+      : require('../../../assets/man.png');
 
   const pickAndUploadImage = async () => {
     await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -54,21 +68,21 @@ function ImagePickerComponent({
 
       const file = {
         uri: asset.uri,
-        name: `${user!.id}.jpg`,
+        name: `${userId}.jpg`,
         type: 'image/jpeg',
       };
 
       await uploadToStorageAndReturnPath(file);
-      await refetch();
+      await refreshUser();
     }
   };
 
   const deleteProfilePicture = async () => {
     await api.delete(`/api/users/me/profile-picture`, {
-      data: { path: profileimagePath },
+      data: { path: profilePicPath },
     });
 
-    await refetch();
+    await refreshUser();
   };
 
   useEffect(() => {
@@ -83,71 +97,58 @@ function ImagePickerComponent({
     setTriggerRemoveImg(false);
   }, [triggerRemoveImg]);
 
+  useEffect(() => {
+    if (triggerViewImg) {
+      closeActionSheet();
+      setViewerOpen(true);
+    }
+  }, [triggerViewImg]);
+
   return (
-    <View
-      style={{
-        alignItems: 'center',
-        flexDirection: 'column',
-        gap: height * 0.02,
-      }}
-    >
-      <TouchableOpacity onPress={openActionSheet}>
+    <View style={styles.container}>
+      <TouchableOpacity onPress={openActionSheet} accessibilityLabel="Manage profile photo">
         {mediaLoading ? (
           <ActivityIndicator size="large" />
         ) : (
           <Image
-            source={
-              profileimagePath
-                ? {
-                    uri:
-                      process.env.EXPO_PUBLIC_ENVIRONMENT === 'production'
-                        ? `${process.env.EXPO_PUBLIC_SUPABASE_URL}/storage/v1/object/public/${profileimagePath}`
-                        : `${process.env.EXPO_PUBLIC_DEV_IMAGE_BUCKET}/${profileimagePath}`,
-                  }
-                : user?.gender == 'Male'
-                  ? require('../../../assets/man.png')
-                  : require('../../../assets/woman.png')
-            }
-            cachePolicy={'disk'}
+            source={imageSource}
+            cachePolicy="disk"
+            contentFit="cover"
             style={[styles.image, style]}
           />
         )}
       </TouchableOpacity>
 
-      <View style={styles.cameraIconContainer}>
-        <MaterialCommunityIcons name={'camera-outline'} color={colors.textSecondary} size={RFValue(12)} />
+      <View style={[styles.cameraIconContainer, { backgroundColor: theme.primary, borderColor: theme.canvas }]} pointerEvents="none">
+        <MaterialCommunityIcons name="camera" color={theme.white} size={RFValue(14)} />
       </View>
+      <Modal visible={viewerOpen} transparent animationType="fade" onRequestClose={() => setViewerOpen(false)}>
+        <Pressable style={styles.viewerBackdrop} onPress={() => setViewerOpen(false)} accessibilityLabel="Close profile photo">
+          <Image source={imageSource} contentFit="contain" style={styles.viewerImage} />
+        </Pressable>
+      </Modal>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
+  container: { alignItems: 'center' },
   image: {
-    width: width * 0.3,
-    height: width * 0.3,
-    borderRadius: height * 0.7,
-  },
-  deleteButton: {
-    backgroundColor: '#ff4444',
-    paddingHorizontal: 15,
-    paddingVertical: 6,
-    borderRadius: 15,
-  },
-  deleteButtonText: {
-    color: 'white',
-    fontSize: 12,
-    fontWeight: 'bold',
+    borderRadius: 999,
   },
   cameraIconContainer: {
     position: 'absolute',
-    bottom: 0,
-    right: -5,
-    backgroundColor: '#e6e6e6ff',
-    padding: 8,
-    borderRadius: 20,
-    borderColor: 'white',
-    borderWidth: 1,
+    bottom: 2,
+    right: 0,
+    width: 36,
+    height: 36,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 18,
+    borderWidth: 3,
   },
+  viewerBackdrop: { flex: 1, backgroundColor: 'rgba(0,0,0,0.9)', alignItems: 'center', justifyContent: 'center', padding: 24 },
+  viewerImage: { width: '100%', aspectRatio: 1, borderRadius: 20 },
 });
 
 export default ImagePickerComponent;

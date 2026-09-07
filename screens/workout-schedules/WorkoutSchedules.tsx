@@ -75,7 +75,7 @@ const WorkoutSchedules = () => {
               <Text style={[styles.reminderName, { color: data.theme.textPrimary }]}>Reminders</Text>
               <Text style={[styles.metaText, { color: data.theme.textSecondary }]}>{data.reminderLabel}</Text>
               {!data.hasNotificationsPermission && (
-                <Text style={[styles.permission, { color: data.theme.textSecondary }]}>Enable notifications in Settings</Text>
+                <Text style={[styles.permission, { color: data.theme.textSecondary }]}>Enable notifications in your device settings</Text>
               )}
             </View>
             <View style={styles.reminderActions}>

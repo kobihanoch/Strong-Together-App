@@ -2,7 +2,6 @@ import { WorkoutSplit } from '../../features/workouts/plan/types/workout-plan.ty
 
 export type RootParamList = {
   Home: undefined;
-  Settings: undefined;
   Profile: undefined;
   MyWorkoutPlan: undefined;
   WorkoutSchedules: undefined;
