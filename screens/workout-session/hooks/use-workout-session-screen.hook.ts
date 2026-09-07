@@ -209,7 +209,7 @@ const useWorkoutSessionScreen = (workoutSplit: WorkoutSplit, navigation: StackNa
         : 'Are you sure you have finished this workout?',
       [
         { text: 'Keep working', style: 'cancel' },
-        { text: 'Finish workout', onPress: () => void submitWorkout() },
+        { text: 'Finish workout', onPress: submitWorkout },
       ],
     );
   };

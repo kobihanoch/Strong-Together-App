@@ -22,6 +22,12 @@ interface AuthProviderValue {
 }
 
 const AuthContext = createContext<AuthProviderValue | null>(null);
+/**
+ * Reads the shared authentication lifecycle and actions from the nearest provider.
+ *
+ * @returns Authentication phase, cached user identity, validation state, and login/logout lifecycle actions.
+ * @throws Error when called outside an `AuthProvider`.
+ */
 export const useAuth = () => {
   const ctx = useContext(AuthContext);
   if (!ctx) {

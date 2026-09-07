@@ -4,6 +4,13 @@ import { useCallback } from 'react';
 import { Platform } from 'react-native';
 import { loginUserApple } from '../../services/oauth.service';
 
+/**
+ * Builds the native Apple authorization flow, including nonce hashing and the
+ * backend identity-token exchange. The action rejects on unsupported platforms,
+ * cancellation, missing credentials, or exchange failure.
+ *
+ * @returns A stable `signInWithApple` action resolving to the backend login response.
+ */
 export function useAppleAuth() {
   const signInWithApple = useCallback(async () => {
     try {

@@ -7,6 +7,12 @@ import { loginUserGoogle } from '../../services/oauth.service';
 
 WebBrowser.maybeCompleteAuthSession();
 
+/**
+ * Prepares Google's PKCE authorization request and exchanges its authorization
+ * code before sending the resulting ID token to the application backend.
+ *
+ * @returns Request/response state from Expo and a `signInWithGoogle` action resolving to the backend login response.
+ */
 export function useGoogleAuth() {
   // Create request (PKCE code_verifier will be generated here)
   const [request, response, promptAsync] = Google.useAuthRequest(googleAuthConfig);

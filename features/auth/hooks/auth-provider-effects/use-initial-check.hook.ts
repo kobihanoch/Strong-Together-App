@@ -2,6 +2,16 @@ import { SetStateAction, useEffect } from 'react';
 import { AppUser } from '../../../user/types/user.types';
 import { getRefreshToken, getUserId } from '../../utils/token-storage.utils';
 
+/**
+ * Restores the cached user/refresh-token pair during provider startup, exposes
+ * cached authenticated UI immediately, then validates the session in background.
+ *
+ * @param attemptServerValidation - Refreshes tokens and confirms the cached session with the server.
+ * @param setUserIdCache - Stores the restored user identifier in provider state.
+ * @param setAuthPhase - Moves routing between checking, authenticated, and guest phases.
+ * @param logout - Performs complete cleanup when either cached credential is missing.
+ * @returns Nothing; the hook performs its work in a mount effect.
+ */
 const useInitialCheck = ({
   attemptServerValidation,
   setUserIdCache,

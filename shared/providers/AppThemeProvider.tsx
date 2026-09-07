@@ -9,6 +9,13 @@ const AppThemeContext = createContext<{
   colors: AppThemeColors;
 } | null>(null);
 
+/**
+ * Publishes the persisted theme mode, matching color palette, and mode setter,
+ * while synchronizing the native status bar whenever the preference changes.
+ *
+ * @param children - Descendants that consume theme state through `useAppTheme`.
+ * @returns A context provider containing the active mode, palette, and setter.
+ */
 export const AppThemeProvider = ({ children }: { children: ReactNode }) => {
   const mode = useAppThemeStore((state) => state.mode);
   const setMode = useAppThemeStore((state) => state.setMode);
@@ -18,6 +25,12 @@ export const AppThemeProvider = ({ children }: { children: ReactNode }) => {
   return <AppThemeContext.Provider value={value}>{children}</AppThemeContext.Provider>;
 };
 
+/**
+ * Reads the current application theme and fails fast when used outside its provider.
+ *
+ * @returns The active mode, resolved color palette, and persistent mode setter.
+ * @throws Error when no `AppThemeProvider` is present above the caller.
+ */
 export const useAppTheme = () => {
   const ctx = useContext(AppThemeContext);
   if (!ctx) {

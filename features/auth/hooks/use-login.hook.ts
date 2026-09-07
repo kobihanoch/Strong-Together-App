@@ -4,13 +4,10 @@ import { useAuth } from '../../auth/providers/AuthProvider';
 import { loginUser } from '../services/login.service';
 
 /**
- * Provides the authenticated user's persisted messages server state.
+ * Runs credential login and completes the shared authentication session only
+ * after the server returns a valid access-token, refresh-token, and user tuple.
  *
- * The query revalidates after server authentication, mutations synchronize
- * server changes with the shared cache, and the local updater allows live
- * WebSocket messages to update that same cache.
- *
- * @returns Message data, derived unread messages, loading states, and cache-aware actions.
+ * @returns Pending state and an async `login` action that rejects with the service error.
  */
 export const useLogin = () => {
   const { completeAuthSession } = useAuth();

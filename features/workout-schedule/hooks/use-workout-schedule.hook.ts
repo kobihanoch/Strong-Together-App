@@ -7,7 +7,12 @@ import { getNextScheduledWorkout } from '../utils/workout-schedule.utils';
 
 type ModifiedWorkoutSchedules = ReplaceWorkoutSchedulesBody['schedules'];
 
-/** Loads and updates the authenticated user's weekly schedule. */
+/**
+ * Loads and replaces the authenticated user's weekly workout schedule, deriving
+ * whether a schedule exists and which workout is next for screen consumers.
+ *
+ * @returns Schedule data and derived values, loading states, and cache-invalidating update/refetch actions.
+ */
 export const useWorkoutSchedule = () => {
   const { isValidatedWithServer, userIdCache: userId } = useAuth();
   const queryKey = ['workout-schedules', userId];

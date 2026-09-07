@@ -5,13 +5,11 @@ import { useAppleAuth } from './use-apple-auth.hook';
 import { useGoogleAuth } from './use-google-auth.hook';
 
 /**
- * Provides the authenticated user's persisted messages server state.
+ * Coordinates Google and Apple sign-in mutations with the shared AuthProvider.
+ * Successful provider responses persist the resulting session; provider errors
+ * are surfaced through the application's error alert boundary.
  *
- * The query revalidates after server authentication, mutations synchronize
- * server changes with the shared cache, and the local updater allows live
- * WebSocket messages to update that same cache.
- *
- * @returns Message data, derived unread messages, loading states, and cache-aware actions.
+ * @returns Combined/per-provider pending states and async actions for each OAuth provider.
  */
 export const useOAuth = () => {
   const { completeAuthSession } = useAuth();

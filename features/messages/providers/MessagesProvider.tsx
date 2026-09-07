@@ -19,6 +19,12 @@ interface MessagesProviderValue {
 
 const MessagesContext = createContext<MessagesProviderValue | null>(null);
 
+/**
+ * Reads application-wide message state backed by the feature query cache.
+ *
+ * @returns Received/unread messages, mutation actions, and consolidated loading states.
+ * @throws Error when called outside a `MessagesProvider`.
+ */
 export const useMessagesContext = () => {
   const context = useContext(MessagesContext);
   if (!context) {
@@ -31,13 +37,12 @@ export const useMessagesContext = () => {
 export const useMessages = useMessagesContext;
 
 /**
- * Provides authenticated message state to the application. It hydrates the
- * It exposes TanStack-backed message state and owns the single app-wide
+ * Provides authenticated message state to the application. It exposes
+ * TanStack-backed message state and owns the single app-wide
  * listener for newly received WebSocket messages.
  *
- * @param children Components that consume the shared message state.
- * @returns A context provider containing messages, unread messages, loading
- * state, and a setter that updates both context state and the local cache.
+ * @param children - Components that consume the shared message state.
+ * @returns A context provider containing messages, unread messages, loading states, and server-backed mutations.
  */
 export const MessagesProvider = ({ children }: { children: ReactNode }) => {
   const { userIdCache: userId } = useAuth();

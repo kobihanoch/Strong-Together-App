@@ -4,6 +4,13 @@ import * as Notifications from 'expo-notifications';
 import { useAuth } from '../../auth/providers/AuthProvider';
 import { getUserReminder, updateUserReminder } from '../services/reminder.service';
 
+/**
+ * Loads and updates the authenticated user's reminder settings, enforcing the
+ * device permission before an enabled reminder can be persisted.
+ *
+ * @param hasNotificationsPermission - Current app-level permission used to derive whether enabling is available.
+ * @returns Reminder data, query/mutation states, and cache-invalidating update and refetch actions.
+ */
 export const useReminder = (hasNotificationsPermission: boolean) => {
   const { userIdCache: userId, isValidatedWithServer } = useAuth();
   const queryClient = useQueryClient();

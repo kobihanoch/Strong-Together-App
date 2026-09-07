@@ -4,7 +4,10 @@ import { registerUser } from '../services/register.service';
 import { showSuccessAlert } from '../../../shared/alerts/success-alerts';
 
 /**
- * Handles user registration flow and notifies the user to verify their account.
+ * Creates an email account through the registration service and shows the
+ * verification destination only after the server accepts the request.
+ *
+ * @returns Pending state and an async `register` action that accepts the complete user payload.
  */
 export const useRegister = () => {
   const register = useMutation({

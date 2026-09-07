@@ -49,6 +49,8 @@ type WorkoutSessionStore = {
  * Holds the active workout draft and persists it to AsyncStorage after each change.
  * The persisted start timestamp allows elapsed time to be calculated after the app
  * has been backgrounded, closed, or restarted.
+ *
+ * @returns A Zustand hook for selecting session state/actions; its `getState` and persistence APIs also support imperative lifecycle cleanup.
  */
 export const useWorkoutSessionStore = create<WorkoutSessionStore>()(
   persist(
@@ -229,7 +231,7 @@ export const useWorkoutSessionStore = create<WorkoutSessionStore>()(
 
       finishWorkout: () => set((state) => (state.draft ? { draft: { ...state.draft, workoutEndUtc: new Date().toISOString() } } : state)),
 
-      resetWorkout: async () => set({ draft: null, workoutSplit: null, progress: initialProgress }),
+      resetWorkout: () => set({ draft: null, workoutSplit: null, progress: initialProgress }),
     }),
     {
       name: WORKOUT_SESSION_STORAGE_KEY,

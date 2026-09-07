@@ -4,8 +4,11 @@ import { getExerciseCollection } from '../services/exercises.service';
 import { ExercisesByMuscle } from '../types/exercises.types';
 
 /**
- * Provides exercise collection from db..
- * @returns The result produced by use exercises.
+ * Loads the shared exercise library after the user session is server-validated.
+ * The collection remains cached per authenticated user to support plan editing
+ * and additions made during an active workout.
+ *
+ * @returns The muscle-grouped exercise collection, query loading states, and a manual refetch action.
  */
 const useExercises = () => {
   const { isValidatedWithServer, userIdCache: userId } = useAuth();

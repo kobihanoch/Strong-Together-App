@@ -6,7 +6,7 @@ import Animated, { FadeIn } from 'react-native-reanimated';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import type { AppThemeColors } from '../../../shared/constants/theme';
 import { fontFamilies, fontSizes } from '../../../shared/constants/typography';
-import { Exercise } from '../../../features/workouts/plan/types/workout-plan.types';
+import { Exercise } from '../../../features/workouts/plan/types/exercises.types';
 
 type ExerciseInput = ReplaceWorkoutPlanBody['workoutData'][number]['exercises'][number];
 

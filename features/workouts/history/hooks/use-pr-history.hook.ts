@@ -7,14 +7,10 @@ import { PrHistoryMap } from '../types/pr-history.types';
 import { checkHasAnyPr } from '../utils/pr-history.utils';
 
 /**
- * Loads the authenticated user's exercise-performance history.
+ * Loads personal records after server authentication and exposes a stable
+ * exercise-ID lookup alongside the derived indication that any PR exists.
  *
- * The query runs after server authentication and caches the history by user.
- * It also derives whether any visible history exists and provides a stable
- * lookup for the latest performance associated with an exercise-to-split ID.
- *
- * @returns Exercise-history data and derived lookups, query loading states,
- * and a manual refetch action.
+ * @returns PR data, derived lookup helpers, query loading states, and a manual refetch action.
  */
 export const usePrHistory = () => {
   const { isValidatedWithServer, userIdCache: userId } = useAuth();
