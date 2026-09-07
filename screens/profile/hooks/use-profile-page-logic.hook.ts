@@ -9,7 +9,8 @@ import { getDaysSince } from '../../home/utils/home-page.utils';
 const useProfilePageLogic = () => {
   const {
     data: user,
-    actions: { refetch, updateUser },
+    loadingStates,
+    actions: { refetch, updateUser, uploadProfilePicture },
   } = useUser();
   const username = user?.username ?? '';
   const email = user?.email ?? '';
@@ -36,9 +37,13 @@ const useProfilePageLogic = () => {
     },
     actions: {
       updateUser,
+      uploadProfilePicture,
       refreshUser: async () => {
         await refetch();
       },
+    },
+    loadingStates: {
+      isUploadingProfilePicture: loadingStates.isUploadingProfilePicture,
     },
   };
 };

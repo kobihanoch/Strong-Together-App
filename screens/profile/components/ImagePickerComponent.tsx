@@ -7,7 +7,7 @@ import { ActivityIndicator, Modal, Pressable, StyleSheet, TouchableOpacity, View
 import { RFValue } from 'react-native-responsive-fontsize';
 import api from '../../../infrastructure/api/api-config/api';
 import { useAppTheme } from '../../../shared/providers/AppThemeProvider';
-import useMediaUploads from '../hooks/use-media-uploads.hook';
+import { UploadableFile } from '../../../features/user/services/media.service';
 
 type ImagePickerComponentProps = {
   openActionSheet: () => void;
@@ -18,6 +18,8 @@ type ImagePickerComponentProps = {
   userId: string;
   gender: string;
   profilePicPath: string | null;
+  isUploadingProfilePicture: boolean;
+  uploadProfilePicture: (file: UploadableFile) => Promise<unknown>;
   refreshUser: () => Promise<void>;
   setTriggerImgPicker: React.Dispatch<React.SetStateAction<boolean>>;
   setTriggerRemoveImg: React.Dispatch<React.SetStateAction<boolean>>;
@@ -35,11 +37,12 @@ function ImagePickerComponent({
   userId,
   gender,
   profilePicPath,
+  isUploadingProfilePicture,
+  uploadProfilePicture,
   refreshUser,
   setTriggerRemoveImg,
   style,
 }: ImagePickerComponentProps) {
-  const { uploadToStorageAndReturnPath, loading: mediaLoading } = useMediaUploads();
   const { colors: theme } = useAppTheme();
   const [viewerOpen, setViewerOpen] = useState(false);
 
@@ -72,8 +75,7 @@ function ImagePickerComponent({
         type: 'image/jpeg',
       };
 
-      await uploadToStorageAndReturnPath(file);
-      await refreshUser();
+      await uploadProfilePicture(file);
     }
   };
 
@@ -107,7 +109,7 @@ function ImagePickerComponent({
   return (
     <View style={styles.container}>
       <TouchableOpacity onPress={openActionSheet} accessibilityLabel="Manage profile photo">
-        {mediaLoading ? (
+        {isUploadingProfilePicture ? (
           <ActivityIndicator size="large" />
         ) : (
           <Image

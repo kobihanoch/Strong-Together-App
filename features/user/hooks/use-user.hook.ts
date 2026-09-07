@@ -2,6 +2,7 @@ import { UpdateCurrentUserBody } from '@strong-together/shared';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '../../auth/providers/AuthProvider';
 import { fetchSelfUserData, updateSelfUser } from '../services/user.service';
+import { UploadableFile, uploadProfilePictureToStorageAndGetPath } from '../services/media.service';
 import { AppUser } from '../types/user.types';
 
 type ModifiedUser = UpdateCurrentUserBody;
@@ -40,15 +41,28 @@ export const useUser = () => {
     },
   });
 
+  const uploadProfilePicture = useMutation({
+    mutationFn: async (file: UploadableFile) => {
+      if (!userId) throw new Error('User is not authenticated');
+      return await uploadProfilePictureToStorageAndGetPath(file);
+    },
+
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey });
+    },
+  });
+
   return {
     data: query.data,
     loadingStates: {
       isPending: query.isPending,
       isLoading: query.isLoading,
       isFetching: query.isFetching,
+      isUploadingProfilePicture: uploadProfilePicture.isPending,
     },
     actions: {
       updateUser: updateSourceUser.mutateAsync,
+      uploadProfilePicture: uploadProfilePicture.mutateAsync,
       refetch: query.refetch,
     },
   };

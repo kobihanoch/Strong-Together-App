@@ -18,7 +18,7 @@ const clamp = (value: number, minimum: number, maximum: number) => Math.max(mini
 const profileQueryNames = ['user'] as const;
 
 const Profile = () => {
-  const { data, actions } = useProfilePageLogic();
+  const { data, actions, loadingStates } = useProfilePageLogic();
   const { colors, mode, setMode } = useAppTheme();
   const { logout } = useAuth();
   const { width, height } = useWindowDimensions();
@@ -71,6 +71,8 @@ const Profile = () => {
             userId={data.userId}
             gender={data.gender}
             profilePicPath={data.profilePicPath}
+            isUploadingProfilePicture={loadingStates.isUploadingProfilePicture}
+            uploadProfilePicture={actions.uploadProfilePicture}
             refreshUser={actions.refreshUser}
             setTriggerImgPicker={setPickPhoto}
             setTriggerRemoveImg={setRemovePhoto}

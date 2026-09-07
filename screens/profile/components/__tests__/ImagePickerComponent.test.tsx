@@ -9,15 +9,7 @@ import {
   jest as jestObject,
 } from '@jest/globals';
 import { render, waitFor } from '@testing-library/react-native';
-import type { AuthProviderValue } from '../../../auth/shared/types/auth.types';
-import type { AppUser } from '../../../auth/shared/types/auth.types';
 
-let mockAuthState: AuthProviderValue;
-let mockMediaUploadsState: {
-  uploadToStorageAndReturnPath: ReturnType<typeof jestObject.fn>;
-  loading: boolean;
-  error: Error | null;
-};
 const mockRequestMediaLibraryPermissionsAsync: any = jestObject.fn();
 const mockLaunchImageLibraryAsync: any = jestObject.fn();
 const mockApiDelete: any = jestObject.fn();
@@ -37,76 +29,34 @@ jestObject.mock('expo-image', () => ({
 
 jestObject.mock('expo-image-picker', () => ({
   requestMediaLibraryPermissionsAsync: () => mockRequestMediaLibraryPermissionsAsync(),
-
   launchImageLibraryAsync: () => mockLaunchImageLibraryAsync(),
-  MediaTypeOptions: {
-    Images: 'Images',
-  },
+  MediaTypeOptions: { Images: 'Images' },
 }));
 
 jestObject.mock('../../../../infrastructure/api/api-config/api', () => ({
   __esModule: true,
-  default: {
-    delete: (...args: any[]) => mockApiDelete(...args),
-  },
+  default: { delete: (...args: any[]) => mockApiDelete(...args) },
 }));
 
-jestObject.mock('../../../auth/shared/providers/AuthProvider', () => ({
-  useAuth: () => mockAuthState,
-}));
-
-jestObject.mock('../../hooks/use-media-uploads.hook', () => ({
-  __esModule: true,
-
-  default: () => mockMediaUploadsState,
+jestObject.mock('../../../../shared/providers/AppThemeProvider', () => ({
+  useAppTheme: () => ({
+    colors: { primary: '#2563EB', canvas: '#FFFFFF', white: '#FFFFFF' },
+  }),
 }));
 
 import ImagePickerComponent from '../ImagePickerComponent';
-
-const createUser = (overrides: Partial<AppUser> = {}): AppUser => ({
-  id: 'user-1',
-  username: 'johnny',
-  name: 'John Doe',
-  email: 'john@example.com',
-  gender: 'Male',
-  createdAt: '2026-03-25T10:00:00.000Z',
-  updatedAt: '2026-03-25T10:00:00.000Z',
-  profilePicPath: null,
-  pushToken: null,
-  role: 'user',
-  isFirstLogin: false,
-  tokenVersion: 1,
-  isVerified: true,
-  authProvider: 'email',
-  lastLogin: null,
-  ...overrides,
-});
-
-const createAuthState = (overrides: Partial<AuthProviderValue> = {}): AuthProviderValue => ({
-  authPhase: 'authed',
-  user: createUser(),
-  setUser: jestObject.fn(),
-  userIdCache: 'user-1',
-  loading: false,
-  userDataLoading: false,
-  googleLoading: false,
-  appleLoading: false,
-  isWorkoutMode: false,
-  setIsWorkoutMode: jestObject.fn(),
-  isValidatedWithServer: true,
-  register: jestObject.fn(async () => undefined),
-  login: jestObject.fn(async () => undefined),
-  handleAppleAuth: jestObject.fn(async () => undefined),
-  handleGoogleAuth: jestObject.fn(async () => undefined),
-  logout: jestObject.fn(async () => undefined),
-  ...overrides,
-});
 
 const createProps = (overrides: Partial<React.ComponentProps<typeof ImagePickerComponent>> = {}) => ({
   openActionSheet: jestObject.fn(),
   closeActionSheet: jestObject.fn(),
   triggerImgPicker: false,
   triggerRemoveImg: false,
+  userId: 'user-1',
+  gender: 'Male',
+  profilePicPath: null,
+  isUploadingProfilePicture: false,
+  uploadProfilePicture: jestObject.fn(async () => undefined),
+  refreshUser: jestObject.fn(async () => undefined),
   setTriggerImgPicker: jestObject.fn(),
   setTriggerRemoveImg: jestObject.fn(),
   style: { width: 40, height: 40 },
@@ -116,97 +66,55 @@ const createProps = (overrides: Partial<React.ComponentProps<typeof ImagePickerC
 jestDescribe('ImagePickerComponent', () => {
   jestBeforeEach(() => {
     jestObject.clearAllMocks();
-    mockAuthState = createAuthState();
-    mockMediaUploadsState = {
-      uploadToStorageAndReturnPath: jestObject.fn(async () => ({
-        profilePicPath: 'avatars/user-1.jpg',
-        url: 'https://cdn/u1',
-      })),
-      loading: false,
-      error: null,
-    };
     mockRequestMediaLibraryPermissionsAsync.mockResolvedValue({ status: 'granted' });
     mockLaunchImageLibraryAsync.mockResolvedValue({ canceled: true, assets: [] });
     mockApiDelete.mockResolvedValue(undefined);
   });
 
   jestIt('resets the image picker trigger and does not upload when the picker is canceled', async () => {
-    const closeActionSheet = jestObject.fn();
-    const setTriggerImgPicker = jestObject.fn();
-    render(
-      React.createElement(
-        ImagePickerComponent,
-        createProps({
-          triggerImgPicker: true,
-          closeActionSheet,
-          setTriggerImgPicker,
-        }),
-      ),
-    );
+    const props = createProps({ triggerImgPicker: true });
+    render(React.createElement(ImagePickerComponent, props));
 
-    await waitFor(() => {
-      jestExpect(mockRequestMediaLibraryPermissionsAsync).toHaveBeenCalledTimes(1);
-    });
+    await waitFor(() => jestExpect(mockRequestMediaLibraryPermissionsAsync).toHaveBeenCalledTimes(1));
     jestExpect(mockLaunchImageLibraryAsync).toHaveBeenCalledTimes(1);
-    jestExpect(mockMediaUploadsState.uploadToStorageAndReturnPath).not.toHaveBeenCalled();
-    jestExpect(closeActionSheet).toHaveBeenCalled();
-    jestExpect(setTriggerImgPicker).toHaveBeenCalledWith(false);
+    jestExpect(props.uploadProfilePicture).not.toHaveBeenCalled();
+    jestExpect(props.closeActionSheet).toHaveBeenCalled();
+    jestExpect(props.setTriggerImgPicker).toHaveBeenCalledWith(false);
   });
 
-  jestIt('uploads the picked image and updates the auth user path', async () => {
-    const setUser = jestObject.fn();
-    mockAuthState = createAuthState({ setUser });
+  jestIt('uploads through the supplied user action without explicitly refetching', async () => {
     mockLaunchImageLibraryAsync.mockResolvedValue({
       canceled: false,
       assets: [{ uri: 'file:///picked.jpg' }],
     });
+    const props = createProps({ triggerImgPicker: true });
 
-    render(
-      React.createElement(
-        ImagePickerComponent,
-        createProps({
-          triggerImgPicker: true,
-        }),
-      ),
-    );
+    render(React.createElement(ImagePickerComponent, props));
 
     await waitFor(() => {
-      jestExpect(mockMediaUploadsState.uploadToStorageAndReturnPath).toHaveBeenCalledWith({
+      jestExpect(props.uploadProfilePicture).toHaveBeenCalledWith({
         uri: 'file:///picked.jpg',
         name: 'user-1.jpg',
         type: 'image/jpeg',
       });
     });
-
-    const updater = setUser.mock.calls[0][0] as (prev: AppUser | null | undefined) => AppUser;
-    jestExpect(updater(createUser()).profilePicPath).toBe('avatars/user-1.jpg');
+    jestExpect(props.refreshUser).not.toHaveBeenCalled();
   });
 
-  jestIt('deletes the current profile image and updates the auth user path to null', async () => {
-    const setUser = jestObject.fn();
-    mockAuthState = createAuthState({
-      user: createUser({ profilePicPath: 'avatars/user-1.jpg' }),
-      setUser,
+  jestIt('deletes the current profile image and refreshes the user', async () => {
+    const props = createProps({
+      triggerRemoveImg: true,
+      profilePicPath: 'avatars/user-1.jpg',
     });
-    const setTriggerRemoveImg = jestObject.fn();
 
-    render(
-      React.createElement(
-        ImagePickerComponent,
-        createProps({
-          triggerRemoveImg: true,
-          setTriggerRemoveImg,
-        }),
-      ),
-    );
+    render(React.createElement(ImagePickerComponent, props));
 
     await waitFor(() => {
       jestExpect(mockApiDelete).toHaveBeenCalledWith('/api/users/me/profile-picture', {
         data: { path: 'avatars/user-1.jpg' },
       });
     });
-    const updater = setUser.mock.calls[0][0] as (prev: AppUser | null | undefined) => AppUser;
-    jestExpect(updater(createUser({ profilePicPath: 'avatars/user-1.jpg' })).profilePicPath).toBeNull();
-    jestExpect(setTriggerRemoveImg).toHaveBeenCalledWith(false);
+    jestExpect(props.refreshUser).toHaveBeenCalled();
+    jestExpect(props.setTriggerRemoveImg).toHaveBeenCalledWith(false);
   });
 });
