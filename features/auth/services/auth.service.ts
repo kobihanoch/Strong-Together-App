@@ -13,19 +13,15 @@ export const refreshAndRotateTokens = async () => {
 };
 
 export const logoutUser = async (): Promise<void> => {
-  try {
-    const refreshToken = await getRefreshToken();
-    await api.post(
-      '/api/auth/logout',
-      {},
-      {
-        headers: {
-          'x-refresh-token': `DPoP ${refreshToken}`,
-        },
-        timeout: 5_000,
+  const refreshToken = await getRefreshToken();
+  await api.post(
+    '/api/auth/logout',
+    {},
+    {
+      headers: {
+        'x-refresh-token': `DPoP ${refreshToken}`,
       },
-    );
-  } catch (error) {
-    throw error;
-  }
+      timeout: 5_000,
+    },
+  );
 };

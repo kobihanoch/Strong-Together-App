@@ -8,7 +8,7 @@ import { RFValue } from 'react-native-responsive-fontsize';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import InputField from '../../shared/components/InputField';
 import SelectField from '../../shared/components/SelectField';
-import { useAuth } from '../../features/auth/providers/AuthProvider';
+import { useRegister } from '../../features/auth/hooks/use-register.hook';
 import { showErrorAlert } from '../../shared/alerts/error-alerts';
 import { colors } from '../../shared/constants/colors';
 import { AuthRootParamList } from '../../navigation/types/auth-stack.types';
@@ -26,11 +26,14 @@ const Register = () => {
   const [password, setPassword] = useState<string>('');
   const [confirmPassword, setConfirmPassword] = useState<string>('');
 
-  const { register, loading } = useAuth();
+  const {
+    loadingStates: { isPending },
+    actions: { register },
+  } = useRegister();
 
   const handleRegister = async () => {
     if (!hasErrors()) {
-      await register(email, password, username, fullName, gender ? gender : 'Unknown');
+      await register({ email, password, username, fullName, gender: gender ? gender : 'Unknown' });
       navigation.replace('Login', {
         needToVerify: true,
         email: email,
@@ -129,7 +132,7 @@ const Register = () => {
               />
               <TouchableOpacity style={styles.buttonRegister} onPress={handleRegister}>
                 <View style={styles.buttonContent}>
-                  {loading ? <ActivityIndicator></ActivityIndicator> : <Text style={styles.buttonRegisterText}>Register</Text>}
+                  {isPending ? <ActivityIndicator></ActivityIndicator> : <Text style={styles.buttonRegisterText}>Register</Text>}
                 </View>
               </TouchableOpacity>
             </View>

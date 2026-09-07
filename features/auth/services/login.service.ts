@@ -12,19 +12,15 @@ export const loginUser = async (
   identifier: LoginRequestBody['identifier'],
   password: LoginRequestBody['password'],
 ): Promise<LoginResponse> => {
-  try {
-    const { data } = await api.post<LoginResponse>(
-      '/api/auth/login',
-      {
-        identifier,
-        password,
-      } satisfies LoginRequestBody,
-      { apiMode: 'guest' },
-    );
-    return data;
-  } catch (error) {
-    throw error;
-  }
+  const { data } = await api.post<LoginResponse>(
+    '/api/auth/login',
+    {
+      identifier,
+      password,
+    } satisfies LoginRequestBody,
+    { apiMode: 'guest' },
+  );
+  return data;
 };
 
 export const changeEmail = async (

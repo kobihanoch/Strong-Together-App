@@ -8,15 +8,11 @@ export const registerUser = async (
   fullName: CreateUserBody['fullName'],
   gender: CreateUserBody['gender'],
 ): Promise<void> => {
-  try {
-    await api.post('/api/users', {
-      username,
-      fullName,
-      email,
-      password,
-      gender,
-    } satisfies CreateUserBody);
-  } catch (error) {
-    throw error;
-  }
+  await api.post('/api/users', {
+    username,
+    fullName,
+    email,
+    password,
+    gender,
+  } satisfies CreateUserBody);
 };

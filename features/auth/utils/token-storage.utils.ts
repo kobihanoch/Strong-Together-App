@@ -1,4 +1,3 @@
-// tokenStore.js
 import * as SecureStore from 'expo-secure-store';
 
 const REFRESH_TOKEN_KEY = 'refresh_token';

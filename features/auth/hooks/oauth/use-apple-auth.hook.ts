@@ -1,9 +1,8 @@
 import * as AppleAuthentication from 'expo-apple-authentication';
 import * as Crypto from 'expo-crypto';
-import { Platform } from 'react-native';
 import { useCallback } from 'react';
-import api from '../../../infrastructure/api/api-config/api'; // <-- call backend here for symmetry
-import type { AppleOAuthBody, OAuthLoginResponse } from '@strong-together/shared';
+import { Platform } from 'react-native';
+import { loginUserApple } from '../../services/oauth.service';
 
 export function useAppleAuth() {
   const signInWithApple = useCallback(async () => {
@@ -27,16 +26,10 @@ export function useAppleAuth() {
       }
 
       // Call backend (axios interceptor will add dpop-key-binding)
-      const { data } = await api.post<OAuthLoginResponse>(
-        '/api/oauth/apple',
-        {
-          idToken: result.identityToken,
-          rawNonce,
-          email: result.email || null,
-          name: { givenName: result.fullName?.givenName ?? null, familyName: result.fullName?.familyName ?? null },
-        } satisfies AppleOAuthBody,
-        { apiMode: 'guest' },
-      );
+      const data = await loginUserApple(result.identityToken, rawNonce, result.email || null, {
+        givenName: result.fullName?.givenName ?? null,
+        familyName: result.fullName?.familyName ?? null,
+      });
 
       return data;
     } catch (e) {

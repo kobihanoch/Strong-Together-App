@@ -3,7 +3,7 @@ import { ActivityIndicator, TouchableOpacity, View, Text, StyleSheet, Dimensions
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { RFValue } from 'react-native-responsive-fontsize';
 import InputField from '../../../shared/components/InputField';
-import { useAuth } from '../../../features/auth/providers/AuthProvider';
+import { useLogin } from '../../../features/auth/hooks/use-login.hook';
 import { showErrorAlert } from '../../../shared/alerts/error-alerts';
 import { changeEmail, checkUserVerify, sendVerificationMail } from '../../../features/auth/services/login.service';
 import type { LoginCredentials } from '../../../features/auth/types/auth.types';
@@ -17,7 +17,10 @@ type VerifyCardProps = {
 };
 
 export default function VerifyCard({ username, password, initialEmail }: VerifyCardProps) {
-  const { login, loading } = useAuth();
+  const {
+    loadingStates: { isPending },
+    actions: { login },
+  } = useLogin();
   const [displayEmail, setDisplayEmail] = useState<string>(initialEmail || '');
   const [showChange, setShowChange] = useState<boolean>(false);
   const [newEmail, setNewEmail] = useState<string>('');
@@ -43,7 +46,7 @@ export default function VerifyCard({ username, password, initialEmail }: VerifyC
         showErrorAlert('Not yet verified', 'Please verify your email before logging in');
         return;
       }
-      await login(username, password);
+      await login({ identifier: username, password });
     });
 
     return () => sub.remove();
@@ -73,7 +76,7 @@ export default function VerifyCard({ username, password, initialEmail }: VerifyC
       showErrorAlert('Not yet verified', 'Please verify your email before logging in');
       return;
     }
-    await login(username, password);
+    await login({ identifier: username, password });
   };
 
   const handleToggleChangeEmail = () => setShowChange((s) => !s);
@@ -143,7 +146,7 @@ export default function VerifyCard({ username, password, initialEmail }: VerifyC
       <Text style={styles.verifySubtitle}>Please check your inbox:</Text>
       <Text style={styles.verifyEmail}>{displayEmail}</Text>
       <View style={styles.verifyButtons}>
-        <TouchableOpacity style={styles.btnPrimary} onPress={handleLoginPress} disabled={loading}>
+        <TouchableOpacity style={styles.btnPrimary} onPress={handleLoginPress} disabled={isPending}>
           <Text style={styles.btnPrimaryText}>I verified, log in</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.btnSecondary} onPress={handleToggleChangeEmail}>

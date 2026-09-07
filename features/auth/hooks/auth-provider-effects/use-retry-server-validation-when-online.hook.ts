@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { useNetworkStatus } from '../../../shared/hooks/use-network-status.hook';
+import { useNetworkStatus } from '../../../../shared/hooks/use-network-status.hook';
 
 const useRetryServerValidationWhenOnline = (
   isValidatedWithServer: boolean,

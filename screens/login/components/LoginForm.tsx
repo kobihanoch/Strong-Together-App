@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { ActivityIndicator, TouchableOpacity, View, Text, StyleSheet, Dimensions } from 'react-native';
 import { RFValue } from 'react-native-responsive-fontsize';
 import InputField from '../../../shared/components/InputField';
-import { useAuth } from '../../../features/auth/providers/AuthProvider';
+import { useLogin } from '../../../features/auth/hooks/use-login.hook';
 import { showErrorAlert } from '../../../shared/alerts/error-alerts';
 import { forgotPassword } from '../../../features/auth/services/login.service';
 
@@ -11,7 +11,10 @@ const { width, height } = Dimensions.get('window');
 export default function LoginForm() {
   const [identifier, setIdentifier] = useState<string>('');
   const [password, setPassword] = useState<string>('');
-  const { login, loading } = useAuth();
+  const {
+    loadingStates: { isPending },
+    actions: { login },
+  } = useLogin();
   const [isSendingForgot, setIsSendingForgot] = useState<boolean>(false);
   const [forgotCooldown, setForgotCooldown] = useState<number>(0);
   const forgotCooldownUntilRef = useRef<number | null>(null);
@@ -32,7 +35,7 @@ export default function LoginForm() {
       showErrorAlert('Error', 'Please fill all fields');
       return;
     }
-    await login(identifier, password);
+    await login({ identifier, password });
   };
 
   const handleForgotPassword = async () => {
@@ -80,8 +83,8 @@ export default function LoginForm() {
             </Text>
           </View>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.buttonLogin} onPress={handleLogin} disabled={loading}>
-          <View style={styles.buttonContent}>{loading ? <ActivityIndicator /> : <Text style={styles.buttonLoginText}>Log in</Text>}</View>
+        <TouchableOpacity style={styles.buttonLogin} onPress={handleLogin} disabled={isPending}>
+          <View style={styles.buttonContent}>{isPending ? <ActivityIndicator /> : <Text style={styles.buttonLoginText}>Log in</Text>}</View>
         </TouchableOpacity>
       </View>
     </>

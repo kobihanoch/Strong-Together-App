@@ -11,17 +11,20 @@ import Column from '../../shared/components/Column';
 import Logo from './components/Logo';
 import Row from '../../shared/components/Row';
 import { colors } from '../../shared/constants/colors';
-import { useAuth } from '../../features/auth/providers/AuthProvider';
+import { useOAuth } from '../../features/auth/hooks/oauth/use-oauth.hook';
 import { AuthRootParamList } from '../../navigation/types/auth-stack.types';
 
 const { width, height } = Dimensions.get('window');
 
 const Intro = () => {
   const navigation = useNavigation<StackNavigationProp<AuthRootParamList>>();
-  const { appleLoading, googleLoading, handleAppleAuth, handleGoogleAuth } = useAuth();
+  const {
+    loadingStates: { isApplePending, isGooglePending },
+    actions: { appleSignIn, googleSignIn },
+  } = useOAuth();
 
-  const handleApplePress = async () => await handleAppleAuth();
-  const handleGooglePress = async () => await handleGoogleAuth();
+  const handleApplePress = async () => await appleSignIn();
+  const handleGooglePress = async () => await googleSignIn();
 
   return (
     <LinearGradient colors={[colors.primaryDark, colors.primary]} style={{ flex: 1 }}>
@@ -102,9 +105,9 @@ const Intro = () => {
                 },
               ]}
               onPress={handleApplePress}
-              disabled={appleLoading}
+              disabled={isApplePending}
             >
-              {appleLoading ? (
+              {isApplePending ? (
                 <ActivityIndicator />
               ) : (
                 <Row
@@ -134,9 +137,9 @@ const Intro = () => {
                 },
               ]}
               onPress={handleGooglePress}
-              disabled={googleLoading}
+              disabled={isGooglePending}
             >
-              {googleLoading ? (
+              {isGooglePending ? (
                 <ActivityIndicator />
               ) : (
                 <Row
