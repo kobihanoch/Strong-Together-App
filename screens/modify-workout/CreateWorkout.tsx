@@ -21,10 +21,10 @@ import ExerciseLibrarySheet from './components/ExerciseLibrarySheet';
 import PlanEditorActions from './components/PlanEditorActions';
 import PlanEditorHeader from './components/PlanEditorHeader';
 import PlanExerciseList from './components/PlanExerciseList';
-import useEditWorkoutPlan from './hooks/use-edit-workout-plan.hook';
+import useCreateWorkoutScreen from './hooks/use-create-workout-screen.hook';
 
 const CreateWorkout = () => {
-  const { data, actions } = useEditWorkoutPlan();
+  const { data, actions } = useCreateWorkoutScreen();
   const exerciseSheet = useRef<SlidingBottomModalRef>(null);
   const splitSheet = useRef<SlidingBottomModalRef>(null);
   const { width, height } = useWindowDimensions();

@@ -3,7 +3,7 @@ import { Dimensions, ListRenderItem, Text, View } from 'react-native';
 import { FlatList } from 'react-native-gesture-handler';
 import { RFValue } from 'react-native-responsive-fontsize';
 import MessageItem from './components/MessageItem';
-import useInboxLogic from './hooks/use-inbox-logic.hook';
+import useInboxScreen from './hooks/use-inbox-screen.hook';
 import { colors } from '../../shared/constants/colors';
 import type { UserMessage } from '../../features/messages/types/messages.types';
 import { usePullToRefresh } from '../../shared/hooks/use-pull-to-refresh.hook';
@@ -11,7 +11,7 @@ const { width } = Dimensions.get('window');
 const inboxQueryNames = ['messages'];
 
 const Inbox = () => {
-  const { allReceivedMessages, confirmAndDeleteMessage, markAsRead, unreadMessagesCount } = useInboxLogic();
+  const { allReceivedMessages, confirmAndDeleteMessage, markAsRead, unreadMessagesCount } = useInboxScreen();
   const { isRefreshing, refresh } = usePullToRefresh(inboxQueryNames);
 
   const renderItem: ListRenderItem<UserMessage> = useCallback(

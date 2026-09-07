@@ -3,7 +3,7 @@ import { ALERT_TYPE, Dialog } from 'react-native-alert-notification';
 import { useMessages } from '../../../features/messages/providers/MessagesProvider';
 import type { UserMessage } from '../../../features/messages/types/messages.types';
 
-const useInboxLogic = () => {
+const useInboxScreen = () => {
   const { allReceivedMessages, unreadMessages, updateMessageToRead, deleteMessage } = useMessages();
 
   const unreadMessagesCount = unreadMessages?.length;
@@ -45,4 +45,4 @@ const useInboxLogic = () => {
   };
 };
 
-export default useInboxLogic;
+export default useInboxScreen;

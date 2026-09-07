@@ -17,14 +17,14 @@ import { ExerciseInPlan, WorkoutSplit } from '../../../features/workouts/plan/ty
 import { RootParamList } from '../../../navigation/types/appStackTypes';
 import { useAppTheme } from '../../../shared/providers/AppThemeProvider';
 
-export type MyWorkoutPlanReturn = ReturnType<typeof useMyWorkoutPlan>;
+export type MyWorkoutPlanReturn = ReturnType<typeof useMyWorkoutPlanScreen>;
 
 /**
  * Composes the workout-plan screen state from plan, history, and dashboard data.
  *
  * @returns The screen data and actions used to select, create, edit, or start a split.
  */
-const useMyWorkoutPlan = () => {
+const useMyWorkoutPlanScreen = () => {
   const navigation = useNavigation<StackNavigationProp<RootParamList>>();
   const { colors: theme } = useAppTheme();
   const { data: workoutPlanData, loadingStates: workoutPlanLoadingStates } = useWorkoutPlan();
@@ -91,4 +91,4 @@ const useMyWorkoutPlan = () => {
   };
 };
 
-export default useMyWorkoutPlan;
+export default useMyWorkoutPlanScreen;

@@ -13,7 +13,7 @@ import { Exercise } from '../../../features/workouts/plan/types/exercises.types'
 const MAX_SPLITS = 6;
 const MAX_EXERCISES = 12;
 
-const useEditWorkoutPlan = () => {
+const useCreateWorkoutScreen = () => {
   const navigation = useNavigation<StackNavigationProp<RootParamList>>();
   const { colors: theme, mode: themeMode } = useAppTheme();
   const {
@@ -171,4 +171,4 @@ const useEditWorkoutPlan = () => {
   };
 };
 
-export default useEditWorkoutPlan;
+export default useCreateWorkoutScreen;

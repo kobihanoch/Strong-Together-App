@@ -18,16 +18,16 @@ jest.mock('react-native-alert-notification', () => ({
   Dialog: { show: jest.fn(), hide: jest.fn() },
 }));
 
-import useInboxLogic from '../use-inbox-logic.hook';
+import useInboxScreen from '../use-inbox-screen.hook';
 
-describe('useInboxLogic', () => {
+describe('useInboxScreen', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockUpdateMsgReadStatus.mockResolvedValue(undefined);
   });
 
   it('marks a message as read through the shared message action', async () => {
-    const { result } = renderHook(() => useInboxLogic());
+    const { result } = renderHook(() => useInboxScreen());
 
     await act(async () => {
       await result.current.markAsRead('message-1');

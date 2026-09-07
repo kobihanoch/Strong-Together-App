@@ -19,7 +19,7 @@ import {
  * Builds the Track History screen state from workout, exercise-history, and PR data.
  * It owns only selected-date and expanded-exercise UI state; calculations live in utilities.
  */
-const useTrackHistory = (initialDate?: string) => {
+const useTrackHistoryScreen = (initialDate?: string) => {
   const { colors: theme } = useAppTheme();
   const { data: workoutData, loadingStates: workoutLoading } = useWorkoutHistory();
   const { data: exerciseData, loadingStates: exerciseLoading } = useExerciseHistory();
@@ -103,4 +103,4 @@ const useTrackHistory = (initialDate?: string) => {
   };
 };
 
-export default useTrackHistory;
+export default useTrackHistoryScreen;

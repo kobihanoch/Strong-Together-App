@@ -13,13 +13,13 @@ import ImagePickerComponent from './components/ImagePickerComponent';
 import ProfileDetailsSheet from './components/ProfileDetailsSheet';
 import ProfileNotificationsToggle from './components/ProfileNotificationsToggle';
 import ProfileSkeleton from './components/ProfileSkeleton';
-import useProfilePageLogic from './hooks/use-profile-page-logic.hook';
+import useProfileScreen from './hooks/use-profile-screen.hook';
 
 const clamp = (value: number, minimum: number, maximum: number) => Math.max(minimum, Math.min(value, maximum));
 const profileQueryNames = ['user'] as const;
 
 const Profile = () => {
-  const { data, actions, loadingStates } = useProfilePageLogic();
+  const { data, actions, loadingStates } = useProfileScreen();
   const { colors, mode, setMode } = useAppTheme();
   const { logout } = useAuth();
   const { width, height } = useWindowDimensions();

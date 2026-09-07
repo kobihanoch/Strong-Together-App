@@ -15,7 +15,7 @@ import { applyNotes, applyReps, applyWeight, countSetsDone, createArrayForDataBa
 import { useStartWorkoutCache } from './use-start-workout-cache.hook';
 import { useUserWorkout } from './use-user-workout.hook';
 
-const useStartWorkoutPageLogic = (
+const useStartWorkoutScreen = (
   selectedSplit: WorkoutSplit,
   resumedWorkout?: Omit<ResumeWorkoutCachePayload, 'selectedSplit'>,
 ): StartWorkoutPageLogicReturn => {
@@ -160,4 +160,4 @@ const useStartWorkoutPageLogic = (
   };
 };
 
-export default useStartWorkoutPageLogic;
+export default useStartWorkoutScreen;

@@ -31,7 +31,7 @@ import { DateTime } from 'luxon';
  *
  * @returns The Home view model, navigation actions, and aggregate loading state.
  */
-const useHome = () => {
+const useHomeScreen = () => {
   const navigation = useNavigation<StackNavigationProp<RootParamList>>();
   const { colors: theme } = useAppTheme();
   const { data: userData, loadingStates: userLoadingStates } = useUser();
@@ -209,4 +209,4 @@ const useHome = () => {
   };
 };
 
-export default useHome;
+export default useHomeScreen;

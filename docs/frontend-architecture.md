@@ -47,12 +47,12 @@ flowchart LR
   end
 
   subgraph Screen_logic_hooks[Screen logic hooks]
-    LHome[useHomeDashboard<br/><small>use-home.hook.ts</small>]
-    LPlan[useMyWorkoutPlan]
-    LHistory[useTrackHistory]
-    LEditor[useEditWorkoutPlan]
-    LProfile[useProfilePageLogic]
-    LInbox[useInboxLogic]
+    LHome[useHomeScreen<br/><small>use-home-screen.hook.ts</small>]
+    LPlan[useMyWorkoutPlanScreen]
+    LHistory[useTrackHistoryScreen]
+    LEditor[useCreateWorkoutScreen]
+    LProfile[useProfileScreen]
+    LInbox[useInboxScreen]
   end
 
   subgraph Feature_hooks[Feature hooks]
@@ -123,12 +123,12 @@ flowchart LR
 
 | Screen | Screen logic hook | Consumed feature hooks and TanStack query keys |
 | --- | --- | --- |
-| `Home` | `useHomeDashboard` | `useUser` -> `['user', userId]`; `useMessages` -> `['messages', userId]`; `useWorkoutPlan` -> `['workout-plan', userId]`; `useCardio` -> `['cardio-maps', userId]`; `useDashboard` -> `['home-dashboard', userId]` |
-| `MyWorkoutPlan` | `useMyWorkoutPlan` | `useWorkoutPlan` -> `['workout-plan', userId]`; `useWorkoutHistory` -> `['workout-history', userId]`; `useExerciseHistory` -> `['exercise-history', userId]`; `useDashboard` -> `['home-dashboard', userId]` |
-| `TrackHistory` | `useTrackHistory` | `useWorkoutHistory` -> `['workout-history', userId]`; `useExerciseHistory` -> `['exercise-history', userId]`; `usePrHistory` -> `['pr-history', userId]`; `useWorkoutPlan` -> `['workout-plan', userId]`; `useCardio` -> `['cardio-maps', userId]` |
-| `CreateWorkout` | `useEditWorkoutPlan` | `useWorkoutPlan` -> `['workout-plan', userId]`; `useExercises` -> `['exercises', userId]` |
-| `Profile` | `useProfilePageLogic` | `useUser` -> `['user', userId]` |
-| `Inbox` | `useInboxLogic` | `useMessages` (through `MessagesProvider`) -> `['messages', userId]` |
+| `Home` | `useHomeScreen` | `useUser` -> `['user', userId]`; `useMessages` -> `['messages', userId]`; `useWorkoutPlan` -> `['workout-plan', userId]`; `useCardio` -> `['cardio-maps', userId]`; `useDashboard` -> `['home-dashboard', userId]` |
+| `MyWorkoutPlan` | `useMyWorkoutPlanScreen` | `useWorkoutPlan` -> `['workout-plan', userId]`; `useWorkoutHistory` -> `['workout-history', userId]`; `useExerciseHistory` -> `['exercise-history', userId]`; `useDashboard` -> `['home-dashboard', userId]` |
+| `TrackHistory` | `useTrackHistoryScreen` | `useWorkoutHistory` -> `['workout-history', userId]`; `useExerciseHistory` -> `['exercise-history', userId]`; `usePrHistory` -> `['pr-history', userId]`; `useWorkoutPlan` -> `['workout-plan', userId]`; `useCardio` -> `['cardio-maps', userId]` |
+| `CreateWorkout` | `useCreateWorkoutScreen` | `useWorkoutPlan` -> `['workout-plan', userId]`; `useExercises` -> `['exercises', userId]` |
+| `Profile` | `useProfileScreen` | `useUser` -> `['user', userId]` |
+| `Inbox` | `useInboxScreen` | `useMessages` (through `MessagesProvider`) -> `['messages', userId]` |
 
 All keys are query keys. The feature mutations currently do not declare `mutationKey`; on success, they update the associated query cache using the key shown above.
 

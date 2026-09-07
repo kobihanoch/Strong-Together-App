@@ -9,7 +9,7 @@ import HomeHeader from './components/HomeHeader';
 import NoTrackingCard from './components/NoTrackingCard';
 import NoWorkoutCard from './components/NoWorkoutCard';
 import TrainingOverviewCard from './components/TrainingOverviewCard';
-import useHomeDashboard from './hooks/use-home.hook';
+import useHomeScreen from './hooks/use-home-screen.hook';
 import { colors } from '../../shared/constants/colors';
 import { useAppTheme } from '../../shared/providers/AppThemeProvider';
 import CardioEntrySheet from '../../features/workouts/cardio/components/CardioEntrySheet';
@@ -18,7 +18,7 @@ import { usePullToRefresh } from '../../shared/hooks/use-pull-to-refresh.hook';
 const homeQueryNames = ['user', 'messages', 'workout-plan', 'workout-schedules', 'cardio-maps', 'home-dashboard', 'workout-history'];
 
 const Home = () => {
-  const { data, actions, loadingStates } = useHomeDashboard();
+  const { data, actions, loadingStates } = useHomeScreen();
   const { width, height } = useWindowDimensions();
   const horizontalPadding = Math.max(14, Math.min(width * 0.045, 22));
   const sectionGap = Math.max(22, Math.min(height * 0.034, 30));

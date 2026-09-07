@@ -9,7 +9,7 @@ import ExercisesSection from '../components/ExercisesSection';
 import LastWorkoutData from '../components/LastWorkoutData';
 import TopBar from '../components/TopBar';
 import { showErrorAlert } from '../../../../shared/alerts/error-alerts';
-import useStartWorkoutPageLogic from '../hooks/use-start-workout-page-logic.hook';
+import useStartWorkoutScreen from './hooks/use-start-workout-screen.hook';
 import { RootParamList } from '../../../../navigation/types/appStackTypes';
 
 import type { AnalyzeVideoResultPayloadDto } from '@strong-together/shared';
@@ -37,7 +37,7 @@ const StartWorkout = (/*{ route }: StackScreenProps<RootParamList, 'StartWorkout
     controls,
     workoutProgressObj,
     onExit,
-  } = useStartWorkoutPageLogic(route.params.workoutSplit, route.params.resumedWorkout);
+  } = useStartWorkoutScreen(route.params.workoutSplit, route.params.resumedWorkout);
   const [lastWorkoutDataForModal, setLastWorkoutDataForModal] = useState<{
     lastWorkoutData: TrackingMapItem | null;
     setIndex: number;

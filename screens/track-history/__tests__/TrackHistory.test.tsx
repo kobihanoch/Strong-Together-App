@@ -1,6 +1,6 @@
 import { describe, expect, it, jest } from '@jest/globals';
 
-jest.mock('../hooks/use-track-history.hook', () => ({ __esModule: true, default: jest.fn() }));
+jest.mock('../hooks/use-track-history-screen.hook', () => ({ __esModule: true, default: jest.fn() }));
 
 import TrackHistory from '../TrackHistory';
 

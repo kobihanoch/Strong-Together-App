@@ -42,7 +42,6 @@ const useWorkoutScheduleScreen = () => {
   const [editingDay, setEditingDay] = useState<number | null>(null);
   const [timeDraft, setTimeDraft] = useState('18:00');
   const [reminderEnabled, setReminderEnabled] = useState(false);
-  const [reminderOffsetMinutes, setReminderOffsetMinutes] = useState(30);
 
   useEffect(() => {
     if (!scheduleData.workoutSchedules || initialized.current) return;
@@ -51,20 +50,18 @@ const useWorkoutScheduleScreen = () => {
   }, [scheduleData.workoutSchedules]);
 
   useEffect(() => {
-    if (!hasNotificationsPermission) setReminderEnabled(false);
-  }, [hasNotificationsPermission]);
-
-  useEffect(() => {
-    if (reminderLoading.isPending || notificationsPermissionStatus === null || reminderInitialized.current) return;
-    setReminderEnabled(Boolean(reminderData.reminder?.reminderEnabled && hasNotificationsPermission));
-    setReminderOffsetMinutes(reminderData.reminder?.reminderOffsetMinutes ?? 30);
+    if (reminderLoading.isPending || notificationsPermissionStatus === null) return;
+    if (!hasNotificationsPermission) {
+      setReminderEnabled(false);
+      reminderInitialized.current = false;
+      return;
+    }
+    if (reminderInitialized.current) return;
+    setReminderEnabled((reminderData.reminder?.reminderEnabled ?? true) && hasNotificationsPermission);
     reminderInitialized.current = true;
   }, [hasNotificationsPermission, notificationsPermissionStatus, reminderData.reminder, reminderLoading.isPending]);
 
-  const scheduleByDay = useMemo(
-    () => new Map(schedules.map((schedule) => [schedule.dayOfWeek, schedule])),
-    [schedules],
-  );
+  const scheduleByDay = useMemo(() => new Map(schedules.map((schedule) => [schedule.dayOfWeek, schedule])), [schedules]);
 
   const weekDays = useMemo(
     () =>
@@ -108,9 +105,7 @@ const useWorkoutScheduleScreen = () => {
     if (editingDay === null) return;
     if (editingSchedule && !isValidTime(timeDraft)) return;
     if (editingSchedule) {
-      setSchedules((current) =>
-        current.map((item) => (item.dayOfWeek === editingDay ? { ...item, startTime: timeDraft } : item)),
-      );
+      setSchedules((current) => current.map((item) => (item.dayOfWeek === editingDay ? { ...item, startTime: timeDraft } : item)));
     }
     closeDay();
   };
@@ -122,7 +117,7 @@ const useWorkoutScheduleScreen = () => {
 
   const save = async () => {
     await scheduleActions.updateWorkoutSchedules(schedules);
-    await reminderActions.updateReminder({ reminderEnabled, reminderOffsetMinutes, timeZone: getTimeZoneFromStore() });
+    await reminderActions.updateReminder({ reminderEnabled, timeZone: getTimeZoneFromStore() });
     navigation.goBack();
   };
 
@@ -137,7 +132,6 @@ const useWorkoutScheduleScreen = () => {
             scheduleActions.updateWorkoutSchedules([]),
             reminderActions.updateReminder({
               reminderEnabled: false,
-              reminderOffsetMinutes,
               timeZone: getTimeZoneFromStore(),
             }),
           ]);
@@ -162,7 +156,7 @@ const useWorkoutScheduleScreen = () => {
       trainingDays,
       restDays: 7 - trainingDays,
       reminderEnabled,
-      reminderLabel: `${getOffsetLabel(reminderOffsetMinutes)} timed workouts`,
+      reminderLabel: `${getOffsetLabel(30)} timed workouts`,
       hasNotificationsPermission,
     },
     loadingStates: {

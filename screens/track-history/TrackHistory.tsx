@@ -8,7 +8,7 @@ import { fontFamilies, fontSizes } from '../../shared/constants/typography';
 import ExerciseHistoryList from './components/ExerciseHistoryList';
 import HistoryWeekStrip from './components/HistoryWeekStrip';
 import TrackHistorySummary from './components/TrackHistorySummary';
-import useTrackHistory from './hooks/use-track-history.hook';
+import useTrackHistoryScreen from './hooks/use-track-history-screen.hook';
 import CardioHistorySection from './components/CardioHistorySection';
 import CardioEntrySheet from '../../features/workouts/cardio/components/CardioEntrySheet';
 import { EditableCardioRecord } from '../../features/workouts/cardio/types/cardio.types';
@@ -20,7 +20,7 @@ const historyQueryNames = ['workout-history', 'exercise-history', 'pr-history', 
 
 const TrackHistory = () => {
   const route = useRoute<RouteProp<RootParamList, 'TrackHistory'>>();
-  const { data, actions, loadingStates } = useTrackHistory(route.params?.date);
+  const { data, actions, loadingStates } = useTrackHistoryScreen(route.params?.date);
   const { width, height } = useWindowDimensions();
   const [calendarOpen, setCalendarOpen] = useState(false);
   const [editingCardio, setEditingCardio] = useState<EditableCardioRecord | null>(null);

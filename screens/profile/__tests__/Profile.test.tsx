@@ -64,7 +64,7 @@ jestObject.mock('../../../auth/shared/providers/AuthProvider', () => ({
   }),
 }));
 
-jestObject.mock('../../hooks/use-profile-page-logic.hook', () => ({
+jestObject.mock('../hooks/use-profile-screen.hook', () => ({
   __esModule: true,
   default: () => mockProfilePageLogic,
 }));

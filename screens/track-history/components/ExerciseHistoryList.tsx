@@ -3,10 +3,10 @@ import { DateTime } from 'luxon';
 import React from 'react';
 import { Pressable, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
 import { fontFamilies, fontSizes } from '../../../shared/constants/typography';
-import useTrackHistory from '../hooks/use-track-history.hook';
+import useTrackHistoryScreen from '../hooks/use-track-history-screen.hook';
 import ExerciseProgressChart from './ExerciseProgressChart';
 
-type Data = ReturnType<typeof useTrackHistory>['data'];
+type Data = ReturnType<typeof useTrackHistoryScreen>['data'];
 type Exercise = Data['exercises'][number];
 
 const ExpandedExercise = ({ exercise, data }: { exercise: Exercise; data: Data }) => {

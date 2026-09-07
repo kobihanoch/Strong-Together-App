@@ -41,7 +41,7 @@ jestObject.mock('react-native-alert-notification', () => ({
   },
 }));
 
-jestObject.mock('../../hooks/use-start-workout-page-logic.hook', () => ({
+jestObject.mock('../hooks/use-start-workout-screen.hook', () => ({
   __esModule: true,
   default: (...args: any[]) => mockUseStartWorkoutPageLogic(...args),
 }));
@@ -199,7 +199,7 @@ jestDescribe('StartWorkout screen', () => {
     });
   });
 
-  jestIt('passes the route params into use-start-workout-page-logic.hook and renders the modal shell', () => {
+  jestIt('passes the route params into useStartWorkoutScreen and renders the modal shell', () => {
     const route = createRoute();
     const { getByText } = render(<StartWorkout route={route as any} navigation={{} as any} />);
 

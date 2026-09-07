@@ -3,9 +3,9 @@ import { DateTime } from 'luxon';
 import React from 'react';
 import { Pressable, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
 import { fontFamilies, fontSizes } from '../../../shared/constants/typography';
-import useTrackHistory from '../hooks/use-track-history.hook';
+import useTrackHistoryScreen from '../hooks/use-track-history-screen.hook';
 
-type Data = ReturnType<typeof useTrackHistory>['data'];
+type Data = ReturnType<typeof useTrackHistoryScreen>['data'];
 
 const HistoryWeekStrip = ({ data, onSelect }: { data: Data; onSelect: (date: string) => void }) => {
   const { height } = useWindowDimensions();

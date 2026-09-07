@@ -180,12 +180,12 @@ On logout, auth cleanup disconnects the socket and clears session/cache state. `
 
 ```mermaid
 flowchart LR
-  Home[Home] --> HL[useHomeDashboard]
-  Plan[MyWorkoutPlan] --> PL[useMyWorkoutPlan]
-  History[TrackHistory] --> THL[useTrackHistory]
-  Editor[CreateWorkout] --> EL[useEditWorkoutPlan]
-  Profile[Profile] --> PRL[useProfilePageLogic]
-  Inbox[Inbox] --> IL[useInboxLogic]
+  Home[Home] --> HL[useHomeScreen]
+  Plan[MyWorkoutPlan] --> PL[useMyWorkoutPlanScreen]
+  History[TrackHistory] --> THL[useTrackHistoryScreen]
+  Editor[CreateWorkout] --> EL[useCreateWorkoutScreen]
+  Profile[Profile] --> PRL[useProfileScreen]
+  Inbox[Inbox] --> IL[useInboxScreen]
 
   HL --> User[useUser<br/>user + userId]
   HL --> Msg[useMessages<br/>messages + userId]
@@ -221,14 +221,14 @@ This matrix covers every screen registered in `AuthStack` and `AppStack`. It lis
 | `Intro` | — | ● | | | | | | | | | |
 | `Login` | —; child `LoginForm` / `VerifyCard` consume auth | ● | | | | | | | | | |
 | `Register` | — | ● | | | | | | | | | |
-| `Home` | `useHomeDashboard` | indirect | ● | ● | ● | | ● | ● | | | |
-| `MyWorkoutPlan` | `useMyWorkoutPlan` | indirect | | | ● | | | ● | ● | ● | |
-| `CreateWorkout` | `useEditWorkoutPlan` | indirect | | | ● | ● | | | | | |
-| `TrackHistory` | `useTrackHistory` | indirect | | | ● | | ● | | ● | ● | ● |
-| `Profile` | `useProfilePageLogic`; child `useMediaUploads` | ● | ● | | | | | | | | |
-| `Inbox` | `useInboxLogic` | indirect | | ● via provider | | | | | | | |
+| `Home` | `useHomeScreen` | indirect | ● | ● | ● | | ● | ● | | | |
+| `MyWorkoutPlan` | `useMyWorkoutPlanScreen` | indirect | | | ● | | | ● | ● | ● | |
+| `CreateWorkout` | `useCreateWorkoutScreen` | indirect | | | ● | ● | | | | | |
+| `TrackHistory` | `useTrackHistoryScreen` | indirect | | | ● | | ● | | ● | ● | ● |
+| `Profile` | `useProfileScreen`; child `useMediaUploads` | ● | ● | | | | | | | | |
+| `Inbox` | `useInboxScreen` | indirect | | ● via provider | | | | | | | |
 | `Settings` | child `useSettingsLogic` | ● | | | | | | | | | |
-| `StartWorkout` | intended: `useStartWorkoutPageLogic`, `useStartWorkoutCache`, `useUserWorkout`, child `useVideoAnalysis` | intended | | | intended | | | | intended | | |
+| `StartWorkout` | intended: `useStartWorkoutScreen`, `useStartWorkoutCache`, `useUserWorkout`, child `useVideoAnalysis` | intended | | | intended | | | | intended | | |
 | `Analytics` | intended: `useAnalysticsLogic` | intended | | | intended | | | | intended | | |
 
 Legend:
@@ -256,15 +256,15 @@ Legend:
 
 | Hook | Owner | Purpose |
 | --- | --- | --- |
-| `useHomeDashboard` | Home | Composes user, messages, plan, cardio, and dashboard data |
-| `useMyWorkoutPlan` | My Workout Plan | Composes plan and history data and owns plan-screen selection state |
-| `useTrackHistory` | Track History | Composes workout, exercise, PR, plan, and cardio history |
-| `useEditWorkoutPlan` | Create Workout | Owns the plan editor reducer and save flow |
-| `useProfilePageLogic` | Profile | Derives profile presentation data and exposes local-user updates |
+| `useHomeScreen` | Home | Composes user, messages, plan, cardio, and dashboard data |
+| `useMyWorkoutPlanScreen` | My Workout Plan | Composes plan and history data and owns plan-screen selection state |
+| `useTrackHistoryScreen` | Track History | Composes workout, exercise, PR, plan, and cardio history |
+| `useCreateWorkoutScreen` | Create Workout | Owns the plan editor reducer and save flow |
+| `useProfileScreen` | Profile | Derives profile presentation data and exposes local-user updates |
 | `useMediaUploads` | Profile image component | Upload lifecycle; uses a service rather than TanStack Query |
-| `useInboxLogic` | Inbox | Adapts message actions and confirmation UI |
+| `useInboxScreen` | Inbox | Adapts message actions and confirmation UI |
 | `useSettingsLogic` | Notifications toggle | Reads and changes device notification permission state |
-| `useStartWorkoutPageLogic` | Start Workout, currently commented | Intended workout-session orchestration |
+| `useStartWorkoutScreen` | Start Workout, currently commented | Intended workout-session orchestration |
 | `useStartWorkoutCache` | Start Workout, currently commented | Intended local workout-resume persistence |
 | `useUserWorkout` | Start Workout, currently commented/missing | Intended workout-save orchestration |
 | `useVideoAnalysis` | Start Workout analysis sheet, currently commented | Intended upload/socket video-analysis pipeline |

@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { act, renderHook } from '@testing-library/react-native';
 import { beforeEach, describe, expect, it, jest } from '@jest/globals';
-import useHomeDashboard from '../use-home.hook';
+import useHomeScreen from '../use-home-screen.hook';
 
 const mockNavigate = jest.fn();
 let mockAuth: any;
@@ -88,7 +88,7 @@ const stats = {
   ],
 };
 
-describe('useHomeDashboard', () => {
+describe('useHomeScreen', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockAuth = {
@@ -109,7 +109,7 @@ describe('useHomeDashboard', () => {
   });
 
   it('maps dashboard stats and nested plan data into Home data', () => {
-    const { result } = renderHook(() => useHomeDashboard());
+    const { result } = renderHook(() => useHomeScreen());
 
     expect(result.current.isLoading).toBe(false);
     expect(result.current.data.nextWorkout).toMatchObject({
@@ -134,7 +134,7 @@ describe('useHomeDashboard', () => {
       loadingStates: { isLoading: false, isFetching: false },
       actions: { refetch: jest.fn() },
     };
-    const { result } = renderHook(() => useHomeDashboard());
+    const { result } = renderHook(() => useHomeScreen());
     expect(result.current.isLoading).toBe(true);
   });
 
@@ -145,7 +145,7 @@ describe('useHomeDashboard', () => {
       loadingStates: { isLoading: false, isFetching: false },
       actions: { refetch: jest.fn() },
     };
-    const { result } = renderHook(() => useHomeDashboard());
+    const { result } = renderHook(() => useHomeScreen());
 
     expect(result.current.data.state).toEqual({ hasWorkout: false, hasTracking: false });
     expect(result.current.data.nextWorkout.exerciseCount).toBe(0);
@@ -164,14 +164,14 @@ describe('useHomeDashboard', () => {
         },
       },
     };
-    const { result } = renderHook(() => useHomeDashboard());
+    const { result } = renderHook(() => useHomeScreen());
 
     expect(result.current.data.aerobics.totalMinutes).toBe(25);
     expect(result.current.data.aerobics.days[0]).toEqual({ label: 'M', minutes: 25 });
   });
 
   it('routes Home actions and passes the selected full split', () => {
-    const { result } = renderHook(() => useHomeDashboard());
+    const { result } = renderHook(() => useHomeScreen());
     act(() => {
       result.current.actions.openInbox();
       result.current.actions.createWorkout();

@@ -6,7 +6,7 @@ import { getDaysSince } from '../../home/utils/home-page.utils';
  *
  * @returns Profile display fields and the user-state setter.
  */
-const useProfilePageLogic = () => {
+const useProfileScreen = () => {
   const {
     data: user,
     loadingStates,
@@ -49,4 +49,4 @@ const useProfilePageLogic = () => {
   };
 };
 
-export default useProfilePageLogic;
+export default useProfileScreen;

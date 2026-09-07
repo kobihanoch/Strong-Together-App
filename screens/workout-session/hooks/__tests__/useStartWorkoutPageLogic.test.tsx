@@ -183,7 +183,7 @@ import { WorkoutHistoryProvider, useWorkoutHistory } from '../../../shared/provi
 import { AuthProvider, useAuth } from '../../../../auth/shared/providers/AuthProvider';
 import { GlobalAppLoadingProvider } from '../../../../../shared/providers/GlobalAppLoadingProvider';
 import { WorkoutPlanProvider, useWorkoutPlan } from '../../../shared/providers/WorkoutPlanProvider';
-import useStartWorkoutPageLogic from '../use-start-workout-page-logic.hook';
+import useStartWorkoutScreen from '../use-start-workout-screen.hook';
 
 const baseWrapper = ({ children }: { children: React.ReactNode }) => (
   <GlobalAppLoadingProvider>
@@ -309,11 +309,11 @@ const useIntegratedStartWorkoutPageLogic = (resumedWorkout?: ReturnType<typeof c
   const auth = useAuth();
   const workout = useWorkoutPlan();
   const analysis = useWorkoutHistory();
-  const logic = useStartWorkoutPageLogic(createSelectedSplitFromProfile(), resumedWorkout);
+  const logic = useStartWorkoutScreen(createSelectedSplitFromProfile(), resumedWorkout);
   return { auth, workout, analysis, logic };
 };
 
-describe('use-start-workout-page-logic.hook integration', () => {
+describe('useStartWorkoutScreen integration', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     jest.spyOn(AppState, 'addEventListener').mockImplementation(

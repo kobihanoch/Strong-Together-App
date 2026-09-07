@@ -4,7 +4,7 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 import { fontFamilies, fontSizes } from '../../../shared/constants/typography';
 import { createSharedComponentStyles } from '../../../shared/styles/component.styles';
 import { formatDate } from '../../../shared/utils/shared-utils';
-import type { MyWorkoutPlanReturn } from '../hooks/use-my-workout-plan.hook';
+import type { MyWorkoutPlanReturn } from '../hooks/use-my-workout-plan-screen.hook';
 import { ExerciseInPlan } from '../../../features/workouts/plan/types/workout-plan.types';
 
 type PlanData = MyWorkoutPlanReturn['data'];

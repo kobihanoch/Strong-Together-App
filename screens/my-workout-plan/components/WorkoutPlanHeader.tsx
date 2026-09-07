@@ -1,7 +1,7 @@
 import React from 'react';
 import { Pressable, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
 import { fontFamilies, fontSizes } from '../../../shared/constants/typography';
-import type { MyWorkoutPlanReturn } from '../hooks/use-my-workout-plan.hook';
+import type { MyWorkoutPlanReturn } from '../hooks/use-my-workout-plan-screen.hook';
 
 type Props = {
   theme: MyWorkoutPlanReturn['data']['theme'];

@@ -7,10 +7,10 @@ jest.mock('../../../../features/workouts/history/hooks/use-pr-history.hook', () 
 jest.mock('../../../../features/workouts/plan/hooks/use-workout-plan.hook', () => ({ useWorkoutPlan: jest.fn() }));
 jest.mock('../../../../features/workouts/cardio/hooks/use-cardio.hook', () => ({ useCardio: jest.fn() }));
 
-import useTrackHistory from '../use-track-history.hook';
+import useTrackHistoryScreen from '../use-track-history-screen.hook';
 
-describe('useTrackHistory', () => {
+describe('useTrackHistoryScreen', () => {
   it('exports the page hook', () => {
-    expect(useTrackHistory).toBeDefined();
+    expect(useTrackHistoryScreen).toBeDefined();
   });
 });

@@ -7,13 +7,13 @@ import WorkoutPlanHeader from './components/WorkoutPlanHeader';
 import WorkoutPlanSkeleton from './components/WorkoutPlanSkeleton';
 import WorkoutPlanSummary from './components/WorkoutPlanSummary';
 import WorkoutSplitSelector from './components/WorkoutSplitSelector';
-import useMyWorkoutPlan from './hooks/use-my-workout-plan.hook';
+import useMyWorkoutPlanScreen from './hooks/use-my-workout-plan-screen.hook';
 import { usePullToRefresh } from '../../shared/hooks/use-pull-to-refresh.hook';
 
 const workoutPlanQueryNames = ['workout-plan', 'workout-history', 'exercise-history', 'home-dashboard'];
 
 const MyWorkoutPlan = () => {
-  const { data, actions } = useMyWorkoutPlan();
+  const { data, actions } = useMyWorkoutPlanScreen();
   const { width, height } = useWindowDimensions();
   const gutter = Math.max(14, Math.min(width * 0.045, 22));
   const { isRefreshing, refresh } = usePullToRefresh(workoutPlanQueryNames);

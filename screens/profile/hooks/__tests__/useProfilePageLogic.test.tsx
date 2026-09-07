@@ -126,7 +126,7 @@ jest.mock('../../../auth/shared/utils/auth.utils', () => ({
 
 import { AuthProvider, useAuth } from '../../../../features/auth/providers/AuthProvider';
 import { GlobalAppLoadingProvider } from '../../../../shared/providers/GlobalAppLoadingProvider';
-import useProfilePageLogic from '../use-profile-page-logic.hook';
+import useProfileScreen from '../use-profile-screen.hook';
 
 const wrapper = ({ children }: { children: React.ReactNode }) => (
   <GlobalAppLoadingProvider>
@@ -136,7 +136,7 @@ const wrapper = ({ children }: { children: React.ReactNode }) => (
 
 const useIntegratedProfileLogic = () => {
   const auth = useAuth();
-  const profile = useProfilePageLogic();
+  const profile = useProfileScreen();
   return { auth, profile };
 };
 
@@ -164,7 +164,7 @@ const setupCacheForScenario = ({ userId, auth }: { userId: string | null; auth?:
   });
 };
 
-describe('useProfilePageLogic integration', () => {
+describe('useProfileScreen integration', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockUseNetworkStatus.mockReturnValue(true);

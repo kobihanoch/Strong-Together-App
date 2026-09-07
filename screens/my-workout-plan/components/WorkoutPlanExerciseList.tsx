@@ -2,7 +2,7 @@ import React from 'react';
 import { StyleSheet, Text, useWindowDimensions, View } from 'react-native';
 import { ExerciseInPlan } from '../../../features/workouts/plan/types/workout-plan.types';
 import { fontFamilies, fontSizes } from '../../../shared/constants/typography';
-import type { MyWorkoutPlanReturn } from '../hooks/use-my-workout-plan.hook';
+import type { MyWorkoutPlanReturn } from '../hooks/use-my-workout-plan-screen.hook';
 import WorkoutPlanExerciseRow from './WorkoutPlanExerciseRow';
 
 type PlanData = MyWorkoutPlanReturn['data'];
