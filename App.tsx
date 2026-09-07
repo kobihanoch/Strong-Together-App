@@ -17,15 +17,14 @@ import { NotifierRoot } from 'react-native-notifier';
 import AuthenticatedUserEffects from './features/auth/components/AuthenticatedUserEffects';
 import { AuthProvider, useAuth } from './features/auth/providers/AuthProvider';
 import { MessagesProvider } from './features/messages/providers/MessagesProvider';
-import NotificationsSetup from './screens/settings/push-notifications-setup/notifications-setup.setup';
 import ensureDpopKeyPair from './infrastructure/api/dpop/ensureDpopKeyPair';
 import { cacheHousekeepingOnBoot } from './infrastructure/cache/cache.constants';
 import { logRestoredQueryCache, queryClient, queryPersistOptions } from './infrastructure/query/query-client';
 import Sentry from './infrastructure/sentry';
 import AppStack from './navigation/AppStack';
 import AuthStack from './navigation/AuthStack';
+import NotificationsSetup from './screens/settings/push-notifications-setup/notifications-setup.setup';
 import BottomTabBar from './shared/components/BottomTabBar';
-import Theme1 from './shared/components/Theme1';
 import UpdateAppModal from './shared/components/UpdateAppModal';
 import { AppThemeProvider } from './shared/providers/AppThemeProvider';
 
@@ -62,6 +61,7 @@ function App() {
   const fontsReady = useFontsReady();
   const navigationRef = useNavigationContainerRef();
   const [keyPairReady, setKeyPairReady] = useState(false);
+  const [legacyHousekeepingDone, setLegacyHousekeepingDone] = useState(false);
 
   // Dpop key pair
   useEffect(() => {
@@ -78,8 +78,12 @@ function App() {
     (async () => {
       const cacheVer = await AsyncStorage.getItem('__VERSION__');
       const appVer = Constants.expoConfig!.version;
-      if (cacheVer === appVer) return; // already cleaned for this version
+      if (cacheVer === appVer) {
+        setLegacyHousekeepingDone(true);
+        return;
+      } // already cleaned for this version
       await cacheHousekeepingOnBoot();
+      setLegacyHousekeepingDone(true);
     })();
   }, []);
 
@@ -93,7 +97,8 @@ function App() {
   }
 
   return (
-    keyPairReady && (
+    keyPairReady &&
+    legacyHousekeepingDone && (
       <Sentry.ErrorBoundary fallback={<AppCrashFallback />}>
         <AlertNotificationRoot>
           <GestureHandlerRootView style={{ flex: 1 }}>
@@ -148,10 +153,8 @@ function AuthenticatedApp() {
 function MainApp() {
   return (
     <>
-      <Theme1>
-        <AppStack />
-        <NotificationsSetup />
-      </Theme1>
+      <AppStack />
+      <NotificationsSetup />
       <BottomTabBar />
     </>
   );
