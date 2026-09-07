@@ -1,7 +1,7 @@
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { RouteProp, useRoute } from '@react-navigation/native';
 import React, { useState } from 'react';
-import { ActivityIndicator, Modal, Pressable, RefreshControl, ScrollView, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
+import { Modal, Pressable, RefreshControl, ScrollView, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
 import { Calendar } from 'react-native-calendars';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { fontFamilies, fontSizes } from '../../shared/constants/typography';
@@ -14,25 +14,20 @@ import CardioEntrySheet from '../../features/workouts/cardio/components/CardioEn
 import { EditableCardioRecord } from '../../features/workouts/cardio/types/cardio.types';
 import { usePullToRefresh } from '../../shared/hooks/use-pull-to-refresh.hook';
 import { RootParamList } from '../../navigation/types/appStackTypes';
+import TrackHistorySkeleton from './components/TrackHistorySkeleton';
 
 const historyQueryNames = ['workout-history', 'exercise-history', 'pr-history', 'workout-plan', 'cardio-maps'];
 
 const TrackHistory = () => {
   const route = useRoute<RouteProp<RootParamList, 'TrackHistory'>>();
-  const { data, actions } = useTrackHistory(route.params?.date);
+  const { data, actions, loadingStates } = useTrackHistory(route.params?.date);
   const { width, height } = useWindowDimensions();
   const [calendarOpen, setCalendarOpen] = useState(false);
   const [editingCardio, setEditingCardio] = useState<EditableCardioRecord | null>(null);
   const gutter = Math.max(16, Math.min(width * 0.055, 24));
   const { isRefreshing, refresh } = usePullToRefresh(historyQueryNames);
 
-  if (data.isLoading) {
-    return (
-      <View style={[styles.loading, { backgroundColor: data.theme.canvas }]}>
-        <ActivityIndicator color={data.theme.primary} />
-      </View>
-    );
-  }
+  if (loadingStates.isPending) return <TrackHistorySkeleton />;
 
   return (
     <SafeAreaView style={[styles.safeArea, { backgroundColor: data.theme.canvas }]} edges={['top']}>
@@ -108,7 +103,6 @@ const TrackHistory = () => {
 
 const styles = StyleSheet.create({
   safeArea: { flex: 1 },
-  loading: { flex: 1, alignItems: 'center', justifyContent: 'center' },
   header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   eyebrow: { fontFamily: fontFamilies.semiBold, fontSize: fontSizes.caption, letterSpacing: 3 },
   title: { fontFamily: fontFamilies.bold, fontSize: fontSizes.hero, marginTop: 2 },

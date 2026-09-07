@@ -43,6 +43,7 @@ const useProfilePageLogic = () => {
       },
     },
     loadingStates: {
+      isPending: loadingStates.isPending,
       isUploadingProfilePicture: loadingStates.isUploadingProfilePicture,
     },
   };

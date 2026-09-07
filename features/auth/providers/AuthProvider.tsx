@@ -17,6 +17,7 @@ interface AuthProviderValue {
   authPhase: 'checking' | 'authed' | 'guest';
   userIdCache: AppUser['id'] | null;
   isValidatedWithServer: boolean;
+  logout: () => Promise<void>;
   completeAuthSession: (accessToken: string, refreshToken: string, userId: AppUser['id']) => Promise<void>;
 }
 
@@ -141,11 +142,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const value = useMemo<AuthProviderValue>(
     () => ({
       authPhase,
+      logout,
       userIdCache: userIdCache ?? null,
       isValidatedWithServer,
       completeAuthSession,
     }),
-    [userIdCache, isValidatedWithServer, authPhase, completeAuthSession],
+    [userIdCache, isValidatedWithServer, authPhase, completeAuthSession, logout],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

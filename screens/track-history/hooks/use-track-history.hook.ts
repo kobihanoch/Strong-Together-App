@@ -90,13 +90,15 @@ const useTrackHistory = (initialDate?: string) => {
       cardioWeek: getTrackCardioWeek(cardioData.weeklyCardioMap, selectedDate),
       isCardioEditing: cardioLoading.isEditing,
       isCardioDeleting: cardioLoading.isDeleting,
-      isLoading: workoutLoading.isPending || exerciseLoading.isPending || prsLoading.isPending || planLoading.isPending || cardioLoading.isPending,
     },
     actions: {
       setDate,
       toggleExercise: (id: number) => setExpandedId((current) => (current === id ? null : id)),
       updateCardio: (id: number, record: Parameters<typeof cardioActions.updateCardio>[0]['record']) => cardioActions.updateCardio({ id, record }),
       deleteCardio: cardioActions.deleteCardio,
+    },
+    loadingStates: {
+      isPending: workoutLoading.isPending || exerciseLoading.isPending || prsLoading.isPending || planLoading.isPending || cardioLoading.isPending,
     },
   };
 };
