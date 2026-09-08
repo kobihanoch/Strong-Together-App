@@ -42,7 +42,14 @@ const Inbox = () => {
           !loadingStates.isPending && data.allReceivedMessages.length === 0 && styles.emptyContent,
         ]}
         showsVerticalScrollIndicator={false}
-        refreshControl={<RefreshControl refreshing={isRefreshing} onRefresh={refresh} tintColor={data.theme.primary} />}
+        refreshControl={
+          <RefreshControl
+            refreshing={isRefreshing}
+            onRefresh={refresh}
+            tintColor={data.theme.primary}
+            colors={[data.theme.primary]}
+          />
+        }
         ListHeaderComponent={
           <View
             style={[

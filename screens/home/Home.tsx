@@ -29,7 +29,14 @@ const Home = () => {
   return (
     <SafeAreaView style={[styles.safeArea, { backgroundColor: data.theme.canvas }]} edges={['top']}>
       <ScrollView
-        refreshControl={<RefreshControl refreshing={isRefreshing} onRefresh={refresh} tintColor={data.theme.primary} />}
+        refreshControl={
+          <RefreshControl
+            refreshing={isRefreshing}
+            onRefresh={refresh}
+            tintColor={data.theme.primary}
+            colors={[data.theme.primary]}
+          />
+        }
         contentContainerStyle={[styles.content, { paddingHorizontal: horizontalPadding, gap: sectionGap }]}
         showsVerticalScrollIndicator={false}
       >

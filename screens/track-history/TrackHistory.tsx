@@ -34,7 +34,14 @@ const TrackHistory = () => {
       <ScrollView
         contentContainerStyle={{ paddingHorizontal: gutter, paddingBottom: height * 0.04 }}
         showsVerticalScrollIndicator={false}
-        refreshControl={<RefreshControl refreshing={isRefreshing} onRefresh={refresh} tintColor={data.theme.primary} />}
+        refreshControl={
+          <RefreshControl
+            refreshing={isRefreshing}
+            onRefresh={refresh}
+            tintColor={data.theme.primary}
+            colors={[data.theme.primary]}
+          />
+        }
       >
         <View style={[styles.header, { paddingTop: height * 0.015 }]}>
           <View>

@@ -1,140 +1,72 @@
-# Refactored frontend architecture
+# Frontend architecture
 
-This document maps the screens that currently follow the refactored `screen -> screen logic hook -> feature hook -> TanStack Query` structure. Auth, Intro, Settings, Analytics, and Start Workout are outside this dependency map because they do not yet follow that structure end to end. Start Workout is shown only as a navigation destination.
+## The rule that organizes v6
 
-For the system context, containers, provider lifecycle, socket sequence, and complete application flow, see [C4 architecture and application flow](./c4-architecture-overview.md).
+State is classified before it is stored:
 
-## Main screen flow
+| Kind of state            | Owner          | Examples                                                     |
+| ------------------------ | -------------- | ------------------------------------------------------------ |
+| Authentication lifecycle | `AuthProvider` | Auth phase, cached user ID, server-validation gate, logout   |
+| Remote/server state      | TanStack Query | User, plan, messages, history, statistics, cardio, schedules |
+| Durable client state     | Zustand        | Active workout, theme, detected timezone                     |
+| Temporary UI state       | React          | Open sheet, selected row, form input, animation state        |
 
-```mermaid
-flowchart LR
-  Home[Home]
-  Plan[My Workout Plan]
-  Editor[Create / Edit Workout]
-  Start[Start Workout<br/>not yet refactored]
-  History[Track History]
-  Profile[Profile]
-  Inbox[Inbox]
+This avoids duplicated sources of truth. A server response is not copied into Context, and a local workout draft is not forced into a network cache.
 
-  Home -->|bottom navigation| Plan
-  Home -->|bottom navigation| History
-  Home -->|bottom navigation| Profile
-  Home -->|unread messages| Inbox
-  Home -->|no plan / create plan| Editor
-  Home -->|next workout| Start
-  Plan -->|create or edit| Editor
-  Plan -->|start selected split| Start
-  Start -->|workout saved| History
-  History -->|view plan| Plan
-
-  classDef external fill:#f5f5f5,stroke:#888,stroke-dasharray:5 5,color:#555;
-  class Start external;
-```
-
-The persistent bottom navigation connects `Home`, `MyWorkoutPlan`, `TrackHistory`, and `Profile` in both directions. The arrows above emphasize the main task flow rather than repeating every tab-to-tab combination.
-
-## Screen-to-data dependency map
+## Dependency direction
 
 ```mermaid
 flowchart LR
-  subgraph Screens
-    SHome[Home]
-    SPlan[MyWorkoutPlan]
-    SHistory[TrackHistory]
-    SEditor[CreateWorkout]
-    SProfile[Profile]
-    SInbox[Inbox]
-  end
-
-  subgraph Screen_logic_hooks[Screen logic hooks]
-    LHome[useHomeScreen<br/><small>use-home-screen.hook.ts</small>]
-    LPlan[useMyWorkoutPlanScreen]
-    LHistory[useTrackHistoryScreen]
-    LEditor[useCreateWorkoutScreen]
-    LProfile[useProfileScreen]
-    LInbox[useInboxScreen]
-  end
-
-  subgraph Feature_hooks[Feature hooks]
-    FUser[useUser]
-    FMessages[useMessages]
-    FPlan[useWorkoutPlan]
-    FExercises[useExercises]
-    FCardio[useCardio]
-    FDashboard[useDashboard]
-    FWorkoutHistory[useWorkoutHistory]
-    FExerciseHistory[useExerciseHistory]
-    FPrHistory[usePrHistory]
-  end
-
-  subgraph TanStack_keys[TanStack query keys]
-    KUser["['user', userId]"]
-    KMessages["['messages', userId]"]
-    KPlan["['workout-plan', userId]"]
-    KExercises["['exercises', userId]"]
-    KCardio["['cardio-maps', userId]"]
-    KDashboard["['home-dashboard', userId]"]
-    KWorkoutHistory["['workout-history', userId]"]
-    KExerciseHistory["['exercise-history', userId]"]
-    KPrHistory["['pr-history', userId]"]
-  end
-
-  SHome --> LHome
-  SPlan --> LPlan
-  SHistory --> LHistory
-  SEditor --> LEditor
-  SProfile --> LProfile
-  SInbox --> LInbox
-
-  LHome --> FUser
-  LHome --> FMessages
-  LHome --> FPlan
-  LHome --> FCardio
-  LHome --> FDashboard
-
-  LPlan --> FPlan
-  LPlan --> FWorkoutHistory
-  LPlan --> FExerciseHistory
-  LPlan --> FDashboard
-
-  LHistory --> FWorkoutHistory
-  LHistory --> FExerciseHistory
-  LHistory --> FPrHistory
-  LHistory --> FPlan
-  LHistory --> FCardio
-
-  LEditor --> FPlan
-  LEditor --> FExercises
-  LProfile --> FUser
-  LInbox -->|via MessagesProvider| FMessages
-
-  FUser --> KUser
-  FMessages --> KMessages
-  FPlan --> KPlan
-  FExercises --> KExercises
-  FCardio --> KCardio
-  FDashboard --> KDashboard
-  FWorkoutHistory --> KWorkoutHistory
-  FExerciseHistory --> KExerciseHistory
-  FPrHistory --> KPrHistory
+    Screen --> ScreenHook[Screen composition hook]
+    ScreenHook --> FeatureHook[Feature hook]
+    FeatureHook --> Query[TanStack Query]
+    FeatureHook --> Store[Zustand selector]
+    Query --> Service[Typed service]
+    Service --> API[Axios infrastructure]
 ```
 
-## Dependency inventory
+- **Screens** render and forward user events.
+- **Screen hooks** assemble view-ready data, navigation, and local workflow state.
+- **Feature hooks** own queries, mutations, derived domain helpers, and invalidation.
+- **Services** express endpoints using `@strong-together/shared` contracts.
+- **Infrastructure** owns HTTP security, retries, tracing, persistence, and sockets.
 
-| Screen | Screen logic hook | Consumed feature hooks and TanStack query keys |
-| --- | --- | --- |
-| `Home` | `useHomeScreen` | `useUser` -> `['user', userId]`; `useMessages` -> `['messages', userId]`; `useWorkoutPlan` -> `['workout-plan', userId]`; `useCardio` -> `['cardio-maps', userId]`; `useDashboard` -> `['home-dashboard', userId]` |
-| `MyWorkoutPlan` | `useMyWorkoutPlanScreen` | `useWorkoutPlan` -> `['workout-plan', userId]`; `useWorkoutHistory` -> `['workout-history', userId]`; `useExerciseHistory` -> `['exercise-history', userId]`; `useDashboard` -> `['home-dashboard', userId]` |
-| `TrackHistory` | `useTrackHistoryScreen` | `useWorkoutHistory` -> `['workout-history', userId]`; `useExerciseHistory` -> `['exercise-history', userId]`; `usePrHistory` -> `['pr-history', userId]`; `useWorkoutPlan` -> `['workout-plan', userId]`; `useCardio` -> `['cardio-maps', userId]` |
-| `CreateWorkout` | `useCreateWorkoutScreen` | `useWorkoutPlan` -> `['workout-plan', userId]`; `useExercises` -> `['exercises', userId]` |
-| `Profile` | `useProfileScreen` | `useUser` -> `['user', userId]` |
-| `Inbox` | `useInboxScreen` | `useMessages` (through `MessagesProvider`) -> `['messages', userId]` |
+Feature hooks return `data`, `loadingStates`, and `actions`. That stable boundary makes screens readable and makes feature behavior testable without embedding transport logic in JSX.
 
-All keys are query keys. The feature mutations currently do not declare `mutationKey`; on success, they update the associated query cache using the key shown above.
+## Feature map
 
-## Layer responsibilities
+| Screen            | Composition hook           | Primary feature hooks                                              |
+| ----------------- | -------------------------- | ------------------------------------------------------------------ |
+| Home              | `useHomeScreen`            | User, messages, plan, cardio, dashboard, workout history, schedule |
+| My Workout Plan   | `useMyWorkoutPlanScreen`   | Plan, workout history, exercise history, dashboard                 |
+| Create Workout    | `useCreateWorkoutScreen`   | Plan and exercise library                                          |
+| Workout Session   | `useWorkoutSessionScreen`  | Persisted workout session, exercise history, PRs, exercise library |
+| Workout Summary   | `useWorkoutSummaryScreen`  | Persisted session summary and PR history                           |
+| Track History     | `useTrackHistoryScreen`    | Workout/exercise/PR history, plan, cardio                          |
+| Workout Schedules | `useWorkoutScheduleScreen` | Schedule, reminders, notification permission, plan                 |
+| Profile           | `useProfileScreen`         | Current user and profile mutations                                 |
+| Inbox             | `useInboxScreen`           | Messages and cache-aware message actions                           |
 
-- **Screen:** renders UI and forwards user events.
-- **Screen logic hook:** combines feature data, derives presentation state, owns screen-local state, and exposes screen actions.
-- **Feature hook:** owns server operations, TanStack loading state, and cache updates for one domain.
-- **TanStack Query cache:** stores authenticated server state, partitioned by `userId`.
+## Decisions and tradeoffs
+
+- **Feature-first folders:** code that changes together is colocated. The tradeoff is some repeated folder names, but ownership is easier to find than in global `components`, `hooks`, and `services` buckets.
+- **Composition hooks instead of smart screens:** route files remain visual. The extra hook layer pays for itself when several domains feed one screen.
+- **Shared API contracts:** compile-time drift detection is stronger than handwritten client DTOs. It couples releases to the shared package intentionally.
+- **Authoritative refetch after complex mutations:** the server projection wins after a write. This costs a request but avoids fragile manual reconciliation.
+- **Derived values remain derived:** progress, next workout, counts, and view models are recomputed rather than persisted as competing truth.
+- **Context is narrow:** React Context distributes the auth lifecycle and resolved theme palette; it is not a general state database.
+- **Cleanup belongs to the owner:** socket listeners, workout reminders, query data, credentials, and request headers have explicit teardown paths.
+
+## Why this is better than the previous architecture
+
+| Previous approach                               | v6                                                                              | Result                                                                    |
+| ----------------------------------------------- | ------------------------------------------------------------------------------- | ------------------------------------------------------------------------- |
+| Domain providers copied API state.              | Query cache is the sole remote-state owner.                                     | Fewer providers and synchronization bugs.                                 |
+| Custom SWR/bootstrap caching.                   | Persisted TanStack Query with version busting.                                  | Standard freshness, deduplication, invalidation, and hydration semantics. |
+| Auth readiness and data readiness were coupled. | Auth validation, Query hydration, and Zustand hydration are separate gates.     | Each startup state has one meaning.                                       |
+| Workout state followed screen lifetime.         | Versioned Zustand persistence owns the complete session.                        | Crash/restart recovery and retry-safe saves.                              |
+| Refresh could be initiated concurrently.        | One shared refresh transaction plus session generation.                         | Rotation is race-safe and logout cannot be undone by a late request.      |
+| Socket responsibility was distributed.          | One authenticated effect owns connect/listen/disconnect.                        | Deterministic realtime lifecycle.                                         |
+| Storage roles overlapped.                       | SecureStore, Query persistence, and Zustand persistence have strict boundaries. | Easier security review and migration.                                     |
+
+v6 is simpler where the problem is standard and explicit where the problem is security- or lifecycle-sensitive.

@@ -26,7 +26,14 @@ const MyWorkoutPlan = () => {
   return (
     <SafeAreaView style={[styles.safeArea, { backgroundColor: data.theme.canvas }]} edges={['top']}>
       <ScrollView
-        refreshControl={<RefreshControl refreshing={isRefreshing} onRefresh={refresh} tintColor={data.theme.primary} />}
+        refreshControl={
+          <RefreshControl
+            refreshing={isRefreshing}
+            onRefresh={refresh}
+            tintColor={data.theme.primary}
+            colors={[data.theme.primary]}
+          />
+        }
         contentContainerStyle={{
           paddingTop: Math.max(10, Math.min(height * 0.015, 14)),
           paddingHorizontal: gutter,
