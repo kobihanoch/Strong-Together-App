@@ -129,7 +129,7 @@ const WorkoutSession = ({ route, navigation }: Props) => {
             <ExerciseCompletionActions
               theme={data.theme}
               workoutComplete={data.isPlannedWorkoutComplete}
-              canAddExtraSet={!data.isActiveExerciseAdded}
+              canAddExtraSet={data.canAddExtraSet}
               onNext={actions.selectNextIncompleteExercise}
               onFinish={actions.finishWorkout}
               onAddSet={actions.addSet}

@@ -4,10 +4,10 @@ import { clearTanStackCache } from '../../../infrastructure/query/query-client';
 import { AppUser } from '../../user/types/user.types';
 import { clearWorkoutSessionStorage } from '../../workouts/session/utils/workout-session-cache.utils';
 import { cancelWorkoutSessionReminder } from '../../workouts/session/utils/workout-session-reminder.utils';
-import { onForceLogout } from '../events/auth-events.event';
+import { onForceLogout, resetForceLogout } from '../events/auth-events.event';
 import useInitialCheck from '../hooks/auth-provider-effects/use-initial-check.hook';
 import useRetryServerValidationWhenOnline from '../hooks/auth-provider-effects/use-retry-server-validation-when-online.hook';
-import { logoutUser, refreshAndRotateTokens } from '../services/auth.service';
+import { logoutUser, refreshSessionOnce } from '../services/auth.service';
 import { setAccessToken, setUsernameInHeader } from '../utils/auth.utils';
 import { clearAuthStorage, saveRefreshToken, saveUserId } from '../utils/token-storage.utils';
 
@@ -46,16 +46,23 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const logoutPromiseRef = useRef<Promise<void> | null>(null);
 
   // Functions ---------------------------------------------------------------------
+  // For server validations
+  const activateAuthState = useCallback((userId: AppUser['id']) => {
+    resetForceLogout();
+    setUserIdCache(userId);
+    setIsValidatedWithServer(true);
+    setAuthPhase('authed');
+    console.log('\x1b[32m[Auth Context]: Auth completed!\x1b[0m');
+  }, []);
+
+  // For login functions
   const completeAuthSession = useCallback(
     async (accessToken: string, refreshToken: string, userId: AppUser['id']) => {
       await Promise.all([saveRefreshToken(refreshToken), saveUserId(userId)]);
       setAccessToken(accessToken);
-      setUserIdCache(userId);
-      setIsValidatedWithServer(true);
-      setAuthPhase('authed');
-      console.log('\x1b[32m[Auth Context]: Auth completed!\x1b[0m');
+      activateAuthState(userId);
     },
-    [setAuthPhase, setIsValidatedWithServer, setUserIdCache],
+    [activateAuthState],
   );
 
   const logout = useCallback((): Promise<void> => {
@@ -96,8 +103,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       // Avoid duplicate refresh attempts during unstable network transitions
       if (serverValidatingLockRef.current) return;
       serverValidatingLockRef.current = true;
-      const { accessToken: at, refreshToken: rt, userId } = await refreshAndRotateTokens();
-      await completeAuthSession(at, rt, userId);
+      const { userId } = await refreshSessionOnce();
+      activateAuthState(userId);
     } catch (e) {
       if (e instanceof AxiosError) {
         const shouldKeepSession = e.isUpgradeRequired || e.isNetworkError || e.isServerError;
@@ -127,7 +134,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       attemptedServerValidationRef.current = true;
       serverValidatingLockRef.current = false;
     }
-  }, [completeAuthSession, logout]);
+  }, [activateAuthState, logout]);
 
   // Side Effects -----------------------------------------------------------------------------------
   // Restore cached session on app start, then validate it in the background

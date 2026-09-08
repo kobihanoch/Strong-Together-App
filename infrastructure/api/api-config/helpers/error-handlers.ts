@@ -1,23 +1,9 @@
 import { AxiosError, AxiosInstance } from 'axios';
-import { refreshAndRotateTokens } from '../../../../features/auth/services/auth.service';
-import { setAccessToken } from '../../../../features/auth/utils/auth.utils';
-import { saveRefreshToken } from '../../../../features/auth/utils/token-storage.utils';
+import { refreshSessionOnce } from '../../../../features/auth/services/auth.service';
 import { showErrorAlert } from '../../../../shared/alerts/error-alerts';
 import { openUpdateModal } from '../../../../shared/utils/imperative-update-modal';
 import { notifyOffline, notifyServerDown } from './network-check';
 import { emitForceLogout } from '../../../../features/auth/events/auth-events.event';
-
-let refreshPromise: ReturnType<typeof refreshAndRotateTokens> | null = null;
-
-// Concurrent 401s must share one refresh because refresh tokens are rotated.
-const refreshTokensOnce = () => {
-  if (!refreshPromise) {
-    refreshPromise = refreshAndRotateTokens().finally(() => {
-      refreshPromise = null;
-    });
-  }
-  return refreshPromise;
-};
 
 export const handleUpdateRequired = (error: AxiosError) => {
   openUpdateModal(); // <-- imperative show
@@ -51,12 +37,18 @@ export const handle401 = async (api: AxiosInstance, error: AxiosError<{ message?
     authHeader: String(firstRequest.headers?.Authorization)?.slice(0, 32) + '...',
   });
   try {
-    // Try to refresh
-    // Flag for second retry
+    // Retry once with an access token that another completed refresh may have
+    // already installed while this request was in flight.
     firstRequest._retry = true;
-    const { refreshToken, accessToken } = await refreshTokensOnce();
-    await saveRefreshToken(refreshToken);
-    setAccessToken(accessToken);
+    const currentAuthorization = api.defaults.headers.common.Authorization;
+    if (currentAuthorization && String(firstRequest.headers?.Authorization) !== String(currentAuthorization)) {
+      firstRequest.headers = firstRequest.headers || {};
+      firstRequest.headers.Authorization = currentAuthorization;
+      return api(firstRequest);
+    }
+
+    // Otherwise join the single app-wide refresh transaction.
+    const { accessToken } = await refreshSessionOnce();
     firstRequest.headers = firstRequest.headers || {};
     firstRequest.headers.Authorization = `DPoP ${accessToken}`;
     return api(firstRequest);

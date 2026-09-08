@@ -66,7 +66,7 @@ Register creates the account and shows a success notification asking the user to
 
 ## Server Validation
 
-`attemptServerValidation()` calls `refreshAndRotateTokens()` to prove the refresh token is still valid and receive a fresh access token.
+`attemptServerValidation()` calls `refreshSessionOnce()` to join the app-wide refresh transaction, prove the refresh token is still valid, persist its rotation, and activate the fresh access token.
 
 Important behavior:
 

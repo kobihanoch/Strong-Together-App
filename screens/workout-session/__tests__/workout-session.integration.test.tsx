@@ -72,12 +72,49 @@ describe('Workout Session core paths and edge cases', () => {
     return hook;
   };
 
+  it('allows consecutive sets on an exercise added during the workout', async () => {
+    const session = await renderSession();
+    const { result } = session;
+
+    act(() => result.current.session.actions.addExercise({ id: 2, name: 'Cable Fly' } as never));
+    await waitFor(() => expect(result.current.session.data.isActiveExerciseAdded).toBe(true));
+    expect(result.current.session.data.sets).toHaveLength(1);
+    expect(result.current.session.data.canAddExtraSet).toBe(false);
+
+    act(() => result.current.session.actions.updateWeight(20));
+    act(() => result.current.session.actions.updateReps(12));
+    await waitFor(() => expect(result.current.session.data.canCompleteActiveSet).toBe(true));
+    await act(async () => {
+      result.current.session.actions.completeSet();
+      await Promise.resolve();
+    });
+    await waitFor(() => expect(result.current.session.data.canAddExtraSet).toBe(true));
+
+    act(() => result.current.session.actions.addSet());
+    await waitFor(() => expect(result.current.session.data.sets).toHaveLength(2));
+    expect(result.current.session.data.setIndex).toBe(1);
+    expect(result.current.session.data.canAddExtraSet).toBe(false);
+
+    act(() => result.current.session.actions.updateWeight(20));
+    act(() => result.current.session.actions.updateReps(10));
+    await act(async () => {
+      result.current.session.actions.completeSet();
+      await Promise.resolve();
+    });
+    await waitFor(() => expect(result.current.session.data.canAddExtraSet).toBe(true));
+
+    act(() => result.current.session.actions.addSet());
+    await waitFor(() => expect(result.current.session.data.sets).toHaveLength(3));
+    session.unmount();
+  });
+
   /**
    * Edge case: invalid metrics cannot be completed. Negative edits are clamped,
    * and repeated completion cannot duplicate progress or advance past bounds.
    */
   it('guards set input and preserves a failed draft before normalized retry submission', async () => {
-    const { result } = await renderSession();
+    const session = await renderSession();
+    const { result } = session;
     expect(result.current.session.data.canCompleteActiveSet).toBe(false);
 
     act(() => result.current.session.actions.updateWeight(-20));
@@ -115,5 +152,7 @@ describe('Workout Session core paths and edge cases', () => {
     const submission = mockedApi.post.mock.calls.find(([url]) => url === '/api/workout-sessions')?.[1] as any;
     expect(submission.workout).toEqual([expect.objectContaining({ trackedSets: [{ setIndex: 0, weight: 80, reps: 8 }] })]);
     expect(useWorkoutSessionStore.getState().draft).toBeNull();
+    session.unmount();
   });
+
 });

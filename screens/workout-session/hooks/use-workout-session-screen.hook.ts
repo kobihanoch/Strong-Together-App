@@ -55,9 +55,7 @@ const useWorkoutSessionScreen = (workoutSplit: WorkoutSplit, navigation: StackNa
   const isActiveSetCompleted = completedSetKeys.includes(setKey);
   const canCompleteActiveSet = Boolean(activeSet && !isActiveSetCompleted && activeSet.weight > 0 && activeSet.reps > 0);
   const lastSet = draftExercise?.trackedSets.at(-1);
-  const canAddExtraSet = Boolean(
-    !isActiveExerciseAdded && lastSet && completedSetKeys.includes(`${exerciseKey}:${lastSet.setIndex}`),
-  );
+  const canAddExtraSet = Boolean(lastSet && completedSetKeys.includes(`${exerciseKey}:${lastSet.setIndex}`));
 
   const workout = data.draft?.workout ?? [];
   const totalSets = getTotalSets(workout);
