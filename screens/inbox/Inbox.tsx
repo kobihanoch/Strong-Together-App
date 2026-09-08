@@ -8,10 +8,13 @@ import { colors } from '../../shared/constants/colors';
 import type { UserMessage } from '../../features/messages/types/messages.types';
 import { usePullToRefresh } from '../../shared/hooks/use-pull-to-refresh.hook';
 const { width } = Dimensions.get('window');
+
 const inboxQueryNames = ['messages'];
 
 const Inbox = () => {
-  const { allReceivedMessages, confirmAndDeleteMessage, markAsRead, unreadMessagesCount } = useInboxScreen();
+  const { data, actions } = useInboxScreen();
+  const { allReceivedMessages, unreadMessagesCount } = data;
+  const { confirmAndDeleteMessage, markAsRead } = actions;
   const { isRefreshing, refresh } = usePullToRefresh(inboxQueryNames);
 
   const renderItem: ListRenderItem<UserMessage> = useCallback(
@@ -75,7 +78,7 @@ const Inbox = () => {
           onRefresh={refresh}
           ListEmptyComponent={
             <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-            <Text style={{ fontFamily: 'Inter_600SemiBold', fontSize: RFValue(18) }}>No messages yet</Text>
+              <Text style={{ fontFamily: 'Inter_600SemiBold', fontSize: RFValue(18) }}>No messages yet</Text>
             </View>
           }
         />

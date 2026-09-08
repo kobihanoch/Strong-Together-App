@@ -16,7 +16,6 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { NotifierRoot } from 'react-native-notifier';
 import AuthenticatedUserEffects from './features/auth/components/AuthenticatedUserEffects';
 import { AuthProvider, useAuth } from './features/auth/providers/AuthProvider';
-import { MessagesProvider } from './features/messages/providers/MessagesProvider';
 import ensureDpopKeyPair from './infrastructure/api/dpop/ensureDpopKeyPair';
 import { cacheHousekeepingOnBoot } from './infrastructure/cache/cache.constants';
 import { logRestoredQueryCache, queryClient, queryPersistOptions } from './infrastructure/query/query-client';
@@ -142,10 +141,10 @@ function QueryHydrationGate({ children }: { children: React.ReactNode }) {
 // ---------- Authenticated app-wide state ----------
 function AuthenticatedApp() {
   return (
-    <MessagesProvider>
+    <>
       <AuthenticatedUserEffects />
       <MainApp />
-    </MessagesProvider>
+    </>
   );
 }
 

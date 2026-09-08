@@ -9,7 +9,7 @@ import {
   selectWorkoutSplit,
 } from '../utils/my-workout-plan.utils';
 
-import useDashboard from '../../../features/dashboard/use-dashboard.hook';
+import useDashboard from '../../../features/dashboard/hooks/use-dashboard.hook';
 import { useExerciseHistory } from '../../../features/workouts/history/hooks/use-exercise-history.hook';
 import { useWorkoutHistory } from '../../../features/workouts/history/hooks/use-workout-history.hook';
 import { useWorkoutPlan } from '../../../features/workouts/plan/hooks/use-workout-plan.hook';

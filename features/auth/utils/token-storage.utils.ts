@@ -21,6 +21,7 @@ export async function getUserId() {
   return SecureStore.getItemAsync(USER_ID_KEY);
 }
 
+/** Clears persisted refresh token and user ID */
 export async function clearAuthStorage() {
   await Promise.all([SecureStore.deleteItemAsync(REFRESH_TOKEN_KEY), SecureStore.deleteItemAsync(USER_ID_KEY)]);
 }

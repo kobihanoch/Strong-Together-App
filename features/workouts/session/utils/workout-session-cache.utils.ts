@@ -8,7 +8,8 @@ export const WORKOUT_SESSION_CACHE_VERSION = Number(CACHE_VERSION?.replace(/\D/g
 
 export const workoutSessionStorage = createJSONStorage(() => AsyncStorage);
 
+/** Clears the active workout session draft if exists */
 export const clearWorkoutSessionStorage = async (): Promise<void> => {
   useWorkoutSessionStore.getState().resetWorkout();
-  useWorkoutSessionStore.persist.clearStorage();
+  await AsyncStorage.removeItem(WORKOUT_SESSION_STORAGE_KEY);
 };

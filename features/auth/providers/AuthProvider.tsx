@@ -1,9 +1,7 @@
 import { AxiosError } from 'axios';
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { clearTanStackCache } from '../../../infrastructure/query/query-client';
-import { disconnectSocket } from '../../../infrastructure/socket';
 import { AppUser } from '../../user/types/user.types';
-import { useWorkoutSessionStore } from '../../workouts/session/hooks/use-workout-session-store.hook';
 import { clearWorkoutSessionStorage } from '../../workouts/session/utils/workout-session-cache.utils';
 import { cancelWorkoutSessionReminder } from '../../workouts/session/utils/workout-session-reminder.utils';
 import { onForceLogout } from '../events/auth-events.event';
@@ -63,7 +61,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       setUserIdCache(userId);
       setIsValidatedWithServer(true);
       setAuthPhase('authed');
-      console.log('\x1b[32m[Auth Context]: Login succeeded!\x1b[0m');
+      console.log('\x1b[32m[Auth Context]: Auth completed!\x1b[0m');
     },
     [setAuthPhase, setIsValidatedWithServer, setUserIdCache],
   );
@@ -75,17 +73,21 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       try {
         await logoutUser();
       } finally {
-        disconnectSocket();
+        // Switching to the guest tree unmounts AuthenticatedUserEffects, the
+        // single owner responsible for disconnecting the authenticated socket.
+        // ----------------- Context reset -----------------
+        setUserIdCache(undefined);
+        setIsValidatedWithServer(false);
+        setAuthPhase('guest');
+        // AsyncStorage reset
         await clearAuthStorage();
         await clearTanStackCache();
         await cancelWorkoutSessionReminder();
         await clearWorkoutSessionStorage();
-        useWorkoutSessionStore.getState().resetWorkout();
+        // ----------------- API Headers reset -----------------
         setAccessToken(null);
         setUsernameInHeader(null);
-        setUserIdCache(undefined);
-        setIsValidatedWithServer(false);
-        setAuthPhase('guest');
+        // ----------------- Refs reset -----------------
         serverValidatingLockRef.current = false;
         attemptedServerValidationRef.current = false;
       }
@@ -103,13 +105,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       if (serverValidatingLockRef.current) return;
       serverValidatingLockRef.current = true;
       const { accessToken: at, refreshToken: rt, userId } = await refreshAndRotateTokens();
-      await Promise.all([saveRefreshToken(rt), saveUserId(userId)]);
-      setAccessToken(at);
-      console.log('\x1b[32m[Auth Context]: Validation with server completed.\x1b[0m');
-      setIsValidatedWithServer(true);
-      setUserIdCache(userId);
+      await completeAuthSession(at, rt, userId);
     } catch (e) {
       if (e instanceof AxiosError) {
+        const shouldKeepSession = e.isUpgradeRequired || e.isNetworkError || e.isServerError;
+        if (!shouldKeepSession) {
+          await logout();
+          return;
+        }
         if (e.isUpgradeRequired) {
           console.log('\x1b[31m[Auth Context]: Upgrade required. Modal is up.\x1b[0m');
           setIsValidatedWithServer(false);
@@ -132,7 +135,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       attemptedServerValidationRef.current = true;
       serverValidatingLockRef.current = false;
     }
-  }, [attemptedServerValidationRef, logout, serverValidatingLockRef, setIsValidatedWithServer, setUserIdCache]);
+  }, [completeAuthSession, logout]);
 
   // Side Effects -----------------------------------------------------------------------------------
   // Restore cached session on app start, then validate it in the background
