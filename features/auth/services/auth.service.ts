@@ -4,6 +4,12 @@ import { setAccessToken } from '../utils/auth.utils';
 import { getRefreshToken, saveRefreshToken, saveUserId } from '../utils/token-storage.utils';
 
 let refreshPromise: Promise<RefreshTokenResponse> | null = null;
+let sessionGeneration = 0;
+
+/** Prevents an in-flight refresh from restoring credentials after logout starts. */
+export const invalidateSessionRefreshes = (): void => {
+  sessionGeneration += 1;
+};
 
 /**
  * Runs the complete refresh-token rotation as one shared transaction.
@@ -14,12 +20,15 @@ export const refreshSessionOnce = (): Promise<RefreshTokenResponse> => {
   if (refreshPromise) return refreshPromise;
 
   refreshPromise = (async () => {
+    const generationAtStart = sessionGeneration;
     const refreshToken = await getRefreshToken();
     if (!refreshToken) throw new Error('No stored refresh token');
 
     const { data } = await api.post<RefreshTokenResponse>('/api/auth/refresh', null, {
       headers: { 'x-refresh-token': `DPoP ${refreshToken}` },
     });
+
+    if (generationAtStart !== sessionGeneration) throw new Error('Session changed during refresh');
 
     // Do not release waiting requests until the rotated credentials are both
     // persisted and active on the shared API client.

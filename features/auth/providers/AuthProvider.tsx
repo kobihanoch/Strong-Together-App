@@ -7,7 +7,7 @@ import { cancelWorkoutSessionReminder } from '../../workouts/session/utils/worko
 import { onForceLogout, resetForceLogout } from '../events/auth-events.event';
 import useInitialCheck from '../hooks/auth-provider-effects/use-initial-check.hook';
 import useRetryServerValidationWhenOnline from '../hooks/auth-provider-effects/use-retry-server-validation-when-online.hook';
-import { logoutUser, refreshSessionOnce } from '../services/auth.service';
+import { invalidateSessionRefreshes, logoutUser, refreshSessionOnce } from '../services/auth.service';
 import { setAccessToken, setUsernameInHeader } from '../utils/auth.utils';
 import { clearAuthStorage, saveRefreshToken, saveUserId } from '../utils/token-storage.utils';
 
@@ -68,6 +68,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const logout = useCallback((): Promise<void> => {
     if (logoutPromiseRef.current) return logoutPromiseRef.current;
 
+    invalidateSessionRefreshes();
     const logoutPromise = (async () => {
       try {
         await logoutUser();
