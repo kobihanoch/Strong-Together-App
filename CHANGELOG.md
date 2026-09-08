@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [6.0.0-rc.0](https://github.com/kobihanoch/Strong-Together-App/compare/v5.2.1...v6.0.0-rc.0) (2026-09-08)
+
+
+### Features
+
+* **Sync:** Added pull to refresh to each page ([5abb9c7](https://github.com/kobihanoch/Strong-Together-App/commit/5abb9c72a17911d6229382d674b72e0ad9cd7bde))
+* **TanStack:** Refactored all caching mechanism to work with TanStack, and refactored providers architecture. ([724f7d0](https://github.com/kobihanoch/Strong-Together-App/commit/724f7d0868ed53f015f4d142101b68dfcaf31a9c))
+* **Wokrout Schedules:** Implemented custom workout scheduling ([b9afd31](https://github.com/kobihanoch/Strong-Together-App/commit/b9afd31597dcad6cb4d8d6981ee8585cf5e5d4cf))
+* **Workout Session:** Added exercise adding during workout, and extra sets adding ([9b56d21](https://github.com/kobihanoch/Strong-Together-App/commit/9b56d21562eb6f8a5b23165e13e6d42868a27e06))
+* **Workout Session:** Push notifications is sent after 2 hours of inactivity ([ddfc6a6](https://github.com/kobihanoch/Strong-Together-App/commit/ddfc6a6831b55dcff2b15c353799bffbf0274827))
+
+
+### Bug Fixes
+
+* **Logout:** FIxed expo push resetting on logout (best effort). ([09cb8af](https://github.com/kobihanoch/Strong-Together-App/commit/09cb8af7ffd66a8c92201cd85affef5c62f450e5))
+
 ### [5.2.1](https://github.com/kobihanoch/Strong-Together-App/compare/v5.2.1-rc.0...v5.2.1) (2026-04-25)
 
 ### [5.2.1-rc.0](https://github.com/kobihanoch/Strong-Together-App/compare/v5.2.0...v5.2.1-rc.0) (2026-04-25)
