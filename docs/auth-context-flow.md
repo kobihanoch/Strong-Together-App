@@ -1,70 +1,88 @@
-# Auth Context Flow
+# Authentication lifecycle
 
-## Table of Contents
+## Responsibility
 
-1. [Purpose](#purpose)
-2. [Session Bootstrap](#session-bootstrap)
-3. [Login and OAuth](#login-and-oauth)
-4. [Server Validation](#server-validation)
-5. [Logout](#logout)
-6. [Related Files](#related-files)
+`AuthProvider` owns only the mobile session lifecycle:
 
-## Purpose
+- `authPhase`: `checking`, `authed`, or `guest`;
+- cached authenticated user ID;
+- whether this run has been validated with the server;
+- login completion and idempotent logout;
+- startup validation and online retry.
 
-`AuthProvider` owns the mobile session lifecycle: **user state**, **login/register/OAuth actions**, **cached session recovery**, **server validation**, **refresh token rotation**, **socket initialization**, and **logout cleanup**.
+The current user profile is TanStack Query data, not auth context state.
 
-## Session Bootstrap
+## Restore and validation
 
-On mount, the provider checks two local values:
+```mermaid
+sequenceDiagram
+    participant App
+    participant Auth as AuthProvider
+    participant Secure as SecureStore
+    participant API
+    participant Query as Feature queries
+    App->>Auth: Mount
+    Auth->>Secure: Read user ID + refresh token
+    alt either value is missing
+        Auth->>Auth: logout cleanup -> guest
+    else both exist
+        Auth->>Auth: authed (cached UI may render)
+        Auth->>API: refreshSessionOnce()
+        alt valid
+            API-->>Auth: access token + rotated refresh token + user ID
+            Auth->>Secure: Save rotation atomically
+            Auth->>Auth: validated = true
+            Auth->>Query: Enable fresh requests
+        else offline/server unavailable/upgrade required
+            Auth->>Auth: Keep cached session; validated = false
+        else invalid session
+            Auth->>Auth: Full logout
+        end
+    end
+```
 
-- `CACHE:USER_ID` from AsyncStorage-backed cache
-- refresh token from secure token storage
-
-If either value is missing, the user becomes a guest. If both exist, the app sets `isLoggedIn`, switches `authPhase` to `authed`, builds the auth cache key, and starts server validation.
-
-Cached user data is loaded through `useCacheAndFetch`, so the app can show previously known user data while validation runs.
+An online-status hook retries validation after a boot-time connectivity failure. It does not retry before the initial attempt or after validation has succeeded.
 
 ## Login and OAuth
 
-Credential login, Google login, and Apple login all follow the same shape:
+Password, Google, and Apple flows call separate typed services but converge on `completeAuthSession(accessToken, refreshToken, userId)`:
 
-1. Call the relevant auth service.
-2. Save the rotated refresh token.
-3. Store the access token in `GlobalAuth`.
-4. Save `CACHE:USER_ID`.
-5. Mark the session as validated.
-6. Let domain providers start their cache-first fetch flow.
+1. Persist refresh token and user ID in SecureStore.
+2. Install the access token in the shared Axios client's in-memory header.
+3. Reset forced-logout state.
+4. enter `authed` and mark the session server-validated.
 
-Register creates the account and shows a success notification asking the user to verify the account by email.
+One convergence point prevents OAuth and password login from drifting into different session semantics.
 
-## Server Validation
+## Race-safe token rotation
 
-`attemptServerValidation()` calls `refreshAndRotateTokens()` to prove the refresh token is still valid and receive a fresh access token.
+`refreshSessionOnce` is a single-flight transaction. Startup validation and every `401` handler join the same promise. Waiting requests are released only after the rotated refresh token/user ID are persisted and the new access token is active.
 
-Important behavior:
+`sessionGeneration` changes when logout starts. A refresh captures the generation before network I/O and refuses to install its result if the session changed meanwhile. This closes the classic “logout, then a late refresh logs me back in” race.
 
-- A lock prevents duplicate validation calls during unstable network states.
-- Network and server-down failures keep the user logged in with cached data.
-- Upgrade-required responses open the update modal and stop API validation.
-- True auth failures clear local session state.
-- When validation succeeds, `isValidatedWithServer` becomes `true`, which tells app providers they may revalidate from the API.
+On `401`, the interceptor first checks whether another request already installed a newer Authorization header. If so, it retries with that token; otherwise it joins the refresh transaction. Each original request is retried once.
 
-## Logout
+## Logout contract
 
-Logout is best-effort against the server, then always clears local state:
+Logout is idempotent: simultaneous callers share `logoutPromiseRef`. The API logout is best effort, but local cleanup always runs:
 
-- refresh token is removed
-- non-workout cache is cleared during auth cleanup
-- all cache is cleared on explicit logout path
-- access token and username headers are removed
-- bootstrap payload is reset
-- socket is disconnected
-- auth state returns to `guest`
+- invalidate in-flight refreshes;
+- enter the guest phase and disable validated queries;
+- clear SecureStore auth values;
+- cancel and remove the persisted workout session/reminder;
+- clear in-memory and persisted TanStack Query data;
+- remove access-token and username headers;
+- reset validation guards;
+- unmount authenticated effects, removing socket listeners and disconnecting the socket.
 
-## Related Files
+This ordering prioritizes local security and predictable UI even when the server cannot be reached.
 
-- `features/auth/shared/providers/AuthProvider.tsx`
-- `features/auth/shared/utils/token-storage.utils.ts`
-- `features/auth/shared/utils/auth.utils.ts`
-- `features/auth/shared/services/auth.service.ts`
-- `infrastructure/socket.ts`
+## Why these decisions
+
+- SecureStore protects durable credentials better than general app storage.
+- In-memory access tokens reduce exposure at rest.
+- Cached UI and server validation are separate so offline use does not imply trusted online access.
+- Connectivity failures preserve work; definitive authentication failures clear it.
+- Locks, single-flight refresh, and generation guards make asynchronous auth deterministic.
+
+Related files: `features/auth/providers/AuthProvider.tsx`, `features/auth/services/auth.service.ts`, `features/auth/hooks/auth-provider-effects/`, and `features/auth/utils/token-storage.utils.ts`.

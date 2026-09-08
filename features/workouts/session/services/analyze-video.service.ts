@@ -1,7 +1,7 @@
 import { backgroundUpload, UploaderHttpMethod, UploadType } from 'react-native-compressor';
 import api from '../../../../infrastructure/api/api-config/api';
-import { GetPresignedUrlFromS3Response } from '@strong-together/shared';
-import { GetPresignedUrlFromS3Body } from '@strong-together/shared';
+import { CreateVideoUploadUrlResponse } from '@strong-together/shared';
+import { CreateVideoUploadUrlBody } from '@strong-together/shared';
 
 type UploadVideoToS3Options = {
   onProgress?: (progress: number) => void;
@@ -9,10 +9,8 @@ type UploadVideoToS3Options = {
   abortSignal?: AbortSignal;
 };
 
-export const getPresignedUrlFromS3 = async (
-  body: GetPresignedUrlFromS3Body,
-): Promise<GetPresignedUrlFromS3Response> => {
-  const { data } = await api.post<GetPresignedUrlFromS3Response>('/api/videoanalysis/getpresignedurl', body, {
+export const getPresignedUrlFromS3 = async (body: CreateVideoUploadUrlBody): Promise<CreateVideoUploadUrlResponse> => {
+  const { data } = await api.post<CreateVideoUploadUrlResponse>('/api/video-analysis/upload-urls', body, {
     sentryContinueTrace: true,
   });
   return data;
@@ -38,6 +36,7 @@ export const uploadVideoToS3 = async (
     uploadUrl,
     fileUri,
     uploadOptions,
+
     (written, total) => {
       if (total) {
         const progress = Math.round((written * 100) / total);

@@ -1,58 +1,46 @@
-# Error Alerts and UX Feedback
+# Errors, recovery, and user feedback
 
-## Table of Contents
+Errors are classified by what the app can safely do next—not merely by status code.
 
-1. [Purpose](#purpose)
-2. [Shared Error Alert](#shared-error-alert)
-3. [Network Feedback](#network-feedback)
-4. [Update Required](#update-required)
-5. [Success and Inline Feedback](#success-and-inline-feedback)
-6. [Related Files](#related-files)
+```mermaid
+flowchart TD
+    Failure --> Kind{Failure type}
+    Kind -->|Validation/domain| Inline[Screen validation or shared alert]
+    Kind -->|Device offline| Offline[Notify; preserve cached session/workout]
+    Kind -->|Server unreachable| Down[Notify; preserve cached session/workout]
+    Kind -->|401| Refresh[Rotate token and retry once]
+    Refresh -->|invalid credentials| Logout[Full local logout]
+    Refresh -->|temporary infrastructure| Preserve[Keep recoverable state]
+    Kind -->|426| Update[Open mandatory update modal]
+    Kind -->|Other API error| Alert[Shared server-message alert]
+    Kind -->|Video workflow| Media[Phase-specific error + Sentry capture]
+```
 
-## Purpose
+## Transport errors
 
-User-facing failures are surfaced through consistent notification patterns so validation errors, network problems, auth issues, and media-processing failures feel like one app instead of many disconnected screens.
+The Axios interceptor closes the Sentry span before classification:
 
-## Shared Error Alert
+- `401`: retry once through the shared refresh transaction; emit forced logout only for a definitive auth failure.
+- `426`: annotate the Axios error and imperatively open `UpdateAppModal` because compatibility is global, not screen-specific.
+- device offline: set `isNetworkError` and notify the user.
+- no HTTP response while online: set `isServerError` and report server unavailability.
+- other responses: display the backend message when available through `showErrorAlert`.
 
-`showErrorAlert(title, description)` wraps `react-native-notifier` with an error alert style, a fixed duration, animation timing, and press-to-dismiss behavior.
+Error annotations let `AuthProvider` distinguish “credentials rejected” from “validation temporarily impossible.” This prevents an outage from deleting a cached session or unfinished workout.
 
-It is used by:
+## UI feedback
 
-- auth screens for missing fields, invalid email, verification, and reset-password limits
-- OAuth handlers for provider failures
-- API interceptors for server errors and session expiry
-- workout editor rules such as max splits
-- live workout validation before saving
-- AI video analysis validation, upload, compression, trim, and backend-result errors
-- profile update validation
+`showErrorAlert` and `showSuccessAlert` wrap `react-native-notifier`, creating consistent timing, appearance, and dismissal behavior across auth, plan editing, workout validation, profile actions, and media workflows. Form-level mistakes are rejected close to the control; infrastructure-wide failures are handled centrally.
 
-## Network Feedback
+Video analysis additionally records exceptions in Sentry and chooses copy based on the current phase. Cancellation through `AbortController` is treated as an intentional exit rather than a user-facing failure.
 
-Network helpers distinguish between:
+## Failure-safe state
 
-- device offline
-- server unreachable despite device connectivity
+- Failed workout submission keeps the Zustand draft for retry.
+- Failed server validation caused by connectivity keeps the Query cache readable.
+- Successful logout clears credentials, query persistence, the workout draft, and scheduled reminder.
+- Socket and video listeners always expose cleanup functions to prevent duplicate delivery after unmount.
 
-Axios errors are annotated with flags such as `isNetworkError` and `isServerError`, which lets auth validation stay logged in with cached data instead of forcing logout during temporary connectivity problems.
+The principle is simple: preserve recoverable user work, remove untrusted credentials, and never hide an incompatibility that requires an app update.
 
-## Update Required
-
-When the backend returns `426`, the client opens `UpdateAppModal` through an imperative utility. This blocks incompatible app versions from continuing with stale API assumptions.
-
-## Success and Inline Feedback
-
-The app also uses success/warning notifications for non-error UX moments:
-
-- account verification email sent after register
-- profile update and image upload status
-- exercise picker and workout editor feedback
-- notification settings changes
-
-## Related Files
-
-- `shared/errors/error-alerts.ts`
-- `infrastructure/api/api-config/helpers/network-check.ts`
-- `infrastructure/api/api-config/helpers/error-handlers.ts`
-- `shared/components/UpdateAppModal.tsx`
-- `shared/utils/imperative-update-modal.ts`
+Related files: `infrastructure/api/api-config/helpers/error-handlers.ts`, `shared/alerts/`, `shared/components/UpdateAppModal.tsx`, and `screens/workout-session/hooks/use-video-analysis.hook.ts`.

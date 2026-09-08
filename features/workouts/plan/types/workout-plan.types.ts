@@ -1,14 +1,5 @@
-import { ExerciseInPlan, WholeUserWorkoutPlan, WorkoutSplitsMap } from '@strong-together/shared';
-import { WorkoutSplitEntity } from '@strong-together/shared';
+import { GetWorkoutPlanResponse } from '@strong-together/shared';
 
-export interface WorkoutPlanSplit {
-  name: WorkoutSplitEntity['name'];
-  id: WorkoutSplitEntity['id'];
-  muscleGroup: WorkoutSplitEntity['muscle_group'];
-}
-
-export type WorkoutPlan = WholeUserWorkoutPlan;
-
-export type WorkoutPlanForEdit = WorkoutSplitsMap;
-
-export type WorkoutPlanExercises = Record<string, ExerciseInPlan[]>;
+export type WorkoutPlan = NonNullable<GetWorkoutPlanResponse['workoutPlan']>;
+export type WorkoutSplit = NonNullable<WorkoutPlan['workoutSplits']>[number];
+export type ExerciseInPlan = WorkoutSplit['exercises'][number];

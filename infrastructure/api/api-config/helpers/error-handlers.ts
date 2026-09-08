@@ -1,10 +1,9 @@
 import { AxiosError, AxiosInstance } from 'axios';
-import { refreshAndRotateTokens } from '../../../../features/auth/shared/services/auth.service';
-import GlobalAuth from '../../../../features/auth/shared/utils/auth.utils';
-import { saveRefreshToken } from '../../../../features/auth/shared/utils/token-storage.utils';
-import { showErrorAlert } from '../../../../shared/errors/error-alerts';
+import { refreshSessionOnce } from '../../../../features/auth/services/auth.service';
+import { showErrorAlert } from '../../../../shared/alerts/error-alerts';
 import { openUpdateModal } from '../../../../shared/utils/imperative-update-modal';
 import { notifyOffline, notifyServerDown } from './network-check';
+import { emitForceLogout } from '../../../../features/auth/events/auth-events.event';
 
 export const handleUpdateRequired = (error: AxiosError) => {
   openUpdateModal(); // <-- imperative show
@@ -38,20 +37,27 @@ export const handle401 = async (api: AxiosInstance, error: AxiosError<{ message?
     authHeader: String(firstRequest.headers?.Authorization)?.slice(0, 32) + '...',
   });
   try {
-    // Try to refresh
-    // Flag for second retry
+    // Retry once with an access token that another completed refresh may have
+    // already installed while this request was in flight.
     firstRequest._retry = true;
-    const { refreshToken, accessToken } = await refreshAndRotateTokens();
-    await saveRefreshToken(refreshToken);
-    GlobalAuth.setAccessToken(accessToken);
+    const currentAuthorization = api.defaults.headers.common.Authorization;
+    if (currentAuthorization && String(firstRequest.headers?.Authorization) !== String(currentAuthorization)) {
+      firstRequest.headers = firstRequest.headers || {};
+      firstRequest.headers.Authorization = currentAuthorization;
+      return api(firstRequest);
+    }
+
+    // Otherwise join the single app-wide refresh transaction.
+    const { accessToken } = await refreshSessionOnce();
     firstRequest.headers = firstRequest.headers || {};
     firstRequest.headers.Authorization = `DPoP ${accessToken}`;
     return api(firstRequest);
   } catch (refreshErr) {
-    // If got here failed at refresh
-    const isAuthError = (refreshErr as AxiosError).response?.status === 401;
-    if (isAuthError && GlobalAuth.logout) {
-      GlobalAuth.logout();
+    const error = refreshErr as AxiosError;
+    const shouldPreserveWorkoutSession = error.isUpgradeRequired || error.isNetworkError || error.isServerError;
+
+    if (!shouldPreserveWorkoutSession) {
+      emitForceLogout();
     }
     // Some toast to show error
     showErrorAlert('Error', data?.message || 'Session expired');

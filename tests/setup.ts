@@ -8,6 +8,50 @@
 import '@testing-library/jest-native/extend-expect';
 import { jest } from '@jest/globals';
 
+// Native persistence is a client boundary. Keeping one in-memory implementation
+// lets integration tests exercise the real providers, hooks, and stores.
+const mockAsyncStorage = new Map<string, string>();
+jest.mock('@react-native-async-storage/async-storage', () => ({
+  __esModule: true,
+  default: {
+    getItem: jest.fn(async (key: string) => mockAsyncStorage.get(key) ?? null),
+    setItem: jest.fn(async (key: string, value: string) => void mockAsyncStorage.set(key, value)),
+    removeItem: jest.fn(async (key: string) => void mockAsyncStorage.delete(key)),
+    clear: jest.fn(async () => void mockAsyncStorage.clear()),
+    getAllKeys: jest.fn(async () => [...mockAsyncStorage.keys()]),
+    multiGet: jest.fn(async (keys: string[]) => keys.map((key) => [key, mockAsyncStorage.get(key) ?? null])),
+    multiSet: jest.fn(async (entries: [string, string][]) => entries.forEach(([key, value]) => mockAsyncStorage.set(key, value))),
+    multiRemove: jest.fn(async (keys: string[]) => keys.forEach((key) => mockAsyncStorage.delete(key))),
+  },
+}));
+
+const mockSecureStorage = new Map<string, string>();
+jest.mock('expo-secure-store', () => ({
+  getItemAsync: jest.fn(async (key: string) => mockSecureStorage.get(key) ?? null),
+  setItemAsync: jest.fn(async (key: string, value: string) => void mockSecureStorage.set(key, value)),
+  deleteItemAsync: jest.fn(async (key: string) => void mockSecureStorage.delete(key)),
+}));
+
+jest.mock('expo-notifications', () => ({
+  PermissionStatus: { GRANTED: 'granted' },
+  AndroidImportance: { DEFAULT: 3 },
+  SchedulableTriggerInputTypes: { TIME_INTERVAL: 'timeInterval' },
+  getPermissionsAsync: jest.fn(async () => ({ status: 'granted' })),
+  scheduleNotificationAsync: jest.fn(async () => 'test-reminder'),
+  cancelScheduledNotificationAsync: jest.fn(async () => undefined),
+  setNotificationChannelAsync: jest.fn(async () => undefined),
+}));
+
+jest.mock('@react-native-community/netinfo', () => ({
+  addEventListener: jest.fn(() => jest.fn()),
+  fetch: jest.fn(async () => ({ isConnected: true, isInternetReachable: true })),
+}));
+
+jest.mock('axios', () => ({
+  AxiosError: class AxiosError extends Error {},
+  isAxiosError: jest.fn(() => false),
+}));
+
 // Silence console.log during tests (keeps output readable)
 jest.spyOn(console, 'log').mockImplementation(() => {});
 

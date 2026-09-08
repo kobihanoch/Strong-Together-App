@@ -1,34 +1,30 @@
 /* eslint-disable @typescript-eslint/no-require-imports */
 require('./global');
+import { Inter_400Regular, Inter_500Medium, Inter_600SemiBold, Inter_700Bold } from '@expo-google-fonts/inter';
 import { NavigationContainer, useNavigationContainerRef } from '@react-navigation/native';
+import { useIsRestoring } from '@tanstack/react-query';
+import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client';
+import Constants from 'expo-constants';
 import * as Font from 'expo-font';
 import React, { useEffect, useState } from 'react';
-import { ActivityIndicator, StatusBar, StyleSheet, Text, View } from 'react-native';
-import { AlertNotificationRoot } from 'react-native-alert-notification';
+import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
-import { Inter_400Regular, Inter_500Medium, Inter_600SemiBold, Inter_700Bold } from '@expo-google-fonts/inter';
-
-import { WorkoutHistoryProvider } from './features/workouts/shared/providers/WorkoutHistoryProvider';
-import { MessagesProvider } from './features/messages/providers/MessagesProvider';
-
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import Constants from 'expo-constants';
 import { MaterialCommunityIcons as ExpoMaterialCommunityIcons } from '@expo/vector-icons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { NotifierRoot } from 'react-native-notifier';
+import AuthenticatedUserEffects from './features/auth/components/AuthenticatedUserEffects';
+import { AuthProvider, useAuth } from './features/auth/providers/AuthProvider';
 import ensureDpopKeyPair from './infrastructure/api/dpop/ensureDpopKeyPair';
-import { cacheHousekeepingOnBoot } from './infrastructure/cache/cache.utils';
-import BottomTabBar from './shared/components/BottomTabBar';
-import Theme1 from './shared/components/Theme1';
-import UpdateAppModal from './shared/components/UpdateAppModal';
-import { CardioProvider } from './features/workouts/shared/providers/CardioProvider';
+import { cacheHousekeepingOnBoot } from './infrastructure/cache/cache.constants';
+import { logRestoredQueryCache, queryClient, queryPersistOptions } from './infrastructure/query/query-client';
+import Sentry from './infrastructure/sentry';
 import AppStack from './navigation/AppStack';
 import AuthStack from './navigation/AuthStack';
-import NotificationsSetup from './features/settings/push-notifications-setup/notifications-setup.setup';
-import Sentry from './infrastructure/sentry';
-import { GlobalAppLoadingProvider } from './shared/providers/GlobalAppLoadingProvider';
-import { AuthProvider, useAuth } from './features/auth/shared/providers/AuthProvider';
-import { WorkoutPlanProvider } from './features/workouts/shared/providers/WorkoutPlanProvider';
+import NotificationsSetup from './screens/settings/push-notifications-setup/notifications-setup.setup';
+import BottomTabBar from './shared/components/BottomTabBar';
+import UpdateAppModal from './shared/components/UpdateAppModal';
+import { AppThemeProvider } from './shared/providers/AppThemeProvider';
 
 // ---------- Fonts Loader Hook ----------
 function useFontsReady() {
@@ -63,6 +59,7 @@ function App() {
   const fontsReady = useFontsReady();
   const navigationRef = useNavigationContainerRef();
   const [keyPairReady, setKeyPairReady] = useState(false);
+  const [legacyHousekeepingDone, setLegacyHousekeepingDone] = useState(false);
 
   // Dpop key pair
   useEffect(() => {
@@ -74,13 +71,17 @@ function App() {
     })();
   }, [keyPairReady]);
 
-  // Delete cache for outdated app versions (against different data structures)
+  /**@deprecated */
   useEffect(() => {
     (async () => {
       const cacheVer = await AsyncStorage.getItem('__VERSION__');
-      const appVer = Constants?.expoConfig?.version;
-      if (cacheVer === appVer) return; // already cleaned for this version
+      const appVer = Constants.expoConfig!.version;
+      if (cacheVer === appVer) {
+        setLegacyHousekeepingDone(true);
+        return;
+      } // already cleaned for this version
       await cacheHousekeepingOnBoot();
+      setLegacyHousekeepingDone(true);
     })();
   }, []);
 
@@ -94,21 +95,24 @@ function App() {
   }
 
   return (
-    keyPairReady && (
+    keyPairReady &&
+    legacyHousekeepingDone && (
       <Sentry.ErrorBoundary fallback={<AppCrashFallback />}>
-        <AlertNotificationRoot>
-          <GestureHandlerRootView style={{ flex: 1 }}>
-            <GlobalAppLoadingProvider>
-              <AuthProvider>
-                <NavigationContainer ref={navigationRef}>
-                  <RootNavigator />
-                  <NotifierRoot />
-                  <UpdateAppModal />
-                </NavigationContainer>
-              </AuthProvider>
-            </GlobalAppLoadingProvider>
-          </GestureHandlerRootView>
-        </AlertNotificationRoot>
+        <GestureHandlerRootView style={{ flex: 1 }}>
+          <AppThemeProvider>
+            <PersistQueryClientProvider client={queryClient} persistOptions={queryPersistOptions} onSuccess={logRestoredQueryCache}>
+              <QueryHydrationGate>
+                <AuthProvider>
+                  <NavigationContainer ref={navigationRef}>
+                    <RootNavigator />
+                    <NotifierRoot />
+                    <UpdateAppModal />
+                  </NavigationContainer>
+                </AuthProvider>
+              </QueryHydrationGate>
+            </PersistQueryClientProvider>
+          </AppThemeProvider>
+        </GestureHandlerRootView>
       </Sentry.ErrorBoundary>
     )
   );
@@ -118,31 +122,26 @@ export default App;
 
 // ---------- Navigation Logic (auth-only here) ----------
 function RootNavigator() {
-  const { isLoggedIn, user, authPhase } = useAuth();
+  const { userIdCache, authPhase } = useAuth();
 
   // Ensures no UI is rendered if auth is not loaded yet
   if (authPhase === 'checking') return null;
 
-  return (
-    <>
-      {/* Always render the tree so providers can mount */}
-      {isLoggedIn ? <AppWithProviders key={user?.id} /> : <AuthStack />}
-    </>
-  );
+  return <>{authPhase === 'authed' ? <AuthenticatedApp key={userIdCache} /> : <AuthStack />}</>;
 }
 
-// ---------- App branch wrapped with app-scoped providers ----------
-function AppWithProviders() {
+function QueryHydrationGate({ children }: { children: React.ReactNode }) {
+  const isRestoring = useIsRestoring();
+  return isRestoring ? null : children;
+}
+
+// ---------- Authenticated app-wide state ----------
+function AuthenticatedApp() {
   return (
-    <MessagesProvider>
-      <WorkoutPlanProvider>
-        <WorkoutHistoryProvider>
-          <CardioProvider>
-            <MainApp />
-          </CardioProvider>
-        </WorkoutHistoryProvider>
-      </WorkoutPlanProvider>
-    </MessagesProvider>
+    <>
+      <AuthenticatedUserEffects />
+      <MainApp />
+    </>
   );
 }
 
@@ -150,11 +149,8 @@ function AppWithProviders() {
 function MainApp() {
   return (
     <>
-      <StatusBar barStyle="dark-content" />
-      <Theme1>
-        <AppStack />
-        <NotificationsSetup />
-      </Theme1>
+      <AppStack />
+      <NotificationsSetup />
       <BottomTabBar />
     </>
   );

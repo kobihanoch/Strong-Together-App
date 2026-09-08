@@ -1,25 +1,25 @@
 import api from '../../../infrastructure/api/api-config/api';
-import { DeleteMessageParams, GetAllUserMessagesQuery, MarkMessageAsReadParams } from '@strong-together/shared';
-import { DeleteMessageResponse, GetAllUserMessagesResponse, MarkMessageAsReadResponse } from '@strong-together/shared';
+import { DeleteMessageParams, ListMessagesQuery, MarkMessageAsReadParams } from '@strong-together/shared';
+import { ListMessagesResponse } from '@strong-together/shared';
+import { getTimeZoneFromStore } from '../../../shared/stores/time-zone.store';
 
-export const updateMsgReadStatus = async (
-  msgId: MarkMessageAsReadParams['id'],
-): Promise<MarkMessageAsReadResponse['id']> => {
+export const updateMsgReadStatus = async (msgId: MarkMessageAsReadParams['id']): Promise<void> => {
   const pathParams = { id: msgId } satisfies MarkMessageAsReadParams;
-  const response = await api.put<MarkMessageAsReadResponse>(`/api/messages/markasread/${pathParams.id}`);
-  return response.data.id;
+  await api.patch(`/api/messages/${pathParams.id}/read`);
 };
 
 // Get messages
-export const getUserMessages = async (): Promise<GetAllUserMessagesResponse> => {
-  const { data } = await api.get<GetAllUserMessagesResponse>('/api/messages/getmessages', {
-    params: { tz: Intl.DateTimeFormat().resolvedOptions().timeZone } satisfies GetAllUserMessagesQuery,
+
+export const getUserMessages = async (): Promise<ListMessagesResponse> => {
+  const { data } = await api.get<ListMessagesResponse>('/api/messages', {
+    params: { tz: getTimeZoneFromStore() } satisfies ListMessagesQuery,
   });
   return data;
 };
 
 // Delete a message
+
 export const deleteMessage = async (msgId: DeleteMessageParams['id']): Promise<void> => {
   const pathParams = { id: msgId } satisfies DeleteMessageParams;
-  await api.delete<DeleteMessageResponse>(`/api/messages/delete/${pathParams.id}`);
+  await api.delete(`/api/messages/${pathParams.id}`);
 };

@@ -1,47 +1,60 @@
-# App Rendering Flow
+# App startup and rendering
 
-## Table of Contents
+## Boot order
 
-1. [Purpose](#purpose)
-2. [Startup Sequence](#startup-sequence)
-3. [Auth-Gated Rendering](#auth-gated-rendering)
-4. [Logged-In Provider Tree](#logged-in-provider-tree)
-5. [Why This Matters](#why-this-matters)
-
-## Purpose
-
-The app shell in `App.tsx` keeps startup predictable by separating **platform initialization**, **session validation**, and **logged-in domain state**.
-
-## Startup Sequence
-
-1. `global.ts` is loaded before React Native app code so crypto/polyfill setup exists before infrastructure code runs.
-2. Fonts are loaded with Expo Font, including local Poppins files, Inter fonts, and Material Community Icons.
-3. `ensureDpopKeyPair()` prepares the local key pair needed for **DPoP-bound API requests**.
-4. Cache housekeeping compares the stored cache version with `Constants.expoConfig.version` and removes stale `CACHE:` entries from older data structures while keeping `CACHE:USER_ID`.
-5. The root is wrapped with Sentry, alert notification support, gesture handling, global loading, auth, navigation, app update modal support, and notifier support.
-
-## Auth-Gated Rendering
-
-`RootNavigator` reads `authPhase`, `isLoggedIn`, and `user` from `AuthProvider`.
-
-- `authPhase === 'checking'` renders nothing to avoid flashing the wrong stack during session bootstrap.
-- Logged-out users render `AuthStack`.
-- Logged-in users render `AppWithProviders` with `key={user?.id}` so account changes remount app-scoped providers cleanly.
-
-## Logged-In Provider Tree
-
-The logged-in app mounts domain providers in this order:
-
-```text
-MessagesProvider
-  WorkoutPlanProvider
-    WorkoutHistoryProvider
-      CardioProvider
-        MainApp
+```mermaid
+flowchart TD
+    Start[Process starts] --> Polyfill[Load global crypto/polyfills]
+    Polyfill --> Parallel[Load fonts<br/>Ensure DPoP key pair<br/>Run one-release legacy cleanup]
+    Parallel --> Root[Sentry boundary + gesture root + theme]
+    Root --> Persist[PersistQueryClientProvider]
+    Persist --> Gate{Query hydration complete?}
+    Gate -->|No| Blank[Render no application tree]
+    Gate -->|Yes| Auth[AuthProvider]
+    Auth --> Phase{authPhase}
+    Phase -->|checking| Blank
+    Phase -->|guest| AuthStack[Intro / Login / Register]
+    Phase -->|authed| Effects[AuthenticatedUserEffects]
+    Effects --> AppStack[Authenticated stack + notifications + bottom tabs]
+    AppStack --> SessionGate{Workout store hydrated?}
+    SessionGate -->|draft + split| Workout[Resume WorkoutSession]
+    SessionGate -->|no session| Home[Open Home]
 ```
 
-`MainApp` renders the logged-in stack, notification setup, theme wrapper, and custom bottom tab bar.
+The order is intentional:
 
-## Why This Matters
+1. Crypto support and the DPoP key exist before protected traffic begins.
+2. Persisted Query data is restored before feature hooks mount, avoiding false empty states and duplicate startup fetch behavior.
+3. Auth checks SecureStore only after the application persistence boundary exists.
+4. Cached authenticated UI may mount immediately, but feature queries and sockets wait for `isValidatedWithServer`.
+5. `AppStack` waits independently for workout-store hydration so an active workout resumes before choosing its initial route.
 
-This structure keeps **auth state** separate from **domain state**, avoids rendering private screens before session checks finish, and lets workout, message, history, and cardio providers hydrate independently after auth validation.
+## Root provider order
+
+```text
+Sentry.ErrorBoundary
+  GestureHandlerRootView
+    AppThemeProvider
+      PersistQueryClientProvider
+        QueryHydrationGate
+          AuthProvider
+            NavigationContainer
+              RootNavigator
+```
+
+There are no domain-data providers in v6. User, messages, plans, history, cardio, schedules, reminders, and statistics are direct TanStack Query consumers. This keeps the root stable as features grow.
+
+## Authenticated effects
+
+`AuthenticatedUserEffects` is mounted only inside the authenticated branch. It:
+
+- detects and synchronizes timezone changes;
+- copies the loaded username into the shared API header;
+- obtains a websocket ticket after validation;
+- owns socket connection, message-listener registration, and teardown.
+
+Keying the authenticated app with the cached user ID forces clean lifecycle boundaries when identities change. Logout switches to the guest tree, naturally unmounting authenticated effects before local cleanup completes.
+
+## Legacy migration
+
+v6 retains a one-release housekeeping step. It migrates the old `CACHE:USER_ID` into SecureStore, deletes legacy `CACHE:*` and `__VERSION__` keys, then leaves all new remote persistence to TanStack Query. This is compatibility code, not the current cache architecture.
