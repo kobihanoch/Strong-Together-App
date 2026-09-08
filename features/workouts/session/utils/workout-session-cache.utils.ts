@@ -1,12 +1,8 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { createJSONStorage } from 'zustand/middleware';
-import { CACHE_VERSION } from '../../../../infrastructure/cache/cache.constants';
 import { useWorkoutSessionStore } from '../hooks/use-workout-session-store.hook';
+import { WORKOUT_SESSION_STORAGE_KEY } from './workout-session-storage.config';
 
-export const WORKOUT_SESSION_STORAGE_KEY = 'workout-session';
-export const WORKOUT_SESSION_CACHE_VERSION = Number(CACHE_VERSION?.replace(/\D/g, '') ?? 0);
-
-export const workoutSessionStorage = createJSONStorage(() => AsyncStorage);
+export { WORKOUT_SESSION_CACHE_VERSION, WORKOUT_SESSION_STORAGE_KEY, workoutSessionStorage } from './workout-session-storage.config';
 
 /** Clears the active workout session draft if exists */
 export const clearWorkoutSessionStorage = async (): Promise<void> => {

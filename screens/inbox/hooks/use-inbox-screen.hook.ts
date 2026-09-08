@@ -1,47 +1,62 @@
-import { useCallback } from 'react';
-import { ALERT_TYPE, Dialog } from 'react-native-alert-notification';
+import { useCallback, useState } from 'react';
+import { Alert } from 'react-native';
 import { useMessages } from '../../../features/messages/hooks/use-messages.hook';
 import type { UserMessage } from '../../../features/messages/types/messages.types';
+import { showErrorAlert } from '../../../shared/alerts/error-alerts';
+import { useAppTheme } from '../../../shared/providers/AppThemeProvider';
 
 const useInboxScreen = () => {
+  const { colors: theme } = useAppTheme();
   const { data, loadingStates, actions } = useMessages();
-  const { allReceivedMessages, unreadMessages } = data;
   const { updateMessageToRead, deleteMessage } = actions;
+  const [selectedMessageId, setSelectedMessageId] = useState<UserMessage['id'] | null>(null);
 
-  const unreadMessagesCount = unreadMessages?.length;
+  const openMessage = useCallback(
+    async (message: UserMessage) => {
+      setSelectedMessageId(message.id);
+      if (!message.isRead) {
+        try {
+          await updateMessageToRead(message.id);
+        } catch {
+          showErrorAlert('Could not update message', 'The message was opened, but its read status could not be saved.');
+        }
+      }
+    },
+    [updateMessageToRead],
+  );
+
+  const closeMessage = useCallback(() => setSelectedMessageId(null), []);
 
   const confirmAndDeleteMessage = useCallback(
-    (msgId: UserMessage['id']): void => {
-      let pressedYes = false;
-
-      Dialog.show({
-        type: ALERT_TYPE.WARNING,
-        title: 'Delete Message',
-        textBody: 'Are you sure you want to delete this message?',
-        button: 'Yes',
-        closeOnOverlayTap: true,
-        onPressButton: async () => {
-          pressedYes = true;
-          Dialog.hide();
-          try {
-            await deleteMessage(msgId);
-          } catch (err) {
-            console.log('Delete failed:', err);
-          }
+    (messageId: UserMessage['id']) => {
+      Alert.alert('Delete message?', 'This message will be permanently removed.', [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Delete',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              await deleteMessage(messageId);
+              setSelectedMessageId((current) => (current === messageId ? null : current));
+            } catch {
+              showErrorAlert('Could not delete message', 'Please try again.');
+            }
+          },
         },
-        onHide: () => {
-          if (!pressedYes) {
-          }
-        },
-      });
+      ]);
     },
     [deleteMessage],
   );
 
   return {
-    data: { allReceivedMessages, unreadMessagesCount },
-    actions: { confirmAndDeleteMessage, markAsRead: updateMessageToRead },
-    loadingStates: { isPending: loadingStates.isPending },
+    data: {
+      allReceivedMessages: data.allReceivedMessages,
+      unreadMessagesCount: data.unreadMessages.length,
+      selectedMessageId,
+      theme,
+    },
+    actions: { openMessage, closeMessage, confirmAndDeleteMessage },
+    loadingStates: { isPending: loadingStates.isPending, isUpdating: loadingStates.isUpdating },
   };
 };
 

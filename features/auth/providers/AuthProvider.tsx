@@ -20,6 +20,7 @@ interface AuthProviderValue {
 }
 
 const AuthContext = createContext<AuthProviderValue | null>(null);
+
 /**
  * Reads the shared authentication lifecycle and actions from the nearest provider.
  *
@@ -34,15 +35,6 @@ export const useAuth = () => {
   return ctx;
 };
 
-/**
- * Owns the application authentication and session lifecycle.
- *
- * The provider restores cached sessions, validates them with the server,
- * exposes the application's authentication actions and loading states.
- *
- * @param children - Descendant React nodes that can consume authentication state.
- * @returns A context provider containing the shared authentication state.
- */
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [userIdCache, setUserIdCache] = useState<AppUser['id'] | null | undefined>(undefined); // --- Cached session identifier ---
   const [authPhase, setAuthPhase] = useState<'checking' | 'authed' | 'guest'>('checking'); // --- Startup phase for smooth auth-stack/app-stack routing ---

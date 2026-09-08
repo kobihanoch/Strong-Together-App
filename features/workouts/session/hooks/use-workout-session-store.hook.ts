@@ -3,7 +3,7 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import type { Exercise } from '../../plan/types/exercises.types';
 import type { WorkoutSplit } from '../../plan/types/workout-plan.types';
-import { WORKOUT_SESSION_CACHE_VERSION, WORKOUT_SESSION_STORAGE_KEY, workoutSessionStorage } from '../utils/workout-session-cache.utils';
+import { WORKOUT_SESSION_CACHE_VERSION, WORKOUT_SESSION_STORAGE_KEY, workoutSessionStorage } from '../utils/workout-session-storage.config';
 import { getTimeZoneFromStore } from '../../../../shared/stores/time-zone.store';
 
 type WorkoutEntry = CreateWorkoutSessionBody['workout'][number];

@@ -8,7 +8,6 @@ import Constants from 'expo-constants';
 import * as Font from 'expo-font';
 import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
-import { AlertNotificationRoot } from 'react-native-alert-notification';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 import { MaterialCommunityIcons as ExpoMaterialCommunityIcons } from '@expo/vector-icons';
@@ -99,23 +98,21 @@ function App() {
     keyPairReady &&
     legacyHousekeepingDone && (
       <Sentry.ErrorBoundary fallback={<AppCrashFallback />}>
-        <AlertNotificationRoot>
-          <GestureHandlerRootView style={{ flex: 1 }}>
-            <AppThemeProvider>
-              <PersistQueryClientProvider client={queryClient} persistOptions={queryPersistOptions} onSuccess={logRestoredQueryCache}>
-                <QueryHydrationGate>
-                  <AuthProvider>
-                    <NavigationContainer ref={navigationRef}>
-                      <RootNavigator />
-                      <NotifierRoot />
-                      <UpdateAppModal />
-                    </NavigationContainer>
-                  </AuthProvider>
-                </QueryHydrationGate>
-              </PersistQueryClientProvider>
-            </AppThemeProvider>
-          </GestureHandlerRootView>
-        </AlertNotificationRoot>
+        <GestureHandlerRootView style={{ flex: 1 }}>
+          <AppThemeProvider>
+            <PersistQueryClientProvider client={queryClient} persistOptions={queryPersistOptions} onSuccess={logRestoredQueryCache}>
+              <QueryHydrationGate>
+                <AuthProvider>
+                  <NavigationContainer ref={navigationRef}>
+                    <RootNavigator />
+                    <NotifierRoot />
+                    <UpdateAppModal />
+                  </NavigationContainer>
+                </AuthProvider>
+              </QueryHydrationGate>
+            </PersistQueryClientProvider>
+          </AppThemeProvider>
+        </GestureHandlerRootView>
       </Sentry.ErrorBoundary>
     )
   );
