@@ -2,12 +2,11 @@
 import BottomSheet, { BottomSheetBackdropProps, BottomSheetFlatList } from '@gorhom/bottom-sheet';
 import { BlurView } from 'expo-blur';
 import React, { forwardRef, ReactNode, useCallback, useImperativeHandle, useMemo, useRef } from 'react';
-import { Dimensions, ListRenderItem, Pressable, StyleProp, StyleSheet, Text, View, ViewStyle } from 'react-native';
+import { ListRenderItem, Pressable, StyleProp, StyleSheet, Text, useWindowDimensions, View, ViewStyle } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import Animated, { Extrapolation, interpolate, useAnimatedStyle } from 'react-native-reanimated';
 import { RFValue } from 'react-native-responsive-fontsize';
-
-const { width } = Dimensions.get('window');
+import { useAppTheme } from '../providers/AppThemeProvider';
 
 // Custom backdrop with Blur + dark overlay
 interface CustomBackdropProps extends BottomSheetBackdropProps {
@@ -62,6 +61,8 @@ interface SlidingBottomModalProps {
   enableBackDrop?: boolean;
   enablePanDownClose?: boolean;
   onChange?: (index: number) => void;
+  keyboardBehavior?: 'interactive' | 'extend' | 'fillParent';
+  keyboardBlurBehavior?: 'none' | 'restore';
 }
 
 const SlidingBottomModal = forwardRef<SlidingBottomModalRef, SlidingBottomModalProps>(function SlidingBottomModal(
@@ -77,10 +78,14 @@ const SlidingBottomModal = forwardRef<SlidingBottomModalRef, SlidingBottomModalP
     enableBackDrop = true,
     enablePanDownClose = true,
     onChange,
+    keyboardBehavior = 'interactive',
+    keyboardBlurBehavior = 'restore',
   },
   ref,
 ) {
   const sheetRef = useRef<BottomSheet>(null);
+  const { colors, mode } = useAppTheme();
+  const { width } = useWindowDimensions();
 
   // Imperative API
   useImperativeHandle(ref, () => ({
@@ -95,11 +100,11 @@ const SlidingBottomModal = forwardRef<SlidingBottomModalRef, SlidingBottomModalP
         {...props}
         close={() => sheetRef.current?.close?.()}
         blurIntensity={22}
-        tint="dark"
+        tint={mode}
         overlayAlpha={0.2}
       />
     ),
-    [],
+    [mode],
   );
 
   const snapPoints = useMemo(() => snapPointsProp, [snapPointsProp]);
@@ -113,7 +118,7 @@ const SlidingBottomModal = forwardRef<SlidingBottomModalRef, SlidingBottomModalP
               width: 40,
               height: 4,
               borderRadius: 2,
-              backgroundColor: '#C4C4C4',
+              backgroundColor: colors.border,
               alignSelf: 'center',
               marginBottom: 10,
               marginTop: 20,
@@ -121,13 +126,13 @@ const SlidingBottomModal = forwardRef<SlidingBottomModalRef, SlidingBottomModalP
           />
           {title && (
             <View style={styles.header}>
-              <Text style={styles.headerTitle}>{title}</Text>
+              <Text style={[styles.headerTitle, { color: colors.textPrimary }]}>{title}</Text>
             </View>
           )}
         </View>
       </View>
     );
-  }, [title]);
+  }, [colors.border, colors.textPrimary, title]);
 
   const keyExtractor = useCallback((item: any, index: number) => {
     if (Array.isArray(item)) return String(item[0]);
@@ -136,7 +141,7 @@ const SlidingBottomModal = forwardRef<SlidingBottomModalRef, SlidingBottomModalP
   }, []);
 
   return (
-    <GestureHandlerRootView style={StyleSheet.absoluteFill} pointerEvents="box-none">
+    <GestureHandlerRootView style={styles.modalLayer} pointerEvents="box-none">
       <BottomSheet
         ref={sheetRef}
         index={initialIndex}
@@ -144,8 +149,12 @@ const SlidingBottomModal = forwardRef<SlidingBottomModalRef, SlidingBottomModalP
         enableDynamicSizing={false}
         {...(enableBackDrop ? { backdropComponent: renderBackdrop } : {})}
         enablePanDownToClose={enablePanDownClose}
+        keyboardBehavior={keyboardBehavior}
+        keyboardBlurBehavior={keyboardBlurBehavior}
+        android_keyboardInputMode="adjustResize"
+        enableBlurKeyboardOnGesture
         handleComponent={Handle}
-        backgroundStyle={styles.sheetBg}
+        backgroundStyle={[styles.sheetBg, { backgroundColor: colors.surface }]}
         {...(onChange ? { onChange: (index: number) => onChange(index) } : {})}
       >
         {flatListUsage ? (
@@ -153,7 +162,7 @@ const SlidingBottomModal = forwardRef<SlidingBottomModalRef, SlidingBottomModalP
             data={data}
             keyExtractor={keyExtractor}
             renderItem={renderItem}
-            contentContainerStyle={[styles.contentContainer, contentContainerStyle]}
+            contentContainerStyle={[styles.contentContainer, { backgroundColor: colors.surface, padding: width * 0.05 }, contentContainerStyle]}
             showsVerticalScrollIndicator={false}
           />
         ) : (
@@ -165,6 +174,7 @@ const SlidingBottomModal = forwardRef<SlidingBottomModalRef, SlidingBottomModalP
 });
 
 const styles = StyleSheet.create({
+  modalLayer: { ...StyleSheet.absoluteFillObject, zIndex: 9999, elevation: 9999 },
   sheetBg: {
     backgroundColor: 'white',
     borderTopLeftRadius: 30,
@@ -184,8 +194,7 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   contentContainer: {
-    backgroundColor: 'white',
-    padding: width * 0.05,
+    paddingHorizontal: 16,
   },
 });
 

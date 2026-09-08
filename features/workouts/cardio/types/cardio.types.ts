@@ -1,3 +1,12 @@
-import { UserAerobicsResponse } from '@strong-together/shared';
-export type CardioDailyMap = UserAerobicsResponse['daily'];
-export type CardioWeeklyMap = UserAerobicsResponse['weekly'];
+import type { GetAerobicHistoryResponse } from '@strong-together/shared';
+
+export type CardioMaps = GetAerobicHistoryResponse;
+export type CardioDailyMap = GetAerobicHistoryResponse['daily'];
+export type CardioWeeklyMap = GetAerobicHistoryResponse['weekly'];
+export type CardioDailyRecord = CardioDailyMap[string][number];
+export type CardioWeeklyData = CardioWeeklyMap[string];
+export type CardioWeeklyRecord = CardioWeeklyData['records'][number];
+
+export type EditableCardioRecord = CardioDailyRecord;
+
+export type CardioEntryInput = Pick<EditableCardioRecord, 'type' | 'durationMins' | 'durationSec'>;

@@ -21,4 +21,16 @@ export const colors = {
   error: "#DC2626",
   warning: "#F59E0B",
   info: "#0EA5E9",
+
+  // Redesign system
+  canvas: "#FAF8F5",
+  surface: "#FFFFFF",
+  surfaceMuted: "#F2EEE8",
+  warmBorder: "#E7E0D8",
+  ink: "#17130F",
+  inkSoft: "#342D26",
+  brandOrange: "#FF7A00",
+  brandAmber: "#FFB800",
+  brandYellow: "#FFD600",
+  brandBlueSoft: "#EAF2FF",
 };
