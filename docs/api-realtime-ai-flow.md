@@ -1,75 +1,76 @@
-# API, Realtime, and AI Analysis Flow
+# API, realtime, and AI analysis
 
-## Table of Contents
+## HTTP pipeline
 
-1. [API Client](#api-client)
-2. [DPoP and Headers](#dpop-and-headers)
-3. [Response Handling](#response-handling)
-4. [Realtime Events](#realtime-events)
-5. [AI Video Analysis](#ai-video-analysis)
-6. [Related Files](#related-files)
+Every feature service uses one Axios instance with a 12-second timeout and shared interceptors.
 
-## API Client
+```mermaid
+flowchart TD
+    Service[Typed service] --> Prepare[Add request ID, version, trace, and DPoP]
+    Prepare --> API[Backend]
+    API --> Result{Result}
+    Result -->|success| Data[Typed data]
+    Result -->|401| Refresh[Rotate token and retry once]
+    Result -->|426| Upgrade[Require app update]
+    Result -->|network or other| Error[Classify and notify]
+```
 
-The Axios client is configured with layered interceptors for **bootstrap**, **headers**, **DPoP**, **Sentry tracing**, **refresh-on-401**, network handling, and update-required handling.
+The request ID survives retries, connecting client diagnostics to backend logs. Sentry HTTP spans finish on success and error. Guest requests attach the DPoP public-key thumbprint; authenticated requests attach signed proofs. The app version lets the backend stop clients whose contracts are no longer compatible.
 
-The bootstrap interceptor runs first so known startup requests can be served from a single bootstrap payload when possible.
+This policy belongs in infrastructure because no feature should be able to accidentally skip authentication, tracing, upgrade handling, or consistent network semantics.
 
-## DPoP and Headers
+## Socket ownership
 
-Each outgoing request receives:
+```mermaid
+sequenceDiagram
+    participant Auth as AuthProvider
+    participant Effects as AuthenticatedUserEffects
+    participant API
+    participant Socket
+    participant Query as Message query cache
+    Auth-->>Effects: validated + current user
+    Effects->>API: POST websocket ticket
+    API-->>Effects: short-lived ticket
+    Effects->>Socket: connect with websocket transport
+    Socket-->>Effects: connected
+    Effects->>Socket: user_loggedin
+    Socket-->>Query: new_message
+    Query->>Query: deduplicate ID and prepend
+    Socket-->>Effects: auth connect_error
+    Effects->>API: mint fresh ticket and reconnect
+    Auth-->>Effects: logout/unmount
+    Effects->>Socket: remove listeners and disconnect
+```
 
-- `x-request-id` for request correlation and retry continuity
-- `x-app-version` for backend release compatibility checks
-- `dpop-key-binding` for guest auth/token-binding requests
-- `dpop` proof for authenticated requests
+There is one module-level socket and one authenticated owner. `connectionGeneration` increments across connect/disconnect attempts so a ticket returned for an obsolete identity cannot take ownership. A connection is reused only for the same user. Reconnection uses bounded backoff and refreshes the short-lived ticket when the server reports missing, invalid, expired, or unauthorized authentication.
 
-The app creates the DPoP key pair during startup before the authenticated app renders.
+Realtime events update existing state owners. Messages enter the TanStack message cache; video results stay in the active analysis hook because they are transient workflow output.
 
-## Response Handling
+## AI video pipeline
 
-The response interceptor handles important production cases:
+```mermaid
+sequenceDiagram
+    participant UI as Analysis sheet
+    participant Hook as useVideoAnalysis
+    participant API
+    participant Storage as Object storage
+    participant Worker
+    participant Socket
+    UI->>Hook: Analyze selected video
+    Hook->>Hook: Create job ID + start Sentry trace
+    Hook->>API: Request presigned upload URL
+    API-->>Hook: Upload URL
+    Hook->>Storage: Direct upload with progress + AbortSignal
+    Hook->>Socket: Register result listener
+    Storage-->>Worker: Queued analysis input
+    Worker-->>Socket: video_analysis_results
+    Socket-->>Hook: success or backend error
+    Hook-->>UI: Render repetition analysis
+    Hook->>Hook: Remove listener and close span
+```
 
-- `426` opens the update-required modal.
-- Offline or server-down states are marked on the Axios error and surfaced through user notifications.
-- `401` attempts refresh-token rotation once, updates the access token, and retries the original request.
-- Failed auth refresh logs the user out through `GlobalAuth.logout`.
-- Other server errors use the shared error-alert helper.
+The UI owns media selection, trim/compression constraints, and supported-exercise checks. The hook owns in-flight exclusion, phases, progress, cancellation, listener cleanup, and observability. A ref mirrors the current phase so asynchronous error handling reports upload and analysis failures accurately.
 
-## Realtime Events
+Direct-to-storage upload keeps large media off the API process and gives the client native progress/cancellation. The backend still authorizes the upload and correlates work through job/request IDs. Socket delivery fits a result whose processing time outlives the initiating HTTP request.
 
-The websocket flow uses short-lived tickets:
-
-1. The app asks the API for a websocket ticket.
-2. Socket.IO connects with the ticket in `auth`.
-3. The socket emits `user_loggedin` on connect.
-4. Auth-related connection errors trigger ticket refresh and reconnect.
-5. Logout removes listeners, disconnects, and clears the socket instance.
-
-Messages register a listener that appends new messages into provider state. AI analysis registers a separate listener for analysis results.
-
-## AI Video Analysis
-
-The workout analysis flow is asynchronous:
-
-1. The user opens the analysis sheet from a workout session.
-2. The UI validates exercise support, media permission, file size, duration, trim, and compression.
-3. The client creates a job id and requests a presigned upload URL.
-4. The video uploads to storage with progress updates and abort support.
-5. The app waits for websocket results while the backend processes the job.
-6. Sentry spans trace the full pipeline from upload through result receipt.
-7. Results render in the analysis sheet; backend failures are shown through `showErrorAlert`.
-
-The first supported analysis target is **squat**, keeping the UX focused while the pipeline is proven end to end.
-
-## Related Files
-
-- `infrastructure/api/api-config/api.interceptor.ts`
-- `infrastructure/api/api-config/helpers/header-injections.ts`
-- `infrastructure/api/api-config/helpers/error-handlers.ts`
-- `infrastructure/api/dpop/*`
-- `infrastructure/socket.ts`
-- `features/messages/messages.listeners.ts`
-- `features/workouts/session/hooks/use-video-analysis.hook.ts`
-- `features/workouts/session/components/AnalyzeExerciseSheet.tsx`
-- `features/workouts/session/video-analysis.listeners.ts`
+Related files: `infrastructure/api/`, `infrastructure/socket.ts`, `features/messages/`, and `screens/workout-session/hooks/use-video-analysis.hook.ts`.

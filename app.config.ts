@@ -23,7 +23,7 @@ const config = ({ config }: ConfigContext): ExpoConfig => {
     name: isProd ? APP_NAME_BASE : `${APP_NAME_BASE} (Dev)`,
     scheme: 'strongtogether',
     slug: 'strong-together',
-    version: '5.2.1',
+    version: '6.0.0',
     orientation: 'portrait',
     icon: './assets/icon.png',
     userInterfaceStyle: 'light',
@@ -55,8 +55,7 @@ const config = ({ config }: ConfigContext): ExpoConfig => {
       bundleIdentifier: iosBundle,
       infoPlist: {
         ITSAppUsesNonExemptEncryption: false,
-        NSPhotoLibraryUsageDescription:
-          'We use your photo library so you can select a profile picture for your account.',
+        NSPhotoLibraryUsageDescription: 'We use your photo library so you can select a profile picture for your account.',
       },
     },
     android: {

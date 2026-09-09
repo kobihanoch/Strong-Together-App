@@ -68,13 +68,33 @@ export const formatDate = (dateToFormat: string) => {
 
 // Format time into HRS hrs MINUTES mins SECONDS secs
 export const formatTime = (min: number = 0, sec: number = 0) => {
-  if (!min && !sec) return 'None';
+  if (!min && !sec) return { hours: 0, minutes: 0, seconds: 0 };
   else {
-    const hrs = Math.floor(min / 60);
-    const mins = min - hrs * 60;
-    const hrsText = hrs > 0 ? (hrs == 1 ? hrs + ' hr' : hrs + ' hrs') : null;
-    const minText = mins > 0 ? (mins == 1 ? mins + ' min' : mins + ' mins') : null;
-    const secText = hrs < 1 ? (sec > 0 ? (sec == 1 ? sec + ' sec' : sec + ' secs') : null) : null;
-    return [hrsText, minText, secText].filter(Boolean).join(' ');
+    const totalSecs = Math.floor(sec + min * 60);
+
+    const hours = Math.floor(totalSecs / 3600);
+    const minutes = Math.floor((totalSecs % 3600) / 60);
+    const seconds = totalSecs % 60;
+
+    return { hours, minutes, seconds };
   }
+};
+
+/**
+ * Returns the start of the week (Sunday) in 'YYYY-MM-DD' format.
+ * @param dateStr Optional date string in 'YYYY-MM-DD' format. Defaults to today.
+ * @returns Start of the week (Sunday) in 'YYYY-MM-DD' format.
+ */
+export const getStartOfWeek = (dateStr: string = new Date().toLocaleDateString('en-CA')): string => {
+  // Append midday time to prevent timezone-related date shifts
+  const d = new Date(`${dateStr}T12:00:00`);
+
+  // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
+  const dayOfWeek = d.getDay();
+
+  // Subtract days to shift back to Sunday
+  d.setDate(d.getDate() - dayOfWeek);
+
+  // Return formatted as YYYY-MM-DD
+  return d.toLocaleDateString('en-CA');
 };
