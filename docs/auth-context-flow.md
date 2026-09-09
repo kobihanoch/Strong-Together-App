@@ -34,7 +34,7 @@ sequenceDiagram
             Auth->>Auth: validated = true
             Auth->>Query: Enable fresh requests
         else offline/server unavailable/upgrade required
-            Auth->>Auth: Keep cached session; validated = false
+            Auth->>Auth: Keep cached session and pause network work
         else invalid session
             Auth->>Auth: Full logout
         end
