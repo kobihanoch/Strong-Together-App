@@ -14,18 +14,15 @@ TanStack Query is the only owner of server data. It handles fetching, request de
 ## Cache lifecycle
 
 ```mermaid
-flowchart LR
-    Disk[(AsyncStorage)] -->|restore| Gate[Query hydration gate]
-    Gate --> Cache[Query cache]
+flowchart TD
+    Disk[(AsyncStorage)] <-->|restore and persist| Cache[Query cache]
     Cache --> UI[Cached UI]
-    Auth[Server validation] --> Enabled[Enable queries]
-    Enabled --> Service[Typed service]
-    Service --> Cache
-    Mutation -->|success| Invalidations[Targeted invalidation]
-    Invalidations --> Service
-    Cache -->|persist| Disk
+    Auth[Validated session] --> Network[Enable requests]
+    Network --> Cache
+    Mutation[Successful mutation] --> Refresh[Invalidate affected keys]
+    Refresh --> Network
     Socket[Realtime message] --> Cache
-    Version[App version] -->|buster| Disk
+    Version[New app version] --> Reset[Discard incompatible disk cache]
 ```
 
 The persister uses AsyncStorage key `REACT_QUERY_OFFLINE_CACHE`. Default queries stay fresh for five minutes and use an infinite garbage-collection window because disk persistence, rather than eviction timing, owns cross-launch availability. The Expo app version is the cache buster: incompatible releases start with a clean query cache.

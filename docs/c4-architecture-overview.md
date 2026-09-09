@@ -3,17 +3,12 @@
 ## System context
 
 ```mermaid
-flowchart LR
-    Athlete([Athlete]) --> App[Strong Together<br/>React Native app]
-    App -->|HTTPS + DPoP| Backend[Strong Together API]
-    App <-->|Ticketed Socket.IO| Backend
-    App -->|OAuth| Identity[Apple / Google]
-    App -->|Presigned upload| Storage[(Object storage)]
-    Backend --> DB[(Database)]
-    Backend --> Push[Push notification service]
-    Push --> App
-    Backend --> Worker[Video analysis worker]
-    Worker -->|Realtime result| App
+flowchart TD
+    Athlete([Athlete]) --> App[Mobile app]
+    App <-->|HTTPS and ticketed realtime| Backend[Strong Together API]
+    App -->|OAuth| Identity[Apple and Google]
+    App -->|Presigned video upload| Storage[(Object storage)]
+    Backend --> Data[Database, push, and analysis worker]
 ```
 
 The mobile client never accesses the application database directly. The backend owns authorization, durable domain data, websocket tickets, upload authorization, and job orchestration. Object storage receives large video bytes directly after the API authorizes a short-lived upload.
@@ -21,30 +16,14 @@ The mobile client never accesses the application database directly. The backend 
 ## Containers inside the device
 
 ```mermaid
-flowchart TB
-    subgraph Device[Mobile device]
-        UI[React Native UI + navigation]
-        Auth[AuthProvider]
-        Query[TanStack Query]
-        Stores[Zustand stores]
-        HTTP[Axios + interceptors]
-        Socket[Socket.IO client]
-        Secure[(SecureStore)]
-        Async[(AsyncStorage)]
-    end
-    UI --> Auth
-    UI --> Query
-    UI --> Stores
-    Query --> HTTP
-    Auth --> HTTP
-    Auth --> Socket
-    Auth <--> Secure
-    HTTP --> Secure
-    Query <--> Async
-    Stores <--> Async
-    HTTP --> API[Backend API]
-    Socket <--> Realtime[Socket.IO server]
+flowchart LR
+    UI[UI and navigation] --> State[Auth, Query, Zustand]
+    State --> IO[Axios and Socket.IO]
+    IO --> Backend[Backend]
+    State <--> Storage[SecureStore and AsyncStorage]
 ```
+
+The storage mechanisms have separate responsibilities; see [Zustand and storage](zustand-and-storage.md).
 
 ## Component ownership
 
@@ -63,27 +42,16 @@ flowchart TB
 
 ```mermaid
 flowchart TD
-    Launch --> Boot[Polyfills, fonts, DPoP key, legacy cleanup]
-    Boot --> Hydrate[Restore Query cache]
-    Hydrate --> Check[Restore SecureStore identity]
-    Check -->|missing| Guest[Intro / Login / Register]
-    Check -->|present| Cached[Render authenticated tree from cache]
-    Guest -->|login or OAuth| Validated[Validated session]
-    Cached --> Refresh[Refresh and rotate credentials]
-    Refresh -->|valid| Validated
-    Refresh -->|offline/server/upgrade| Offline[Keep cached UI; gate network/socket]
-    Refresh -->|invalid| Guest
-    Offline -->|connectivity returns| Refresh
-    Validated --> Features[Enable feature queries + socket]
-    Features --> Home
-    Home --> Plan[Plan / Editor]
-    Home --> Session[Resumable workout]
-    Session --> Summary
-    Summary --> History
-    Home --> History
-    Home --> Schedule[Schedules / reminders]
-    Home --> Inbox
-    Home --> Profile
+    Launch --> Boot[Prepare app and restore caches]
+    Boot --> Session{Stored session?}
+    Session -->|no| Guest[Authentication screens]
+    Session -->|yes| Validate[Validate and rotate token]
+    Validate -->|valid| Online[Enable queries and socket]
+    Validate -->|temporary failure| Offline[Show cache; pause private network]
+    Validate -->|invalid| Guest
+    Offline -->|online again| Validate
+    Guest -->|login or OAuth| Online
+    Online --> App[Home and feature screens]
 ```
 
 Related detail: [frontend ownership](frontend-architecture.md), [startup](app-rendering-flow.md), [authentication](auth-context-flow.md), and [API/realtime](api-realtime-ai-flow.md).

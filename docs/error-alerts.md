@@ -4,16 +4,12 @@ Errors are classified by what the app can safely do next—not merely by status 
 
 ```mermaid
 flowchart TD
-    Failure --> Kind{Failure type}
-    Kind -->|Validation/domain| Inline[Screen validation or shared alert]
-    Kind -->|Device offline| Offline[Notify; preserve cached session/workout]
-    Kind -->|Server unreachable| Down[Notify; preserve cached session/workout]
-    Kind -->|401| Refresh[Rotate token and retry once]
-    Refresh -->|invalid credentials| Logout[Full local logout]
-    Refresh -->|temporary infrastructure| Preserve[Keep recoverable state]
-    Kind -->|426| Update[Open mandatory update modal]
-    Kind -->|Other API error| Alert[Shared server-message alert]
-    Kind -->|Video workflow| Media[Phase-specific error + Sentry capture]
+    Failure --> Kind{Can the app recover?}
+    Kind -->|offline or server unavailable| Preserve[Notify and preserve local work]
+    Kind -->|expired access token| Refresh[Rotate token and retry once]
+    Refresh -->|credentials invalid| Logout[Clear session locally]
+    Kind -->|app incompatible| Update[Require app update]
+    Kind -->|domain or media error| Explain[Show focused feedback and report when needed]
 ```
 
 ## Transport errors

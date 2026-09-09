@@ -4,21 +4,23 @@
 
 ```mermaid
 flowchart TD
-    Start[Process starts] --> Polyfill[Load global crypto/polyfills]
-    Polyfill --> Parallel[Load fonts<br/>Ensure DPoP key pair<br/>Run one-release legacy cleanup]
-    Parallel --> Root[Sentry boundary + gesture root + theme]
-    Root --> Persist[PersistQueryClientProvider]
-    Persist --> Gate{Query hydration complete?}
-    Gate -->|No| Blank[Render no application tree]
-    Gate -->|Yes| Auth[AuthProvider]
-    Auth --> Phase{authPhase}
-    Phase -->|checking| Blank
-    Phase -->|guest| AuthStack[Intro / Login / Register]
-    Phase -->|authed| Effects[AuthenticatedUserEffects]
-    Effects --> AppStack[Authenticated stack + notifications + bottom tabs]
-    AppStack --> SessionGate{Workout store hydrated?}
-    SessionGate -->|draft + split| Workout[Resume WorkoutSession]
-    SessionGate -->|no session| Home[Open Home]
+    Start[Process starts] --> Prepare[Polyfills, fonts, DPoP key, cleanup]
+    Prepare --> Providers[Sentry, gestures, and theme]
+    Providers --> Restore[Restore Query cache]
+    Restore --> Auth[Restore and validate session]
+```
+
+After boot, navigation uses two small gates:
+
+```mermaid
+flowchart TD
+    Auth{Auth phase}
+    Auth -->|checking| Wait[Wait]
+    Auth -->|guest| Guest[Intro, Login, Register]
+    Auth -->|authenticated| Effects[Start authenticated effects]
+    Effects --> Workout{Saved workout?}
+    Workout -->|yes| Resume[Resume session]
+    Workout -->|no| Home[Open Home]
 ```
 
 The order is intentional:

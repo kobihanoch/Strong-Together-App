@@ -5,19 +5,14 @@
 Every feature service uses one Axios instance with a 12-second timeout and shared interceptors.
 
 ```mermaid
-flowchart LR
-    Service --> Request[Request interceptor]
-    Request --> Trace[x-request-id + Sentry span]
-    Trace --> Version[x-app-version]
-    Version --> Security[DPoP proof or key binding]
-    Security --> API[Backend]
-    API --> Status{Status}
-    Status -->|2xx| Data[Typed response]
-    Status -->|401| Refresh[Single-flight token rotation]
-    Refresh --> Retry[Retry original request once]
-    Status -->|426| Upgrade[Required-update modal]
-    Status -->|offline/no response| Network[Classified error + notification]
-    Status -->|other| Error[Shared error alert]
+flowchart TD
+    Service[Typed service] --> Prepare[Add request ID, version, trace, and DPoP]
+    Prepare --> API[Backend]
+    API --> Result{Result}
+    Result -->|success| Data[Typed data]
+    Result -->|401| Refresh[Rotate token and retry once]
+    Result -->|426| Upgrade[Require app update]
+    Result -->|network or other| Error[Classify and notify]
 ```
 
 The request ID survives retries, connecting client diagnostics to backend logs. Sentry HTTP spans finish on success and error. Guest requests attach the DPoP public-key thumbprint; authenticated requests attach signed proofs. The app version lets the backend stop clients whose contracts are no longer compatible.
