@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useCallback, useMemo } from 'react';
 import { useAuth } from '../../auth/providers/AuthProvider';
+import { messagesQueryKeys } from '../query-keys';
 import { deleteMessage, getUserMessages, updateMsgReadStatus } from '../services/messages.service';
 import { UserMessage, UserMessages } from '../types/messages.types';
 import { filterMessagesByUnread } from '../utils/messages-context-utils';
@@ -19,7 +20,7 @@ type MessagesUpdater = UserMessages | undefined | ((previous: UserMessages | und
 export const useMessages = () => {
   const { isValidatedWithServer, userIdCache: userId } = useAuth();
   const queryClient = useQueryClient();
-  const queryKey = ['messages', userId];
+  const queryKey = messagesQueryKeys.byUser(userId);
 
   const query = useQuery({
     queryKey,

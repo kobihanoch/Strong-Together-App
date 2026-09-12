@@ -1,5 +1,11 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '../../../auth/providers/AuthProvider';
+import { dashboardQueryKeys } from '../../../dashboard/query-keys';
+import {
+  exerciseHistoryQueryKeys,
+  prHistoryQueryKeys,
+  workoutHistoryQueryKeys,
+} from '../../history/query-keys';
 import { saveWorkoutSession } from '../services/workout-session.service';
 import { clearWorkoutSessionStorage } from '../utils/workout-session-cache.utils';
 import { cancelWorkoutSessionReminder, scheduleWorkoutSessionReminder } from '../utils/workout-session-reminder.utils';
@@ -60,10 +66,10 @@ export const useWorkoutSession = () => {
       await clearWorkoutSessionStorage().catch((error) => console.log('[Workout Session]: Local cleanup failed.', error));
 
       await Promise.allSettled([
-        queryClient.invalidateQueries({ queryKey: ['workout-history', userId] }),
-        queryClient.invalidateQueries({ queryKey: ['exercise-history', userId] }),
-        queryClient.invalidateQueries({ queryKey: ['pr-history', userId] }),
-        queryClient.invalidateQueries({ queryKey: ['home-dashboard', userId] }),
+        queryClient.invalidateQueries({ queryKey: workoutHistoryQueryKeys.byUser(userId) }),
+        queryClient.invalidateQueries({ queryKey: exerciseHistoryQueryKeys.byUser(userId) }),
+        queryClient.invalidateQueries({ queryKey: prHistoryQueryKeys.byUser(userId) }),
+        queryClient.invalidateQueries({ queryKey: dashboardQueryKeys.byUser(userId) }),
       ]);
     },
   });

@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { useCallback } from 'react';
 import { useAuth } from '../../../auth/providers/AuthProvider';
+import { prHistoryQueryKeys } from '../query-keys';
 import { ExerciseInPlan } from '../../plan/types/workout-plan.types';
 import { getUserPrHistory } from '../services/pr-history.service';
 import { PrHistoryMap } from '../types/pr-history.types';
@@ -14,7 +15,7 @@ import { checkHasAnyPr } from '../utils/pr-history.utils';
  */
 export const usePrHistory = () => {
   const { isValidatedWithServer, userIdCache: userId } = useAuth();
-  const queryKey = ['pr-history', userId];
+  const queryKey = prHistoryQueryKeys.byUser(userId);
 
   // Fetching with SWR
   const query = useQuery({

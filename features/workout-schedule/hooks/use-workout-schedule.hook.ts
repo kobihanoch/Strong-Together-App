@@ -1,6 +1,8 @@
 import { ReplaceWorkoutSchedulesBody } from '@strong-together/shared';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '../../auth/providers/AuthProvider';
+import { dashboardQueryKeys } from '../../dashboard/query-keys';
+import { workoutScheduleQueryKeys } from '../query-keys';
 import { getUserWorkoutSchedule, replaceUserWorkoutSchedules } from '../services/workout-schedule.service';
 import { WorkoutSchedules } from '../types/workout-schedule.types';
 import { getNextScheduledWorkout } from '../utils/workout-schedule.utils';
@@ -15,7 +17,7 @@ type ModifiedWorkoutSchedules = ReplaceWorkoutSchedulesBody['schedules'];
  */
 export const useWorkoutSchedule = () => {
   const { isValidatedWithServer, userIdCache: userId } = useAuth();
-  const queryKey = ['workout-schedules', userId];
+  const queryKey = workoutScheduleQueryKeys.byUser(userId);
   const queryClient = useQueryClient();
 
   const query = useQuery({
@@ -45,7 +47,7 @@ export const useWorkoutSchedule = () => {
     onSuccess: async () => {
       await Promise.all([
         queryClient.invalidateQueries({ queryKey }),
-        queryClient.invalidateQueries({ queryKey: ['home-dashboard'] }),
+        queryClient.invalidateQueries({ queryKey: dashboardQueryKeys.all }),
       ]);
     },
   });

@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { useCallback } from 'react';
 import { useAuth } from '../../../auth/providers/AuthProvider';
+import { exerciseHistoryQueryKeys } from '../query-keys';
 import { ExerciseInPlan } from '../../plan/types/workout-plan.types';
 import { getUserExerciseHistory } from '../services/exercise-history.service';
 import { ExerciseHistoryMap } from '../types/exercise-history.types';
@@ -18,7 +19,7 @@ import { checkHasVisibleHistory, getLastLogPerformance, getLastWorkoutData as fi
  */
 export const useExerciseHistory = () => {
   const { isValidatedWithServer, userIdCache: userId } = useAuth();
-  const queryKey = ['exercise-history', userId];
+  const queryKey = exerciseHistoryQueryKeys.byUser(userId);
 
   // Fetching with SWR
   const query = useQuery({

@@ -1,6 +1,7 @@
 import type { ListCrewParticipantsParams } from '@strong-together/shared';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { useAuth } from '../../../auth/providers/AuthProvider';
+import { crewQueryKeys } from '../query-keys';
 import { getCrewParticipants } from '../services/crews.service';
 import { CrewParticipants } from '../types/crews.types';
 
@@ -19,7 +20,7 @@ const DEFAULT_PAGE_SIZE = 20;
  */
 export const useCrewParticipants = (crewId: ListCrewParticipantsParams['crewId'] | undefined, limit = DEFAULT_PAGE_SIZE) => {
   const { isValidatedWithServer, userIdCache: userId } = useAuth();
-  const queryKey = ['social', 'crews', crewId, 'participants', userId, limit];
+  const queryKey = crewQueryKeys.participantsByUser(crewId, userId, limit);
 
   const query = useInfiniteQuery({
     queryKey,

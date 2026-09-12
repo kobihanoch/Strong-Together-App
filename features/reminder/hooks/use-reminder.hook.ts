@@ -2,6 +2,7 @@ import { UpsertReminderSettingsBody } from '@strong-together/shared';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import * as Notifications from 'expo-notifications';
 import { useAuth } from '../../auth/providers/AuthProvider';
+import { reminderQueryKeys } from '../query-keys';
 import { getUserReminder, updateUserReminder } from '../services/reminder.service';
 
 /**
@@ -14,7 +15,7 @@ import { getUserReminder, updateUserReminder } from '../services/reminder.servic
 export const useReminder = (hasNotificationsPermission: boolean) => {
   const { userIdCache: userId, isValidatedWithServer } = useAuth();
   const queryClient = useQueryClient();
-  const queryKey = ['reminder', userId];
+  const queryKey = reminderQueryKeys.byUser(userId);
 
   const query = useQuery({
     queryKey,

@@ -11,6 +11,7 @@ import type {
 } from '@strong-together/shared';
 import { useInfiniteQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '../../../auth/providers/AuthProvider';
+import { postQueryKeys } from '../query-keys';
 import {
   addPostComment,
   deletePostComment,
@@ -38,7 +39,7 @@ const DEFAULT_PAGE_SIZE = 20;
 export const useCrewPosts = (crewId: ListCrewPostsParams['crewId'] | undefined, limit = DEFAULT_PAGE_SIZE) => {
   const { isValidatedWithServer, userIdCache: userId } = useAuth();
   const queryClient = useQueryClient();
-  const queryKey = ['social', 'posts', 'crew', crewId, userId, limit];
+  const queryKey = postQueryKeys.crewByUser(crewId, userId, limit);
 
   const query = useInfiniteQuery({
     queryKey,
@@ -54,9 +55,9 @@ export const useCrewPosts = (crewId: ListCrewPostsParams['crewId'] | undefined, 
   });
 
   const invalidateComments = (postId: AddCommentParams['postId']) =>
-    queryClient.invalidateQueries({ queryKey: ['social', 'posts', postId, 'comments'] });
+    queryClient.invalidateQueries({ queryKey: postQueryKeys.comments(postId) });
   const invalidateReactions = (postId: ReactToPostParams['postId']) =>
-    queryClient.invalidateQueries({ queryKey: ['social', 'posts', postId, 'reactions'] });
+    queryClient.invalidateQueries({ queryKey: postQueryKeys.reactions(postId) });
 
   const addCommentMutation = useMutation({
     mutationFn: ([postId, body]: [AddCommentParams['postId'], AddCommentBody]) => {

@@ -1,6 +1,7 @@
 import { UpdateCurrentUserBody } from '@strong-together/shared';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '../../auth/providers/AuthProvider';
+import { userQueryKeys } from '../query-keys';
 import { fetchSelfUserData, updateSelfUser } from '../services/user.service';
 import { UploadableFile, uploadProfilePictureToStorageAndGetPath } from '../services/media.service';
 import { AppUser } from '../types/user.types';
@@ -19,7 +20,7 @@ type ModifiedUser = UpdateCurrentUserBody;
 export const useUser = () => {
   const { userIdCache: userId, isValidatedWithServer } = useAuth();
   const queryClient = useQueryClient();
-  const queryKey = ['user', userId];
+  const queryKey = userQueryKeys.byUser(userId);
 
   const query = useQuery({
     queryKey,

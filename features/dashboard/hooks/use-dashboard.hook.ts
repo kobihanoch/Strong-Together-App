@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { useAuth } from '../../auth/providers/AuthProvider';
+import { dashboardQueryKeys } from '../query-keys';
 import { getUserDashboardStats } from '../services/dashboard.service';
 import { HomeDashboardStats } from '../types/dashboard.types';
 
@@ -12,7 +13,7 @@ const useDashboard = () => {
   const { isValidatedWithServer, userIdCache: userId } = useAuth();
 
   const query = useQuery({
-    queryKey: ['home-dashboard', userId],
+    queryKey: dashboardQueryKeys.byUser(userId),
     queryFn: async (): Promise<HomeDashboardStats> => await getUserDashboardStats(),
     enabled: Boolean(isValidatedWithServer && userId),
     staleTime: 1000 * 60 * 5,

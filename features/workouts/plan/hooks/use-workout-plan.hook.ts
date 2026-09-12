@@ -4,6 +4,7 @@ import { getUserWorkout } from '../../plan/services/workout-plan.service';
 import { addWorkout } from '../../plan/services/workout-plan.service';
 import { WorkoutPlan } from '../types/workout-plan.types';
 import { useAuth } from '../../../auth/providers/AuthProvider';
+import { workoutPlanQueryKeys } from '../query-keys';
 
 type ModifiedWorkoutPlan = ReplaceWorkoutPlanBody['workoutData'];
 
@@ -18,7 +19,7 @@ type ModifiedWorkoutPlan = ReplaceWorkoutPlanBody['workoutData'];
 export const useWorkoutPlan = () => {
   const { isValidatedWithServer, userIdCache: userId } = useAuth();
   const queryClient = useQueryClient();
-  const queryKey = ['workout-plan', userId];
+  const queryKey = workoutPlanQueryKeys.byUser(userId);
 
   // Fetching with SWR
   const query = useQuery({

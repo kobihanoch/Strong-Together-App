@@ -3,6 +3,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useCallback } from 'react';
 import { getStartOfWeek } from '../../../../shared/utils/shared-utils';
 import { useAuth } from '../../../auth/providers/AuthProvider';
+import { cardioQueryKeys } from '../query-keys';
 import { deleteUserCardio, getUserCardio, logUserCardio, updateUserCardio } from '../services/cardio.service';
 import { CardioEntryInput, CardioMaps, EditableCardioRecord } from '../types/cardio.types';
 import { checkIfDoneCardioInSelectedWeek, getCardioForToday } from '../utils/cardio.utils';
@@ -20,7 +21,7 @@ type CardioInput = CreateAerobicEntryBody['record'];
 export const useCardio = () => {
   const { isValidatedWithServer, userIdCache: userId } = useAuth();
   const queryClient = useQueryClient();
-  const queryKey = ['cardio-maps', userId];
+  const queryKey = cardioQueryKeys.byUser(userId);
 
   // Fetching with SWR
   const query = useQuery({

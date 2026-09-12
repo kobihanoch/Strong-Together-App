@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { useAuth } from '../../../auth/providers/AuthProvider';
+import { exercisesQueryKeys } from '../query-keys';
 import { getExerciseCollection } from '../services/exercises.service';
 import { ExercisesByMuscle } from '../types/exercises.types';
 
@@ -14,7 +15,7 @@ const useExercises = () => {
   const { isValidatedWithServer, userIdCache: userId } = useAuth();
 
   const query = useQuery({
-    queryKey: ['exercises', userId],
+    queryKey: exercisesQueryKeys.byUser(userId),
     queryFn: async (): Promise<ExercisesByMuscle> => await getExerciseCollection(),
     enabled: Boolean(isValidatedWithServer && userId),
     staleTime: 1000 * 60 * 5,

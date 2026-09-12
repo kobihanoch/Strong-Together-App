@@ -1,5 +1,6 @@
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { useAuth } from '../../../auth/providers/AuthProvider';
+import { crewQueryKeys } from '../query-keys';
 import { getDiscoverableCrews } from '../services/crews.service';
 import { DiscoverableCrews } from './../types/crews.types';
 
@@ -17,7 +18,7 @@ const DEFAULT_PAGE_SIZE = 20;
  */
 export const useDiscoverableCrews = (limit = DEFAULT_PAGE_SIZE) => {
   const { isValidatedWithServer, userIdCache: userId } = useAuth();
-  const queryKey = ['social', 'crews', 'discoverable', userId, limit];
+  const queryKey = crewQueryKeys.discoverableByUser(userId, limit);
 
   const query = useInfiniteQuery({
     queryKey,
